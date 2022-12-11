@@ -1,6 +1,6 @@
-```{.python .input  n=2}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 # Attention Scoring Functions
@@ -45,7 +45,7 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i
 
 As it turns out, all popular attention mechanisms use the softmax, hence we will limit ourselves to that in the remainder of this chapter.
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab mxnet
 import math
 from d2l import mxnet as d2l
@@ -54,7 +54,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import math
@@ -62,10 +62,19 @@ import torch
 from torch import nn
 ```
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+import math
 ```
 
 ## Convenience Functions
@@ -88,10 +97,9 @@ Since we don't want blanks in our attention model we simply need to limit the su
 
 Let's implement it. Actually, the implementation cheats ever so slightly by setting the values to zero $\mathbf{v}_i = 0$ for $i > l$. Moreover, it sets the attention weights to a large negative number, such as $-10^{6}$ in order to make their contribution to gradients and values vanish in practice. This is done since linear algebra kernels and operators are heavily optimized for GPUs and it is faster to be slightly wasteful in computation rather than to have code with conditional (if then else) statements.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab mxnet
-#@save
-def masked_softmax(X, valid_lens):
+def masked_softmax(X, valid_lens):  #@save
     """Perform softmax operation by masking elements on the last axis."""
     # X: 3D tensor, valid_lens: 1D or 2D tensor
     if valid_lens is None:
@@ -109,10 +117,9 @@ def masked_softmax(X, valid_lens):
         return npx.softmax(X).reshape(shape)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab pytorch
-#@save
-def masked_softmax(X, valid_lens):
+def masked_softmax(X, valid_lens):  #@save
     """Perform softmax operation by masking elements on the last axis."""
     # X: 3D tensor, valid_lens: 1D or 2D tensor 
     def _sequence_mask(X, valid_len, value=0):
@@ -136,10 +143,9 @@ def masked_softmax(X, valid_lens):
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab tensorflow
-#@save
-def masked_softmax(X, valid_lens):
+def masked_softmax(X, valid_lens):  #@save
     """Perform softmax operation by masking elements on the last axis."""
     # X: 3D tensor, valid_lens: 1D or 2D tensor
     def _sequence_mask(X, valid_len, value=0):
@@ -168,43 +174,79 @@ def masked_softmax(X, valid_lens):
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 ```
 
+```{.python .input}
+%%tab jax
+def masked_softmax(X, valid_lens):  #@save
+    """Perform softmax operation by masking elements on the last axis."""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.shape[1]
+        mask = jnp.arange((maxlen),
+                          dtype=jnp.float32)[None, :] < valid_len[:, None]
+        return jnp.where(mask, X, value)
+
+    if valid_lens is None:
+        return nn.softmax(X, axis=-1)
+    else:
+        shape = X.shape
+        if valid_lens.ndim == 1:
+            valid_lens = jnp.repeat(valid_lens, shape[1])
+        else:
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
+        return nn.softmax(X.reshape(shape), axis=-1)
+```
+
 To [**illustrate how this function works**],
 consider a minibatch of two examples of size $2 \times 4$,
 where their valid lengths are $2$ and $3$, respectively. 
 As a result of the masked softmax operation,
 values beyond the valid lengths for each pair of vectors are all masked as zero.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab mxnet
 masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab pytorch
 masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab tensorflow
 masked_softmax(tf.random.uniform(shape=(2, 2, 4)), tf.constant([2, 3]))
 ```
 
+```{.python .input}
+%%tab jax
+masked_softmax(jax.random.uniform(d2l.get_key(), (2, 2, 4)), jnp.array([2, 3]))
+```
+
 If we need more fine-grained control to specify the valid length for each of the two vectors per example, we simply use a two-dimensional tensor of valid lengths. This yields:
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab mxnet
 masked_softmax(np.random.uniform(size=(2, 2, 4)),
                d2l.tensor([[1, 3], [2, 4]]))
 ```
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab pytorch
 masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab tensorflow
 masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
+```
+
+```{.python .input}
+%%tab jax
+masked_softmax(jax.random.uniform(d2l.get_key(), (2, 2, 4)),
+               jnp.array([[1, 3], [2, 4]]))
 ```
 
 ### Batch Matrix Multiplication
@@ -223,25 +265,32 @@ $$\mathrm{BMM}(\mathbf{Q}, \mathbf{K}) = [\mathbf{Q}_1 \mathbf{K}_1, \mathbf{Q}_
 
 Let's see this in action in a deep learning framework.
 
-```{.python .input  n=28}
+```{.python .input}
 %%tab mxnet
 Q = d2l.ones((2, 3, 4))
 K = d2l.ones((2, 4, 6))
 d2l.check_shape(npx.batch_dot(Q, K), (2, 3, 6))
 ```
 
-```{.python .input  n=31}
+```{.python .input}
 %%tab pytorch
 Q = d2l.ones((2, 3, 4))
 K = d2l.ones((2, 4, 6))
 d2l.check_shape(torch.bmm(Q, K), (2, 3, 6))
 ```
 
-```{.python .input  n=32}
+```{.python .input}
 %%tab tensorflow
 Q = d2l.ones((2, 3, 4))
 K = d2l.ones((2, 4, 6))
 d2l.check_shape(tf.matmul(Q, K).numpy(), (2, 3, 6))
+```
+
+```{.python .input}
+%%tab jax
+Q = d2l.ones((2, 3, 4))
+K = d2l.ones((2, 4, 6))
+d2l.check_shape(jax.lax.batch_matmul(Q, K), (2, 3, 6))
 ```
 
 ## [**Scaled Dot-Product Attention**]
@@ -266,10 +315,9 @@ $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \math
 Note that when applying this to a minibatch, we need the batch matrix multiplication introduced in :eqref:`eq_batch-matrix-mul`. In the following implementation of the scaled dot product attention,
 we use dropout for model regularization.
 
-```{.python .input  n=15}
+```{.python .input}
 %%tab mxnet
-#@save
-class DotProductAttention(nn.Block):
+class DotProductAttention(nn.Block):  #@save
     """Scaled dot product attention."""
     def __init__(self, dropout, num_heads=None):
         super().__init__()
@@ -300,10 +348,9 @@ class DotProductAttention(nn.Block):
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 ```
 
-```{.python .input  n=16}
+```{.python .input}
 %%tab pytorch
-#@save
-class DotProductAttention(nn.Module):
+class DotProductAttention(nn.Module):  #@save
     """Scaled dot product attention."""
     def __init__(self, dropout, num_heads=None):
         super().__init__()
@@ -334,10 +381,9 @@ class DotProductAttention(nn.Module):
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
-```{.python .input  n=17}
+```{.python .input}
 %%tab tensorflow
-#@save
-class DotProductAttention(tf.keras.layers.Layer):
+class DotProductAttention(tf.keras.layers.Layer):  #@save
     """Scaled dot product attention."""
     def __init__(self, dropout, num_heads=None):
         super().__init__()
@@ -368,10 +414,43 @@ class DotProductAttention(tf.keras.layers.Layer):
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 ```
 
+```{.python .input}
+%%tab jax
+class DotProductAttention(nn.Module):  #@save
+    """Scaled dot product attention."""
+    dropout: float
+    num_heads: None = None  # To be covered later
+
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+    @nn.compact
+    def __call__(self, queries, keys, values, valid_lens=None,
+                 window_mask=None, training=False):
+        d = queries.shape[-1]
+        # Swap the last two dimensions of keys with keys.swapaxes(1, 2)
+        scores = queries@(keys.swapaxes(1, 2)) / math.sqrt(d)
+        if window_mask is not None:  # To be covered later
+            num_windows = window_mask.shape[0]
+            n, num_queries, num_kv_pairs = scores.shape
+            # Shape of window_mask: (num_windows, no. of queries,
+            # no. of key-value pairs)
+            scores = d2l.reshape(
+                scores, (n//(num_windows*self.num_heads), num_windows,
+                         self.num_heads, num_queries, num_kv_pairs
+                        )) + d2l.expand_dims(
+                d2l.expand_dims(window_mask, 1), 0)
+            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
+        attention_weights = masked_softmax(scores, valid_lens)
+        dropout_layer = nn.Dropout(self.dropout, deterministic=not training)
+        return dropout_layer(attention_weights)@values, attention_weights
+```
+
 To [**illustrate how the `DotProductAttention` class works**],
 we use the same keys, values, and valid lengths from the earlier toy example for additive attention. For the purpose of our example we assume that we have a minibatch size of $2$, a total of $10$ keys and values, and that the dimensionality of the values is $4$. Lastly, we assume that the valid length per observation is $2$ and $6$ respectively. Given that, we expect the output to be a $2 \times 1 \times 4$ tensor, i.e., one row per example of the minibatch.
 
-```{.python .input  n=18}
+```{.python .input}
 %%tab mxnet
 queries = d2l.normal(0, 1, (2, 1, 2))
 keys = d2l.normal(0, 1, (2, 10, 2))
@@ -383,7 +462,7 @@ attention.initialize()
 d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 %%tab pytorch
 queries = d2l.normal(0, 1, (2, 1, 2))
 keys = d2l.normal(0, 1, (2, 10, 2))
@@ -395,7 +474,7 @@ attention.eval()
 d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
-```{.python .input  n=20}
+```{.python .input}
 %%tab tensorflow
 queries = tf.random.normal(shape=(2, 1, 2))
 keys = tf.random.normal(shape=(2, 10, 2))
@@ -407,11 +486,30 @@ d2l.check_shape(attention(queries, keys, values, valid_lens, training=False),
                 (2, 1, 4))
 ```
 
+```{.python .input}
+%%tab jax
+queries = jax.random.normal(d2l.get_key(), (2, 1, 2))
+keys = jax.random.normal(d2l.get_key(), (2, 10, 2))
+values = jax.random.normal(d2l.get_key(), (2, 10, 4))
+valid_lens = d2l.tensor([2, 6])
+
+attention = DotProductAttention(dropout=0.5)
+(output, attention_weights), params = attention.init_with_output(
+    d2l.get_key(), queries, keys, values, valid_lens)
+print(output)
+```
+
 Let's check whether the attention weights actually vanish for anything beyond the second and sixth column respectively (due to setting valid length to $2$ and $6$).
 
-```{.python .input  n=21}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
+                  xlabel='Keys', ylabel='Queries')
+```
+
+```{.python .input}
+%%tab jax
+d2l.show_heatmaps(d2l.reshape(attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```
 
@@ -435,10 +533,9 @@ and fed into an MLP with a single hidden layer.
 Using $\tanh$ as the activation function and disabling bias terms, 
 we implement additive attention as follows:
 
-```{.python .input  n=21}
+```{.python .input}
 %%tab mxnet
-#@save
-class AdditiveAttention(nn.Block):
+class AdditiveAttention(nn.Block):  #@save
     """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
@@ -468,10 +565,9 @@ class AdditiveAttention(nn.Block):
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 ```
 
-```{.python .input  n=22}
+```{.python .input}
 %%tab pytorch
-#@save
-class AdditiveAttention(nn.Module):
+class AdditiveAttention(nn.Module):  #@save
     """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
@@ -497,10 +593,9 @@ class AdditiveAttention(nn.Module):
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
-```{.python .input  n=23}
+```{.python .input}
 %%tab tensorflow
-#@save
-class AdditiveAttention(tf.keras.layers.Layer):
+class AdditiveAttention(tf.keras.layers.Layer):  #@save
     """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super().__init__(**kwargs)
@@ -528,10 +623,40 @@ class AdditiveAttention(tf.keras.layers.Layer):
             self.attention_weights, **kwargs), values)
 ```
 
+```{.python .input}
+%%tab jax
+class AdditiveAttention(nn.Module):  #@save
+    num_hiddens: int
+    dropout: float
+
+    def setup(self):
+        self.W_k = nn.Dense(self.num_hiddens, use_bias=False)
+        self.W_q = nn.Dense(self.num_hiddens, use_bias=False)
+        self.w_v = nn.Dense(1, use_bias=False)
+
+    @nn.compact
+    def __call__(self, queries, keys, values, valid_lens, training=False):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
+        features = jnp.expand_dims(queries, axis=2) + jnp.expand_dims(keys, axis=1)
+        features = nn.tanh(features)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
+        scores = self.w_v(features).squeeze(-1)
+        attention_weights = masked_softmax(scores, valid_lens)
+        dropout_layer = nn.Dropout(self.dropout, deterministic=not training)
+        # Shape of values: (batch_size, no. of key-value pairs, value
+        # dimension)
+        return dropout_layer(attention_weights)@values, attention_weights
+```
+
 Let's [**see how `AdditiveAttention` works**]. In our toy example we pick queries, keys and values of size 
 $(2, 1, 20)$, $(2, 10, 2)$ and $(2, 10, 4)$, respectively. This is identical to our choice for `DotProductAttention`, except that now the queries are $20$-dimensional. Likewise, we pick $(2, 6)$ as the valid lengths for the sequences in the minibatch.
 
-```{.python .input  n=24}
+```{.python .input}
 %%tab mxnet
 queries = d2l.normal(0, 1, (2, 1, 20))
 
@@ -540,7 +665,7 @@ attention.initialize()
 d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
-```{.python .input  n=25}
+```{.python .input}
 %%tab pytorch
 queries = d2l.normal(0, 1, (2, 1, 20))
 
@@ -549,7 +674,7 @@ attention.eval()
 d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
-```{.python .input  n=26}
+```{.python .input}
 %%tab tensorflow
 queries = tf.random.normal(shape=(2, 1, 20))
 
@@ -559,11 +684,26 @@ d2l.check_shape(attention(queries, keys, values, valid_lens, training=False),
                 (2, 1, 4))
 ```
 
+```{.python .input}
+%%tab jax
+queries = jax.random.normal(d2l.get_key(), (2, 1, 20))
+attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
+(output, attention_weights), params = attention.init_with_output(
+    d2l.get_key(), queries, keys, values, valid_lens)
+print(output)
+```
+
 When reviewing the attention function we see a behavior that is qualitatively quite similar to that from `DotProductAttention`. That is, only terms within the chosen valid length $(2, 6)$ are nonzero.
 
-```{.python .input  n=27}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
+                  xlabel='Keys', ylabel='Queries')
+```
+
+```{.python .input}
+%%tab jax
+d2l.show_heatmaps(d2l.reshape(attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```
 

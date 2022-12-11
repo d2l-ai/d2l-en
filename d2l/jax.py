@@ -1169,6 +1169,90 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                 ax.set_title(titles[j])
     fig.colorbar(pcm, ax=axes, shrink=0.6);
 
+def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis.
+
+    Defined in :numref:`sec_attention-scoring-functions`"""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.shape[1]
+        mask = jnp.arange((maxlen),
+                          dtype=jnp.float32)[None, :] < valid_len[:, None]
+        return jnp.where(mask, X, value)
+
+    if valid_lens is None:
+        return nn.softmax(X, axis=-1)
+    else:
+        shape = X.shape
+        if valid_lens.ndim == 1:
+            valid_lens = jnp.repeat(valid_lens, shape[1])
+        else:
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
+        return nn.softmax(X.reshape(shape), axis=-1)
+
+class DotProductAttention(nn.Module):
+    """Scaled dot product attention.
+
+    Defined in :numref:`subsec_batch_dot`"""
+    dropout: float
+    num_heads: None = None  # To be covered later
+
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+    @nn.compact
+    def __call__(self, queries, keys, values, valid_lens=None,
+                 window_mask=None, training=False):
+        d = queries.shape[-1]
+        # Swap the last two dimensions of keys with keys.swapaxes(1, 2)
+        scores = queries@(keys.swapaxes(1, 2)) / math.sqrt(d)
+        if window_mask is not None:  # To be covered later
+            num_windows = window_mask.shape[0]
+            n, num_queries, num_kv_pairs = scores.shape
+            # Shape of window_mask: (num_windows, no. of queries,
+            # no. of key-value pairs)
+            scores = d2l.reshape(
+                scores, (n//(num_windows*self.num_heads), num_windows,
+                         self.num_heads, num_queries, num_kv_pairs
+                        )) + d2l.expand_dims(
+                d2l.expand_dims(window_mask, 1), 0)
+            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
+        attention_weights = masked_softmax(scores, valid_lens)
+        dropout_layer = nn.Dropout(self.dropout, deterministic=not training)
+        return dropout_layer(attention_weights)@values, attention_weights
+
+class AdditiveAttention(nn.Module):
+    """Defined in :numref:`subsec_batch_dot`"""
+    num_hiddens: int
+    dropout: float
+
+    def setup(self):
+        self.W_k = nn.Dense(self.num_hiddens, use_bias=False)
+        self.W_q = nn.Dense(self.num_hiddens, use_bias=False)
+        self.w_v = nn.Dense(1, use_bias=False)
+
+    @nn.compact
+    def __call__(self, queries, keys, values, valid_lens, training=False):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
+        features = jnp.expand_dims(queries, axis=2) + jnp.expand_dims(keys, axis=1)
+        features = nn.tanh(features)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
+        scores = self.w_v(features).squeeze(-1)
+        attention_weights = masked_softmax(scores, valid_lens)
+        dropout_layer = nn.Dropout(self.dropout, deterministic=not training)
+        # Shape of values: (batch_size, no. of key-value pairs, value
+        # dimension)
+        return dropout_layer(attention_weights)@values, attention_weights
+
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
 
