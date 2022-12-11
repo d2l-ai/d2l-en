@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['pytorch'])
+tab.interact_select(['pytorch', 'jax'])
 ```
 
 # Transformers for Vision
@@ -75,10 +75,19 @@ via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
 its representation from the Transformer encoder output
 will be further transformed into the output label.
 
-```{.python .input  n=1}
+```{.python .input}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
 ```
 
 ## Patch Embedding
@@ -90,7 +99,8 @@ and linearly projecting these flattened patches
 can be simplified as a single convolution operation, 
 where both the kernel size and the stride size are set to the patch size.
 
-```{.python .input  n=2}
+```{.python .input}
+%%tab pytorch
 class PatchEmbedding(nn.Module):
     def __init__(self, img_size=96, patch_size=16, num_hiddens=512):
         super().__init__()
@@ -109,16 +119,50 @@ class PatchEmbedding(nn.Module):
         return self.conv(X).flatten(2).transpose(1, 2)
 ```
 
+```{.python .input}
+%%tab jax
+class PatchEmbedding(nn.Module):
+    img_size: int = 96
+    patch_size: int = 16
+    num_hiddens: int = 512
+
+    def setup(self):
+        def _make_tuple(x):
+            if not isinstance(x, (list, tuple)):
+                return (x, x)
+            return x
+        img_size, patch_size = _make_tuple(self.img_size), _make_tuple(self.patch_size)
+        self.num_patches = (img_size[0] // patch_size[0]) * (
+            img_size[1] // patch_size[1])
+        self.conv = nn.Conv(self.num_hiddens, kernel_size=patch_size,
+                            strides=patch_size, padding='SAME')
+
+    def __call__(self, X):
+        # Output shape: (batch size, no. of patches, no. of channels)
+        X = self.conv(X)
+        return X.reshape((X.shape[0], -1, X.shape[3]))
+```
+
 In the following example, taking images with height and width of `img_size` as inputs,
 the patch embedding outputs `(img_size//patch_size)**2` patches 
 that are linearly projected to vectors of length `num_hiddens`.
 
-```{.python .input  n=9}
+```{.python .input}
+%%tab pytorch
 img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
 patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
-X = d2l.randn(batch_size, 3, img_size, img_size)
+X = d2l.zeros(batch_size, 3, img_size, img_size)
 d2l.check_shape(patch_emb(X),
                 (batch_size, (img_size//patch_size)**2, num_hiddens))
+```
+
+```{.python .input}
+%%tab jax
+img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
+patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
+X = d2l.zeros((batch_size, img_size, img_size, 3))
+output, _ = patch_emb.init_with_output(d2l.get_key(), X)
+d2l.check_shape(output, (batch_size, (img_size//patch_size)**2, num_hiddens))
 ```
 
 ## Vision Transformer Encoder
@@ -132,6 +176,7 @@ which can be considered as a smoother version of the ReLU :cite:`hendrycks2016ga
 Second, dropout is applied to the output of each fully connected layer in the MLP for regularization.
 
 ```{.python .input}
+%%tab pytorch
 class ViTMLP(nn.Module):
     def __init__(self, mlp_num_hiddens, mlp_num_outputs, dropout=0.5):
         super().__init__()
@@ -146,6 +191,23 @@ class ViTMLP(nn.Module):
             self.dense1(x)))))
 ```
 
+```{.python .input}
+%%tab jax
+class ViTMLP(nn.Module):
+    mlp_num_hiddens: int
+    mlp_num_outputs: int
+    dropout: float = 0.5
+
+    @nn.compact
+    def __call__(self, x, training=False):
+        x = nn.Dense(self.mlp_num_hiddens)(x)
+        x = nn.gelu(x)
+        x = nn.Dropout(self.dropout, deterministic=not training)(x)
+        x = nn.Dense(self.mlp_num_outputs)(x)
+        x = nn.Dropout(self.dropout, deterministic=not training)(x)
+        return x
+```
+
 The vision Transformer encoder block implementation
 just follows the pre-normalization design in :numref:`fig_vit`,
 where normalization is applied right *before* multi-head attention or the MLP.
@@ -154,6 +216,7 @@ where normalization is placed right *after* residual connections,
 pre-normalization leads to more effective or efficient training for Transformers :cite:`baevski2018adaptive,wang2019learning,xiong2020layer`.
 
 ```{.python .input}
+%%tab pytorch
 class ViTBlock(nn.Module):
     def __init__(self, num_hiddens, norm_shape, mlp_num_hiddens, 
                  num_heads, dropout, use_bias=False):
@@ -169,14 +232,43 @@ class ViTBlock(nn.Module):
         return X + self.mlp(self.ln2(X))
 ```
 
+```{.python .input}
+%%tab jax
+class ViTBlock(nn.Module):
+    num_hiddens: int
+    mlp_num_hiddens: int
+    num_heads: int
+    dropout: float
+    use_bias: bool = False
+
+    def setup(self):
+        self.attention = d2l.MultiHeadAttention(self.num_hiddens, self.num_heads,
+                                                self.dropout, self.use_bias)
+        self.mlp = ViTMLP(self.mlp_num_hiddens, self.num_hiddens, self.dropout)
+
+    @nn.compact
+    def __call__(self, X, valid_lens=None, training=False):
+        X = X + self.attention(*([nn.LayerNorm()(X)] * 3),
+                               valid_lens, training=training)[0]
+        return X + self.mlp(nn.LayerNorm()(X), training=training)
+```
+
 Same as in :numref:`subsec_transformer-encoder`,
 any vision Transformer encoder block does not change its input shape.
 
 ```{.python .input}
+%%tab pytorch
 X = d2l.ones((2, 100, 24))
 encoder_blk = ViTBlock(24, 24, 48, 8, 0.5)
 encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
+```
+
+```{.python .input}
+%%tab jax
+X = d2l.ones((2, 100, 24))
+encoder_blk = ViTBlock(24, 48, 8, 0.5)
+d2l.check_shape(encoder_blk.init_with_output(d2l.get_key(), X)[0], X.shape)
 ```
 
 ## Putting It All Together
@@ -189,6 +281,7 @@ Then the output is fed into the Transformer encoder that stacks `num_blks` insta
 Finally, the representation of the “&lt;cls&gt;”  token is projected by the network head.
 
 ```{.python .input}
+%%tab pytorch
 class ViT(d2l.Classifier):
     """Vision Transformer."""
     def __init__(self, img_size, patch_size, num_hiddens, mlp_num_hiddens,
@@ -221,11 +314,53 @@ class ViT(d2l.Classifier):
         return self.head(X[:, 0])
 ```
 
+```{.python .input}
+%%tab jax
+class ViT(d2l.Classifier):
+    """Vision Transformer."""
+    img_size: int
+    patch_size: int
+    num_hiddens: int
+    mlp_num_hiddens: int
+    num_heads: int
+    num_blks: int
+    emb_dropout: float
+    blk_dropout: float
+    lr: float = 0.1
+    use_bias: bool = False
+    num_classes: int = 10
+    training: bool = False
+
+    def setup(self):
+        self.patch_embedding = PatchEmbedding(self.img_size, self.patch_size,
+                                              self.num_hiddens)
+        self.cls_token = self.param('cls_token', nn.initializers.zeros,
+                                    (1, 1, self.num_hiddens))
+        num_steps = self.patch_embedding.num_patches + 1  # Add the cls token
+        # Positional embeddings are learnable
+        self.pos_embedding = self.param('pos_embed', nn.initializers.normal(),
+                                        (1, num_steps, self.num_hiddens))
+        self.blks = [ViTBlock(self.num_hiddens, self.mlp_num_hiddens,
+                              self.num_heads, self.blk_dropout, self.use_bias)
+                    for _ in range(self.num_blks)]
+        self.head = nn.Sequential([nn.LayerNorm(), nn.Dense(self.num_classes)])
+
+    @nn.compact
+    def __call__(self, X):
+        X = self.patch_embedding(X)
+        X = d2l.concat((jnp.tile(self.cls_token, (X.shape[0], 1, 1)), X), 1)
+        X = nn.Dropout(emb_dropout, deterministic=not self.training)(X + self.pos_embedding)
+        for blk in self.blks:
+            X = blk(X, training=self.training)
+        return self.head(X[:, 0])
+```
+
 ## Training
 
 Training a vision Transformer on the Fashion-MNIST dataset is just like how CNNs were trained in :numref:`chap_modern_cnn`.
 
 ```{.python .input}
+%%tab all
 img_size, patch_size = 96, 16
 num_hiddens, mlp_num_hiddens, num_heads, num_blks = 512, 2048, 8, 2
 emb_dropout, blk_dropout, lr = 0.1, 0.1, 0.1
@@ -268,7 +403,6 @@ beyond image classification with state-of-the-art results :cite:`liu2021swin`.
 1. How does the value of `img_size` affect training time?
 1. Instead of projecting the “&lt;cls&gt;” token representation to the output, how to project the averaged patch representations? Implement this change and see how it affects the accuracy.
 1. Can you modify hyperparameters to improve the accuracy of the vision Transformer?
-
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/8943)
