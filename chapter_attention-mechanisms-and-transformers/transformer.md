@@ -308,7 +308,7 @@ print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ln = tf.keras.layers.LayerNormalization()
 bn = tf.keras.layers.BatchNormalization()
 X = tf.constant([[1, 2], [2, 3]], dtype=tf.float32)
-print('layer norm:', ln(X), '\nbatch norm:', bn(X))
+print('layer norm:', ln(X), '\nbatch norm:', bn(X, training=True))
 ```
 
 ```{.python .input}
@@ -318,7 +318,8 @@ bn = nn.BatchNorm()
 X = d2l.tensor([[1, 2], [2, 3]], dtype=d2l.float32)
 # Compute mean and variance from X in the training mode
 print('layer norm:', ln.init_with_output(d2l.get_key(), X)[0],
-      '\nbatch norm:', bn.init_with_output(d2l.get_key(), X, True)[0])
+      '\nbatch norm:', bn.init_with_output(d2l.get_key(), X,
+                                           use_running_average=False)[0])
 ```
 
 Now we can implement the `AddNorm` class
