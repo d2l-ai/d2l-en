@@ -1354,6 +1354,85 @@ class PositionalEncoding(nn.Module):
         X = X + self.P[:, :X.shape[1], :]
         return nn.Dropout(self.dropout)(X, deterministic=not training)
 
+class PositionWiseFFN(nn.Module):
+    """Defined in :numref:`sec_transformer`"""
+    ffn_num_hiddens: int
+    ffn_num_outputs: int
+
+    def setup(self):
+        self.dense1 = nn.Dense(self.ffn_num_hiddens)
+        self.dense2 = nn.Dense(self.ffn_num_outputs)
+
+    def __call__(self, X):
+        return self.dense2(nn.relu(self.dense1(X)))
+
+class AddNorm(nn.Module):
+    """Defined in :numref:`subsec_positionwise-ffn`"""
+    dropout: int
+
+    @nn.compact
+    def __call__(self, X, Y, training=False):
+        return nn.LayerNorm()(
+            nn.Dropout(self.dropout)(Y, deterministic=not training) + X)
+
+class TransformerEncoderBlock(nn.Module):
+    """Transformer encoder block.
+
+    Defined in :numref:`subsec_positionwise-ffn`"""
+    num_hiddens: int
+    ffn_num_hiddens: int
+    num_heads: int
+    dropout: float
+    use_bias: bool = False
+
+    def setup(self):
+        self.attention = d2l.MultiHeadAttention(self.num_hiddens, self.num_heads,
+                                                self.dropout, self.use_bias)
+        self.addnorm1 = AddNorm(self.dropout)
+        self.ffn = PositionWiseFFN(self.ffn_num_hiddens, self.num_hiddens)
+        self.addnorm2 = AddNorm(self.dropout)
+
+    def __call__(self, X, valid_lens, training=False):
+        output, attention_weights = self.attention(X, X, X, valid_lens,
+                                                   training=training)
+        Y = self.addnorm1(X, output, training=training)
+        return self.addnorm2(Y, self.ffn(Y), training=training), attention_weights
+
+class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder.
+
+    Defined in :numref:`subsec_transformer-encoder`"""
+    vocab_size: int
+    num_hiddens:int
+    ffn_num_hiddens: int
+    num_heads: int
+    num_blks: int
+    dropout: float
+    use_bias: bool = False
+
+    def setup(self):
+        self.embedding = nn.Embed(self.vocab_size, self.num_hiddens)
+        self.pos_encoding = d2l.PositionalEncoding(self.num_hiddens, self.dropout)
+        self.blks = [TransformerEncoderBlock(self.num_hiddens,
+                                             self.ffn_num_hiddens,
+                                             self.num_heads,
+                                             self.dropout, self.use_bias)
+                     for _ in range(self.num_blks)]
+
+    def __call__(self, X, valid_lens, training=False):
+        # Since positional encoding values are between -1 and 1, the embedding
+        # values are multiplied by the square root of the embedding dimension
+        # to rescale before they are summed up
+        X = self.embedding(X) * math.sqrt(self.num_hiddens)
+        X = self.pos_encoding(X, training=training)
+        attention_weights = [None] * len(self.blks)
+        for i, blk in enumerate(self.blks):
+            X, attention_w = blk(X, valid_lens, training=training)
+            attention_weights[i] = attention_w
+        # Flax sow API is used to capture intermediate variables
+        self.sow('intermediates', 'enc_attention_weights', attention_weights)
+        return X
+
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
 
