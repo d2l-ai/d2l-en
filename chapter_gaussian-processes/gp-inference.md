@@ -199,14 +199,15 @@ d2l.plt.scatter(train_x, train_y)
 d2l.plt.plot(test_x, test_y, linewidth=2.)
 d2l.plt.plot(test_x, post_mean, linewidth=2.)
 d2l.plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
+d2l.plt.legend(['Observed Data', 'True Function', 'Predictive Mean', '95% Set on True Func'])
 d2l.plt.show()
 ```
 
-We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute
+We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ (true) function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute
 
 ```{.python .input}
-lw_bd = post_mean - 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
-up_bd = post_mean + 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
+lw_bd_observed = post_mean - 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
+up_bd_observed = post_mean + 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
 ```
 
 There are two sources of uncertainty, _epistemic_ uncertainty, representing _reducible_ uncertainty, and _aleatoric_ or _irreducible_ uncertainty. The _epistemic_ uncertainty here represents uncertainty about the true values of the noise free function. This uncertainty should grow as we move away from the data points, as away from the data there are a greater variety of function values consistent with our data. As we observe more and more data, our beliefs about the true function become more confident, and the epistemic uncertainty disappears. The _aleatoric_ uncertainty in this instance is the observation noise, since the data are given to us with this noise, and it cannot be reduced.
@@ -226,6 +227,7 @@ d2l.plt.plot(test_x, test_y, linewidth=2.)
 d2l.plt.plot(test_x, post_mean, linewidth=2.)
 d2l.plt.plot(test_x, post_samples.T, color='gray', alpha=0.25)
 d2l.plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
+plt.legend(['Observed Data', 'True Function', 'Predictive Mean', 'Posterior Samples'])
 d2l.plt.show()
 ```
 
