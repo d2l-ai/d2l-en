@@ -353,3 +353,7 @@ Try seeing if you can find these local optima: initialize with very large length
 5. Try running the GPyTorch example with different covariance functions, such as the Matern kernel. How do the results change? How about the spectral mixture kernel, found in the GPyTorch library? Are some easier to train the marginal likelihood than others? Are some more valuable for long-range versus short-range predictions?
 
 6. In our GPyTorch example, we plotted the predictive distribution including observation noise, while in our "from scratch" example, we only included epistemic uncertainty. Re-do the GPyTorch example, but this time only plotting epistemic uncertainty, and compare to the from-scratch results. Do the predictive distributions now look the same?  (They should.)
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12117)
+:end_tab:
