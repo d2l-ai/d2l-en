@@ -259,6 +259,12 @@ by updating the parameters in the direction
 that incrementally lowers the loss function.
 This algorithm is called *gradient descent*.
 
+Before we dive in into math behind the gradient descent let's take a look at the intuition of it.
+Imagine that you are on a top of the hill and you need to come back to the valley where your hotel is located.
+You cannot see what is around you because of the thick fog, only what is underneath you.
+Since you need to descent your best option is to look at the ground underneath you, choose direction where the slope is the steepest and take a step in the downward direction. 
+Repeat this until there is no slope in any direction. This means that you are in the valley.
+
 The most naive application of gradient descent
 consists of taking the derivative of the loss function,
 which is an average of the losses computed
