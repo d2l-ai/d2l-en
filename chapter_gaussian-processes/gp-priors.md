@@ -168,3 +168,7 @@ Gaussian processes are a relatively general model class, containing many example
 4. Suppose we form $g(x) = a(x)f(x)$, where $f(x) \sim \mathcal{GP}(0,k)$ and $a(x) = x^2$. Is $g(x)$ a Gaussian process, and if so, what is its mean and covariance function? What is the effect of $a(x)$? What do sample functions drawn from $g(x)$ look like?
 
 5. Suppose we form $u(x) = f(x)g(x)$, where $f(x) \sim \mathcal{GP}(m_1,k_1)$ and $g(x) \sim \mathcal{GP}(m_2,k_2)$. Is $u(x)$ a Gaussian process, and if so, what is its mean and covariance function?
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12116)
+:end_tab:
