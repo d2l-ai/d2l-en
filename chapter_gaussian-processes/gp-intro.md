@@ -6,27 +6,27 @@ Let's get a feel for how Gaussian processes operate, by starting with some examp
 
 Suppose we observe the following dataset, of regression targets (outputs), $y$, indexed by inputs, $x$. As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded. What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until $x=25$?
 
-![Observed data.](https://user-images.githubusercontent.com/6753639/206877503-de651312-1a44-46c7-b0b2-a18ffb1fc7f8.svg)
+![Observed data.](../img/gp-observed-data.svg)
 
 In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable? Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. Note that we will see code for reproducing all of the plots in this notebook, in the next notebooks on priors and inference.
 
-![Sample prior functions that we may want to represent with our model.](https://user-images.githubusercontent.com/6753639/206877559-54c47fc2-ae6a-47e1-97b1-a0bd4f6cf81e.svg)
+![Sample prior functions that we may want to represent with our model.](../img/gp-sample-prior-functions.svg)
 
 Once we condition on data, we can use this prior to infer a posterior distribution over functions that could fit the data. Here we show sample posterior functions.
 
-![Sample posterior functions, once we have observed the data.](https://user-images.githubusercontent.com/6753639/206877599-57c33f66-ca57-4d78-a33e-f20889a382b1.svg)
+![Sample posterior functions, once we have observed the data.](../img/gp-sample-posterior-functions.svg)
 
 We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we don't actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form. 
 
-![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](https://user-images.githubusercontent.com/6753639/206877617-8664e9ce-5ed8-41ef-bf3f-394b6bd57a3a.svg)
+![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](../img/gp-posterior-samples.svg)
 
 We may also want a representation of uncertainty, so we know how confident we should be in our predictions. Intuitively, we should have more uncertainty where there is more variability in the sample posterior functions, as this tells us there are many more possible values the true function could take. This type of uncertainty is called _epistemic uncertainty_, which is the _reducible uncertainty_ associated with lack of information. As we acquire more data, this type of uncertainty disappears, as there will be increasingly fewer solutions consistent with what we observe. Like with the posterior mean, we can compute the posterior variance (the variability of these functions in the posterior) in closed form. With shade, we show two times the posterior standard deviation on either side of the mean, creating a _credible interval_ that has a 95% probability of containing the true value of the function for any input $x$.
 
-![Posterior samples, including 95% credible set.](https://user-images.githubusercontent.com/6753639/206877636-94890cd7-d868-45b8-bd5b-ca1c0e7b0b20.svg)
+![Posterior samples, including 95% credible set.](../img/gp-posterior-samples-95.svg)
 
 The plot looks somewhat cleaner if we remove the posterior samples, simply visualizing the data, posterior mean, and 95% credible set. Notice how the uncertainty grows away from the data, a property of epistemic uncertainty. 
 
-![Point predictions, and credible set.](https://user-images.githubusercontent.com/6753639/206877643-ca64adc1-7f3f-4106-8f2b-a21a614ac3f9.svg)
+![Point predictions, and credible set.](../img/gp-point-predictions.svg)
 
 The properties of the Gaussian process that we used to fit the data are strongly controlled by what's called a _covariance function_, also known as a _kernel_. The covariance function we used is called the _RBF (Radial Basis Function) kernel_, which has the form
 $$ k_{\text{RBF}}(x,x') = \mathrm{Cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right) $$
@@ -51,31 +51,31 @@ $\ell = 0.1, 0.5, 2, 5, 10$
 . A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
 
 
-![priorpoint1](https://user-images.githubusercontent.com/6753639/206877928-8add8f33-947e-4ad6-b635-c05f9ddbf45c.svg)
-![postpoint1](https://user-images.githubusercontent.com/6753639/206877934-9d63e0ba-c0df-416f-9efb-458dd2de20a9.svg)
+![priorpoint1](../img/gp-priorpoint1.svg)
+![postpoint1](../img/gp-postpoint1.svg)
 
-![priorpoint5](https://user-images.githubusercontent.com/6753639/206877944-cfd2cd8a-c6c8-4ebf-b8e5-10e823feac23.svg)
-![postpoint5](https://user-images.githubusercontent.com/6753639/206877945-08420e93-eb64-42a2-b5a1-20b081af84df.svg)
+![priorpoint5](../img/gp-priorpoint5.svg)
+![postpoint5](../img/gp-postpoint5.svg)
 
-![prior2](https://user-images.githubusercontent.com/6753639/206877949-0cad1aec-fd74-46a5-9375-1c89c5c35393.svg)
-![post2](https://user-images.githubusercontent.com/6753639/206877951-e565b213-64bb-431b-a634-c3b7dd2f2eb3.svg)
+![prior2](../img/gp-prior2.svg)
+![post2](../img/gp-post2.svg)
 
-![prior5](https://user-images.githubusercontent.com/6753639/206877968-34daa780-ec9f-4b71-a858-d97ed9655949.svg)
-![post5](https://user-images.githubusercontent.com/6753639/206877976-12c80980-0c58-4c1d-bfc1-613a66f73779.svg)
+![prior5](../img/gp-prior5.svg)
+![post5](../img/gp-post5.svg)
 
 Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values. 
 
 Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. Note the vertical scale is held fixed for the prior samples, and varies for the posterior samples, so you can clearly see both the increasing scale of the function, and the fits to the data.
 
 
-![priorap1](https://user-images.githubusercontent.com/6753639/206878168-305f4bc7-0ee2-4778-8ead-1d977d5c1f65.svg)
-![postapoint1](https://user-images.githubusercontent.com/6753639/206878178-1d52c5fa-fc37-4890-ab1c-9d404e5c92a0.svg)
+![priorap1](../img/gp-priorap1.svg)
+![postapoint1](../img/gp-postapoint1.svg)
 
-![priora2](https://user-images.githubusercontent.com/6753639/206878180-52a5fec7-726a-4fb8-91c0-2c9452d23df1.svg)
-![posta2](https://user-images.githubusercontent.com/6753639/206878185-2cabcffb-975c-4eaa-b3d5-9d966200b5c5.svg)
+![priora2](../img/gp-priora2.svg)
+![posta2](../img/gp-posta2.svg)
 
-![priora8](https://user-images.githubusercontent.com/6753639/206878188-2836e726-88e8-414c-9e59-04d13517a71e.svg)
-![posta8](https://user-images.githubusercontent.com/6753639/206878192-aa5411cd-a681-4a04-b6d3-7d94df2c373d.svg)
+![priora8](../img/gp-priora8.svg)
+![posta8](../img/gp-posta8.svg)
 
 We see the amplitude parameter affects the scale of the function, but not the rate of variation. At this point, we also have the sense that the generalization performance of our procedure will depend on having reasonable values for these hyperparameters. Values of $\ell=2$ and $a=1$ appeared to provide reasonable fits, while some of the other values did not. Fortunately, there is a robust and automatic way to specify these hyperparameters, using what is called the _marginal likelihood_, which we will return to in the notebook on inference. 
 
