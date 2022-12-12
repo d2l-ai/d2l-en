@@ -534,8 +534,11 @@ at the end of each notebook.
 We are indebted to the hundreds of contributors for both
 the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
-We thank Anirudh Dagar and Yuan Tang for adapting part of early MXNet code into PyTorch and TensorFlow implementations, respectively.
-We thank a team from Baidu for adapting more recent PyTorch code into PaddlePaddle implementations in the Chinese draft.
+This book was originally implemented with MXNet as the primary framework.
+We thank Anirudh Dagar and Yuan Tang for adapting a majority part of earlier MXNet code into PyTorch and TensorFlow implementations, respectively.
+Since July 2021, we have redesigned and reimplemented this book in PyTorch, MXNet, and TensorFlow, choosing PyTorch as the primary framework.
+We thank Anirudh Dagar for adapting a majority part of more recent PyTorch code into JAX implementations.
+We thank Gaosheng Wu, Liujun Hu, Ge Zhang, and Jiehang Xie from Baidu for adapting a majority part of more recent PyTorch code into PaddlePaddle implementations in the Chinese draft.
 We thank Shuai Zhang for integrating the LaTeX style from the press into the PDF building.
 
 On GitHub, we thank every contributor of this English draft
