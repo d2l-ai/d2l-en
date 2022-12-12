@@ -202,7 +202,7 @@ a {
     <p class="version">With New API</p>
     <p class="version">Switch to <a href="https://classic.d2l.ai/">Classic API</a></p>
     <p><b>Interactive</b> deep learning book with code, math, and discussions <br><br>
-        Implemented with <b>PyTorch</b>, <b>NumPy/MXNet</b>, and <b>TensorFlow</b><br><br>
+        Implemented with <b>PyTorch</b>, <b>NumPy/MXNet</b>, <b>JAX</b>, and <b>TensorFlow</b><br><br>
         Adopted at 400 universities from 60 countries<br><br>
         <a class="github-button" href="https://github.com/d2l-ai/d2l-en" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star d2l-ai/d2l-en on GitHub">Star</a>
     </p>
@@ -216,6 +216,10 @@ a {
     </div>
     <div align="left">
     <ul>
+        <li> [Dec 2022] JAX implementation is available! New topics of <a href="chapter_reinforcement-learning/index.html">reinforcement learning</a>,
+          <a href="chapter_gaussian-processes/index.html">Gaussian processes</a>, and
+          <a href="chapter_hyperparameter-optimization/index.html">hyperparameter optimization</a> are added! The book is forthcoming on Cambridge University Press.
+          Follow D2L's <a href="https://github.com/d2l-ai/d2l-en">open-source project</a> for the latest updates.
         <li> [Jul 2022] Check out our <a href="chapter_linear-regression/oo-design.html">new API</a>
             for implementation
             (switch back to <a href="https://classic.d2l.ai/">classic API</a>)
@@ -225,8 +229,7 @@ a {
             <a href="chapter_convolutional-modern/resnet.html">ResNeXt</a>,
             <a href="chapter_convolutional-modern/cnn-design.html">CNN design space</a>, and
             transformers for <a href="chapter_attention-mechanisms-and-transformers/vision-transformer.html">vision</a>
-            and <a href="chapter_attention-mechanisms-and-transformers/large-pretraining-transformers.html">large-scale pretraining</a>.
-          To keep track of the latest updates, just follow D2L's <a href="https://github.com/d2l-ai/d2l-en">open-source project</a>.
+            and <a href="chapter_attention-mechanisms-and-transformers/large-pretraining-transformers.html">large-scale pretraining</a>. 
       </li>
       <li> [May 2022] Join <a href="https://github.com/d2l-ai">us</a> to improve ongoing translations
           in <a href="https://pt.d2l.ai/">Portuguese</a>,
@@ -236,11 +239,6 @@ a {
           and <a href="https://ja.d2l.ai/">Japanese</a>.</li>
       <li> [Dec 2021] We added a new option to <a href="#jupyter">run this book</a> for free: check out <a href="https://studiolab.sagemaker.aws/import/github/d2l-ai/d2l-pytorch-sagemaker-studio-lab/blob/main/GettingStarted-D2L.ipynb">SageMaker Studio Lab</a>.
       </li>
-      </li>
-      <li> [Apr 2020] We have revamped
-        <a href="chapter_natural-language-processing-pretraining/index.html">Chapter: NLP pretraining</a>
-        and <a href="chapter_natural-language-processing-applications/index.html">Chapter: NLP applications</a>,
-        and added sections of BERT and natural language inference.
       </li>
     <li>[Jul 2019]
       The Chinese version is the <a href="https://raw.githubusercontent.com/d2l-ai/d2l-zh/master/img/frontpage/jd-190715-en.png">No. 1 best seller</a> of new books in "Computers and Internet" at the largest Chinese online bookstore.
@@ -270,9 +268,7 @@ a {
     <div class="author-item">
       <img src="./_images/zack.jpg"/>
       <h3><a href="http://zacklipton.com/">Zack C. Lipton</a></h3>
-      <p>Amazon Scientist<br>
-        CMU Assistant Professor
-        </p>
+      <p>CMU Assistant Professor<br>Amazon Scientist</p>
     </div>
   </div>
   <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
@@ -291,31 +287,76 @@ a {
         </p>
     </div>
   </div>
+
   <div class = "author-group-title mdl-cell mdl-cell--12-col mdl-cell--top">
   <h2>Vol.2 Chapter Authors</h2>
   </div>
+
   <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
     <div class="author-item">
-      <img src="./_images/brent.jpg"/>
-      <h3><a href="https://www.linkedin.com/in/brent-werness-1506471b7/">Brent Werness</a></h3>
-      <p>Amazon Senior Scientist<br><i><a href="http://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html">Mathematics
-        for Deep Learning</a></i></p>
+      <img src="./_images/pratik.jpg"/>
+      <h3><a href="https://pratikac.github.io/">Pratik Chaudhari</a></h3>
+      <p>UPenn Assistant Professor<br>Amazon Scientist<br><i><a href="chapter_reinforcement-learning/index.html">Reinforcement Learning</a></i></p>
     </div>
   </div>
+
   <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
     <div class="author-item">
-      <img src="./_images/rachel.jpeg"/>
-      <h3><a href="https://www.linkedin.com/in/rachelsonghu/">Rachel Hu</a></h3>
-      <p> Amazon Scientist<br><i><a href="http://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html">Mathematics
-        for Deep Learning</a></i></p>
+      <img src="./_images/rasool.jpg"/>
+      <h3><a href="https://sites.google.com/site/rfakoor">Rasool Fakoor</a></h3>
+      <p>Amazon Senior Scientist<br><i><a href="chapter_reinforcement-learning/index.html">Reinforcement Learning</a></i></p>
     </div>
   </div>
+
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/kavosh.jpg"/>
+      <h3><a href="https://cs.brown.edu/~kasadiat/">Kavosh Asadi</a></h3>
+      <p>Amazon Scientist<br><i><a href="chapter_reinforcement-learning/index.html">Reinforcement Learning</a></i></p>
+    </div>
+  </div>
+
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/andrew.jpg"/>
+      <h3><a href="https://cims.nyu.edu/~andrewgw/">Andrew Gordon Wilson</a></h3>
+      <p>NYU Associate Professor<br>Amazon Scientist<br><i><a href="chapter_gaussian-processes/index.html">Gaussian Processes</a></i></p>
+    </div>
+  </div>
+
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/aaron.jpg"/>
+      <h3><a href="https://aaronkl.github.io/">Aaron Klein</a></h3>
+      <p>Amazon Scientist<br><i><a href="chapter_hyperparameter-optimization/index.html">Hyperparameter Optimization</a></i></p>
+    </div>
+  </div>
+
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/matthias.jpg"/>
+      <h3><a href="https://mseeger.github.io/">Matthias Seeger</a></h3>
+      <p>Amazon Principal Scientist<br><i><a href="chapter_hyperparameter-optimization/index.html">Hyperparameter Optimization</a></i></p>
+    </div>
+  </div>
+
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/cedric.png"/>
+      <h3><a href="http://www0.cs.ucl.ac.uk/staff/c.archambeau/">Cedric Archambeau</a></h3>
+      <p>Amazon Principal Scientist<br><i><a href="chapter_hyperparameter-optimization/index.html">Hyperparameter Optimization</a></i></p>
+    </div>
+  </div>
+
+
+
+
   <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
     <div class="author-item">
       <img src="./_images/shuai.jpg"/>
       <h3><a href="https://shuaizhang.tech/">Shuai Zhang</a></h3>
-      <p>ETH Zürich Postdoctoral Researcher
-        <br><i><a href="http://d2l.ai/chapter_recommender-systems/index.html">Recommender Systems</a></i></p>
+      <p>Amazon Scientist
+        <br><i><a href="chapter_recommender-systems/index.html">Recommender Systems</a></i></p>
     </div>
   </div>
 
@@ -323,8 +364,25 @@ a {
     <div class="author-item">
       <img src="./_images/yi.jpg"/>
       <h3><a href="https://vanzytay.github.io/">Yi Tay</a></h3>
-      <p>Google Scientist
-        <br><i><a href="http://d2l.ai/chapter_recommender-systems/index.html">Recommender Systems</a></i></p>
+      <p>Google Senior Scientist
+        <br><i><a href="chapter_recommender-systems/index.html">Recommender Systems</a></i></p>
+    </div>
+  </div>
+
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/brent.jpg"/>
+      <h3><a href="https://www.linkedin.com/in/brent-werness-1506471b7/">Brent Werness</a></h3>
+      <p>Amazon Senior Scientist<br><i><a href="chapter_appendix-mathematics-for-deep-learning/index.html">Mathematics
+        for Deep Learning</a></i></p>
+    </div>
+  </div>
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/rachel.jpeg"/>
+      <h3><a href="https://www.linkedin.com/in/rachelsonghu/">Rachel Hu</a></h3>
+      <p> Amazon Scientist<br><i><a href="chapter_appendix-mathematics-for-deep-learning/index.html">Mathematics
+        for Deep Learning</a></i></p>
     </div>
   </div>
 
@@ -335,7 +393,7 @@ a {
     <div class="author-item">
       <img src="./_images/anirudh.jpg"/>
       <h3><a href="https://github.com/AnirudhDagar">Anirudh Dagar</a></h3>
-      <p>IIT Roorkee Student<br><i>PyTorch Adaptation</i></p>
+      <p>Amazon Scientist<br><i>JAX Adaptation</i><br><i>PyTorch Adaptation (early version)</i></p>
     </div>
   </div>
   <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
