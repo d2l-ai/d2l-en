@@ -44,6 +44,7 @@ stage("Build and Publish") {
       sh label: "Execute Notebooks [Jax]", script: """set -ex
       conda activate ${ENV_NAME}
       ./static/cache.sh restore _build/eval_jax/data
+      export XLA_PYTHON_CLIENT_MEM_FRACTION=.70
       export TF_CPP_MIN_LOG_LEVEL=3
       export TF_FORCE_GPU_ALLOW_GROWTH=true
       d2lbook build eval --tab jax
