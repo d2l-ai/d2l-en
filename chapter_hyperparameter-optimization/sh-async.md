@@ -69,7 +69,7 @@ rung 2. At the same time, Worker-1 continues with evaluating new trials (i.e.,
 Trial-5) on rung 0.
 
 
-![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](../img/asha.svg)
+![Asynchronous successive halving (ASHA) with two workers.](../img/asha.svg)
 :label:`asha`
 
 ```{.python .input}
