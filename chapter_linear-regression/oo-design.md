@@ -294,7 +294,7 @@ It provides convenient features to handle neural networks. For example, it invok
 
 :begin_tab:`jax`
 You may notice that `Module` is a subclass of `linen.Module`, the base class of neural networks in Flax.
-It provides convenient features to handle neural networks. For example, it handles the model parameters, provides `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
+It provides convenient features to handle neural networks. For example, it handles the model parameters, provides the `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
 Here we also redirect `__call__` to the `forward` function. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
