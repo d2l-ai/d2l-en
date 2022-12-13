@@ -231,7 +231,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         l = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
 
-    def apply_init(self, dummy_input, **kwargs):
+    def apply_init(self, dummy_input, key):
         """To be defined later in :numref:`sec_lazy_init`"""
         raise NotImplementedError
 
@@ -242,14 +242,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         """Defined in :numref:`sec_classification`"""
         return optax.sgd(self.lr)
 
-    def apply_init(self, dummy_input, **kwargs):
+    def apply_init(self, dummy_input, key):
         """Defined in :numref:`sec_lazy_init`"""
-        if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
-            self.key = kwargs['key']
-        else:
-            # Dropout key is only used for models with dropout layers
-            self.key = {'params': d2l.get_key(), 'dropout': d2l.get_key()}
-        params = self.init(self.key, *dummy_input)  # dummy_input tuple unpacked
+        params = self.init(key, *dummy_input)  # dummy_input tuple unpacked
         return params
 
 class DataModule(d2l.HyperParameters):
@@ -300,6 +295,13 @@ class Trainer(d2l.HyperParameters):
         self.prepare_model(model)
         self.optim = model.configure_optimizers()
 
+        if key is None:
+            root_key = d2l.get_key()
+        else:
+            root_key = key
+        params_key, dropout_key = jax.random.split(root_key)
+        key = {'params': params_key, 'dropout': dropout_key}
+
         dummy_input = next(iter(self.train_dataloader))[:-1]
         variables = model.apply_init(dummy_input, key=key)
         params = variables['params']
@@ -310,13 +312,17 @@ class Trainer(d2l.HyperParameters):
         else:
             batch_stats = {}
 
-        # Flax uses optax under the hood for a single state obj TrainState
-        # (more will be discussed later in the batch normalization section)
+        # Flax uses optax under the hood for a single state obj TrainState.
+        # More will be discussed later in the dropout and batch
+        # normalization section.
         class TrainState(train_state.TrainState):
             batch_stats: Any
+            dropout_rng: jax.random.PRNGKeyArray
+
         self.state = TrainState.create(apply_fn=model.apply,
                                        params=params,
                                        batch_stats=batch_stats,
+                                       dropout_rng=dropout_key,
                                        tx=model.configure_optimizers())
         self.epoch = 0
         self.train_batch_idx = 0
@@ -341,6 +347,9 @@ class Trainer(d2l.HyperParameters):
                                                                self.prepare_batch(batch),
                                                                self.state)
                 self.state = self.state.apply_gradients(grads=grads)
+                # Can be ignored for models without Dropout Layers
+                self.state = self.state.replace(
+                    dropout_rng=jax.random.split(self.state.dropout_rng)[0])
                 self.state = self.state.replace(batch_stats=mutated_vars['batch_stats'])
                 self.train_batch_idx += 1
         else:
@@ -349,6 +358,9 @@ class Trainer(d2l.HyperParameters):
                                                     self.prepare_batch(batch),
                                                     self.state)
                 self.state = self.state.apply_gradients(grads=grads)
+                # Can be ignored for models without Dropout Layers
+                self.state = self.state.replace(
+                    dropout_rng=jax.random.split(self.state.dropout_rng)[0])
                 self.train_batch_idx += 1
     
         if self.val_dataloader is None:
@@ -569,7 +581,7 @@ class Classifier(d2l.Module):
         """Defined in :numref:`sec_dropout`"""
         Y_hat = state.apply_fn({'params': params}, *X,
                                mutable=False,  # To be used later (e.g., batch norm)
-                               rngs={'dropout': jax.random.PRNGKey(0)})
+                               rngs={'dropout': state.dropout_rng})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
         fn = optax.softmax_cross_entropy_with_integer_labels
@@ -593,7 +605,7 @@ class Classifier(d2l.Module):
         Y_hat, updates = state.apply_fn({'params': params,
                                          'batch_stats': state.batch_stats},
                                         *X, mutable=['batch_stats'],
-                                        rngs={'dropout': jax.random.PRNGKey(0)})
+                                        rngs={'dropout': state.dropout_rng})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
         fn = optax.softmax_cross_entropy_with_integer_labels

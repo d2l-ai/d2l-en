@@ -205,8 +205,11 @@ It will be used later when default random initializations are not desired.
 
 :begin_tab:`jax`
 Parameter initialization in Flax is always done manually and handled by the
-user. The following method sets a PRNG Key and passes in a dummy input to
-initialize the model parameters and return the parameters.
+user. The following method takes a dummy input and a key dictionary as argument.
+This key dictionary has the rngs for initializing the model parameters
+and dropout rng for generating the dropout mask for the models with
+dropout layers. More about dropout will be covered later in :numref:`sec_dropout`.
+Ultimately the method initializes the model returning the parameters.
 We have been using it under the hood in the previous sections as well.
 :end_tab:
 
@@ -222,13 +225,8 @@ def apply_init(self, inputs, init=None):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Module)  #@save
-def apply_init(self, dummy_input, **kwargs):
-    if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
-        self.key = kwargs['key']
-    else:
-        # Dropout key is only used for models with dropout layers
-        self.key = {'params': d2l.get_key(), 'dropout': d2l.get_key()}
-    params = self.init(self.key, *dummy_input)  # dummy_input tuple unpacked
+def apply_init(self, dummy_input, key):
+    params = self.init(key, *dummy_input)  # dummy_input tuple unpacked
     return params
 ```
 

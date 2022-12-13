@@ -154,7 +154,7 @@ with probability `dropout`**),
 rescaling the remainder as described above:
 dividing the survivors by `1.0-dropout`.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -168,7 +168,7 @@ def dropout_layer(X, dropout):
     return mask.astype(np.float32) * X / (1.0 - dropout)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -215,7 +215,7 @@ In the following lines of code,
 we pass our input `X` through the dropout operation,
 with probabilities 0, 0.5, and 1, respectively.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab all
 if tab.selected('mxnet'):
     X = np.arange(16).reshape(2, 8)
@@ -428,7 +428,14 @@ Note that we need to redefine the loss function since a network
 with a dropout layer needs a PRNGKey when using `Module.apply()`,
 and this RNG seed should be explicitly named `dropout`. This key is
 used by the `dropout` layer in Flax to generate the random dropout
-mask internally.
+mask internally. It is important to use a unique `dropout_rng` key
+with every epoch in the training loop, otherwise the generated dropout
+mask will not be stochastic and different between the epoch runs.
+This `dropout_rng` can be stored in the
+`TrainState` object (in the `d2l.Trainer` class defined in
+:numref:`oo-design-training`) as an attribute and with every epoch
+it is replaced with a new `dropout_rng`. We already handled this with the
+`fit_epoch` method defined in :numref:`sec_linear_scratch`.
 :end_tab:
 
 ```{.python .input}
@@ -438,7 +445,7 @@ mask internally.
 def loss(self, params, X, Y, state, averaged=True):
     Y_hat = state.apply_fn({'params': params}, *X,
                            mutable=False,  # To be used later (e.g., batch norm)
-                           rngs={'dropout': jax.random.PRNGKey(0)})
+                           rngs={'dropout': state.dropout_rng})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels
