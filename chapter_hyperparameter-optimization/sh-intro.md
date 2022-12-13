@@ -80,7 +80,7 @@ trial will be trained to the full budget $r_{max}$. Once such a round of
 successive halving is done, we start the next one with a new set of initial
 configurations, iterating until the total budget is spent.
 
-![Learning curves of random hyperparameter configurations.](../img/sh.png)
+![Learning curves of random hyperparameter configurations.](../img/sh.svg)
 
 We subclass the `HPOScheduler` base class from :numref:`sec_api_hpo` in order to
 implement successive halving, allowing for a generic `HPOSearcher` object to
