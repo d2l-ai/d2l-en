@@ -314,7 +314,7 @@ class Trainer(d2l.HyperParameters):
 
         # Flax uses optax under the hood for a single state obj TrainState.
         # More will be discussed later in the dropout and batch
-        # normalization section.
+        # normalization section
         class TrainState(train_state.TrainState):
             batch_stats: Any
             dropout_rng: jax.random.PRNGKeyArray
