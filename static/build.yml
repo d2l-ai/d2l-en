@@ -12,7 +12,7 @@ dependencies:
     - tensorflow-probability==0.18.0
     - tensorflow-datasets==4.7.0
     - jaxlib
-    - "jax[cuda]"
+    - "jax[cuda11_cudnn82]"
     - -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
     - flax
     - syne-tune[gpsearchers]
