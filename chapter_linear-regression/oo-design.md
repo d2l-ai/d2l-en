@@ -269,7 +269,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             l = self.loss(params, batch[:-1], batch[-1], state)
             self.plot('loss', l, train=False)
         
-        def apply_init(self, dummy_input, **kwargs):
+        def apply_init(self, dummy_input, key):
             """To be defined later in :numref:`sec_lazy_init`"""
             raise NotImplementedError
 
@@ -290,6 +290,12 @@ It provides convenient features to handle neural networks. For example, if we de
 :begin_tab:`tensorflow`
 You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
 It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` function, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
+:end_tab:
+
+:begin_tab:`jax`
+You may notice that `Module` is a subclass of `linen.Module`, the base class of neural networks in Flax.
+It provides convenient features to handle neural networks. For example, it handles the model parameters, provides the `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
+Here we also redirect `__call__` to the `forward` method. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
 ##  Data
@@ -321,7 +327,13 @@ class DataModule(d2l.HyperParameters):  #@save
 ## Training
 :label:`oo-design-training`
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+:end_tab:
+
+:begin_tab:`jax`
+The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+:end_tab:
 
 ```{.python .input}
 %%tab all
@@ -359,6 +371,13 @@ class Trainer(d2l.HyperParameters):  #@save
             self.prepare_model(model)
             self.optim = model.configure_optimizers()
 
+            if key is None:
+                root_key = d2l.get_key()
+            else:
+                root_key = key
+            params_key, dropout_key = jax.random.split(root_key)
+            key = {'params': params_key, 'dropout': dropout_key}
+
             dummy_input = next(iter(self.train_dataloader))[:-1]
             variables = model.apply_init(dummy_input, key=key)
             params = variables['params']
@@ -369,13 +388,17 @@ class Trainer(d2l.HyperParameters):  #@save
             else:
                 batch_stats = {}
 
-            # Flax uses optax under the hood for a single state obj TrainState
-            # (more will be discussed later in the batch normalization section)
+            # Flax uses optax under the hood for a single state obj TrainState.
+            # More will be discussed later in the dropout and batch
+            # normalization section
             class TrainState(train_state.TrainState):
                 batch_stats: Any
+                dropout_rng: jax.random.PRNGKeyArray
+
             self.state = TrainState.create(apply_fn=model.apply,
                                            params=params,
                                            batch_stats=batch_stats,
+                                           dropout_rng=dropout_key,
                                            tx=model.configure_optimizers())
             self.epoch = 0
             self.train_batch_idx = 0

@@ -194,9 +194,6 @@ for very large minibatches as they arise
 in distributed large scale learning.
 For now, we can ignore this dependency.
 
- 
-
-
 :begin_tab:`mxnet`
 We define our `SGD` class, 
 a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
@@ -213,7 +210,7 @@ to have a similar API
 as the built-in SGD optimizer.
 We update the parameters in the `step` method.
 The `zero_grad` method sets all gradients to 0,
-which must be run before a backpropagation step. 
+which must be run before a backpropagation step.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -222,7 +219,7 @@ a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`
 to have a similar API
 as the built-in SGD optimizer.
 We update the parameters in the `apply_gradients` method.
-It accepts a list of parameter and gradient pairs. 
+It accepts a list of parameter and gradient pairs.
 :end_tab:
 
 ```{.python .input}
@@ -257,10 +254,10 @@ class SGD(d2l.HyperParameters):  #@save
 
     def apply_gradients(self, grads_and_vars):
         for grad, param in grads_and_vars:
-            param.assign_sub(self.lr * grad)        
+            param.assign_sub(self.lr * grad)
 ```
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab jax
 class SGD(d2l.HyperParameters):  #@save
     def __init__(self, lr):
@@ -424,6 +421,9 @@ def fit_epoch(self):
                                                            self.prepare_batch(batch),
                                                            self.state)
             self.state = self.state.apply_gradients(grads=grads)
+            # Can be ignored for models without Dropout Layers
+            self.state = self.state.replace(
+                dropout_rng=jax.random.split(self.state.dropout_rng)[0])
             self.state = self.state.replace(batch_stats=mutated_vars['batch_stats'])
             self.train_batch_idx += 1
     else:
@@ -432,6 +432,9 @@ def fit_epoch(self):
                                                 self.prepare_batch(batch),
                                                 self.state)
             self.state = self.state.apply_gradients(grads=grads)
+            # Can be ignored for models without Dropout Layers
+            self.state = self.state.replace(
+                dropout_rng=jax.random.split(self.state.dropout_rng)[0])
             self.train_batch_idx += 1
 
     if self.val_dataloader is None:

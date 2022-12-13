@@ -633,7 +633,7 @@ def loss(self, Y_hat, Y):
 @partial(jax.jit, static_argnums=(0, 5))
 def loss(self, params, X, Y, state, averaged=False):
     Y_hat = state.apply_fn({'params': params}, *X,
-                           rngs={'dropout': jax.random.PRNGKey(0)})
+                           rngs={'dropout': state.dropout_rng})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels

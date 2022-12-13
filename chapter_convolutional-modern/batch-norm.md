@@ -641,7 +641,7 @@ def loss(self, params, X, Y, state, averaged=True):
     Y_hat, updates = state.apply_fn({'params': params,
                                      'batch_stats': state.batch_stats},
                                     *X, mutable=['batch_stats'],
-                                    rngs={'dropout': jax.random.PRNGKey(0)})
+                                    rngs={'dropout': state.dropout_rng})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels
