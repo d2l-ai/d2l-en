@@ -435,23 +435,24 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.apply(init_seq2seq)
             
     def init_state(self, enc_all_outputs, *args):
-        return enc_all_outputs[1] 
+        return enc_all_outputs
 
-    def forward(self, X, state, enc_all_outputs):
+    def forward(self, X, state):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
+        enc_output, hidden_state = state
         # context shape: (batch_size, num_hiddens)
-        context = enc_all_outputs[0][-1]
+        context = enc_output[-1]
         # Broadcast context to (num_steps, batch_size, num_hiddens)
         context = context.repeat(embs.shape[0], 1, 1)
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, state)
+        outputs, hidden_state = self.rnn(embs_and_context, hidden_state)
         outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
         # outputs shape: (batch_size, num_steps, vocab_size)
-        # state shape: (num_layers, batch_size, num_hiddens)
-        return outputs, state
+        # hidden_state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, [enc_output, hidden_state]
 ```
 
 ```{.python .input}
@@ -530,7 +531,7 @@ where the last dimension of the tensor stores the predicted token distribution.
 decoder = Seq2SeqDecoder(vocab_size, embed_size, num_hiddens, num_layers)
 if tab.selected('mxnet', 'pytorch', 'tensorflow'):
     state = decoder.init_state(encoder(X))
-    dec_outputs, state = decoder(X, state, (enc_outputs, enc_state))
+    dec_outputs, state = decoder(X, state)
 if tab.selected('jax'):
     state = decoder.init_state(encoder.init_with_output(d2l.get_key(), X)[0])
     (outputs, state), _ = decoder.init_with_output(d2l.get_key(), X, state)
@@ -538,7 +539,7 @@ if tab.selected('jax'):
 
 d2l.check_shape(dec_outputs, (batch_size, num_steps, vocab_size))
 if tab.selected('mxnet', 'pytorch', 'jax'):
-    d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
+    d2l.check_shape(state[1], (num_layers, batch_size, num_hiddens))
 if tab.selected('tensorflow'):
     d2l.check_len(state, num_layers)
     d2l.check_shape(state[0], (batch_size, num_hiddens))
@@ -718,8 +719,7 @@ def predict_step(self, batch, device, num_steps,
     outputs, attention_weights = [d2l.expand_dims(tgt[:, 0], 1), ], []
     for _ in range(num_steps):
         if tab.selected('mxnet', 'pytorch'):
-            Y, dec_state = self.decoder(outputs[-1], dec_state,
-                                        enc_all_outputs)
+            Y, dec_state = self.decoder(outputs[-1], dec_state)
         if tab.selected('tensorflow'):
             Y, dec_state = self.decoder(outputs[-1], dec_state, training=False)
         outputs.append(d2l.argmax(Y, 2))

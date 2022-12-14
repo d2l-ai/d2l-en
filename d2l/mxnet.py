@@ -925,18 +925,18 @@ class EncoderDecoder(d2l.Classifier):
         enc_all_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
-        return self.decoder(dec_X, dec_state, enc_all_outputs)[0]
+        return self.decoder(dec_X, dec_state)[0]
 
     def predict_step(self, batch, device, num_steps,
                      save_attention_weights=False):
         """Defined in :numref:`sec_seq2seq_training`"""
         batch = [d2l.to(a, device) for a in batch]
         src, tgt, src_valid_len, _ = batch
-        enc_outputs = self.encoder(src, src_valid_len)
-        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        enc_all_outputs = self.encoder(src, src_valid_len)
+        dec_state = self.decoder.init_state(enc_all_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:, 0], 1), ], []
         for _ in range(num_steps):
-            Y, dec_state = self.decoder(outputs[-1], dec_state, enc_outputs)
+            Y, dec_state = self.decoder(outputs[-1], dec_state)
             outputs.append(d2l.argmax(Y, 2))
             # Save attention weights (to be covered later)
             if save_attention_weights:
