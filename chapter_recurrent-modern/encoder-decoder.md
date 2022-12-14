@@ -132,7 +132,7 @@ class Decoder(nn.Block):  #@save
         super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
@@ -162,7 +162,7 @@ class Decoder(tf.keras.layers.Layer):  #@save
         super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def call(self, X, state):
@@ -177,7 +177,7 @@ class Decoder(nn.Module):  #@save
         raise NotImplementedError
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def __call__(self, X, state):
@@ -218,8 +218,8 @@ class EncoderDecoder(d2l.Classifier):  #@save
         self.decoder = decoder
 
     def call(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args, training=True)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
+        enc_all_outputs = self.encoder(enc_X, *args, training=True)
+        dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state, training=True)[0]
 ```
@@ -233,8 +233,8 @@ class EncoderDecoder(d2l.Classifier):  #@save
     training: bool
 
     def __call__(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args, training=self.training)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
+        enc_all_outputs = self.encoder(enc_X, *args, training=self.training)
+        dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state, training=self.training)[0]
 ```

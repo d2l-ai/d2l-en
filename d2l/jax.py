@@ -1068,7 +1068,7 @@ class Decoder(nn.Module):
         raise NotImplementedError
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def __call__(self, X, state):
@@ -1083,8 +1083,8 @@ class EncoderDecoder(d2l.Classifier):
     training: bool
 
     def __call__(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args, training=self.training)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
+        enc_all_outputs = self.encoder(enc_X, *args, training=self.training)
+        dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state, training=self.training)[0]
 
