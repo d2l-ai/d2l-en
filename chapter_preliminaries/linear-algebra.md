@@ -926,9 +926,9 @@ and should not be confused with the Hadamard product.
 
 Some of the most useful operators in linear algebra are *norms*.
 Informally, the norm of a vector tells us how *big* it is. 
-For instance, the $\\ell_2$ norm measures
+For instance, the $\ell_2$ norm measures
 the (Euclidean) length of a vector.
-Here, we are employing a notion of *size* that concerns the magnitude a vector's components
+Here, we are employing a notion of *size* that concerns the magnitude of a vector's components
 (not its dimensionality). 
 
 A norm is a function $\| \cdot \|$ that maps a vector
