@@ -111,7 +111,7 @@ class Encoder(nn.Module):  #@save
 
 In the following decoder interface,
 we add an additional `init_state` function
-to convert the encoder output (`enc_outputs`)
+to convert the encoder output (`enc_all_outputs`)
 into the encoded state.
 Note that this step
 may require extra inputs,
@@ -147,7 +147,7 @@ class Decoder(nn.Module):  #@save
         super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
@@ -202,10 +202,10 @@ class EncoderDecoder(d2l.Classifier):  #@save
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
+        enc_all_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
-        return self.decoder(dec_X, dec_state)[0]
+        return self.decoder(dec_X, dec_state, enc_all_outputs)[0]
 ```
 
 ```{.python .input}

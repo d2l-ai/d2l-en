@@ -1135,10 +1135,10 @@ class Seq2SeqEncoder(d2l.Encoder):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
         # embs shape: (num_steps, batch_size, embed_size)
-        output, state = self.rnn(embs, training=training)
-        # output shape: (num_steps, batch_size, num_hiddens)
+        outputs, state = self.rnn(embs, training=training)
+        # outputs shape: (num_steps, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens)
-        return output, state
+        return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""
