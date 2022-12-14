@@ -889,7 +889,7 @@ class Decoder(nn.Module):
         super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
@@ -905,8 +905,8 @@ class EncoderDecoder(d2l.Classifier):
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
+        enc_all_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state)[0]
 
@@ -915,9 +915,9 @@ class EncoderDecoder(d2l.Classifier):
         """Defined in :numref:`sec_seq2seq_training`"""
         batch = [d2l.to(a, device) for a in batch]
         src, tgt, src_valid_len, _ = batch
-        enc_outputs = self.encoder(src, src_valid_len)
-        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
-        outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
+        enc_all_outputs = self.encoder(src, src_valid_len)
+        dec_state = self.decoder.init_state(enc_all_outputs, src_valid_len)
+        outputs, attention_weights = [d2l.expand_dims(tgt[:, 0], 1), ], []
         for _ in range(num_steps):
             Y, dec_state = self.decoder(outputs[-1], dec_state)
             outputs.append(d2l.argmax(Y, 2))
@@ -952,10 +952,10 @@ class Seq2SeqEncoder(d2l.Encoder):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
         # embs shape: (num_steps, batch_size, embed_size)
-        output, state = self.rnn(embs)
-        # output shape: (num_steps, batch_size, num_hiddens)
+        outputs, state = self.rnn(embs)
+        # outputs shape: (num_steps, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens)
-        return output, state
+        return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""

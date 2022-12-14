@@ -1068,7 +1068,7 @@ class Decoder(nn.Module):
         raise NotImplementedError
 
     # Later there can be additional arguments (e.g., length excluding padding)
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_all_outputs, *args):
         raise NotImplementedError
 
     def __call__(self, X, state):
@@ -1083,8 +1083,8 @@ class EncoderDecoder(d2l.Classifier):
     training: bool
 
     def __call__(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args, training=self.training)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
+        enc_all_outputs = self.encoder(enc_X, *args, training=self.training)
+        dec_state = self.decoder.init_state(enc_all_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state, training=self.training)[0]
 
@@ -1092,30 +1092,32 @@ class EncoderDecoder(d2l.Classifier):
                      save_attention_weights=False):
         """Defined in :numref:`sec_seq2seq_training`"""
         src, tgt, src_valid_len, _ = batch
-        enc_outputs, inter_enc_vars = self.encoder.apply({'params': params['encoder']},
-                                                         src, src_valid_len, training=False,
-                                                         mutable='intermediates')
+        enc_all_outputs, inter_enc_vars = self.encoder.apply(
+            {'params': params['encoder']}, src, src_valid_len, training=False,
+            mutable='intermediates')
         # Save encoder attention weights if inter_enc_vars containing encoder
         # attention weights is not empty. (to be covered later)
         enc_attention_weights = []
         if bool(inter_enc_vars) and save_attention_weights:
             # Encoder Attention Weights saved in the intermediates collection
-            enc_attention_weights = inter_enc_vars['intermediates']['enc_attention_weights'][0]
+            enc_attention_weights = inter_enc_vars[
+                'intermediates']['enc_attention_weights'][0]
     
-        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        dec_state = self.decoder.init_state(enc_all_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
         for _ in range(num_steps):
-            (Y, dec_state), inter_dec_vars = self.decoder.apply({'params': params['decoder']},
-                                                                outputs[-1], dec_state,
-                                                                training=False,
-                                                                mutable='intermediates')
+            (Y, dec_state), inter_dec_vars = self.decoder.apply(
+                {'params': params['decoder']}, outputs[-1], dec_state,
+                training=False, mutable='intermediates')
             outputs.append(d2l.argmax(Y, 2))
             # Save attention weights (to be covered later)
             if save_attention_weights:
                 # Decoder Attention Weights saved in the intermediates collection
-                dec_attention_weights = inter_dec_vars['intermediates']['dec_attention_weights'][0]
+                dec_attention_weights = inter_dec_vars[
+                    'intermediates']['dec_attention_weights'][0]
                 attention_weights.append(dec_attention_weights)
-        return d2l.concat(outputs[1:], 1), (attention_weights, enc_attention_weights)
+        return d2l.concat(outputs[1:], 1), (attention_weights,
+                                            enc_attention_weights)
 
 class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
@@ -1135,10 +1137,10 @@ class Seq2SeqEncoder(d2l.Encoder):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
         # embs shape: (num_steps, batch_size, embed_size)
-        output, state = self.rnn(embs, training=training)
-        # output shape: (num_steps, batch_size, num_hiddens)
+        outputs, state = self.rnn(embs, training=training)
+        # outputs shape: (num_steps, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens)
-        return output, state
+        return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""

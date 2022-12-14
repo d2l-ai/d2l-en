@@ -74,10 +74,10 @@ we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
 the residual connection $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
 This addition from the residual connection is immediately
 followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
-As a result, the Transformer encoder outputs a $d$-dimensional vector representation 
+As a result, the Transformer encoder outputs a $d$-dimensional vector representation
 for each position of the input sequence.
 
-The Transformer decoder is also a stack of multiple identical layers 
+The Transformer decoder is also a stack of multiple identical layers
 with residual connections and layer normalizations.
 Besides the two sublayers described in
 the encoder, the decoder inserts
@@ -97,7 +97,7 @@ allowed to only attend to all positions in the decoder
 up to that position.
 This *masked* attention
 preserves the auto-regressive property,
-ensuring that the prediction only depends 
+ensuring that the prediction only depends
 on those output tokens that have been generated.
 
 
@@ -1375,17 +1375,16 @@ or the Transformer decoder
 is often individually used
 for different deep learning tasks.
 
-
 ## Summary
 
-The Transformer is an instance of the encoder-decoder architecture, 
+The Transformer is an instance of the encoder-decoder architecture,
 though either the encoder or the decoder can be used individually in practice.
-In the Transformer architecture, multi-head self-attention is used 
-for representing the input sequence and the output sequence, 
+In the Transformer architecture, multi-head self-attention is used
+for representing the input sequence and the output sequence,
 though the decoder has to preserve the auto-regressive property via a masked version.
 Both the residual connections and the layer normalization in the Transformer
 are important for training a very deep model.
-The positionwise feed-forward network in the Transformer model 
+The positionwise feed-forward network in the Transformer model
 transforms the representation at all the sequence positions using the same MLP.
 
 ## Exercises

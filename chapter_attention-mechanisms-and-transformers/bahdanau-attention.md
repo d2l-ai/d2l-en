@@ -7,7 +7,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 :label:`sec_seq2seq_attention`
 
 When we encountered machine translation in :numref:`sec_seq2seq`,
-we designed an encoder-decoder architecture for sequence to sequence (seq2seq) learning 
+we designed an encoder-decoder architecture for sequence to sequence (seq2seq) learning
 based on two RNNs :cite:`Sutskever.Vinyals.Le.2014`.
 Specifically, the RNN encoder transforms a variable-length sequence
 into a *fixed-shape* context variable.
@@ -21,7 +21,7 @@ Recall :numref:`fig_seq2seq_details` which we reprint below (:numref:`fig_s2s_at
 
 While this is quite reasonable for short sequences, it is clear that it is infeasible for long sequences, such as a book chapter or even just a very long sentence. After all, after a while there will simply not be enough "space" in the intermediate representation to store all that is important in the source sequence. Consequently the decoder will fail to translate long and complex sentences. One of the first to encounter was :citet:`Graves.2013` when they tried to design an RNN to generate handwritten text. Since the source text has arbitrary length they designed a differentiable attention model
 to align text characters with the much longer pen trace,
-where the alignment moves only in one direction. This, in turn, draws on decoding algorithms in speech recognition, e.g., hidden Markov models :cite:`RabJua93`. 
+where the alignment moves only in one direction. This, in turn, draws on decoding algorithms in speech recognition, e.g., hidden Markov models :cite:`RabJua93`.
 
 Inspired by the idea of learning to align,
 :citet:`Bahdanau.Cho.Bengio.2014` proposed a differentiable attention model
@@ -29,12 +29,12 @@ Inspired by the idea of learning to align,
 When predicting a token,
 if not all the input tokens are relevant,
 the model aligns (or attends)
-only to parts of the input sequence 
-that are deemed relevant to the current prediction. This is then used to update the current state before generating the next token. While quite innocuous in its description, this *Bahdanau attention mechanism* has arguably turned into one of the most influential ideas of the past decade in deep learning, giving rise to Transformers :cite:`Vaswani.Shazeer.Parmar.ea.2017` and many related new architectures. 
+only to parts of the input sequence
+that are deemed relevant to the current prediction. This is then used to update the current state before generating the next token. While quite innocuous in its description, this *Bahdanau attention mechanism* has arguably turned into one of the most influential ideas of the past decade in deep learning, giving rise to Transformers :cite:`Vaswani.Shazeer.Parmar.ea.2017` and many related new architectures.
 
 ## Model
 
-We follow the notation introduced by the seq2seq architecture of :numref:`sec_seq2seq`, in particular :eqref:`eq_seq2seq_s_t`. 
+We follow the notation introduced by the seq2seq architecture of :numref:`sec_seq2seq`, in particular :eqref:`eq_seq2seq_s_t`.
 The key idea is that instead of keeping the state,
 i.e., the context variable $\mathbf{c}$ summarizing the source sentence as fixed, we dynamically update it, as a function of both the original text (encoder hidden states $\mathbf{h}_{t}$) and the text that was already generated (decoder hidden states $\mathbf{s}_{t'-1}$). This yields $\mathbf{c}_{t'}$, which is updated after any decoding time step $t'$. Suppose that the input sequence is of length $T$. In this case the context variable is the output of attention pooling:
 
@@ -45,7 +45,7 @@ $\mathbf{h}_{t}$ as both the key and the value. Note that $\mathbf{c}_{t'}$ is t
 using the additive attention scoring function
 defined by :eqref:`eq_additive-attn`.
 This RNN encoder-decoder architecture
-using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition. 
+using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition.
 
 ![Layers in an RNN encoder-decoder model with the Bahdanau attention mechanism.](../img/seq2seq-details-attention.svg)
 :label:`fig_s2s_attention_details`
@@ -81,7 +81,7 @@ import jax
 
 ## Defining the Decoder with Attention
 
-To implement the RNN encoder-decoder with attention, 
+To implement the RNN encoder-decoder with attention,
 we only need to redefine the decoder (omitting the generated symbols from the attention function simplifies the design). Let's begin with [**the base interface for decoders with attention**] by defining the quite unsurprisingly named `AttentionDecoder` class.
 
 ```{.python .input}
@@ -99,10 +99,10 @@ class AttentionDecoder(d2l.Decoder):  #@save
 We need to [**implement the RNN decoder**]
 in the `Seq2SeqAttentionDecoder` class.
 The state of the decoder is initialized with
-(i) the hidden states of the last layer of the encoder at all time steps, used as keys and values for attention; 
+(i) the hidden states of the last layer of the encoder at all time steps, used as keys and values for attention;
 (ii) the hidden state of the encoder at all layers at the final time step. This serves to initialize the hidden state of the decoder;
 and (iii) the valid length of the encoder, to exclude the padding tokens in attention pooling.
-At each decoding time step, the hidden state of the last layer of the decoder, obtained at the previous time step, is used as the query of the attention mechanism. 
+At each decoding time step, the hidden state of the last layer of the decoder, obtained at the previous time step, is used as the query of the attention mechanism.
 Both the output of the attention mechanism and the input embedding are concatenated to serve as the input of the RNN decoder.
 
 ```{.python .input}
@@ -351,14 +351,14 @@ d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 
 ## [**Training**]
 
-Now that we specified the new decoder we can proceed analogously to :numref:`sec_seq2seq_training`: 
+Now that we specified the new decoder we can proceed analogously to :numref:`sec_seq2seq_training`:
 specify the hyperparameters, instantiate
 a regular encoder and a decoder with attention,
 and train this model for machine translation.
 
 ```{.python .input}
 %%tab all
-data = d2l.MTFraEng(batch_size=128) 
+data = d2l.MTFraEng(batch_size=128)
 embed_size, num_hiddens, num_layers, dropout = 256, 256, 2, 0.2
 if tab.selected('mxnet', 'pytorch', 'jax'):
     encoder = d2l.Seq2SeqEncoder(
@@ -404,13 +404,13 @@ for en, fr, p in zip(engs, fras, preds):
     for token in data.tgt_vocab.to_tokens(p):
         if token == '<eos>':
             break
-        translation.append(token)        
+        translation.append(token)
     print(f'{en} => {translation}, bleu,'
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
 Let's [**visualize the attention weights**]
-when translating the last English sentence. 
+when translating the last English sentence.
 We see that each query assigns non-uniform weights
 over key-value pairs.
 It shows that at each decoding step,
@@ -465,7 +465,6 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 
 When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with the Bahdanau attention mechanism selectively aggregates different parts of the input sequence. This is achieved by treating the state (context variable) as an output of additive attention pooling.
 In the RNN encoder-decoder, the Bahdanau attention mechanism treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
-
 
 ## Exercises
 
