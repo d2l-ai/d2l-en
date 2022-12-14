@@ -1092,30 +1092,32 @@ class EncoderDecoder(d2l.Classifier):
                      save_attention_weights=False):
         """Defined in :numref:`sec_seq2seq_training`"""
         src, tgt, src_valid_len, _ = batch
-        enc_outputs, inter_enc_vars = self.encoder.apply({'params': params['encoder']},
-                                                         src, src_valid_len, training=False,
-                                                         mutable='intermediates')
+        enc_all_outputs, inter_enc_vars = self.encoder.apply(
+            {'params': params['encoder']}, src, src_valid_len, training=False,
+            mutable='intermediates')
         # Save encoder attention weights if inter_enc_vars containing encoder
         # attention weights is not empty. (to be covered later)
         enc_attention_weights = []
         if bool(inter_enc_vars) and save_attention_weights:
             # Encoder Attention Weights saved in the intermediates collection
-            enc_attention_weights = inter_enc_vars['intermediates']['enc_attention_weights'][0]
+            enc_attention_weights = inter_enc_vars[
+                'intermediates']['enc_attention_weights'][0]
     
-        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        dec_state = self.decoder.init_state(enc_all_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
         for _ in range(num_steps):
-            (Y, dec_state), inter_dec_vars = self.decoder.apply({'params': params['decoder']},
-                                                                outputs[-1], dec_state,
-                                                                training=False,
-                                                                mutable='intermediates')
+            (Y, dec_state), inter_dec_vars = self.decoder.apply(
+                {'params': params['decoder']}, outputs[-1], dec_state,
+                training=False, mutable='intermediates')
             outputs.append(d2l.argmax(Y, 2))
             # Save attention weights (to be covered later)
             if save_attention_weights:
                 # Decoder Attention Weights saved in the intermediates collection
-                dec_attention_weights = inter_dec_vars['intermediates']['dec_attention_weights'][0]
+                dec_attention_weights = inter_dec_vars[
+                    'intermediates']['dec_attention_weights'][0]
                 attention_weights.append(dec_attention_weights)
-        return d2l.concat(outputs[1:], 1), (attention_weights, enc_attention_weights)
+        return d2l.concat(outputs[1:], 1), (attention_weights,
+                                            enc_attention_weights)
 
 class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.

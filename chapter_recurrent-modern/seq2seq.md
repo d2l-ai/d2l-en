@@ -401,24 +401,25 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.dense = nn.Dense(vocab_size, flatten=False)
         self.initialize(init.Xavier())
             
-    def init_state(self, enc_outputs, *args):
-        return enc_outputs[1] 
+    def init_state(self, enc_all_outputs, *args):
+        return enc_all_outputs 
 
-    def forward(self, X, enc_state):
+    def forward(self, X, state):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.transpose(X))
+        enc_output, hidden_state = state
         # context shape: (batch_size, num_hiddens)
-        context = enc_state[-1]
+        context = enc_output[-1]
         # Broadcast context to (num_steps, batch_size, num_hiddens)
         context = np.tile(context, (embs.shape[0], 1, 1))
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, enc_state)
+        outputs, hidden_state = self.rnn(embs_and_context, hidden_state)
         outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
         # outputs shape: (batch_size, num_steps, vocab_size)
-        # state shape: (num_layers, batch_size, num_hiddens)
-        return outputs, state
+        # hidden_state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, [enc_output, hidden_state]
 ```
 
 ```{.python .input}
@@ -466,24 +467,25 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
         self.dense = tf.keras.layers.Dense(vocab_size)
             
-    def init_state(self, enc_outputs, *args):
-        return enc_outputs[1] 
+    def init_state(self, enc_all_outputs, *args):
+        return enc_all_outputs
 
-    def call(self, X, enc_state):
+    def call(self, X, state):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.transpose(X))
+        enc_output, hidden_state = state
         # context shape: (batch_size, num_hiddens)
-        context = enc_state[-1]
+        context = enc_output[-1]
         # Broadcast context to (num_steps, batch_size, num_hiddens)
         context = tf.tile(tf.expand_dims(context, 0), (embs.shape[0], 1, 1))
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, enc_state)
+        outputs, hidden_state = self.rnn(embs_and_context, hidden_state)
         outputs = d2l.transpose(self.dense(outputs), (1, 0, 2))
         # outputs shape: (batch_size, num_steps, vocab_size)
-        # state shape: (num_layers, batch_size, num_hiddens)
-        return outputs, state
+        # hidden_state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, [enc_output, hidden_state]
 ```
 
 ```{.python .input}
@@ -501,24 +503,26 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.rnn = d2l.GRU(self.num_hiddens, self.num_layers, self.dropout)
         self.dense = nn.Dense(self.vocab_size)
 
-    def init_state(self, enc_outputs, *args):
-        return enc_outputs[1]
+    def init_state(self, enc_all_outputs, *args):
+        return enc_all_outputs
 
-    def __call__(self, X, enc_state, training=False):
+    def __call__(self, X, state, training=False):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
+        enc_output, hidden_state = state
         # context shape: (batch_size, num_hiddens)
-        context = enc_state[-1]
+        context = enc_output[-1]
         # Broadcast context to (num_steps, batch_size, num_hiddens)
         context = jnp.tile(context, (embs.shape[0], 1, 1))
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, enc_state, training=training)
+        outputs, hidden_state = self.rnn(embs_and_context, hidden_state,
+                                         training=training)
         outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
         # outputs shape: (batch_size, num_steps, vocab_size)
-        # state shape: (num_layers, batch_size, num_hiddens)
-        return outputs, state
+        # hidden_state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, [enc_output, hidden_state]
 ```
 
 To [**illustrate the implemented decoder**],
@@ -534,15 +538,16 @@ if tab.selected('mxnet', 'pytorch', 'tensorflow'):
     dec_outputs, state = decoder(X, state)
 if tab.selected('jax'):
     state = decoder.init_state(encoder.init_with_output(d2l.get_key(), X)[0])
-    (outputs, state), _ = decoder.init_with_output(d2l.get_key(), X, state)
+    (dec_outputs, state), _ = decoder.init_with_output(d2l.get_key(), X,
+                                                       state)
 
 
 d2l.check_shape(dec_outputs, (batch_size, num_steps, vocab_size))
 if tab.selected('mxnet', 'pytorch', 'jax'):
     d2l.check_shape(state[1], (num_layers, batch_size, num_hiddens))
 if tab.selected('tensorflow'):
-    d2l.check_len(state, num_layers)
-    d2l.check_shape(state[0], (batch_size, num_hiddens))
+    d2l.check_len(state[1], num_layers)
+    d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 ```
 
 To summarize, the layers in the above RNN encoder-decoder model 
@@ -735,30 +740,32 @@ def predict_step(self, batch, device, num_steps,
 def predict_step(self, params, batch, num_steps,
                  save_attention_weights=False):
     src, tgt, src_valid_len, _ = batch
-    enc_outputs, inter_enc_vars = self.encoder.apply({'params': params['encoder']},
-                                                     src, src_valid_len, training=False,
-                                                     mutable='intermediates')
+    enc_all_outputs, inter_enc_vars = self.encoder.apply(
+        {'params': params['encoder']}, src, src_valid_len, training=False,
+        mutable='intermediates')
     # Save encoder attention weights if inter_enc_vars containing encoder
     # attention weights is not empty. (to be covered later)
     enc_attention_weights = []
     if bool(inter_enc_vars) and save_attention_weights:
         # Encoder Attention Weights saved in the intermediates collection
-        enc_attention_weights = inter_enc_vars['intermediates']['enc_attention_weights'][0]
+        enc_attention_weights = inter_enc_vars[
+            'intermediates']['enc_attention_weights'][0]
 
-    dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+    dec_state = self.decoder.init_state(enc_all_outputs, src_valid_len)
     outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
     for _ in range(num_steps):
-        (Y, dec_state), inter_dec_vars = self.decoder.apply({'params': params['decoder']},
-                                                            outputs[-1], dec_state,
-                                                            training=False,
-                                                            mutable='intermediates')
+        (Y, dec_state), inter_dec_vars = self.decoder.apply(
+            {'params': params['decoder']}, outputs[-1], dec_state,
+            training=False, mutable='intermediates')
         outputs.append(d2l.argmax(Y, 2))
         # Save attention weights (to be covered later)
         if save_attention_weights:
             # Decoder Attention Weights saved in the intermediates collection
-            dec_attention_weights = inter_dec_vars['intermediates']['dec_attention_weights'][0]
+            dec_attention_weights = inter_dec_vars[
+                'intermediates']['dec_attention_weights'][0]
             attention_weights.append(dec_attention_weights)
-    return d2l.concat(outputs[1:], 1), (attention_weights, enc_attention_weights)
+    return d2l.concat(outputs[1:], 1), (attention_weights,
+                                        enc_attention_weights)
 ```
 
 ## Evaluation of Predicted Sequences
