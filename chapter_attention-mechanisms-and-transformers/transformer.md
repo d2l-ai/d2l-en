@@ -1406,3 +1406,4 @@ transforms the representation at all the sequence positions using the same MLP.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3871)
 :end_tab:
+
