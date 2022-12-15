@@ -24,7 +24,7 @@ and `save` requires as input the variable to be saved.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input}
@@ -56,6 +56,19 @@ x = tf.range(4)
 np.save('x-file.npy', x)
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+import flax
+from flax import linen as nn
+from flax.training import checkpoints
+import jax
+from jax import numpy as jnp
+
+x = jnp.arange(4)
+jnp.save('x-file.npy', x)
+```
+
 We can now read the data from the stored file back into memory.
 
 ```{.python .input}
@@ -73,6 +86,12 @@ x2
 ```{.python .input}
 %%tab tensorflow
 x2 = np.load('x-file.npy', allow_pickle=True)
+x2
+```
+
+```{.python .input}
+%%tab jax
+x2 = jnp.load('x-file.npy', allow_pickle=True)
 x2
 ```
 
@@ -102,6 +121,14 @@ x2, y2 = np.load('xy-files.npy', allow_pickle=True)
 (x2, y2)
 ```
 
+```{.python .input}
+%%tab jax
+y = jnp.zeros(4)
+jnp.save('xy-files.npy', [x, y])
+x2, y2 = jnp.load('xy-files.npy', allow_pickle=True)
+(x2, y2)
+```
+
 We can even [**write and read a dictionary that maps
 from strings to tensors.**]
 This is convenient when we want
@@ -128,6 +155,14 @@ mydict2
 mydict = {'x': x, 'y': y}
 np.save('mydict.npy', mydict)
 mydict2 = np.load('mydict.npy', allow_pickle=True)
+mydict2
+```
+
+```{.python .input}
+%%tab jax
+mydict = {'x': x, 'y': y}
+jnp.save('mydict.npy', mydict)
+mydict2 = jnp.load('mydict.npy', allow_pickle=True)
 mydict2
 ```
 
@@ -203,6 +238,21 @@ X = tf.random.uniform((2, 20))
 Y = net(X)
 ```
 
+```{.python .input}
+%%tab jax
+class MLP(nn.Module):
+    def setup(self):
+        self.hidden = nn.Dense(256)
+        self.output = nn.Dense(10)
+
+    def __call__(self, x):
+        return self.output(nn.relu(self.hidden(x)))
+
+net = MLP()
+X = jax.random.normal(jax.random.PRNGKey(d2l.get_seed()), (2, 20))
+Y, params = net.init_with_output(jax.random.PRNGKey(d2l.get_seed()), X)
+```
+
 Next, we [**store the parameters of the model as a file**] with the name "mlp.params".
 
 ```{.python .input}
@@ -218,6 +268,11 @@ torch.save(net.state_dict(), 'mlp.params')
 ```{.python .input}
 %%tab tensorflow
 net.save_weights('mlp.params')
+```
+
+```{.python .input}
+%%tab jax
+checkpoints.save_checkpoint('ckpt_dir', params, step=1, overwrite=True)
 ```
 
 To recover the model, we instantiate a clone
@@ -244,21 +299,34 @@ clone = MLP()
 clone.load_weights('mlp.params')
 ```
 
+```{.python .input}
+%%tab jax
+clone = MLP()
+cloned_params = flax.core.freeze(checkpoints.restore_checkpoint('ckpt_dir',
+                                                                target=None))
+```
+
 Since both instances have the same model parameters,
 the computational result of the same input `X` should be the same.
 Let's verify this.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 Y_clone = clone(X)
+Y_clone == Y
+```
+
+```{.python .input}
+%%tab jax
+Y_clone = clone.apply(cloned_params, X)
 Y_clone == Y
 ```
 
 ## Summary
 
-* The `save` and `load` functions can be used to perform file I/O for tensor objects.
-* We can save and load the entire sets of parameters for a network via a parameter dictionary.
-* Saving the architecture has to be done in code rather than in parameters.
+The `save` and `load` functions can be used to perform file I/O for tensor objects.
+We can save and load the entire sets of parameters for a network via a parameter dictionary.
+Saving the architecture has to be done in code rather than in parameters.
 
 ## Exercises
 

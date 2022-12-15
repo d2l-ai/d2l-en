@@ -16,7 +16,7 @@ but with the advantage of being faster
 to compute :cite:`Chung.Gulcehre.Cho.ea.2014`.
 
 
-### Reset Gate and Update Gate
+## Reset Gate and Update Gate
 
 Here, the LSTM's three gates are replaced by two:
 the *reset gate* and the *update gate*.
@@ -40,7 +40,7 @@ with a sigmoid activation function.
 Mathematically, for a given time step $t$,
 suppose that the input is a minibatch
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-number of examples: $n$, number of inputs: $d$)
+(number of examples: $n$, number of inputs: $d$)
 and the hidden state of the previous time step 
 is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ 
 (number of hidden units: $h$). 
@@ -60,7 +60,7 @@ are weight parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h
 are bias parameters.
 
 
-### Candidate Hidden State
+## Candidate Hidden State
 
 Next, we integrate the reset gate $\mathbf{R}_t$ 
 with the regular updating mechanism
@@ -99,7 +99,7 @@ Any pre-existing hidden state is thus *reset* to defaults.
 :label:`fig_gru_2`
 
 
-### Hidden State
+## Hidden State
 
 Finally, we need to incorporate the effect of the update gate $\mathbf{Z}_t$.
 This determines the extent to which the new hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ 
@@ -136,7 +136,7 @@ To gain a better understanding of the GRU model, let's implement it from scratch
 
 ```{.python .input  n=5}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input  n=6}
@@ -160,6 +160,14 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ### (**Initializing Model Parameters**)
 
 The first step is to initialize the model parameters.
@@ -170,7 +178,7 @@ We instantiate all weights and biases relating to the update gate,
 the reset gate, and the candidate hidden state.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class GRUScratch(d2l.Module):
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
@@ -197,6 +205,27 @@ class GRUScratch(d2l.Module):
         self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state        
 ```
 
+```{.python .input}
+%%tab jax
+class GRUScratch(d2l.Module):
+    num_inputs: int
+    num_hiddens: int
+    sigma: float = 0.01
+
+    def setup(self):
+        init_weight = lambda name, shape: self.param(name,
+                                                     nn.initializers.normal(self.sigma),
+                                                     shape)
+        triple = lambda name : (
+            init_weight(f'W_x{name}', (self.num_inputs, self.num_hiddens)),
+            init_weight(f'W_h{name}', (self.num_hiddens, self.num_hiddens)),
+            self.param(f'b_{name}', nn.initializers.zeros, (self.num_hiddens)))
+
+        self.W_xz, self.W_hz, self.b_z = triple('z')  # Update gate
+        self.W_xr, self.W_hr, self.b_r = triple('r')  # Reset gate
+        self.W_xh, self.W_hh, self.b_h = triple('h')  # Candidate hidden state
+```
+
 ### Defining the Model
 
 Now we are ready to [**define the GRU forward computation**].
@@ -204,22 +233,57 @@ Its structure is the same as that of the basic RNN cell,
 except that the update equations are more complex.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(GRUScratch)
 def forward(self, inputs, H=None):
-    matmul_H = lambda A, B: d2l.matmul(A, B) if H is not None else 0
+    if H is None:
+        # Initial state with shape: (batch_size, num_hiddens)
+        if tab.selected('mxnet'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          ctx=inputs.ctx)
+        if tab.selected('pytorch'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          device=inputs.device)
+        if tab.selected('tensorflow'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens))
     outputs = []
     for X in inputs:
-        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + (
-            d2l.matmul(H, self.W_hz) if H is not None else 0) + self.b_z)
-        if H is None: H = d2l.zeros_like(Z)
+        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) +
+                        d2l.matmul(H, self.W_hz) + self.b_z)
         R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
                         d2l.matmul(H, self.W_hr) + self.b_r)
         H_tilde = d2l.tanh(d2l.matmul(X, self.W_xh) + 
                            d2l.matmul(R * H, self.W_hh) + self.b_h)
         H = Z * H + (1 - Z) * H_tilde
         outputs.append(H)
-    return outputs, (H, )
+    return outputs, H
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(GRUScratch)
+def forward(self, inputs, H=None):
+    # Use lax.scan primitive instead of looping over the
+    # inputs, since scan saves time in jit compilation
+    def scan_fn(H, X):
+        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + d2l.matmul(H, self.W_hz) +
+                        self.b_z)
+        R = d2l.sigmoid(d2l.matmul(X, self.W_xr) +
+                        d2l.matmul(H, self.W_hr) + self.b_r)
+        H_tilde = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                           d2l.matmul(R * H, self.W_hh) + self.b_h)
+        H = Z * H + (1 - Z) * H_tilde
+        return H, H  # return carry, y
+
+    if H is None:
+        batch_size = inputs.shape[1]
+        carry = jnp.zeros((batch_size, self.num_hiddens))
+    else:
+        carry = H
+
+    # scan takes the scan_fn, initial carry state, xs with leading axis to be scanned
+    carry, outputs = jax.lax.scan(scan_fn, carry, inputs)
+    return outputs, carry
 ```
 
 ### Training
@@ -230,7 +294,7 @@ works in exactly the same manner as in :numref:`sec_rnn-scratch`.
 ```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
     model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=4)
     trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
@@ -244,11 +308,11 @@ trainer.fit(model, data)
 
 ## [**Concise Implementation**]
 
-In high-level APIs, we can directly instantiate a GPU model.
+In high-level APIs, we can directly instantiate a GRU model.
 This encapsulates all the configuration detail that we made explicit above.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class GRU(d2l.RNN):
     def __init__(self, num_inputs, num_hiddens):
         d2l.Module.__init__(self)
@@ -262,13 +326,35 @@ class GRU(d2l.RNN):
                                            return_state=True)
 ```
 
+```{.python .input}
+%%tab jax
+class GRU(d2l.RNN):
+    num_hiddens: int
+
+    @nn.compact
+    def __call__(self, inputs, H=None, training=False):
+        if H is None:
+            batch_size = inputs.shape[1]
+            H = nn.GRUCell.initialize_carry(jax.random.PRNGKey(0),
+                                            (batch_size,), self.num_hiddens)
+
+        GRU = nn.scan(nn.GRUCell, variable_broadcast="params",
+                      in_axes=0, out_axes=0, split_rngs={"params": False})
+
+        H, outputs = GRU()(H, inputs)
+        return outputs, H
+```
+
 The code is significantly faster in training as it uses compiled operators 
 rather than Python.
 
 ```{.python .input}
 %%tab all
-gru = GRU(num_inputs=len(data.vocab), num_hiddens=32)
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'tensorflow'):
+    gru = GRU(num_inputs=len(data.vocab), num_hiddens=32)
+if tab.selected('jax'):
+    gru = GRU(num_hiddens=32)
+if tab.selected('mxnet', 'pytorch', 'jax'):
     model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=4)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -287,6 +373,11 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```{.python .input}
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
+```
+
+```{.python .input}
+%%tab jax
+model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
 ## Summary

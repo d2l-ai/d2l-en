@@ -8,7 +8,9 @@ requirements = [
     'matplotlib-inline',
     'requests',
     'pandas',
-    'gym'
+    'gym==0.21.0',
+    'gpytorch',
+    'scipy'
 ]
 
 setup(

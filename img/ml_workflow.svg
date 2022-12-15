@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="327 281 400 200" width="400" height="200">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 10 8" markerWidth="10" markerHeight="8" color="black">
+      <g>
+        <path d="M 8 0 L 0 0 M 0 -3 L 8 0 L 0 3" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="Canvas_1" fill-opacity="1" stroke-opacity="1" fill="none" stroke="none" stroke-dasharray="none">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_2">
+        <rect x="371.0215" y="318" width="124" height="38" fill="#b2d9ff"/>
+        <rect x="371.0215" y="318" width="124" height="38" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(376.0215 331.8528)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="14.232422" y="8">Set Hyperparameters</tspan>
+        </text>
+      </g>
+      <g id="Graphic_3">
+        <rect x="371.0215" y="376" width="124" height="38" fill="#b2d9ff"/>
+        <rect x="371.0215" y="376" width="124" height="38" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(376.0215 389.8528)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="46.91455" y="8">Train</tspan>
+        </text>
+      </g>
+      <g id="Graphic_4">
+        <rect x="371.0215" y="434" width="124" height="38" fill="#b2d9ff"/>
+        <rect x="371.0215" y="434" width="124" height="38" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(376.0215 447.8528)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="39.487793" y="8">Evaluate</tspan>
+        </text>
+      </g>
+      <g id="Line_5">
+        <line x1="433.0215" y1="356" x2="433.0215" y2="366.1" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_6">
+        <line x1="433.0215" y1="414" x2="433.0215" y2="424.1" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_7">
+        <line x1="495.0215" y1="453" x2="549.0785" y2="453" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_8">
+        <path d="M 521.88344 453 L 521.88344 443 L 521.4785 297 L 447.891 297.29217 L 442.891 297.29217" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_9">
+        <line x1="432.9785" y1="281" x2="432.9993" y2="308.1" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_10">
+        <rect x="558.9785" y="434" width="124" height="38" fill="#66bfff"/>
+        <rect x="558.9785" y="434" width="124" height="38" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(563.9785 447.8528)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="42.99243" y="8">Deploy</tspan>
+        </text>
+      </g>
+      <g id="Graphic_11">
+        <text transform="translate(538.4785 343.5)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="23.220703" y="8">Loop until validation </tspan>
+          <tspan font-family="Arial" font-size="9" fill="black" x="10.483154" y="18.294434">performance is maximised</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

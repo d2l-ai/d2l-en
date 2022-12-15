@@ -1,28 +1,29 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 # Self-Attention and Positional Encoding
 :label:`sec_self-attention-and-positional-encoding`
 
-In deep learning,
-we often use CNNs or RNNs to encode a sequence.
-Now with attention mechanisms,
-imagine that we feed a sequence of tokens
-into attention pooling
-so that
-the same set of tokens
-act as queries, keys, and values.
-Specifically,
-each query attends to all the key-value pairs
-and generates one attention output.
-Since the queries, keys, and values
-come from the same place,
-this performs
-*self-attention* :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, which is also called *intra-attention* :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
-In this section,
-we will discuss sequence encoding using self-attention,
+In deep learning, we often use CNNs or RNNs to encode sequences.
+Now with attention mechanisms in mind, 
+imagine feeding a sequence of tokens 
+into an attention mechanism
+such that at each step,
+each token has its own query, keys, and values.
+Here, when computing the value of a token's representation at the next layer,
+the token can attend (via its query vector) to each other token 
+(matching based on their key vectors).
+Using the full set of query-key compatibility scores,
+we can compute, for each token, a representation
+by building the appropriate weighted sum
+over the other tokens. 
+Because each token is attending to each other token
+(unlike the case where decoder steps attend to encoder steps),
+such architectures are typically described as *self-attention* models :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, 
+and elsewhere described as *intra-attention* model :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
+In this section, we will discuss sequence encoding using self-attention,
 including using additional information for the sequence order.
 
 ```{.python .input}
@@ -47,6 +48,14 @@ from torch import nn
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
 ```
 
 ## [**Self-Attention**]
@@ -76,7 +85,7 @@ attention.initialize()
 ```
 
 ```{.python .input}
-%%tab pytorch
+%%tab pytorch, jax
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
@@ -104,6 +113,15 @@ d2l.check_shape(attention(X, X, X, valid_lens, training=False),
                 (batch_size, num_queries, num_hiddens))
 ```
 
+```{.python .input}
+%%tab jax
+batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+d2l.check_shape(attention.init_with_output(d2l.get_key(), X, X, X, valid_lens,
+                                           training=False)[0][0],
+                (batch_size, num_queries, num_hiddens))
+```
+
 ## Comparing CNNs, RNNs, and Self-Attention
 :label:`subsec_cnn-rnn-self-attention`
 
@@ -122,7 +140,8 @@ and maximum path lengths.
 Note that sequential operations prevent parallel computation,
 while a shorter path between
 any combination of sequence positions
-makes it easier to learn long-range dependencies within the sequence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
+makes it easier to learn long-range dependencies 
+within the sequence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
 
 
 ![Comparing CNN (padding tokens are omitted), RNN, and self-attention architectures.](../img/cnn-rnn-self-attention.svg)
@@ -131,14 +150,13 @@ makes it easier to learn long-range dependencies within the sequence :cite:`Hoch
 Consider a convolutional layer whose kernel size is $k$.
 We will provide more details about sequence processing
 using CNNs in later chapters.
-For now,
-we only need to know that
+For now, we only need to know that
 since the sequence length is $n$,
 the numbers of input and output channels are both $d$,
 the computational complexity of the convolutional layer is $\mathcal{O}(knd^2)$.
 As :numref:`fig_cnn-rnn-self-attention` shows,
-CNNs are hierarchical  so 
-there are $\mathcal{O}(1)$ sequential operations
+CNNs are hierarchical,
+so there are $\mathcal{O}(1)$ sequential operations
 and the maximum path length is $\mathcal{O}(n/k)$.
 For example, $\mathbf{x}_1$ and $\mathbf{x}_5$
 are within the receptive field of a two-layer CNN
@@ -189,28 +207,35 @@ makes self-attention prohibitively slow for very long sequences.
 :label:`subsec_positional-encoding`
 
 
-Unlike RNNs that recurrently process
+Unlike RNNs, which recurrently process
 tokens of a sequence one by one,
 self-attention ditches
 sequential operations in favor of 
 parallel computation.
-To use the sequence order information,
-we can inject
-absolute or relative
-positional information
-by adding *positional encoding*
-to the input representations.
-Positional encodings can be 
-either learned or fixed.
-In the following, 
-we describe a fixed positional encoding
+Note, however, that self-attention by itself
+does not preserve the order of the sequence. 
+What do we do if it really matters 
+that the model knows in which order
+the input sequence arrived?
+
+The dominant approach for preserving 
+information about the order of tokens
+is to represent this to the model 
+as an additional input associated 
+with each token. 
+These inputs are called *positional encodings*.
+and they can either be learned or fixed a priori.
+We now describe a simple scheme for fixed positional encodings
 based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 
-Suppose that
-the input representation $\mathbf{X} \in \mathbb{R}^{n \times d}$ contains the $d$-dimensional embeddings for $n$ tokens of a sequence.
+Suppose that the input representation 
+$\mathbf{X} \in \mathbb{R}^{n \times d}$ 
+contains the $d$-dimensional embeddings 
+for $n$ tokens of a sequence.
 The positional encoding outputs
 $\mathbf{X} + \mathbf{P}$
-using a positional embedding matrix $\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
+using a positional embedding matrix 
+$\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
 whose element on the $i^\mathrm{th}$ row 
 and the $(2j)^\mathrm{th}$
 or the $(2j + 1)^\mathrm{th}$ column is
@@ -226,8 +251,7 @@ let's first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
 %%tab mxnet
-#@save
-class PositionalEncoding(nn.Block):
+class PositionalEncoding(nn.Block):  #@save
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
@@ -246,8 +270,7 @@ class PositionalEncoding(nn.Block):
 
 ```{.python .input}
 %%tab pytorch
-#@save
-class PositionalEncoding(nn.Module):
+class PositionalEncoding(nn.Module):  #@save
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
@@ -267,8 +290,7 @@ class PositionalEncoding(nn.Module):
 
 ```{.python .input}
 %%tab tensorflow
-#@save
-class PositionalEncoding(tf.keras.layers.Layer):
+class PositionalEncoding(tf.keras.layers.Layer):  #@save
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
@@ -284,6 +306,31 @@ class PositionalEncoding(tf.keras.layers.Layer):
     def call(self, X, **kwargs):
         X = X + self.P[:, :X.shape[1], :]
         return self.dropout(X, **kwargs)
+```
+
+```{.python .input}
+%%tab jax
+class PositionalEncoding(nn.Module):  #@save
+    """Positional encoding."""
+    num_hiddens: int
+    dropout: float
+    max_len: int = 1000
+
+    def setup(self):
+        # Create a long enough P
+        self.P = d2l.zeros((1, self.max_len, self.num_hiddens))
+        X = d2l.arange(self.max_len, dtype=jnp.float32).reshape(
+            -1, 1) / jnp.power(10000, jnp.arange(
+            0, self.num_hiddens, 2, dtype=jnp.float32) / self.num_hiddens)
+        self.P = self.P.at[:, :, 0::2].set(jnp.sin(X))
+        self.P = self.P.at[:, :, 1::2].set(jnp.cos(X))
+
+    @nn.compact
+    def __call__(self, X, training=False):
+        # Flax sow API is used to capture intermediate variables
+        self.sow('intermediates', 'P', self.P)
+        X = X + self.P[:, :X.shape[1], :]
+        return nn.Dropout(self.dropout)(X, deterministic=not training)
 ```
 
 In the positional embedding matrix $\mathbf{P}$,
@@ -331,13 +378,27 @@ d2l.plot(np.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in np.arange(6, 10)])
 ```
 
+```{.python .input}
+%%tab jax
+encoding_dim, num_steps = 32, 60
+pos_encoding = PositionalEncoding(encoding_dim, 0)
+params = pos_encoding.init(d2l.get_key(), d2l.zeros((1, num_steps, encoding_dim)))
+X, inter_vars = pos_encoding.apply(params, d2l.zeros((1, num_steps, encoding_dim)),
+                                   mutable='intermediates')
+P = inter_vars['intermediates']['P'][0]  # retrieve intermediate value P
+P = P[:, :X.shape[1], :]
+d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
+         figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
+```
+
 ### Absolute Positional Information
 
 To see how the monotonically decreased frequency
 along the encoding dimension relates to absolute positional information,
 let's print out [**the binary representations**] of $0, 1, \ldots, 7$.
-As we can see,
-the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
+As we can see, the lowest bit, the second-lowest bit, 
+and the third-lowest bit alternate on every number, 
+every two numbers, and every four numbers, respectively.
 
 ```{.python .input}
 %%tab all
@@ -345,10 +406,9 @@ for i in range(8):
     print(f'{i} in binary is {i:>03b}')
 ```
 
-In binary representations,
-a higher bit has a lower frequency than a lower bit.
-Similarly,
-as demonstrated in the heat map below,
+In binary representations, a higher bit 
+has a lower frequency than a lower bit.
+Similarly, as demonstrated in the heat map below,
 [**the positional encoding decreases
 frequencies along the encoding dimension**]
 by using trigonometric functions.
@@ -374,6 +434,13 @@ d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
 ```{.python .input}
 %%tab tensorflow
 P = tf.expand_dims(tf.expand_dims(P[0, :, :], axis=0), axis=0)
+d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
+                  ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
+```
+
+```{.python .input}
+%%tab jax
+P = jnp.expand_dims(jnp.expand_dims(P[0, :, :], axis=0), axis=0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
@@ -414,9 +481,16 @@ where the $2\times 2$ projection matrix does not depend on any position index $i
 
 ## Summary
 
-* In self-attention, the queries, keys, and values all come from the same place.
-* Both CNNs and self-attention enjoy parallel computation and self-attention has the shortest maximum path length. However, the quadratic computational complexity with respect to the sequence length makes self-attention prohibitively slow for very long sequences.
-* To use the sequence order information, we can inject absolute or relative positional information by adding positional encoding to the input representations.
+In self-attention, the queries, keys, and values all come from the same place.
+Both CNNs and self-attention enjoy parallel computation
+and self-attention has the shortest maximum path length.
+However, the quadratic computational complexity
+with respect to the sequence length
+makes self-attention prohibitively slow
+for very long sequences.
+To use the sequence order information, 
+we can inject absolute or relative positional information 
+by adding positional encoding to the input representations.
 
 
 ## Exercises

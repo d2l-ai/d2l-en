@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="190 170 400 200" width="400" height="200">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 10 8" markerWidth="10" markerHeight="8" color="black">
+      <g>
+        <path d="M 8 0 L 0 0 M 0 -3 L 8 0 L 0 3" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-9 -4 10 8" markerWidth="10" markerHeight="8" color="black">
+      <g>
+        <path d="M -8 0 L 0 0 M 0 3 L -8 0 L 0 -3" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="Canvas_1" fill-opacity="1" stroke-opacity="1" fill="none" stroke="none" stroke-dasharray="none">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_23">
+        <rect x="240.8167" y="199.67874" width="344.7833" height="45.92183" fill="white"/>
+        <rect x="240.8167" y="199.67874" width="344.7833" height="45.92183" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_22">
+        <rect x="241.0667" y="264.93397" width="344.7833" height="50.135116" fill="white"/>
+        <rect x="241.0667" y="264.93397" width="344.7833" height="50.135116" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_21">
+        <rect x="250.25408" y="207.92486" width="40.653358" height="29.974964" fill="#66bfff"/>
+        <rect x="250.25408" y="207.92486" width="40.653358" height="29.974964" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(255.25408 217.76512)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="2.742939" y="8">Trial-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_20">
+        <rect x="250.25408" y="274.8814" width="75.49909" height="30.24023" fill="#b2d9ff"/>
+        <rect x="250.25408" y="274.8814" width="75.49909" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(255.25408 284.8543)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="20.165806" y="8">Trial-1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_19">
+        <rect x="290.90744" y="207.7846" width="154.902" height="30.24023" fill="#b2d9ff"/>
+        <rect x="290.90744" y="207.7846" width="154.902" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(295.90744 217.7575)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="59.867256" y="8">Trial-2</tspan>
+        </text>
+      </g>
+      <g id="Graphic_18">
+        <rect x="325.75318" y="274.8814" width="52.994555" height="30.24023" fill="#66bfff"/>
+        <rect x="325.75318" y="274.8814" width="52.994555" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(330.75318 284.8543)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="8.913538" y="8">Trial-3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_17">
+        <rect x="444.80944" y="207.7846" width="40.927405" height="30.24023" fill="#66bfff"/>
+        <rect x="444.80944" y="207.7846" width="40.927405" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(449.80944 217.7575)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="2.879962" y="8">Trial-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_16">
+        <rect x="444.68444" y="274.89668" width="53.87757" height="30.24023" fill="#66bfff"/>
+        <rect x="444.68444" y="274.89668" width="53.87757" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(449.68444 284.86958)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="9.355045" y="8">Trial-3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_15">
+        <text transform="translate(356.88473 172.9279)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Synchronous Successive Halving</tspan>
+        </text>
+      </g>
+      <g id="Graphic_14">
+        <text transform="translate(192.0819 218.09908)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Worker-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_13">
+        <text transform="translate(192.0819 284.8543)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Worker-1</tspan>
+        </text>
+      </g>
+      <g id="Line_12">
+        <line x1="240.5667" y1="201.27033" x2="241.0667" y2="364.875" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.0,2.0" stroke-width=".5"/>
+      </g>
+      <g id="Line_11">
+        <line x1="444.68444" y1="200.25" x2="444.8375" y2="362.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.0,2.0" stroke-width=".5"/>
+      </g>
+      <g id="Graphic_10">
+        <text transform="translate(328.31012 352.77767)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Rung 0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_9">
+        <rect x="497.562" y="207.7846" width="75.49909" height="30.24023" fill="#66bfff"/>
+        <rect x="497.562" y="207.7846" width="75.49909" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(502.562 217.7575)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="20.165806" y="8">Trial-0</tspan>
+        </text>
+      </g>
+      <g id="Line_8">
+        <line x1="498.046" y1="199" x2="498.046" y2="362.25" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.0,2.0" stroke-width=".5"/>
+      </g>
+      <g id="Graphic_7">
+        <text transform="translate(458.98163 352.77767)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Rung 1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_6">
+        <text transform="translate(530.45314 350.7279)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Rung 2</tspan>
+        </text>
+      </g>
+      <g id="Line_5">
+        <line x1="434.7345" y1="341.4832" x2="250.8942" y2="341.17154" marker-end="url(#StickArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_4">
+        <line x1="488.14665" y1="340.99257" x2="454.5338" y2="341.38456" marker-end="url(#StickArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_3">
+        <line x1="576.47024" y1="341.4959" x2="507.946" y2="341.4959" marker-end="url(#StickArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_2">
+        <rect x="498.062" y="274.89668" width="75.63923" height="30.24023" fill="#b2d9ff"/>
+        <rect x="498.062" y="274.89668" width="75.63923" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(503.062 284.86958)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="20.235874" y="8">Trial-4</tspan>
+        </text>
+      </g>
+      <g id="Graphic_24">
+        <rect x="378" y="274.8814" width="66.68443" height="30.24023"/>
+        <rect x="378" y="274.8814" width="66.68443" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="bevel" stroke-width="1"/>
+      </g>
+      <g id="Graphic_26">
+        <rect x="484.73684" y="207.7846" width="13.06715" height="30.24023"/>
+        <rect x="484.73684" y="207.7846" width="13.06715" height="30.24023" stroke="black" stroke-linecap="round" stroke-linejoin="bevel" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>

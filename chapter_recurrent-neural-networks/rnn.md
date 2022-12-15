@@ -132,7 +132,7 @@ we obtain a matrix of shape (3, 4).
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 ```{.python .input}
@@ -155,6 +155,13 @@ import tensorflow as tf
 ```
 
 ```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+```
+
+```{.python .input}
 %%tab mxnet, pytorch
 X, W_xh = d2l.randn(3, 1), d2l.randn(1, 4)
 H, W_hh = d2l.randn(3, 4), d2l.randn(4, 4)
@@ -165,6 +172,15 @@ d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 %%tab tensorflow
 X, W_xh = d2l.normal((3, 1)), d2l.normal((1, 4))
 H, W_hh = d2l.normal((3, 4)), d2l.normal((4, 4))
+d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
+```
+
+```{.python .input}
+%%tab jax
+X, W_xh = jax.random.normal(d2l.get_key(), (3, 1)), jax.random.normal(
+                                                        d2l.get_key(), (1, 4))
+H, W_hh = jax.random.normal(d2l.get_key(), (3, 4)), jax.random.normal(
+                                                        d2l.get_key(), (4, 4))
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
@@ -192,8 +208,8 @@ we aim to predict the next token based on
 the current and past tokens,
 thus we shift the original sequence by one token
 as the targets (labels).
-Bengio et al. first proposed
-to use a neural network for language modeling :cite:`Bengio.Ducharme.Vincent.ea.2003`.
+:citet:`Bengio.Ducharme.Vincent.ea.2003` first proposed
+to use a neural network for language modeling.
 In the following we illustrate how RNNs can be used to build a language model.
 Let the minibatch size be one, and the sequence of the text be "machine".
 To simplify training in subsequent sections,

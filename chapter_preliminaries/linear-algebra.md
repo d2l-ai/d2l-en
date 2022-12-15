@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Linear Algebra
@@ -87,6 +87,16 @@ y = tf.constant(2.0)
 x + y, x * y, x / y, x**y
 ```
 
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+
+x = jnp.array(3.0)
+y = jnp.array(2.0)
+
+x + y, x * y, x / y, x**y
+```
+
 ## Vectors
 
 For our purposes, [**you can think of vectors
@@ -132,6 +142,12 @@ x = tf.range(3)
 x
 ```
 
+```{.python .input}
+%%tab jax
+x = jnp.arange(3)
+x
+```
+
 We can refer to an element of a vector by using a subscript.
 For example, $x_2$ denotes the second element of $\mathbf{x}$. 
 Since $x_2$ is a scalar, we do not bold it.
@@ -147,17 +163,7 @@ and *row vectors* whose elements are stacked horizontally.
 Recall that [**we access a tensor's elements via indexing.**]
 
 ```{.python .input}
-%%tab mxnet
-x[2]
-```
-
-```{.python .input}
-%%tab pytorch
-x[2]
-```
-
-```{.python .input}
-%%tab tensorflow
+%%tab all
 x[2]
 ```
 
@@ -168,17 +174,7 @@ Formally, we call $n$ the *dimensionality* of the vector.
 accessible via Python's built-in `len` function.
 
 ```{.python .input}
-%%tab mxnet
-len(x)
-```
-
-```{.python .input}
-%%tab pytorch
-len(x)
-```
-
-```{.python .input}
-%%tab tensorflow
+%%tab all
 len(x)
 ```
 
@@ -187,17 +183,7 @@ The shape is a tuple that indicates a tensor's length along each axis.
 (**Tensors with just one axis have shapes with just one element.**)
 
 ```{.python .input}
-%%tab mxnet
-x.shape
-```
-
-```{.python .input}
-%%tab pytorch
-x.shape
-```
-
-```{.python .input}
-%%tab tensorflow
+%%tab all
 x.shape
 ```
 
@@ -257,6 +243,12 @@ A = tf.reshape(tf.range(6), (3, 2))
 A
 ```
 
+```{.python .input}
+%%tab jax
+A = jnp.arange(6).reshape(3, 2)
+A
+```
+
 Sometimes, we want to flip the axes.
 When we exchange a matrix's rows and columns,
 the result is called its *transpose*.
@@ -279,12 +271,7 @@ $$
 In code, we can access any (**matrix's transpose**) as follows:
 
 ```{.python .input}
-%%tab mxnet
-A.T
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.T
 ```
 
@@ -314,6 +301,12 @@ A == A.T
 %%tab tensorflow
 A = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == tf.transpose(A)
+```
+
+```{.python .input}
+%%tab jax
+A = jnp.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+A == A.T
 ```
 
 Matrices are useful for representing datasets. 
@@ -373,6 +366,11 @@ torch.arange(24).reshape(2, 3, 4)
 tf.reshape(tf.range(24), (2, 3, 4))
 ```
 
+```{.python .input}
+%%tab jax
+jnp.arange(24).reshape(2, 3, 4)
+```
+
 ## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, 
@@ -403,6 +401,13 @@ B = A  # No cloning of `A` to `B` by allocating new memory
 A, A + B
 ```
 
+```{.python .input}
+%%tab jax
+A = jnp.arange(6, dtype=jnp.float32).reshape(2, 3)
+B = A
+A, A + B
+```
+
 The [**elementwise product of two matrices
 is called their *Hadamard product***] (denoted $\odot$).
 Below, we spell out the entries 
@@ -422,17 +427,7 @@ $$
 $$
 
 ```{.python .input}
-%%tab mxnet
-A * B
-```
-
-```{.python .input}
-%%tab pytorch
-A * B
-```
-
-```{.python .input}
-%%tab tensorflow
+%%tab all
 A * B
 ```
 
@@ -461,6 +456,13 @@ X = tf.reshape(tf.range(24), (2, 3, 4))
 a + X, (a * X).shape
 ```
 
+```{.python .input}
+%%tab jax
+a = 2
+X = jnp.arange(24).reshape(2, 3, 4)
+a + X, (a * X).shape
+```
+
 ## Reduction
 :label:`subsec_lin-alg-reduction`
 
@@ -486,6 +488,12 @@ x = tf.range(3, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
+```{.python .input}
+%%tab jax
+x = jnp.arange(3, dtype=jnp.float32)
+x, x.sum()
+```
+
 To express [**sums over the elements of tensors of arbitrary shape**],
 we simply sum over all of its axes. 
 For example, the sum of the elements 
@@ -493,12 +501,7 @@ of an $m \times n$ matrix $\mathbf{A}$
 could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
-%%tab mxnet
-A.shape, A.sum()
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.shape, A.sum()
 ```
 
@@ -519,12 +522,7 @@ to generate the output vector,
 this axis is missing from the shape of the output.
 
 ```{.python .input}
-%%tab mxnet
-A.shape, A.sum(axis=0).shape
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.shape, A.sum(axis=0).shape
 ```
 
@@ -536,12 +534,7 @@ A.shape, tf.reduce_sum(A, axis=0).shape
 Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
 
 ```{.python .input}
-%%tab mxnet
-A.shape, A.sum(axis=1).shape
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.shape, A.sum(axis=1).shape
 ```
 
@@ -554,12 +547,7 @@ Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
-%%tab mxnet
-A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
 ```
 
@@ -576,7 +564,7 @@ it gets a dedicated library function
 that works analogously to `sum`.
 
 ```{.python .input}
-%%tab mxnet
+%%tab mxnet, jax
 A.mean(), A.sum() / A.size
 ```
 
@@ -594,12 +582,7 @@ Likewise, the function for calculating the mean
 can also reduce a tensor along specific axes.
 
 ```{.python .input}
-%%tab mxnet
-A.mean(axis=0), A.sum(axis=0) / A.shape[0]
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```
 
@@ -616,13 +599,7 @@ when invoking the function for calculating the sum or mean.
 This matters when we want to use the broadcast mechanism.
 
 ```{.python .input}
-%%tab mxnet
-sum_A = A.sum(axis=1, keepdims=True)
-sum_A, sum_A.shape
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 sum_A = A.sum(axis=1, keepdims=True)
 sum_A, sum_A.shape
 ```
@@ -638,17 +615,7 @@ we can (**divide `A` by `sum_A` with broadcasting**)
 to create a matrix where each row sums up to $1$.
 
 ```{.python .input}
-%%tab mxnet
-A / sum_A
-```
-
-```{.python .input}
-%%tab pytorch
-A / sum_A
-```
-
-```{.python .input}
-%%tab tensorflow
+%%tab all
 A / sum_A
 ```
 
@@ -657,12 +624,7 @@ say `axis=0` (row by row), we can call the `cumsum` function.
 By design, this function does not reduce the input tensor along any axis.
 
 ```{.python .input}
-%%tab mxnet
-A.cumsum(axis=0)
-```
-
-```{.python .input}
-%%tab pytorch
+%%tab mxnet, pytorch, jax
 A.cumsum(axis=0)
 ```
 
@@ -703,6 +665,12 @@ y = tf.ones(3, dtype=tf.float32)
 x, y, tf.tensordot(x, y, axes=1)
 ```
 
+```{.python .input}
+%%tab jax
+y = jnp.ones(3, dtype = jnp.float32)
+x, y, jnp.dot(x, y)
+```
+
 Equivalently, (**we can calculate the dot product of two vectors 
 by performing an elementwise multiplication followed by a sum:**)
 
@@ -719,6 +687,11 @@ torch.sum(x * y)
 ```{.python .input}
 %%tab tensorflow
 tf.reduce_sum(x * y)
+```
+
+```{.python .input}
+%%tab jax
+jnp.sum(x * y)
 ```
 
 Dot products are useful in a wide range of contexts.
@@ -836,6 +809,11 @@ A.shape, x.shape, torch.mv(A, x), A@x
 A.shape, x.shape, tf.linalg.matvec(A, x)
 ```
 
+```{.python .input}
+%%tab jax
+A.shape, x.shape, jnp.matmul(A, x)
+```
+
 ## Matrix-Matrix Multiplication
 
 If you've gotten the hang of dot products and matrix-vector products,
@@ -883,7 +861,7 @@ To form the matrix product $\mathbf{C} \in \mathbb{R}^{n \times m}$,
 we simply compute each element $c_{ij}$
 as the dot product between 
 the $i^{\mathrm{th}}$ row of $\mathbf{A}$
-and the $j^{\mathrm{th}}$ row of $\mathbf{B}$,
+and the $j^{\mathrm{th}}$ column of $\mathbf{B}$,
 i.e., $\mathbf{a}^\top_i \mathbf{b}_j$:
 
 $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
@@ -932,6 +910,12 @@ B = tf.ones((3, 4), tf.float32)
 tf.matmul(A, B)
 ```
 
+```{.python .input}
+%%tab jax
+B = jnp.ones((3, 4))
+jnp.matmul(A, B)
+```
+
 The term *matrix-matrix multiplication* is 
 often simplified to *matrix multiplication*,
 and should not be confused with the Hadamard product.
@@ -942,9 +926,9 @@ and should not be confused with the Hadamard product.
 
 Some of the most useful operators in linear algebra are *norms*.
 Informally, the norm of a vector tells us how *big* it is. 
-For instance, the $\\ell_2$ norm measures
+For instance, the $\ell_2$ norm measures
 the (Euclidean) length of a vector.
-Here, we are employing a notion of *size* that concerns the magnitude a vector's components
+Here, we are employing a notion of *size* that concerns the magnitude of a vector's components
 (not its dimensionality). 
 
 A norm is a function $\| \cdot \|$ that maps a vector
@@ -988,6 +972,12 @@ u = tf.constant([3.0, -4.0])
 tf.norm(u)
 ```
 
+```{.python .input}
+%%tab jax
+u = jnp.array([3.0, -4.0])
+jnp.linalg.norm(u)
+```
+
 [**The $\ell_1$ norm**] is also popular 
 and the associated metric is called the Manhattan distance. 
 By definition, the $\ell_1$ norm sums 
@@ -1013,6 +1003,11 @@ torch.abs(u).sum()
 ```{.python .input}
 %%tab tensorflow
 tf.reduce_sum(tf.abs(u))
+```
+
+```{.python .input}
+%%tab jax
+jnp.linalg.norm(u, ord=1) # same as jnp.abs(u).sum()
 ```
 
 Both the $\ell_2$ and $\ell_1$ norms are special cases
@@ -1052,6 +1047,11 @@ torch.norm(torch.ones((4, 9)))
 ```{.python .input}
 %%tab tensorflow
 tf.norm(tf.ones((4, 9)))
+```
+
+```{.python .input}
+%%tab jax
+jnp.linalg.norm(jnp.ones((4, 9)))
 ```
 
 While we do not want to get too far ahead of ourselves,

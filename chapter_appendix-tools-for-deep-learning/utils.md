@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Utility Functions and Classes
@@ -37,6 +37,15 @@ from IPython import display
 import collections
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+import inspect
+from IPython import display
+import collections
+from d2l import jax as d2l
+import jax
 ```
 
 Hyperparameters.
@@ -97,6 +106,189 @@ def draw(self, x, y, label, every_n=1):
     axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)
+```
+
+Add FrozenLake enviroment
+```{.python .input}
+%%tab pytorch
+
+def frozen_lake(seed): #@save
+    # See https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
+    # How to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
+
+    env = gym.make('FrozenLake-v1', is_slippery=False)
+    env.seed(seed)
+    env.action_space.np_random.seed(seed)
+    env.action_space.seed(seed)
+    env_info = {}
+    env_info['desc'] = env.desc  # 2D array specifying what each grid item means
+    env_info['num_states'] = env.nS  # Number of observations/states or obs/state dim
+    env_info['num_actions'] = env.nA  # Number of actions or action dim
+    # Define indices for (transition probability, nextstate, reward, done) tuple
+    env_info['trans_prob_idx'] = 0  # Index of transition probability entry
+    env_info['nextstate_idx'] = 1  # Index of next state entry
+    env_info['reward_idx'] = 2  # Index of reward entry
+    env_info['done_idx'] = 3  # Index of done entry
+    env_info['mdp'] = {}
+    env_info['env'] = env
+
+    for (s, others) in env.P.items():
+        # others(s) = {a0: [ (p(s'|s,a0), s', reward, done),...], a1:[...], ...}
+
+        for (a, pxrds) in others.items():
+            # pxrds is [(p1,next1,r1,d1),(p2,next2,r2,d2),..].
+            # e.g. [(0.3, 0, 0, False), (0.3, 0, 0, False), (0.3, 4, 1, False)]
+            env_info['mdp'][(s,a)] = pxrds
+
+    return env_info
+
+```
+
+Create enviroment
+```{.python .input}
+%%tab pytorch
+
+def make_env(name ='', seed=0): #@save
+    # Input parameters:
+    # name: specifies a gym environment.
+    # For Value iteration, only FrozenLake-v1 is supported.
+    if name == 'FrozenLake-v1':
+        return frozen_lake(seed)
+
+    else:
+        raise ValueError("%s env is not supported in this Notebook")
+
+```
+
+Show value function
+```{.python .input}
+%%tab pytorch
+
+def show_value_function_progress(env_desc, V, pi): #@save
+    # This function visualizes how value and policy changes over time.
+    # V: [num_iters, num_states]
+    # pi: [num_iters, num_states]
+    # How to visualize value function is adapted (but changed) from: https://sites.google.com/view/deep-rl-bootcamp/labs
+
+    num_iters = V.shape[0]
+    fig, ax  = plt.subplots(figsize=(15, 15))
+
+    for k in range(V.shape[0]):
+        plt.subplot(4, 4, k + 1)
+        plt.imshow(V[k].reshape(4,4), cmap="bone")
+        ax = plt.gca()
+        ax.set_xticks(np.arange(0, 5)-.5, minor=True)
+        ax.set_yticks(np.arange(0, 5)-.5, minor=True)
+        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+        ax.tick_params(which="minor", bottom=False, left=False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        # LEFT action: 0, DOWN action: 1
+        # RIGHT action: 2, UP action: 3
+        action2dxdy = {0:(-.25, 0),1: (0, .25),
+                       2:(0.25, 0),3: (-.25, 0)}
+
+        for y in range(4):
+            for x in range(4):
+                action = pi[k].reshape(4,4)[y, x]
+                dx, dy = action2dxdy[action]
+
+                if env_desc[y,x].decode() == 'H':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="y",
+                         size=20, fontweight='bold')
+
+                elif env_desc[y,x].decode() == 'G':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="w",
+                         size=20, fontweight='bold')
+
+                else:
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="g",
+                         size=15, fontweight='bold')
+
+                # No arrow for cells with G and H labels
+                if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
+                    ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
+
+        ax.set_title("Step = "  + str(k + 1), fontsize=20)
+
+    fig.tight_layout()
+    plt.show()
+
+```
+Show Q function
+```{.python .input}
+%%tab pytorch
+
+def show_Q_function_progress(env_desc, V_all, pi_all): #@save
+    # This function visualizes how value and policy changes over time.
+    # V: [num_iters, num_states]
+    # pi: [num_iters, num_states]
+
+    # We want to only shows few values
+    num_iters_all = V_all.shape[0]
+    num_iters = num_iters_all // 10
+
+    vis_indx = np.arange(0, num_iters_all, num_iters).tolist()
+    vis_indx.append(num_iters_all - 1)
+    V = np.zeros((len(vis_indx), V_all.shape[1]))
+    pi = np.zeros((len(vis_indx), V_all.shape[1]))
+
+    for c, i in enumerate(vis_indx):
+        V[c]  = V_all[i]
+        pi[c] = pi_all[i]
+
+    num_iters = V.shape[0]
+    fig, ax = plt.subplots(figsize=(15, 15))
+
+    for k in range(V.shape[0]):
+        plt.subplot(4, 4, k + 1)
+        plt.imshow(V[k].reshape(4,4), cmap="bone")
+        ax = plt.gca()
+        ax.set_xticks(np.arange(0, 5)-.5, minor=True)
+        ax.set_yticks(np.arange(0, 5)-.5, minor=True)
+        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+        ax.tick_params(which="minor", bottom=False, left=False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        # LEFT action: 0, DOWN action: 1
+        # RIGHT action: 2, UP action: 3
+        action2dxdy = {0:(-.25, 0),1:(0, .25),
+                       2:(0.25, 0),3:(-.25, 0)}
+
+        for y in range(4):
+            for x in range(4):
+                action = pi[k].reshape(4,4)[y, x]
+                dx, dy = action2dxdy[action]
+
+                if env_desc[y,x].decode() == 'H':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="y",
+                         size=20, fontweight='bold')
+
+                elif env_desc[y,x].decode() == 'G':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="w",
+                         size=20, fontweight='bold')
+
+                else:
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="g",
+                         size=15, fontweight='bold')
+
+                # No arrow for cells with G and H labels
+                if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
+                    ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
+
+        ax.set_title("Step = "  + str(vis_indx[k] + 1), fontsize=20)
+
+    fig.tight_layout()
+    plt.show()
+
 ```
 
 Trainer
@@ -204,8 +396,8 @@ def grad_clipping(net, theta):  #@save
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    dataset = torch.utils.data.TensorDataset(*data_arrays)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
@@ -235,10 +427,10 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=get_dataloader_workers()),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=get_dataloader_workers()))
 
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""
@@ -401,21 +593,6 @@ def evaluate_accuracy(net, data_iter):  #@save
 
 ```{.python .input}
 %%tab all
-
-def linreg(X, w, b):  #@save
-    """The linear regression model."""
-    return d2l.matmul(X, w) + b
-
-def squared_loss(y_hat, y):  #@save
-    """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-
-def get_fashion_mnist_labels(labels):  #@save
-    """Return text labels for the Fashion-MNIST dataset."""
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
-
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -432,8 +609,26 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
         if titles:
             ax.set_title(titles[i])
     return axes
+```
 
-#@tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
+
+def linreg(X, w, b):  #@save
+    """The linear regression model."""
+    return d2l.matmul(X, w) + b
+
+def squared_loss(y_hat, y):  #@save
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+
+def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
+    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+    return [text_labels[int(i)] for i in labels]
+
+#@tab pytorch, mxnet, tensorflow
 class Animator:  #@save
     """For plotting data in animation."""
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
@@ -473,8 +668,8 @@ class Animator:  #@save
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
-        
-#@tab all
+
+#@tab pytorch, mxnet, tensorflow
 class Accumulator:  #@save
     """For accumulating sums over `n` variables."""
     def __init__(self, n):
@@ -487,10 +682,10 @@ class Accumulator:  #@save
         self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
-        return self.data[idx]        
-    
-    
-#@tab all
+        return self.data[idx]
+
+
+#@tab pytorch, mxnet, tensorflow
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
@@ -548,7 +743,7 @@ def extract(filename, folder=None):  #@save
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
@@ -636,7 +831,7 @@ def grad_clipping(grads, theta):  #@save
 More for the attention chapter.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 #@save
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
@@ -645,7 +840,7 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 def read_data_nmt():
     """Load the English-French dataset."""
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r', encoding='utf-8') as f:
         return f.read()
 
 #@save

@@ -98,12 +98,12 @@ with 256 units and ReLU activation,
 followed by a fully connected output layer
 with 10 units (no activation function).
 
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -118,7 +118,7 @@ X = np.random.uniform(size=(2, 20))
 net(X).shape
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 import torch
 from torch import nn
@@ -130,7 +130,7 @@ X = torch.rand(2, 20)
 net(X).shape
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 
@@ -141,6 +141,22 @@ net = tf.keras.models.Sequential([
 
 X = tf.random.uniform((2, 20))
 net(X).shape
+```
+
+```{.python .input}
+%%tab jax
+from typing import List
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+
+net = nn.Sequential([nn.Dense(256), nn.relu, nn.Dense(10)])
+
+# get_key is a d2l saved function returning jax.random.PRNGKey(random_seed)
+X = jax.random.uniform(d2l.get_key(), (2, 20))
+params = net.init(d2l.get_key(), X)
+net.apply(params, X).shape
 ```
 
 :begin_tab:`mxnet`
@@ -230,7 +246,7 @@ Note that the `MLP` class below inherits the class that represents a module.
 We will heavily rely on the parent class's methods,
 supplying only our own constructor (the `__init__` method in Python) and the forward propagation method.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 class MLP(nn.Block):
     def __init__(self):
@@ -246,7 +262,7 @@ class MLP(nn.Block):
         return self.out(self.hidden(X))
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch
 class MLP(nn.Module):
     def __init__(self):
@@ -262,7 +278,7 @@ class MLP(nn.Module):
         return self.out(F.relu(self.hidden(X)))
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 class MLP(tf.keras.Model):
     def __init__(self):
@@ -276,6 +292,20 @@ class MLP(tf.keras.Model):
     # required model output based on the input X
     def call(self, X):
         return self.out(self.hidden((X)))
+```
+
+```{.python .input}
+%%tab jax
+class MLP(nn.Module):
+    def setup(self):
+        # Define the layers
+        self.hidden = nn.Dense(256)
+        self.out = nn.Dense(10)
+
+    # Define the forward propagation of the model, that is, how to return the
+    # required model output based on the input X
+    def __call__(self, X):
+        return self.out(nn.relu(self.hidden(X)))
 ```
 
 Let's first focus on the forward propagation method.
@@ -309,12 +339,19 @@ or parameter initialization.
 The system will generate these methods automatically.
 Let's try this out.
 
-```{.python .input  n=8}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 net = MLP()
 if tab.selected('mxnet'):
     net.initialize()
 net(X).shape
+```
+
+```{.python .input}
+%%tab jax
+net = MLP()
+params = net.init(d2l.get_key(), X)
+net.apply(params, X).shape
 ```
 
 A key virtue of the module abstraction is its versatility.
@@ -329,6 +366,7 @@ convolutional neural networks.
 
 
 ## [**The Sequential Module**]
+:label:`subsec_model-construction-sequential`
 
 We can now take a closer look
 at how the `Sequential` class works.
@@ -336,13 +374,14 @@ Recall that `Sequential` was designed
 to daisy-chain other modules together.
 To build our own simplified `MySequential`,
 we just need to define two key methods:
+
 1. A method to append modules one by one to a list.
-2. A forward propagation method to pass an input through the chain of modules, in the same order as they were appended.
+1. A forward propagation method to pass an input through the chain of modules, in the same order as they were appended.
 
 The following `MySequential` class delivers the same
 functionality of the default `Sequential` class.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab mxnet
 class MySequential(nn.Block):
     def add(self, block):
@@ -361,7 +400,7 @@ class MySequential(nn.Block):
         return X
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab pytorch
 class MySequential(nn.Module):
     def __init__(self, *args):
@@ -375,7 +414,7 @@ class MySequential(nn.Module):
         return X
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab tensorflow
 class MySequential(tf.keras.Model):
     def __init__(self, *args):
@@ -383,6 +422,17 @@ class MySequential(tf.keras.Model):
         self.modules = args
 
     def call(self, X):
+        for module in self.modules:
+            X = module(X)
+        return X
+```
+
+```{.python .input}
+%%tab jax
+class MySequential(nn.Module):
+    modules: List
+
+    def __call__(self, X):
         for module in self.modules:
             X = module(X)
         return X
@@ -415,7 +465,7 @@ in the order in which they were added.
 We can now reimplement an MLP
 using our `MySequential` class.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab mxnet
 net = MySequential()
 net.add(nn.Dense(256, activation='relu'))
@@ -424,18 +474,25 @@ net.initialize()
 net(X).shape
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab pytorch
 net = MySequential(nn.LazyLinear(256), nn.ReLU(), nn.LazyLinear(10))
 net(X).shape
 ```
 
-```{.python .input  n=15}
+```{.python .input}
 %%tab tensorflow
 net = MySequential(
     tf.keras.layers.Dense(units=256, activation=tf.nn.relu),
     tf.keras.layers.Dense(10))
 net(X).shape
+```
+
+```{.python .input}
+%%tab jax
+net = MySequential([nn.Dense(256), nn.relu, nn.Dense(10)])
+params = net.init(d2l.get_key(), X)
+net.apply(params, X).shape
 ```
 
 Note that this use of `MySequential`
@@ -475,7 +532,7 @@ and $c$ is some specified constant
 that is not updated during optimization.
 So we implement a `FixedHiddenMLP` class as follows.
 
-```{.python .input  n=16}
+```{.python .input}
 %%tab mxnet
 class FixedHiddenMLP(nn.Block):
     def __init__(self):
@@ -547,6 +604,28 @@ class FixedHiddenMLP(tf.keras.Model):
         return tf.reduce_sum(X)
 ```
 
+```{.python .input}
+%%tab jax
+class FixedHiddenMLP(nn.Module):
+    # Random weight parameters that will not compute gradients and
+    # therefore keep constant during training
+    rand_weight: jnp.array = jax.random.uniform(d2l.get_key(), (20, 20))
+
+    def setup(self):
+        self.dense = nn.Dense(20)
+
+    def __call__(self, X):
+        X = self.dense(X)
+        X = nn.relu(X @ self.rand_weight + 1)
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
+        X = self.dense(X)
+        # Control flow
+        while jnp.abs(X).sum() > 1:
+            X /= 2
+        return X.sum()
+```
+
 In this `FixedHiddenMLP` model,
 we implement a hidden layer whose weights
 (`self.rand_weight`) are initialized randomly
@@ -572,11 +651,18 @@ arbitrary code into the flow of your
 neural network computations.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 net = FixedHiddenMLP()
 if tab.selected('mxnet'):
     net.initialize()
 net(X)
+```
+
+```{.python .input}
+%%tab jax
+net = FixedHiddenMLP()
+params = net.init(d2l.get_key(), X)
+net.apply(params, X)
 ```
 
 We can [**mix and match various
@@ -639,14 +725,32 @@ chimera.add(FixedHiddenMLP())
 chimera(X)
 ```
 
+```{.python .input}
+%%tab jax
+class NestMLP(nn.Module):
+    def setup(self):
+        self.net = nn.Sequential([nn.Dense(64), nn.relu,
+                                  nn.Dense(32), nn.relu])
+        self.dense = nn.Dense(16)
+
+    def __call__(self, X):
+        return self.dense(self.net(X))
+
+
+chimera = nn.Sequential([NestMLP(), nn.Dense(20), FixedHiddenMLP()])
+params = chimera.init(d2l.get_key(), X)
+chimera.apply(params, X)
+```
+
 ## Summary
 
-* Layers are modules.
-* Many layers can comprise a module.
-* Many modules can comprise a module.
-* A module can contain code.
-* Modules take care of lots of housekeeping, including parameter initialization and backpropagation.
-* Sequential concatenations of layers and modules are handled by the `Sequential` module.
+Layers are modules.
+Many layers can comprise a module.
+Many modules can comprise a module.
+
+A module can contain code.
+Modules take care of lots of housekeeping, including parameter initialization and backpropagation.
+Sequential concatenations of layers and modules are handled by the `Sequential` module.
 
 
 ## Exercises

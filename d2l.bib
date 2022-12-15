@@ -762,6 +762,15 @@
   publisher	= {Springer}
 }
 
+@InProceedings{Gardner.Pleiss.Weinberger.Bindel.Wilson.2018,
+  title={{GPyTorch}: Blackbox matrix-matrix {G}aussian process inference with {GPU} acceleration},
+  author={Gardner, Jacob and Pleiss, Geoff and Weinberger, Kilian Q and Bindel, David and Wilson, Andrew G},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={31},
+  year={2018}
+}
+
+
 @InProceedings{Garg.Balakrishnan.Kolter.Lipton.2021,
   title={Ratt: Leveraging unlabeled data to guarantee generalization},
   author={Garg, Saurabh and Balakrishnan, Sivaraman and Kolter, Zico and Lipton, Zachary},
@@ -1176,13 +1185,60 @@
   organization	= {Ieee}
 }
 
-@Article{	  Hu.Lee.Aggarwal.ea.2020,
-  title		= {Text Style Transfer: A Review and Experimental
-		  Evaluation},
-  author	= {Hu, Zhiqiang and Lee, Roy Ka-Wei and Aggarwal, Charu C and
-		  Zhang, Aston},
-  journal	= {arXiv preprint arXiv:2010.12742},
-  year		= {2020}
+@article{10.1145/3544903.3544906,
+  author = {Hu, Zhiqiang and Lee, Roy Ka-Wei and Aggarwal, Charu C. and Zhang, Aston},
+  title = {Text Style Transfer: A Review and Experimental Evaluation},
+  year = {2022},
+  issue_date = {June 2022},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {24},
+  number = {1},
+  issn = {1931-0145},
+  url = {https://doi.org/10.1145/3544903.3544906},
+  doi = {10.1145/3544903.3544906},
+  abstract = {The stylistic properties of text have intrigued computational linguistics researchers in recent years. Specifically, researchers have investigated the text style transfer task (TST), which aims to change the stylistic properties of the text while retaining its independent content of style. Over the last few years, many novel TST algorithms have been developed, while the industry has leveraged these algorithms to enable exciting TST applications. The field of TST research has developed because of this symbiosis. This article aims to provide a comprehensive review of recent research efforts on text style transfer. More concretely, we create a taxonomy to organize the TST models, and provide a comprehensive summary of the state of the art. We review existing evaluation methodologies for TST tasks and conduct a large-scale reproducibility study in which we experimentally benchmark 19 state-of-the-art TST algorithms on two publicly available datasets. Finally, we expand on current trends and provide new perspectives on the new and exciting developments in the TST field.},
+  journal = {SIGKDD Explor. Newsl.},
+  month = {jun},
+  pages = {14–45},
+  numpages = {32}
+}
+
+@article{parzen1957consistent,
+  title={On consistent estimates of the spectrum of a stationary time series},
+  author={Parzen, Emanuel},
+  journal={The Annals of Mathematical Statistics},
+  pages={329--348},
+  year={1957},
+  publisher={JSTOR}
+}
+
+@article{mack1982weak,
+  title={Weak and strong uniform consistency of kernel regression estimates},
+  author={Mack, Yue-pok and Silverman, Bernard W},
+  journal={Zeitschrift f{\"u}r Wahrscheinlichkeitstheorie und verwandte Gebiete},
+  volume={61},
+  number={3},
+  pages={405--415},
+  year={1982},
+  publisher={Springer}
+}
+
+@book{Silverman86,
+  Address =	 {London},
+  Author =	 {B.~W. Silverman},
+  Publisher =	 {Chapman and Hall},
+  Series =	 {Monographs on statistics and applied probability},
+  Title =	 {Density Estimation for Statistical and Data
+                  Analysis},
+  Year =	 1986
+}
+
+@article{norelli2022asif,
+  title={ASIF: Coupled Data Turns Unimodal Models to Multimodal Without Training},
+  author={Norelli, Antonio and Fumero, Marco and Maiorca, Valentino and Moschella, Luca and Rodol{\`a}, Emanuele and Locatello, Francesco},
+  journal={arXiv preprint arXiv:2210.01738},
+  year={2022}
 }
 
 @InProceedings{	  Hu.Shen.Sun.2018,
@@ -2620,6 +2676,28 @@
   pages		= {1139--1147},
   year		= {2013}
 }
+
+@article{chan2015listen,
+  title={Listen, attend and spell},
+  author={Chan, William and Jaitly, Navdeep and Le, Quoc V and Vinyals, Oriol},
+  journal={arXiv preprint arXiv:1508.01211},
+  year={2015}
+}
+
+@article{RabJua93,
+  title={Fundamentals of speech recognition},
+  author={Rabiner, Lawrence and Juang, Biing-Hwang},
+  year={1993},
+  publisher={Prentice hall}
+}
+
+@article{yang2016neural,
+  title={Neural machine translation with recurrent attention modeling},
+  author={Yang, Zichao and Hu, Zhiting and Deng, Yuntian and Dyer, Chris and Smola, Alex},
+  journal={arXiv preprint arXiv:1607.05108},
+  year={2016}
+}
+
 
 @InProceedings{	  Sutskever.Vinyals.Le.2014,
   title		= {Sequence to sequence learning with neural networks},
@@ -4247,13 +4325,22 @@
   publisher={Routledge}
 }
 
-
 @book{mackay2003information,
   title={Information theory, inference and learning algorithms},
   author={MacKay, David JC and Mac Kay, David JC},
   year={2003},
   publisher={Cambridge university press}
 }
+
+@book{rasmussen2006gaussian,
+  title={Gaussian processes for machine learning},
+  author={Rasmussen, Carl Edward and Williams, Christopher KI},
+  volume={2},
+  number={3},
+  year={2006},
+  publisher={MIT press}
+}
+
 
 @inproceedings{lavin2016fast,
   title={Fast algorithms for convolutional neural networks},
@@ -4337,6 +4424,27 @@
   title={Self-attention with relative position representations},
   author={Shaw, Peter and Uszkoreit, Jakob and Vaswani, Ashish},
   journal={arXiv preprint arXiv:1803.02155},
+  year={2018}
+}
+
+@book{neal1996bayesian,
+  title={Bayesian learning for neural networks},
+  author={Neal, Radford M},
+  year={1996},
+  publisher={Springer Science \& Business Media}
+}
+
+@article{matthews2018gaussian,
+  title={Gaussian process behaviour in wide deep neural networks},
+  author={Matthews, Alexander G de G and Rowland, Mark and Hron, Jiri and Turner, Richard E and Ghahramani, Zoubin},
+  journal={arXiv preprint arXiv:1804.11271},
+  year={2018}
+}
+
+@article{novak2018bayesian,
+  title={Bayesian deep convolutional networks with many channels are {G}aussian processes},
+  author={Novak, Roman and Xiao, Lechao and Lee, Jaehoon and Bahri, Yasaman and Yang, Greg and Hron, Jiri and Abolafia, Daniel A and Pennington, Jeffrey and Sohl-Dickstein, Jascha},
+  journal={arXiv preprint arXiv:1810.05148},
   year={2018}
 }
 
@@ -4455,6 +4563,15 @@
   year={2019}
 }
 
+@article{wilson2020bayesian,
+  title={Bayesian deep learning and a probabilistic perspective of generalization},
+  author={Wilson, Andrew G and Izmailov, Pavel},
+  journal={Advances in neural information processing systems},
+  volume={33},
+  pages={4697--4708},
+  year={2020}
+}
+
 @article{lewis2019bart,
   title={Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension},
   author={Lewis, Mike and Liu, Yinhan and Goyal, Naman and Ghazvininejad, Marjan and Mohamed, Abdelrahman and Levy, Omer and Stoyanov, Ves and Zettlemoyer, Luke},
@@ -4534,6 +4651,13 @@
   author={Du, Nan and Huang, Yanping and Dai, Andrew M and Tong, Simon and Lepikhin, Dmitry and Xu, Yuanzhong and Krikun, Maxim and Zhou, Yanqi and Yu, Adams Wei and Firat, Orhan and others},
   journal={arXiv preprint arXiv:2112.06905},
   year={2021}
+}
+
+@article{shoeybi2019megatron,
+  title={Megatron-lm: Training multi-billion parameter language models using model parallelism},
+  author={Shoeybi, Mohammad and Patwary, Mostofa and Puri, Raul and LeGresley, Patrick and Casper, Jared and Catanzaro, Bryan},
+  journal={arXiv preprint arXiv:1909.08053},
+  year={2019}
 }
 
 @article{smith2022using,
@@ -4686,7 +4810,6 @@
   year={2022}
 }
 
-
 @article{mnih2015human,
   title={Human-level control through deep reinforcement learning},
   author={Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David and Rusu, Andrei A and Veness, Joel and Bellemare, Marc G and Graves, Alex and Riedmiller, Martin and Fidjeland, Andreas K and Ostrovski, Georg and others},
@@ -4808,6 +4931,17 @@
   publisher={Springer}
 }
 
+@article{forrester2007multi,
+  title={Multi-fidelity optimization via surrogate modelling},
+  author={Forrester, Alexander IJ and S{\'o}bester, Andr{\'a}s and Keane, Andy J},
+  journal={Proceedings of the royal society a: mathematical, physical and engineering sciences},
+  volume={463},
+  number={2088},
+  pages={3251--3269},
+  year={2007},
+  publisher={The Royal Society London}
+}
+
 @inproceedings{dean2012large,
   title={Large scale distributed deep networks},
   author={Dean, Jeffrey and Corrado, Greg S and Monga, Rajat and Chen, Kai and Devin, Matthieu and Le, Quoc V and Mao, Mark Z and Ranzato, Marc'Aurelio and Senior, Andrew and Tucker, Paul and others},
@@ -4816,3 +4950,294 @@
   year={2012}
 }
 
+@article{feurer-arxiv22, 
+  author = {M. Feurer and B. Letham and F. Hutter and E. Bakshy},
+  title = {Practical Transfer Learning for Bayesian Optimization},
+  journal = {arXiv:1802.02219 [stat.ML]},
+  year = {2022}
+}
+
+@article{wistuba-ml18, 
+  author = {M. Wistuba and N. Schilling and L. Schmidt-Thieme},
+  title = {Scalable gaussian process-based transfer surrogates for hyperparameter optimization},
+  journal = {Machine Learning},
+  year = {2018}
+}
+
+@inproceedings{bardenet-icml13a,
+    author    = {R. Bardenet and M. Brendel and B. K{\'e}gl and M. Sebag},
+    title     = {Collaborative hyperparameter tuning},
+    booktitle = {Proceedings of the 30th International Conference on Machine Learning (ICML'13)},
+    year      = {2013},
+}
+
+@InProceedings{jenatton-icml17a,
+  title	    = {Bayesian {Optimization} with {Tree}-structured {Dependencies}},
+  author    = {R. Jenatton and C. Archambeau and J. González and M. Seeger},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning (ICML'17)},
+  year      = {2017},
+
+}
+
+@article{li-arxiv18,
+ title   = {Massively Parallel Hyperparameter Tuning},
+ author  = {L. Li and K. Jamieson and A. Rostamizadeh and K. Gonina and M. Hardt and B. Recht and A. Talwalkar},
+ year    = {2018},
+ journal = {arXiv:1810.05934 [cs.LG]}
+}
+
+@article{bellman-science66,
+  title={Dynamic programming},
+  author={R. Bellman},
+  journal={Science},
+  year={1966},
+}
+
+@inproceedings{li-iclr17,
+ author    = {L. Li and K. Jamieson and G. DeSalvo and A. Rostamizadeh and A. Talwalkar},
+ title     = {Hyperband: Bandit-Based Configuration Evaluation for Hyperparameter Optimization},
+ booktitle = {International Conference on Learning Representations (ICLR'17)},
+ year      = {2017}
+}
+
+@inproceedings{karnin-icml13,
+  author    = {Z. Karnin and T. Koren and O. Somekh},
+  title     = {Almost optimal exploration in multi-armed bandits},
+  booktitle = {In Proceedings of the 30th International Conference on Machine Learning (ICML'13)},
+  year      = {2013},
+}
+
+@inproceedings{jamieson-aistats16,
+ author    = {K. Jamieson and A. Talwalkar},
+ title     = {Non-stochastic Best Arm Identification and Hyperparameter Optimization},
+ booktitle = {Proceedings of the 17th International Conference on Artificial Intelligence and Statistics (AISTATS'16)},
+ year      = {2016}
+}
+
+@InProceedings{akiba-sigkdd19,
+ title     = {{Optuna}: A next-generation hyperparameter optimization framework},
+ author    = {T. Akiba and S. Sano and T. Yanase and T. Ohta and M. Koyama},
+ booktitle = {Proceedings of the 25th ACM SIGKDD international conference on knowledge discovery \& data mining},
+ year      = {2019}
+}
+
+@article{liaw-arxiv18,
+ author  = {R. Liaw and E. Liang and R. Nishihara and P. Moritz and J. Gonzalez and I. Stoica},
+ title   = {{Tune}: A Research Platform for Distributed Model Selection and Training},
+ journal = {arXiv:1807.05118 [cs.LG]},
+ year    = {2018}
+}
+
+@InProceedings{salinas-automl22,
+  title     = {Syne Tune: A Library for Large Scale Hyperparameter Tuning and Reproducible Research},
+  author    = {D. Salinas and M. Seeger and A. Klein and V. Perrone and M. Wistuba and C. Archambeau},
+  booktitle = {First Conference on Automated Machine Learning (Main Track)},
+  year      = {2022},
+}
+
+@InProceedings{baptista-icml18a,
+  title = 	 {{B}ayesian Optimization of Combinatorial Structures},
+  author =       {R. Baptista and M. Poloczek},
+  booktitle = 	 {Proceedings of the 35th International Conference on Machine Learning},
+  year = 	 {2018},
+}
+
+@inproceedings{hutter-lion11a,
+    author    = {F. Hutter and H. Hoos and K. Leyton-Brown},
+    title     = {Sequential Model-Based Optimization for General Algorithm Configuration},
+    booktitle = {Proceedings of the Fifth International Conference on Learning and Intelligent Optimization (LION'11)},
+    year      = {2011}
+}
+
+@inproceedings{franceschi-icml17a,
+  title = 	 {Forward and Reverse Gradient-Based Hyperparameter Optimization},
+  author = 	 {L. Franceschi and M. Donini and P. Frasconi and M. Pontil},
+  booktitle = 	 {Proceedings of the 34th International Conference on Machine Learning (ICML'17)},
+  year = 	 {2017},
+}
+
+@inproceedings{maclaurin-icml15,
+  title = 	 {Gradient-based Hyperparameter Optimization through Reversible Learning},
+  author = 	 {D. Maclaurin and D. Duvenaud and R. Adams},
+  booktitle = 	 {Proceedings of the 32nd International Conference on Machine Learning (ICML'15)},
+  year = 	 {2015}
+}
+
+@Book{hutter-book19a,
+  editor	= {F. Hutter and L. Kotthoff and J. Vanschoren},
+  publisher	= {Springer},
+  title		= {Automated Machine Learning: Methods, Systems, Challenges},
+  year		= {2019}
+}
+
+@article{wistuba-arxiv19,
+  author  = {M. Wistuba and A. Rawat and T. Pedapati},
+  title   = {A survey on neural architecture search},
+  journal = {arXiv:1905.01392 [cs.LG]},
+  year    = {2019}
+}
+
+@article{elsken-arxiv18a,
+  author  = {T. Elsken and J. H. Metzen and F. Hutter},
+  title   = {Neural Architecture Search: A Survey},
+  journal = {arXiv:1808.05377 [stat.ML]},
+  year    = {2018}
+}
+
+@incollection{feurer-automlbook18a,
+  author    = {M. Feurer and F. Hutter},
+  title     = {Hyperparameter Optimization},
+  booktitle = {Automatic Machine Learning: Methods, Systems, Challenges},
+  year      = {2018},
+  publisher = {Springer}
+}
+
+@inproceedings{snoek-nips12,
+  title       = {Practical {Bayesian} Optimization of Machine Learning Algorithms},
+  author      = {Snoek, J. and Larochelle, H. and Adams, R.},
+  booktitle   = {Advances in Neural Information Processing Systems 25},
+  year        = {2012},
+  pages       = {2951--2959}
+}
+
+@inproceedings{bergstra-nips11,
+  author      = {Bergstra, J. and Bardenet, R. and Bengio, Y. and Kegl, B.},
+  booktitle   = {Advances in Neural Information Processing Systems 24},
+  year        = {2011},
+  pages       = {2546--2554}
+}
+
+
+@article{beltagy2020longformer,
+  title={Longformer: The long-document transformer},
+  author={Beltagy, Iz and Peters, Matthew E and Cohan, Arman},
+  journal={arXiv preprint arXiv:2004.05150},
+  year={2020}
+}
+
+@article{gulati2020conformer,
+  title={Conformer: Convolution-augmented Transformer for Speech Recognition},
+  author={Gulati, Anmol and Qin, James and Chiu, Chung-Cheng and Parmar, Niki and Zhang, Yu and Yu, Jiahui and Han, Wei and Wang, Shibo and Zhang, Zhengdong and Wu, Yonghui and others},
+  journal={Proc. Interspeech 2020},
+  pages={5036--5040},
+  year={2020}
+}
+
+@article{chen2021decision,
+  title={Decision transformer: Reinforcement learning via sequence modeling},
+  author={Chen, Lili and Lu, Kevin and Rajeswaran, Aravind and Lee, Kimin and Grover, Aditya and Laskin, Misha and Abbeel, Pieter and Srinivas, Aravind and Mordatch, Igor},
+  journal={Advances in neural information processing systems},
+  volume={34},
+  pages={15084--15097},
+  year={2021}
+}
+
+@article{dwivedi2020generalization,
+  title={A generalization of transformer networks to graphs},
+  author={Dwivedi, Vijay Prakash and Bresson, Xavier},
+  journal={arXiv preprint arXiv:2012.09699},
+  year={2020}
+}
+
+@techreport{wolpert1995no,
+  title={No free lunch theorems for search},
+  author={Wolpert, David H and Macready, William G and others},
+  year={1995},
+  institution={Technical Report SFI-TR-95-02-010, Santa Fe Institute}
+}
+
+@inproceedings{rezende2015variational,
+  title={Variational inference with normalizing flows},
+  author={Rezende, Danilo and Mohamed, Shakir},
+  booktitle={International conference on machine learning},
+  pages={1530--1538},
+  year={2015},
+  organization={PMLR}
+}
+
+@inproceedings{sohl2015deep,
+  title={Deep unsupervised learning using nonequilibrium thermodynamics},
+  author={Sohl-Dickstein, Jascha and Weiss, Eric and Maheswaranathan, Niru and Ganguli, Surya},
+  booktitle={International Conference on Machine Learning},
+  pages={2256--2265},
+  year={2015},
+  organization={PMLR}
+}
+
+@article{ho2020denoising,
+  title={Denoising diffusion probabilistic models},
+  author={Ho, Jonathan and Jain, Ajay and Abbeel, Pieter},
+  journal={Advances in Neural Information Processing Systems},
+  volume={33},
+  pages={6840--6851},
+  year={2020}
+}
+
+@article{song2019generative,
+  title={Generative modeling by estimating gradients of the data distribution},
+  author={Song, Yang and Ermon, Stefano},
+  journal={Advances in Neural Information Processing Systems},
+  volume={32},
+  year={2019}
+}
+
+@article{BellmanDPPaper,
+author = {Richard Bellman },
+title = {On the Theory of Dynamic Programming},
+journal = {Proceedings of the National Academy of Sciences},
+volume = {38},
+number = {8},
+pages = {716-719},
+year = {1952},
+doi = {10.1073/pnas.38.8.716},
+}
+
+@article{BellmanMDP,
+ ISSN = {00959057, 19435274},
+ URL = {http://www.jstor.org/stable/24900506},
+ author = {Richard Bellman},
+ journal = {Journal of Mathematics and Mechanics},
+ number = {5},
+ pages = {679--684},
+ publisher = {Indiana University Mathematics Department},
+ title = {A Markovian Decision Process},
+ urldate = {2022-11-28},
+ volume = {6},
+ year = {1957}
+}
+
+@book{BellmanDPBook,
+  isbn={9780486317199},
+  publisher = {Dover Publications},
+  title = {{Dynamic Programming}},
+  year = 1957,
+  author = {Richard Bellman },
+  series={Dover Books on Computer Science},
+}
+
+@article{silver2016mastering,
+  title={Mastering the game of Go with deep neural networks and tree search},
+  author={Silver, David and Huang, Aja and Maddison, Chris J and Guez, Arthur and Sifre, Laurent and Van Den Driessche, George and Schrittwieser, Julian and Antonoglou, Ioannis and Panneershelvam, Veda and Lanctot, Marc and others},
+  journal={nature},
+  volume={529},
+  number={7587},
+  pages={484--489},
+  year={2016},
+  publisher={Nature Publishing Group}
+}
+
+@article{mnih2013playing,
+	Author = {Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David and Graves, Alex and Antonoglou, Ioannis and Wierstra, Daan and Riedmiller, Martin},
+	Journal = {arXiv:1312.5602},
+	Title = {Playing atari with deep reinforcement learning},
+	Year = {2013}
+	}
+
+@article{watkinsQlearning1992,
+  Author = {Watkins, Christopher J. C. H. and Dayan, Peter},
+  Title = {Q-Learning},
+  year={1992},
+  volume={8},
+  Journal={Machine Learning},
+  pages={279-292}
+}

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="200 474 400 200" width="400" height="200">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 10 8" markerWidth="10" markerHeight="8" color="black">
+      <g>
+        <path d="M 8 0 L 0 0 M 0 -3 L 8 0 L 0 3" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="Canvas_1" fill-opacity="1" stroke-opacity="1" fill="none" stroke="none" stroke-dasharray="none">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_6">
+        <rect x="251.20193" y="524.7702" width="343.79807" height="41.78435" fill="white"/>
+        <rect x="251.20193" y="524.7702" width="343.79807" height="41.78435" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_5">
+        <rect x="251.20193" y="579.15616" width="343.79807" height="41.78435" fill="white"/>
+        <rect x="251.20193" y="579.15616" width="343.79807" height="41.78435" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_12">
+        <rect x="260.54232" y="531.73424" width="40.23551" height="27.856234" fill="#66bfff"/>
+        <rect x="260.54232" y="531.73424" width="40.23551" height="27.856234" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(265.54232 540.51514)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="2.5340147" y="8">Trial-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_13">
+        <rect x="260.54232" y="587.4467" width="74.72309" height="25.20326" fill="#b2d9ff"/>
+        <rect x="260.54232" y="587.4467" width="74.72309" height="25.20326" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(265.54232 594.9011)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="19.777805" y="8">Trial-1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_14">
+        <rect x="300.77783" y="531.73424" width="151.60166" height="27.856234" fill="#b2d9ff"/>
+        <rect x="300.77783" y="531.73424" width="151.60166" height="27.856234" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(305.77783 540.51514)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="58.21709" y="8">Trial-2</tspan>
+        </text>
+      </g>
+      <g id="Graphic_19">
+        <rect x="335.2654" y="587.4467" width="40.23551" height="25.20326" fill="#66bfff"/>
+        <rect x="335.2654" y="587.4467" width="40.23551" height="25.20326" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(340.2654 594.9011)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="2.5340147" y="8">Trial-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_20">
+        <rect x="375.5009" y="587.4467" width="52.44986" height="25.20326" fill="#66bfff"/>
+        <rect x="375.5009" y="587.4467" width="52.44986" height="25.20326" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(380.5009 594.9011)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="8.641191" y="8">Trial-3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_22">
+        <text transform="translate(331.2168 475.58286)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Asynchronous Successive Halving</tspan>
+        </text>
+      </g>
+      <g id="Graphic_24">
+        <text transform="translate(207.80525 540.51514)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Worker-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_26">
+        <text transform="translate(205 594.9011)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="2.805254" y="8">Worker-1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_27">
+        <rect x="452.3795" y="531.73424" width="52.44986" height="27.856234" fill="#66bfff"/>
+        <rect x="452.3795" y="531.73424" width="52.44986" height="27.856234" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(457.3795 540.51514)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="8.641191" y="8">Trial-3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_28">
+        <rect x="427.9508" y="587.4467" width="74.72309" height="25.20326" fill="#b2d9ff"/>
+        <rect x="427.9508" y="587.4467" width="74.72309" height="25.20326" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(432.9508 594.9011)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="19.777805" y="8">Trial-4</tspan>
+        </text>
+      </g>
+      <g id="Graphic_53">
+        <rect x="504.82935" y="531.73424" width="81.54876" height="27.856234" fill="#66bfff"/>
+        <rect x="504.82935" y="531.73424" width="81.54876" height="27.856234" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(509.82935 540.51514)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="23.19064" y="8">Trial-0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_58">
+        <text transform="translate(314.10973 662.1227)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Promotion to Rung 1</tspan>
+        </text>
+      </g>
+      <g id="Line_62">
+        <line x1="355.38316" y1="660.53985" x2="355.38316" y2="622.54996" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_64">
+        <text transform="translate(437.331 507.58286)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Promotion to Rung 1</tspan>
+        </text>
+      </g>
+      <g id="Line_63">
+        <line x1="478.6044" y1="519.46015" x2="478.6044" y2="521.83424" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_66">
+        <text transform="translate(415.78596 642.08906)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Start new trial on Rung 0</tspan>
+        </text>
+      </g>
+      <g id="Line_65">
+        <line x1="465.3123" y1="640.5062" x2="465.3123" y2="622.54996" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_68">
+        <text transform="translate(504.3303 492.0007)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Promotion to Rung 2</tspan>
+        </text>
+      </g>
+      <g id="Line_67">
+        <line x1="545.6037" y1="503.878" x2="545.6037" y2="521.83424" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_69">
+        <rect x="502.6739" y="587.4467" width="78.35344" height="25.20326" fill="#b2d9ff"/>
+        <rect x="502.6739" y="587.4467" width="78.35344" height="25.20326" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(507.6739 594.9011)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="21.59298" y="8">Trial-5</tspan>
+        </text>
+      </g>
+      <g id="Graphic_71">
+        <text transform="translate(492.3242 661.2475)" fill="black">
+          <tspan font-family="Arial" font-size="9" fill="black" x="0" y="8">Start new trial on Rung 0</tspan>
+        </text>
+      </g>
+      <g id="Line_70">
+        <line x1="541.8506" y1="660.53985" x2="541.8506" y2="622.54996" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>

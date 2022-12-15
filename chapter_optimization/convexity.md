@@ -266,7 +266,7 @@ all $\lambda \in [0, 1]$
 $$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
 =&g(\lambda \cdot 1 + (1-\lambda) \cdot 0)\\
 \leq& \lambda g(1)  + (1-\lambda) g(0) \\
-=& \lambda f(\mathbf{x}) + (1-\lambda) g(\mathbf{y}).
+=& \lambda f(\mathbf{x}) + (1-\lambda) f(\mathbf{y}).
 \end{aligned}$$
 
 
@@ -369,9 +369,6 @@ In the context of deep learning the main purpose of convex functions is to motiv
 1. Prove that linear subspaces, i.e., $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, are convex sets.
 1. Prove that in the case of linear subspaces with $\mathbf{b} = \mathbf{0}$ the projection $\mathrm{Proj}_\mathcal{X}$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
 1. Show that for  twice-differentiable convex functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
-1. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $\ell_1$ unit ball.
-    1. As an intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
-    1. Can you find the "right" value of $\lambda$ without a lot of trial and error?
 1. Given a convex set $\mathcal{X}$ and two vectors $\mathbf{x}$ and $\mathbf{y}$, prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_\mathcal{X}(\mathbf{x}) - \mathrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
 
 

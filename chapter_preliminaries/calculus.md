@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Calculus
@@ -21,8 +21,8 @@ as we partition the circle more finely.
 At the same time, its base approaches $2 \pi r/n$, 
 since the ratio between arc and secant approaches 1 
 for a large number of vertices. 
-Thus, the area of the triangle approaches
-$n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$. 
+Thus, the area of the polygon approaches
+$n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$.
 
 ![Finding the area of a circle as a limit procedure.](../img/polygon-circle.svg)
 :label:`fig_circle_area`
@@ -121,6 +121,17 @@ def f(x):
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
 from matplotlib_inline import backend_inline
 import numpy as np
 

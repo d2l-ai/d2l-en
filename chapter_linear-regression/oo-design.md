@@ -1,6 +1,6 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Object-Oriented Design for Implementation
@@ -64,6 +64,19 @@ import time
 import numpy as np
 from d2l import torch as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from dataclasses import field
+from d2l import jax as d2l
+from flax import linen as nn
+from flax.training import train_state
+from jax import numpy as jnp
+import numpy as np
+import jax
+import time
+from typing import Any
 ```
 
 ## Utilities
@@ -154,33 +167,61 @@ for x in np.arange(0, 10, 0.1):
 ```
 
 ## Models
-:label:`oo-design-models`
+:label:`subsec_oo-design-models`
 
 The `Module` class  is the base class of all models we will implement. At a minimum we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
 Sometimes we put the code to compute the output into a separate `forward` method to make it more reusable.
 
+:begin_tab:`jax`
+With the introduction of [dataclasses](https://docs.python.org/3/library/dataclasses.html)
+in Python 3.7, classes decorated with `@dataclass` automatically add magic
+methods such as `__init__` and `__repr__`. The member variables are defined
+using type annotations. All Flax modules are Python 3.7 dataclasses.
+:end_tab:
+
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
-        super().__init__()
-        self.save_hyperparameters()
-        self.board = ProgressBoard()
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
+            super().__init__()
+            self.save_hyperparameters()
+            self.board = ProgressBoard()
         if tab.selected('tensorflow'):
             self.training = None
+
+    if tab.selected('jax'):
+        # No need for save_hyperparam when using Python dataclass
+        plot_train_per_epoch: int = field(default=2, init=False)
+        plot_valid_per_epoch: int = field(default=1, init=False)
+        # Use default_factory to make sure new plots are generated on each run
+        board: ProgressBoard = field(default_factory=lambda: ProgressBoard(),
+                                     init=False)
 
     def loss(self, y_hat, y):
         raise NotImplementedError
 
-    def forward(self, X):
-        assert hasattr(self, 'net'), 'Neural network is defined'
-        return self.net(X)
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def forward(self, X):
+            assert hasattr(self, 'net'), 'Neural network is defined'
+            return self.net(X)
 
     if tab.selected('tensorflow'):
         def call(self, X, *args, **kwargs):
             if kwargs and "training" in kwargs:
                 self.training = kwargs['training']
             return self.forward(X, *args)
+
+    if tab.selected('jax'):
+        # JAX & Flax don't have a forward-method-like syntax. Flax uses setup
+        # and built-in __call__ magic methods for forward pass. Adding here
+        # for consistency
+        def forward(self, X, *args, **kwargs):
+            assert hasattr(self, 'net'), 'Neural network is defined'
+            return self.net(X, *args, **kwargs)
+
+        def __call__(self, X, *args, **kwargs):
+            return self.forward(X, *args, **kwargs)
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
@@ -202,15 +243,35 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
                             ('train_' if train else 'val_') + key,
                             every_n=int(n))
+        if tab.selected('jax'):
+            self.board.draw(x, d2l.to(value, d2l.cpu()),
+                            ('train_' if train else 'val_') + key,
+                            every_n=int(n))
 
-    def training_step(self, batch):
-        l = self.loss(self(*batch[:-1]), batch[-1])
-        self.plot('loss', l, train=True)
-        return l
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def training_step(self, batch):
+            l = self.loss(self(*batch[:-1]), batch[-1])
+            self.plot('loss', l, train=True)
+            return l
 
-    def validation_step(self, batch):
-        l = self.loss(self(*batch[:-1]), batch[-1])
-        self.plot('loss', l, train=False)
+        def validation_step(self, batch):
+            l = self.loss(self(*batch[:-1]), batch[-1])
+            self.plot('loss', l, train=False)
+
+    if tab.selected('jax'):
+        def training_step(self, params, batch, state):
+            l, grads = jax.value_and_grad(self.loss)(params, batch[:-1],
+                                                     batch[-1], state)
+            self.plot("loss", l, train=True)
+            return l, grads
+
+        def validation_step(self, params, batch, state):
+            l = self.loss(params, batch[:-1], batch[-1], state)
+            self.plot('loss', l, train=False)
+        
+        def apply_init(self, dummy_input, key):
+            """To be defined later in :numref:`sec_lazy_init`"""
+            raise NotImplementedError
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -231,6 +292,12 @@ You may notice that `Module` is a subclass of `tf.keras.Model`, the base class o
 It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` function, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
+:begin_tab:`jax`
+You may notice that `Module` is a subclass of `linen.Module`, the base class of neural networks in Flax.
+It provides convenient features to handle neural networks. For example, it handles the model parameters, provides the `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
+Here we also redirect `__call__` to the `forward` method. We do this to make our code more similar to other framework implementations.
+:end_tab:
+
 ##  Data
 :label:`oo-design-data`
 
@@ -243,7 +310,7 @@ class DataModule(d2l.HyperParameters):  #@save
         def __init__(self, root='../data', num_workers=4):
             self.save_hyperparameters()
 
-    if tab.selected('tensorflow'):
+    if tab.selected('tensorflow', 'jax'):
         def __init__(self, root='../data'):
             self.save_hyperparameters()
 
@@ -260,7 +327,13 @@ class DataModule(d2l.HyperParameters):  #@save
 ## Training
 :label:`oo-design-training`
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+:end_tab:
+
+:begin_tab:`jax`
+The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+:end_tab:
 
 ```{.python .input}
 %%tab all
@@ -281,15 +354,57 @@ class Trainer(d2l.HyperParameters):  #@save
         model.board.xlim = [0, self.max_epochs]
         self.model = model
 
-    def fit(self, model, data):
-        self.prepare_data(data)
-        self.prepare_model(model)
-        self.optim = model.configure_optimizers()
-        self.epoch = 0
-        self.train_batch_idx = 0
-        self.val_batch_idx = 0
-        for self.epoch in range(self.max_epochs):
-            self.fit_epoch()
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def fit(self, model, data):
+            self.prepare_data(data)
+            self.prepare_model(model)
+            self.optim = model.configure_optimizers()
+            self.epoch = 0
+            self.train_batch_idx = 0
+            self.val_batch_idx = 0
+            for self.epoch in range(self.max_epochs):
+                self.fit_epoch()
+
+    if tab.selected('jax'):
+        def fit(self, model, data, key=None):
+            self.prepare_data(data)
+            self.prepare_model(model)
+            self.optim = model.configure_optimizers()
+
+            if key is None:
+                root_key = d2l.get_key()
+            else:
+                root_key = key
+            params_key, dropout_key = jax.random.split(root_key)
+            key = {'params': params_key, 'dropout': dropout_key}
+
+            dummy_input = next(iter(self.train_dataloader))[:-1]
+            variables = model.apply_init(dummy_input, key=key)
+            params = variables['params']
+
+            if 'batch_stats' in variables.keys():
+                # Here batch_stats will be used later (e.g., for batch norm)
+                batch_stats = variables['batch_stats']
+            else:
+                batch_stats = {}
+
+            # Flax uses optax under the hood for a single state obj TrainState.
+            # More will be discussed later in the dropout and batch
+            # normalization section
+            class TrainState(train_state.TrainState):
+                batch_stats: Any
+                dropout_rng: jax.random.PRNGKeyArray
+
+            self.state = TrainState.create(apply_fn=model.apply,
+                                           params=params,
+                                           batch_stats=batch_stats,
+                                           dropout_rng=dropout_key,
+                                           tx=model.configure_optimizers())
+            self.epoch = 0
+            self.train_batch_idx = 0
+            self.val_batch_idx = 0
+            for self.epoch in range(self.max_epochs):
+                self.fit_epoch()
 
     def fit_epoch(self):
         raise NotImplementedError
@@ -316,7 +431,6 @@ this degree of modularity pays dividends throughout the book in terms of concise
 
 1. Locate full implementations of the above classes that are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
 1. Remove the `save_hyperparameters` statement in the `B` class. Can you still print `self.a` and `self.b`? Optional: if you have dived into the full implementation of the `HyperParameters` class, can you explain why?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/6645)

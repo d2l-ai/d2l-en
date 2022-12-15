@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Predicting House Prices on Kaggle
@@ -127,7 +127,6 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 import pandas as pd
-import numpy as np
 ```
 
 ```{.python .input}
@@ -136,7 +135,16 @@ import numpy as np
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import pandas as pd
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
 import numpy as np
+import pandas as pd
 ```
 
 To get started, we will [**read in and process the data
@@ -394,8 +402,13 @@ The following code will generate a file called `submission.csv`.
 
 ```{.python .input}
 %%tab all
-preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
-         for model in models]
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
+             for model in models]
+if tab.selected('jax'):
+    preds = [model.apply({'params': trainer.state.params},
+             d2l.tensor(data.val.values, dtype=d2l.float32))
+             for model in models]
 # Taking exponentiation of predictions in the logarithm scale
 ensemble_preds = d2l.reduce_mean(d2l.exp(d2l.concat(preds, 1)), 1)
 submission = pd.DataFrame({'Id':data.raw_val.Id,
@@ -420,11 +433,16 @@ The steps are quite simple:
 
 ## Summary
 
-* Real data often contains a mix of different data types and need to be preprocessed.
-* Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
-* Transforming categorical features into indicator features allows us to treat them like one-hot vectors.
-* We can use $K$-fold cross-validation to select the model and adjust the hyperparameters.
-* Logarithms are useful for relative errors.
+Real data often contains a mix of different data types and needs to be preprocessed.
+Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
+Besides, transforming categorical features into indicator features allows us to treat them like one-hot vectors.
+When we tend to care more about
+the relative error than about the absolute error,
+we can 
+measure the discrepancy in the logarithm of the prediction.
+To select the model and adjust the hyperparameters,
+we can use $K$-fold cross-validation .
+
 
 
 ## Exercises
