@@ -19,7 +19,7 @@ Despite thousands of papers proposing alternative ideas,
 models resembling classical convolutional neural networks (:numref:`chap_cnn`) 
 retained *state of the art* status in computer vision
 and models resembling Sepp Hochreiter's original design
-for the LSTM recurrent neural netowrk (:numref:`sec_lstm`),
+for the LSTM recurrent neural network (:numref:`sec_lstm`),
 dominated most applications in natural language processing. 
 Arguably, to that point, the rapid emergence of deep learning
 appeared to be primarily attributable to shifts 
@@ -117,7 +117,7 @@ on enormous generic background corpora
 to optimize some self-supervised pretraining objective,
 and then to fine-tune these models 
 using the available downstream data. 
-The gap between Transformers and tradition architectures
+The gap between Transformers and traditional architectures
 grew especially wide when applied in this pretraining paradigm,
 and thus the ascendance of Transformers coincided 
 with the ascendence of such large-scale pretrained models,
