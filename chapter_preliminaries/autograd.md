@@ -23,14 +23,14 @@ As we pass data through each successive function,
 the framework builds a *computational graph* 
 that tracks how each value depends on others.
 To calculate derivatives, 
-automatic differentiation packages 
-then work backwards through this graph
+automatic differentiation 
+works backwards through this graph
 applying the chain rule. 
 The computational algorithm for applying the chain rule
-this fashion is called *backpropagation*.
+in this fashion is called *backpropagation*.
 
-While autograd libraries become 
-hot concerns over the past decade,
+While autograd libraries have become
+a hot concern over the past decade,
 they have a long history. 
 In fact the earliest references to autograd
 date back over half of a century :cite:`Wengert.1964`.
@@ -114,9 +114,9 @@ x.grad
 
 ```{.python .input  n=9}
 %%tab pytorch
-# Better create x = torch.arange(4.0, requires_grad=True)
+# Can also create x = torch.arange(4.0, requires_grad=True)
 x.requires_grad_(True)
-x.grad  # The default value is None
+x.grad  # The gradient is None by default
 ```
 
 ```{.python .input}
@@ -249,8 +249,8 @@ and take its gradient.**]
 Note that PyTorch does not automatically 
 reset the gradient buffer 
 when we record a new gradient. 
-Instead the new gradient 
-is added to the already stored gradient.
+Instead, the new gradient
+is added to the already-stored gradient.
 This behavior comes in handy
 when we want to optimize the sum 
 of multiple objective functions.
@@ -316,7 +316,7 @@ with respect to the full vector `x`,
 yielding a vector of the same shape as `x`.
 For example, we often have a vector 
 representing the value of our loss function
-calculated separately for each among
+calculated separately for each example among
 a *batch* of training examples.
 Here, we just want to (**sum up the gradients
 computed individually for each example**).
@@ -394,7 +394,7 @@ For example, say that we use the input
 to create some auxiliary intermediate terms 
 for which we do not want to compute a gradient. 
 In this case, we need to *detach* 
-the respective computational influence graph 
+the respective computational graph
 from the final result. 
 The following toy example makes this clearer: 
 suppose we have `z = x * y` and `y = x * x` 
@@ -405,7 +405,7 @@ that takes the same value as `y`
 but whose *provenance* (how it was created)
 has been wiped out.
 Thus `u` has no ancestors in the graph
-and gradients to not flow through `u` to `x`.
+and gradients do not flow through `u` to `x`.
 For example, taking the gradient of `z = x * u`
 will yield the result `x`,
 (not `3 * x * x` as you might have 
