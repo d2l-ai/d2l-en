@@ -24,7 +24,7 @@ the framework builds a *computational graph*
 that tracks how each value depends on others.
 To calculate derivatives, 
 automatic differentiation 
-then works backwards through this graph
+works backwards through this graph
 applying the chain rule. 
 The computational algorithm for applying the chain rule
 in this fashion is called *backpropagation*.
