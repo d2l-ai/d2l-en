@@ -16,7 +16,7 @@ even simple models by today's standards achieve classification accuracy over 95%
 making it unsuitable for distinguishing between stronger models and weaker ones. Even more so, the dataset allows for *very* high levels of accuracy, not typically seen in many classification problems. This skewed algorithmic development towards specific families of algorithms that can take advantage of clean datasets, such as active set methods and boundary-seeking active set algorithms.
 Today, MNIST serves as more of sanity checks than as a benchmark. ImageNet :cite:`Deng.Dong.Socher.ea.2009` poses a much 
 more relevant challenge. Unfortunately, ImageNet is too large for many of the examples and illustrations in this book, as it would take too long to train to make the examples interactive. As a substitute we will focus our discussion in the coming sections on the qualitatively similar, but much smaller Fashion-MNIST
-dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017. It constains images of 10 categories of clothing at $28 \times 28$ pixels resolution.
+dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017. It contains images of 10 categories of clothing at $28 \times 28$ pixels resolution.
 
 ```{.python .input}
 %%tab mxnet
