@@ -12,8 +12,76 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```
 
+## Models
+
+```eval_rst 
+
+.. autoclass:: Module
+   :members: 
+
+.. autoclass:: LinearRegressionScratch
+   :members:
+
+.. autoclass:: LinearRegression
+   :members:    
+
+.. autoclass:: Classifier
+   :members:
+
+```
+
+
+## Data
+
+```eval_rst 
+
+.. autoclass:: DataModule
+   :members: 
+
+.. autoclass:: SyntheticRegressionData
+   :members: 
+
+.. autoclass:: FashionMNIST
+   :members: 
+
+```
+
+
+## Trainer
+
+```eval_rst 
+
+.. autoclass:: Trainer
+   :members: 
+
+.. autoclass:: SGD
+   :members: 
+
+```
+
+
+## Utilities
+
+```eval_rst 
+
+.. autofunction:: add_to_class
+
+.. autofunction:: cpu
+
+.. autofunction:: gpu
+
+.. autofunction:: num_gpus
+
+.. autoclass:: ProgressBoard
+   :members: 
+
+.. autoclass:: HyperParameters
+   :members:    
+
+```
 
 :end_tab:
+
 
 :begin_tab:`pytorch`
 
@@ -22,18 +90,6 @@ The implementations of the following members of the `d2l` package and sections w
 .. currentmodule:: d2l.torch
 
 ```
-
-
-:begin_tab:`tensorflow`
-
-```eval_rst
-
-.. currentmodule:: d2l.torch
-
-```
-
-
-:end_tab:
 
 ## Models
 
@@ -102,4 +158,85 @@ The implementations of the following members of the `d2l` package and sections w
    :members:    
 
 ```
+
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+
+```eval_rst
+
+.. currentmodule:: d2l.tensorflow
+
+```
+
+## Models
+
+```eval_rst 
+
+.. autoclass:: Module
+   :members: 
+
+.. autoclass:: LinearRegressionScratch
+   :members:
+
+.. autoclass:: LinearRegression
+   :members:    
+
+.. autoclass:: Classifier
+   :members:
+
+```
+
+
+## Data
+
+```eval_rst 
+
+.. autoclass:: DataModule
+   :members: 
+
+.. autoclass:: SyntheticRegressionData
+   :members: 
+
+.. autoclass:: FashionMNIST
+   :members: 
+
+```
+
+
+## Trainer
+
+```eval_rst 
+
+.. autoclass:: Trainer
+   :members: 
+
+.. autoclass:: SGD
+   :members: 
+
+```
+
+
+## Utilities
+
+```eval_rst 
+
+.. autofunction:: add_to_class
+
+.. autofunction:: cpu
+
+.. autofunction:: gpu
+
+.. autofunction:: num_gpus
+
+.. autoclass:: ProgressBoard
+   :members: 
+
+.. autoclass:: HyperParameters
+   :members:    
+
+```
+
+:end_tab:
 
