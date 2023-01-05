@@ -121,7 +121,7 @@ by which a neural network can select elements from a set and to construct an ass
 ## Exercises
 
 1. Suppose that you wanted to reimplement approximate (key, query) matches as used in classical databases, which attention function would you pick? 
-1. Suppose that the attention function is given by $a(\mathbf{q}, \mathbf{k}_i) = \mathbf{q}^\top \mathbf{k}_i$ and that $\mathbf{k}_i = \mathbf{v}_i$ for $i = 1, \ldots, m$. Denote by $p(\mathbf{k}_i; \mathbf{q})$ the probabilitiy distribution over keys when using the softmax normalization in :numref:`eq_softmax_attention`. Prove that $\nabla_{\mathbf{q}} \mathop{\mathrm{Attention}}(\mathbf{q}, \mathcal{D}) = \mathrm{Cov}_{p(\mathbf{k}_i; \mathbf{q})}[\mathbf{k}_i]$.
+1. Suppose that the attention function is given by $a(\mathbf{q}, \mathbf{k}_i) = \mathbf{q}^\top \mathbf{k}_i$ and that $\mathbf{k}_i = \mathbf{v}_i$ for $i = 1, \ldots, m$. Denote by $p(\mathbf{k}_i; \mathbf{q})$ the probability distribution over keys when using the softmax normalization in :eqref:`eq_softmax_attention`. Prove that $\nabla_{\mathbf{q}} \mathop{\mathrm{Attention}}(\mathbf{q}, \mathcal{D}) = \mathrm{Cov}_{p(\mathbf{k}_i; \mathbf{q})}[\mathbf{k}_i]$.
 1. Design a differentiable search engine using the attention mechanism. 
 1. Review the design of the Squeeze and Excitation Networks :cite:`Hu.Shen.Sun.2018` and interpret them through the lens of the attention mechanism. 
 
