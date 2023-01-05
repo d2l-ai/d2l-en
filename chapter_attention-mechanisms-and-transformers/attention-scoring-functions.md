@@ -114,7 +114,9 @@ def masked_softmax(X, valid_lens):  #@save
         # value, whose exponentiation outputs 0
         X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_lens, True,
                               value=-1e6, axis=1)
-        return npx.softmax(X).reshape(shape)
+        X = npx.softmax(X)
+        X[valid_lens == 0] = 0
+        return X.reshape(shape)
 ```
 
 ```{.python .input}
@@ -140,7 +142,9 @@ def masked_softmax(X, valid_lens):  #@save
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0
         X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
-        return nn.functional.softmax(X.reshape(shape), dim=-1)
+        X = nn.functional.softmax(X, dim=-1)
+        X[valid_lens == 0] = 0
+        return X.reshape(shape)
 ```
 
 ```{.python .input}
@@ -171,7 +175,9 @@ def masked_softmax(X, valid_lens):  #@save
         # value, whose exponentiation outputs 0    
         X = _sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens,
                            value=-1e6)    
-        return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
+        X = tf.nn.softmax(X, axis=-1)
+        X[valid_lens == 0] = 0
+        return tf.reshape(X, shape=shape)
 ```
 
 ```{.python .input}
@@ -196,7 +202,9 @@ def masked_softmax(X, valid_lens):  #@save
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0
         X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
-        return nn.softmax(X.reshape(shape), axis=-1)
+        X = nn.softmax(X, axis=-1)
+        X[valid_lens == 0] = 0
+        return X.reshape(shape)
 ```
 
 To [**illustrate how this function works**],
