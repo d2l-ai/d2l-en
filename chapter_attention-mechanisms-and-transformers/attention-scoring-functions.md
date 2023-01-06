@@ -203,7 +203,7 @@ def masked_softmax(X, valid_lens):  #@save
         # value, whose exponentiation outputs 0
         X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
         X = nn.softmax(X, axis=-1)
-        X[valid_lens == 0] = 0
+        X = X.at[valid_lens == 0].set(0)
         return X.reshape(shape)
 ```
 
