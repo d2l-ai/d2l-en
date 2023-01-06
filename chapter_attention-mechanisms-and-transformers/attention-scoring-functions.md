@@ -176,7 +176,8 @@ def masked_softmax(X, valid_lens):  #@save
         X = _sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens,
                            value=-1e6)    
         X = tf.nn.softmax(X, axis=-1)
-        X[valid_lens == 0] = 0
+        where_zero = tf.equal(valid_lens, tf.constant(0, dtype=tf.int32))
+        X = tf.scatter_update(X, where_zero, tf.constant(0.0))
         return tf.reshape(X, shape=shape)
 ```
 
