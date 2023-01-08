@@ -342,7 +342,7 @@ Typically, the Xavier initialization
 samples weights from a Gaussian distribution
 with zero mean and variance
 $\sigma^2 = \frac{2}{n_\mathrm{in} + n_\mathrm{out}}$.
-We can also adapt Xavier's intuition to
+We can also adapt this to
 choose the variance when sampling weights
 from a uniform distribution.
 Note that the uniform distribution $U(-a, a)$ has variance $\frac{a^2}{3}$.
