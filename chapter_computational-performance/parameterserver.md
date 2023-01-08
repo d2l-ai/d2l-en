@@ -9,7 +9,7 @@ The core idea of the parameter server was introduced in :citet:`Smola.Narayanamu
 
 ## Data-Parallel Training
 
-Let's review the data parallel training approach to distributed training. We will use this to the exclusion of all others in this section since it is significantly simpler to implement in practice. There are virtually no use cases (besides deep learning on graphs) where any other strategy for parallelism is preferred since GPUs have plenty of memory nowadays. :numref:`fig_parameterserver` describes the variant of data parallelism that we implemented in :numref:`sec_multi_gpu`. The key aspect in it is that the aggregation of gradients occurs on GPU 0 before the updated parameters are rebroadcast to all GPUs.
+Let's review the data parallel training approach to distributed training. We will use this to the exclusion of all others in this section since it is significantly simpler to implement in practice. There are virtually no use cases (besides deep learning on graphs) where any other strategy for parallelism is preferred since GPUs have plenty of memory nowadays. :numref:`fig_parameterserver` describes the variant of data parallelism that we implemented in :numref:`sec_multi_gpu`. The key aspect in it is that the aggregation of gradients occurs on one single GPU (GPU 0) before the updated parameters are rebroadcast to all GPUs.
 
 ![Left: single GPU training. Right: a variant of multi-GPU training: (1) we compute loss and gradient, (2) all gradients are aggregated on one GPU, (3) parameter update happens and the parameters are re-distributed to all GPUs.](../img/ps.svg)
 :label:`fig_parameterserver`
