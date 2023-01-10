@@ -75,7 +75,7 @@ of length equal to the original input sequence.
 Then, at decoding time, the decoder can (via some control mechanism)
 receive as input a context vector consisting of a weighted sum 
 of the representations on the input at each time step. 
-Intuitively, the weights determine the extend 
+Intuitively, the weights determine the extent 
 to which each step's context "focuses" on each input token,
 and the key is to make this process 
 for assigning the weights differentiable
