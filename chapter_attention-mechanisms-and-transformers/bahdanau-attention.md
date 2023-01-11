@@ -45,7 +45,7 @@ $\mathbf{h}_{t}$ as both the key and the value. Note that $\mathbf{c}_{t'}$ is t
 using the additive attention scoring function
 defined by :eqref:`eq_additive-attn`.
 This RNN encoder-decoder architecture
-using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition.
+using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does not stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition.
 
 ![Layers in an RNN encoder-decoder model with the Bahdanau attention mechanism.](../img/seq2seq-details-attention.svg)
 :label:`fig_s2s_attention_details`
