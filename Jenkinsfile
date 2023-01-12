@@ -16,8 +16,8 @@ stage("Build and Publish") {
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      pip install sphinxcontrib-applehelp==1.0.2  # 1.0.3 has issues
       pip install git+https://github.com/d2l-ai/d2l-book
+      pip install sphinx==5.3.0
       pip list
       nvidia-smi
       """
