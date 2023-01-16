@@ -49,6 +49,26 @@ def _sec_to_chap(lines):
                 tgt = src.replace('Section \\ref', 'Chapter \\ref')
                 lines[i] = lines[i].replace(src, tgt)
 
+# Apple roman numbers for front matters and page number 1 starts from the Introduction chapter
+def _pagenumbering(lines):
+    BEGINDOC = '\\begin{document}'
+    FRONTNUMS = ['\\pagenumbering{roman}',
+    '\\pagestyle{empty}',
+    '\\halftitle',
+    '\\cleardoublepage']
+    INTRONUMS = ['\\mainmatter', '\\pagenumbering{arabic}', '\\setcounter{page}{1}']
+    CHAPINTRO = '\\chapter{Introduction}'
+    for i, l in enumerate(lines):
+        if l.startswith(BEGINDOC):
+            frontnums_i = i + 1
+        elif l.startswith(CHAPINTRO):
+            chapintro_i = i
+            break
+    for i, v in enumerate(FRONTNUMS):
+        lines.insert(frontnums_i + i, v)
+    for i, v in enumerate(INTRONUMS):
+        lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
+
 
 # Remove date
 def _edit_titlepage(pdf_dir):
@@ -123,6 +143,7 @@ def main():
     _sec_to_chap(lines)
     #lines = _delete_discussions_title(lines)
     _protect_hyperlink_in_caption(lines)
+    _pagenumbering(lines)
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
