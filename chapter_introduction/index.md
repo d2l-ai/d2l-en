@@ -1513,13 +1513,13 @@ over the past decade.
   increased accuracy for long sequences, since the model
   no longer needed to remember the entire sequence before
   commencing the generation of a new sequence.
-  Built solely on attention mechanisms,
-  the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
-  has demonstrated compelling success in a wide range of areas.
-  For example, a single Transformer pretrained on modalities
+* Built solely on attention mechanisms,
+  the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017` has demonstrated superior *scaling* behavior: it performs better with increased data, model size, and compute :cite:`kaplan2020scaling`. This architecture has demonstrated compelling success in a wide range of areas,
+  such as natural language processing :cite:`Devlin.Chang.Lee.ea.2018,brown2020language`, computer vision :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,liu2021swin`, speech recognition :cite:`gulati2020conformer`, reinforcement learning :cite:`chen2021decision`, and graph neural networks :cite:`dwivedi2020generalization`. For example, a single Transformer pretrained on modalities
   as diverse as text, images, joint torques, and button presses
   can play Atari, caption images, chat,
   and control a robot :cite:`reed2022generalist`.
+* Modeling probabilities of text sequences, *language models* can predict text given other text. Scaling up the data, model, and compute has unlocked a growing number of capabilities of language models to perform desired tasks via human-like text generation based on input text :cite:`brown2020language,hoffmann2022training,chowdhery2022palm`. For instance, aligning language models with human intent :cite:`ouyang2022training`, OpenAI's [ChatGPT](https://chat.openai.com/) allows users to interact with it in a conversational way to solve problems, such as code debugging and note drafting.
 * Multi-stage designs, e.g., via the memory networks
   :cite:`Sukhbaatar.Weston.Fergus.ea.2015`
   and the neural programmer-interpreter :cite:`Reed.De-Freitas.2015`
@@ -1529,8 +1529,8 @@ over the past decade.
   thus carrying out subsequent steps
   in a chain of reasoning, similar to how a processor
   can modify memory for a computation.
-* Another key development was the invention
-  of generative adversarial networks
+* A key development in *deep generative modeling* was the invention
+  of *generative adversarial networks*
   :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
   Traditionally, statistical methods for density estimation
   and generative models focused on finding proper probability distributions
@@ -1548,7 +1548,8 @@ over the past decade.
   are both testimony to this progress.
   Even amateur doodlers can produce
   photorealistic images based on just sketches that describe
-  how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
+  how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`. 
+* Besides, while the diffusion process gradually adds random noise to data samples, *diffusion models* :cite:`sohl2015deep,ho2020denoising` learn the denoising process to gradually construct data samples from random noise, reversing the diffusion process. They start to replace generative adversarial networks in more recent deep generative models, such as in DALL-E 2 :cite:`ramesh2022hierarchical` and Imagen :cite:`saharia2022photorealistic` for creative art and image generation based on text descriptions.
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
   Over the past decade the ability to build parallel and
@@ -1567,7 +1568,7 @@ over the past decade.
   on the ImageNet dataset to less than 7 minutes.
   For comparison---initially training times were measured in the order of days.
 * The ability to parallelize computation
-  has also contributed to progress in reinforcement learning,
+  has also contributed to progress in *reinforcement learning*,
   This has led to significant progress in computers achieving
   superhuman performance on tasks like Go, Atari games,
   Starcraft, and in physics simulations (e.g., using MuJoCo),
@@ -1593,7 +1594,7 @@ over the past decade.
   which used a syntax similar to Python NumPy to describe models.
   This idea was adopted by both [PyTorch](https://github.com/pytorch/pytorch),
   the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet,
-  and [Jax](https://github.com/google/jax).
+  and [JAX](https://github.com/google/jax).
 
 
 The division of labor between system researchers building better tools
