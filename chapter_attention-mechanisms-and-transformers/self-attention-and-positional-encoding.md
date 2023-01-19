@@ -69,8 +69,8 @@ where
 
 $$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
 
-according to the definition of attention pooling $f$ in
-:eqref:`eq_attn-pooling-def`.
+according to the definition of attention pooling in
+:eqref:`eq_attention_pooling`.
 Using multi-head attention,
 the following code snippet
 computes the self-attention of a tensor
