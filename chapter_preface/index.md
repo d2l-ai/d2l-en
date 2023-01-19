@@ -33,8 +33,7 @@ With these advances in hand,
 we can now build cars that drive themselves
 with more autonomy than ever before
 (and less autonomy than some companies might have you believe),
-smart reply systems that automatically draft the most mundane emails,
-helping people dig out from oppressively large inboxes,
+dialogue systems that debug code by asking clarifying questions,
 and software agents that dominate the world's best humans
 at board games like Go, a feat once thought to be decades away.
 Already, these tools exert ever-wider impacts on industry and society,
@@ -117,7 +116,7 @@ published on the website [Distill](http://distill.pub), or personal blogs,
 they only covered selected topics in deep learning,
 and often lacked associated code.
 On the other hand, while several deep learning textbooks
-have emerged---e.g., :cite:`Goodfellow.Bengio.Courville.2016`,
+have emerged---e.g., :citet:`Goodfellow.Bengio.Courville.2016`,
 which offers a comprehensive survey
 on the basics of deep learning---these
 resources do not marry the descriptions
@@ -137,7 +136,7 @@ to actually becoming an applied machine learning scientist;
 *how* to solve problems in practice;
 (iv) allow for rapid updates, both by us
 and also by the community at large;
-and (v) be complemented by a [forum](http://discuss.d2l.ai)
+and (v) be complemented by a [forum](https://discuss.d2l.ai/c/5)
 for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
@@ -244,7 +243,7 @@ and applications (:numref:`fig_book_org`).
 :label:`fig_book_org`
 
 
-* **Part 1: Basics and Preliminaries.**
+* **Part 1: Basics and Preliminaries**.
 :numref:`chap_introduction` offers 
 an introduction to deep learning.
 Then, in :numref:`chap_preliminaries`,
@@ -261,7 +260,7 @@ including regression and classification;
 linear models; multilayer perceptrons;
 and overfitting and regularization.
 
-* **Part 2: Modern Deep Learning Techniques.**
+* **Part 2: Modern Deep Learning Techniques**.
 :numref:`chap_computation` describes
 the key computational components
 of deep learning systems
@@ -287,21 +286,20 @@ These sections will bring you up to speed
 on the most powerful and general tools
 that are widely used by deep learning practitioners.
 
-* **Part 3: Scalability, Efficiency, and Applications.**
-In :numref:`chap_optimization`,
+* **Part 3: Scalability, Efficiency, and Applications** (available [online](https://d2l.ai)).
+In Chapter 12,
 we discuss several common optimization algorithms
 used to train deep learning models.
-Next, in :numref:`chap_performance`,
+Next, in Chapter 13,
 we examine several key factors
 that influence the computational performance 
 of deep learning code.
-Then, in :numref:`chap_cv`,
+Then, in Chapter 14,
 we illustrate major applications 
 of deep learning in computer vision.
-Finally, in :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
+Finally, in Chapter 15 and Chapter 16,
 we demonstrate how to pretrain language representation models 
 and apply them to natural language processing tasks.
-This part is available [online](https://d2l.ai).
 
 
 ### Code
@@ -382,7 +380,7 @@ In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-Here is how we import modules from MXNet.
+Here is a list of dependencies in our MXNet implementation.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -400,7 +398,7 @@ In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-Here is how we import modules from PyTorch.
+Here is a list of dependencies in our PyTorch implementation.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -418,7 +416,7 @@ In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-Here is how we import modules from TensorFlow.
+Here is a list of dependencies in our TensorFlow implementation.
 :end_tab:
 
 :begin_tab:`jax`
@@ -439,7 +437,7 @@ In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-Here is how we import modules from JAX.
+Here is a list of dependencies in our JAX implementation.
 :end_tab:
 
 ```{.python .input}
@@ -500,7 +498,7 @@ but we will only assume that you come in with some basics,
 including modest amounts of linear algebra,
 calculus, probability, and Python programming.
 Just in case you forget the basics,
-the Appendix provides a refresher
+the [online Appendix](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html) provides a refresher
 on most of the mathematics
 you will find in this book.
 Most of the time, we will prioritize
@@ -523,7 +521,7 @@ you may want to peruse this [Python tutorial](http://learnpython.org/).
 ### Forum
 
 Associated with this book, we have launched a discussion forum,
-located at [discuss.d2l.ai](https://discuss.d2l.ai/).
+located at [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
 When you have questions on any section of the book,
 you can find a link to the associated discussion page
 at the end of each notebook.
@@ -607,7 +605,7 @@ and the engineering techniques to implement it all.
 This book presents a comprehensive resource, 
 including prose, figures, mathematics, and code, all in one place.
 To ask (or answer) questions related to this book,
-visit our forum at https://discuss.d2l.ai/.
+visit our forum at https://discuss.d2l.ai.
 All of our notebooks are available for download
 on the [D2L.ai website](https://d2l.ai)
 and on [GitHub](https://github.com/d2l-ai/d2l-en).
