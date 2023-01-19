@@ -148,7 +148,7 @@ Challenge :cite:`russakovsky2015imagenet`,
 pushed computer vision and machine learning research forward,
 challenging researchers to identify which models performed best
 at a greater scale than academics had previously considered. The largest vision datasets, such as LAION-5B 
-:cite:`schuhmannlaion` contain billions of images with additional metadata.
+:cite:`schuhmann2022laion` contain billions of images with additional metadata.
 
 ### Missing Ingredient: Hardware
 

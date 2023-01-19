@@ -21,7 +21,7 @@ Recall :numref:`fig_seq2seq_details` which we reprint below (:numref:`fig_s2s_at
 
 While this is quite reasonable for short sequences, it is clear that it is infeasible for long sequences, such as a book chapter or even just a very long sentence. After all, after a while there will simply not be enough "space" in the intermediate representation to store all that is important in the source sequence. Consequently the decoder will fail to translate long and complex sentences. One of the first to encounter was :citet:`Graves.2013` when they tried to design an RNN to generate handwritten text. Since the source text has arbitrary length they designed a differentiable attention model
 to align text characters with the much longer pen trace,
-where the alignment moves only in one direction. This, in turn, draws on decoding algorithms in speech recognition, e.g., hidden Markov models :cite:`RabJua93`.
+where the alignment moves only in one direction. This, in turn, draws on decoding algorithms in speech recognition, e.g., hidden Markov models :cite:`rabiner1993fundamentals`.
 
 Inspired by the idea of learning to align,
 :citet:`Bahdanau.Cho.Bengio.2014` proposed a differentiable attention model
