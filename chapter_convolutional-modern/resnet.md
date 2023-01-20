@@ -48,7 +48,7 @@ For deep neural networks,
 if we can
 train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
 
-This is the question that :cite:`He.Zhang.Ren.ea.2016` considered when working on very deep computer vision models.
+This is the question that :citet:`He.Zhang.Ren.ea.2016` considered when working on very deep computer vision models.
 At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should
 more easily
 contain the identity function as one of its elements.

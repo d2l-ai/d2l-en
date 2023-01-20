@@ -7,7 +7,7 @@ Shortly after the first Elman-style RNNs were trained using backpropagation
 (owing to vanishing and exploding gradients)
 became salient, with Bengio and Hochreiter 
 discussing the problem
-:cite:`bengio1994learning` :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
+:cite:`bengio1994learning,Hochreiter.Bengio.Frasconi.ea.2001`.
 Hochreiter had articulated this problem as early 
 as in his 1991 masters thesis, although the results 
 were not widely known because the thesis was written in German.

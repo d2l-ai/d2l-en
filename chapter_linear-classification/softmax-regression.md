@@ -388,7 +388,7 @@ In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
 relative to what we predict that should happen $\hat{\mathbf{y}}$.
 We provide a very basic explanation in the following. For further
 details on information theory see
-:cite:`Cover.Thomas.1999` or :cite:`mackay2003information`.
+:citet:`Cover.Thomas.1999` or :citet:`mackay2003information`.
 
 
 

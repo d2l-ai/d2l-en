@@ -16,7 +16,7 @@ The house price prediction competition
 is a great place to start.
 The data is fairly generic and do not exhibit exotic structure
 that might require specialized models (as audio or video might).
-This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`,
+This dataset, collected by :citet:`De-Cock.2011`,
 covers house prices in Ames, IA from the period of 2006--2010.
 It is considerably larger than the famous [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
 boasting both more examples and more features.

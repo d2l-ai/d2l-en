@@ -1097,7 +1097,7 @@ we wrap up this section here.
 If you are eager to learn more linear algebra,
 there are many excellent books and online resources.
 For a more advanced crash course, consider checking out
-:cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
+:citet:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 To recap:
 

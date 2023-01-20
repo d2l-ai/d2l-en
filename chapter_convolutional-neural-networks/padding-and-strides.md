@@ -330,7 +330,7 @@ Padding can increase the height and width of the output. This is often used to g
 
 A similar convention applies to strides. When horizontal stride $s_h$ and vertical stride $s_w$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
 
-So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provides an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
+So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provided an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
 
 
 ## Exercises

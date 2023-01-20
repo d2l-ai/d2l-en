@@ -113,7 +113,7 @@ show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ## Summary
 
 The attention mechanism allows us to aggregate data from many (key, value) pairs. So far our discussion was 
-quite abstract, simply describing a way to pool data. We have not explained yet where those mysterious queries, keys, and values might arise from. Some intuition might help here: for instance, in a regression setting, the query might correspond to the location where the regression should be carried out. The keys are the locations where past data was observed and the values are the (regression) values themselves. This is the so-called Nadaraya-Watson estimator :cite:`Nadaraya.1964, Watson.1964` that we will be studying in the next section. 
+quite abstract, simply describing a way to pool data. We have not explained yet where those mysterious queries, keys, and values might arise from. Some intuition might help here: for instance, in a regression setting, the query might correspond to the location where the regression should be carried out. The keys are the locations where past data was observed and the values are the (regression) values themselves. This is the so-called Nadaraya-Watson estimator :cite:`Nadaraya.1964,Watson.1964` that we will be studying in the next section. 
 
 By design, the attention mechanism provides a *differentiable* means of control 
 by which a neural network can select elements from a set and to construct an associated weighted sum over representations. 

@@ -3,7 +3,7 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# Encoder-Decoder Architecture
+# The Encoder-Decoder Architecture
 :label:`sec_encoder-decoder`
 
 In general seq2seq problems 

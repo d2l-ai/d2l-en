@@ -488,9 +488,9 @@ Over the following sections we will encounter a number of design choices (e.g., 
    1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
       later in :numref:`sec_batch_norm`.
    1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in
-      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+      :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
    1. Use label smoothing for model regularization, as described in
-      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+      :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
    1. Make further adjustments to the Inception block by adding residual connection
       :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
       :numref:`sec_resnet`.

@@ -223,7 +223,7 @@ and thus behave, in some ways, more like nonparametric models.
 More recent theoretical research has established
 deep connection between large neural networks
 and nonparametric methods, notably kernel methods.
-In particular, :cite:`Jacot.Grabriel.Hongler.2018`
+In particular, :citet:`Jacot.Grabriel.Hongler.2018`
 demonstrated that in the limit, as multilayer perceptrons
 with randomly initialized weights grow infinitely wide,
 they become equivalent to (nonparametric) kernel methods

@@ -116,8 +116,8 @@ For reasons that are not yet well-characterized theoretically,
 various sources of noise in optimization
 often lead to faster training and less overfitting:
 this variation appears to act as a form of regularization.
-:cite:`Teye.Azizpour.Smith.2018` and :cite:`Luo.Wang.Shao.ea.2018`
-relate the properties of batch normalization to Bayesian priors and penalties respectively. 
+:citet:`Teye.Azizpour.Smith.2018` and :citet:`Luo.Wang.Shao.ea.2018`
+related the properties of batch normalization to Bayesian priors and penalties, respectively. 
 In particular, this sheds some light on the puzzle
 of why batch normalization works best for moderate minibatches sizes in the $50 \sim 100$ range.
 This particular size of minibatch seems to inject just the "right amount" of noise per layer, both in terms of scale via $\hat{\boldsymbol{\sigma}}$, and in terms of offset via $\hat{\boldsymbol{\mu}}$: a
@@ -857,6 +857,7 @@ have proposed alternative explanations for the success of batch normalization,
 some claiming that batch normalization's success comes despite exhibiting behavior
 that is in some ways opposite to those claimed in the original paper :cite:`Santurkar.Tsipras.Ilyas.ea.2018`.
 
+
 We note that the *internal covariate shift*
 is no more worthy of criticism than any of
 thousands of similarly vague claims
@@ -881,6 +882,7 @@ On a more practical note, there are a number of aspects worth remembering about 
   in training mode and prediction mode.
 * Batch normalization is useful for regularization and improving convergence in optimization. On the other hand,
   the original motivation of reducing internal covariate shift seems not to be a valid explanation.
+* For more robust models that are less sensitive to input perturbations, consider removing batch normalization :cite:`wang2022removing`.
 
 ## Exercises
 

@@ -688,7 +688,7 @@ than any one neuron alone could express
 owes to our study of real biological neural systems.
 At the same time, most research in deep learning today
 draws inspiration from a much wider source.
-We invoke Stuart Russell and Peter Norvig :cite:`Russell.Norvig.2016`
+We invoke :citet:`Russell.Norvig.2016`
 who pointed out that although airplanes might have been *inspired* by birds,
 ornithology has not been the primary driver
 of aeronautics innovation for some centuries.

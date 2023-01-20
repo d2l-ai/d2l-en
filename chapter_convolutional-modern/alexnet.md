@@ -291,7 +291,7 @@ To augment the data even further, the training loop of AlexNet
 added a great deal of image augmentation,
 such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
-We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
+We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :citet:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
 
 ```{.python .input  n=2}
 %%tab mxnet
