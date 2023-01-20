@@ -9,7 +9,7 @@ However, there are many other sequence learning tasks contexts
 where it is perfectly fine to condition the prediction at every time step
 on both the leftward and the rightward context. 
 Consider, for example, part of speech detection. 
-Why should not we take the context in both directions into account
+Why shouldn't we take the context in both directions into account
 when assessing the part of speech associated with a given word?
 
 Another common task---often useful as a pretraining exercise
