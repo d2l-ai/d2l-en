@@ -566,6 +566,7 @@ Putting it all together in code yields the following:
 ```{.python .input}
 %%tab pytorch, tensorflow, mxnet
 class Seq2Seq(d2l.EncoderDecoder):  #@save
+    """The RNN encoder-decoder for sequence to sequence learning."""
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__(encoder, decoder)
         self.save_hyperparameters()
@@ -588,6 +589,7 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
 ```{.python .input}
 %%tab jax
 class Seq2Seq(d2l.EncoderDecoder):  #@save
+    """The RNN encoder-decoder for sequence to sequence learning."""
     encoder: nn.Module
     decoder: nn.Module
     tgt_pad: int

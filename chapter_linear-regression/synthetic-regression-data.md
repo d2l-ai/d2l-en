@@ -82,6 +82,7 @@ The `batch_size` will be determined later on.
 ```{.python .input}
 %%tab all
 class SyntheticRegressionData(d2l.DataModule):  #@save
+    """Synthetic data for linear regression."""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
                  batch_size=32):
         super().__init__()

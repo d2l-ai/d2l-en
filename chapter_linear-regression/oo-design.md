@@ -88,6 +88,7 @@ utility function allows us to register functions as methods in a class *after* t
 ```{.python .input}
 %%tab all
 def add_to_class(Class):  #@save
+    """Register functions as methods in created class."""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
@@ -120,6 +121,7 @@ The second one is a utility class that saves all arguments in a class's `__init_
 ```{.python .input}
 %%tab all
 class HyperParameters:  #@save
+    """The base class of hyperparameters."""
     def save_hyperparameters(self, ignore=[]):
         raise NotImplemented
 ```
@@ -145,7 +147,7 @@ The `draw` function plots a point `(x, y)` in the figure, with `label` specified
 ```{.python .input}
 %%tab all
 class ProgressBoard(d2l.HyperParameters):  #@save
-    """Plot data points in animation."""
+    """The board that plots data points in animation."""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
@@ -182,6 +184,7 @@ using type annotations. All Flax modules are Python 3.7 dataclasses.
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
+    """The base class of models."""
     if tab.selected('pytorch', 'mxnet', 'tensorflow'):
         def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
             super().__init__()
@@ -306,6 +309,7 @@ The `DataModule` class is the base class for data. Quite frequently the `__init_
 ```{.python .input}
 %%tab all
 class DataModule(d2l.HyperParameters):  #@save
+    """The base class of data."""
     if tab.selected('mxnet', 'pytorch'):
         def __init__(self, root='../data', num_workers=4):
             self.save_hyperparameters()
@@ -338,6 +342,7 @@ The `Trainer` class trains the learnable parameters `params` with data specified
 ```{.python .input}
 %%tab all
 class Trainer(d2l.HyperParameters):  #@save
+    """The base class for training models with data."""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'

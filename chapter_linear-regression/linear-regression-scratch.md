@@ -81,6 +81,7 @@ we add the code to the `__init__` method of a subclass of `d2l.Module` (introduc
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class LinearRegressionScratch(d2l.Module):  #@save
+    """The linear regression model implemented from scratch."""
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -102,6 +103,7 @@ class LinearRegressionScratch(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class LinearRegressionScratch(d2l.Module):  #@save
+    """The linear regression model implemented from scratch."""
     num_inputs: int
     lr: float
     sigma: float = 0.01
@@ -132,7 +134,6 @@ via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def forward(self, X):
-    """The linear regression model."""
     return d2l.matmul(X, self.w) + self.b
 ```
 
@@ -225,8 +226,8 @@ It accepts a list of parameter and gradient pairs.
 ```{.python .input}
 %%tab mxnet, pytorch
 class SGD(d2l.HyperParameters):  #@save
+    """Minibatch stochastic gradient descent."""
     def __init__(self, params, lr):
-        """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
     if tab.selected('mxnet'):
@@ -248,8 +249,8 @@ class SGD(d2l.HyperParameters):  #@save
 ```{.python .input}
 %%tab tensorflow
 class SGD(d2l.HyperParameters):  #@save
+    """Minibatch stochastic gradient descent."""
     def __init__(self, lr):
-        """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
     def apply_gradients(self, grads_and_vars):
@@ -260,15 +261,15 @@ class SGD(d2l.HyperParameters):  #@save
 ```{.python .input}
 %%tab jax
 class SGD(d2l.HyperParameters):  #@save
+    """
+    Minibatch stochastic gradient descent.
+    The key transformation of Optax is the GradientTransformation
+    defined by two methods, the init and the update.
+    The init initializes the state and the update transforms
+    the gradients.
+    https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
+    """
     def __init__(self, lr):
-        """
-        Minibatch stochastic gradient descent.
-        The key transformation of Optax is the GradientTransformation
-        defined by two methods, the init and the update.
-        The init initializes the state and the update transforms
-        the gradients.
-        https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
-        """
         self.save_hyperparameters()
 
     def init(self, params):

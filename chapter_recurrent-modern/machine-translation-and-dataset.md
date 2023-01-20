@@ -92,6 +92,7 @@ and French is called the *target language*.
 ```{.python .input  n=5}
 %%tab all
 class MTFraEng(d2l.DataModule):  #@save
+    """The English-French dataset."""
     def _download(self):
         d2l.extract(d2l.download(
             d2l.DATA_URL+'fra-eng.zip', self.root, 

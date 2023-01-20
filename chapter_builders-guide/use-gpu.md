@@ -155,6 +155,7 @@ from jax import numpy as jnp
 ```{.python .input}
 %%tab all
 def cpu():  #@save
+    """Get the CPU device."""
     if tab.selected('mxnet'):
         return npx.cpu()
     if tab.selected('pytorch'):
@@ -165,6 +166,7 @@ def cpu():  #@save
         return jax.devices('cpu')[0]
 
 def gpu(i=0):  #@save
+    """Get a GPU device."""
     if tab.selected('mxnet'):
         return npx.gpu(i)
     if tab.selected('pytorch'):
@@ -182,6 +184,7 @@ We can (**query the number of available GPUs.**)
 ```{.python .input}
 %%tab all
 def num_gpus():  #@save
+    """Get the number of available GPUs."""
     if tab.selected('mxnet'):
         return npx.num_gpus()
     if tab.selected('pytorch'):

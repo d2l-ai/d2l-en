@@ -88,12 +88,15 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 def add_to_class(Class):
-    """Defined in :numref:`sec_oo-design`"""
+    """Register functions as methods in created class.
+
+    Defined in :numref:`sec_oo-design`"""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
 
 class HyperParameters:
+    """The base class of hyperparameters."""
     def save_hyperparameters(self, ignore=[]):
         """Defined in :numref:`sec_oo-design`"""
         raise NotImplemented
@@ -110,7 +113,7 @@ class HyperParameters:
             setattr(self, k, v)
 
 class ProgressBoard(d2l.HyperParameters):
-    """Plot data points in animation.
+    """The board that plots data points in animation.
 
     Defined in :numref:`sec_oo-design`"""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
@@ -163,7 +166,9 @@ class ProgressBoard(d2l.HyperParameters):
         display.clear_output(wait=True)
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """The base class of models.
+
+    Defined in :numref:`sec_oo-design`"""
     def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
         super().__init__()
         self.save_hyperparameters()
@@ -214,7 +219,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         return tf.keras.optimizers.SGD(self.lr)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`subsec_oo-design-models`"""
+    """The base class of data.
+
+    Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, root='../data'):
         self.save_hyperparameters()
 
@@ -236,7 +243,9 @@ class DataModule(d2l.HyperParameters):
     
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`subsec_oo-design-models`"""
+    """The base class for training models with data.
+
+    Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -301,7 +310,9 @@ class Trainer(d2l.HyperParameters):
         return grads
 
 class SyntheticRegressionData(d2l.DataModule):
-    """Defined in :numref:`sec_synthetic-regression-data`"""
+    """Synthetic data for linear regression.
+
+    Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
                  batch_size=32):
         super().__init__()
@@ -317,7 +328,9 @@ class SyntheticRegressionData(d2l.DataModule):
         return self.get_tensorloader((self.X, self.y), train, i)
 
 class LinearRegressionScratch(d2l.Module):
-    """Defined in :numref:`sec_linear_scratch`"""
+    """The linear regression model implemented from scratch.
+
+    Defined in :numref:`sec_linear_scratch`"""
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -327,9 +340,7 @@ class LinearRegressionScratch(d2l.Module):
         self.b = tf.Variable(b, trainable=True)
 
     def forward(self, X):
-        """The linear regression model.
-    
-        Defined in :numref:`sec_linear_scratch`"""
+        """Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
     def loss(self, y_hat, y):
@@ -342,9 +353,10 @@ class LinearRegressionScratch(d2l.Module):
         return SGD(self.lr)
 
 class SGD(d2l.HyperParameters):
-    """Defined in :numref:`sec_linear_scratch`"""
+    """Minibatch stochastic gradient descent.
+
+    Defined in :numref:`sec_linear_scratch`"""
     def __init__(self, lr):
-        """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
     def apply_gradients(self, grads_and_vars):
@@ -352,7 +364,9 @@ class SGD(d2l.HyperParameters):
             param.assign_sub(self.lr * grad)
 
 class LinearRegression(d2l.Module):
-    """Defined in :numref:`sec_linear_concise`"""
+    """The linear regression model implemented with high-level APIs.
+
+    Defined in :numref:`sec_linear_concise`"""
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -360,9 +374,7 @@ class LinearRegression(d2l.Module):
         self.net = tf.keras.layers.Dense(1, kernel_initializer=initializer)
 
     def forward(self, X):
-        """The linear regression model.
-    
-        Defined in :numref:`sec_linear_concise`"""
+        """Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
     def loss(self, y_hat, y):
@@ -379,7 +391,9 @@ class LinearRegression(d2l.Module):
         return (self.get_weights()[0], self.get_weights()[1])
 
 class FashionMNIST(d2l.DataModule):
-    """Defined in :numref:`sec_fashion_mnist`"""
+    """The Fashion-MNIST dataset.
+
+    Defined in :numref:`sec_fashion_mnist`"""
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
@@ -417,7 +431,9 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     raise NotImplementedError
 
 class Classifier(d2l.Module):
-    """Defined in :numref:`sec_classification`"""
+    """The base class of classification models.
+
+    Defined in :numref:`sec_classification`"""
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
         self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
@@ -447,7 +463,9 @@ class Classifier(d2l.Module):
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
 class SoftmaxRegression(d2l.Classifier):
-    """Defined in :numref:`sec_softmax_concise`"""
+    """The softmax regression model.
+
+    Defined in :numref:`sec_softmax_concise`"""
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -459,14 +477,20 @@ class SoftmaxRegression(d2l.Classifier):
         return self.net(X)
 
 def cpu():
-    """Defined in :numref:`sec_use_gpu`"""
+    """Get the CPU device.
+
+    Defined in :numref:`sec_use_gpu`"""
     return tf.device('/CPU:0')
 def gpu(i=0):
-    """Defined in :numref:`sec_use_gpu`"""
+    """Get a GPU device.
+
+    Defined in :numref:`sec_use_gpu`"""
     return tf.device(f'/GPU:{i}')
 
 def num_gpus():
-    """Defined in :numref:`sec_use_gpu`"""
+    """Get the number of available GPUs.
+
+    Defined in :numref:`sec_use_gpu`"""
     return len(tf.config.experimental.list_physical_devices('GPU'))
 
 def try_gpu(i=0):
@@ -494,7 +518,9 @@ def corr2d(X, K):
     return Y
 
 class LeNet(d2l.Classifier):
-    """Defined in :numref:`sec_lenet`"""
+    """The LeNet-5 model.
+
+    Defined in :numref:`sec_lenet`"""
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
@@ -511,7 +537,7 @@ class LeNet(d2l.Classifier):
             tf.keras.layers.Dense(num_classes)])
 
 class Residual(tf.keras.Model):
-    """The Residual block of ResNet."""
+    """The Residual block of ResNet models."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = tf.keras.layers.Conv2D(num_channels, padding='same',
@@ -565,7 +591,9 @@ class ResNeXtBlock(tf.keras.Model):
         return tf.keras.activations.relu(Y + X)
 
 class TimeMachine(d2l.DataModule):
-    """Defined in :numref:`sec_text-sequence`"""
+    """The Time Machine dataset.
+
+    Defined in :numref:`sec_text-sequence`"""
     def _download(self):
         fname = d2l.download(d2l.DATA_URL + 'timemachine.txt', self.root,
                              '090b5e7e70c295757f55df93cb0a180b9691891a')
@@ -637,7 +665,9 @@ class Vocab:
         return self.token_to_idx['<unk>']
 
 class RNNScratch(d2l.Module):
-    """Defined in :numref:`sec_rnn-scratch`"""
+    """The RNN model implemented from scratch.
+
+    Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -663,16 +693,22 @@ class RNNScratch(d2l.Module):
         return outputs, state
 
 def check_len(a, n):
-    """Defined in :numref:`sec_rnn-scratch`"""
-    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+    """Check the length of a list.
+
+    Defined in :numref:`sec_rnn-scratch`"""
+    assert len(a) == n, f'list\'s length {len(a)} != expected length {n}'
 
 def check_shape(a, shape):
-    """Defined in :numref:`sec_rnn-scratch`"""
+    """Check the shape of a tensor.
+
+    Defined in :numref:`sec_rnn-scratch`"""
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
 class RNNLMScratch(d2l.Classifier):
-    """Defined in :numref:`sec_rnn-scratch`"""
+    """The RNN-based language model implemented from scratch.
+
+    Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -724,7 +760,9 @@ class RNNLMScratch(d2l.Classifier):
         return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 class RNN(d2l.Module):
-    """Defined in :numref:`sec_rnn-concise`"""
+    """The RNN model implemented with high-level APIs.
+
+    Defined in :numref:`sec_rnn-concise`"""
     def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()
@@ -737,7 +775,9 @@ class RNN(d2l.Module):
         return outputs, H
 
 class RNNLM(d2l.RNNLMScratch):
-    """Defined in :numref:`sec_rnn-concise`"""
+    """The RNN-based language model implemented with high-level APIs.
+
+    Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
         self.linear = tf.keras.layers.Dense(self.vocab_size)
 
@@ -745,7 +785,9 @@ class RNNLM(d2l.RNNLMScratch):
         return d2l.transpose(self.linear(hiddens), (1, 0, 2))
 
 class GRU(d2l.RNN):
-    """Defined in :numref:`sec_deep_rnn`"""
+    """The multi-layer GRU model.
+
+    Defined in :numref:`sec_deep_rnn`"""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -759,7 +801,9 @@ class GRU(d2l.RNN):
         return outputs, state
 
 class MTFraEng(d2l.DataModule):
-    """Defined in :numref:`sec_machine_translation`"""
+    """The English-French dataset.
+
+    Defined in :numref:`sec_machine_translation`"""
     def _download(self):
         d2l.extract(d2l.download(
             d2l.DATA_URL+'fra-eng.zip', self.root,
@@ -917,7 +961,9 @@ class Seq2SeqEncoder(d2l.Encoder):
         return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
-    """Defined in :numref:`sec_seq2seq_decoder`"""
+    """The RNN encoder-decoder for sequence to sequence learning.
+
+    Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__(encoder, decoder)
         self.save_hyperparameters()
@@ -1154,7 +1200,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
         return self.dropout(X, **kwargs)
 
 class PositionWiseFFN(tf.keras.layers.Layer):
-    """Positionwise feed-forward network.
+    """The positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs):
@@ -1167,7 +1213,7 @@ class PositionWiseFFN(tf.keras.layers.Layer):
         return self.dense2(self.relu(self.dense1(X)))
 
 class AddNorm(tf.keras.layers.Layer):
-    """Residual connection followed by layer normalization.
+    """The residual connection followed by layer normalization.
 
     Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, norm_shape, dropout):
@@ -1179,7 +1225,7 @@ class AddNorm(tf.keras.layers.Layer):
         return self.ln(self.dropout(Y, **kwargs) + X)
 
 class TransformerEncoderBlock(tf.keras.layers.Layer):
-    """Transformer encoder block.
+    """The Transformer encoder block.
 
     Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
@@ -1198,7 +1244,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 
 class TransformerEncoder(d2l.Encoder):
-    """Transformer encoder.
+    """The Transformer encoder.
 
     Defined in :numref:`subsec_transformer-encoder`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
@@ -1227,6 +1273,7 @@ class TransformerEncoder(d2l.Encoder):
         return X
 
 def annotate(text, xy, xytext):
+    """Defined in :numref:`sec_optimization-intro`"""
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
@@ -1416,7 +1463,7 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
     batch_size = X.shape[0]
     ones = tf.ones((batch_size,)) # Labels corresponding to real data
     zeros = tf.zeros((batch_size,)) # Labels corresponding to fake data
-    # Do not need to compute gradient for `net_G`, so it's outside GradientTape
+    # Do not need to compute gradient for `net_G`, so it is outside GradientTape
     fake_X = net_G(Z)
     with tf.GradientTape() as tape:
         real_Y = net_D(X)

@@ -64,6 +64,7 @@ is a tunable hyperparameter.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class RNNScratch(d2l.Module):  #@save
+    """The RNN model implemented from scratch."""
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -89,6 +90,7 @@ class RNNScratch(d2l.Module):  #@save
 ```{.python .input  n=7}
 %%tab jax
 class RNNScratch(nn.Module):  #@save
+    """The RNN model implemented from scratch."""
     num_inputs: int
     num_hiddens: int
     sigma: float = 0.01
@@ -178,9 +180,11 @@ of the hidden state remains unchanged.
 ```{.python .input}
 %%tab all
 def check_len(a, n):  #@save
-    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+    """Check the length of a list."""
+    assert len(a) == n, f'list\'s length {len(a)} != expected length {n}'
     
 def check_shape(a, shape):  #@save
+    """Check the shape of a tensor."""
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
@@ -208,6 +212,7 @@ that sequences of different length are comparable.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class RNNLMScratch(d2l.Classifier):  #@save
+    """The RNN-based language model implemented from scratch."""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -243,6 +248,7 @@ class RNNLMScratch(d2l.Classifier):  #@save
 ```{.python .input  n=14}
 %%tab jax
 class RNNLMScratch(d2l.Classifier):  #@save
+    """The RNN-based language model implemented from scratch."""
     rnn: nn.Module
     vocab_size: int
     lr: float = 0.01

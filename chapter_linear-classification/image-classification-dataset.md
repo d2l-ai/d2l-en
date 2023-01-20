@@ -73,6 +73,7 @@ Since it is such a frequently used dataset, all major frameworks provide preproc
 ```{.python .input}
 %%tab mxnet
 class FashionMNIST(d2l.DataModule):  #@save
+    """The Fashion-MNIST dataset."""
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
@@ -87,6 +88,7 @@ class FashionMNIST(d2l.DataModule):  #@save
 ```{.python .input}
 %%tab pytorch
 class FashionMNIST(d2l.DataModule):  #@save
+    """The Fashion-MNIST dataset."""
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
@@ -101,6 +103,7 @@ class FashionMNIST(d2l.DataModule):  #@save
 ```{.python .input}
 %%tab tensorflow, jax
 class FashionMNIST(d2l.DataModule):  #@save
+    """The Fashion-MNIST dataset."""
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()

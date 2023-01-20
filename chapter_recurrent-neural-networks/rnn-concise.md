@@ -80,6 +80,7 @@ which are available in the Flax `linen` API.
 ```{.python .input}
 %%tab mxnet
 class RNN(d2l.Module):  #@save
+    """The RNN model implemented with high-level APIs."""
     def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()        
@@ -95,6 +96,7 @@ class RNN(d2l.Module):  #@save
 ```{.python .input}
 %%tab pytorch
 class RNN(d2l.Module):  #@save
+    """The RNN model implemented with high-level APIs."""
     def __init__(self, num_inputs, num_hiddens):
         super().__init__()
         self.save_hyperparameters()
@@ -107,6 +109,7 @@ class RNN(d2l.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class RNN(d2l.Module):  #@save
+    """The RNN model implemented with high-level APIs."""
     def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()            
@@ -122,6 +125,7 @@ class RNN(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class RNN(nn.Module):  #@save
+    """The RNN model implemented with high-level APIs."""
     num_hiddens: int
 
     @nn.compact
@@ -136,6 +140,7 @@ Note that we need to create a separate fully connected output layer.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class RNNLM(d2l.RNNLMScratch):  #@save
+    """The RNN-based language model implemented with high-level APIs."""
     def init_params(self):
         if tab.selected('mxnet'):
             self.linear = nn.Dense(self.vocab_size, flatten=False)
@@ -155,6 +160,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 ```{.python .input}
 %%tab jax
 class RNNLM(d2l.RNNLMScratch):  #@save
+    """The RNN-based language model implemented with high-level APIs."""
     training: bool = True
 
     def setup(self):

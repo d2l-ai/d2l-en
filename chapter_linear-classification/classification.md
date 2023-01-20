@@ -57,6 +57,7 @@ represent the auxiliary data.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class Classifier(d2l.Module):  #@save
+    """The base class of classification models."""
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
         self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
@@ -66,6 +67,7 @@ class Classifier(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class Classifier(d2l.Module):  #@save
+    """The base class of classification models."""
     def training_step(self, params, batch, state):
         # Here value is a tuple since models with BatchNorm layers require
         # the loss to return auxiliary data

@@ -147,6 +147,7 @@ We will describe how this works in more detail later.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class LinearRegression(d2l.Module):  #@save
+    """The linear regression model implemented with high-level APIs."""
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -165,6 +166,7 @@ class LinearRegression(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class LinearRegression(d2l.Module):  #@save
+    """The linear regression model implemented with high-level APIs."""
     lr: float
 
     def setup(self):
@@ -177,7 +179,6 @@ In the `forward` method, we just invoke the built-in `__call__` function of the 
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LinearRegression)  #@save
 def forward(self, X):
-    """The linear regression model."""
     return self.net(X)
 ```
 
@@ -185,7 +186,6 @@ def forward(self, X):
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
 def forward(self, X):
-    """The linear regression model."""
     return self.net(X)
 ```
 
