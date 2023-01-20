@@ -424,7 +424,7 @@ Most of the code in this book is based on Jax,
 an open-source framework enabling composable function
 transformations such as differentiation of arbitrary
 Python and NumPy functions, as well as JIT compliation,
-vectorization and much more! It's becoming popular in
+vectorization and much more! It is becoming popular in
 the machine learning research space and has an
 easy-to-learn NumPy-like API. Actually, JAX tries
 to achieve 1:1 parity with NumPy, so switching your

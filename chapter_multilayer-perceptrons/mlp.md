@@ -363,7 +363,7 @@ In these cases, we default to the left-hand-side
 derivative and say that the derivative is 0 when the input is 0.
 We can get away with this because
 the input may never actually be zero (mathematicians would
-say that it's nondifferentiable on a set of measure zero).
+say that it is nondifferentiable on a set of measure zero).
 There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here, or at least, the fact that

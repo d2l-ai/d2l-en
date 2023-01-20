@@ -301,8 +301,8 @@ np.random.multinomial(100, fair_probs) / 100
 Here, even though our simulated coin is fair
 (we set the probabilities `[0.5, 0.5]` ourselves),
 the counts of heads and tails may not be identical.
-That's because we only drew a finite number of samples.
-If we didn't implement the simulation ourselves,
+That is because we only drew a finite number of samples.
+If we did not implement the simulation ourselves,
 and only saw the outcome,
 how would we know if the coin were slightly unfair
 or if the possible deviation from $1/2$ was
@@ -739,7 +739,7 @@ correspond to causes of some third variable $C$.
 For example, broken bones and lung cancer might be independent
 in the general population but if we condition on being in the hospital
 then we might find that broken bones are negatively correlated with lung cancer.
-That's because the broken bone *explains away* why some person is in the hospital
+That is because the broken bone *explains away* why some person is in the hospital
 and thus lowers the probability that they have lung cancer.
 
 
@@ -770,7 +770,7 @@ and $H \in \{0, 1\}$ to denote the HIV status.
 | $P(D_1 = 1 \mid H)$        |     1 |  0.01 |
 | $P(D_1 = 0 \mid H)$        |     0 |  0.99 |
 
-Note that the column sums are all 1 (but the row sums don't),
+Note that the column sums are all 1 (but the row sums do not),
 since they are conditional probabilities.
 Let's compute the probability of the patient having HIV
 if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$.
@@ -924,10 +924,10 @@ how *risky* an investment is.
 Here, we care not just about the expected value
 but how much the actual values tend to *vary*
 relative to this value.
-Note that we can't just take
+Note that we cannot just take
 the expectation of the difference
 between the actual and expected values.
-That's because the expectation of a difference
+That is because the expectation of a difference
 is the difference of the expectations,
 and thus $E[X - E[X]] = E[X] - E[E[X]] = 0$.
 However, we can look at the expectation
@@ -1019,7 +1019,7 @@ we will never be more or less than 50% certain
 that the next toss will come up heads.
 These terms owe to literature in mechanical modeling,
 (see e.g., :citet:`Der-Kiureghian.Ditlevsen.2009` for a review on this aspect of [uncertainty quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
-It's worth noting that these terms constitute a slight abuse of language.
+It is worth noting that these terms constitute a slight abuse of language.
 The term *epistemic* refers to anything concerning *knowledge*
 and thus in the philosophical sense, all uncertainty is epistemic.
 

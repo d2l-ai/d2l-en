@@ -199,7 +199,7 @@ cd tensorflow
 
 :end_tab:
 
-If you don't already have `unzip` installed, first run `sudo apt-get install unzip`.
+If you do not already have `unzip` installed, first run `sudo apt-get install unzip`.
 Now we can start the Jupyter Notebook server by running:
 
 ```bash

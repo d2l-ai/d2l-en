@@ -187,7 +187,7 @@ in the direction that may reduce the loss.
 The following code applies the update, 
 given a set of parameters, a learning rate `lr`.
 Since our loss is computed as an average over the minibatch, 
-we don't need to adjust the learning rate against the batch size. 
+we do not need to adjust the learning rate against the batch size. 
 In later chapters we will investigate 
 how learning rates should be adjusted
 for very large minibatches as they arise 

@@ -277,7 +277,7 @@ This works when we are dealing with numerical inputs
 like price or temperature, where any two values
 sufficiently close together
 should be treated similarly.
-But this doesn't quite make sense. 
+But this does not quite make sense. 
 The $45^{\mathrm{th}}$ and $46^{\mathrm{th}}$ words 
 in our vocabulary happen to be "their" and "said",
 whose meanings are not remotely similar.
@@ -474,7 +474,7 @@ but is unstable owing to massive spikes in the loss.
 
 One way to limit the size of $L \eta \|\mathbf{g}\|$ 
 is to shrink the learning rate $\eta$ to tiny values.
-One advantage here is that we don't bias the updates.
+One advantage here is that we do not bias the updates.
 But what if we only *rarely* get large gradients?
 This drastic move slows down our progress at all steps,
 just to deal with the rare exploding gradient events.
@@ -492,11 +492,11 @@ of limiting the influence any given minibatch
 (and within it any given sample) 
 can exert on the parameter vector. 
 This bestows a certain degree of robustness to the model. 
-To be clear, it's a hack. 
+To be clear, it is a hack. 
 Gradient clipping means that we are not always
-following the true gradient and it's hard 
+following the true gradient and it is hard 
 to reason analytically about the possible side effects.
-However, it's a very useful hack,
+However, it is a very useful hack,
 and is widely adopted in RNN implementations
 in most deep learning frameworks.
 
@@ -593,7 +593,7 @@ it were the next token in the input.
 Sometimes we will just want to generate text
 as though we were starting at the beginning 
 of a document. 
-However, it's often useful to condition
+However, it is often useful to condition
 the language model on a user-supplied prefix.
 For example, if we were developing an
 autocomplete feature for search engine

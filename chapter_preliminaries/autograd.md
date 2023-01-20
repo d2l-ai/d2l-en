@@ -38,7 +38,7 @@ The core ideas behind modern backpropagation
 date to a PhD thesis from 1980 :cite:`Speelpenning.1980`
 and were further developed in the late 1980s :cite:`Griewank.1989`.
 While backpropagation has become the default method 
-for computing gradients, it's not the only option. 
+for computing gradients, it is not the only option. 
 For instance, the Julia programming language employs 
 forward propagation :cite:`Revels.Lubin.Papamarkou.2016`. 
 Before exploring methods, 

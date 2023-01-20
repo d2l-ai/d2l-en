@@ -6,10 +6,10 @@ where we aim to predict the next token given all previous tokens in a sequence.
 In this scenario, we wish only to condition upon the leftward context,
 and thus the unidirectional chaining of a standard RNN seems appropriate. 
 However, there are many other sequence learning tasks contexts 
-where it's perfectly fine to condition the prediction at every time step
+where it is perfectly fine to condition the prediction at every time step
 on both the leftward and the rightward context. 
 Consider, for example, part of speech detection. 
-Why shouldn't we take the context in both directions into account
+Why should not we take the context in both directions into account
 when assessing the part of speech associated with a given word?
 
 Another common task---often useful as a pretraining exercise
@@ -173,7 +173,7 @@ Here we take a GRU model as an example.
 :end_tab:
 
 :begin_tab:`jax`
-Flax API doesn't offer RNN layers and hence there is no
+Flax API does not offer RNN layers and hence there is no
 notion of any `bidirectional` argument. One needs to manually
 reverse the inputs as shown in the scratch implementation,
 if a bidirectional layer is needed.

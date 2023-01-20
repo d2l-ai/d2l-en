@@ -75,7 +75,7 @@ from a normal distribution with mean $\mu= 0$
 and standard deviation $\sigma = 0.01$.
 Note that for object-oriented design
 we add the code to the `__init__` method of a subclass of `d2l.DataModule` (introduced in :numref:`oo-design-data`). 
-It's good practice to allow setting any additional hyperparameters. 
+It is good practice to allow setting any additional hyperparameters. 
 We accomplish this with `save_hyperparameters()`. 
 The `batch_size` will be determined later on.
 
@@ -278,7 +278,7 @@ We will put this to good use in the next section.
     1. What happens if we cannot hold all data in memory?
     1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
-1. How would you design a random data generator that generates *the same* data each time it's called?
+1. How would you design a random data generator that generates *the same* data each time it is called?
 
 
 :begin_tab:`mxnet`

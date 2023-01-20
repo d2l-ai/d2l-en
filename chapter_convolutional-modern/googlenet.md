@@ -395,7 +395,7 @@ def b5(self):
     if tab.selected('jax'):
         return nn.Sequential([Inception(256, (160, 320), (32, 128), 128),
                               Inception(384, (192, 384), (48, 128), 128),
-                              # Flax doesn't provide a GlobalAvgPool2D layer
+                              # Flax does not provide a GlobalAvgPool2D layer
                               lambda x: nn.avg_pool(x,
                                                     window_shape=x.shape[1:3],
                                                     strides=x.shape[1:3],
@@ -403,7 +403,7 @@ def b5(self):
                               lambda x: x.reshape((x.shape[0], -1))])
 ```
 
-Now that we defined all blocks `b1` through `b5`, it's just a matter of assembling them all into a full network.
+Now that we defined all blocks `b1` through `b5`, it is just a matter of assembling them all into a full network.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow

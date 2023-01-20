@@ -6,7 +6,7 @@ Like most of our from-scratch implementations,
 to provide insight into how each component works.
 But when you're using RNNs every day 
 or writing production code,
-you'll want to rely more on libraries
+you will want to rely more on libraries
 that cut down on both implementation time 
 (by supplying library code for common models and functions)
 and computation time 
@@ -72,7 +72,7 @@ this list will also contain other information.
 :end_tab:
 
 :begin_tab:`jax`
-Flax doesn't provide an RNNCell for concise implementation of Vanilla RNNs
+Flax does not provide an RNNCell for concise implementation of Vanilla RNNs
 as of today. There are more advanced variants of RNNs like LSTMs and GRUs
 which are available in the Flax `linen` API.
 :end_tab:

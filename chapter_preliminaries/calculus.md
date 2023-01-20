@@ -39,7 +39,7 @@ where we repeatedly update our parameters
 in order to decrease the loss function.
 Optimization addresses how to fit our models to training data,
 and calculus is its key prerequisite.
-However, don't forget that our ultimate goal
+However, do not forget that our ultimate goal
 is to perform well on *previously unseen* data.
 That problem is called *generalization*
 and will be a key focus of other chapters.

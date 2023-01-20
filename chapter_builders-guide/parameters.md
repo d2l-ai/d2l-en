@@ -177,13 +177,13 @@ type(bias), bias
 Parameters are complex objects,
 containing values, gradients,
 and additional information.
-That's why we need to request the value explicitly.
+That is why we need to request the value explicitly.
 
 In addition to the value, each parameter also allows us to access the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
 :end_tab:
 
 :begin_tab:`jax`
-Unlike the other frameworks, JAX doesn't keep a track of the gradients over the
+Unlike the other frameworks, JAX does not keep a track of the gradients over the
 neural network parameters, instead the parameters and the network are decoupled.
 It allows the user to express their computation as a
 Python function, and use the `grad` transformation for the same purpose.

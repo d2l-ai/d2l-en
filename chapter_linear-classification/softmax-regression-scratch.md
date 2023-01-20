@@ -363,7 +363,7 @@ with solving linear regression
 and classification problems.
 With it, we have reached what would arguably be
 the state of the art of 1960-1970s of statistical modeling.
-In the next section, we'll show you how to leverage
+In the next section, we will show you how to leverage
 deep learning frameworks to implement this model
 much more efficiently.
 

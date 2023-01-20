@@ -65,7 +65,7 @@ Once our model outputs "&lt;eos&gt;"
 the output sequence is completed.
 
 This strategy might look reasonable, 
-and in fact it's not so bad!
+and in fact it is not so bad!
 Considering how computationally undemanding it is,
 you'd be hard pressed to get more bang for your buck. 
 However, if we put aside efficiency for a minute,

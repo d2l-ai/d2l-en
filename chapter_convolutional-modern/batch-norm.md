@@ -30,7 +30,7 @@ beneficial to keep the estimation problem well controlled. See e.g., the article
 Intuitively, this standardization plays nicely with our optimizers
 since it puts the parameters *a priori* at a similar scale.
 As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
-might not be beneficial. While this isn't quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework.
+might not be beneficial. While this is not quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework.
 
 Second, for a typical MLP or CNN, as we train,
 the variables 
@@ -204,7 +204,7 @@ both of which are scalars.
 
 Note that in the context of convolutions the batch normalization is well-defined even for
 minibatches of size 1: after all, we have all the locations across an image to average. Consequently,
-mean and variance are well defined, even if it's just within a single observation. This consideration
+mean and variance are well defined, even if it is just within a single observation. This consideration
 led :citet:`Ba.Kiros.Hinton.2016` to introduce the notion of *layer normalization*. It works just like
 a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. Given an $n$-dimensional vector $\mathbf{x}$ layer norms are given by 
 
@@ -218,7 +218,7 @@ $$\hat{\mu} \stackrel{\mathrm{def}}{=} \frac{1}{n} \sum_{i=1}^n x_i \text{ and }
 
 As before we add a small offset $\epsilon > 0$ to prevent division by zero. One of the major benefits of using layer normalization is that it prevents divergence. After all, ignoring $\epsilon$, the output of the layer normalization is scale independent. That is, we have $\mathrm{LN}(\mathbf{x}) \approx \mathrm{LN}(\alpha \mathbf{x})$ for any choice of $\alpha \neq 0$. This becomes an equality for $|\alpha| \to \infty$ (the approximate equality is due to the offset $\epsilon$ for the variance). 
 
-Another advantage of the layer normalization is that it doesn't depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transformation that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend the interested reader to consult the original paper.
+Another advantage of the layer normalization is that it does not depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transformation that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend the interested reader to consult the original paper.
 
 ### Batch Normalization During Prediction
 
@@ -826,7 +826,7 @@ notion that the distribution of variable values changes
 over the course of training.
 However, there were two problems with this explanation:
 i) This drift is very different from *covariate shift*,
-rendering the name a misnomer. If anything, it's closer to concept drift. 
+rendering the name a misnomer. If anything, it is closer to concept drift. 
 ii) The explanation offers an under-specified intuition
 but leaves the question of *why precisely this technique works*
 an open question wanting for a rigorous explanation.

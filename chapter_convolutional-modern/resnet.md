@@ -420,7 +420,7 @@ def create_net(self):
     for i, b in enumerate(self.arch):
         net.layers.extend([self.block(*b, first_block=(i==0))])
     net.layers.extend([nn.Sequential([
-        # Flax doesn't provide a GlobalAvg2D layer
+        # Flax does not provide a GlobalAvg2D layer
         lambda x: nn.avg_pool(x, window_shape=x.shape[1:3],
                               strides=x.shape[1:3], padding='valid'),
         lambda x: x.reshape((x.shape[0], -1)),
@@ -708,7 +708,7 @@ A common feature of the designs we have discussed so far is that the network des
 1. Refer to Table 1 in the ResNet paper :cite:`He.Zhang.Ren.ea.2016` to implement different variants of the network. 
 1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce model complexity. Try to implement it.
 1. In subsequent versions of ResNet, the authors changed the "convolution, batch normalization, and activation" structure to the "batch normalization, activation, and convolution" structure. Make this improvement yourself. See Figure 1 in :citet:`He.Zhang.Ren.ea.2016*1` for details.
-1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
+1. Why cannot we just increase the complexity of functions without bound, even if the function classes are nested?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/85)

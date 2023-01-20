@@ -50,7 +50,7 @@ We also redefine the `training_step` method for JAX since all models that will
 subclass `Classifier` later will have a loss that returns auxiliary data.
 This auxiliary data can be used for models with batch normalization
 (to be explained in :numref:`sec_batch_norm`), while in all other cases
-we'll make the loss also return a placeholder (empty dictionary) to
+we will make the loss also return a placeholder (empty dictionary) to
 represent the auxiliary data.
 :end_tab:
 
@@ -192,7 +192,7 @@ def parameters(self):
 
 ## Summary
 
-Classification is a sufficiently common problem that it warrants its own convenience functions. Of central importance in classification is the *accuracy* of the classifier. Note that while we often care primarily about accuracy, we train classifiers to optimize a variety of other objectives for statistical and computational reasons. However, regardless of which loss function was minimized during training, it's useful to have a convenience method for assessing the accuracy of our classifier empirically. 
+Classification is a sufficiently common problem that it warrants its own convenience functions. Of central importance in classification is the *accuracy* of the classifier. Note that while we often care primarily about accuracy, we train classifiers to optimize a variety of other objectives for statistical and computational reasons. However, regardless of which loss function was minimized during training, it is useful to have a convenience method for assessing the accuracy of our classifier empirically. 
 
 
 ## Exercises

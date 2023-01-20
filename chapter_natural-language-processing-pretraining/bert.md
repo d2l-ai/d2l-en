@@ -496,7 +496,7 @@ nsp_Y_hat.shape
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch by default won't flatten the tensor as seen in mxnet where, if
+# PyTorch by default will not flatten the tensor as seen in mxnet where, if
 # flatten=True, all but the first axis of input data are collapsed together
 encoded_X = torch.flatten(encoded_X, start_dim=1)
 # input_shape for NSP: (batch size, `num_hiddens`)

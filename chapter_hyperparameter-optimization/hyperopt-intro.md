@@ -229,7 +229,7 @@ print(f"optimal learning rate = {values[best_idx]}")
 ```
 
 Due to its simplicity and generality, random search is one of the most frequently
-used HPO algorithms. It doesn't require any sophisticated implementation and
+used HPO algorithms. It does not require any sophisticated implementation and
 can be applied to any configuration space as long as we can define some
 probability distribution for each hyperparameter.
 

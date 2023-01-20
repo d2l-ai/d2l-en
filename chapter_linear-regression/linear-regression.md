@@ -91,7 +91,7 @@ explicitly expressing models long-form,
 as in :eqref:`eq_price-area`, is common.
 In machine learning, we usually work
 with high-dimensional datasets,
-where it's more convenient to employ
+where it is more convenient to employ
 compact linear algebra notation.
 When our inputs consist of $d$ features,
 we can assign each an index (between $1$ and $d$)
@@ -346,7 +346,7 @@ with a global minimum
 (whenever $\mathbf{X}$ is full rank, or equivalently,
 whenever $\mathbf{X}^\top \mathbf{X}$ is invertible).
 However, the loss surfaces for deep networks contain many saddle points and minima.
-Fortunately, we typically don't care about finding
+Fortunately, we typically do not care about finding
 an exact set of parameters but merely any set of parameters
 that leads to accurate predictions (and thus low loss).
 In practice, deep learning practitioners
@@ -734,7 +734,7 @@ and ultimately, evaluation on previously unseen data.
     1. What happens if this is not the case?
     1. How could you fix it? What happens if you add a small amount of coordinate-wise independent Gaussian noise to all entries of $\mathbf{X}$?
     1. What is the expected value of the design matrix $\mathbf{X}^\top \mathbf{X}$ in this case?
-    1. What happens with stochastic gradient descent when $\mathbf{X}^\top \mathbf{X}$ doesn't have full rank?
+    1. What happens with stochastic gradient descent when $\mathbf{X}^\top \mathbf{X}$ does not have full rank?
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
     1. Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
     1. Can you find a closed form solution?

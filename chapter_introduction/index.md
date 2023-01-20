@@ -947,7 +947,7 @@ These problems also occur in medicine.
 We might want a model to monitor patients in the intensive care unit
 and to fire off alerts whenever their risk of dying in the next 24 hours
 exceeds some threshold.
-Here, we wouldn't throw away everything
+Here, we would not throw away everything
 that we know about the patient history every hour,
 making predictions based only
 on the most recent measurements.

@@ -131,7 +131,7 @@ d2l.train_concise_ch11(trainer, {'rho': 0.9}, data_iter)
 ```{.python .input}
 #@tab tensorflow
 # adadelta is not converging at default learning rate
-# but it's converging at lr = 5.0
+# but it is converging at lr = 5.0
 trainer = tf.keras.optimizers.Adadelta
 d2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)
 ```

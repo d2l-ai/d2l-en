@@ -46,8 +46,8 @@ depends heavily on what transpired
 in the previous nine days.
 
 This should come as no surprise.
-If we didn't believe that the elements in a sequence were related,
-we wouldn't have bothered to model them as a sequence in the first place.
+If we did not believe that the elements in a sequence were related,
+we would not have bothered to model them as a sequence in the first place.
 Consider the usefulness of the auto-fill features
 that are popular on search tools and modern email clients.
 They are useful precisely because it is often possible
@@ -55,7 +55,7 @@ to predict (imperfectly, but better than random guessing)
 what likely continuations of a sequence might be,
 given some initial prefix.
 For most sequence models,
-we don't require independence,
+we do not require independence,
 or even stationarity, of our sequences.
 Instead, we require only that
 the sequences themselves are sampled

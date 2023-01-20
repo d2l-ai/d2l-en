@@ -104,7 +104,7 @@ we set that number to 1.
 It is worth noting that, for convenience,
 Gluon does not require us to specify
 the input shape for each layer.
-Hence we don't need to tell Gluon
+Hence we do not need to tell Gluon
 how many inputs go into this linear layer.
 When we first pass data through our model,
 e.g., when we execute `net(X)` later,
@@ -135,7 +135,7 @@ we set that number to 1.
 It is worth noting that, for convenience,
 Keras does not require us to specify
 the input shape for each layer.
-We don't need to tell Keras
+We do not need to tell Keras
 how many inputs go into this linear layer.
 When we first try to pass data through our model,
 e.g., when we execute `net(X)` later,
@@ -368,7 +368,7 @@ and Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
 We used framework defaults for loading data, defining a layer,
 a loss function, an optimizer and a training loop.
 Whenever the framework provides all necessary features,
-it's generally a good idea to use them,
+it is generally a good idea to use them,
 since the library implementations of these components
 tend to be heavily optimized for performance
 and properly tested for reliability.

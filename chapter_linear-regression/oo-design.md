@@ -213,7 +213,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             return self.forward(X, *args)
 
     if tab.selected('jax'):
-        # JAX & Flax don't have a forward-method-like syntax. Flax uses setup
+        # JAX & Flax do not have a forward-method-like syntax. Flax uses setup
         # and built-in __call__ magic methods for forward pass. Adding here
         # for consistency
         def forward(self, X, *args, **kwargs):
