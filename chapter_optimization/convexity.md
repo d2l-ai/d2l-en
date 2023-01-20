@@ -181,7 +181,7 @@ Concretely,
 given a convex function $f$ defined on a convex set $\mathcal{X}$,
 any below set
 
-$$\mathcal{S}_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
+$$\mathcal{S}_b \stackrel{\mathrm{def}}{=} \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
 
 is convex. 
 
