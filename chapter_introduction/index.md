@@ -1514,12 +1514,12 @@ over the past decade.
   no longer needed to remember the entire sequence before
   commencing the generation of a new sequence.
 * Built solely on attention mechanisms,
-  the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017` has demonstrated superior *scaling* behavior: it performs better with increased data, model size, and compute :cite:`kaplan2020scaling`. This architecture has demonstrated compelling success in a wide range of areas,
+  the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017` has demonstrated superior *scaling* behavior: it performs better with an increase in dataset size, model size, and amount of training compute :cite:`kaplan2020scaling`. This architecture has demonstrated compelling success in a wide range of areas,
   such as natural language processing :cite:`Devlin.Chang.Lee.ea.2018,brown2020language`, computer vision :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,liu2021swin`, speech recognition :cite:`gulati2020conformer`, reinforcement learning :cite:`chen2021decision`, and graph neural networks :cite:`dwivedi2020generalization`. For example, a single Transformer pretrained on modalities
   as diverse as text, images, joint torques, and button presses
   can play Atari, caption images, chat,
   and control a robot :cite:`reed2022generalist`.
-* Modeling probabilities of text sequences, *language models* can predict text given other text. Scaling up the data, model, and compute has unlocked a growing number of capabilities of language models to perform desired tasks via human-like text generation based on input text :cite:`brown2020language,hoffmann2022training,chowdhery2022palm`. For instance, aligning language models with human intent :cite:`ouyang2022training`, OpenAI's [ChatGPT](https://chat.openai.com/) allows users to interact with it in a conversational way to solve problems, such as code debugging and note drafting.
+* Modeling probabilities of text sequences, *language models* can predict text given other text. Scaling up the data, model, and compute has unlocked a growing number of capabilities of language models to perform desired tasks via human-like text generation based on input text :cite:`brown2020language,rae2021scaling,hoffmann2022training,chowdhery2022palm`. For instance, aligning language models with human intent :cite:`ouyang2022training`, OpenAI's [ChatGPT](https://chat.openai.com/) allows users to interact with it in a conversational way to solve problems, such as code debugging and note drafting.
 * Multi-stage designs, e.g., via the memory networks
   :cite:`Sukhbaatar.Weston.Fergus.ea.2015`
   and the neural programmer-interpreter :cite:`Reed.De-Freitas.2015`
