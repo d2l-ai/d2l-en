@@ -58,6 +58,7 @@ def _pagenumbering(lines):
     '\\cleardoublepage']
     INTRONUMS = ['\\mainmatter', '\\pagenumbering{arabic}', '\\setcounter{page}{1}']
     CHAPINTRO = '\\chapter{Introduction}'
+    chapintro_i = -1
     for i, l in enumerate(lines):
         if l.startswith(BEGINDOC):
             frontnums_i = i + 1
@@ -67,7 +68,8 @@ def _pagenumbering(lines):
     for i, v in enumerate(FRONTNUMS):
         lines.insert(frontnums_i + i, v)
     for i, v in enumerate(INTRONUMS):
-        lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
+        if chapintro_i > 0:
+            lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
 
 
 # Remove date
