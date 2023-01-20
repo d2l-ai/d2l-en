@@ -171,6 +171,7 @@ hyperparameters of a multi-layer perceptron including their type and standard
 ranges.
 
 : Example configuration space of multi-layer perceptron
+:label:`tab_example_configspace`
 
 | Name                | Type        |Hyperparameter Ranges           | log-scale |
 | :----:              | :----:      |:------------------------------:|:---------:|
@@ -180,7 +181,7 @@ ranges.
 | activation function | categorical | $\{\text{tanh}, \text{relu}\}$ |     -     |
 | number of units     | integer     |          $[32, 1024]$          |    yes    |
 | number of layers    | integer     |            $[1, 6]$            |    no     |
-:label:`tab_example_configspace`
+
 
 
 In general, the structure of the configuration space $\mathcal{X}$ can be complex

@@ -199,14 +199,14 @@ and their ratios based on  statistics from a large corpus.
 
 
 :Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :citet:`Pennington.Socher.Manning.2014`)
-
+:label:`tab_glove`
 
 |$w_k$=|solid|gas|water|fashion|
 |:--|:-|:-|:-|:-|
 |$p_1=P(w_k\mid \text{ice})$|0.00019|0.000066|0.003|0.000017|
 |$p_2=P(w_k\mid\text{steam})$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
-:label:`tab_glove`
+
 
 
 We can observe the following from :numref:`tab_glove`:

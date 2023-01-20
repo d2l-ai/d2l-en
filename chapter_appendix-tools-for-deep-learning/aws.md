@@ -61,6 +61,7 @@ We begin by selecting a suitable Amazon Machine Image (AMI). Select an Ubuntu in
 EC2 provides many different instance configurations to choose from. This can sometimes feel overwhelming to a beginner. :numref:`tab_ec2` lists different suitable machines.
 
 :Different EC2 instance types
+:label:`tab_ec2`
 
 | Name | GPU         | Notes                         |
 |------|-------------|-------------------------------|
@@ -70,7 +71,7 @@ EC2 provides many different instance configurations to choose from. This can som
 | p3   | Volta V100  | high performance for FP16     |
 | p4   | Ampere A100 | high performance for large-scale training |
 | g4   | Turing T4   | inference optimized FP16/INT8 |
-:label:`tab_ec2`
+
 
 All these servers come in multiple flavors indicating the number of GPUs used. For example, a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details, see the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in the red box of :numref:`fig_p2x`).
 

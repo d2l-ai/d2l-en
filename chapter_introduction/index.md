@@ -1453,6 +1453,7 @@ became relevant (and vice versa).
 This is best illustrated in :numref:`tab_intro_decade`.
 
 :Dataset vs. computer memory and computational power
+:label:`tab_intro_decade`
 
 |Decade|Dataset|Memory|Floating point calculations per second|
 |:--|:-|:-|:-|
@@ -1462,7 +1463,7 @@ This is best illustrated in :numref:`tab_intro_decade`.
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
 |2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
 |2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
-:label:`tab_intro_decade`
+
 
 Note that random-access memory has not kept pace with the growth in data.
 At the same time, increases in computational power
