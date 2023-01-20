@@ -598,7 +598,7 @@ grad_tanh = vmap(grad(jax.nn.tanh))
 d2l.plot(x, grad_tanh(x), 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
-## Summary
+## Summary and Discussion
 
 We now know how to incorporate nonlinearities
 to build expressive multilayer neural network architectures.
@@ -618,9 +618,14 @@ A secondary benefit is that ReLU is significantly more amenable to
 optimization than the sigmoid or the tanh function. One could argue
 that this was one of the key innovations that helped the resurgence
 of deep learning over the past decade. Note, though, that research in
-activation functions has not stopped. For instance, the Swish activation
-function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
-:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy
+activation functions has not stopped.
+For instance, 
+the GELU (Gaussian error linear unit)
+activation function $x \Phi(x)$ :cite:`Hendrycks.Gimpel.2016`, where $\Phi(x)$
+is the standard Gaussian cumulative distribution function 
+and
+the Swish activation
+function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in :citet:`Ramachandran.Zoph.Le.2017` can yield better accuracy
 in many cases.
 
 ## Exercises
