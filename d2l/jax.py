@@ -449,16 +449,13 @@ class LinearRegressionScratch(d2l.Module):
         return SGD(self.lr)
 
 class SGD(d2l.HyperParameters):
-    
+    """Minibatch stochastic gradient descent.
 
     Defined in :numref:`sec_linear_scratch`"""
-    Minibatch stochastic gradient descent.
-    The key transformation of Optax is the GradientTransformation
-    defined by two methods, the init and the update.
-    The init initializes the state and the update transforms
-    the gradients.
-    https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
-    """
+    # The key transformation of Optax is the GradientTransformation
+    # defined by two methods, the init and the update.
+    # The init initializes the state and the update transforms the gradients.
+    # https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
     def __init__(self, lr):
         self.save_hyperparameters()
 

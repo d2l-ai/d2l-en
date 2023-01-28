@@ -261,14 +261,11 @@ class SGD(d2l.HyperParameters):  #@save
 ```{.python .input}
 %%tab jax
 class SGD(d2l.HyperParameters):  #@save
-    """
-    Minibatch stochastic gradient descent.
-    The key transformation of Optax is the GradientTransformation
-    defined by two methods, the init and the update.
-    The init initializes the state and the update transforms
-    the gradients.
-    https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
-    """
+    """Minibatch stochastic gradient descent."""
+    # The key transformation of Optax is the GradientTransformation
+    # defined by two methods, the init and the update.
+    # The init initializes the state and the update transforms the gradients.
+    # https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
     def __init__(self, lr):
         self.save_hyperparameters()
 
