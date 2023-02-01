@@ -307,7 +307,7 @@ def get_dataloader(self, train):
     get_tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
     # Logarithm of prices 
     tensors = (get_tensor(data.drop(columns=[label])),  # X
-               d2l.reshape(d2l.log(get_tensor(data[label])), (-1, 1)))  # Y
+               d2l.log(get_tensor(data[label])))  # Y
     return self.get_tensorloader(tensors, train)
 ```
 
