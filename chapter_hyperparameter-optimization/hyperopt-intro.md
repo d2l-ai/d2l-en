@@ -274,7 +274,7 @@ depends on a small subset of the hyperparameters :cite:`bergstra-jmlr12a`.
     5. Apart from the sheer amount of compute and storage required, what other issues would gradient-based hyperparameter optimization run into? Hint: Re-read about vanishing and exploding gradients in :numref:`sec_numerical_stability`.
     6. *Advanced*: Read :cite:`maclaurin-icml15` for an elegant (yet still somewhat unpractical) approach to gradient-based HPO.
 3. Grid search is another HPO baseline, where we define an equispaced grid for each hyperparameter, then iterate over the (combinatorial) Cartesian product in order to suggest configurations.
-    1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :cite:`bergstra-jmlr12a`.
+    1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :citet:`bergstra-jmlr12a`.
 
 
 :begin_tab:`pytorch`
