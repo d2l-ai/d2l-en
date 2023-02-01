@@ -518,7 +518,7 @@ multistep_preds = d2l.zeros(data.T)
 multistep_preds[:] = data.x
 for i in range(data.num_train + data.tau, data.T):
     multistep_preds[i] = model(
-        d2l.reshape(multistep_preds[i-data.tau : i], (1, -1)))
+        multistep_preds[i-data.tau : i])
 multistep_preds = d2l.numpy(multistep_preds)
 ```
 
