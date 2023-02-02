@@ -123,8 +123,8 @@ Training machine learning models often requires multiple passes over a dataset,
 grabbing one minibatch of examples at a time. 
 This data is then used to update the model. 
 To illustrate how this works, we 
-[**implement the `get_dataloader` function,**] 
-registering it as a method in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
+[**implement the `get_dataloader` method,**] 
+registering it in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 It (**takes a batch size, a matrix of features,
 and a vector of labels, and generates minibatches of size `batch_size`.**)
 As such, each minibatch consists of a tuple of features and labels. 
@@ -181,7 +181,7 @@ are considerably more efficient and they can deal
 with sources such as data stored in files, 
 data received via a stream, 
 and data generated or processed on the fly. 
-Next let's try to implement the same function using built-in iterators.
+Next let's try to implement the same method using built-in iterators.
 
 ## Concise Implementation of the Data Loader
 

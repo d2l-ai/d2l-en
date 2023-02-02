@@ -609,7 +609,7 @@ had written so far (the prefix),
 and then generate a likely continuation.
 
 
-[**The following `predict` function
+[**The following `predict` method
 generates a continuation, one character at a time,
 after ingesting a user-provided `prefix`**],
 When looping through the characters in `prefix`,
@@ -706,7 +706,7 @@ During training, gradient clipping can mitigate the problem of exploding gradien
    e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
 1. Conduct another experiment to evaluate the perplexity of this model
    on books written by other authors. 
-1. Modify the prediction function such as to use sampling 
+1. Modify the prediction method such as to use sampling 
    rather than picking the most likely next character.
     * What happens?
     * Bias the model towards more likely outputs, e.g., 

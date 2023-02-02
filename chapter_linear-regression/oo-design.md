@@ -142,7 +142,7 @@ b = B(a=1, b=2, c=3)
 
 The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [TensorBoard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
 
-The `draw` function plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
+The `draw` method plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
 
 ```{.python .input}
 %%tab all
@@ -282,17 +282,17 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
 :begin_tab:`mxnet`
 You may notice that `Module` is a subclass of `nn.Block`, the base class of neural networks in Gluon.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
+It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`pytorch`
 You may notice that `Module` is a subclass of `nn.Module`, the base class of neural networks in PyTorch.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
+It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`tensorflow`
 You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
-It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` function, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
+It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` method, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
 :begin_tab:`jax`
@@ -332,11 +332,11 @@ class DataModule(d2l.HyperParameters):  #@save
 :label:`oo-design-training`
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this method to later chapters.
 :end_tab:
 
 :begin_tab:`jax`
-The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this method to later chapters.
 :end_tab:
 
 ```{.python .input}

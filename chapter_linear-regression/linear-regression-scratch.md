@@ -126,8 +126,8 @@ Due to the broadcasting mechanism
 (see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,
 the scalar is added to each component of the vector.
-The resulting `forward` function 
-is registered as a method in the `LinearRegressionScratch` class
+The resulting `forward` method 
+is registered in the `LinearRegressionScratch` class
 via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 
 ```{.python .input}
@@ -146,7 +146,7 @@ Here we use the squared loss function
 in :eqref:`eq_mse`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
-The result returned by the following function
+The result returned by the following method
 will also have the same shape as `y_hat`. 
 We also return the averaged loss value
 among all examples in the minibatch.
@@ -333,8 +333,8 @@ to measure our model quality.
 Here we pass the validation dataloader 
 once in each epoch to measure the model performance.
 Following our object-oriented design,
-the `prepare_batch` and `fit_epoch` functions
-are registered as methods of the `d2l.Trainer` class
+the `prepare_batch` and `fit_epoch` methods
+are registered in the `d2l.Trainer` class
 (introduced in :numref:`oo-design-training`).
 
 ```{.python .input}

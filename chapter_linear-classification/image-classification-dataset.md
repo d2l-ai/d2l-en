@@ -68,7 +68,7 @@ d2l.use_svg_display()
 
 ## Loading the Dataset
 
-Since it is such a frequently used dataset, all major frameworks provide preprocessed versions of it. We can [**download and read the Fashion-MNIST dataset into memory using built-in framework functions.**]
+Since it is such a frequently used dataset, all major frameworks provide preprocessed versions of it. We can [**download and read the Fashion-MNIST dataset into memory using built-in framework utilities.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -139,7 +139,7 @@ data.train[0][0].shape
 [~~Two utility functions to visualize the dataset~~]
 
 The categories of Fashion-MNIST have human-understandable names. 
-The following convenience function converts between numeric labels and their names.
+The following convenience method converts between numeric labels and their names.
 
 ```{.python .input}
 %%tab all

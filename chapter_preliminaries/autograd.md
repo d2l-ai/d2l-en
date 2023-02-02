@@ -173,11 +173,11 @@ via `x`'s `grad` attribute.
 :begin_tab:`tensorflow`
 [**We can now calculate the gradient of `y`
 with respect to `x`**] by calling 
-the `gradient` function.
+the `gradient` method.
 :end_tab:
 
 :begin_tab:`jax`
-[**We can now take the gradient of function `y`
+[**We can now take the gradient of `y`
 with respect to `x`**] by passing through the
 `grad` transform.
 :end_tab:

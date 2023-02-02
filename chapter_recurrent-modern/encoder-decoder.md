@@ -110,7 +110,7 @@ class Encoder(nn.Module):  #@save
 ## [**Decoder**]
 
 In the following decoder interface,
-we add an additional `init_state` function
+we add an additional `init_state` method
 to convert the encoder output (`enc_all_outputs`)
 into the encoded state.
 Note that this step

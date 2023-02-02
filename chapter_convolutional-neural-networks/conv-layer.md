@@ -169,7 +169,7 @@ We are now ready to [**implement a two-dimensional convolutional layer**]
 based on the `corr2d` function defined above.
 In the `__init__` constructor method,
 we declare `weight` and `bias` as the two model parameters.
-The forward propagation function
+The forward propagation method
 calls the `corr2d` function and adds the bias.
 
 ```{.python .input}

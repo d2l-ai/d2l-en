@@ -173,7 +173,7 @@ class LinearRegression(d2l.Module):  #@save
         self.net = nn.Dense(1, kernel_init=nn.initializers.normal(0.01))
 ```
 
-In the `forward` method, we just invoke the built-in `__call__` function of the predefined layers to compute the outputs.
+In the `forward` method, we just invoke the built-in `__call__` method of the predefined layers to compute the outputs.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -244,7 +244,7 @@ variations on this algorithm through its `Trainer` class.
 Note that Gluon's `Trainer` class stands
 for the optimization algorithm,
 while the `Trainer` class we created in :numref:`sec_oo-design`
-contains the training function,
+contains the training method,
 i.e., repeatedly call the optimizer
 to update the model parameters.
 When we instantiate `Trainer`,

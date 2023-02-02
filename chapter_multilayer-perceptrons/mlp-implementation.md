@@ -193,7 +193,7 @@ def forward(self, X):
 ### Training
 
 Fortunately, [**the training loop for MLPs
-is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` function on model and data.
+is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` method on model and data.
 
 ```{.python .input}
 %%tab all
