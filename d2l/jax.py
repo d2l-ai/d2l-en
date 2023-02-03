@@ -88,7 +88,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
 
     Defined in :numref:`sec_calculus`"""
 
-    def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
+    def has_one_axis(X):  # True if X (tensor or list) has 1 axis
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
 
@@ -580,8 +580,9 @@ class Classifier(d2l.Module):
     @partial(jax.jit, static_argnums=(0, 5))
     def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_softmax_concise`"""
+        # To be used later (e.g., for batch norm)
         Y_hat = state.apply_fn({'params': params}, *X,
-                               mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
+                               mutable=False, rngs=None)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
         fn = optax.softmax_cross_entropy_with_integer_labels
@@ -631,7 +632,7 @@ class SoftmaxRegression(d2l.Classifier):
 
     @nn.compact
     def __call__(self, X):
-        X = X.reshape((X.shape[0], -1))  # flatten
+        X = X.reshape((X.shape[0], -1))  # Flatten
         X = nn.Dense(self.num_outputs)(X)
         return X
 
@@ -938,7 +939,7 @@ class RNNLMScratch(d2l.Classifier):
                                                 embs, state)
             if i < len(prefix) - 1:  # Warm-up period
                 outputs.append(vocab[prefix[i + 1]])
-            else:  # Predict `num_preds` steps
+            else:  # Predict num_preds steps
                 Y = self.apply({'params': params}, rnn_outputs,
                                method=self.output_layer)
                 outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
@@ -1240,7 +1241,7 @@ def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
     def _sequence_mask(X, valid_len, value=0):
         maxlen = X.shape[1]
         mask = jnp.arange((maxlen),

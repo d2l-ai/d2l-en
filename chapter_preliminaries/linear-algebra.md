@@ -383,21 +383,21 @@ same shape as their operands.
 ```{.python .input}
 %%tab mxnet
 A = np.arange(6).reshape(2, 3)
-B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
+B = A.copy()  # Assign a copy of A to B by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 %%tab pytorch
 A = torch.arange(6, dtype=torch.float32).reshape(2, 3)
-B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
+B = A.clone()  # Assign a copy of A to B by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 %%tab tensorflow
 A = tf.reshape(tf.range(6, dtype=tf.float32), (2, 3))
-B = A  # No cloning of `A` to `B` by allocating new memory
+B = A  # No cloning of A to B by allocating new memory
 A, A + B
 ```
 
@@ -548,12 +548,12 @@ is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
-A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
+A.sum(axis=[0, 1]) == A.sum() # Same as A.sum()
 ```
 
 ```{.python .input}
 %%tab tensorflow
-tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as `tf.reduce_sum(A)`
+tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as tf.reduce_sum(A)
 ```
 
 [**A related quantity is the *mean*, also called the *average*.**]

@@ -103,7 +103,7 @@ with standard deviation 0.01, while bias parameters cleared to zero.
 
 ```{.python .input}
 %%tab mxnet
-# Here `force_reinit` ensures that parameters are freshly initialized even if
+# Here force_reinit ensures that parameters are freshly initialized even if
 # they were already initialized previously
 net.initialize(init=init.Normal(sigma=0.01), force_reinit=True)
 net[0].weight.data()[0]

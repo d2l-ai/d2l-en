@@ -638,7 +638,7 @@ def predict(self, prefix, num_preds, vocab, device=None):
         rnn_outputs, state = self.rnn(embs, state)
         if i < len(prefix) - 1:  # Warm-up period
             outputs.append(vocab[prefix[i + 1]])
-        else:  # Predict `num_preds` steps
+        else:  # Predict num_preds steps
             Y = self.output_layer(rnn_outputs)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
@@ -656,7 +656,7 @@ def predict(self, prefix, num_preds, vocab, params):
                                             embs, state)
         if i < len(prefix) - 1:  # Warm-up period
             outputs.append(vocab[prefix[i + 1]])
-        else:  # Predict `num_preds` steps
+        else:  # Predict num_preds steps
             Y = self.apply({'params': params}, rnn_outputs,
                            method=self.output_layer)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))

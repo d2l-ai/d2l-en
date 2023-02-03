@@ -68,7 +68,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
 
     Defined in :numref:`sec_calculus`"""
 
-    def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
+    def has_one_axis(X):  # True if X (tensor or list) has 1 axis
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
 
@@ -754,7 +754,7 @@ class RNNLMScratch(d2l.Classifier):
             rnn_outputs, state = self.rnn(embs, state)
             if i < len(prefix) - 1:  # Warm-up period
                 outputs.append(vocab[prefix[i + 1]])
-            else:  # Predict `num_preds` steps
+            else:  # Predict num_preds steps
                 Y = self.output_layer(rnn_outputs)
                 outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
         return ''.join([vocab.idx_to_token[i] for i in outputs])

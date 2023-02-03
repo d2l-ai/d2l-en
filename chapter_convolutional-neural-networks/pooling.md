@@ -330,7 +330,8 @@ X
 
 ```{.python .input}
 %%tab tensorflow, jax
-X = d2l.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax
+# Concatenate along `dim=3` due to channels-last syntax
+X = d2l.concat([X, X + 1], 3)
 X
 ```
 

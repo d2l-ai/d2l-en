@@ -128,7 +128,8 @@ x = tf.Variable(x)
 
 ```{.python .input  n=10}
 %%tab mxnet
-# Our code is inside an `autograd.record` scope to build the computational graph
+# Our code is inside an `autograd.record` scope to build the computational
+# graph
 with autograd.record():
     y = 2 * np.dot(x, x)
 y
@@ -203,7 +204,7 @@ x_grad
 ```{.python .input}
 %%tab jax
 from jax import grad
-# the `grad` transform returns a Python function that
+# The `grad` transform returns a Python function that
 # computes the gradient of the original function
 x_grad = grad(y)(x)
 x_grad
@@ -376,13 +377,13 @@ x.grad
 %%tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
-t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
+t.gradient(y, x)  # Same as y = tf.reduce_sum(x * x)
 ```
 
 ```{.python .input}
 %%tab jax
 y = lambda x: x * x
-# `grad` is only defined for scalar output functions
+# grad is only defined for scalar output functions
 grad(lambda x: y(x).sum())(x)
 ```
 
@@ -434,8 +435,8 @@ x.grad == u
 
 ```{.python .input}
 %%tab tensorflow
-# Set `persistent=True` to preserve the compute graph. 
-# This lets us run `t.gradient` more than once
+# Set persistent=True to preserve the compute graph. 
+# This lets us run t.gradient more than once
 with tf.GradientTape(persistent=True) as t:
     y = x * x
     u = tf.stop_gradient(y)
@@ -450,7 +451,7 @@ x_grad == u
 import jax
 
 y = lambda x: x * x
-# `jax.lax` primitives are Python wrappers around XLA operations
+# jax.lax primitives are Python wrappers around XLA operations
 u = jax.lax.stop_gradient(y(x))
 z = lambda x: u * x
 

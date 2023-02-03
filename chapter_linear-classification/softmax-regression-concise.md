@@ -109,7 +109,7 @@ class SoftmaxRegression(d2l.Classifier):  #@save
 
     @nn.compact
     def __call__(self, X):
-        X = X.reshape((X.shape[0], -1))  # flatten
+        X = X.reshape((X.shape[0], -1))  # Flatten
         X = nn.Dense(self.num_outputs)(X)
         return X
 ```
@@ -194,8 +194,9 @@ def loss(self, Y_hat, Y, averaged=True):
 @d2l.add_to_class(d2l.Classifier)  #@save
 @partial(jax.jit, static_argnums=(0, 5))
 def loss(self, params, X, Y, state, averaged=True):
+    # To be used later (e.g., for batch norm)
     Y_hat = state.apply_fn({'params': params}, *X,
-                           mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
+                           mutable=False, rngs=None)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels

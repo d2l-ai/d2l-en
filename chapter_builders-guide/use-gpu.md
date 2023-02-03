@@ -304,7 +304,7 @@ X
 
 ```{.python .input}
 %%tab jax
-# By default jax puts arrays to GPUs or TPUs if available
+# By default JAX puts arrays to GPUs or TPUs if available
 X = jax.device_put(jnp.ones((2, 3)), try_gpu())
 X
 ```

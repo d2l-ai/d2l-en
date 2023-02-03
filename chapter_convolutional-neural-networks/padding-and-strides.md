@@ -115,7 +115,7 @@ npx.set_np()
 
 # We define a helper function to calculate convolutions. It initializes 
 # the convolutional layer weights and performs corresponding dimensionality 
-# elevations and reductions on the input and output.
+# elevations and reductions on the input and output
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
     # (1, 1) indicates that batch size and the number of channels are both 1
@@ -135,8 +135,8 @@ comp_conv2d(conv2d, X).shape
 import torch
 from torch import nn
 
-# We define a helper function to calculate convolutions. It initializes
-# the convolutional layer weights and performs corresponding dimensionality
+# We define a helper function to calculate convolutions. It initializes the
+# convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output
 def comp_conv2d(conv2d, X):
     # (1, 1) indicates that batch size and the number of channels are both 1
@@ -144,7 +144,8 @@ def comp_conv2d(conv2d, X):
     Y = conv2d(X)
     # Strip the first two dimensions: examples and channels
     return Y.reshape(Y.shape[2:])
-# 1 row and column is padded on either side, so a total of 2 rows or columns are added
+# 1 row and column is padded on either side, so a total of 2 rows or columns
+# are added
 conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1)
 X = torch.rand(size=(8, 8))
 comp_conv2d(conv2d, X).shape
@@ -163,7 +164,8 @@ def comp_conv2d(conv2d, X):
     Y = conv2d(X)
     # Strip the first two dimensions: examples and channels
     return tf.reshape(Y, Y.shape[1:3])
-# 1 row and column is padded on either side, so a total of 2 rows or columns are added
+# 1 row and column is padded on either side, so a total of 2 rows or columns
+# are added
 conv2d = tf.keras.layers.Conv2D(1, kernel_size=3, padding='same')
 X = tf.random.uniform(shape=(8, 8))
 comp_conv2d(conv2d, X).shape
@@ -206,8 +208,8 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab pytorch
-# We use a convolution kernel with height 5 and width 3. The padding on
-# either side of the height and width are 2 and 1, respectively
+# We use a convolution kernel with height 5 and width 3. The padding on either
+# side of the height and width are 2 and 1, respectively
 conv2d = nn.LazyConv2d(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```

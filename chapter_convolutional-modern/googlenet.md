@@ -49,7 +49,7 @@ from mxnet.gluon import nn
 npx.set_np()
 
 class Inception(nn.Block):
-    # `c1`--`c4` are the number of output channels for each branch
+    # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Branch 1
@@ -82,7 +82,7 @@ from torch import nn
 from torch.nn import functional as F
 
 class Inception(nn.Module):
-    # `c1`--`c4` are the number of output channels for each branch
+    # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Branch 1
@@ -111,7 +111,7 @@ import tensorflow as tf
 from d2l import tensorflow as d2l
 
 class Inception(tf.keras.Model):
-    # `c1`--`c4` are the number of output channels for each branch
+    # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4):
         super().__init__()
         self.b1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')

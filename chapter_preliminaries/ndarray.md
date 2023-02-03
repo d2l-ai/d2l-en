@@ -406,7 +406,7 @@ X_var
 
 ```{.python .input}
 %%tab jax
-# JAX arrays are immutable. `jax.numpy.ndarray.at` index
+# JAX arrays are immutable. jax.numpy.ndarray.at index
 # update operators create a new array with the corresponding
 # modifications made
 X_new_1 = X.at[1, 2].set(17)

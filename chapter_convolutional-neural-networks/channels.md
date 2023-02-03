@@ -154,8 +154,8 @@ to [**calculate the output of multiple channels**] as shown below.
 ```{.python .input}
 %%tab all
 def corr2d_multi_in_out(X, K):
-    # Iterate through the 0th dimension of `K`, and each time, perform
-    # cross-correlation operations with input `X`. All of the results are
+    # Iterate through the 0th dimension of K, and each time, perform
+    # cross-correlation operations with input X. All of the results are
     # stacked together
     return d2l.stack([corr2d_multi_in(X, k) for k in K], 0)
 ```

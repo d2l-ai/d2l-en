@@ -450,7 +450,7 @@ class WeightDecay(d2l.LinearRegression):
     wd: int = 0
     
     def configure_optimizers(self):
-        # Weight Decay is not available directly within `optax.sgd`, but
+        # Weight Decay is not available directly within optax.sgd, but
         # optax allows chaining several transformations together
         return optax.chain(optax.additive_weight_decay(self.wd),
                            optax.sgd(self.lr))
