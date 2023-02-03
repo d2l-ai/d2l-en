@@ -334,15 +334,22 @@ GPT-3 performs better with larger model size,
 where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`).
 
 Large language models offer an exciting prospect
-of formulating text input to induce models to perform desired task via in-context learning,
+of formulating text input to induce models to perform desired tasks via in-context learning,
 which is also known as *prompting*.
 For example,
-*chain-of-thought prompting* :cite:`wei2022chain,zhang2023automatic`,
+*chain-of-thought prompting* :cite:`wei2022chain`,
 an in-context learning method
 with few-shot "question, intermediate reasoning steps, answer" demonstrations,
 elicit the complex reasoning capabilities of
 large language models
 to solve mathematical, commonsense, and symbolic reasoning tasks.
+Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
+and reducing complex problems to sub-problems :cite:`zhou2023least`
+can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
+large language models can even perform *zero-shot*
+chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
+Even for multimodal inputs consisting of both text and images,
+language models can perform multimodal chain-of-thought reasoning with further improved accuracy than using text input only :cite:`zhang2023multicot`.
 
 
 
