@@ -121,10 +121,10 @@ pip install mxnet==1.7.0.post1
 
 :begin_tab:`pytorch`
 
-You can install PyTorch with either CPU or GPU support as follows:
+You can install PyTorch (the specified versions are tested at the time of writing) with either CPU or GPU support as follows:
 
 ```bash
-pip install torch torchvision
+pip install torch==1.12.0 torchvision==0.13.0
 ```
 
 
