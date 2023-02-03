@@ -340,7 +340,7 @@ For example,
 *chain-of-thought prompting* :cite:`wei2022chain`,
 an in-context learning method
 with few-shot "question, intermediate reasoning steps, answer" demonstrations,
-elicit the complex reasoning capabilities of
+elicits the complex reasoning capabilities of
 large language models
 to solve mathematical, commonsense, and symbolic reasoning tasks.
 Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
