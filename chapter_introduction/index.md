@@ -1105,7 +1105,7 @@ The fields concerned with *causality* and
 *probabilistic graphical models* tackle such questions.
 * Another important and exciting recent development in unsupervised learning
 is the advent of deep generative models.
-These models estimate the density of the data $p(\mathbf{x})$,
+These models estimate the density of the data,
 either explicitly or *implicitly*.
 Once trained, we can use a generative model
 either to score examples according to how likely they are,
