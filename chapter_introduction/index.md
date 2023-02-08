@@ -1113,7 +1113,7 @@ or to sample synthetic examples from the learned distribution.
 Early deep learning breakthroughs in generative modeling
 came with the invention of *variational autoencoders* :cite:`Kingma.Welling.2014,rezende2014stochastic`
 and continued with the development of *generative adversarial networks* :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
-More recent advances include normalizing flows :cite:`rezende2015variational` and
+More recent advances include normalizing flows :cite:`dinh2014nice,dinh2017density` and
 diffusion models :cite:`sohl2015deep,song2019generative,ho2020denoising,song2021score`.
 
 
