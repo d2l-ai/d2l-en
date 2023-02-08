@@ -71,6 +71,12 @@ def _pagenumbering(lines):
         if chapintro_i > 0:
             lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
 
+# E.g., \chapter{Builders’ Guide} -> \chapter{Builders' Guide}
+def _replace_quote_in_chapter_title(lines):
+    for i, l in enumerate(lines):
+        if l.startswith('\\chapter{'):
+            lines[i] = lines[i].replace('’', '\'')
+
 
 # Remove date
 def _edit_titlepage(pdf_dir):
@@ -146,6 +152,7 @@ def main():
     #lines = _delete_discussions_title(lines)
     _protect_hyperlink_in_caption(lines)
     _pagenumbering(lines)
+    _replace_quote_in_chapter_title(lines)
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
