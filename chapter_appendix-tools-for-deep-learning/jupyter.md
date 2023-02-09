@@ -1,6 +1,7 @@
 # Using Jupyter Notebooks
 :label:`sec_jupyter`
 
+
 This section describes how to edit and run the code
 in each section of this book
 using the Jupyter Notebook. Make sure you have

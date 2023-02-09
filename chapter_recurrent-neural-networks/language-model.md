@@ -1,7 +1,6 @@
 # Language Models
 :label:`sec_language-model`
 
-
 In :numref:`sec_text-sequence`, we see how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 The goal of *language models*
 is to estimate the joint probability of the whole sequence:
