@@ -387,7 +387,7 @@ so that [**the output tensor also has the same shape after the addition operatio
 add_norm = AddNorm(0.5)
 add_norm.initialize()
 shape = (2, 3, 4)
-d2l.check_shape(add_norm(d2l.ones(shape), d2l.ones(shape), shape)
+d2l.check_shape(add_norm(d2l.ones(shape), d2l.ones(shape)), shape)
 ```
 
 ```{.python .input}
