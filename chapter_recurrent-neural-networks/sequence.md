@@ -3,7 +3,7 @@
 
 
 
-Up until now, we've focused on models whose inputs
+Up until now, we have focused on models whose inputs
 consisted of a single feature vector $\mathbf{x} \in \mathbb{R}^d$.
 The main change of perspective when developing models
 capable of processing sequences is that we now

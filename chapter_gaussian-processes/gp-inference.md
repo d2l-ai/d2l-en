@@ -118,7 +118,7 @@ mean = np.zeros(test_x.shape[0])
 cov = d2l.rbfkernel(test_x, test_x, ls=0.2)
 ```
 
-We've started with a length-scale of 0.2. Before we fit the data, it is important to consider whether we've specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
+We have started with a length-scale of 0.2. Before we fit the data, it is important to consider whether we have specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
 
 ```{.python .input}
 prior_samples = np.random.multivariate_normal(mean=mean, cov=cov, size=5)

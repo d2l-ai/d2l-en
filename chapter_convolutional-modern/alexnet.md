@@ -153,7 +153,7 @@ at a greater scale than academics had previously considered. The largest vision 
 ### Missing Ingredient: Hardware
 
 Deep learning models are voracious consumers of compute cycles.
-Training can take hundreds of epochs, and each iteration
+Model training can take hundreds of epochs, and each iteration
 requires passing data through many layers of computationally-expensive
 linear algebra operations.
 This is one of the main reasons why in the 1990s and early 2000s,

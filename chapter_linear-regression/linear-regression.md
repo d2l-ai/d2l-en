@@ -492,7 +492,7 @@ reducing the potential for errors and increasing portability of the code.
 ## The Normal Distribution and Squared Loss
 :label:`subsec_normal_distribution_and_squared_loss`
 
-So far we've given a fairly functional motivation
+So far we have given a fairly functional motivation
 of the squared loss objective:
 the optimal parameters return the conditional expectation $E[Y\mid X]$
 whenever the underlying pattern is truly linear,

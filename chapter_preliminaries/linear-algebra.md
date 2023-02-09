@@ -816,7 +816,7 @@ A.shape, x.shape, jnp.matmul(A, x)
 
 ## Matrix-Matrix Multiplication
 
-If you've gotten the hang of dot products and matrix-vector products,
+If you have gotten the hang of dot products and matrix-vector products,
 then *matrix-matrix multiplication* should be straightforward.
 
 Say that we have two matrices 

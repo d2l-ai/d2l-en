@@ -195,7 +195,7 @@ def get_dataloader(self, train):
                 self.batch_size).map(resize_fn).shuffle(shuffle_buf))
 ```
 
-To see how this works, let's load a minibatch of images by invoking the newly-added `train_dataloader` method. It contains 64 images.
+To see how this works, let's load a minibatch of images by invoking the `train_dataloader` method. It contains 64 images.
 
 ```{.python .input}
 %%tab all

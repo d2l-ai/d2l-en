@@ -637,7 +637,7 @@ since it is impossible to compute the gradient a priori.
 
 ## Discussion
 
-You've now gotten a taste of the power of automatic differentiation. 
+You have now gotten a taste of the power of automatic differentiation. 
 The development of libraries for calculating derivatives
 both automatically and efficiently 
 has been a massive productivity booster

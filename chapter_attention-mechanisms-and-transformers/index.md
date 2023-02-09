@@ -41,9 +41,9 @@ is to grab a large Transformer-based pretrained model,
 adapting the output layers as necessary, 
 and fine-tuning the model on the available 
 data for the downstream task. 
-If you've been paying attention to the last few years
+If you have been paying attention to the last few years
 of breathless news coverage centered on OpenAI's
-large language models, then you've been tracking a conversation 
+large language models, then you have been tracking a conversation 
 centered on the GPT-2 and GPT-3 Transformer-based models :cite:`Radford.Wu.Child.ea.2019,brown2020language`.
 Meanwhile, the vision Transformer has emerged 
 as a default model for diverse vision tasks,
