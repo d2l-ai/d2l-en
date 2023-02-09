@@ -426,9 +426,9 @@ if tab.selected('jax'):
     _, (dec_attention_weights, _) = model.predict_step(
         trainer.state.params, data.build([engs[-1]], [fras[-1]]),
         data.num_steps, True)
-attention_weights = d2l.reshape(
-    d2l.concat([step[0][0][0] for step in dec_attention_weights], 0),
-    (1, 1, -1, data.num_steps))
+attention_weights = d2l.concat(
+    [step[0][0][0] for step in dec_attention_weights], 0)
+attention_weights = d2l.reshape(attention_weights, (1, 1, -1, data.num_steps))
 ```
 
 ```{.python .input}

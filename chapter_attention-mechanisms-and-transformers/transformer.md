@@ -386,29 +386,33 @@ so that [**the output tensor also has the same shape after the addition operatio
 %%tab mxnet
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-d2l.check_shape(add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))), (2, 3, 4))
+shape = (2, 3, 4)
+d2l.check_shape(add_norm(d2l.ones(shape), d2l.ones(shape), shape)
 ```
 
 ```{.python .input}
 %%tab pytorch
 add_norm = AddNorm(4, 0.5)
-d2l.check_shape(add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))), (2, 3, 4))
+shape = (2, 3, 4)
+d2l.check_shape(add_norm(d2l.ones(shape), d2l.ones(shape)), shape)
 ```
 
 ```{.python .input}
 %%tab tensorflow
 # Normalized_shape is: [i for i in range(len(input.shape))][1:]
 add_norm = AddNorm([1, 2], 0.5)
-d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
-                         training=False), (2, 3, 4))
+shape = (2, 3, 4)
+d2l.check_shape(add_norm(tf.ones(shape), tf.ones(shape), training=False),
+                shape)
 ```
 
 ```{.python .input}
 %%tab jax
 add_norm = AddNorm(0.5)
-output, _ = add_norm.init_with_output(d2l.get_key(), d2l.ones((2, 3, 4)),
-                                      d2l.ones((2, 3, 4)))
-d2l.check_shape(output, (2, 3, 4))
+shape = (2, 3, 4)
+output, _ = add_norm.init_with_output(d2l.get_key(), d2l.ones(shape),
+                                      d2l.ones(shape))
+d2l.check_shape(output, shape)
 ```
 
 ## Encoder

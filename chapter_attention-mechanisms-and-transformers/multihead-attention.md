@@ -415,7 +415,8 @@ attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 
 ```{.python .input}
 %%tab mxnet, pytorch
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 d2l.check_shape(attention(X, Y, Y, valid_lens),
@@ -424,7 +425,8 @@ d2l.check_shape(attention(X, Y, Y, valid_lens),
 
 ```{.python .input}
 %%tab tensorflow
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
 Y = tf.ones((batch_size, num_kvpairs, num_hiddens))
 d2l.check_shape(attention(X, Y, Y, valid_lens, training=False),
@@ -433,7 +435,8 @@ d2l.check_shape(attention(X, Y, Y, valid_lens, training=False),
 
 ```{.python .input}
 %%tab jax
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 d2l.check_shape(attention.init_with_output(d2l.get_key(), X, Y, Y, valid_lens,
