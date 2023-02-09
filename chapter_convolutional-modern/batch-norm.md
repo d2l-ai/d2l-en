@@ -14,6 +14,37 @@ Together with residual blocks---covered later in :numref:`sec_resnet`---batch no
 has made it possible for practitioners to routinely train networks with over 100 layers.
 A secondary (serendipitous) benefit of batch normalization lies in its inherent regularization.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import autograd, np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from functools import partial
+from jax import numpy as jnp
+import jax
+import optax
+```
+
 ## Training Deep Networks
 
 When working with data, we often preprocess before training.
@@ -244,11 +275,6 @@ To see how batch normalization works in practice, we implement one from scratch 
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import autograd, np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     # Use autograd to determine whether we are in training mode
     if not autograd.is_training():
@@ -279,10 +305,6 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     # Use is_grad_enabled to determine whether we are in training mode
     if not torch.is_grad_enabled():
@@ -313,9 +335,6 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
     # Compute reciprocal of square root of the moving variance elementwise
     inv = tf.cast(tf.math.rsqrt(moving_var + eps), X.dtype)
@@ -327,13 +346,6 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from functools import partial
-from jax import numpy as jnp
-import jax
-import optax
-
 def batch_norm(X, deterministic, gamma, beta, moving_mean, moving_var, eps,
                momentum):
     # Use `deterministic` to determine whether the current mode is training

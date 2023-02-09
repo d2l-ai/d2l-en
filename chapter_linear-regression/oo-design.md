@@ -210,17 +210,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             x = self.trainer.epoch + 1
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
-        if tab.selected('mxnet', 'tensorflow'):
-            self.board.draw(x, d2l.numpy(value), (
-                'train_' if train else 'val_') + key, every_n=int(n))
-        if tab.selected('pytorch'):
-            self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
-                            ('train_' if train else 'val_') + key,
-                            every_n=int(n))
-        if tab.selected('jax'):
-            self.board.draw(x, d2l.to(value, d2l.cpu()),
-                            ('train_' if train else 'val_') + key,
-                            every_n=int(n))
+        self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
+                        ('train_' if train else 'val_') + key,
+                        every_n=int(n))
 
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])

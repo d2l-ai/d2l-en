@@ -32,6 +32,35 @@ is a single network instance. EfficientNets are a notable outcome of this search
 
 In the following we discuss an idea that is quite different to the quest for the *single best network*. It is computationally relatively inexpensive, it leads to scientific insights on the way, and it is quite effective in terms of the quality of outcomes. Let's review the strategy by :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` to *design network design spaces*. The strategy combines the strength of manual design and NAS. It accomplishes this by operating on *distributions of networks* and optimizing the distributions in a way to obtain good performance for entire families of networks. The outcome of it are *RegNets*, specifically RegNetX and RegNetY, plus a range of guiding principles for the design of performant CNNs. 
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+```
+
 ## The AnyNet Design Space
 :label:`subsec_the-anynet-design-space`
 
@@ -55,11 +84,6 @@ In total this adds up to 17 parameters, resulting in an unreasonably large numbe
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         net = nn.Sequential()
@@ -70,11 +94,6 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return nn.Sequential(
@@ -84,9 +103,6 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return tf.keras.models.Sequential([
@@ -98,9 +114,6 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-
 class AnyNet(d2l.Classifier):
     arch: tuple
     stem_channels: int

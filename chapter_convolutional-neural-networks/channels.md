@@ -23,6 +23,32 @@ channels is as old as CNNs themselves. For instance LeNet5 :cite:`LeCun.Jackel.B
 In this section, we will take a deeper look
 at convolution kernels with multiple input and multiple output channels.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 ## Multiple Input Channels
 
 When the input data contains multiple channels,
@@ -64,26 +90,6 @@ Notice that all we are doing is performing a cross-correlation operation
 per channel and then adding up the results.
 
 ```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-```
-
-```{.python .input}
 %%tab mxnet, pytorch, jax
 def corr2d_multi_in(X, K):
     # Iterate through the 0th dimension (channel) of K first, then add them up
@@ -92,9 +98,6 @@ def corr2d_multi_in(X, K):
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 def corr2d_multi_in(X, K):
     # Iterate through the 0th dimension (channel) of K first, then add them up
     return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)
@@ -247,22 +250,24 @@ Let's check this with some sample data.
 %%tab mxnet, pytorch
 X = d2l.normal(0, 1, (3, 3, 3))
 K = d2l.normal(0, 1, (2, 3, 1, 1))
+Y1 = corr2d_multi_in_out_1x1(X, K)
+Y2 = corr2d_multi_in_out(X, K)
+assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 ```
 
 ```{.python .input}
 %%tab tensorflow
 X = d2l.normal((3, 3, 3), 0, 1)
 K = d2l.normal((2, 3, 1, 1), 0, 1)
+Y1 = corr2d_multi_in_out_1x1(X, K)
+Y2 = corr2d_multi_in_out(X, K)
+assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 ```
 
 ```{.python .input}
 %%tab jax
 X = jax.random.normal(jax.random.PRNGKey(d2l.get_seed()), (3, 3, 3)) + 0 * 1
 K = jax.random.normal(jax.random.PRNGKey(d2l.get_seed()), (2, 3, 1, 1)) + 0 * 1
-```
-
-```{.python .input}
-%%tab all
 Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
 assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6

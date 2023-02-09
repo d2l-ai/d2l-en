@@ -208,6 +208,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
                         ('train_' if train else 'val_') + key,
                         every_n=int(n))
+
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)
@@ -578,7 +579,9 @@ class LeNet(d2l.Classifier):
             nn.LazyLinear(num_classes))
 
 class Residual(nn.Module):
-    """The Residual block of ResNet models."""
+    """The Residual block of ResNet models.
+
+    Defined in :numref:`sec_resnet`"""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1,
@@ -657,7 +660,7 @@ class TimeMachine(d2l.DataModule):
         return corpus, vocab
 
     def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
-        """Defined in :numref:`subsec_perplexity`"""
+        """Defined in :numref:`sec_language-model`"""
         super(d2l.TimeMachine, self).__init__()
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
@@ -921,7 +924,9 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
     d2l.plt.legend(legend)
 
 class Encoder(nn.Module):
-    """The base encoder interface for the encoder-decoder architecture."""
+    """The base encoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self):
         super().__init__()
 

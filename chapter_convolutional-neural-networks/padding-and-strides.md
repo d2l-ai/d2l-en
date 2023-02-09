@@ -35,6 +35,32 @@ In other cases, we may want to reduce the dimensionality drastically,
 e.g., if we find the original input resolution to be unwieldy.
 *Strided convolutions* are a popular technique that can help in these instances.
 
+```{.python .input}
+%%tab mxnet
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
@@ -109,10 +135,6 @@ we find that the height and width of the output is also 8.
 
 ```{.python .input}
 %%tab mxnet
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 # We define a helper function to calculate convolutions. It initializes 
 # the convolutional layer weights and performs corresponding dimensionality 
 # elevations and reductions on the input and output
@@ -132,9 +154,6 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab pytorch
-import torch
-from torch import nn
-
 # We define a helper function to calculate convolutions. It initializes the
 # convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output
@@ -154,8 +173,6 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 # We define a helper function to calculate convolutions. It initializes
 # the convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output
@@ -174,11 +191,6 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 # We define a helper function to calculate convolutions. It initializes
 # the convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output

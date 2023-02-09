@@ -16,7 +16,26 @@ to the most essential concepts,
 starting from scalar arithmetic
 and ramping up to matrix multiplication.
 
+```{.python .input}
+%%tab mxnet
+from mxnet import np, npx
+npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+```
 
 ## Scalars
 
@@ -58,9 +77,6 @@ division, and exponentiation operations.
 
 ```{.python .input}
 %%tab mxnet
-from mxnet import np, npx
-npx.set_np()
-
 x = np.array(3.0)
 y = np.array(2.0)
 
@@ -69,8 +85,6 @@ x + y, x * y, x / y, x ** y
 
 ```{.python .input}
 %%tab pytorch
-import torch
-
 x = torch.tensor(3.0)
 y = torch.tensor(2.0)
 
@@ -79,8 +93,6 @@ x + y, x * y, x / y, x**y
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 x = tf.constant(3.0)
 y = tf.constant(2.0)
 
@@ -89,8 +101,6 @@ x + y, x * y, x / y, x**y
 
 ```{.python .input}
 %%tab jax
-from jax import numpy as jnp
-
 x = jnp.array(3.0)
 y = jnp.array(2.0)
 

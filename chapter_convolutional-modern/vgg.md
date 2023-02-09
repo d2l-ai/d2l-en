@@ -31,6 +31,34 @@ in their eponymously-named *VGG* network :cite:`Simonyan.Zisserman.2014`.
 It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+```
+
 ## (**VGG Blocks**)
 :label:`subsec_vgg-blocks`
 
@@ -68,11 +96,6 @@ and the number of output channels `num_channels`.
 
 ```{.python .input  n=2}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 def vgg_block(num_convs, num_channels):
     blk = nn.Sequential()
     for _ in range(num_convs):
@@ -84,10 +107,6 @@ def vgg_block(num_convs, num_channels):
 
 ```{.python .input  n=3}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-
 def vgg_block(num_convs, out_channels):
     layers = []
     for _ in range(num_convs):
@@ -99,9 +118,6 @@ def vgg_block(num_convs, out_channels):
 
 ```{.python .input  n=4}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 def vgg_block(num_convs, num_channels):
     blk = tf.keras.models.Sequential()
     for _ in range(num_convs):
@@ -114,10 +130,6 @@ def vgg_block(num_convs, num_channels):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-
 def vgg_block(num_convs, out_channels):
     layers = []
     for _ in range(num_convs):

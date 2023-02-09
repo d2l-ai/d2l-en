@@ -22,6 +22,35 @@ which is easily resolved through a language model that rejects the second transl
 Likewise, in a document summarization algorithm
 it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
 
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
+```{.python .input  n=2}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+npx.set_np()
+```
+
+```{.python .input  n=3}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+```
+
+```{.python .input  n=4}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
+```
 
 ## Learning Language Models
 
@@ -184,36 +213,6 @@ Perplexity can be best understood as the geometric mean of the number of real ch
 * In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
 * In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
 * At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
-
-```{.python .input  n=1}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
-```{.python .input  n=2}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-npx.set_np()
-```
-
-```{.python .input  n=3}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-```
-
-```{.python .input  n=4}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from jax import numpy as jnp
-```
 
 ## Partitioning Sequences
 :label:`subsec_partitioning-seqs`

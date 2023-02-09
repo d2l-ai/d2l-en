@@ -10,6 +10,35 @@ As we design increasingly deeper networks it becomes imperative to understand ho
 Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different.
 To make some progress we need a bit of mathematics.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+```
 
 ## Function Classes
 
@@ -101,11 +130,6 @@ This kind of design requires that the output of the two convolutional layers has
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 class Residual(nn.Block):  #@save
     """The Residual block of ResNet models."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
@@ -131,11 +155,6 @@ class Residual(nn.Block):  #@save
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 class Residual(nn.Module):  #@save
     """The Residual block of ResNet models."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
@@ -162,9 +181,6 @@ class Residual(nn.Module):  #@save
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 class Residual(tf.keras.Model):  #@save
     """The Residual block of ResNet models."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
@@ -191,11 +207,6 @@ class Residual(tf.keras.Model):  #@save
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-
 class Residual(nn.Module):  #@save
     """The Residual block of ResNet models."""
     num_channels: int

@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Custom Layers
 
 One factor behind deep learning's success
@@ -15,6 +20,38 @@ a layer that does not exist yet in the deep learning framework.
 In these cases, you must build a custom layer.
 In this section, we show you how.
 
+
+
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## (**Layers without Parameters**)
 
 To start, we construct a custom layer
@@ -27,17 +64,7 @@ To build it, we simply need to inherit
 from the base layer class and implement the forward propagation function.
 
 ```{.python .input}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
-```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 class CenteredLayer(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -48,11 +75,6 @@ class CenteredLayer(nn.Block):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 class CenteredLayer(nn.Module):
     def __init__(self):
         super().__init__()
@@ -63,9 +85,6 @@ class CenteredLayer(nn.Module):
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 class CenteredLayer(tf.keras.Model):
     def __init__(self):
         super().__init__()
@@ -76,11 +95,6 @@ class CenteredLayer(tf.keras.Model):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 class CenteredLayer(nn.Module):
     def __call__(self, X):
         return X - X.mean()

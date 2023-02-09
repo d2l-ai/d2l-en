@@ -24,6 +24,39 @@ the comparatively rich class of models
 with which this book is primarily concerned.
 
 
+
+
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import autograd, np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+```
+
 ## Hidden Layers
 
 We described affine transformations in
@@ -273,37 +306,6 @@ They are differentiable operators to transform input signals to outputs,
 while most of them add non-linearity.
 Because activation functions are fundamental to deep learning,
 (**let's briefly survey some common activation functions**).
-
-```{.python .input}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import autograd, np, npx
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-from jax import grad, vmap
-```
 
 ### ReLU Function
 

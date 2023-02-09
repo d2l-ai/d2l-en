@@ -502,7 +502,9 @@ def try_all_gpus():
     return [gpu(i) for i in range(num_gpus())]
 
 def corr2d(X, K):
-    """Compute 2D cross-correlation."""
+    """Compute 2D cross-correlation.
+
+    Defined in :numref:`sec_conv_layer`"""
     h, w = K.shape
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
@@ -531,7 +533,9 @@ class LeNet(d2l.Classifier):
             tf.keras.layers.Dense(num_classes)])
 
 class Residual(tf.keras.Model):
-    """The Residual block of ResNet models."""
+    """The Residual block of ResNet models.
+
+    Defined in :numref:`sec_resnet`"""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = tf.keras.layers.Conv2D(num_channels, padding='same',
@@ -610,7 +614,7 @@ class TimeMachine(d2l.DataModule):
         return corpus, vocab
 
     def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
-        """Defined in :numref:`subsec_perplexity`"""
+        """Defined in :numref:`sec_language-model`"""
         super(d2l.TimeMachine, self).__init__()
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
@@ -882,7 +886,9 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
     d2l.plt.legend(legend)
 
 class Encoder(tf.keras.layers.Layer):
-    """The base encoder interface for the encoder-decoder architecture."""
+    """The base encoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self):
         super().__init__()
 

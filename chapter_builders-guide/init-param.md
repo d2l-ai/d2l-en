@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Parameter Initialization
 
 Now that we know how to access the parameters,
@@ -7,6 +12,34 @@ The deep learning framework provides default random initializations to its layer
 However, we often want to initialize our weights
 according to various other protocols. The framework provides most commonly
 used protocols, and also allows to create a custom initializer.
+
+
+
+```{.python .input}
+%%tab mxnet
+from mxnet import init, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
 
 :begin_tab:`mxnet`
 By default, MXNet initializes weight parameters by randomly drawing from a uniform distribution $U(-0.07, 0.07)$,
@@ -38,16 +71,7 @@ of preset initialization methods.
 :end_tab:
 
 ```{.python .input}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
-```{.python .input}
 %%tab mxnet
-from mxnet import init, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 net = nn.Sequential()
 net.add(nn.Dense(8, activation='relu'))
 net.add(nn.Dense(1))
@@ -59,9 +83,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab pytorch
-import torch
-from torch import nn
-
 net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(), nn.LazyLinear(1))
 X = torch.rand(size=(2, 4))
 net(X).shape
@@ -69,8 +90,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(4, activation=tf.nn.relu),
@@ -83,11 +102,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 net = nn.Sequential([nn.Dense(8), nn.relu, nn.Dense(1)])
 X = jax.random.uniform(d2l.get_key(), (2, 4))
 params = net.init(d2l.get_key(), X)

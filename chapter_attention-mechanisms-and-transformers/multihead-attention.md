@@ -45,8 +45,36 @@ describes multi-head attention.
 ![Multi-head attention, where multiple heads are concatenated then linearly transformed.](../img/multi-head-attention.svg)
 :label:`fig_multi-head-attention`
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+import math
+from mxnet import autograd, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import math
+import torch
+from torch import nn
+```
 
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+```
 
 ## Model
 
@@ -81,37 +109,6 @@ Based on this design, each head may attend
 to different parts of the input.
 More sophisticated functions 
 than the simple weighted average can be expressed.
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-import math
-from mxnet import autograd, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import math
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-```
 
 ## Implementation
 

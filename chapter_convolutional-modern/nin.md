@@ -31,6 +31,34 @@ local nonlinearities across the channel activations and (ii) use global average 
 across all locations in the last representation layer. Note that global average pooling would not
 be effective, were it not for the added nonlinearities. Let's dive into this in detail.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
 
 ## (**NiN Blocks**)
 
@@ -54,11 +82,6 @@ Note both the difference in the NiN blocks (the initial convolution is followed 
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 def nin_block(num_channels, kernel_size, strides, padding):
     blk = nn.Sequential()
     blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding,
@@ -70,10 +93,6 @@ def nin_block(num_channels, kernel_size, strides, padding):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-
 def nin_block(out_channels, kernel_size, strides, padding):
     return nn.Sequential(
         nn.LazyConv2d(out_channels, kernel_size, strides, padding), nn.ReLU(),
@@ -83,9 +102,6 @@ def nin_block(out_channels, kernel_size, strides, padding):
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 def nin_block(out_channels, kernel_size, strides, padding):
     return tf.keras.models.Sequential([
     tf.keras.layers.Conv2D(out_channels, kernel_size, strides=strides,
@@ -99,11 +115,6 @@ def nin_block(out_channels, kernel_size, strides, padding):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 def nin_block(out_channels, kernel_size, strides, padding):
     return nn.Sequential([
         nn.Conv(out_channels, kernel_size, strides, padding),

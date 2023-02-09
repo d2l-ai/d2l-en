@@ -32,24 +32,6 @@ the model aligns (or attends)
 only to parts of the input sequence
 that are deemed relevant to the current prediction. This is then used to update the current state before generating the next token. While quite innocuous in its description, this *Bahdanau attention mechanism* has arguably turned into one of the most influential ideas of the past decade in deep learning, giving rise to Transformers :cite:`Vaswani.Shazeer.Parmar.ea.2017` and many related new architectures.
 
-## Model
-
-We follow the notation introduced by the seq2seq architecture of :numref:`sec_seq2seq`, in particular :eqref:`eq_seq2seq_s_t`.
-The key idea is that instead of keeping the state,
-i.e., the context variable $\mathbf{c}$ summarizing the source sentence as fixed, we dynamically update it, as a function of both the original text (encoder hidden states $\mathbf{h}_{t}$) and the text that was already generated (decoder hidden states $\mathbf{s}_{t'-1}$). This yields $\mathbf{c}_{t'}$, which is updated after any decoding time step $t'$. Suppose that the input sequence is of length $T$. In this case the context variable is the output of attention pooling:
-
-$$\mathbf{c}_{t'} = \sum_{t=1}^{T} \alpha(\mathbf{s}_{t' - 1}, \mathbf{h}_{t}) \mathbf{h}_{t}.$$
-
-We used $\mathbf{s}_{t' - 1}$ as the query, and
-$\mathbf{h}_{t}$ as both the key and the value. Note that $\mathbf{c}_{t'}$ is then used to generate the state $\mathbf{s}_{t'}$ and to generate a new token (see :eqref:`eq_seq2seq_s_t`). In particular, the attention weight $\alpha$ is computed as in :eqref:`eq_attn-scoring-alpha`
-using the additive attention scoring function
-defined by :eqref:`eq_additive-attn`.
-This RNN encoder-decoder architecture
-using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition.
-
-![Layers in an RNN encoder-decoder model with the Bahdanau attention mechanism.](../img/seq2seq-details-attention.svg)
-:label:`fig_s2s_attention_details`
-
 ```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
@@ -78,6 +60,24 @@ from flax import linen as nn
 from jax import numpy as jnp
 import jax
 ```
+
+## Model
+
+We follow the notation introduced by the seq2seq architecture of :numref:`sec_seq2seq`, in particular :eqref:`eq_seq2seq_s_t`.
+The key idea is that instead of keeping the state,
+i.e., the context variable $\mathbf{c}$ summarizing the source sentence as fixed, we dynamically update it, as a function of both the original text (encoder hidden states $\mathbf{h}_{t}$) and the text that was already generated (decoder hidden states $\mathbf{s}_{t'-1}$). This yields $\mathbf{c}_{t'}$, which is updated after any decoding time step $t'$. Suppose that the input sequence is of length $T$. In this case the context variable is the output of attention pooling:
+
+$$\mathbf{c}_{t'} = \sum_{t=1}^{T} \alpha(\mathbf{s}_{t' - 1}, \mathbf{h}_{t}) \mathbf{h}_{t}.$$
+
+We used $\mathbf{s}_{t' - 1}$ as the query, and
+$\mathbf{h}_{t}$ as both the key and the value. Note that $\mathbf{c}_{t'}$ is then used to generate the state $\mathbf{s}_{t'}$ and to generate a new token (see :eqref:`eq_seq2seq_s_t`). In particular, the attention weight $\alpha$ is computed as in :eqref:`eq_attn-scoring-alpha`
+using the additive attention scoring function
+defined by :eqref:`eq_additive-attn`.
+This RNN encoder-decoder architecture
+using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition.
+
+![Layers in an RNN encoder-decoder model with the Bahdanau attention mechanism.](../img/seq2seq-details-attention.svg)
+:label:`fig_s2s_attention_details`
 
 ## Defining the Decoder with Attention
 

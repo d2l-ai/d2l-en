@@ -66,6 +66,35 @@ that a slightly bigger or cleaner dataset
 or a slightly improved feature-extraction pipeline
 mattered far more to the final accuracy than any learning algorithm.
 
+```{.python .input  n=2}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, init, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input  n=3}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input  n=4}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## Representation Learning
 
 Another way to cast the state of affairs is that
@@ -292,35 +321,6 @@ added a great deal of image augmentation,
 such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
 We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :citet:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
-
-```{.python .input  n=2}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, init, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input  n=3}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input  n=4}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
 
 ```{.python .input  n=5}
 %%tab pytorch, mxnet, tensorflow

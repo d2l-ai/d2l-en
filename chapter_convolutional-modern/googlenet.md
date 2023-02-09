@@ -16,6 +16,35 @@ convolution kernels in an ingenious way. While other works tried to identify whi
 In what follows we introduce a slightly simplified version of GoogLeNet: the original design included a number of tricks to stabilize training through intermediate loss functions, applied to multiple layers of the network. 
 They are no longer necessary due to the availability of improved training algorithms. 
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+```
 
 ## (**Inception Blocks**)
 
@@ -43,11 +72,6 @@ are the number of output channels per layer, i.e., how to allocate capacity amon
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 class Inception(nn.Block):
     # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4, **kwargs):
@@ -76,11 +100,6 @@ class Inception(nn.Block):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 class Inception(nn.Module):
     # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4, **kwargs):
@@ -107,9 +126,6 @@ class Inception(nn.Module):
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 class Inception(tf.keras.Model):
     # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4):
@@ -134,11 +150,6 @@ class Inception(tf.keras.Model):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-
 class Inception(nn.Module):
     # `c1`--`c4` are the number of output channels for each branch
     c1: int

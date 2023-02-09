@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # File I/O
 
 So far we discussed how to process data and how
@@ -14,27 +19,13 @@ Thus it is time to learn how to load and store
 both individual weight vectors and entire models.
 This section addresses both issues.
 
-## (**Loading and Saving Tensors**)
 
-For individual tensors, we can directly
-invoke the `load` and `save` functions
-to read and write them respectively.
-Both functions require that we supply a name,
-and `save` requires as input the variable to be saved.
-
-```{.python .input}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
 
 ```{.python .input}
 %%tab mxnet
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-x = np.arange(4)
-npx.save('x-file', x)
 ```
 
 ```{.python .input}
@@ -42,18 +33,12 @@ npx.save('x-file', x)
 import torch
 from torch import nn
 from torch.nn import functional as F
-
-x = torch.arange(4)
-torch.save(x, 'x-file')
 ```
 
 ```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 import numpy as np
-
-x = tf.range(4)
-np.save('x-file.npy', x)
 ```
 
 ```{.python .input}
@@ -64,7 +49,36 @@ from flax import linen as nn
 from flax.training import checkpoints
 import jax
 from jax import numpy as jnp
+```
 
+## (**Loading and Saving Tensors**)
+
+For individual tensors, we can directly
+invoke the `load` and `save` functions
+to read and write them respectively.
+Both functions require that we supply a name,
+and `save` requires as input the variable to be saved.
+
+```{.python .input}
+%%tab mxnet
+x = np.arange(4)
+npx.save('x-file', x)
+```
+
+```{.python .input}
+%%tab pytorch
+x = torch.arange(4)
+torch.save(x, 'x-file')
+```
+
+```{.python .input}
+%%tab tensorflow
+x = tf.range(4)
+np.save('x-file.npy', x)
+```
+
+```{.python .input}
+%%tab jax
 x = jnp.arange(4)
 jnp.save('x-file.npy', x)
 ```

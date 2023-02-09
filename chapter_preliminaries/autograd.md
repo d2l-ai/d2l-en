@@ -45,6 +45,29 @@ Before exploring methods,
 let's first master the autograd package.
 
 
+
+
+```{.python .input}
+%%tab mxnet
+from mxnet import autograd, np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+```
+
 ## A Simple Function
 
 Let's assume that we are interested
@@ -55,33 +78,24 @@ To start, we assign `x` an initial value.
 
 ```{.python .input  n=1}
 %%tab mxnet
-from mxnet import autograd, np, npx
-npx.set_np()
-
 x = np.arange(4.0)
 x
 ```
 
 ```{.python .input  n=7}
 %%tab pytorch
-import torch
-
 x = torch.arange(4.0)
 x
 ```
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 x = tf.range(4, dtype=tf.float32)
 x
 ```
 
 ```{.python .input}
 %%tab jax
-from jax import numpy as jnp
-
 x = jnp.arange(4.0)
 x
 ```

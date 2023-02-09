@@ -72,47 +72,6 @@ is used
 to initiate the hidden state of the decoder
 only at the first decoding step.
 
-
-
-## Teacher Forcing
-
-While running the encoder on the input sequence
-is relatively straightforward,
-how to handle the input and output 
-of the decoder requires more care. 
-The most common approach is sometimes called *teacher forcing*.
-Here, the original target sequence (token labels)
-is fed into the decoder as input.
-More concretely,
-the special beginning-of-sequence token
-and the original target sequence,
-excluding the final token,
-are concatenated as input to the decoder,
-while the decoder output (labels for training) is
-the original target sequence,
-shifted by one token:
-"&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
-"Ils", "regardent", ".", "&lt;eos&gt;" (:numref:`fig_seq2seq`).
-
-Our implementation in
-:numref:`subsec_loading-seq-fixed-len`
-prepared training data for teacher forcing,
-where shifting tokens for self-supervised learning
-is similar to the training of language models in
-:numref:`sec_language-model`.
-An alternative approach is
-to feed the *predicted* token
-from the previous time step
-as the current input to the decoder.
-
-
-In the following, we explain the design 
-depicted in :numref:`fig_seq2seq`
-in greater detail.
-We will train this model for machine translation
-on the English-French dataset as introduced in
-:numref:`sec_machine_translation`.
-
 ```{.python .input}
 %%tab mxnet
 import collections
@@ -152,6 +111,45 @@ from jax import numpy as jnp
 import math
 import optax
 ```
+
+## Teacher Forcing
+
+While running the encoder on the input sequence
+is relatively straightforward,
+how to handle the input and output 
+of the decoder requires more care. 
+The most common approach is sometimes called *teacher forcing*.
+Here, the original target sequence (token labels)
+is fed into the decoder as input.
+More concretely,
+the special beginning-of-sequence token
+and the original target sequence,
+excluding the final token,
+are concatenated as input to the decoder,
+while the decoder output (labels for training) is
+the original target sequence,
+shifted by one token:
+"&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
+"Ils", "regardent", ".", "&lt;eos&gt;" (:numref:`fig_seq2seq`).
+
+Our implementation in
+:numref:`subsec_loading-seq-fixed-len`
+prepared training data for teacher forcing,
+where shifting tokens for self-supervised learning
+is similar to the training of language models in
+:numref:`sec_language-model`.
+An alternative approach is
+to feed the *predicted* token
+from the previous time step
+as the current input to the decoder.
+
+
+In the following, we explain the design 
+depicted in :numref:`fig_seq2seq`
+in greater detail.
+We will train this model for machine translation
+on the English-French dataset as introduced in
+:numref:`sec_machine_translation`.
 
 ## Encoder
 

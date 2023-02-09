@@ -46,6 +46,41 @@ and will be a key focus of other chapters.
 
 
 
+
+
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from matplotlib_inline import backend_inline
+from mxnet import np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+```
+
 ## Derivatives and Differentiation
 
 Put simply, a *derivative* is the rate of change
@@ -96,45 +131,24 @@ Let's develop some intuition with an example.
 
 ```{.python .input}
 %%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from matplotlib_inline import backend_inline
-from mxnet import np, npx
-npx.set_np()
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
 ```{.python .input}
 %%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-from matplotlib_inline import backend_inline
-import numpy as np
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
 ```{.python .input}
 %%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-from matplotlib_inline import backend_inline
-import numpy as np
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
 ```{.python .input}
 %%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-from matplotlib_inline import backend_inline
-import numpy as np
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```

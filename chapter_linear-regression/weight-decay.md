@@ -46,6 +46,39 @@ dramatically increase the complexity of our model.
 Thus we often need a more fine-grained tool
 for adjusting function complexity.
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import autograd, gluon, init, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+import optax
+```
+
 ## Norms and Weight Decay
 
 (**Rather than directly manipulating the number of parameters,
@@ -186,45 +219,10 @@ the idea of regularization through
 shrinking the size of weights
 still holds true.
 
-
-
 ## High-Dimensional Linear Regression
 
 We can illustrate the benefits of weight decay 
 through a simple synthetic example.
-
-```{.python .input}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import autograd, gluon, init, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-import optax
-```
 
 First, we [**generate some data as before**]:
 

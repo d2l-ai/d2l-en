@@ -38,6 +38,29 @@ which serve the dual purposes of
 mitigating the sensitivity of convolutional layers to location
 and of spatially downsampling representations.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## Maximum Pooling and Average Pooling
 
 Like convolutional layers, *pooling* operators
@@ -105,29 +128,6 @@ This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
 However, no kernel is needed, computing the output
 as either the maximum or the average of each region in the input.
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
 
 ```{.python .input}
 %%tab mxnet, pytorch

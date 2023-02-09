@@ -1,8 +1,6 @@
 # Working with Sequences
 :label:`sec_sequence`
 
-
-
 Up until now, we have focused on models whose inputs
 consisted of a single feature vector $\mathbf{x} \in \mathbb{R}^d$.
 The main change of perspective when developing models
@@ -96,6 +94,43 @@ our goal is to estimate the probability mass function
 that tells us how likely we are to see any given sequence,
 i.e., $p(\mathbf{x}_1, \ldots, \mathbf{x}_T)$.
 
+```{.python .input  n=6}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
+```
+
+```{.python .input  n=7}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import autograd, np, npx, gluon, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input  n=8}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input  n=9}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input  n=9}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+import numpy as np
+```
 
 ## Autoregressive Models
 
@@ -356,44 +391,6 @@ We are barely scratching the surface of it.
 Before we focus our attention on text data,
 let's first try this out with some
 continuous-valued synthetic data.
-
-```{.python .input  n=6}
-%load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
-```
-
-```{.python .input  n=7}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import autograd, np, npx, gluon, init
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input  n=8}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input  n=9}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input  n=9}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-import numpy as np
-```
 
 (**Here, our 1000 synthetic data will follow
 the trigonometric `sin` function,

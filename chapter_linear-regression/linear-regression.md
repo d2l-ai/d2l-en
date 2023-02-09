@@ -30,6 +30,44 @@ The variables (age and area)
 upon which the predictions are based
 are called *features* (or *covariates*).
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+import math
+from mxnet import np
+import time
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import math
+import torch
+import numpy as np
+import time
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
+import numpy as np
+import time
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from jax import numpy as jnp
+import math
+import time
+```
+
 ## Basics
 
 *Linear regression* may be both the simplest
@@ -377,7 +415,6 @@ In the following we will stick to *prediction* whenever possible.
 
 
 
-
 ## Vectorization for Speed
 
 When training our models, we typically want to process
@@ -386,44 +423,6 @@ Doing this efficiently requires that (**we**) (~~should~~)
 (**vectorize the calculations and leverage
 fast linear algebra libraries
 rather than writing costly for-loops in Python.**)
-
-```{.python .input}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-import math
-from mxnet import np
-import time
-```
-
-```{.python .input}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import math
-import torch
-import numpy as np
-import time
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import math
-import tensorflow as tf
-import numpy as np
-import time
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-from jax import numpy as jnp
-import math
-import time
-```
 
 To illustrate why this matters so much,
 we can (**consider two methods for adding vectors.**)

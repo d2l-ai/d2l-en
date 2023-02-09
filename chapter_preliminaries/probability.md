@@ -77,7 +77,43 @@ While this section only scratches the surface,
 we will provide the foundation
 that you need to begin building models.
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import np, npx
+from mxnet.numpy.random import multinomial
+import random
+npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import random
+import torch
+from torch.distributions.multinomial import Multinomial
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import random
+import tensorflow as tf
+from tensorflow_probability import distributions as tfd
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import random
+import jax
+from jax import numpy as jnp
+import numpy as np
+```
 
 ## A Simple Example: Tossing Coins
 
@@ -160,44 +196,6 @@ one natural estimator
 is the fraction between
 the number of observed *heads*
 by the total number of tosses.
-
-```{.python .input}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import np, npx
-from mxnet.numpy.random import multinomial
-import random
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import random
-import torch
-from torch.distributions.multinomial import Multinomial
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import random
-import tensorflow as tf
-from tensorflow_probability import distributions as tfd
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import random
-import jax
-from jax import numpy as jnp
-import numpy as np
-```
 
 Now, suppose that the coin was in fact fair,
 i.e., $P(\textrm{heads}) = 0.5$.
@@ -349,18 +347,26 @@ how our estimate evolves as we grow
 the number of tosses from `1` to `10000`.
 
 ```{.python .input}
-%%tab mxnet
-counts = multinomial(1, fair_probs, size=10000)
-cum_counts = counts.astype(np.float32).cumsum(axis=0)
-estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
-```
-
-```{.python .input}
 %%tab pytorch
 counts = Multinomial(1, fair_probs).sample((10000,))
 cum_counts = counts.cumsum(dim=0)
 estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
 estimates = estimates.numpy()
+
+d2l.set_figsize((4.5, 3.5))
+d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
+d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
+d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Samples')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+%%tab mxnet
+counts = multinomial(1, fair_probs, size=10000)
+cum_counts = counts.astype(np.float32).cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 ```
 
 ```{.python .input}
@@ -379,7 +385,7 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 ```
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, tensorflow, jax
 d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
@@ -422,7 +428,7 @@ Here, each element is a distinct possible *outcome*.
 In the case of rolling a single coin,
 $\mathcal{S} = \{\textrm{heads}, \textrm{tails}\}$.
 For a single die, $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$.
-When flipping two coins, we have four possible outcomes:
+When flipping two coins, possible outcomes are
 $\{(\textrm{heads}, \textrm{heads}), (\textrm{heads}, \textrm{tails}), (\textrm{tails}, \textrm{heads}),  (\textrm{tails}, \textrm{tails})\}$.
 *Events* are subsets of the sample space.
 For instance, the event "the first coin toss comes up heads"

@@ -27,6 +27,43 @@ pervasive in a wide range of
 modern deep learning applications,
 such as in areas of language, vision, speech, and reinforcement learning.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+import math
+from mxnet import autograd, init, np, npx
+from mxnet.gluon import nn
+import pandas as pd
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import math
+import pandas as pd
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+import math
+import pandas as pd
+```
+
 ## Model
 
 As an instance of the encoder-decoder
@@ -107,43 +144,6 @@ in :numref:`sec_multihead-attention`
 and positional encoding in :numref:`subsec_positional-encoding`.
 In the following, we will implement
 the rest of the Transformer model.
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-import math
-from mxnet import autograd, init, np, npx
-from mxnet.gluon import nn
-import pandas as pd
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import math
-import pandas as pd
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import numpy as np
-import pandas as pd
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-import math
-import pandas as pd
-```
 
 ## [**Positionwise Feed-Forward Networks**]
 :label:`subsec_positionwise-ffn`
