@@ -334,7 +334,7 @@ or collection of import statements) with `#@save`
 to indicate that they will be accessed later
 via the `d2l` package.
 We offer a detailed overview 
-of these functions and classes in :numref:`sec_d2l`.
+of these classes and functions in :numref:`sec_d2l`.
 The `d2l` package is lightweight and only requires
 the following dependencies:
 
