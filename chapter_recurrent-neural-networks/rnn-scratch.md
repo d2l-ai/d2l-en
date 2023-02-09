@@ -210,7 +210,32 @@ As discussed in :numref:`subsec_perplexity`, this ensures
 that sequences of different length are comparable.
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
+class RNNLMScratch(d2l.Classifier):  #@save
+    """The RNN-based language model implemented from scratch."""
+    def __init__(self, rnn, vocab_size, lr=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.init_params()
+        
+    def init_params(self):
+        self.W_hq = nn.Parameter(
+            d2l.randn(
+                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
+        self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
+
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=True)
+        return l
+        
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow
 class RNNLMScratch(d2l.Classifier):  #@save
     """The RNN-based language model implemented from scratch."""
     def __init__(self, rnn, vocab_size, lr=0.01):
@@ -225,11 +250,6 @@ class RNNLMScratch(d2l.Classifier):  #@save
             self.b_q = d2l.zeros(self.vocab_size)        
             for param in self.get_scratch_params():
                 param.attach_grad()
-        if tab.selected('pytorch'):
-            self.W_hq = nn.Parameter(
-                d2l.randn(
-                    self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
-            self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
         if tab.selected('tensorflow'):
             self.W_hq = tf.Variable(d2l.normal(
                 (self.rnn.num_hiddens, self.vocab_size)) * self.rnn.sigma)

@@ -138,20 +138,29 @@ the following `RNNLM` class defines a complete RNN-based language model.
 Note that we need to create a separate fully connected output layer.
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
+class RNNLM(d2l.RNNLMScratch):  #@save
+    """The RNN-based language model implemented with high-level APIs."""
+    def init_params(self):
+        self.linear = nn.LazyLinear(self.vocab_size)
+        
+    def output_layer(self, hiddens):
+        return d2l.swapaxes(self.linear(hiddens), 0, 1)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow
 class RNNLM(d2l.RNNLMScratch):  #@save
     """The RNN-based language model implemented with high-level APIs."""
     def init_params(self):
         if tab.selected('mxnet'):
             self.linear = nn.Dense(self.vocab_size, flatten=False)
             self.initialize()
-        if tab.selected('pytorch'):
-            self.linear = nn.LazyLinear(self.vocab_size)
         if tab.selected('tensorflow'):
             self.linear = tf.keras.layers.Dense(self.vocab_size)
         
     def output_layer(self, hiddens):
-        if tab.selected('mxnet', 'pytorch'):
+        if tab.selected('mxnet'):
             return d2l.swapaxes(self.linear(hiddens), 0, 1)        
         if tab.selected('tensorflow'):
             return d2l.transpose(self.linear(hiddens), (1, 0, 2))

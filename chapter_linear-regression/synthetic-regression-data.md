@@ -224,7 +224,9 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
             buffer_size=shuffle_buffer).batch(self.batch_size)
+```
 
+```{.python .input}
 @d2l.add_to_class(SyntheticRegressionData)  #@save
 def get_dataloader(self, train):
     i = slice(0, self.num_train) if train else slice(self.num_train, None)

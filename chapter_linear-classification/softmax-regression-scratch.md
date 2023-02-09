@@ -205,8 +205,8 @@ before passing the data through our model.
 %%tab all
 @d2l.add_to_class(SoftmaxRegressionScratch)
 def forward(self, X):
-    return softmax(d2l.matmul(d2l.reshape(
-        X, (-1, self.W.shape[0])), self.W) + self.b)
+    X = d2l.reshape(X, (-1, self.W.shape[0]))
+    return softmax(d2l.matmul(X, self.W) + self.b)
 ```
 
 ## The Cross-Entropy Loss

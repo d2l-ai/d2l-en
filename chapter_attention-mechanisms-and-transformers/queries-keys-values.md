@@ -45,10 +45,6 @@ where weights are derived according to the compatibility between a query $\mathb
 
 What is quite remarkable is that the actual "code" to execute on the set of keys and values, namely the query, can be quite concise, even though the space to operate on is significant. This is a desirable property for a network layer as it does not require too many parameters to learn. Just as convenient is the fact that attention can operate on arbitrarily large databases without the need to change the way the attention pooling operation is performed. 
 
-## Visualization
-
-One of the benefits of the attention mechanism is that it can be quite intuitive, particularly when the weights are nonnegative and sum to $1$. In this case we might *interpret* large weights as a way for the model to select components of relevance. While this is a good intuition, it is important to remember that it is just that, an *intuition*. Regardless, we may want to visualize its effect on the given set of keys, when applying a variety of different queries. This function will come in handy later.
-
 ```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
@@ -73,6 +69,10 @@ import tensorflow as tf
 from d2l import jax as d2l
 from jax import numpy as jnp
 ```
+
+## Visualization
+
+One of the benefits of the attention mechanism is that it can be quite intuitive, particularly when the weights are nonnegative and sum to $1$. In this case we might *interpret* large weights as a way for the model to select components of relevance. While this is a good intuition, it is important to remember that it is just that, an *intuition*. Regardless, we may want to visualize its effect on the given set of keys, when applying a variety of different queries. This function will come in handy later.
 
 We thus define the `show_heatmaps` function. Note that it does not take a matrix (of attention weights) as its input but rather a tensor with 4 axes, allowing for an array of different queries and weights. Consequently the input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys). This will come in handy later on when we want to visualize the workings of :numref:`sec_multihead-attention` that is used to design Transformers.
 

@@ -182,10 +182,64 @@ using type annotations. All Flax modules are Python 3.7 dataclasses.
 :end_tab:
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     """The base class of models."""
-    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
+        super().__init__()
+        self.save_hyperparameters()
+        self.board = ProgressBoard()
+
+    def loss(self, y_hat, y):
+        raise NotImplementedError
+
+    def forward(self, X):
+        assert hasattr(self, 'net'), 'Neural network is defined'
+        return self.net(X)
+
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        if tab.selected('mxnet', 'tensorflow'):
+            self.board.draw(x, d2l.numpy(value), (
+                'train_' if train else 'val_') + key, every_n=int(n))
+        if tab.selected('pytorch'):
+            self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
+                            ('train_' if train else 'val_') + key,
+                            every_n=int(n))
+        if tab.selected('jax'):
+            self.board.draw(x, d2l.to(value, d2l.cpu()),
+                            ('train_' if train else 'val_') + key,
+                            every_n=int(n))
+
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('loss', l, train=True)
+        return l
+
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('loss', l, train=False)
+
+    def configure_optimizers(self):
+        raise NotImplementedError
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow, jax
+class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
+    """The base class of models."""
+    if tab.selected('mxnet', 'tensorflow'):
         def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
             super().__init__()
             self.save_hyperparameters()
@@ -204,7 +258,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def loss(self, y_hat, y):
         raise NotImplementedError
 
-    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    if tab.selected('mxnet', 'tensorflow'):
         def forward(self, X):
             assert hasattr(self, 'net'), 'Neural network is defined'
             return self.net(X)
@@ -242,16 +296,12 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         if tab.selected('mxnet', 'tensorflow'):
             self.board.draw(x, d2l.numpy(value), (
                 'train_' if train else 'val_') + key, every_n=int(n))
-        if tab.selected('pytorch'):
-            self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
-                            ('train_' if train else 'val_') + key,
-                            every_n=int(n))
         if tab.selected('jax'):
             self.board.draw(x, d2l.to(value, d2l.cpu()),
                             ('train_' if train else 'val_') + key,
                             every_n=int(n))
 
-    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    if tab.selected('mxnet', 'tensorflow'):
         def training_step(self, batch):
             l = self.loss(self(*batch[:-1]), batch[-1])
             self.plot('loss', l, train=True)

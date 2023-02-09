@@ -184,6 +184,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         super().__init__()
         self.save_hyperparameters()
         self.board = ProgressBoard()
+
     def loss(self, y_hat, y):
         raise NotImplementedError
 
@@ -505,6 +506,7 @@ class SoftmaxRegression(d2l.Classifier):
         self.save_hyperparameters()
         self.net = nn.Sequential(nn.Flatten(),
                                  nn.LazyLinear(num_outputs))
+
     def forward(self, X):
         return self.net(X)
 
@@ -513,6 +515,7 @@ def cpu():
 
     Defined in :numref:`sec_use_gpu`"""
     return torch.device('cpu')
+
 def gpu(i=0):
     """Get a GPU device.
 
@@ -757,6 +760,7 @@ class RNNLMScratch(d2l.Classifier):
             d2l.randn(
                 self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
         self.b_q = nn.Parameter(d2l.zeros(self.vocab_size))
+
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('ppl', d2l.exp(l), train=True)
@@ -815,6 +819,7 @@ class RNNLM(d2l.RNNLMScratch):
     Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
         self.linear = nn.LazyLinear(self.vocab_size)
+
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
@@ -867,10 +872,9 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
-        """Defined in :numref:`sec_machine_translation`"""
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
         def _build_array(sentences, vocab, is_tgt=False):
             pad_or_trim = lambda seq, t: (
                 seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))

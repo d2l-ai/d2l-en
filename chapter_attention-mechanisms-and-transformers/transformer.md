@@ -1233,7 +1233,8 @@ is (number of encoder layers, number of attention heads, `num_steps` or number o
 %%tab pytorch, mxnet, tensorflow
 _, dec_attention_weights = model.predict_step(
     data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
-enc_attention_weights = d2l.reshape(d2l.concat(model.encoder.attention_weights, 0),
+enc_attention_weights = d2l.concat(model.encoder.attention_weights, 0)
+enc_attention_weights = d2l.reshape(enc_attention_weights,
                                     (num_blks, num_heads, -1, data.num_steps))
 d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
@@ -1244,7 +1245,8 @@ d2l.check_shape(enc_attention_weights,
 _, (dec_attention_weights, enc_attention_weights) = model.predict_step(
     trainer.state.params, data.build([engs[-1]], [fras[-1]]),
     data.num_steps, True)
-enc_attention_weights = d2l.reshape(d2l.concat(enc_attention_weights, 0),
+enc_attention_weights = d2l.concat(enc_attention_weights, 0)
+enc_attention_weights = d2l.reshape(enc_attention_weights,
                                     (num_blks, num_heads, -1, data.num_steps))
 d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
@@ -1308,8 +1310,8 @@ dec_attention_weights_2d = [head[0].tolist()
                             for attn in step for blk in attn for head in blk]
 dec_attention_weights_filled = d2l.tensor(
     pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)
-dec_attention_weights = d2l.reshape(dec_attention_weights_filled, (
-    -1, 2, num_blks, num_heads, data.num_steps))
+shape = (-1, 2, num_blks, num_heads, data.num_steps)
+dec_attention_weights = d2l.reshape(dec_attention_weights_filled, shape)
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.permute(1, 2, 3, 0, 4)
 ```

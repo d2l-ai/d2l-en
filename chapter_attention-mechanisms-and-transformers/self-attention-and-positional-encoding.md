@@ -78,6 +78,16 @@ with shape (batch size, number of time steps or sequence length in tokens, $d$).
 The output tensor has the same shape.
 
 ```{.python .input}
+%%tab pytorch
+num_hiddens, num_heads = 100, 5
+attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
+batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+d2l.check_shape(attention(X, X, X, valid_lens),
+                (batch_size, num_queries, num_hiddens))
+```
+
+```{.python .input}
 %%tab mxnet
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
@@ -85,7 +95,7 @@ attention.initialize()
 ```
 
 ```{.python .input}
-%%tab pytorch, jax
+%%tab jax
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
@@ -98,7 +108,7 @@ attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab mxnet
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 d2l.check_shape(attention(X, X, X, valid_lens),

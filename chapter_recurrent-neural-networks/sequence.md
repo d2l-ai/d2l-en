@@ -417,7 +417,10 @@ class Data(d2l.DataModule):
             key = d2l.get_key()
             self.x = d2l.sin(0.01 * self.time) + jax.random.normal(key,
                                                                    [T]) * 0.2
+```
 
+```{.python .input}
+%%tab all
 data = Data()
 d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```

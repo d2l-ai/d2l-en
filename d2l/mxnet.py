@@ -372,11 +372,6 @@ class SyntheticRegressionData(d2l.DataModule):
         noise = d2l.randn(n, 1) * noise
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
-    def get_dataloader(self, train):
-        """Defined in :numref:`sec_synthetic-regression-data`"""
-        i = slice(0, self.num_train) if train else slice(self.num_train, None)
-        return self.get_tensorloader((self.X, self.y), train, i)
-
 class LinearRegressionScratch(d2l.Module):
     """The linear regression model implemented from scratch.
 
@@ -884,10 +879,9 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
-        """Defined in :numref:`sec_machine_translation`"""
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
         def _build_array(sentences, vocab, is_tgt=False):
             pad_or_trim = lambda seq, t: (
                 seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))

@@ -144,6 +144,7 @@ def comp_conv2d(conv2d, X):
     Y = conv2d(X)
     # Strip the first two dimensions: examples and channels
     return Y.reshape(Y.shape[2:])
+
 # 1 row and column is padded on either side, so a total of 2 rows or columns
 # are added
 conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1)

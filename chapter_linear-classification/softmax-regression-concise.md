@@ -80,7 +80,21 @@ the dataclass.
 :end_tab:
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
+class SoftmaxRegression(d2l.Classifier):  #@save
+    """The softmax regression model."""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.LazyLinear(num_outputs))
+
+    def forward(self, X):
+        return self.net(X)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow
 class SoftmaxRegression(d2l.Classifier):  #@save
     """The softmax regression model."""
     def __init__(self, num_outputs, lr):
@@ -89,9 +103,6 @@ class SoftmaxRegression(d2l.Classifier):  #@save
         if tab.selected('mxnet'):
             self.net = nn.Dense(num_outputs)
             self.net.initialize()
-        if tab.selected('pytorch'):
-            self.net = nn.Sequential(nn.Flatten(),
-                                     nn.LazyLinear(num_outputs))
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
             self.net.add(tf.keras.layers.Flatten())
@@ -207,7 +218,7 @@ def loss(self, params, X, Y, state, averaged=True):
 
 ## Training
 
-Next we train our model. As before, we use Fashion-MNIST images, flattened to 784-dimensional feature vectors.
+Next we train our model. We use Fashion-MNIST images, flattened to 784-dimensional feature vectors.
 
 ```{.python .input}
 %%tab all

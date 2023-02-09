@@ -115,6 +115,7 @@ def init_normal(module):
     if type(module) == nn.Linear:
         nn.init.normal_(module.weight, mean=0, std=0.01)
         nn.init.zeros_(module.bias)
+
 net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
@@ -162,6 +163,7 @@ def init_constant(module):
     if type(module) == nn.Linear:
         nn.init.constant_(module.weight, 1)
         nn.init.zeros_(module.bias)
+
 net.apply(init_constant)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
@@ -213,6 +215,7 @@ print(net[1].weight.data())
 def init_xavier(module):
     if type(module) == nn.Linear:
         nn.init.xavier_uniform_(module.weight)
+
 def init_42(module):
     if type(module) == nn.Linear:
         nn.init.constant_(module.weight, 42)

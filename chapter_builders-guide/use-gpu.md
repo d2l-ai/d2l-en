@@ -153,13 +153,24 @@ from jax import numpy as jnp
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
+def cpu():  #@save
+    """Get the CPU device."""
+    return torch.device('cpu')
+
+def gpu(i=0):  #@save
+    """Get a GPU device."""
+    return torch.device(f'cuda:{i}')
+
+cpu(), gpu(), gpu(1)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow, jax
 def cpu():  #@save
     """Get the CPU device."""
     if tab.selected('mxnet'):
         return npx.cpu()
-    if tab.selected('pytorch'):
-        return torch.device('cpu')
     if tab.selected('tensorflow'):
         return tf.device('/CPU:0')
     if tab.selected('jax'):
@@ -169,8 +180,6 @@ def gpu(i=0):  #@save
     """Get a GPU device."""
     if tab.selected('mxnet'):
         return npx.gpu(i)
-    if tab.selected('pytorch'):
-        return torch.device(f'cuda:{i}')
     if tab.selected('tensorflow'):
         return tf.device(f'/GPU:{i}')
     if tab.selected('jax'):
@@ -182,13 +191,20 @@ cpu(), gpu(), gpu(1)
 We can (**query the number of available GPUs.**)
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
+def num_gpus():  #@save
+    """Get the number of available GPUs."""
+    return torch.cuda.device_count()
+
+num_gpus()
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow, jax
 def num_gpus():  #@save
     """Get the number of available GPUs."""
     if tab.selected('mxnet'):
         return npx.num_gpus()
-    if tab.selected('pytorch'):
-        return torch.cuda.device_count()
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
     if tab.selected('jax'):

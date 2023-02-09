@@ -394,6 +394,18 @@ the shape of the multi-head attention output
 is (`batch_size`, `num_queries`, `num_hiddens`).
 
 ```{.python .input}
+%%tab pytorch
+num_hiddens, num_heads = 100, 5
+attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
+d2l.check_shape(attention(X, Y, Y, valid_lens),
+                (batch_size, num_queries, num_hiddens))
+```
+
+```{.python .input}
 %%tab mxnet
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
@@ -401,7 +413,7 @@ attention.initialize()
 ```
 
 ```{.python .input}
-%%tab pytorch, jax
+%%tab jax
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
@@ -414,7 +426,7 @@ attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab mxnet
 batch_size, num_queries, num_kvpairs = 2, 4, 6
 valid_lens = d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))

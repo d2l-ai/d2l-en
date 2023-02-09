@@ -90,9 +90,12 @@ if tab.selected('tensorflow'):
 if tab.selected('jax'):
     def epanechikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
+```
+
+```{.python .input}
+%%tab all
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
-
 x = d2l.arange(-2.5, 2.5, 0.1)
 for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('pytorch', 'mxnet', 'tensorflow'):
@@ -179,7 +182,10 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
             ax.legend(['y_hat', 'y'])
     if attention:
         fig.colorbar(pcm, ax=axes, shrink=0.7)
-        
+```
+
+```{.python .input}
+%%tab all
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 
@@ -206,7 +212,6 @@ def gaussian_with_width(sigma):
     return (lambda x: d2l.exp(-x**2 / (2*sigma**2)))
 
 kernels = [gaussian_with_width(sigma) for sigma in sigmas]
-
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 

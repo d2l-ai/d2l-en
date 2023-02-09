@@ -99,7 +99,10 @@ class MTFraEng(d2l.DataModule):  #@save
             '94646ad1522d915e7b0f9296181140edcf86a4f5'))
         with open(self.root + '/fra-eng/fra.txt', encoding='utf-8') as f:
             return f.read()
-            
+```
+
+```{.python .input}
+%%tab all
 data = MTFraEng() 
 raw_text = data._download()
 print(raw_text[:75])
@@ -123,7 +126,10 @@ def _preprocess(self, text):
     out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
            for i, char in enumerate(text.lower())]
     return ''.join(out)
+```
 
+```{.python .input}
+%%tab all
 text = data._preprocess(raw_text)
 print(text[:80])
 ```
@@ -165,7 +171,10 @@ def _tokenize(self, text, max_examples=None):
             src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
             tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
     return src, tgt
+```
 
+```{.python .input}
+%%tab all
 src, tgt = data._tokenize(text)
 src[:6], tgt[:6]
 ```
@@ -187,7 +196,10 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
     for patch in patches[1].patches:
         patch.set_hatch('/')
     d2l.plt.legend(legend)
+```
 
+```{.python .input}
+%%tab all
 show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
                         'count', src, tgt);
 ```
@@ -253,7 +265,10 @@ def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
         self._download())
+```
 
+```{.python .input}
+%%tab all
 @d2l.add_to_class(MTFraEng)  #@save
 def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
     def _build_array(sentences, vocab, is_tgt=False):
