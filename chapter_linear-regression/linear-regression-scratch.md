@@ -1,6 +1,23 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "57cc06f84c11481db2eb50fe11f395cc",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', index=3, options=('mxnet', 'pytorch', 'tensorflow', 'jax'), \u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
 ```
 
 # Linear Regression Implementation from Scratch
@@ -32,7 +49,7 @@ Later on, we will introduce a more concise implementation,
 taking advantage of bells and whistles of deep learning frameworks 
 while retaining the structure of what follows below.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -40,21 +57,51 @@ from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```{.json .output n=2}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=3}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input}
+```{.json .output n=3}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=4}
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-```{.python .input}
+```{.json .output n=4}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=5}
 %%tab jax
 %matplotlib inline
 from d2l import jax as d2l
@@ -62,6 +109,16 @@ from flax import linen as nn
 import jax
 from jax import numpy as jnp
 import optax
+```
+
+```{.json .output n=5}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)\n"
+ }
+]
 ```
 
 ## Defining the Model
@@ -78,7 +135,7 @@ Moreover we set the bias to 0.
 Note that for object-oriented design
 we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`subsec_oo-design-models`).
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch, mxnet, tensorflow
 class LinearRegressionScratch(d2l.Module):  #@save
     """The linear regression model implemented from scratch."""
@@ -100,7 +157,17 @@ class LinearRegressionScratch(d2l.Module):  #@save
             self.b = tf.Variable(b, trainable=True)
 ```
 
-```{.python .input}
+```{.json .output n=6}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=7}
 %%tab jax
 class LinearRegressionScratch(d2l.Module):  #@save
     """The linear regression model implemented from scratch."""
@@ -130,7 +197,7 @@ The resulting `forward` method
 is registered in the `LinearRegressionScratch` class
 via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def forward(self, X):
@@ -151,7 +218,7 @@ will also have the same shape as `y_hat`.
 We also return the averaged loss value
 among all examples in the minibatch.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, y_hat, y):
@@ -159,7 +226,17 @@ def loss(self, y_hat, y):
     return d2l.reduce_mean(l)
 ```
 
-```{.python .input}
+```{.json .output n=9}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=10}
 %%tab jax
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, params, X, y, state):
@@ -223,7 +300,7 @@ We update the parameters in the `apply_gradients` method.
 It accepts a list of parameter and gradient pairs.
 :end_tab:
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet, pytorch
 class SGD(d2l.HyperParameters):  #@save
     """Minibatch stochastic gradient descent."""
@@ -246,7 +323,17 @@ class SGD(d2l.HyperParameters):  #@save
                     param.grad.zero_()
 ```
 
-```{.python .input}
+```{.json .output n=11}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=12}
 %%tab tensorflow
 class SGD(d2l.HyperParameters):  #@save
     """Minibatch stochastic gradient descent."""
@@ -258,7 +345,17 @@ class SGD(d2l.HyperParameters):  #@save
             param.assign_sub(self.lr * grad)
 ```
 
-```{.python .input}
+```{.json .output n=12}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=13}
 %%tab jax
 class SGD(d2l.HyperParameters):  #@save
     """Minibatch stochastic gradient descent."""
@@ -288,7 +385,7 @@ class SGD(d2l.HyperParameters):  #@save
 
 We next define the `configure_optimizers` method, which returns an instance of the `SGD` class.
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def configure_optimizers(self):
@@ -337,14 +434,14 @@ the `prepare_batch` and `fit_epoch` methods
 are registered in the `d2l.Trainer` class
 (introduced in :numref:`oo-design-training`).
 
-```{.python .input}
+```{.python .input  n=15}
 %%tab all    
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_batch(self, batch):
     return batch
 ```
 
-```{.python .input}
+```{.python .input  n=16}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -367,7 +464,17 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
+```{.json .output n=16}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=17}
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -386,7 +493,17 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
+```{.json .output n=17}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=18}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -407,7 +524,17 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
+```{.json .output n=18}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=19}
 %%tab jax
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -462,12 +589,30 @@ and the third reserved for the final evaluation.
 We elide these details for now but will revise them
 later.
 
-```{.python .input}
+```{.python .input  n=20}
 %%tab all
 model = LinearRegressionScratch(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
+```
+
+```{.json .output n=20}
+[
+ {
+  "ename": "TypeError",
+  "evalue": "object of type 'generator' has no len()",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mTypeError\u001b[0m                                 Traceback (most recent call last)",
+   "Input \u001b[0;32mIn [20]\u001b[0m, in \u001b[0;36m<cell line: 4>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      2\u001b[0m data \u001b[38;5;241m=\u001b[39m d2l\u001b[38;5;241m.\u001b[39mSyntheticRegressionData(w\u001b[38;5;241m=\u001b[39md2l\u001b[38;5;241m.\u001b[39mtensor([\u001b[38;5;241m2\u001b[39m, \u001b[38;5;241m-\u001b[39m\u001b[38;5;241m3.4\u001b[39m]), b\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m4.2\u001b[39m)\n\u001b[1;32m      3\u001b[0m trainer \u001b[38;5;241m=\u001b[39m d2l\u001b[38;5;241m.\u001b[39mTrainer(max_epochs\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m3\u001b[39m)\n\u001b[0;32m----> 4\u001b[0m \u001b[43mtrainer\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mfit\u001b[49m\u001b[43m(\u001b[49m\u001b[43mmodel\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mdata\u001b[49m\u001b[43m)\u001b[49m\n",
+   "File \u001b[0;32m~/code/git_repo/d2l-en/d2l/jax.py:303\u001b[0m, in \u001b[0;36mTrainer.fit\u001b[0;34m(self, model, data, key)\u001b[0m\n\u001b[1;32m    302\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mfit\u001b[39m(\u001b[38;5;28mself\u001b[39m, model, data, key\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mNone\u001b[39;00m):\n\u001b[0;32m--> 303\u001b[0m     \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mprepare_data\u001b[49m\u001b[43m(\u001b[49m\u001b[43mdata\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    304\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mprepare_model(model)\n\u001b[1;32m    305\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39moptim \u001b[38;5;241m=\u001b[39m model\u001b[38;5;241m.\u001b[39mconfigure_optimizers()\n",
+   "File \u001b[0;32m~/code/git_repo/d2l-en/d2l/jax.py:293\u001b[0m, in \u001b[0;36mTrainer.prepare_data\u001b[0;34m(self, data)\u001b[0m\n\u001b[1;32m    291\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mtrain_dataloader \u001b[38;5;241m=\u001b[39m data\u001b[38;5;241m.\u001b[39mtrain_dataloader()\n\u001b[1;32m    292\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mval_dataloader \u001b[38;5;241m=\u001b[39m data\u001b[38;5;241m.\u001b[39mval_dataloader()\n\u001b[0;32m--> 293\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mnum_train_batches \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mlen\u001b[39;49m\u001b[43m(\u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mtrain_dataloader\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    294\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mnum_val_batches \u001b[38;5;241m=\u001b[39m (\u001b[38;5;28mlen\u001b[39m(\u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mval_dataloader)\n\u001b[1;32m    295\u001b[0m                         \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mval_dataloader \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m \u001b[38;5;28;01melse\u001b[39;00m \u001b[38;5;241m0\u001b[39m)\n",
+   "\u001b[0;31mTypeError\u001b[0m: object of type 'generator' has no len()"
+  ]
+ }
+]
 ```
 
 Because we synthesized the dataset ourselves,
@@ -477,17 +622,43 @@ by comparing the true parameters
 with those that we learned**] through our training loop.
 Indeed they turn out to be very close to each other.
 
-```{.python .input}
+```{.python .input  n=21}
 %%tab pytorch, mxnet, tensorflow
 print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
 
-```{.python .input}
+```{.json .output n=21}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"jax\" cell."
+ }
+]
+```
+
+```{.python .input  n=22}
 %%tab jax
 params = trainer.state.params
 print(f"error in estimating w: {data.w - d2l.reshape(params['w'], data.w.shape)}")
 print(f"error in estimating b: {data.b - params['b']}")
+```
+
+```{.json .output n=22}
+[
+ {
+  "ename": "AttributeError",
+  "evalue": "'Trainer' object has no attribute 'state'",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+   "Input \u001b[0;32mIn [22]\u001b[0m, in \u001b[0;36m<cell line: 1>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0m params \u001b[38;5;241m=\u001b[39m \u001b[43mtrainer\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mstate\u001b[49m\u001b[38;5;241m.\u001b[39mparams\n\u001b[1;32m      2\u001b[0m \u001b[38;5;28mprint\u001b[39m(\u001b[38;5;124mf\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124merror in estimating w: \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mdata\u001b[38;5;241m.\u001b[39mw \u001b[38;5;241m-\u001b[39m d2l\u001b[38;5;241m.\u001b[39mreshape(params[\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mw\u001b[39m\u001b[38;5;124m'\u001b[39m], data\u001b[38;5;241m.\u001b[39mw\u001b[38;5;241m.\u001b[39mshape)\u001b[38;5;132;01m}\u001b[39;00m\u001b[38;5;124m\"\u001b[39m)\n\u001b[1;32m      3\u001b[0m \u001b[38;5;28mprint\u001b[39m(\u001b[38;5;124mf\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124merror in estimating b: \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mdata\u001b[38;5;241m.\u001b[39mb \u001b[38;5;241m-\u001b[39m params[\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mb\u001b[39m\u001b[38;5;124m'\u001b[39m]\u001b[38;5;132;01m}\u001b[39;00m\u001b[38;5;124m\"\u001b[39m)\n",
+   "\u001b[0;31mAttributeError\u001b[0m: 'Trainer' object has no attribute 'state'"
+  ]
+ }
+]
 ```
 
 We should not take the ability to exactly recover 
