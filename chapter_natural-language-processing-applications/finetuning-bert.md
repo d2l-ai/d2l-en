@@ -1,6 +1,7 @@
 # Fine-Tuning BERT for Sequence-Level and Token-Level Applications
 :label:`sec_finetuning-bert`
 
+
 In the previous sections of this chapter,
 we have designed different models for natural language processing applications,
 such as based on RNNs, CNNs, attention, and MLPs.

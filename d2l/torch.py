@@ -1084,31 +1084,18 @@ class DotProductAttention(nn.Module):
     """Scaled dot product attention.
 
     Defined in :numref:`subsec_batch_dot`"""
-    def __init__(self, dropout, num_heads=None):
+    def __init__(self, dropout):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
-        self.num_heads = num_heads  # To be covered later
 
     # Shape of queries: (batch_size, no. of queries, d)
     # Shape of keys: (batch_size, no. of key-value pairs, d)
     # Shape of values: (batch_size, no. of key-value pairs, value dimension)
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
-    def forward(self, queries, keys, values, valid_lens=None,
-                window_mask=None):
+    def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
         # Swap the last two dimensions of keys with keys.transpose(1, 2)
         scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
-        if window_mask is not None:  # To be covered later
-            num_windows = window_mask.shape[0]
-            n, num_queries, num_kv_pairs = scores.shape
-            # Shape of window_mask: (num_windows, no. of queries,
-            # no. of key-value pairs)
-            scores = d2l.reshape(
-                scores, (n//(num_windows*self.num_heads), num_windows,
-                         self.num_heads, num_queries, num_kv_pairs
-                        )) + d2l.expand_dims(
-                d2l.expand_dims(window_mask, 1), 0)
-            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
@@ -1157,13 +1144,13 @@ class MultiHeadAttention(d2l.Module):
     def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
         super().__init__()
         self.num_heads = num_heads
-        self.attention = d2l.DotProductAttention(dropout, num_heads)
+        self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_k = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
 
-    def forward(self, queries, keys, values, valid_lens, window_mask=None):
+    def forward(self, queries, keys, values, valid_lens):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -1182,8 +1169,7 @@ class MultiHeadAttention(d2l.Module):
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output = self.attention(queries, keys, values, valid_lens,
-                                window_mask)
+        output = self.attention(queries, keys, values, valid_lens)
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
         return self.W_o(output_concat)

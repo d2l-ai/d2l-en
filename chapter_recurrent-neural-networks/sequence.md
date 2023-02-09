@@ -161,7 +161,7 @@ $P(x_t \mid x_{t-1}, \ldots, x_1)$
 or some statistic(s) of this distribution.
 
 A few strategies recur frequently.
-First, we might believe that although long sequences
+First of all, we might believe that although long sequences
 $x_{t-1}, \ldots, x_1$ are available,
 it may not be necessary
 to look back so far in the history

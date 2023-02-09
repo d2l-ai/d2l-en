@@ -93,7 +93,7 @@ Hello world <blank> <blank>
 ```
 
 
-Since we do not want blanks in our attention model we simply need to limit the sum $\sum_{i=1}^n \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ to $\sum_{i=1}^l \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ for however long $l \leq n$ the actual sentence is. Since it is such a common problem, it has a name: the *masked softmax operation*. 
+Since we do not want blanks in our attention model we simply need to limit $\sum_{i=1}^n \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ to $\sum_{i=1}^l \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ for however long $l \leq n$ the actual sentence is. Since it is such a common problem, it has a name: the *masked softmax operation*. 
 
 Let's implement it. Actually, the implementation cheats ever so slightly by setting the values to zero $\mathbf{v}_i = 0$ for $i > l$. Moreover, it sets the attention weights to a large negative number, such as $-10^{6}$ in order to make their contribution to gradients and values vanish in practice. This is done since linear algebra kernels and operators are heavily optimized for GPUs and it is faster to be slightly wasteful in computation rather than to have code with conditional (if then else) statements.
 
@@ -319,31 +319,18 @@ we use dropout for model regularization.
 %%tab mxnet
 class DotProductAttention(nn.Block):  #@save
     """Scaled dot product attention."""
-    def __init__(self, dropout, num_heads=None):
+    def __init__(self, dropout):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
-        self.num_heads = num_heads  # To be covered later
 
     # Shape of queries: (batch_size, no. of queries, d)
     # Shape of keys: (batch_size, no. of key-value pairs, d)
     # Shape of values: (batch_size, no. of key-value pairs, value dimension)
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
-    def forward(self, queries, keys, values, valid_lens=None,
-                window_mask=None):
+    def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of keys
         scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
-        if window_mask is not None:  # To be covered later
-            num_windows = window_mask.shape[0]
-            n, num_queries, num_kv_pairs = scores.shape
-            # Shape of window_mask: (num_windows, no. of queries,
-            # no. of key-value pairs)
-            scores = d2l.reshape(
-                scores, (n//(num_windows*self.num_heads), num_windows,
-                         self.num_heads, num_queries, num_kv_pairs
-                        )) + d2l.expand_dims(
-                d2l.expand_dims(window_mask, 1), 0)
-            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 ```
@@ -352,31 +339,18 @@ class DotProductAttention(nn.Block):  #@save
 %%tab pytorch
 class DotProductAttention(nn.Module):  #@save
     """Scaled dot product attention."""
-    def __init__(self, dropout, num_heads=None):
+    def __init__(self, dropout):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
-        self.num_heads = num_heads  # To be covered later
 
     # Shape of queries: (batch_size, no. of queries, d)
     # Shape of keys: (batch_size, no. of key-value pairs, d)
     # Shape of values: (batch_size, no. of key-value pairs, value dimension)
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
-    def forward(self, queries, keys, values, valid_lens=None,
-                window_mask=None):
+    def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
         # Swap the last two dimensions of keys with keys.transpose(1, 2)
         scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
-        if window_mask is not None:  # To be covered later
-            num_windows = window_mask.shape[0]
-            n, num_queries, num_kv_pairs = scores.shape
-            # Shape of window_mask: (num_windows, no. of queries,
-            # no. of key-value pairs)
-            scores = d2l.reshape(
-                scores, (n//(num_windows*self.num_heads), num_windows,
-                         self.num_heads, num_queries, num_kv_pairs
-                        )) + d2l.expand_dims(
-                d2l.expand_dims(window_mask, 1), 0)
-            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
@@ -385,31 +359,18 @@ class DotProductAttention(nn.Module):  #@save
 %%tab tensorflow
 class DotProductAttention(tf.keras.layers.Layer):  #@save
     """Scaled dot product attention."""
-    def __init__(self, dropout, num_heads=None):
+    def __init__(self, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        self.num_heads = num_heads  # To be covered later
         
     # Shape of queries: (batch_size, no. of queries, d)
     # Shape of keys: (batch_size, no. of key-value pairs, d)
     # Shape of values: (batch_size, no. of key-value pairs, value dimension)
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
-    def call(self, queries, keys, values, valid_lens=None, window_mask=None,
-             **kwargs):
+    def call(self, queries, keys, values, valid_lens=None, **kwargs):
         d = queries.shape[-1]
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
             tf.cast(d, dtype=tf.float32))
-        if window_mask is not None:  # To be covered later
-            num_windows = window_mask.shape[0]
-            n, num_queries, num_kv_pairs = scores.shape
-            # Shape of window_mask: (num_windows, no. of queries,
-            # no. of key-value pairs)
-            scores = d2l.reshape(
-                scores, (n//(num_windows*self.num_heads), num_windows,
-                         self.num_heads, num_queries, num_kv_pairs
-                        )) + d2l.expand_dims(
-                d2l.expand_dims(window_mask, 1), 0)
-            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 ```
@@ -419,7 +380,6 @@ class DotProductAttention(tf.keras.layers.Layer):  #@save
 class DotProductAttention(nn.Module):  #@save
     """Scaled dot product attention."""
     dropout: float
-    num_heads: None = None  # To be covered later
 
     # Shape of queries: (batch_size, no. of queries, d)
     # Shape of keys: (batch_size, no. of key-value pairs, d)
@@ -427,21 +387,10 @@ class DotProductAttention(nn.Module):  #@save
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     @nn.compact
     def __call__(self, queries, keys, values, valid_lens=None,
-                 window_mask=None, training=False):
+                 training=False):
         d = queries.shape[-1]
         # Swap the last two dimensions of keys with keys.swapaxes(1, 2)
         scores = queries@(keys.swapaxes(1, 2)) / math.sqrt(d)
-        if window_mask is not None:  # To be covered later
-            num_windows = window_mask.shape[0]
-            n, num_queries, num_kv_pairs = scores.shape
-            # Shape of window_mask: (num_windows, no. of queries,
-            # no. of key-value pairs)
-            scores = d2l.reshape(
-                scores, (n//(num_windows*self.num_heads), num_windows,
-                         self.num_heads, num_queries, num_kv_pairs
-                        )) + d2l.expand_dims(
-                d2l.expand_dims(window_mask, 1), 0)
-            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         attention_weights = masked_softmax(scores, valid_lens)
         dropout_layer = nn.Dropout(self.dropout, deterministic=not training)
         return dropout_layer(attention_weights)@values, attention_weights

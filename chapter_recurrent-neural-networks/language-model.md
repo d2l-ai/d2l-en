@@ -35,7 +35,8 @@ $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 For example, 
 the probability of a text sequence containing four words would be given as:
 
-$$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$
+$$\begin{aligned}&P(\text{deep}, \text{learning}, \text{is}, \text{fun}) \\
+=&P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).\end{aligned}$$
 
 ### Markov Models and $n$-grams
 

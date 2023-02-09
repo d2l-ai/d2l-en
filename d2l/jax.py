@@ -1266,7 +1266,6 @@ class DotProductAttention(nn.Module):
 
     Defined in :numref:`subsec_batch_dot`"""
     dropout: float
-    num_heads: None = None  # To be covered later
 
     # Shape of queries: (batch_size, no. of queries, d)
     # Shape of keys: (batch_size, no. of key-value pairs, d)
@@ -1274,21 +1273,10 @@ class DotProductAttention(nn.Module):
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     @nn.compact
     def __call__(self, queries, keys, values, valid_lens=None,
-                 window_mask=None, training=False):
+                 training=False):
         d = queries.shape[-1]
         # Swap the last two dimensions of keys with keys.swapaxes(1, 2)
         scores = queries@(keys.swapaxes(1, 2)) / math.sqrt(d)
-        if window_mask is not None:  # To be covered later
-            num_windows = window_mask.shape[0]
-            n, num_queries, num_kv_pairs = scores.shape
-            # Shape of window_mask: (num_windows, no. of queries,
-            # no. of key-value pairs)
-            scores = d2l.reshape(
-                scores, (n//(num_windows*self.num_heads), num_windows,
-                         self.num_heads, num_queries, num_kv_pairs
-                        )) + d2l.expand_dims(
-                d2l.expand_dims(window_mask, 1), 0)
-            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         attention_weights = masked_softmax(scores, valid_lens)
         dropout_layer = nn.Dropout(self.dropout, deterministic=not training)
         return dropout_layer(attention_weights)@values, attention_weights
@@ -1329,15 +1317,14 @@ class MultiHeadAttention(nn.Module):
     bias: bool = False
 
     def setup(self):
-        self.attention = d2l.DotProductAttention(self.dropout, self.num_heads)
+        self.attention = d2l.DotProductAttention(self.dropout)
         self.W_q = nn.Dense(self.num_hiddens, use_bias=self.bias)
         self.W_k = nn.Dense(self.num_hiddens, use_bias=self.bias)
         self.W_v = nn.Dense(self.num_hiddens, use_bias=self.bias)
         self.W_o = nn.Dense(self.num_hiddens, use_bias=self.bias)
 
     @nn.compact
-    def __call__(self, queries, keys, values, valid_lens,
-                 window_mask=None, training=False):
+    def __call__(self, queries, keys, values, valid_lens, training=False):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -1355,9 +1342,8 @@ class MultiHeadAttention(nn.Module):
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output, attention_weights = self.attention(queries, keys, values,
-                                                   valid_lens, window_mask,
-                                                   training=training)
+        output, attention_weights = self.attention(
+            queries, keys, values, valid_lens, training=training)
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
         return self.W_o(output_concat), attention_weights

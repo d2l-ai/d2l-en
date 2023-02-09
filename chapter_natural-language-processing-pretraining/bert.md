@@ -603,7 +603,6 @@ class BERTModel(nn.Module):
 * Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the latter explicitly models the logical relationship between text pairs.
 
 
-
 ## Exercises
 
 1. All other things being equal, will a masked language model require more or fewer pretraining steps to converge than a left-to-right language model? Why?

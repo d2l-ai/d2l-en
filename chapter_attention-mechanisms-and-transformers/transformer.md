@@ -1389,6 +1389,7 @@ are important for training a very deep model.
 The positionwise feed-forward network in the Transformer model
 transforms the representation at all the sequence positions using the same MLP.
 
+
 ## Exercises
 
 1. Train a deeper Transformer in the experiments. How does it affect the training speed and the translation performance?

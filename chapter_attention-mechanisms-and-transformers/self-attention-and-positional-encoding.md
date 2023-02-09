@@ -492,7 +492,6 @@ To use the sequence order information,
 we can inject absolute or relative positional information 
 by adding positional encoding to the input representations.
 
-
 ## Exercises
 
 1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
