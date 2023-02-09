@@ -135,7 +135,7 @@ may be important for debugging purposes.
 
 ```{.python .input}
 %%tab all
-@d2l.add_to_class(SyntheticRegressionData)
+@d2l.add_to_class(SyntheticRegressionData)  #@save
 def get_dataloader(self, train):
     if train:
         indices = list(range(0, self.num_train))
