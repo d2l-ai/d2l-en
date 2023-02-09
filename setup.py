@@ -4,7 +4,7 @@ import d2l
 requirements = [
     'jupyter',
     'numpy<=1.23.5',
-    'matplotlib<=3.6.2',
+    'matplotlib',
     'matplotlib-inline',
     'requests',
     'pandas',
