@@ -324,15 +324,8 @@ class SyntheticRegressionData(d2l.DataModule):
 
     def get_dataloader(self, train):
         """Defined in :numref:`sec_synthetic-regression-data`"""
-        if train:
-            indices = list(range(0, self.num_train))
-            # The examples are read in random order
-            random.shuffle(indices)
-        else:
-            indices = list(range(self.num_train, self.num_train+self.num_val))
-        for i in range(0, len(indices), self.batch_size):
-            j = tf.constant(indices[i : i+self.batch_size])
-            yield tf.gather(self.X, j), tf.gather(self.y, j)
+        i = slice(0, self.num_train) if train else slice(self.num_train, None)
+        return self.get_tensorloader((self.X, self.y), train, i)
 
 class LinearRegressionScratch(d2l.Module):
     """The linear regression model implemented from scratch.
