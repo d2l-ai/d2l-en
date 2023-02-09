@@ -240,7 +240,7 @@ def layer_summary(self, X_shape):
     for layer in self.net:
         X = layer(X)
         print(layer.__class__.__name__, 'output shape:\t', X.shape)
-
+        
 model = LeNet()
 model.layer_summary((1, 1, 28, 28))
 ```

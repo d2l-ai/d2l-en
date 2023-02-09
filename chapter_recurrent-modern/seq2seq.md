@@ -236,7 +236,10 @@ def init_seq2seq(module):  #@save
         for param in module._flat_weights_names:
             if "weight" in param:
                 nn.init.xavier_uniform_(module._parameters[param])
+```
 
+```{.python .input}
+%%tab pytorch
 class Seq2SeqEncoder(d2l.Encoder):  #@save
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -316,7 +319,6 @@ are a tensor of shape
 %%tab all
 vocab_size, embed_size, num_hiddens, num_layers = 10, 8, 16, 2
 batch_size, num_steps = 4, 9
-
 encoder = Seq2SeqEncoder(vocab_size, embed_size, num_hiddens, num_layers)
 X = d2l.zeros((batch_size, num_steps))
 if tab.selected('pytorch', 'mxnet', 'tensorflow'):

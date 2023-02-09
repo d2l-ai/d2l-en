@@ -23,9 +23,6 @@ we can launch our exploration of deep neural networks,
 the comparatively rich class of models
 with which this book is primarily concerned.
 
-
-
-
 ```{.python .input}
 %%tab mxnet
 %matplotlib inline
@@ -580,7 +577,7 @@ d2l.plot(x, x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
 
 ```{.python .input}
 %%tab pytorch
-# Clear out previous gradients.
+# Clear out previous gradients
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))

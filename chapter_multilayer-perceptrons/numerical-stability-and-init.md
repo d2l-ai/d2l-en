@@ -194,7 +194,6 @@ M = np.random.normal(size=(4, 4))
 print('a single matrix', M)
 for i in range(100):
     M = np.dot(M, np.random.normal(size=(4, 4)))
-
 print('after multiplying 100 matrices', M)
 ```
 
@@ -204,7 +203,6 @@ M = torch.normal(0, 1, size=(4, 4))
 print('a single matrix \n',M)
 for i in range(100):
     M = M @ torch.normal(0, 1, size=(4, 4))
-
 print('after multiplying 100 matrices\n', M)
 ```
 
@@ -214,7 +212,6 @@ M = tf.random.normal((4, 4))
 print('a single matrix \n', M)
 for i in range(100):
     M = tf.matmul(M, tf.random.normal((4, 4)))
-
 print('after multiplying 100 matrices\n', M.numpy())
 ```
 
@@ -225,7 +222,6 @@ M = jax.random.normal(get_key(), (4, 4))
 print('a single matrix \n', M)
 for i in range(100):
     M = jnp.matmul(M, jax.random.normal(get_key(), (4, 4)))
-
 print('after multiplying 100 matrices\n', M)
 ```
 

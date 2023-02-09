@@ -44,10 +44,6 @@ is to perform well on *previously unseen* data.
 That problem is called *generalization*
 and will be a key focus of other chapters.
 
-
-
-
-
 ```{.python .input}
 %%tab mxnet
 %matplotlib inline
@@ -271,7 +267,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         X = X * len(Y)
         
     set_figsize(figsize)
-    if axes is None: axes = d2l.plt.gca()
+    if axes is None:
+        axes = d2l.plt.gca()
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
