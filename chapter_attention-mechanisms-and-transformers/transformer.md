@@ -1234,8 +1234,8 @@ is (number of encoder layers, number of attention heads, `num_steps` or number o
 _, dec_attention_weights = model.predict_step(
     data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
 enc_attention_weights = d2l.concat(model.encoder.attention_weights, 0)
-enc_attention_weights = d2l.reshape(enc_attention_weights,
-                                    (num_blks, num_heads, -1, data.num_steps))
+shape = (num_blks, num_heads, -1, data.num_steps)
+enc_attention_weights = d2l.reshape(enc_attention_weights, shape)
 d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
@@ -1246,8 +1246,8 @@ _, (dec_attention_weights, enc_attention_weights) = model.predict_step(
     trainer.state.params, data.build([engs[-1]], [fras[-1]]),
     data.num_steps, True)
 enc_attention_weights = d2l.concat(enc_attention_weights, 0)
-enc_attention_weights = d2l.reshape(enc_attention_weights,
-                                    (num_blks, num_heads, -1, data.num_steps))
+shape = (num_blks, num_heads, -1, data.num_steps)
+enc_attention_weights = d2l.reshape(enc_attention_weights, shape)
 d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
