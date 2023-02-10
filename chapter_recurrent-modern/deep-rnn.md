@@ -306,12 +306,22 @@ The only difference is that we now
 by specifying the value of `num_layers`.**)
 
 ```{.python .input}
-%%tab all
-if tab.selected('mxnet', 'tensorflow', 'jax'):
+%%tab mxnet
+gru = GRU(num_hiddens=32, num_layers=2)
+model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
+
+# Running takes > 1h (pending fix from MXNet)
+# trainer.fit(model, data)
+# model.predict('it has', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab pytorch, tensorflow, jax
+if tab.selected('tensorflow', 'jax'):
     gru = GRU(num_hiddens=32, num_layers=2)
 if tab.selected('pytorch'):
     gru = GRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
-if tab.selected('mxnet', 'pytorch', 'jax'):
+if tab.selected('pytorch', 'jax'):
     model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -320,7 +330,7 @@ trainer.fit(model, data)
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab pytorch
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 

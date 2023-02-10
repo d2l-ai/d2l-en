@@ -203,9 +203,8 @@ loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 
-d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, devices,
-                  d2l.evaluate_ranking, candidates, eval_step=1)
+# Running takes > 1h (pending fix from MXNet)
+# d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, num_users, num_items, num_epochs, devices, d2l.evaluate_ranking, candidates, eval_step=1)
 ```
 
 ## Summary
