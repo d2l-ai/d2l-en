@@ -80,18 +80,29 @@ the dataclass.
 :end_tab:
 
 ```{.python .input}
-
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
 class SoftmaxRegression(d2l.Classifier):  #@save
+    """The softmax regression model."""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.LazyLinear(num_outputs))
+
+    def forward(self, X):
+        return self.net(X)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow
+class SoftmaxRegression(d2l.Classifier):  #@save
+    """The softmax regression model."""
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.net = nn.Dense(num_outputs)
             self.net.initialize()
-        if tab.selected('pytorch'):
-            self.net = nn.Sequential(nn.Flatten(),
-                                     nn.LazyLinear(num_outputs))
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
             self.net.add(tf.keras.layers.Flatten())
@@ -109,7 +120,7 @@ class SoftmaxRegression(d2l.Classifier):  #@save
 
     @nn.compact
     def __call__(self, X):
-        X = X.reshape((X.shape[0], -1))  # flatten
+        X = X.reshape((X.shape[0], -1))  # Flatten
         X = nn.Dense(self.num_outputs)(X)
         return X
 ```
@@ -194,8 +205,9 @@ def loss(self, Y_hat, Y, averaged=True):
 @d2l.add_to_class(d2l.Classifier)  #@save
 @partial(jax.jit, static_argnums=(0, 5))
 def loss(self, params, X, Y, state, averaged=True):
+    # To be used later (e.g., for batch norm)
     Y_hat = state.apply_fn({'params': params}, *X,
-                           mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
+                           mutable=False, rngs=None)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels
@@ -206,7 +218,7 @@ def loss(self, params, X, Y, state, averaged=True):
 
 ## Training
 
-Next we train our model. As before, we use Fashion-MNIST images, flattened to 784-dimensional feature vectors.
+Next we train our model. We use Fashion-MNIST images, flattened to 784-dimensional feature vectors.
 
 ```{.python .input}
 %%tab all

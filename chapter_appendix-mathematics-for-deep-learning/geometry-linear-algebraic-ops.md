@@ -1005,12 +1005,12 @@ np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch doesn't support this type of notation.
+# PyTorch does not support this type of notation.
 ```
 
 ```{.python .input}
 #@tab tensorflow
-# TensorFlow doesn't support this type of notation.
+# TensorFlow does not support this type of notation.
 ```
 
 Either notation allows for concise and efficient representation of tensor contractions in code.

@@ -82,7 +82,7 @@ of this book on this instance
 
 
 After finishing your work,
-don't forget to stop the instance to avoid 
+do not forget to stop the instance to avoid 
 being charged further (:numref:`fig_sagemaker-stop`).
 
 ![Stop a SageMaker instance.](../img/sagemaker-stop.png)

@@ -19,7 +19,7 @@ Despite thousands of papers proposing alternative ideas,
 models resembling classical convolutional neural networks (:numref:`chap_cnn`) 
 retained *state of the art* status in computer vision
 and models resembling Sepp Hochreiter's original design
-for the LSTM recurrent neural netowrk (:numref:`sec_lstm`),
+for the LSTM recurrent neural network (:numref:`sec_lstm`),
 dominated most applications in natural language processing. 
 Arguably, to that point, the rapid emergence of deep learning
 appeared to be primarily attributable to shifts 
@@ -41,9 +41,9 @@ is to grab a large Transformer-based pretrained model,
 adapting the output layers as necessary, 
 and fine-tuning the model on the available 
 data for the downstream task. 
-If you've been paying attention to the last few years
+If you have been paying attention to the last few years
 of breathless news coverage centered on OpenAI's
-large language models, then you've been tracking a conversation 
+large language models, then you have been tracking a conversation 
 centered on the GPT-2 and GPT-3 Transformer-based models :cite:`Radford.Wu.Child.ea.2019,brown2020language`.
 Meanwhile, the vision Transformer has emerged 
 as a default model for diverse vision tasks,
@@ -75,7 +75,7 @@ of length equal to the original input sequence.
 Then, at decoding time, the decoder can (via some control mechanism)
 receive as input a context vector consisting of a weighted sum 
 of the representations on the input at each time step. 
-Intuitively, the weights determine the extend 
+Intuitively, the weights determine the extent 
 to which each step's context "focuses" on each input token,
 and the key is to make this process 
 for assigning the weights differentiable
@@ -117,11 +117,11 @@ on enormous generic background corpora
 to optimize some self-supervised pretraining objective,
 and then to fine-tune these models 
 using the available downstream data. 
-The gap between Transformers and tradition architectures
+The gap between Transformers and traditional architectures
 grew especially wide when applied in this pretraining paradigm,
 and thus the ascendance of Transformers coincided 
 with the ascendence of such large-scale pretrained models,
-now sometimes called "foundation models" :cite:`bommasani2021opportunities`.
+now sometimes called *foundation models* :cite:`bommasani2021opportunities`.
 
 
 In this chapter, we introduce attention models, 

@@ -171,6 +171,7 @@ hyperparameters of a multi-layer perceptron including their type and standard
 ranges.
 
 : Example configuration space of multi-layer perceptron
+:label:`tab_example_configspace`
 
 | Name                | Type        |Hyperparameter Ranges           | log-scale |
 | :----:              | :----:      |:------------------------------:|:---------:|
@@ -180,7 +181,7 @@ ranges.
 | activation function | categorical | $\{\text{tanh}, \text{relu}\}$ |     -     |
 | number of units     | integer     |          $[32, 1024]$          |    yes    |
 | number of layers    | integer     |            $[1, 6]$            |    no     |
-:label:`tab_example_configspace`
+
 
 
 In general, the structure of the configuration space $\mathcal{X}$ can be complex
@@ -228,7 +229,7 @@ print(f"optimal learning rate = {values[best_idx]}")
 ```
 
 Due to its simplicity and generality, random search is one of the most frequently
-used HPO algorithms. It doesn't require any sophisticated implementation and
+used HPO algorithms. It does not require any sophisticated implementation and
 can be applied to any configuration space as long as we can define some
 probability distribution for each hyperparameter.
 
@@ -272,7 +273,7 @@ depends on a small subset of the hyperparameters.
     5. Apart from the sheer amount of compute and storage required, what other issues would gradient-based hyperparameter optimization run into? Hint: Re-read about vanishing and exploding gradients in :numref:`sec_numerical_stability`.
     6. *Advanced*: Read :cite:`maclaurin-icml15` for an elegant (yet still somewhat unpractical) approach to gradient-based HPO.
 3. Grid search is another HPO baseline, where we define an equi-spaced grid for each hyperparameter, then iterate over the (combinatorial) Cartesian product in order to suggest configurations.
-    1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :cite:`bergstra-nips11`.
+    1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :cite:`bergstra2011algorithms`.
 
 
 :begin_tab:`pytorch`

@@ -16,7 +16,7 @@ Once we condition on data, we can use this prior to infer a posterior distributi
 
 ![Sample posterior functions, once we have observed the data.](../img/gp-sample-posterior-functions.svg)
 
-We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we don't actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form. 
+We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we do not actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form. 
 
 ![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](../img/gp-posterior-samples.svg)
 
@@ -125,7 +125,7 @@ $$
 The off-diagonal expression $k(x,x_1) = k(x_1,x)$ 
 tells us how correlated the function values will be --- how strongly determined $f(x)$
 will be from $f(x_1)$. 
-We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x_1$, 
+We have seen already that if we use a large length-scale, relative to the distance between $x$ and $x_1$, 
 $||x-x_1||$, then the function values will be highly correlated. We can visualize the process of determining $f(x)$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1), f(x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.9$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
 
 Suppose we observe $f(x_1) = 1.2$. 
@@ -163,7 +163,7 @@ with variance $\sigma^2$, then our covariance function simply becomes
 $k(x_i,x_j) \to k(x_i,x_j) + \delta_{ij}\sigma^2$,
 where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
 
-We've already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we'll precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
+We have already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we will precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
 
 ## Summary
 

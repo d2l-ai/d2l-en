@@ -34,13 +34,6 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [MXNet]", script: """set -ex
-      conda activate ${ENV_NAME}
-      ./static/cache.sh restore _build/eval_mxnet/data
-      d2lbook build eval --tab mxnet
-      ./static/cache.sh store _build/eval_mxnet/data
-      """
-
       sh label: "Execute Notebooks [Jax]", script: """set -ex
       conda activate ${ENV_NAME}
       ./static/cache.sh restore _build/eval_jax/data
@@ -58,6 +51,13 @@ stage("Build and Publish") {
       export TF_FORCE_GPU_ALLOW_GROWTH=true
       d2lbook build eval --tab tensorflow
       ./static/cache.sh store _build/eval_tensorflow/data
+      """
+      
+      sh label: "Execute Notebooks [MXNet]", script: """set -ex
+      conda activate ${ENV_NAME}
+      ./static/cache.sh restore _build/eval_mxnet/data
+      d2lbook build eval --tab mxnet
+      ./static/cache.sh store _build/eval_mxnet/data
       """
 
       sh label:"Build HTML", script:"""set -ex

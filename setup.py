@@ -3,7 +3,7 @@ import d2l
 
 requirements = [
     'jupyter',
-    'numpy',
+    'numpy<=1.23.5',
     'matplotlib',
     'matplotlib-inline',
     'requests',

@@ -1,4 +1,5 @@
 # Optimization and Deep Learning
+:label:`sec_optimization-intro`
 
 In this section, we will discuss the relationship between optimization and deep learning as well as the challenges of using optimization in deep learning.
 For a deep learning problem, we will usually define a *loss function* first. Once we have the loss function, we can use an optimization algorithm in attempt to minimize the loss.

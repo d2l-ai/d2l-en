@@ -45,8 +45,36 @@ describes multi-head attention.
 ![Multi-head attention, where multiple heads are concatenated then linearly transformed.](../img/multi-head-attention.svg)
 :label:`fig_multi-head-attention`
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+import math
+from mxnet import autograd, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import math
+import torch
+from torch import nn
+```
 
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+```
 
 ## Model
 
@@ -82,37 +110,6 @@ to different parts of the input.
 More sophisticated functions 
 than the simple weighted average can be expressed.
 
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-import math
-from mxnet import autograd, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import math
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-```
-
 ## Implementation
 
 In our implementation,
@@ -136,13 +133,13 @@ class MultiHeadAttention(d2l.Module):  #@save
                  **kwargs):
         super().__init__()
         self.num_heads = num_heads
-        self.attention = d2l.DotProductAttention(dropout, num_heads)
+        self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_k = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
-    def forward(self, queries, keys, values, valid_lens, window_mask=None):
+    def forward(self, queries, keys, values, valid_lens):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -160,8 +157,7 @@ class MultiHeadAttention(d2l.Module):  #@save
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output = self.attention(queries, keys, values, valid_lens,
-                                window_mask)
+        output = self.attention(queries, keys, values, valid_lens)
         
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
@@ -175,13 +171,13 @@ class MultiHeadAttention(d2l.Module):  #@save
     def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
         super().__init__()
         self.num_heads = num_heads
-        self.attention = d2l.DotProductAttention(dropout, num_heads)
+        self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_k = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
 
-    def forward(self, queries, keys, values, valid_lens, window_mask=None):
+    def forward(self, queries, keys, values, valid_lens):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -200,8 +196,7 @@ class MultiHeadAttention(d2l.Module):  #@save
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output = self.attention(queries, keys, values, valid_lens,
-                                window_mask)
+        output = self.attention(queries, keys, values, valid_lens)
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
@@ -215,14 +210,13 @@ class MultiHeadAttention(d2l.Module):  #@save
                  num_heads, dropout, bias=False, **kwargs):
         super().__init__()
         self.num_heads = num_heads
-        self.attention = d2l.DotProductAttention(dropout, num_heads)
+        self.attention = d2l.DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
         self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
         self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
         self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
     
-    def call(self, queries, keys, values, valid_lens, window_mask=None,
-             **kwargs):
+    def call(self, queries, keys, values, valid_lens, **kwargs):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -240,8 +234,7 @@ class MultiHeadAttention(d2l.Module):  #@save
             
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output = self.attention(queries, keys, values, valid_lens,
-                                window_mask, **kwargs)
+        output = self.attention(queries, keys, values, valid_lens, **kwargs)
         
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
@@ -257,15 +250,14 @@ class MultiHeadAttention(nn.Module):  #@save
     bias: bool = False
 
     def setup(self):
-        self.attention = d2l.DotProductAttention(self.dropout, self.num_heads)
+        self.attention = d2l.DotProductAttention(self.dropout)
         self.W_q = nn.Dense(self.num_hiddens, use_bias=self.bias)
         self.W_k = nn.Dense(self.num_hiddens, use_bias=self.bias)
         self.W_v = nn.Dense(self.num_hiddens, use_bias=self.bias)
         self.W_o = nn.Dense(self.num_hiddens, use_bias=self.bias)
 
     @nn.compact
-    def __call__(self, queries, keys, values, valid_lens,
-                 window_mask=None, training=False):
+    def __call__(self, queries, keys, values, valid_lens, training=False):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -283,9 +275,8 @@ class MultiHeadAttention(nn.Module):  #@save
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output, attention_weights = self.attention(queries, keys, values,
-                                                   valid_lens, window_mask,
-                                                   training=training)
+        output, attention_weights = self.attention(
+            queries, keys, values, valid_lens, training=training)
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
         return self.W_o(output_concat), attention_weights
@@ -400,6 +391,18 @@ the shape of the multi-head attention output
 is (`batch_size`, `num_queries`, `num_hiddens`).
 
 ```{.python .input}
+%%tab pytorch
+num_hiddens, num_heads = 100, 5
+attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
+d2l.check_shape(attention(X, Y, Y, valid_lens),
+                (batch_size, num_queries, num_hiddens))
+```
+
+```{.python .input}
 %%tab mxnet
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
@@ -407,7 +410,7 @@ attention.initialize()
 ```
 
 ```{.python .input}
-%%tab pytorch, jax
+%%tab jax
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
@@ -420,8 +423,9 @@ attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
+%%tab mxnet
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 d2l.check_shape(attention(X, Y, Y, valid_lens),
@@ -430,7 +434,8 @@ d2l.check_shape(attention(X, Y, Y, valid_lens),
 
 ```{.python .input}
 %%tab tensorflow
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
 Y = tf.ones((batch_size, num_kvpairs, num_hiddens))
 d2l.check_shape(attention(X, Y, Y, valid_lens, training=False),
@@ -439,7 +444,8 @@ d2l.check_shape(attention(X, Y, Y, valid_lens, training=False),
 
 ```{.python .input}
 %%tab jax
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
+batch_size, num_queries, num_kvpairs = 2, 4, 6
+valid_lens = d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 d2l.check_shape(attention.init_with_output(d2l.get_key(), X, Y, Y, valid_lens,

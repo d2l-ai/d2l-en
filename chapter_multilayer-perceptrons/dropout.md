@@ -105,6 +105,37 @@ $$
 
 By design, the expectation remains unchanged, i.e., $E[h'] = h$.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import autograd, gluon, init, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from functools import partial
+import jax
+from jax import numpy as jnp
+import optax
+```
+
 ## Dropout in Practice
 
 Recall the MLP with a hidden layer and 5 hidden units
@@ -156,11 +187,6 @@ dividing the survivors by `1.0-dropout`.
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import autograd, gluon, init, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1
     if dropout == 1: return np.zeros_like(X)
@@ -170,10 +196,6 @@ def dropout_layer(X, dropout):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1
     if dropout == 1: return torch.zeros_like(X)
@@ -183,9 +205,6 @@ def dropout_layer(X, dropout):
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1
     if dropout == 1: return tf.zeros_like(X)
@@ -196,13 +215,6 @@ def dropout_layer(X, dropout):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from functools import partial
-import jax
-from jax import numpy as jnp
-import optax
-
 def dropout_layer(X, dropout, key=d2l.get_key()):
     assert 0 <= dropout <= 1
     if dropout == 1: return jnp.zeros_like(X)

@@ -11,8 +11,8 @@ dependencies:
     - tensorflow==2.11.0
     - tensorflow-probability==0.18.0
     - tensorflow-datasets==4.7.0
-    - jaxlib
-    - "jax[cuda11_cudnn82]"
+    - jaxlib==0.4.1+cuda11.cudnn82
+    - "jax[cuda11_cudnn82]==0.4.1"
     - -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
     - flax
-    - syne-tune[gpsearchers]
+    - syne-tune[gpsearchers]==0.3.2

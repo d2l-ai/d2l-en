@@ -35,6 +35,32 @@ In other cases, we may want to reduce the dimensionality drastically,
 e.g., if we find the original input resolution to be unwieldy.
 *Strided convolutions* are a popular technique that can help in these instances.
 
+```{.python .input}
+%%tab mxnet
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
@@ -109,13 +135,9 @@ we find that the height and width of the output is also 8.
 
 ```{.python .input}
 %%tab mxnet
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 # We define a helper function to calculate convolutions. It initializes 
 # the convolutional layer weights and performs corresponding dimensionality 
-# elevations and reductions on the input and output.
+# elevations and reductions on the input and output
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
     # (1, 1) indicates that batch size and the number of channels are both 1
@@ -132,11 +154,8 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab pytorch
-import torch
-from torch import nn
-
-# We define a helper function to calculate convolutions. It initializes
-# the convolutional layer weights and performs corresponding dimensionality
+# We define a helper function to calculate convolutions. It initializes the
+# convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output
 def comp_conv2d(conv2d, X):
     # (1, 1) indicates that batch size and the number of channels are both 1
@@ -144,7 +163,9 @@ def comp_conv2d(conv2d, X):
     Y = conv2d(X)
     # Strip the first two dimensions: examples and channels
     return Y.reshape(Y.shape[2:])
-# 1 row and column is padded on either side, so a total of 2 rows or columns are added
+
+# 1 row and column is padded on either side, so a total of 2 rows or columns
+# are added
 conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1)
 X = torch.rand(size=(8, 8))
 comp_conv2d(conv2d, X).shape
@@ -152,8 +173,6 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 # We define a helper function to calculate convolutions. It initializes
 # the convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output
@@ -163,7 +182,8 @@ def comp_conv2d(conv2d, X):
     Y = conv2d(X)
     # Strip the first two dimensions: examples and channels
     return tf.reshape(Y, Y.shape[1:3])
-# 1 row and column is padded on either side, so a total of 2 rows or columns are added
+# 1 row and column is padded on either side, so a total of 2 rows or columns
+# are added
 conv2d = tf.keras.layers.Conv2D(1, kernel_size=3, padding='same')
 X = tf.random.uniform(shape=(8, 8))
 comp_conv2d(conv2d, X).shape
@@ -171,11 +191,6 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 # We define a helper function to calculate convolutions. It initializes
 # the convolutional layer weights and performs corresponding dimensionality
 # elevations and reductions on the input and output
@@ -206,8 +221,8 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab pytorch
-# We use a convolution kernel with height 5 and width 3. The padding on
-# either side of the height and width are 2 and 1, respectively
+# We use a convolution kernel with height 5 and width 3. The padding on either
+# side of the height and width are 2 and 1, respectively
 conv2d = nn.LazyConv2d(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
@@ -330,7 +345,7 @@ Padding can increase the height and width of the output. This is often used to g
 
 A similar convention applies to strides. When horizontal stride $s_h$ and vertical stride $s_w$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
 
-So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provides an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
+So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provided an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
 
 
 ## Exercises

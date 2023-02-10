@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Lazy Initialization
 :label:`sec_lazy_init`
 
@@ -36,23 +41,11 @@ can greatly simplify the task of specifying
 and subsequently modifying our models.
 Next, we go deeper into the mechanics of initialization.
 
-
-To begin, let's instantiate an MLP.
-
-```{.python .input}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
 ```{.python .input}
 %%tab mxnet
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-net = nn.Sequential()
-net.add(nn.Dense(256, activation='relu'))
-net.add(nn.Dense(10))
 ```
 
 ```{.python .input}
@@ -60,18 +53,11 @@ net.add(nn.Dense(10))
 from d2l import torch as d2l
 import torch
 from torch import nn
-
-net = nn.Sequential(nn.LazyLinear(256), nn.ReLU(), nn.LazyLinear(10))
 ```
 
 ```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
-
-net = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(256, activation=tf.nn.relu),
-    tf.keras.layers.Dense(10),
-])
 ```
 
 ```{.python .input}
@@ -80,7 +66,32 @@ from d2l import jax as d2l
 from flax import linen as nn
 import jax
 from jax import numpy as jnp
+```
 
+To begin, let's instantiate an MLP.
+
+```{.python .input}
+%%tab mxnet
+net = nn.Sequential()
+net.add(nn.Dense(256, activation='relu'))
+net.add(nn.Dense(10))
+```
+
+```{.python .input}
+%%tab pytorch
+net = nn.Sequential(nn.LazyLinear(256), nn.ReLU(), nn.LazyLinear(10))
+```
+
+```{.python .input}
+%%tab tensorflow
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10),
+])
+```
+
+```{.python .input}
+%%tab jax
 net = nn.Sequential([nn.Dense(256), nn.relu, nn.Dense(10)])
 ```
 

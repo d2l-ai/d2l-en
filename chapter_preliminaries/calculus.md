@@ -39,12 +39,43 @@ where we repeatedly update our parameters
 in order to decrease the loss function.
 Optimization addresses how to fit our models to training data,
 and calculus is its key prerequisite.
-However, don't forget that our ultimate goal
+However, do not forget that our ultimate goal
 is to perform well on *previously unseen* data.
 That problem is called *generalization*
 and will be a key focus of other chapters.
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from matplotlib_inline import backend_inline
+from mxnet import np, npx
+npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+```
 
 ## Derivatives and Differentiation
 
@@ -96,45 +127,24 @@ Let's develop some intuition with an example.
 
 ```{.python .input}
 %%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from matplotlib_inline import backend_inline
-from mxnet import np, npx
-npx.set_np()
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
 ```{.python .input}
 %%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-from matplotlib_inline import backend_inline
-import numpy as np
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
 ```{.python .input}
 %%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-from matplotlib_inline import backend_inline
-import numpy as np
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
 ```{.python .input}
 %%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-from matplotlib_inline import backend_inline
-import numpy as np
-
 def f(x):
     return 3 * x ** 2 - 4 * x
 ```
@@ -244,7 +254,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
     """Plot data points."""
 
-    def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
+    def has_one_axis(X):  # True if X (tensor or list) has 1 axis
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
     
@@ -257,7 +267,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         X = X * len(Y)
         
     set_figsize(figsize)
-    if axes is None: axes = d2l.plt.gca()
+    if axes is None:
+        axes = d2l.plt.gca()
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)

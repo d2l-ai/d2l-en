@@ -23,14 +23,14 @@ As we pass data through each successive function,
 the framework builds a *computational graph* 
 that tracks how each value depends on others.
 To calculate derivatives, 
-automatic differentiation packages 
-then work backwards through this graph
+automatic differentiation 
+works backwards through this graph
 applying the chain rule. 
 The computational algorithm for applying the chain rule
-this fashion is called *backpropagation*.
+in this fashion is called *backpropagation*.
 
-While autograd libraries become 
-hot concerns over the past decade,
+While autograd libraries have become
+a hot concern over the past decade,
 they have a long history. 
 In fact the earliest references to autograd
 date back over half of a century :cite:`Wengert.1964`.
@@ -38,12 +38,35 @@ The core ideas behind modern backpropagation
 date to a PhD thesis from 1980 :cite:`Speelpenning.1980`
 and were further developed in the late 1980s :cite:`Griewank.1989`.
 While backpropagation has become the default method 
-for computing gradients, it's not the only option. 
+for computing gradients, it is not the only option. 
 For instance, the Julia programming language employs 
 forward propagation :cite:`Revels.Lubin.Papamarkou.2016`. 
 Before exploring methods, 
 let's first master the autograd package.
 
+
+
+
+```{.python .input}
+%%tab mxnet
+from mxnet import autograd, np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+```
 
 ## A Simple Function
 
@@ -55,33 +78,24 @@ To start, we assign `x` an initial value.
 
 ```{.python .input  n=1}
 %%tab mxnet
-from mxnet import autograd, np, npx
-npx.set_np()
-
 x = np.arange(4.0)
 x
 ```
 
 ```{.python .input  n=7}
 %%tab pytorch
-import torch
-
 x = torch.arange(4.0)
 x
 ```
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 x = tf.range(4, dtype=tf.float32)
 x
 ```
 
 ```{.python .input}
 %%tab jax
-from jax import numpy as jnp
-
 x = jnp.arange(4.0)
 x
 ```
@@ -114,9 +128,9 @@ x.grad
 
 ```{.python .input  n=9}
 %%tab pytorch
-# Better create x = torch.arange(4.0, requires_grad=True)
+# Can also create x = torch.arange(4.0, requires_grad=True)
 x.requires_grad_(True)
-x.grad  # The default value is None
+x.grad  # The gradient is None by default
 ```
 
 ```{.python .input}
@@ -128,7 +142,8 @@ x = tf.Variable(x)
 
 ```{.python .input  n=10}
 %%tab mxnet
-# Our code is inside an `autograd.record` scope to build the computational graph
+# Our code is inside an `autograd.record` scope to build the computational
+# graph
 with autograd.record():
     y = 2 * np.dot(x, x)
 y
@@ -173,11 +188,11 @@ via `x`'s `grad` attribute.
 :begin_tab:`tensorflow`
 [**We can now calculate the gradient of `y`
 with respect to `x`**] by calling 
-the `gradient` function.
+the `gradient` method.
 :end_tab:
 
 :begin_tab:`jax`
-[**We can now take the gradient of function `y`
+[**We can now take the gradient of `y`
 with respect to `x`**] by passing through the
 `grad` transform.
 :end_tab:
@@ -203,7 +218,7 @@ x_grad
 ```{.python .input}
 %%tab jax
 from jax import grad
-# the `grad` transform returns a Python function that
+# The `grad` transform returns a Python function that
 # computes the gradient of the original function
 x_grad = grad(y)(x)
 x_grad
@@ -249,8 +264,8 @@ and take its gradient.**]
 Note that PyTorch does not automatically 
 reset the gradient buffer 
 when we record a new gradient. 
-Instead the new gradient 
-is added to the already stored gradient.
+Instead, the new gradient
+is added to the already-stored gradient.
 This behavior comes in handy
 when we want to optimize the sum 
 of multiple objective functions.
@@ -316,7 +331,7 @@ with respect to the full vector `x`,
 yielding a vector of the same shape as `x`.
 For example, we often have a vector 
 representing the value of our loss function
-calculated separately for each among
+calculated separately for each example among
 a *batch* of training examples.
 Here, we just want to (**sum up the gradients
 computed individually for each example**).
@@ -376,13 +391,13 @@ x.grad
 %%tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
-t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
+t.gradient(y, x)  # Same as y = tf.reduce_sum(x * x)
 ```
 
 ```{.python .input}
 %%tab jax
 y = lambda x: x * x
-# `grad` is only defined for scalar output functions
+# grad is only defined for scalar output functions
 grad(lambda x: y(x).sum())(x)
 ```
 
@@ -394,7 +409,7 @@ For example, say that we use the input
 to create some auxiliary intermediate terms 
 for which we do not want to compute a gradient. 
 In this case, we need to *detach* 
-the respective computational influence graph 
+the respective computational graph
 from the final result. 
 The following toy example makes this clearer: 
 suppose we have `z = x * y` and `y = x * x` 
@@ -405,7 +420,7 @@ that takes the same value as `y`
 but whose *provenance* (how it was created)
 has been wiped out.
 Thus `u` has no ancestors in the graph
-and gradients to not flow through `u` to `x`.
+and gradients do not flow through `u` to `x`.
 For example, taking the gradient of `z = x * u`
 will yield the result `x`,
 (not `3 * x * x` as you might have 
@@ -434,8 +449,8 @@ x.grad == u
 
 ```{.python .input}
 %%tab tensorflow
-# Set `persistent=True` to preserve the compute graph. 
-# This lets us run `t.gradient` more than once
+# Set persistent=True to preserve the compute graph. 
+# This lets us run t.gradient more than once
 with tf.GradientTape(persistent=True) as t:
     y = x * x
     u = tf.stop_gradient(y)
@@ -450,7 +465,7 @@ x_grad == u
 import jax
 
 y = lambda x: x * x
-# `jax.lax` primitives are Python wrappers around XLA operations
+# jax.lax primitives are Python wrappers around XLA operations
 u = jax.lax.stop_gradient(y(x))
 z = lambda x: u * x
 
@@ -636,7 +651,7 @@ since it is impossible to compute the gradient a priori.
 
 ## Discussion
 
-You've now gotten a taste of the power of automatic differentiation. 
+You have now gotten a taste of the power of automatic differentiation. 
 The development of libraries for calculating derivatives
 both automatically and efficiently 
 has been a massive productivity booster

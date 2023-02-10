@@ -3,7 +3,7 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# Encoder-Decoder Architecture
+# The Encoder-Decoder Architecture
 :label:`sec_encoder-decoder`
 
 In general seq2seq problems 
@@ -39,6 +39,32 @@ in subsequent sections,
 this section will convert this architecture
 into an interface that will be implemented later.
 
+
+
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet.gluon import nn
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+```
+
 ## (**Encoder**)
 
 In the encoder interface,
@@ -49,9 +75,6 @@ by any model that inherits this base `Encoder` class.
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet.gluon import nn
-
 class Encoder(nn.Block):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
@@ -64,9 +87,6 @@ class Encoder(nn.Block):  #@save
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-from torch import nn
-
 class Encoder(nn.Module):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
@@ -79,9 +99,6 @@ class Encoder(nn.Module):  #@save
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 class Encoder(tf.keras.layers.Layer):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
@@ -94,9 +111,6 @@ class Encoder(tf.keras.layers.Layer):  #@save
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-
 class Encoder(nn.Module):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def setup(self):
@@ -110,7 +124,7 @@ class Encoder(nn.Module):  #@save
 ## [**Decoder**]
 
 In the following decoder interface,
-we add an additional `init_state` function
+we add an additional `init_state` method
 to convert the encoder output (`enc_all_outputs`)
 into the encoded state.
 Note that this step

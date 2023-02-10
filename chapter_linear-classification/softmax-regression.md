@@ -183,7 +183,7 @@ In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
 where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 This is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model),
 first introduced by :citet:`Fechner.1860`.
-While appealing, it doesn't work quite as well
+While appealing, it does not work quite as well
 nor lead to a particularly nice optimization problem,
 when compared to the softmax.
 
@@ -388,7 +388,7 @@ In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
 relative to what we predict that should happen $\hat{\mathbf{y}}$.
 We provide a very basic explanation in the following. For further
 details on information theory see
-:cite:`Cover.Thomas.1999` or :cite:`mackay2003information`.
+:citet:`Cover.Thomas.1999` or :citet:`mackay2003information`.
 
 
 
@@ -521,7 +521,7 @@ that can be executed most efficiently on modern GPUs.
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     1. What is the problem if we try to design a binary code for it?
     1. Can you design a better code? Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
-1. When encoding signals transmitted over a physical wire, engineers don't always use binary codes. For instance, [PAM-3](https://en.wikipedia.org/wiki/Ternary_signal) uses three signal levels $\{-1, 0, 1\}$ as opposed to two levels $\{0, 1\}$. How many ternary units do you need to transmit an integer in the range $\{0, \ldots, 7\}$? Why might this be a better idea in terms of electronics?
+1. When encoding signals transmitted over a physical wire, engineers do not always use binary codes. For instance, [PAM-3](https://en.wikipedia.org/wiki/Ternary_signal) uses three signal levels $\{-1, 0, 1\}$ as opposed to two levels $\{0, 1\}$. How many ternary units do you need to transmit an integer in the range $\{0, \ldots, 7\}$? Why might this be a better idea in terms of electronics?
 1. The [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
 a logistic model to capture preferences. For a user to choose between apples and oranges one
 assumes scores $o_{\mathrm{apple}}$ and $o_{\mathrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that

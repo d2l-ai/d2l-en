@@ -27,6 +27,43 @@ pervasive in a wide range of
 modern deep learning applications,
 such as in areas of language, vision, speech, and reinforcement learning.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+import math
+from mxnet import autograd, init, np, npx
+from mxnet.gluon import nn
+import pandas as pd
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import math
+import pandas as pd
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+import math
+import pandas as pd
+```
+
 ## Model
 
 As an instance of the encoder-decoder
@@ -108,43 +145,6 @@ and positional encoding in :numref:`subsec_positional-encoding`.
 In the following, we will implement
 the rest of the Transformer model.
 
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-import math
-from mxnet import autograd, init, np, npx
-from mxnet.gluon import nn
-import pandas as pd
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import math
-import pandas as pd
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import numpy as np
-import pandas as pd
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-import math
-import pandas as pd
-```
-
 ## [**Positionwise Feed-Forward Networks**]
 :label:`subsec_positionwise-ffn`
 
@@ -163,7 +163,7 @@ an output tensor of shape
 ```{.python .input}
 %%tab mxnet
 class PositionWiseFFN(nn.Block):  #@save
-    """Positionwise feed-forward network."""
+    """The positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs):
         super().__init__()
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
@@ -177,7 +177,7 @@ class PositionWiseFFN(nn.Block):  #@save
 ```{.python .input}
 %%tab pytorch
 class PositionWiseFFN(nn.Module):  #@save
-    """Positionwise feed-forward network."""
+    """The positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs):
         super().__init__()
         self.dense1 = nn.LazyLinear(ffn_num_hiddens)
@@ -191,7 +191,7 @@ class PositionWiseFFN(nn.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class PositionWiseFFN(tf.keras.layers.Layer):  #@save
-    """Positionwise feed-forward network."""
+    """The positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs):
         super().__init__()
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
@@ -205,6 +205,7 @@ class PositionWiseFFN(tf.keras.layers.Layer):  #@save
 ```{.python .input}
 %%tab jax
 class PositionWiseFFN(nn.Module):  #@save
+    """The positionwise feed-forward network."""
     ffn_num_hiddens: int
     ffn_num_outputs: int
 
@@ -329,7 +330,7 @@ Dropout is also applied for regularization.
 ```{.python .input}
 %%tab mxnet
 class AddNorm(nn.Block):  #@save
-    """Residual connection followed by layer normalization."""
+    """The residual connection followed by layer normalization."""
     def __init__(self, dropout):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
@@ -342,7 +343,7 @@ class AddNorm(nn.Block):  #@save
 ```{.python .input}
 %%tab pytorch
 class AddNorm(nn.Module):  #@save
-    """Residual connection followed by layer normalization."""
+    """The residual connection followed by layer normalization."""
     def __init__(self, norm_shape, dropout):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
@@ -355,7 +356,7 @@ class AddNorm(nn.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class AddNorm(tf.keras.layers.Layer):  #@save
-    """Residual connection followed by layer normalization."""
+    """The residual connection followed by layer normalization."""
     def __init__(self, norm_shape, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
@@ -368,6 +369,7 @@ class AddNorm(tf.keras.layers.Layer):  #@save
 ```{.python .input}
 %%tab jax
 class AddNorm(nn.Module):  #@save
+    """The residual connection followed by layer normalization."""
     dropout: int
 
     @nn.compact
@@ -384,29 +386,33 @@ so that [**the output tensor also has the same shape after the addition operatio
 %%tab mxnet
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-d2l.check_shape(add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))), (2, 3, 4))
+shape = (2, 3, 4)
+d2l.check_shape(add_norm(d2l.ones(shape), d2l.ones(shape)), shape)
 ```
 
 ```{.python .input}
 %%tab pytorch
 add_norm = AddNorm(4, 0.5)
-d2l.check_shape(add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))), (2, 3, 4))
+shape = (2, 3, 4)
+d2l.check_shape(add_norm(d2l.ones(shape), d2l.ones(shape)), shape)
 ```
 
 ```{.python .input}
 %%tab tensorflow
 # Normalized_shape is: [i for i in range(len(input.shape))][1:]
 add_norm = AddNorm([1, 2], 0.5)
-d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
-                         training=False), (2, 3, 4))
+shape = (2, 3, 4)
+d2l.check_shape(add_norm(tf.ones(shape), tf.ones(shape), training=False),
+                shape)
 ```
 
 ```{.python .input}
 %%tab jax
 add_norm = AddNorm(0.5)
-output, _ = add_norm.init_with_output(d2l.get_key(), d2l.ones((2, 3, 4)),
-                                      d2l.ones((2, 3, 4)))
-d2l.check_shape(output, (2, 3, 4))
+shape = (2, 3, 4)
+output, _ = add_norm.init_with_output(d2l.get_key(), d2l.ones(shape),
+                                      d2l.ones(shape))
+d2l.check_shape(output, shape)
 ```
 
 ## Encoder
@@ -424,7 +430,7 @@ around both sublayers.
 ```{.python .input}
 %%tab mxnet
 class TransformerEncoderBlock(nn.Block):  #@save
-    """Transformer encoder block."""
+    """The Transformer encoder block."""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False):
         super().__init__()
@@ -442,7 +448,7 @@ class TransformerEncoderBlock(nn.Block):  #@save
 ```{.python .input}
 %%tab pytorch
 class TransformerEncoderBlock(nn.Module):  #@save
-    """Transformer encoder block."""
+    """The Transformer encoder block."""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False):
         super().__init__()
@@ -460,7 +466,7 @@ class TransformerEncoderBlock(nn.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
-    """Transformer encoder block."""
+    """The Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
         super().__init__()
@@ -480,7 +486,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):  #@save
 ```{.python .input}
 %%tab jax
 class TransformerEncoderBlock(nn.Module):  #@save
-    """Transformer encoder block."""
+    """The Transformer encoder block."""
     num_hiddens: int
     ffn_num_hiddens: int
     num_heads: int
@@ -553,7 +559,7 @@ to rescale before summing up the input embedding and the positional encoding.
 ```{.python .input}
 %%tab mxnet
 class TransformerEncoder(d2l.Encoder):  #@save
-    """Transformer encoder."""
+    """The Transformer encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_blks, dropout, use_bias=False):
         super().__init__()
@@ -582,7 +588,7 @@ class TransformerEncoder(d2l.Encoder):  #@save
 ```{.python .input}
 %%tab pytorch
 class TransformerEncoder(d2l.Encoder):  #@save
-    """Transformer encoder."""
+    """The Transformer encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_blks, dropout, use_bias=False):
         super().__init__()
@@ -610,7 +616,7 @@ class TransformerEncoder(d2l.Encoder):  #@save
 ```{.python .input}
 %%tab tensorflow
 class TransformerEncoder(d2l.Encoder):  #@save
-    """Transformer encoder."""
+    """The Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
                  num_blks, dropout, bias=False):
@@ -640,7 +646,7 @@ class TransformerEncoder(d2l.Encoder):  #@save
 ```{.python .input}
 %%tab jax
 class TransformerEncoder(d2l.Encoder):  #@save
-    """Transformer encoder."""
+    """The Transformer encoder."""
     vocab_size: int
     num_hiddens:int
     ffn_num_hiddens: int
@@ -1227,8 +1233,9 @@ is (number of encoder layers, number of attention heads, `num_steps` or number o
 %%tab pytorch, mxnet, tensorflow
 _, dec_attention_weights = model.predict_step(
     data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
-enc_attention_weights = d2l.reshape(d2l.concat(model.encoder.attention_weights, 0),
-                                    (num_blks, num_heads, -1, data.num_steps))
+enc_attention_weights = d2l.concat(model.encoder.attention_weights, 0)
+shape = (num_blks, num_heads, -1, data.num_steps)
+enc_attention_weights = d2l.reshape(enc_attention_weights, shape)
 d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
@@ -1238,8 +1245,9 @@ d2l.check_shape(enc_attention_weights,
 _, (dec_attention_weights, enc_attention_weights) = model.predict_step(
     trainer.state.params, data.build([engs[-1]], [fras[-1]]),
     data.num_steps, True)
-enc_attention_weights = d2l.reshape(d2l.concat(enc_attention_weights, 0),
-                                    (num_blks, num_heads, -1, data.num_steps))
+enc_attention_weights = d2l.concat(enc_attention_weights, 0)
+shape = (num_blks, num_heads, -1, data.num_steps)
+enc_attention_weights = d2l.reshape(enc_attention_weights, shape)
 d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
@@ -1302,8 +1310,8 @@ dec_attention_weights_2d = [head[0].tolist()
                             for attn in step for blk in attn for head in blk]
 dec_attention_weights_filled = d2l.tensor(
     pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)
-dec_attention_weights = d2l.reshape(dec_attention_weights_filled, (
-    -1, 2, num_blks, num_heads, data.num_steps))
+shape = (-1, 2, num_blks, num_heads, data.num_steps)
+dec_attention_weights = d2l.reshape(dec_attention_weights_filled, shape)
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.permute(1, 2, 3, 0, 4)
 ```
@@ -1387,6 +1395,7 @@ are important for training a very deep model.
 The positionwise feed-forward network in the Transformer model
 transforms the representation at all the sequence positions using the same MLP.
 
+
 ## Exercises
 
 1. Train a deeper Transformer in the experiments. How does it affect the training speed and the translation performance?
@@ -1406,4 +1415,3 @@ transforms the representation at all the sequence positions using the same MLP.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3871)
 :end_tab:
-

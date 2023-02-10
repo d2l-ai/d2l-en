@@ -229,6 +229,7 @@ rather than picking the default of a single layer.
 ```{.python .input}
 %%tab mxnet
 class GRU(d2l.RNN):  #@save
+    """The multi-layer GRU model."""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -238,6 +239,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab pytorch
 class GRU(d2l.RNN):  #@save
+    """The multi-layer GRU model."""
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -248,6 +250,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab tensorflow
 class GRU(d2l.RNN):  #@save
+    """The multi-layer GRU model."""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -264,6 +267,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab jax
 class GRU(d2l.RNN):  #@save
+    """The multi-layer GRU model."""
     num_hiddens: int
     num_layers: int
     dropout: float = 0
@@ -302,12 +306,22 @@ The only difference is that we now
 by specifying the value of `num_layers`.**)
 
 ```{.python .input}
-%%tab all
-if tab.selected('mxnet', 'tensorflow', 'jax'):
+%%tab mxnet
+gru = GRU(num_hiddens=32, num_layers=2)
+model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
+
+# Running takes > 1h (pending fix from MXNet)
+# trainer.fit(model, data)
+# model.predict('it has', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab pytorch, tensorflow, jax
+if tab.selected('tensorflow', 'jax'):
     gru = GRU(num_hiddens=32, num_layers=2)
 if tab.selected('pytorch'):
     gru = GRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
-if tab.selected('mxnet', 'pytorch', 'jax'):
+if tab.selected('pytorch', 'jax'):
     model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -316,7 +330,7 @@ trainer.fit(model, data)
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab pytorch
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 

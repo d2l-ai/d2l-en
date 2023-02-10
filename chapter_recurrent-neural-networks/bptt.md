@@ -40,7 +40,7 @@ from our chapters on convolutional neural networks.
 
 Complications arise because sequences
 can be rather long.
-It's not unusual to work with text sequences
+It is not unusual to work with text sequences
 consisting of over a thousand tokens. 
 Note that this poses problems both from 
 a computational (too much memory)

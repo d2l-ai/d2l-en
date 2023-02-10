@@ -209,7 +209,7 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
     batch_size = X.shape[0]
     ones = tf.ones((batch_size,)) # Labels corresponding to real data
     zeros = tf.zeros((batch_size,)) # Labels corresponding to fake data
-    # Do not need to compute gradient for `net_G`, so it's outside GradientTape
+    # Do not need to compute gradient for `net_G`, so it is outside GradientTape
     fake_X = net_G(Z)
     with tf.GradientTape() as tape:
         real_Y = net_D(X)

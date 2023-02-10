@@ -39,6 +39,35 @@ for processing deposits in ATM machines.
 To this day, some ATMs still run the code
 that Yann LeCun and his colleague Leon Bottou wrote in the 1990s!
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import autograd, gluon, init, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+from types import FunctionType
+```
 
 ## LeNet
 
@@ -91,36 +120,6 @@ using Xavier initialization as
 introduced in :numref:`subsec_xavier`.
 
 ```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import autograd, gluon, init, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-from types import FunctionType
-```
-
-```{.python .input}
 %%tab pytorch
 def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
@@ -131,6 +130,7 @@ def init_cnn(module):  #@save
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class LeNet(d2l.Classifier):  #@save
+    """The LeNet-5 model."""
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
@@ -173,6 +173,7 @@ class LeNet(d2l.Classifier):  #@save
 ```{.python .input}
 %%tab jax
 class LeNet(d2l.Classifier):  #@save
+    """The LeNet-5 model."""
     lr: float = 0.1
     num_classes: int = 10
     kernel_init: FunctionType = nn.initializers.xavier_uniform
@@ -239,7 +240,7 @@ def layer_summary(self, X_shape):
     for layer in self.net:
         X = layer(X)
         print(layer.__class__.__name__, 'output shape:\t', X.shape)
-
+        
 model = LeNet()
 model.layer_summary((1, 1, 28, 28))
 ```

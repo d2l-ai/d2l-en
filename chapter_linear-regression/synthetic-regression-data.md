@@ -75,13 +75,14 @@ from a normal distribution with mean $\mu= 0$
 and standard deviation $\sigma = 0.01$.
 Note that for object-oriented design
 we add the code to the `__init__` method of a subclass of `d2l.DataModule` (introduced in :numref:`oo-design-data`). 
-It's good practice to allow setting any additional hyperparameters. 
+It is good practice to allow setting any additional hyperparameters. 
 We accomplish this with `save_hyperparameters()`. 
 The `batch_size` will be determined later on.
 
 ```{.python .input}
 %%tab all
 class SyntheticRegressionData(d2l.DataModule):  #@save
+    """Synthetic data for linear regression."""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
                  batch_size=32):
         super().__init__()
@@ -122,8 +123,8 @@ Training machine learning models often requires multiple passes over a dataset,
 grabbing one minibatch of examples at a time. 
 This data is then used to update the model. 
 To illustrate how this works, we 
-[**implement the `get_dataloader` function,**] 
-registering it as a method in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
+[**implement the `get_dataloader` method,**] 
+registering it in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 It (**takes a batch size, a matrix of features,
 and a vector of labels, and generates minibatches of size `batch_size`.**)
 As such, each minibatch consists of a tuple of features and labels. 
@@ -180,7 +181,7 @@ are considerably more efficient and they can deal
 with sources such as data stored in files, 
 data received via a stream, 
 and data generated or processed on the fly. 
-Next let's try to implement the same function using built-in iterators.
+Next let's try to implement the same method using built-in iterators.
 
 ## Concise Implementation of the Data Loader
 
@@ -223,7 +224,10 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
             buffer_size=shuffle_buffer).batch(self.batch_size)
+```
 
+```{.python .input}
+%%tab all
 @d2l.add_to_class(SyntheticRegressionData)  #@save
 def get_dataloader(self, train):
     i = slice(0, self.num_train) if train else slice(self.num_train, None)
@@ -278,7 +282,7 @@ We will put this to good use in the next section.
     1. What happens if we cannot hold all data in memory?
     1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
-1. How would you design a random data generator that generates *the same* data each time it's called?
+1. How would you design a random data generator that generates *the same* data each time it is called?
 
 
 :begin_tab:`mxnet`

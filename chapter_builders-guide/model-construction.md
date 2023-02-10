@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Layers and Modules
 :label:`sec_model_construction`
 
@@ -89,6 +94,36 @@ when defining our own module,
 we only need to worry about parameters
 and the forward propagation method.
 
+
+
+```{.python .input}
+%%tab mxnet
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from typing import List
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 [**To begin, we revisit the code
 that we used to implement MLPs**]
 (:numref:`sec_mlp`).
@@ -99,16 +134,7 @@ followed by a fully connected output layer
 with 10 units (no activation function).
 
 ```{.python .input}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
-```{.python .input}
 %%tab mxnet
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
@@ -120,10 +146,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab pytorch
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 net = nn.Sequential(nn.LazyLinear(256), nn.ReLU(), nn.LazyLinear(10))
 
 X = torch.rand(2, 20)
@@ -132,8 +154,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     tf.keras.layers.Dense(10),
@@ -145,12 +165,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab jax
-from typing import List
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 net = nn.Sequential([nn.Dense(256), nn.relu, nn.Dense(10)])
 
 # get_key is a d2l saved function returning jax.random.PRNGKey(random_seed)
@@ -537,7 +551,7 @@ So we implement a `FixedHiddenMLP` class as follows.
 class FixedHiddenMLP(nn.Block):
     def __init__(self):
         super().__init__()
-        # Random weight parameters created with the `get_constant` method
+        # Random weight parameters created with the get_constant method
         # are not updated during training (i.e., constant parameters)
         self.rand_weight = self.params.get_constant(
             'rand_weight', np.random.uniform(size=(20, 20)))
@@ -545,7 +559,7 @@ class FixedHiddenMLP(nn.Block):
 
     def forward(self, X):
         X = self.dense(X)
-        # Use the created constant parameters, as well as the `relu` and `dot`
+        # Use the created constant parameters, as well as the relu and dot
         # functions
         X = npx.relu(np.dot(X, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
@@ -585,15 +599,15 @@ class FixedHiddenMLP(tf.keras.Model):
     def __init__(self):
         super().__init__()
         self.flatten = tf.keras.layers.Flatten()
-        # Random weight parameters created with `tf.constant` are not updated
+        # Random weight parameters created with tf.constant are not updated
         # during training (i.e., constant parameters)
         self.rand_weight = tf.constant(tf.random.uniform((20, 20)))
         self.dense = tf.keras.layers.Dense(20, activation=tf.nn.relu)
 
     def call(self, inputs):
         X = self.flatten(inputs)
-        # Use the created constant parameters, as well as the `relu` and
-        # `matmul` functions
+        # Use the created constant parameters, as well as the relu and
+        # matmul functions
         X = tf.nn.relu(tf.matmul(X, self.rand_weight) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers

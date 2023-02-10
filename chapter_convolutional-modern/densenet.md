@@ -13,6 +13,34 @@ and the concatenation operation (rather than the addition operator in ResNet) to
 from earlier layers.
 To understand how to arrive at it, let's take a small detour to mathematics.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import init, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+```
 
 ## From ResNet to DenseNet
 
@@ -60,11 +88,6 @@ First, we implement this convolution block structure.
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import init, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-
 def conv_block(num_channels):
     blk = nn.Sequential()
     blk.add(nn.BatchNorm(),
@@ -75,10 +98,6 @@ def conv_block(num_channels):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-
 def conv_block(num_channels):
     return nn.Sequential(
         nn.LazyBatchNorm2d(), nn.ReLU(),
@@ -87,9 +106,6 @@ def conv_block(num_channels):
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 class ConvBlock(tf.keras.layers.Layer):
     def __init__(self, num_channels):
         super(ConvBlock, self).__init__()
@@ -110,11 +126,6 @@ class ConvBlock(tf.keras.layers.Layer):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-
 class ConvBlock(nn.Module):
     num_channels: int
     training: bool = True

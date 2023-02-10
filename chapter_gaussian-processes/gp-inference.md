@@ -13,7 +13,7 @@ $$y(x) = f(x) + \epsilon(x),$$
 
 with $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$. Let $\mathbf{y} = y(X) = (y(x_1),\dots,y(x_n))^{\top}$ be a vector of our training observations, and $\textbf{f} = (f(x_1),\dots,f(x_n))^{\top}$ be a vector of the latent noise-free function values, queried at the training inputs $X = {x_1, \dots, x_n}$.
 
-We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection fo function values $\textbf{f}$ has a joint multivariate Gaussian distribution, with mean vector $\mu_i = m(x_i)$ and covariance matrix $K_{ij} = k(x_i,x_j)$. The RBF kernel $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x_i-x_j||^2\right)$ would be a standard choice of covariance function. For notational simplicity, we'll assume the mean function $m(x)=0$; our derivations can easily be generalized later on.
+We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection of function values $\textbf{f}$ has a joint multivariate Gaussian distribution, with mean vector $\mu_i = m(x_i)$ and covariance matrix $K_{ij} = k(x_i,x_j)$. The RBF kernel $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x_i-x_j||^2\right)$ would be a standard choice of covariance function. For notational simplicity, we will assume the mean function $m(x)=0$; our derivations can easily be generalized later on.
 
 Suppose we want to make predictions at a set of inputs $$X_* = x_{*1},x_{*2},\dots,x_{*m}.$$ Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
 
@@ -118,7 +118,7 @@ mean = np.zeros(test_x.shape[0])
 cov = d2l.rbfkernel(test_x, test_x, ls=0.2)
 ```
 
-We've started with a length-scale of 0.2. Before we fit the data, it's important to consider whether we've specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
+We have started with a length-scale of 0.2. Before we fit the data, it is important to consider whether we have specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
 
 ```{.python .input}
 prior_samples = np.random.multivariate_normal(mean=mean, cov=cov, size=5)
@@ -143,7 +143,7 @@ $$
 
 Before we make predictions, we should learn our kernel hyperparameters $\theta$ and noise variance $\sigma^2$. Let's initialize our length-scale at 0.75, as our prior functions looked too quickly varying compared to the data we are fitting. We'll also guess a noise standard deviation $\sigma$ of 0.75. 
 
-In order to learn these parameters, we'll maximize the marginal likelihood with respect to these parameters.
+In order to learn these parameters, we will maximize the marginal likelihood with respect to these parameters.
 
 $$
 \log p(y | X) = \log \int p(y | f, X)p(f | X)df
@@ -153,7 +153,7 @@ $$
 $$
 
 
-Perhaps our prior functions were too quickly varying. Let's guess a length-scale of 0.4. We'll also guess a noise standard deviation of 0.75. These are simply hyperparameter initializations --- we'll learn these parameters from the marginal likelihood.
+Perhaps our prior functions were too quickly varying. Let's guess a length-scale of 0.4. We'll also guess a noise standard deviation of 0.75. These are simply hyperparameter initializations --- we will learn these parameters from the marginal likelihood.
 
 ```{.python .input}
 ell_est = 0.4
@@ -178,7 +178,7 @@ post_sig_est = learned_hypers.x[1]
 
 In this instance, we learn a length-scale of 0.299, and a noise standard deviation of 0.24. Note that the learned noise is extremely close to the true noise, which helps indicate that our GP is a very well-specified to this problem. 
 
-In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. While marginal likelihood optimization can be relatively robust to initialization, it's not immune to poor initializations. Try running the above script with a variety of initializations and see what results you find.
+In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. While marginal likelihood optimization can be relatively robust to initialization, it is not immune to poor initializations. Try running the above script with a variety of initializations and see what results you find.
 
 Now, let's make predictions with these learned hypers.
 
@@ -216,7 +216,7 @@ The _epistemic_ uncertainty in the data is captured by variance of the latent no
 
 Unfortunately, people are often careless about how they represent uncertainty, with many papers showing error bars that are completely undefined, no clear sense of whether we are visualizing epistemic or aleatoric uncertainty or both, and confusing noise variances with noise standard deviations, standard deviations with standard errors, confidence intervals with credible sets, and so on. Without being precise about what the uncertainty represents, it is essentially meaningless. 
 
-In the spirit of playing close attention to what our uncertainty represents, it's crucial to note that we are taking _two times_ the _square root_ of our variance estimate for the noise free function. Since our predictive distribution is Gaussian, this quantity enables us to form a 95\% credible set, representing our beliefs about the interval which is 95\% likely to contain the ground truth function. The noise _variance_ is living on a completely different scale, and is much less interpretable. 
+In the spirit of playing close attention to what our uncertainty represents, it is crucial to note that we are taking _two times_ the _square root_ of our variance estimate for the noise free function. Since our predictive distribution is Gaussian, this quantity enables us to form a 95\% credible set, representing our beliefs about the interval which is 95\% likely to contain the ground truth function. The noise _variance_ is living on a completely different scale, and is much less interpretable. 
 
 Finally, let's take a look at 20 posterior samples. These samples tell us what types of functions we believe might fit our data, a posteriori.
 
@@ -231,7 +231,7 @@ plt.legend(['Observed Data', 'True Function', 'Predictive Mean', 'Posterior Samp
 d2l.plt.show()
 ```
 
-In basic regression applications, it's most common to use the posterior predictive mean and standard deviation as a point predictor and metric for uncertainty, respectively. In more advanced applications, such as Bayesian optimization with Monte Carlo acquisition functions, or Gaussian processes for model-based RL, it often necessary to take posterior samples. However, even if not strictly required in the basic applications, these samples give us more intuition about the fit we have for the data, and are often useful to include in visualizations. 
+In basic regression applications, it is most common to use the posterior predictive mean and standard deviation as a point predictor and metric for uncertainty, respectively. In more advanced applications, such as Bayesian optimization with Monte Carlo acquisition functions, or Gaussian processes for model-based RL, it often necessary to take posterior samples. However, even if not strictly required in the basic applications, these samples give us more intuition about the fit we have for the data, and are often useful to include in visualizations. 
 
 ## Making Life Easy with GPyTorch
 

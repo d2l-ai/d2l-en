@@ -41,6 +41,20 @@ vision Transformers outperform ResNets by a significant margin.
 Similar to the landscape of network architecture design in natural language processing,
 Transformers also became a game-changer in computer vision.
 
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
 
 ## Model
 
@@ -74,21 +88,6 @@ Since the “&lt;cls&gt;” token attends to all the image patches
 via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
 its representation from the Transformer encoder output
 will be further transformed into the output label.
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
 
 ## Patch Embedding
 
@@ -396,7 +395,6 @@ with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
 and added back convolution-like priors,
 extending the applicability of Transformers to a range of computer vision tasks 
 beyond image classification with state-of-the-art results :cite:`liu2021swin`.
-
 
 ## Exercises
 

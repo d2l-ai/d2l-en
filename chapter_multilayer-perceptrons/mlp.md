@@ -23,6 +23,36 @@ we can launch our exploration of deep neural networks,
 the comparatively rich class of models
 with which this book is primarily concerned.
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import autograd, np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+```
 
 ## Hidden Layers
 
@@ -274,37 +304,6 @@ while most of them add non-linearity.
 Because activation functions are fundamental to deep learning,
 (**let's briefly survey some common activation functions**).
 
-```{.python .input}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import autograd, np, npx
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-from jax import grad, vmap
-```
-
 ### ReLU Function
 
 The most popular choice,
@@ -363,7 +362,7 @@ In these cases, we default to the left-hand-side
 derivative and say that the derivative is 0 when the input is 0.
 We can get away with this because
 the input may never actually be zero (mathematicians would
-say that it's nondifferentiable on a set of measure zero).
+say that it is nondifferentiable on a set of measure zero).
 There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here, or at least, the fact that
@@ -578,7 +577,7 @@ d2l.plot(x, x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
 
 ```{.python .input}
 %%tab pytorch
-# Clear out previous gradients.
+# Clear out previous gradients
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
@@ -598,7 +597,7 @@ grad_tanh = vmap(grad(jax.nn.tanh))
 d2l.plot(x, grad_tanh(x), 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
-## Summary
+## Summary and Discussion
 
 We now know how to incorporate nonlinearities
 to build expressive multilayer neural network architectures.
@@ -618,9 +617,14 @@ A secondary benefit is that ReLU is significantly more amenable to
 optimization than the sigmoid or the tanh function. One could argue
 that this was one of the key innovations that helped the resurgence
 of deep learning over the past decade. Note, though, that research in
-activation functions has not stopped. For instance, the Swish activation
-function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
-:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy
+activation functions has not stopped.
+For instance, 
+the GELU (Gaussian error linear unit)
+activation function $x \Phi(x)$ :cite:`Hendrycks.Gimpel.2016`, where $\Phi(x)$
+is the standard Gaussian cumulative distribution function 
+and
+the Swish activation
+function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in :citet:`Ramachandran.Zoph.Le.2017` can yield better accuracy
 in many cases.
 
 ## Exercises

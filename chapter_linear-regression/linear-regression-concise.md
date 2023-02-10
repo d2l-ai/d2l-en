@@ -104,7 +104,7 @@ we set that number to 1.
 It is worth noting that, for convenience,
 Gluon does not require us to specify
 the input shape for each layer.
-Hence we don't need to tell Gluon
+Hence we do not need to tell Gluon
 how many inputs go into this linear layer.
 When we first pass data through our model,
 e.g., when we execute `net(X)` later,
@@ -135,7 +135,7 @@ we set that number to 1.
 It is worth noting that, for convenience,
 Keras does not require us to specify
 the input shape for each layer.
-We don't need to tell Keras
+We do not need to tell Keras
 how many inputs go into this linear layer.
 When we first try to pass data through our model,
 e.g., when we execute `net(X)` later,
@@ -147,6 +147,7 @@ We will describe how this works in more detail later.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class LinearRegression(d2l.Module):  #@save
+    """The linear regression model implemented with high-level APIs."""
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -165,19 +166,19 @@ class LinearRegression(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class LinearRegression(d2l.Module):  #@save
+    """The linear regression model implemented with high-level APIs."""
     lr: float
 
     def setup(self):
         self.net = nn.Dense(1, kernel_init=nn.initializers.normal(0.01))
 ```
 
-In the `forward` method, we just invoke the built-in `__call__` function of the predefined layers to compute the outputs.
+In the `forward` method, we just invoke the built-in `__call__` method of the predefined layers to compute the outputs.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LinearRegression)  #@save
 def forward(self, X):
-    """The linear regression model."""
     return self.net(X)
 ```
 
@@ -185,7 +186,6 @@ def forward(self, X):
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
 def forward(self, X):
-    """The linear regression model."""
     return self.net(X)
 ```
 
@@ -244,7 +244,7 @@ variations on this algorithm through its `Trainer` class.
 Note that Gluon's `Trainer` class stands
 for the optimization algorithm,
 while the `Trainer` class we created in :numref:`sec_oo-design`
-contains the training function,
+contains the training method,
 i.e., repeatedly call the optimizer
 to update the model parameters.
 When we instantiate `Trainer`,
@@ -368,7 +368,7 @@ and Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
 We used framework defaults for loading data, defining a layer,
 a loss function, an optimizer and a training loop.
 Whenever the framework provides all necessary features,
-it's generally a good idea to use them,
+it is generally a good idea to use them,
 since the library implementations of these components
 tend to be heavily optimized for performance
 and properly tested for reliability.

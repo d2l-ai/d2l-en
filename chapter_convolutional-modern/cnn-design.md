@@ -32,6 +32,35 @@ is a single network instance. EfficientNets are a notable outcome of this search
 
 In the following we discuss an idea that is quite different to the quest for the *single best network*. It is computationally relatively inexpensive, it leads to scientific insights on the way, and it is quite effective in terms of the quality of outcomes. Let's review the strategy by :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` to *design network design spaces*. The strategy combines the strength of manual design and NAS. It accomplishes this by operating on *distributions of networks* and optimizing the distributions in a way to obtain good performance for entire families of networks. The outcome of it are *RegNets*, specifically RegNetX and RegNetY, plus a range of guiding principles for the design of performant CNNs. 
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+```
+
 ## The AnyNet Design Space
 :label:`subsec_the-anynet-design-space`
 
@@ -55,11 +84,6 @@ In total this adds up to 17 parameters, resulting in an unreasonably large numbe
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         net = nn.Sequential()
@@ -70,11 +94,6 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return nn.Sequential(
@@ -84,9 +103,6 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return tf.keras.models.Sequential([
@@ -98,9 +114,6 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-
 class AnyNet(d2l.Classifier):
     arch: tuple
     stem_channels: int
@@ -233,7 +246,7 @@ def create_net(self):
 ## Distributions and Parameters of Design Spaces
 
 As just discussed in :numref:`subsec_the-anynet-design-space`, parameters of a design space are hyperparameters of networks in that design space.
-Consider the problem of identifying good parameters in the AnyNet design space. We could try finding the *single best* parameter choice for a given amount of computation (e.g., FLOPs and compute time). If we allowed for even only *two* possible choices for each parameter, we would have to explore $2^{17} = 131072$ combinations to find the best solution. This is clearly infeasible due to its exorbitant cost. Even worse, we don't really learn anything from this exercise in terms of how one should design a network. Next time we add, say, an X-stage, or a shift operation, or similar, we would need to start from scratch. Even worse, due to the stochasticity in training (rounding, shuffling, bit errors), no two runs are likely to produce exactly the same results. A better strategy is to try to determine general guidelines of how the choices of parameters should be related. For instance, the bottleneck ratio, the number of channels, blocks, groups, or their change between layers should ideally be governed by a collection of simple rules. The approach in :citet:`radosavovic2019network` relies on the following four assumptions:
+Consider the problem of identifying good parameters in the AnyNet design space. We could try finding the *single best* parameter choice for a given amount of computation (e.g., FLOPs and compute time). If we allowed for even only *two* possible choices for each parameter, we would have to explore $2^{17} = 131072$ combinations to find the best solution. This is clearly infeasible due to its exorbitant cost. Even worse, we do not really learn anything from this exercise in terms of how one should design a network. Next time we add, say, an X-stage, or a shift operation, or similar, we would need to start from scratch. Even worse, due to the stochasticity in training (rounding, shuffling, bit errors), no two runs are likely to produce exactly the same results. A better strategy is to try to determine general guidelines of how the choices of parameters should be related. For instance, the bottleneck ratio, the number of channels, blocks, groups, or their change between layers should ideally be governed by a collection of simple rules. The approach in :citet:`radosavovic2019network` relies on the following four assumptions:
 
 1. We assume that general design principles actually exist, such that many networks satisfying these requirements should offer good performance. Consequently, identifying a *distribution* over networks can be a good strategy. In other words, we assume that there are many good needles in the haystack.
 1. We need not train networks to convergence before we can assess whether a network is good. Instead, it is sufficient to use the intermediate results as reliable guidance for final accuracy. Using (approximate) proxies to optimize an objective is referred to as multi-fidelity optimization :cite:`forrester2007multi`. Consequently, design optimization is carried out, based on the accuracy achieved after only a few passes through the dataset, reducing the cost significantly. 
@@ -249,8 +262,8 @@ Our goal is now to find a distribution $p$ over *networks* such that most networ
 $$\hat{F}(e, \mathcal{Z}) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i \leq e).$$
 
 Whenever the CDF for one set of choices majorizes (or matches) another CDF it follows that its choice of parameters is superior (or indifferent). Accordingly 
-:citet:`Radosavovic.Kosaraju.Girshick.ea.2020` experimented with a shared network bottleneck ratio $k_i = k$ for all stages $i$ of the network. This gets rid of $3$ of the $4$ parameters governing the bottleneck ratio. To assess whether this (negatively) affects the performance one can draw networks from the constrained and from the unconstrained distribution and compare the corresonding CDFs. It turns out that this constraint doesn't affect accuracy of the distribution of networks at all, as can be seen in the first panel of :numref:`fig_regnet-fig`. 
-Likewise, we could choose to pick the same group width $g_i = g$ occurring at the various stages of the network. Again, this doesn't affect performance, as can be seen in the second panel of :numref:`fig_regnet-fig`.
+:citet:`Radosavovic.Kosaraju.Girshick.ea.2020` experimented with a shared network bottleneck ratio $k_i = k$ for all stages $i$ of the network. This gets rid of $3$ of the $4$ parameters governing the bottleneck ratio. To assess whether this (negatively) affects the performance one can draw networks from the constrained and from the unconstrained distribution and compare the corresonding CDFs. It turns out that this constraint does not affect accuracy of the distribution of networks at all, as can be seen in the first panel of :numref:`fig_regnet-fig`. 
+Likewise, we could choose to pick the same group width $g_i = g$ occurring at the various stages of the network. Again, this does not affect performance, as can be seen in the second panel of :numref:`fig_regnet-fig`.
 Both steps combined reduce the number of free parameters by $6$. 
 
 ![Comparing error empirical distribution functions of design spaces. $\mathrm{AnyNet}_A$ is the original design space; $\mathrm{AnyNet}_B$ ties the bottleneck ratios, $\mathrm{AnyNet}_C$ also ties group widths, $\mathrm{AnyNet}_D$ increases the network depth across stages. From left to right: (i) tying bottleneck ratios has no effect on performance, (ii) tying group widths has no effect on performance, (iii) increasing network widths (channels) across stages improves performance, (iv) increasing network depths across stages improves performance. Figure courtesy of :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`.](../img/regnet-fig.png)
@@ -337,7 +350,7 @@ with d2l.try_gpu():
 With desirable inductive biases (assumptions or preferences) like locality and translation invariance (:numref:`sec_why-conv`)
 for vision, CNNs have been the dominant architectures in this area. This has remained the case since LeNet up until recently when Transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training` started surpassing CNNs in terms of accuracy. While much of the recent progress in terms of vision Transformers *can* be backported into CNNs :cite:`liu2022convnet`, it is only possible at a higher computational cost. Just as importantly, recent hardware optimizations (NVIDIA Ampere and Hopper) have only widened the gap in favor of Transformers. 
 
-It is worth noting that Transformers have a significantly lower degree of inductive bias towards locality and translation invariance than CNNs. It is not the least due to the availability of large image collections, such as LAION-400m and LAION-5B :cite:`schuhmannlaion` with up to 5 billion images that learned structures prevailed. Quite surprisingly, some of the more relevant work in this context even includes MLPs :cite:`tolstikhin2021mlp`. 
+It is worth noting that Transformers have a significantly lower degree of inductive bias towards locality and translation invariance than CNNs. It is not the least due to the availability of large image collections, such as LAION-400m and LAION-5B :cite:`schuhmann2022laion` with up to 5 billion images that learned structures prevailed. Quite surprisingly, some of the more relevant work in this context even includes MLPs :cite:`tolstikhin2021mlp`. 
 
 In sum, vision Transformers (:numref:`sec_vision-transformer`) by now lead in terms of 
 state-of-the-art performance in large-scale image classification, 

@@ -19,7 +19,6 @@ for a proper *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/us
 will give you a crash course
 on some of the most common routines.
 
-
 ## Reading the Dataset
 
 Comma-separated values (CSV) files are ubiquitous 

@@ -406,7 +406,7 @@ X_var
 
 ```{.python .input}
 %%tab jax
-# JAX arrays are immutable. `jax.numpy.ndarray.at` index
+# JAX arrays are immutable. jax.numpy.ndarray.at index
 # update operators create a new array with the corresponding
 # modifications made
 X_new_1 = X.at[1, 2].set(17)
@@ -681,7 +681,7 @@ which gives us the exact address
 of the referenced object in memory.
 Note that after we run `Y = Y + X`,
 `id(Y)` points to a different location.
-That's because Python first evaluates `Y + X`,
+That is because Python first evaluates `Y + X`,
 allocating new memory for the result 
 and then points `Y` to this new location in memory.
 

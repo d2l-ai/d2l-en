@@ -83,11 +83,12 @@ from typing import Any
 :label:`oo-design-utilities`
 
 We need a few utilities to simplify object-oriented programming in Jupyter notebooks. One of the challenges is that class definitions tend to be fairly long blocks of code. Notebook readability demands short code fragments, interspersed with explanations, a requirement incompatible with the style of programming common for Python libraries. The first
-utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we've created instances of the class! It allows us to split the implementation of a class into multiple code blocks.
+utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we have created instances of the class! It allows us to split the implementation of a class into multiple code blocks.
 
 ```{.python .input}
 %%tab all
 def add_to_class(Class):  #@save
+    """Register functions as methods in created class."""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
@@ -120,6 +121,7 @@ The second one is a utility class that saves all arguments in a class's `__init_
 ```{.python .input}
 %%tab all
 class HyperParameters:  #@save
+    """The base class of hyperparameters."""
     def save_hyperparameters(self, ignore=[]):
         raise NotImplemented
 ```
@@ -140,12 +142,12 @@ b = B(a=1, b=2, c=3)
 
 The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [TensorBoard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
 
-The `draw` function plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
+The `draw` method plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
 
 ```{.python .input}
 %%tab all
 class ProgressBoard(d2l.HyperParameters):  #@save
-    """Plot data points in animation."""
+    """The board that plots data points in animation."""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
@@ -180,9 +182,56 @@ using type annotations. All Flax modules are Python 3.7 dataclasses.
 :end_tab:
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    """The base class of models."""
+    def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
+        super().__init__()
+        self.save_hyperparameters()
+        self.board = ProgressBoard()
+
+    def loss(self, y_hat, y):
+        raise NotImplementedError
+
+    def forward(self, X):
+        assert hasattr(self, 'net'), 'Neural network is defined'
+        return self.net(X)
+
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
+                        ('train_' if train else 'val_') + key,
+                        every_n=int(n))
+
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('loss', l, train=True)
+        return l
+
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('loss', l, train=False)
+
+    def configure_optimizers(self):
+        raise NotImplementedError
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow, jax
+class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
+    """The base class of models."""
+    if tab.selected('mxnet', 'tensorflow'):
         def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
             super().__init__()
             self.save_hyperparameters()
@@ -201,7 +250,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def loss(self, y_hat, y):
         raise NotImplementedError
 
-    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    if tab.selected('mxnet', 'tensorflow'):
         def forward(self, X):
             assert hasattr(self, 'net'), 'Neural network is defined'
             return self.net(X)
@@ -213,7 +262,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             return self.forward(X, *args)
 
     if tab.selected('jax'):
-        # JAX & Flax don't have a forward-method-like syntax. Flax uses setup
+        # JAX & Flax do not have a forward-method-like syntax. Flax uses setup
         # and built-in __call__ magic methods for forward pass. Adding here
         # for consistency
         def forward(self, X, *args, **kwargs):
@@ -239,16 +288,12 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         if tab.selected('mxnet', 'tensorflow'):
             self.board.draw(x, d2l.numpy(value), (
                 'train_' if train else 'val_') + key, every_n=int(n))
-        if tab.selected('pytorch'):
-            self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
-                            ('train_' if train else 'val_') + key,
-                            every_n=int(n))
         if tab.selected('jax'):
             self.board.draw(x, d2l.to(value, d2l.cpu()),
                             ('train_' if train else 'val_') + key,
                             every_n=int(n))
 
-    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    if tab.selected('mxnet', 'tensorflow'):
         def training_step(self, batch):
             l = self.loss(self(*batch[:-1]), batch[-1])
             self.plot('loss', l, train=True)
@@ -279,17 +324,17 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
 :begin_tab:`mxnet`
 You may notice that `Module` is a subclass of `nn.Block`, the base class of neural networks in Gluon.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
+It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`pytorch`
 You may notice that `Module` is a subclass of `nn.Module`, the base class of neural networks in PyTorch.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
+It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`tensorflow`
 You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
-It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` function, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
+It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` method, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
 :begin_tab:`jax`
@@ -306,6 +351,7 @@ The `DataModule` class is the base class for data. Quite frequently the `__init_
 ```{.python .input}
 %%tab all
 class DataModule(d2l.HyperParameters):  #@save
+    """The base class of data."""
     if tab.selected('mxnet', 'pytorch'):
         def __init__(self, root='../data', num_workers=4):
             self.save_hyperparameters()
@@ -328,16 +374,17 @@ class DataModule(d2l.HyperParameters):  #@save
 :label:`oo-design-training`
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this method to later chapters.
 :end_tab:
 
 :begin_tab:`jax`
-The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this method to later chapters.
 :end_tab:
 
 ```{.python .input}
 %%tab all
 class Trainer(d2l.HyperParameters):  #@save
+    """The base class for training models with data."""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'

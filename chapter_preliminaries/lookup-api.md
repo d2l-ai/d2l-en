@@ -30,6 +30,28 @@ This section provides some guidance for how to explore the TensorFlow API.
 :end_tab:
 
 
+
+
+```{.python .input}
+%%tab mxnet
+from mxnet import np
+```
+
+```{.python .input}
+%%tab pytorch
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+import jax
+```
+
 ## Functions and Classes in a Module
 
 In order to know which functions and classes can be called in a module,
@@ -38,25 +60,21 @@ we invoke the `dir` function. For instance, we can
 
 ```{.python .input  n=1}
 %%tab mxnet
-from mxnet import np
 print(dir(np.random))
 ```
 
 ```{.python .input  n=1}
 %%tab pytorch
-import torch
 print(dir(torch.distributions))
 ```
 
 ```{.python .input  n=1}
 %%tab tensorflow
-import tensorflow as tf
 print(dir(tf.random))
 ```
 
 ```{.python .input}
 %%tab jax
-import jax
 print(dir(jax.random))
 ```
 

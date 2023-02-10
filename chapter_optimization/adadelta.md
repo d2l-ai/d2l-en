@@ -115,7 +115,7 @@ d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
                {'rho': 0.9}, data_iter, feature_dim);
 ```
 
-For a concise implementation we simply use the `adadelta` algorithm from the `Trainer` class. This yields the following one-liner for a much more compact invocation.
+For a concise implementation we simply use the Adadelta algorithm from high-level APIs. This yields the following one-liner for a much more compact invocation.
 
 ```{.python .input}
 #@tab mxnet
@@ -131,7 +131,7 @@ d2l.train_concise_ch11(trainer, {'rho': 0.9}, data_iter)
 ```{.python .input}
 #@tab tensorflow
 # adadelta is not converging at default learning rate
-# but it's converging at lr = 5.0
+# but it is converging at lr = 5.0
 trainer = tf.keras.optimizers.Adadelta
 d2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)
 ```

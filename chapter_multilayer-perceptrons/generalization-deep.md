@@ -123,7 +123,7 @@ must come by way of regularization,
 either by reducing the complexity of the model class,
 or by applying a penalty, severely constraining
 the set of values that our parameters might take.
-But that's where things start to get weird.
+But that is where things start to get weird.
 
 Strangely, for many deep learning tasks
 (e.g., image recognition and text classification)
@@ -132,7 +132,7 @@ all of which can achieve arbitrarily low training loss
 (and zero training error).
 Because all models under consideration achieve zero training error,
 *the only avenue for further gains is to reduce overfitting*.
-Even stranger, it's often the case that
+Even stranger, it is often the case that
 despite fitting the training data perfectly,
 we can actually *reduce the generalization error*
 further by making the model *even more expressive*,
@@ -166,7 +166,7 @@ cannot explain why neural networks generalize.
 ## Inspiration from Nonparametrics
 
 Approaching deep learning for the first time,
-it's tempting to think of them as parametric models.
+it is tempting to think of them as parametric models.
 After all, the models *do* have millions of parameters.
 When we update the models, we update their parameters.
 When we save the models, we write their parameters to disk.
@@ -223,7 +223,7 @@ and thus behave, in some ways, more like nonparametric models.
 More recent theoretical research has established
 deep connection between large neural networks
 and nonparametric methods, notably kernel methods.
-In particular, :cite:`Jacot.Grabriel.Hongler.2018`
+In particular, :citet:`Jacot.Grabriel.Hongler.2018`
 demonstrated that in the limit, as multilayer perceptrons
 with randomly initialized weights grow infinitely wide,
 they become equivalent to (nonparametric) kernel methods
@@ -247,7 +247,7 @@ A new line of work :cite:`Rolnick.Veit.Belongie.Shavit.2017`
 has revealed that in the setting of label noise,
 neural networks tend to fit cleanly labeled data first
 and only subsequently to interpolate the mislabeled data.
-Moreover, it's been established that this phenomenon
+Moreover, it is been established that this phenomenon
 translates directly into a guarantee on generalization:
 whenever a model has fitted the cleanly labeled data
 but not randomly labeled examples included in the training set,
@@ -310,7 +310,7 @@ from interpolating the data
 and thus the benefits if interpreted
 as regularization might only make sense
 in combination with the early stopping criteria.
-Absent early stopping, it's possible
+Absent early stopping, it is possible
 that just like the number of layers
 or number of nodes (in deep learning)
 or the distance metric (in 1-nearest neighbor),
@@ -349,7 +349,7 @@ many of hard fast-held intuitions.
 Functionally, neural networks look like parametric models.
 But thinking of them as nonparametric models
 can sometimes be a more reliable source of intuition.
-Because it's often the case that all deep networks under consideration
+Because it is often the case that all deep networks under consideration
 are capable of fitting all of the training labels,
 nearly all gains must come by mitigating overfitting
 (closing the *generalization gap*).
