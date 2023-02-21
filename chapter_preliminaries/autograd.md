@@ -270,7 +270,7 @@ This behavior comes in handy
 when we want to optimize the sum 
 of multiple objective functions.
 To reset the gradient buffer,
-we can call `x.grad.zero()` as follows:
+we can call `x.grad.zero_()` as follows:
 :end_tab:
 
 :begin_tab:`tensorflow`
