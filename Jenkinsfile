@@ -87,7 +87,7 @@ stage("Build and Publish") {
         // conda activate ${ENV_NAME}
         // pip install setuptools wheel twine
         // python setup.py bdist_wheel
-        """
+        // """
       } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
