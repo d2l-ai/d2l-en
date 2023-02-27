@@ -82,10 +82,11 @@ stage("Build and Publish") {
         d2lbook deploy html pdf pkg colab sagemaker slides --s3 s3://${LANG}.d2l.ai/
         """
 
-        sh label:"Release d2l", script:"""set -ex
-        conda activate ${ENV_NAME}
-        pip install setuptools wheel twine
-        python setup.py bdist_wheel
+        // Publish d2l pypi package
+        // sh label:"Release d2l", script:"""set -ex
+        // conda activate ${ENV_NAME}
+        // pip install setuptools wheel twine
+        // python setup.py bdist_wheel
         """
       } else {
         sh label:"Publish", script:"""set -ex
