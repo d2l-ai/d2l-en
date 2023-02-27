@@ -17,7 +17,7 @@ After you are done, fill in your change descriptions in the "Propose file change
 
 If you plan to update a large portion of text or code, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through the [d2lbook](http://book.d2l.ai/user/markdown.html) package such as referring to equations, images, chapters, and citations. You can use any markdown editors to open these files and make your changes.
 
-If you would like to change the code, we recommend you to use the Jupyter Notebook to open these markdown files as described in :numref:`sec_jupyter`. So that you can run and test your changes. Please remember to clear all outputs before submitting your changes, our CI system will execute the sections you updated to generate outputs.
+If you would like to change the code, we recommend you to use the Jupyter Notebook to open these markdown files as described in :numref:`sec_jupyter`, so that you can run and test your changes. Please remember to clear all outputs before submitting your changes because our CI system will execute the sections you updated to generate outputs.
 
 Some sections may support multiple framework implementations.
 If you add a new code block, please use `%%tab` to mark this block on the beginning line. For example,
