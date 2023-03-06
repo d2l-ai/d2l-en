@@ -306,7 +306,7 @@ are adjustable hyperparameters.
 That means that while these values are not
 learned during our primary training loop,
 they still influence the performance
-of our model, bot vis-a-vis training
+of our model, both vis-a-vis training
 and generalization performance.
 In practice you will want to choose these values
 based on the *validation* split of the data
