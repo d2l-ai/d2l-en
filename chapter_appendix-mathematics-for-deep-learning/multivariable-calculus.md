@@ -163,7 +163,7 @@ This brings us to one of the most important mathematical concepts in machine lea
 
 1. Start with a random choice for the initial parameters $\mathbf{w}$.
 2. Compute $\nabla_{\mathbf{w}} L(\mathbf{w})$.
-3. Take a small step in the opposite of that direction: $\mathbf{w} \rightarrow \mathbf{w} - \epsilon\nabla_{\mathbf{w}} L(\mathbf{w})$.
+3. Take a small step in the opposite of that direction: $\mathbf{w} \leftarrow \mathbf{w} - \epsilon\nabla_{\mathbf{w}} L(\mathbf{w})$.
 4. Repeat.
 
 
