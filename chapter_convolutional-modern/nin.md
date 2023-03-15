@@ -18,7 +18,7 @@ First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
 model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
 400MB of RAM in single precision (FP32). This is a significant impediment to computation, in particular on
-mobile and embedded devices. After all, even high-end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4S had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
+mobile and embedded devices. After all, even high-end mobile phones support no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4S had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
 
 Second, it is equally impossible to add fully connected layers
 earlier in the network to increase the degree of nonlinearity: doing so would destroy the
