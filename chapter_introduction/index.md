@@ -660,7 +660,7 @@ e.g., the pixel values in an image,
 and then predict which *category*
 (sometimes called a *class*)
 among some discrete set of options,
-an example belongs.
+an example belongs to.
 For handwritten digits, we might have ten classes,
 corresponding to the digits 0 through 9.
 The simplest form of classification is when there are only two classes,
