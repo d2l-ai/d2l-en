@@ -213,6 +213,7 @@ def train(net, num_gpus, batch_size, lr):
         if type(module) in [nn.Linear, nn.Conv2d]:
             nn.init.normal_(module.weight, std=0.01)
     net.apply(init_weights)
+    net = net.to(devices[0])
     # Set the model on multiple GPUs
     net = nn.DataParallel(net, device_ids=devices)
     trainer = torch.optim.SGD(net.parameters(), lr)
