@@ -123,7 +123,7 @@ the encoder-decoder attention,
 between these two.
 In the encoder-decoder attention,
 queries are from the
-outputs of the previous decoder layer,
+outputs of the decoder's self-attention sublayer,
 and the keys and values are
 from the Transformer encoder outputs.
 In the decoder self-attention,
