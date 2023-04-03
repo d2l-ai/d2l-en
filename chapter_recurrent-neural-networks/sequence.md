@@ -334,7 +334,7 @@ In principle, there is nothing wrong with unfolding
 $P(x_1, \ldots, x_T)$ in reverse order.
 The result is a valid factorization:
 
-$$P(x_1, \ldots, x_T) = \prod_{t=T}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
+$$P(x_1, \ldots, x_T) = P(x_T) \prod_{t=T-1}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
 
 
 However, there are many reasons why factorizing text
