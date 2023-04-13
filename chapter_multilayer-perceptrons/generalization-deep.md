@@ -305,9 +305,7 @@ weight decay remains a popular tool.
 However, researchers have noted
 that typical strengths of $\ell_2$ regularization
 are insufficient to prevent the networks
-from interpolating the data
-:cite:`zhang2021understanding`
-and thus the benefits if interpreted
+from interpolating the data :cite:`zhang2021understanding` and thus the benefits if interpreted
 as regularization might only make sense
 in combination with the early stopping criteria.
 Absent early stopping, it is possible
