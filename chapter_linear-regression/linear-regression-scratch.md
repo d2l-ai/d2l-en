@@ -457,7 +457,7 @@ and the learning rate are hyperparameters.
 In general, setting hyperparameters is tricky
 and we will usually want to use a 3-way split,
 one set for training, 
-a second for hyperparameter seclection,
+a second for hyperparameter selection,
 and the third reserved for the final evaluation.
 We elide these details for now but will revise them
 later.
