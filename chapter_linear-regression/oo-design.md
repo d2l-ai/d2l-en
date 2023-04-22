@@ -62,7 +62,7 @@ from torch import nn
 %%tab tensorflow
 import time
 import numpy as np
-from d2l import torch as d2l
+from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
