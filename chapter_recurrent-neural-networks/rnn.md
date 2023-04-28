@@ -66,10 +66,10 @@ Let's take a look at an MLP with a single hidden layer.
 Let the hidden layer's activation function be $\phi$.
 Given a minibatch of examples $\mathbf{X} \in \mathbb{R}^{n \times d}$ with batch size $n$ and $d$ inputs, the hidden layer output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
 
-$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
+$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{dh} + \mathbf{b}_h).$$
 :eqlabel:`rnn_h_without_state`
 
-In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
+In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{dh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
 Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
 Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer. The output layer is given by
 
@@ -96,7 +96,7 @@ Next,
 denote by $\mathbf{H}_t  \in \mathbb{R}^{n \times h}$ the hidden layer output of time step $t$.
 Unlike the MLP, here we save the hidden layer output $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$ to describe how to use the hidden layer output of the previous time step in the current time step. Specifically, the calculation of the hidden layer output of the current time step is determined by the input of the current time step together with the hidden layer output of the previous time step:
 
-$$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}  + \mathbf{b}_h).$$
+$$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{dh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}  + \mathbf{b}_h).$$
 :eqlabel:`rnn_h_with_state`
 
 Compared with :eqref:`rnn_h_without_state`, :eqref:`rnn_h_with_state` adds one more term $\mathbf{H}_{t-1} \mathbf{W}_{hh}$ and thus
@@ -120,7 +120,7 @@ the output of the output layer is similar to the computation in the MLP:
 $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$
 
 Parameters of the RNN
-include the weights $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$,
+include the weights $\mathbf{W}_{dh} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$,
 and the bias $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$
 of the hidden layer,
 together with the weights $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$
@@ -139,7 +139,7 @@ the computation of the hidden state can be treated as:
 (ii) feeding the concatenation result into a fully connected layer with the activation function $\phi$.
 The output of such a fully connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
 In this case,
-the model parameters are the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, and a bias of $\mathbf{b}_h$, all from :eqref:`rnn_h_with_state`.
+the model parameters are the concatenation of $\mathbf{W}_{dh}$ and $\mathbf{W}_{hh}$, and a bias of $\mathbf{b}_h$, all from :eqref:`rnn_h_with_state`.
 The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$.
 What is more, $\mathbf{H}_t$ will also be
 fed into the fully connected output layer
@@ -149,45 +149,45 @@ $\mathbf{O}_t$ of the current time step $t$.
 ![An RNN with a hidden state.](../img/rnn.svg)
 :label:`fig_rnn`
 
-We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ for the hidden state is equivalent to
+We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{dh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ for the hidden state is equivalent to
 matrix multiplication of
 concatenation of $\mathbf{X}_t$ and $\mathbf{H}_{t-1}$
 and
-concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$.
+concatenation of $\mathbf{W}_{dh}$ and $\mathbf{W}_{hh}$.
 Though this can be proven in mathematics,
 in the following we just use a simple code snippet to show this.
 To begin with,
-we define matrices `X`, `W_xh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4), (3, 4), and (4, 4), respectively.
-Multiplying `X` by `W_xh`, and `H` by `W_hh`, respectively, and then adding these two multiplications,
+we define matrices `X`, `W_dh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4), (3, 4), and (4, 4), respectively.
+Multiplying `X` by `W_dh`, and `H` by `W_hh`, respectively, and then adding these two multiplications,
 we obtain a matrix of shape (3, 4).
 
 ```{.python .input}
 %%tab mxnet, pytorch
-X, W_xh = d2l.randn(3, 1), d2l.randn(1, 4)
+X, W_dh = d2l.randn(3, 1), d2l.randn(1, 4)
 H, W_hh = d2l.randn(3, 4), d2l.randn(4, 4)
-d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
+d2l.matmul(X, W_dh) + d2l.matmul(H, W_hh)
 ```
 
 ```{.python .input}
 %%tab tensorflow
-X, W_xh = d2l.normal((3, 1)), d2l.normal((1, 4))
+X, W_dh = d2l.normal((3, 1)), d2l.normal((1, 4))
 H, W_hh = d2l.normal((3, 4)), d2l.normal((4, 4))
-d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
+d2l.matmul(X, W_dh) + d2l.matmul(H, W_hh)
 ```
 
 ```{.python .input}
 %%tab jax
-X, W_xh = jax.random.normal(d2l.get_key(), (3, 1)), jax.random.normal(
+X, W_dh = jax.random.normal(d2l.get_key(), (3, 1)), jax.random.normal(
                                                         d2l.get_key(), (1, 4))
 H, W_hh = jax.random.normal(d2l.get_key(), (3, 4)), jax.random.normal(
                                                         d2l.get_key(), (4, 4))
-d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
+d2l.matmul(X, W_dh) + d2l.matmul(H, W_hh)
 ```
 
 Now we concatenate the matrices `X` and `H`
 along columns (axis 1),
 and the matrices
-`W_xh` and `W_hh` along rows (axis 0).
+`W_dh` and `W_hh` along rows (axis 0).
 These two concatenations
 result in
 matrices of shape (3, 5)
@@ -198,7 +198,7 @@ as above.
 
 ```{.python .input}
 %%tab all
-d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
+d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_dh, W_hh), 0))
 ```
 
 ## RNN-based Character-Level Language Models
