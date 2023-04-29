@@ -889,7 +889,7 @@ of the random variable $X$ is defined as
 
 $$E[X] = E_{x \sim P}[x] = \sum_{x} x P(X = x).$$
 
-Likewise, for densities we obtain $E[X] = \int x \;dp(x)$.
+Likewise, for densities we obtain $E[X] = \int x p(x) \;dx$.
 Sometimes we are interested in the expected value
 of some function of $x$.
 We can calculate these expectations as
