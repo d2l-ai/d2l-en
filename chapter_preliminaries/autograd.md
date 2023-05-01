@@ -672,6 +672,7 @@ in the most expedient and memory-efficient manner.
 
 For now, try to remember these basics: (i) attach gradients to those variables with respect to which we desire derivatives; (ii) record the computation of the target value; (iii) execute the backpropagation function; and  (iv) access the resulting gradient.
 
+If you have any doubts on understanding backpropagation, feel free to check https://cs231n.github.io/optimization-2/.
 
 ## Exercises
 
