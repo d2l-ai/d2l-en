@@ -16,7 +16,7 @@ job_type_info = {
         'job_queue': 'D2L-CI-CPU'
     },
     'ci-cpu-push': {
-        'job_definition': 'd2l-ci-cpu-builder-push:2',
+        'job_definition': 'd2l-ci-cpu-builder-push:1',
         'job_queue': 'D2L-CI-CPU'
     },
     'ci-gpu-torch': {

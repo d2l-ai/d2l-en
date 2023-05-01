@@ -22,12 +22,14 @@ aws s3 sync s3://preview.d2l.ai/ci_cache/$REPO_NAME-$TARGET_BRANCH/_build _build
 d2lbook build pdf
 d2lbook build pdf --tab mxnet
 
-# Deploy D2L Preview
 
 # Check if the JOB_NAME is either "$REPO_NAME/release" or "$REPO_NAME/classic"
 if [[ "$JOB_NAME" == "$REPO_NAME/release" || "$JOB_NAME" == "$REPO_NAME/classic" ]]; then
+
+  # Setup D2L Bot
   source $(dirname "$0")/setup_git.sh
   setup_git
+
   # Run d2lbook release deployment
   if [[ "$JOB_NAME" == *"/classic" ]]; then
     # Use classic s3 bucket for classic release
@@ -35,6 +37,7 @@ if [[ "$JOB_NAME" == "$REPO_NAME/release" || "$JOB_NAME" == "$REPO_NAME/classic"
   fi
   d2lbook build pkg
   d2lbook deploy html pdf pkg colab sagemaker slides --s3 "s3://${LANG}.d2l.ai/"
+
 else
   # Run d2lbook preview deployment
   d2lbook deploy html pdf --s3 "s3://preview.d2l.ai/${JOB_NAME}/"
