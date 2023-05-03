@@ -12,27 +12,31 @@ from botocore.config import Config
 
 job_type_info = {
     'ci-cpu': {
-        'job_definition': 'd2l-ci-cpu-builder:1',
+        'job_definition': 'd2l-ci-cpu-builder:2',
         'job_queue': 'D2L-CI-CPU'
     },
     'ci-cpu-push': {
-        'job_definition': 'd2l-ci-cpu-builder-push:1',
+        'job_definition': 'd2l-ci-cpu-builder-push:7',
+        'job_queue': 'D2L-CI-CPU'
+    },
+    'ci-cpu-release': {
+        'job_definition': 'd2l-ci-cpu-builder-release:1',
         'job_queue': 'D2L-CI-CPU'
     },
     'ci-gpu-torch': {
-        'job_definition': 'd2l-ci-gpu-torch:1',
+        'job_definition': 'd2l-ci-gpu-torch:2',
         'job_queue': 'D2L-CI-GPU'
     },
     'ci-gpu-tf': {
-        'job_definition': 'd2l-ci-gpu-tf:1',
+        'job_definition': 'd2l-ci-gpu-tf:2',
         'job_queue': 'D2L-CI-GPU'
     },
     'ci-gpu-jax': {
-        'job_definition': 'd2l-ci-gpu-jax:1',
+        'job_definition': 'd2l-ci-gpu-jax:2',
         'job_queue': 'D2L-CI-GPU'
     },
     'ci-gpu-mxnet': {
-        'job_definition': 'd2l-ci-gpu-mxnet:1',
+        'job_definition': 'd2l-ci-gpu-mxnet:2',
         'job_queue': 'D2L-CI-GPU'
     }
 }
@@ -41,6 +45,7 @@ job_type_info = {
 for job_type in list(job_type_info.keys()):
     if job_type.startswith('ci-gpu'):
         job_type_info[job_type+'-push'] = job_type_info[job_type]
+        job_type_info[job_type+'-release'] = job_type_info[job_type]
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 

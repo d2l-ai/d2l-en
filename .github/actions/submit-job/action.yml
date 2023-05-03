@@ -33,13 +33,28 @@ runs:
         github_token: ${{ github.token }}
         permission: write
 
-    - name: Submit Job (For Push)
-      if: ${{ github.event_name == 'push' }}
+    - name: Submit Job (For Push on development branches)
+      if: ${{ github.event_name == 'push' && github.ref != 'refs/heads/release' && github.ref != 'refs/heads/classic' }}
       shell: bash
       run: |
-        echo "Start submitting job"
-        # Add "-push" for all these jobs to use elevated job-definition permissions
+        echo "Start submitting job for a Push Event on a Development Branch"
+        # Add "-push" for all these jobs to use elevated push level job-def permissions
         python ./ci/submit-job.py --job-type ${{ inputs.job-type }}-push \
+                                  --name ${{ inputs.job-name }}-'${{ github.ref }}' \
+                                  --source-ref '${{ github.ref }}' \
+                                  --work-dir ${{ inputs.work-dir }} \
+                                  --remote https://github.com/'${{ github.repository }}' \
+                                  --command "${{ inputs.command }}" \
+                                  --safe-to-use-script \
+                                  --wait
+
+    - name: Submit Job (For Push on Release/Classic)
+      if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/classic') }}
+      shell: bash
+      run: |
+        echo "Start submitting job for a Push Event on Release/Classic Branch"
+        # Add "-release" for all these jobs to use elevated release level job-def permissions
+        python ./ci/submit-job.py --job-type ${{ inputs.job-type }}-release \
                                   --name ${{ inputs.job-name }}-'${{ github.ref }}' \
                                   --source-ref '${{ github.ref }}' \
                                   --work-dir ${{ inputs.work-dir }} \
