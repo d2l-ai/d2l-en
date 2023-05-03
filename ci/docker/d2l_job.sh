@@ -27,16 +27,6 @@ ORIGINAL_ORG=${9:-'d2l-ai'}
 # Copy the workflow from master branch
 git clone https://github.com/"$ORIGINAL_ORG"/"$ORIGINAL_REPO".git
 
-# Reset modification times for all notebooks using git-timesync
-# We use this to make sure d2lbook build eval caching is valid
-# even after cloning the repo for each run
-# Modification times for original repo files are corrected and are now
-# good for comparing with modification times of build files coming
-# from the S3 bucket
-cd "$ORIGINAL_REPO"
-git timesync *.md **/*.md
-cd ..
-
 WORKFLOW_SCRIPTS="$ORIGINAL_REPO"/.github/workflow_scripts
 if [ -d "$WORKFLOW_SCRIPTS" ]; then
     cp -R "$ORIGINAL_REPO"/.github/workflow_scripts .
@@ -50,6 +40,14 @@ fi
 
 git fetch origin $SOURCE_REF:working
 git checkout working
+
+# Reset modification times for all notebooks using git-timesync
+# We use this to make sure d2lbook build eval caching is valid
+# even after cloning the repo for each run
+# Modification times for original repo files are corrected and are now
+# good for comparing with modification times of build files coming
+# from the S3 bucket
+git timesync *.md **/*.md
 
 # If not safe to use script, we overwrite with the script from master branch
 TRUE=true
