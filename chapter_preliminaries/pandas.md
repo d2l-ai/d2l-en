@@ -123,7 +123,7 @@ we can load them into a tensor**] (recall :numref:`sec_ndarray`).
 %%tab mxnet
 from mxnet import np
 
-X, y = np.array(inputs.values), np.array(targets.values)
+X, y = np.array(inputs.to_numpy(dtype=float)), np.array(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -131,7 +131,8 @@ X, y
 %%tab pytorch
 import torch
 
-X, y = torch.tensor(inputs.values), torch.tensor(targets.values)
+X = torch.tensor(inputs.to_numpy(dtype=float))
+y = torch.tensor(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -139,7 +140,8 @@ X, y
 %%tab tensorflow
 import tensorflow as tf
 
-X, y = tf.constant(inputs.values), tf.constant(targets.values)
+X = tf.constant(inputs.to_numpy(dtype=float))
+y = tf.constant(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -147,7 +149,8 @@ X, y
 %%tab jax
 from jax import numpy as jnp
 
-X, y = jnp.array(inputs.values), jnp.array(targets.values)
+X = jnp.array(inputs.to_numpy(dtype=float))
+y = jnp.array(targets.to_numpy(dtype=float))
 X, y
 ```
 

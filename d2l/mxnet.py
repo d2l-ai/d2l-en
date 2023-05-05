@@ -2642,8 +2642,8 @@ d2l.DATA_HUB['ml-100k'] = (
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(os.path.join(data_dir, 'u.data'), '\t', names=names,
-                       engine='python')
+    data = pd.read_csv(os.path.join(data_dir, 'u.data'), sep='\t',
+                       names=names, engine='python')
     num_users = data.user_id.unique().shape[0]
     num_items = data.item_id.unique().shape[0]
     return data, num_users, num_items

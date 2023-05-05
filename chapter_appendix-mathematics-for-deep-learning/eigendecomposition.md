@@ -105,8 +105,7 @@ from d2l import torch as d2l
 from IPython import display
 import torch
 
-torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64),
-          eigenvectors=True)
+torch.linalg.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64))
 ```
 
 ```{.python .input}
@@ -295,7 +294,7 @@ A = torch.tensor([[1.0, 0.1, 0.1, 0.1],
               [0.1, 0.2, 5.0, 0.5],
               [0.1, 0.3, 0.5, 9.0]])
 
-v, _ = torch.eig(A)
+v, _ = torch.linalg.eig(A)
 v
 ```
 
@@ -497,7 +496,7 @@ print(f'norms of eigenvalues: {norm_eigs}')
 ```{.python .input}
 #@tab pytorch
 # Compute the eigenvalues
-eigs = torch.eig(A)[0][:,0].tolist()
+eigs = torch.linalg.eig(A).eigenvalues.tolist()
 norm_eigs = [torch.abs(torch.tensor(x)) for x in eigs]
 norm_eigs.sort()
 print(f'norms of eigenvalues: {norm_eigs}')
