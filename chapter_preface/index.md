@@ -344,7 +344,6 @@ the following dependencies:
 import inspect
 import collections
 from collections import defaultdict
-import gym
 from IPython import display
 import math
 from matplotlib import pyplot as plt
@@ -353,7 +352,6 @@ import os
 import pandas as pd
 import random
 import re
-from scipy.spatial import distance_matrix
 import shutil
 import sys
 import tarfile
@@ -453,10 +451,12 @@ from mxnet.gluon import nn, rnn
 import numpy as np
 import torch
 import torchvision
+import gym
 from torch import nn
 from torch.nn import functional as F
 from torchvision import transforms
 from PIL import Image
+from scipy.spatial import distance_matrix
 ```
 
 ```{.python .input}

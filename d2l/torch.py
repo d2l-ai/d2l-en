@@ -30,20 +30,20 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
-import gym
 import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
-from scipy.spatial import distance_matrix
 
 d2l = sys.modules[__name__]
 
+import gym
 import numpy as np
 import torch
 import torchvision
 from PIL import Image
+from scipy.spatial import distance_matrix
 from torch import nn
 from torch.nn import functional as F
 from torchvision import transforms
