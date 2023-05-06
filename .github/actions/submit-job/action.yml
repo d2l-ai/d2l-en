@@ -67,7 +67,7 @@ runs:
       if: ${{ github.event_name == 'pull_request_target' && steps.check.outputs.permitted == 'true' }}
       shell: bash
       run: |
-        echo "Start submitting job"
+        echo "Start submitting job for PR Safe Scripts"
         python ./ci/submit-job.py --job-type ${{ inputs.job-type }} \
                                   --name ${{ inputs.job-name }}-PR#'${{ github.event.number }}' \
                                   --source-ref '${{ github.event.pull_request.head.sha }}' \
@@ -81,7 +81,7 @@ runs:
       if: ${{ github.event_name == 'pull_request_target' && steps.check.outputs.permitted != 'true' }}
       shell: bash
       run: |
-        echo "Start submitting job"
+        echo "Start submitting job for PR Unsafe Scripts"
         python ./ci/submit-job.py --job-type ${{ inputs.job-type }} \
                                   --name ${{ inputs.job-name }}-PR#'${{ github.event.number }}' \
                                   --source-ref '${{ github.event.pull_request.head.sha }}' \
