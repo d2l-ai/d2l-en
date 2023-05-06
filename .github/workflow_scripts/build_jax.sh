@@ -7,6 +7,8 @@ ss=0
 
 REPO_NAME="$1"  # Eg. 'd2l-en'
 TARGET_BRANCH="$2" # Eg. 'master' ; if PR raised to master
+CLEAR_CACHE="${3:-false}"  # Eg. 'true' or 'false'
+
 
 pip3 install .
 mkdir _build
@@ -15,8 +17,11 @@ mkdir _build
 d2lbook build outputcheck tabcheck
 
 # Move aws copy commands for cache restore outside
-echo "Retrieving jax build cache"
-aws s3 sync s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build/eval_jax/ _build/eval_jax/ --delete --quiet --exclude 'data/*'
+if [ "$CLEAR_CACHE" = "false" ]; then
+  echo "Retrieving jax build cache"
+  aws s3 sync s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build/eval_jax/ _build/eval_jax/ --delete --quiet --exclude 'data/*'
+fi
+
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=.70
 export TF_CPP_MIN_LOG_LEVEL=3
