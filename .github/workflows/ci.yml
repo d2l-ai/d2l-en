@@ -17,11 +17,13 @@ defaults:
   run:
     shell: bash
 
+env:
+  CLEAR_CACHE: ${{ contains(github.event.head_commit.message, '[clear_cache]') }}
+
 jobs:
   build_torch:
       name: Build PyTorch
       if: "!contains(github.event.head_commit.message, '[skip torch]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
-      # needs: [sanity_check]
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
@@ -33,7 +35,7 @@ jobs:
           with:
             job-type: ci-gpu-torch
             job-name: D2L-Build-PyTorch
-            command: chmod +x ./.github/workflow_scripts/build_pytorch.sh && ./.github/workflow_scripts/build_pytorch.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
+            command: chmod +x ./.github/workflow_scripts/build_pytorch.sh && ./.github/workflow_scripts/build_pytorch.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}' '${{ env.CLEAR_CACHE }}'
 
   build_tf:
       name: Build Tensorflow
@@ -49,7 +51,7 @@ jobs:
           with:
             job-type: ci-gpu-tf
             job-name: D2L-Build-Tensorflow
-            command: chmod +x ./.github/workflow_scripts/build_tf.sh && ./.github/workflow_scripts/build_tf.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
+            command: chmod +x ./.github/workflow_scripts/build_tf.sh && ./.github/workflow_scripts/build_tf.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}' '${{ env.CLEAR_CACHE }}'
 
   build_jax:
       name: Build JAX
@@ -65,7 +67,7 @@ jobs:
           with:
             job-type: ci-gpu-jax
             job-name: D2L-Build-JAX
-            command: chmod +x ./.github/workflow_scripts/build_jax.sh && ./.github/workflow_scripts/build_jax.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
+            command: chmod +x ./.github/workflow_scripts/build_jax.sh && ./.github/workflow_scripts/build_jax.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}' '${{ env.CLEAR_CACHE }}'
 
   build_mxnet:
       name: Build MXNet
@@ -81,7 +83,7 @@ jobs:
           with:
             job-type: ci-gpu-mxnet
             job-name: D2L-Build-MXNet
-            command: chmod +x ./.github/workflow_scripts/build_mxnet.sh && ./.github/workflow_scripts/build_mxnet.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
+            command: chmod +x ./.github/workflow_scripts/build_mxnet.sh && ./.github/workflow_scripts/build_mxnet.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}' '${{ env.CLEAR_CACHE }}'
 
   build_and_deploy:
       name: Build Website/PDF & Publish Preview/Release
