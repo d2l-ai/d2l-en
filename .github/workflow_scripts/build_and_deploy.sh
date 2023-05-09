@@ -12,8 +12,10 @@ LANG="$4" # Eg. 'en','zh' etc.
 pip3 install .
 mkdir _build
 
+source $(dirname "$0")/utils.sh
+
 # Move aws copy commands for cache restore outside
-aws s3 sync s3://preview.d2l.ai/ci_cache/$REPO_NAME-$TARGET_BRANCH/_build _build --delete --quiet --exclude 'eval*/data/*'
+measure_command_time "aws s3 sync s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build _build --delete --quiet --exclude 'eval*/data/*'"
 
 # Build D2L Website
 ./.github/workflow_scripts/build_html.sh $TARGET_BRANCH $JOB_NAME
@@ -44,4 +46,4 @@ else
 fi
 
 # Move aws copy commands for cache store outside
-aws s3 sync _build s3://preview.d2l.ai/ci_cache/$REPO_NAME-$TARGET_BRANCH/_build --acl public-read --quiet --exclude 'eval*/data/*'
+measure_command_time "aws s3 sync _build s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build --acl public-read --quiet --exclude 'eval*/data/*'"
