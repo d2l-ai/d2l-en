@@ -13,16 +13,6 @@ runs:
       run: |
         short_sha=$(git rev-parse --short "$SHA")
         echo "SHORT_SHA=$short_sha" >> $GITHUB_ENV
-
-        commit_msg="$(git show --no-patch --format=%B $short_sha)"
-        echo "COMMIT_MSG=$commit_msg" >> $GITHUB_ENV
-
-        if [[ "$commit_msg" == *"[clear_cache]"* ]]; then
-          echo "CLEAR_CACHE=true" >> $GITHUB_ENV
-        else
-          echo "CLEAR_CACHE=false" >> $GITHUB_ENV
-        fi
-
         echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
 
         target_branch=${GITHUB_REF##*/}
@@ -33,6 +23,9 @@ runs:
 
         IFS='-' read -ra name_parts <<< "$repo_name"
         echo "LANG=${name_parts[1]}" >> $GITHUB_ENV
+
+        task="${repo_name}-${target_branch}"
+        echo "TASK=$task" >> $GITHUB_ENV
 
         job_name=${repo_name}/${target_branch}
         echo "JOB_NAME=$job_name" >> $GITHUB_ENV
@@ -49,16 +42,6 @@ runs:
       run: |
         short_sha=$(git rev-parse --short "$SHA")
         echo "SHORT_SHA=$short_sha" >> $GITHUB_ENV
-
-        commit_msg="$(git show --no-patch --format=%B $short_sha)"
-        echo "COMMIT_MSG=$commit_msg" >> $GITHUB_ENV
-
-        if [[ "$commit_msg" == *"[clear_cache]"* ]]; then
-          echo "CLEAR_CACHE=true" >> $GITHUB_ENV
-        else
-          echo "CLEAR_CACHE=false" >> $GITHUB_ENV
-        fi
-
         echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
 
         echo "TARGET_BRANCH=$target_branch" >> $GITHUB_ENV
@@ -69,5 +52,8 @@ runs:
         IFS='-' read -ra name_parts <<< "$repo_name"
         echo "LANG=${name_parts[1]}" >> $GITHUB_ENV
 
-        job_name=${repo_name}/${pr_number}/${short_sha}
+        task="${repo_name}-${target_branch}"
+        echo "TASK=$task" >> $GITHUB_ENV
+
+        job_name=${repo_name}/PR-${{ github.event.number }}/${short_sha}
         echo "JOB_NAME=$job_name" >> $GITHUB_ENV

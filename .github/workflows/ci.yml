@@ -21,6 +21,7 @@ jobs:
   build_torch:
       name: Build PyTorch
       if: "!contains(github.event.head_commit.message, '[skip torch]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
+      # needs: [sanity_check]
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
@@ -32,7 +33,7 @@ jobs:
           with:
             job-type: ci-gpu-torch
             job-name: D2L-Build-PyTorch
-            command: chmod +x ./.github/workflow_scripts/build_pytorch.sh && ./.github/workflow_scripts/build_pytorch.sh "${{ env.REPO_NAME }}" "${{ env.TARGET_BRANCH }}" "${{ env.CLEAR_CACHE }}"
+            command: chmod +x ./.github/workflow_scripts/build_pytorch.sh && ./.github/workflow_scripts/build_pytorch.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
 
   build_tf:
       name: Build Tensorflow
@@ -48,7 +49,7 @@ jobs:
           with:
             job-type: ci-gpu-tf
             job-name: D2L-Build-Tensorflow
-            command: chmod +x ./.github/workflow_scripts/build_tf.sh && ./.github/workflow_scripts/build_tf.sh "${{ env.REPO_NAME }}" "${{ env.TARGET_BRANCH }}" "${{ env.CLEAR_CACHE }}"
+            command: chmod +x ./.github/workflow_scripts/build_tf.sh && ./.github/workflow_scripts/build_tf.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
 
   build_jax:
       name: Build JAX
@@ -64,7 +65,7 @@ jobs:
           with:
             job-type: ci-gpu-jax
             job-name: D2L-Build-JAX
-            command: chmod +x ./.github/workflow_scripts/build_jax.sh && ./.github/workflow_scripts/build_jax.sh "${{ env.REPO_NAME }}" "${{ env.TARGET_BRANCH }}" "${{ env.CLEAR_CACHE }}"
+            command: chmod +x ./.github/workflow_scripts/build_jax.sh && ./.github/workflow_scripts/build_jax.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
 
   build_mxnet:
       name: Build MXNet
@@ -80,7 +81,7 @@ jobs:
           with:
             job-type: ci-gpu-mxnet
             job-name: D2L-Build-MXNet
-            command: chmod +x ./.github/workflow_scripts/build_mxnet.sh && ./.github/workflow_scripts/build_mxnet.sh "${{ env.REPO_NAME }}" "${{ env.TARGET_BRANCH }}" "${{ env.CLEAR_CACHE }}"
+            command: chmod +x ./.github/workflow_scripts/build_mxnet.sh && ./.github/workflow_scripts/build_mxnet.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}'
 
   build_and_deploy:
       name: Build Website/PDF & Publish Preview/Release
@@ -103,7 +104,7 @@ jobs:
           with:
             job-type: ci-cpu
             job-name: D2L-Builder
-            command: chmod +x ./.github/workflow_scripts/build_and_deploy.sh ./.github/workflow_scripts/build_html.sh && ./.github/workflow_scripts/build_and_deploy.sh "${{ env.REPO_NAME }}" "${{ env.TARGET_BRANCH }}" "${{ env.JOB_NAME }}" "${{ env.LANG }}"
+            command: chmod +x ./.github/workflow_scripts/build_and_deploy.sh ./.github/workflow_scripts/build_html.sh && ./.github/workflow_scripts/build_and_deploy.sh '${{ env.REPO_NAME }}' '${{ env.TARGET_BRANCH }}' '${{ env.JOB_NAME }}' '${{ env.LANG }}'
         - name: Comment on PR
           if: ${{ github.event_name == 'pull_request_target' }}
           uses: peter-evans/create-or-update-comment@v3.0.0
