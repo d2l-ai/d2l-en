@@ -24,9 +24,6 @@ runs:
         IFS='-' read -ra name_parts <<< "$repo_name"
         echo "LANG=${name_parts[1]}" >> $GITHUB_ENV
 
-        task="${repo_name}-${target_branch}"
-        echo "TASK=$task" >> $GITHUB_ENV
-
         job_name=${repo_name}/${target_branch}
         echo "JOB_NAME=$job_name" >> $GITHUB_ENV
 
@@ -52,8 +49,5 @@ runs:
         IFS='-' read -ra name_parts <<< "$repo_name"
         echo "LANG=${name_parts[1]}" >> $GITHUB_ENV
 
-        task="${repo_name}-${target_branch}"
-        echo "TASK=$task" >> $GITHUB_ENV
-
-        job_name=${repo_name}/PR-${{ github.event.number }}/${short_sha}
+        job_name=${repo_name}/${pr_number}/${short_sha}
         echo "JOB_NAME=$job_name" >> $GITHUB_ENV
