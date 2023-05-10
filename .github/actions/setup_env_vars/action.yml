@@ -27,6 +27,8 @@ runs:
         job_name=${repo_name}/${target_branch}
         echo "JOB_NAME=$job_name" >> $GITHUB_ENV
 
+        echo "CACHE_DIR=ci_cache_push" >> $GITHUB_ENV
+
 
     - name: Get Commit SHA (For Pull Request)
       if: ${{ github.event_name == 'pull_request_target' }}
@@ -51,3 +53,5 @@ runs:
 
         job_name=${repo_name}/${pr_number}/${short_sha}
         echo "JOB_NAME=$job_name" >> $GITHUB_ENV
+
+        echo "CACHE_DIR=ci_cache_pr" >> $GITHUB_ENV
