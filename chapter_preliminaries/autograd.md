@@ -422,7 +422,7 @@ has been wiped out.
 Thus `u` has no ancestors in the graph
 and gradients do not flow through `u` to `x`.
 For example, taking the gradient of `z = x * u`
-will yield the result `x`,
+will yield the result `u`,
 (not `3 * x * x` as you might have 
 expected since `z = x * x * x`).
 
