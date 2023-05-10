@@ -18,7 +18,7 @@ source $(dirname "$0")/utils.sh
 d2lbook build outputcheck tabcheck
 
 # Move aws copy commands for cache restore outside
-if [ "$CLEAR_CACHE" = "false" ]; then
+if [ "$DISABLE_CACHE" = "false" ]; then
   echo "Retrieving tensorflow build cache from "$CACHE_DIR""
   measure_command_time "aws s3 sync s3://preview.d2l.ai/"$CACHE_DIR"/"$REPO_NAME"-"$TARGET_BRANCH"/_build/eval_tensorflow/ _build/eval_tensorflow/ --delete --quiet --exclude 'data/*'"
 fi

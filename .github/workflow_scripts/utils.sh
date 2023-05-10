@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Default value for CLEAR_CACHE
-CLEAR_CACHE=false  # Eg. 'true' or 'false'
+# By default, all builds are cached
+DISABLE_CACHE=false  # Eg. 'true' or 'false'
 
 
 # Function to measure command execution time
