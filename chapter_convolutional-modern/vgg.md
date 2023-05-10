@@ -159,7 +159,7 @@ The convolutional part of the network connects several VGG blocks from :numref:`
 in succession. This grouping of convolutions is a pattern that has 
 remained almost unchanged over the past decade, although the specific choice of 
 operations has undergone considerable modifications. 
-The variable `conv_arch` consists of a list of tuples (one per block),
+The variable `arch` consists of a list of tuples (one per block),
 where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments required to call
