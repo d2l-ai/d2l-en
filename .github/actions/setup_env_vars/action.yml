@@ -13,16 +13,6 @@ runs:
       run: |
         short_sha=$(git rev-parse --short "$SHA")
         echo "SHORT_SHA=$short_sha" >> $GITHUB_ENV
-
-        commit_msg="$(git show --no-patch --format=%B $short_sha)"
-        echo "COMMIT_MSG=$commit_msg" >> $GITHUB_ENV
-
-        if [[ "$commit_msg" == *"[clear_cache]"* ]]; then
-          echo "CLEAR_CACHE=true" >> $GITHUB_ENV
-        else
-          echo "CLEAR_CACHE=false" >> $GITHUB_ENV
-        fi
-
         echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
 
         target_branch=${GITHUB_REF##*/}
@@ -49,16 +39,6 @@ runs:
       run: |
         short_sha=$(git rev-parse --short "$SHA")
         echo "SHORT_SHA=$short_sha" >> $GITHUB_ENV
-
-        commit_msg="$(git show --no-patch --format=%B $short_sha)"
-        echo "COMMIT_MSG=$commit_msg" >> $GITHUB_ENV
-
-        if [[ "$commit_msg" == *"[clear_cache]"* ]]; then
-          echo "CLEAR_CACHE=true" >> $GITHUB_ENV
-        else
-          echo "CLEAR_CACHE=false" >> $GITHUB_ENV
-        fi
-
         echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
 
         echo "TARGET_BRANCH=$target_branch" >> $GITHUB_ENV

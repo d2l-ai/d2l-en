@@ -28,7 +28,7 @@ runs:
     - name: Check for Actor Permissions
       id: check
       continue-on-error: true
-      uses: prince-chrismc/check-actor-permissions-action@v2
+      uses: prince-chrismc/check-actor-permissions-action@88995341900ae4e7aa248df51d32aeb981cc62f5 # v2
       with:
         github_token: ${{ github.token }}
         permission: write
