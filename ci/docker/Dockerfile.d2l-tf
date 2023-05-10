@@ -1,5 +1,5 @@
-# Use Tensorflow 2.11 (March 2023)
-FROM nvcr.io/nvidia/tensorflow:23.03-tf2-py3
+# Use Tensorflow 2.12 (April 2023)
+FROM nvcr.io/nvidia/tensorflow:23.04-tf2-py3
 
 RUN adduser --disabled-password --disabled-login ci
 WORKDIR /home/ci
