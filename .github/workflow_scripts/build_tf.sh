@@ -7,10 +7,11 @@ ss=0
 
 REPO_NAME="$1"  # Eg. 'd2l-en'
 TARGET_BRANCH="$2" # Eg. 'master' ; if PR raised to master
-CLEAR_CACHE="${3:-false}"  # Eg. 'true' or 'false'
 
 pip3 install .
 mkdir _build
+
+source $(dirname "$0")/utils.sh
 
 # Move sanity check outside
 d2lbook build outputcheck tabcheck
@@ -18,7 +19,7 @@ d2lbook build outputcheck tabcheck
 # Move aws copy commands for cache restore outside
 if [ "$CLEAR_CACHE" = "false" ]; then
   echo "Retrieving tensorflow build cache"
-  aws s3 sync s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build/eval_tensorflow/ _build/eval_tensorflow/ --delete --quiet --exclude 'data/*'
+  measure_command_time "aws s3 sync s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build/eval_tensorflow/ _build/eval_tensorflow/ --delete --quiet --exclude 'data/*'"
 fi
 
 export TF_CPP_MIN_LOG_LEVEL=3
@@ -29,8 +30,9 @@ d2lbook build eval --tab tensorflow || ((ss=1))
 
 # Move aws copy commands for cache store outside
 echo "Upload tensorflow build cache to s3"
-aws s3 sync _build s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build --acl public-read --quiet
+measure_command_time "aws s3 sync _build s3://preview.d2l.ai/ci_cache/"$REPO_NAME"-"$TARGET_BRANCH"/_build --acl public-read --quiet --exclude 'eval*/data/*'"
 
+# Exit with a non-zero status if evaluation failed
 if [ "$ss" -ne 0 ]; then
   exit 1
 fi
