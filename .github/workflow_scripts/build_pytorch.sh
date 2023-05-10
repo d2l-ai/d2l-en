@@ -7,7 +7,6 @@ ss=0
 
 REPO_NAME="$1"  # Eg. 'd2l-en'
 TARGET_BRANCH="$2" # Eg. 'master' ; if PR raised to master
-CLEAR_CACHE="${3:-false}"  # Eg. 'true' or 'false'
 
 pip3 install .
 mkdir _build

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Default value for CLEAR_CACHE
+CLEAR_CACHE=false  # Eg. 'true' or 'false'
+
+
 # Function to measure command execution time
 measure_command_time() {
     local command="$1"
