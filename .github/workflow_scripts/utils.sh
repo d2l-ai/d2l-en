@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default value for CLEAR_CACHE
-CLEAR_CACHE=false  # Eg. 'true' or 'false'
+CLEAR_CACHE=true  # Eg. 'true' or 'false'
 
 
 # Function to measure command execution time
