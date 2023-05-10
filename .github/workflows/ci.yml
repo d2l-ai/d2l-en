@@ -20,7 +20,7 @@ defaults:
 jobs:
   build_torch:
       name: Build PyTorch
-      if: "!contains(github.event.head_commit.message, '[skip torch]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
+      if: "github.repository == 'd2l-ai/d2l-en' && !contains(github.event.head_commit.message, '[skip torch]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
@@ -36,7 +36,7 @@ jobs:
 
   build_tf:
       name: Build Tensorflow
-      if: "!contains(github.event.head_commit.message, '[skip tf]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
+      if: "github.repository == 'd2l-ai/d2l-en' && !contains(github.event.head_commit.message, '[skip tf]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
@@ -52,7 +52,7 @@ jobs:
 
   build_jax:
       name: Build JAX
-      if: "!contains(github.event.head_commit.message, '[skip jax]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
+      if: "github.repository == 'd2l-ai/d2l-en' && !contains(github.event.head_commit.message, '[skip jax]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
@@ -68,7 +68,7 @@ jobs:
 
   build_mxnet:
       name: Build MXNet
-      if: "!contains(github.event.head_commit.message, '[skip mxnet]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
+      if: "github.repository == 'd2l-ai/d2l-en' && !contains(github.event.head_commit.message, '[skip mxnet]') && !contains(github.event.head_commit.message, '[skip frameworks]')"
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
@@ -87,6 +87,7 @@ jobs:
       needs: [build_torch, build_tf, build_jax, build_mxnet]
       if: |
         always() &&
+        github.repository == 'd2l-ai/d2l-en' &&
         !contains(github.event.head_commit.message, '[skip builder]') &&
         (needs.build_torch.result == 'success' || needs.build_torch.result == 'skipped') &&
         (needs.build_tf.result == 'success' || needs.build_tf.result == 'skipped') &&
