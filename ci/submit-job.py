@@ -1,5 +1,6 @@
 import argparse
 import random
+import os
 import re
 import sys
 import time
@@ -157,6 +158,12 @@ def main():
     submitJobResponse = batch.submit_job(**kwargs)
 
     jobId = submitJobResponse['jobId']
+
+    # Export Batch_JobID to Github Actions Environment Variable
+    with open(os.environ['GITHUB_ENV'], 'a') as f:
+        f.write(f'Batch_JobID={jobId}\n')
+    os.environ['batch_jobid'] = jobId
+
     print('Submitted job [{} - {}] to the job queue [{}]'.format(jobName, jobId, jobQueue))
 
     spinner = 0
