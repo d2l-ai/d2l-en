@@ -95,10 +95,10 @@ then execute the following command:
 
 ```bash
 # For macOS and Linux users
-pip install mxnet-cu102==1.7.0
+pip install mxnet-cu112==1.9.1
 
 # For Windows users
-pip install mxnet-cu102==1.7.0 -f https://dist.mxnet.io/python
+pip install mxnet-cu112==1.9.1 -f https://dist.mxnet.io/python
 ```
 
 
@@ -112,7 +112,7 @@ you can install the CPU version
 as follows:
 
 ```bash
-pip install mxnet==1.7.0.post1
+pip install mxnet==1.9.1
 ```
 
 
@@ -124,7 +124,7 @@ pip install mxnet==1.7.0.post1
 You can install PyTorch (the specified versions are tested at the time of writing) with either CPU or GPU support as follows:
 
 ```bash
-pip install torch==1.12.0 torchvision==0.13.0
+pip install torch==2.0.0 torchvision==0.15.0
 ```
 
 
