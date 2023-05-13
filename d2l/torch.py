@@ -2815,7 +2815,7 @@ def frozen_lake(seed):
     """Defined in :numref:`sec_utils`"""
     # See https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
     # How to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
-    import gymnasium as gym
+    import gym
 
     env = gym.make('FrozenLake-v1', is_slippery=False)
     env.seed(seed)

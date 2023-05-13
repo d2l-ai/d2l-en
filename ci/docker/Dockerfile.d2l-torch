@@ -20,6 +20,6 @@ USER ci
 ENV PATH="/home/ci/.local/bin:$PATH"
 
 # Install d2lbook using pip + dependencies for torch d2l
-RUN pip3 install git+https://github.com/d2l-ai/d2l-book gymnasium==0.28.1 gpytorch scipy syne-tune[gpsearchers]==0.3.2
+RUN pip3 install git+https://github.com/d2l-ai/d2l-book gym==0.21.0 gpytorch scipy syne-tune[gpsearchers]==0.3.2
 
 CMD ["/bin/bash"]

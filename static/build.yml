@@ -18,5 +18,5 @@ dependencies:
     - flax==0.6.8
     # Chapter Specific Dependencies for PyTorch
     - syne-tune[gpsearchers]==0.3.2
-    - gymnasium==0.28.1
+    - gym==0.21.0
     - gpytorch
