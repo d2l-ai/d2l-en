@@ -188,7 +188,7 @@ net(X)
 ```{.python .input}
 %%tab jax
 params = net.init(d2l.get_key(), jnp.zeros((2, 20)))
-jax.tree_util.tree_map(lambda x: x.shape, params).tree_flatten()
+jax.tree_util.tree_map(lambda x: x.shape, params).tree_flatten_with_keys()
 ```
 
 As soon as we know the input dimensionality,
