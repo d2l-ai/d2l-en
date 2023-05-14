@@ -451,7 +451,6 @@ from mxnet.gluon import nn, rnn
 import numpy as np
 import torch
 import torchvision
-import gym
 from torch import nn
 from torch.nn import functional as F
 from torchvision import transforms

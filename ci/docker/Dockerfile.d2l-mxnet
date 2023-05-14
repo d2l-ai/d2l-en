@@ -1,5 +1,5 @@
-# Use MXNet 1.9.1 (March 2023)
-FROM nvcr.io/nvidia/mxnet:23.03-py3
+# Use MXNet 1.9.1 (April 2023)
+FROM nvcr.io/nvidia/mxnet:23.04-py3
 
 RUN adduser --disabled-password --disabled-login ci
 WORKDIR /home/ci
