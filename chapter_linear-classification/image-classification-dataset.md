@@ -128,6 +128,8 @@ data = FashionMNIST(resize=(32, 32))
 len(data.train[0]), len(data.val[0])
 ```
 
+After running this cell, you should see that 4 .gz files (2 starts with t10k refers to testing data and 2 starts with train refers to training data) are downloaded into folder d2l/data/FashionMNIST/ and 4 corresponding .idx3-ubyte files are created in folder d2l/data/FashionMNIST/raw/. This is because torchvision.datasets.FashionMNIST automatically download the gzip-compressed files such as t10k-images-idx3-ubyte.gz  and then extract them into t10k-images-idx3-ubyte. The uncompressed file is in the IDX format, which is a file format commonly used for storing and distributing binary data, particularly for datasets in the machine learning and computer vision domains. This is why it doesn't look like a folder with images and labels for your to open and view.
+
 The images are grayscale and upscaled to $32 \times 32$ pixels in resolution above. This is similar to the original MNIST dataset which consisted of (binary) black and white images. Note, though, that most modern image data which has 3 channels (red, green, blue) and hyperspectral images which can have in excess of 100 channels (the HyMap sensor has 126 channels).
 By convention we store image as a $c \times h \times w$ tensor, where $c$ is the number of color channels, $h$ is the height and $w$ is the width.
 
