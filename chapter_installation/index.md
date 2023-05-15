@@ -221,7 +221,6 @@ To exit the environment,
 run `conda deactivate`.
 
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/23)
 :end_tab:
@@ -233,3 +232,4 @@ run `conda deactivate`.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/436)
 :end_tab:
+
