@@ -1,13 +1,19 @@
 name: Continuous Integration
 
 on:
-  # Triggers the workflow on push or pull request events but only for the "master" branch
+  # Triggers the workflow on push or pull request events only for the specified branches
   push:
     branches:
       - master
+      - r0.17
+      - release
+      - classic
   pull_request_target:
     branches:
       - master
+      - r0.17
+      - release
+      - classic
 
 permissions:
   id-token: write
