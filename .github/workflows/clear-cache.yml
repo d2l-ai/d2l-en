@@ -28,7 +28,6 @@ jobs:
     name: Clear CI Cache
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
