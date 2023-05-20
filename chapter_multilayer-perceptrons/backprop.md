@@ -116,6 +116,38 @@ are primarily rightward and upward.
 ![Computational graph of forward propagation.](../img/forward.svg)
 :label:`fig_forward`
 
+## Computational Graph Visualization
+A computational graph in PyTorch is a graphical representation of the sequence of operations or computations performed on tensors. It captures the flow of data and the dependencies between tensors, providing a mechanism for automatic differentiation and gradient computation.
+
+In PyTorch, when you define a computation using tensor operations, the computational graph is automatically constructed in the background. This graph keeps track of the tensors involved in the computation, the operations performed on them, and the relationships between them.
+
+The computational graph consists of nodes and edges, where nodes represent tensors and edges represent the operations applied to those tensors. Each node in the graph represents a tensor and includes information such as the tensor's shape, data type, and the operation that created it. The edges connect the nodes and represent the flow of data between tensors.
+
+Here we will use the `torchviz` package to visualize the computational graph of forward propagation. For install `torchviz`, you can refer to [here](https://www.graphviz.org/download/). Linux user can simply run "sudo apt-get install graphviz" to install it from the terminal.
+
+```{.python .input}
+%%tab pytorch
+# "sudo apt-get install graphviz" to install graphviz
+import torch
+from torchviz import make_dot
+
+# Create some tensors and perform operations
+x = torch.tensor([2.0], requires_grad=True)
+y = torch.tensor([3.0], requires_grad=True)
+z = x + y
+output = z * z
+
+# Visualize the computational graph
+dot = make_dot(output, params={"x": x, "y": y})
+
+# Save the graph as a PDF file
+dot.render("computational_graph", format="png")
+```
+
+From the generated graph, we can see that the computational graph is a directed acyclic graph (DAG). AccumulateGrad for x and y is a flag or attribute that can be set for a tensor's gradient computation. When AccumulateGrad is enabled, the gradients of the tensor accumulate over multiple backward passes, instead of being overwritten with each subsequent backward pass. AddBackward and MulBackward are classes in PyTorch that represent the backward pass (gradient computation) functions for the addition and multiplication operations, respectively. During the forward pass in a PyTorch computation graph, when tensors undergo addition or multiplication operations, the framework keeps track of the operations and constructs a computation graph. This graph allows PyTorch to perform automatic differentiation and compute gradients during the backward pass. When you call the backward() method on a tensor, PyTorch traverses the computation graph in reverse order, starting from the output tensor(s) towards the input tensors.
+
+
+
 ## Backpropagation
 
 *Backpropagation* refers to the method of calculating
