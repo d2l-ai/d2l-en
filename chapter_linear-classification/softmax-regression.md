@@ -316,7 +316,7 @@ Since $\mathbf{y}$ is a one-hot vector of length $q$,
 the sum over all its coordinates $j$ vanishes for all but one term.
 Note that the loss $l(\mathbf{y}, \hat{\mathbf{y}})$
 is bounded from below by $0$
-whenever $\hat{y}$ is a probability vector:
+whenever $\hat{\mathbf{y}}$ is a probability vector:
 no single entry is larger than $1$,
 hence their negative logarithm cannot be lower than $0$;
 $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$ only if we predict
