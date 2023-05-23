@@ -171,8 +171,8 @@ in the rest of the chapter.
 
 Next, let's discuss about how to measure the language model quality, which will be used to evaluate our models in the subsequent sections.
 One way is to check how surprising the text is.
-A good language model is able to predict with
-high-accuracy tokens that what we will see next.
+A good language model is able to predict tokens with
+high accuracy. That what we will see next.
 Consider the following continuations of the phrase "It is raining", as proposed by different language models:
 
 1. "It is raining outside"
