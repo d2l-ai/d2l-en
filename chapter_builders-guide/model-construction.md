@@ -108,6 +108,7 @@ npx.set_np()
 import torch
 from torch import nn
 from torch.nn import functional as F
+import torchinfo
 ```
 
 ```{.python .input}
@@ -367,6 +368,29 @@ net = MLP()
 params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
+
+Here we demonstrate using torchinfo to summary the model, which is a handy tool to check the model architecture, like the number of parameters, the output shape of each layer, etc. Meanwhile, it also supports to calculate the parameter size and size of the model. 
+
+```{.python .input}
+%%tab pytorch
+torchinfo.summary(net, input_size=X.shape)
+```
+
+After running the cell above, you will see the following output:
+Input X with shape [2,20] passes nn.LazyLinear(256) with output shape [2,256].
+Input X with shape [2,256] passes nn.LazyLinear(10) with output shape [2,10].
+With 2 Linear layes, the number of parameters is calculated as follows:
+Linear1: 20*256+256=5376
+Linear2: 256*10+10=2570
+Total: 5376+2570=7946
+Total mult-adds can be calculated as follows:
+Linear1: 20*2*256 + (20-1)*2*256+2=19970
+Linear2: 256*2*10 + (256-1)*2*10+2=10222
+Total: 19970+10222=30192, which is 0.03 million.
+
+To calculate the size of the model, we need to check the data type of the parameters. In this case, the data type is float32, so the size of the model is 7946*4/1024=0.03 MB, as 4 bytes are needed to store a float32 number.
+
+
 
 A key virtue of the module abstraction is its versatility.
 We can subclass a module to create layers
