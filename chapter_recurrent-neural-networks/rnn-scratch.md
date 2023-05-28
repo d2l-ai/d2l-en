@@ -631,7 +631,7 @@ and then generate a likely continuation.
 
 [**The following `predict` method
 generates a continuation, one character at a time,
-after ingesting a user-provided `prefix`**],
+after ingesting a user-provided `prefix`**].
 When looping through the characters in `prefix`,
 we keep passing the hidden state
 to the next time step 
