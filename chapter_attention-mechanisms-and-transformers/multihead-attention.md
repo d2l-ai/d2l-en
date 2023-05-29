@@ -14,7 +14,7 @@ combine knowledge from
 different behaviors of the same attention mechanism,
 such as capturing dependencies of various ranges
 (e.g., shorter-range vs. longer-range) within a sequence.
-Thus,  it may be beneficial  
+Thus, it may be beneficial 
 to allow our attention mechanism
 to jointly use different representation subspaces
 of queries, keys, and values.
