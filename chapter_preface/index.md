@@ -53,7 +53,7 @@ For any computing technology to reach its full impact,
 it must be well-understood, well-documented, and supported by
 mature, well-maintained tools.
 The key ideas should be clearly distilled,
-minimizing the onboarding time needing
+minimizing the onboarding time needed
 to bring new practitioners up to date.
 Mature libraries should automate common tasks,
 and exemplar code should make it easy for practitioners
@@ -81,7 +81,7 @@ and (v) the engineering techniques
 required to train models efficiently,
 navigating the pitfalls of numerical computing
 and getting the most out of available hardware.
-Teaching both the critical thinking skills
+Teaching the critical thinking skills
 required to formulate problems,
 the mathematics to solve them,
 and the software tools to implement those solutions
