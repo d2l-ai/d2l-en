@@ -71,7 +71,7 @@ We split the dataset into training and test sets. The following function provide
 ```{.python .input  n=5}
 #@tab mxnet
 #@save
-def split_data_ml100k(data, num_users, num_items,
+def split_data_ml100k(data, num_users,
                       split_mode='random', test_ratio=0.1):
     """Split the dataset in random mode or seq-aware mode."""
     if split_mode == 'seq-aware':
@@ -129,7 +129,7 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
                           test_ratio=0.1, batch_size=256):
     data, num_users, num_items = read_data_ml100k()
     train_data, test_data = split_data_ml100k(
-        data, num_users, num_items, split_mode, test_ratio)
+        data, num_users, split_mode, test_ratio)
     train_u, train_i, train_r, _ = load_data_ml100k(
         train_data, num_users, num_items, feedback)
     test_u, test_i, test_r, _ = load_data_ml100k(
