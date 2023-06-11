@@ -161,7 +161,7 @@ captured in low resolution and often with an artificially clean background.
 
 In 2009, the ImageNet dataset was released :cite:`Deng.Dong.Socher.ea.2009`,
 challenging researchers to learn models from 1 million examples,
-1000 each from 1000 distinct categories of objects. The categories themselves
+each from 1000 distinct categories of objects. The categories themselves
 were based on the most popular noun nodes in WordNet :cite:`Miller.1995`.
 The ImageNet team used Google Image Search to prefilter large candidate sets
 for each category and employed
