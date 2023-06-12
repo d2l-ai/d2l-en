@@ -90,10 +90,7 @@ if tab.selected('tensorflow'):
 if tab.selected('jax'):
     def epanechikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
-```
 
-```{.python .input}
-%%tab all
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
 x = d2l.arange(-2.5, 2.5, 0.1)
@@ -103,6 +100,8 @@ for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('jax'):
         ax.plot(x, kernel(x))
     ax.set_xlabel(name)
+
+d2l.plt.show()
 ```
 
 Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of $1$ (or some otherwise defined hyperparameter) and does so indiscriminately. 
