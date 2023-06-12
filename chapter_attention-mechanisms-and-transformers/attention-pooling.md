@@ -66,8 +66,6 @@ All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *tr
 
 ```{.python .input}
 %%tab all
-fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
-
 # Define some kernels
 def gaussian(x):
     return d2l.exp(-x**2 / 2)
@@ -90,7 +88,11 @@ if tab.selected('tensorflow'):
 if tab.selected('jax'):
     def epanechikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
+```
 
+```{.python .input}
+%%tab all
+fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
 
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
