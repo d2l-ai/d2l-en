@@ -91,6 +91,7 @@ if tab.selected('jax'):
     def epanechikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
 
+
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
 x = d2l.arange(-2.5, 2.5, 0.1)
