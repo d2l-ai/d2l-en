@@ -66,8 +66,6 @@ All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *tr
 
 ```{.python .input}
 %%tab all
-fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
-
 # Define some kernels
 def gaussian(x):
     return d2l.exp(-x**2 / 2)
@@ -94,6 +92,8 @@ if tab.selected('jax'):
 
 ```{.python .input}
 %%tab all
+fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
+
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
 x = d2l.arange(-2.5, 2.5, 0.1)
@@ -103,6 +103,8 @@ for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('jax'):
         ax.plot(x, kernel(x))
     ax.set_xlabel(name)
+
+d2l.plt.show()
 ```
 
 Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of $1$ (or some otherwise defined hyperparameter) and does so indiscriminately. 
