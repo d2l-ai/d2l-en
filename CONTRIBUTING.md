@@ -71,7 +71,7 @@ git clone https://github.com/<UserName>/d2l-en.git
 ```
 
 * Setup your local environment: Create an empty conda environment
-(you may refer to our [Miniconda Installaton](https://d2l.ai/chapter_installation/index.html#installing-miniconda) section in the book).
+(you may refer to our [Miniconda Installation](https://d2l.ai/chapter_installation/index.html#installing-miniconda) section in the book).
 
 * Install the required packages after activating the environment.
 What are the required packages? This depends on the framework you wish to edit. Note that master and release branches may have different
