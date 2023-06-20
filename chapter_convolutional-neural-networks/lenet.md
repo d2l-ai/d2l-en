@@ -76,7 +76,7 @@ At a high level, (**LeNet (LeNet-5) consists of two parts:
 (ii) a dense block consisting of three fully connected layers**);
 The architecture is summarized in :numref:`img_lenet`.
 
-![Data flow in LeNet. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
+![Data flow in LeNet. The input is a handwritten digit, the output is a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
 The basic units in each convolutional block
