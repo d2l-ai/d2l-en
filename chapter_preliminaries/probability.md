@@ -214,7 +214,7 @@ by testing whether the returned float is greater than `0.5`
 ```{.python .input}
 %%tab all
 num_tosses = 100
-heads = sum([random.random() > 0.5 for _ in range(100)])
+heads = sum([random.random() > 0.5 for _ in range(num_tosses)])
 tails = num_tosses - heads
 print("heads, tails: ", [heads, tails])
 ```
