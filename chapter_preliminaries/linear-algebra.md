@@ -558,12 +558,12 @@ is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
-A.sum(axis=[0, 1]) == A.sum() # Same as A.sum()
+A.sum(axis=[0, 1]) == A.sum()  # Same as A.sum()
 ```
 
 ```{.python .input}
 %%tab tensorflow
-tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as tf.reduce_sum(A)
+tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A)  # Same as tf.reduce_sum(A)
 ```
 
 [**A related quantity is the *mean*, also called the *average*.**]
