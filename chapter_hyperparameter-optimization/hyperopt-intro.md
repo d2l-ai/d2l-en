@@ -1,4 +1,4 @@
-```{.python .input  n=2}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(["pytorch"])
 ```

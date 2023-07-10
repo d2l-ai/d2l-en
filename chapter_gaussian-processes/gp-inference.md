@@ -1,3 +1,9 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(["pytorch"])
+#required_libs("gpytorch")
+```
+
 # Gaussian Process Inference
 
 In this section, we will show how to perform posterior inference and make predictions using the GP priors we introduced in the last section. We will start with regression, where we can perform inference in _closed form_. This is a "GPs in a nutshell" section to quickly get up and running with Gaussian processes in practice. We'll start coding all the basic operations from scratch, and then introduce [GPyTorch](https://gpytorch.ai/), which will make working with state-of-the-art Gaussian processes and integration with deep neural networks much more convenient. We will consider these more advanced topics in depth in the next section. In that section, we will also consider settings where approximate inference is required --- classification, point processes, or any non-Gaussian likelihoods. 

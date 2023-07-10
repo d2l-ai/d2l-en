@@ -1,3 +1,9 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(["pytorch"])
+#required_libs("setuptools==66", "wheel==0.38.4", "gym==0.21.0")
+```
+
 # Q-Learning
 :label:`sec_qlearning`
 
@@ -86,9 +92,11 @@ np.random.seed(seed)
 # Now set up the environment
 env_info = d2l.make_env('FrozenLake-v1', seed=seed)
 ```
+
 In the FrozenLake environment, the robot moves on a $4 \times 4$ grid (these are the states) with actions that are "up" ($\uparrow$), "down" ($\rightarrow$), "left" ($\leftarrow$), and "right" ($\rightarrow$). The environment contains a number of holes (H) cells and frozen (F) cells as well as a goal cell (G), all of which are unknown to the robot. To keep the problem simple, we assume the robot has reliable actions, i.e. $P(s' \mid s, a) = 1$ for all $s \in \mathcal{S}, a \in \mathcal{A}$. If the robot reaches the goal, the trial ends and the robot receives a reward of $1$ irrespective of the action; the reward at any other state is $0$ for all actions. The objective of the robot is to learn a policy that reaches the goal location (G) from a given start location (S) (this is $s_0$) to maximize the *return*.
 
 We first implement $\epsilon$-greedy method as follows:
+
 ```{.python .input}
 %%tab all
 
@@ -100,7 +108,9 @@ def e_greedy(env, Q, s, epsilon):
         return np.argmax(Q[s,:])
 
 ```
+
 We are now ready to implement Q-learning:
+
 ```{.python .input}
 %%tab all
 
@@ -137,6 +147,7 @@ def q_learning(env_info, gamma, num_iters, alpha, epsilon):
 q_learning(env_info=env_info, gamma=gamma, num_iters=num_iters, alpha=alpha, epsilon=epsilon)
 
 ```
+
 This result shows that Q-learning can find the optimal solution for this problem roughly after 250 iterations. However, when we compare this result with the Value Iteration algorithm's result (see :ref:`subsec_valueitercode`), we can see that the Value Iteration algorithm needs way fewer iterations to find the optimal solution for this problem. This happens because the Value Iteration algorithm has access to the full MDP whereas Q-learning does not.
 
 

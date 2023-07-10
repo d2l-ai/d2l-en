@@ -1,6 +1,7 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(["pytorch"])
+#required_libs("syne-tune[gpsearchers]==0.3.2")
 ```
 
 # Asynchronous Successive Halving
