@@ -233,7 +233,7 @@ information about the order of tokens
 is to represent this to the model 
 as an additional input associated 
 with each token. 
-These inputs are called *positional encodings*.
+These inputs are called *positional encodings*, 
 and they can either be learned or fixed a priori.
 We now describe a simple scheme for fixed positional encodings
 based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
