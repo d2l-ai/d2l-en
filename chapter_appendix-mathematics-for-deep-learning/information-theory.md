@@ -272,7 +272,7 @@ def conditional_entropy(p_xy, p_x):
     out = nansum(cond_ent.as_nd_ndarray())
     return out
 
-conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
+conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.2]]), np.array([0.2, 0.8]))
 ```
 
 ```{.python .input}
@@ -284,7 +284,7 @@ def conditional_entropy(p_xy, p_x):
     out = nansum(cond_ent)
     return out
 
-conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]),
+conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.2]]),
                     torch.tensor([0.2, 0.8]))
 ```
 
@@ -297,7 +297,7 @@ def conditional_entropy(p_xy, p_x):
     out = nansum(cond_ent)
     return out
 
-conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
+conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.2]]),
                     tf.constant([0.2, 0.8]))
 ```
 
