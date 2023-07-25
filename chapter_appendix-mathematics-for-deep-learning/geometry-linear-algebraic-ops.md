@@ -170,7 +170,7 @@ from torchvision import transforms
 import torchvision
 
 def angle(v, w):
-    return torch.acos(v.dot(w) / (torch.norm(v) * torch.norm(w)))
+    return torch.acos(v.dot(w) / (torch.linalg.vector_norm(v) * torch.linalg.vector_norm(w)))
 
 angle(torch.tensor([0, 1, 2], dtype=torch.float32), torch.tensor([2.0, 3, 4]))
 ```

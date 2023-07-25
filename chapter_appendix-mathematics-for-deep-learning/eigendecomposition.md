@@ -412,10 +412,10 @@ d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 # Calculate the sequence of norms after repeatedly applying `A`
 v_in = torch.randn(k, 1, dtype=torch.float64)
 
-norm_list = [torch.norm(v_in).item()]
+norm_list = [torch.linalg.matrix_norm(v_in).item()]
 for i in range(1, 100):
     v_in = A @ v_in
-    norm_list.append(torch.norm(v_in).item())
+    norm_list.append(torch.linalg.matrix_norm(v_in).item())
 
 d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
@@ -578,10 +578,10 @@ A /= norm_eigs[-1]
 # Do the same experiment again
 v_in = torch.randn(k, 1, dtype=torch.float64)
 
-norm_list = [torch.norm(v_in).item()]
+norm_list = [torch.linalg.matrix_norm(v_in).item()]
 for i in range(1, 100):
     v_in = A @ v_in
-    norm_list.append(torch.norm(v_in).item())
+    norm_list.append(torch.linalg.matrix_norm(v_in).item())
 
 d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```

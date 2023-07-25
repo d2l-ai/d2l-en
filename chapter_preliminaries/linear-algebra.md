@@ -973,7 +973,7 @@ np.linalg.norm(u)
 ```{.python .input}
 %%tab pytorch
 u = torch.tensor([3.0, -4.0])
-torch.norm(u)
+torch.linalg.vector_norm(u)
 ```
 
 ```{.python .input}
@@ -1051,7 +1051,7 @@ np.linalg.norm(np.ones((4, 9)))
 
 ```{.python .input}
 %%tab pytorch
-torch.norm(torch.ones((4, 9)))
+torch.linalg.matrix_norm(torch.ones((4, 9)))
 ```
 
 ```{.python .input}
