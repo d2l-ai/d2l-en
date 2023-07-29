@@ -83,6 +83,8 @@ If you find this book useful, please star (★) this repository or cite this boo
 > <p>"This is a highly welcome addition to the machine learning literature, with a focus on hands-on experience implemented via the integration of Jupyter notebooks. Students of deep learning should find this invaluable to become proficient in this field."</p>
 > <b>&mdash; Bernhard Schölkopf, Director, Max Planck Institute for Intelligent Systems</b>
 
+> <p>"Dive into Deep Learning strikes an excellent balance between hands-on learning and in-depth explanation. I've used it in my deep learning course and recommend it to anyone who wants to develop a thorough and practical understanding of deep learning."</p>
+> <b>&mdash; Colin Raffel, Assistant Professor, University of North Carolina, Chapel Hill</b>
 
 ## Contributing ([Learn How](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html))
 
