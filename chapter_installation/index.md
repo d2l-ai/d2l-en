@@ -124,7 +124,7 @@ pip install mxnet==1.9.1
 You can install PyTorch (the specified versions are tested at the time of writing) with either CPU or GPU support as follows:
 
 ```bash
-pip install torch==2.0.0 torchvision==0.15.0
+pip install torch==2.0.0 torchvision==0.15.1
 ```
 
 
