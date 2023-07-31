@@ -18,6 +18,7 @@ aws
 colab
 selecting-servers-gpus
 contributing
+utils
 d2l
 ```
 
