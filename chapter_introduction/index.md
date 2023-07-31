@@ -1392,7 +1392,7 @@ Many scholars have asked whether one could explain
 and possibly reverse engineer this capacity.
 One of the oldest biologically inspired algorithms
 was formulated by [Donald Hebb (1904--1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
-In his groundbreaking book *The Organization of Behavior* :cite:`Hebb.Hebb.1949`,
+In his groundbreaking book *The Organization of Behavior* :cite:`Hebb.1949`,
 he posited that neurons learn by positive reinforcement.
 This became known as the Hebbian learning rule.
 These ideas inspired later works like
