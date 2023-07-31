@@ -262,7 +262,7 @@ and even to optimize for the most likely sequences.
 While language modeling might not look, at first glance,
 like an autoregressive problem,
 we can reduce language modeling to autoregressive prediction
-by decomposing the joint density  of a sequence $p(x_t \mid x_1, \ldots, x_T)$
+by decomposing the joint density  of a sequence $p(x_1, \ldots, x_T)$
 into the product of conditional densities
 in a left-to-right fashion
 by applying the chain rule of probability:
@@ -334,7 +334,7 @@ In principle, there is nothing wrong with unfolding
 $P(x_1, \ldots, x_T)$ in reverse order.
 The result is a valid factorization:
 
-$$P(x_1, \ldots, x_T) = \prod_{t=T}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
+$$P(x_1, \ldots, x_T) = P(x_T) \prod_{t=T-1}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
 
 
 However, there are many reasons why factorizing text
