@@ -9,7 +9,7 @@ became salient, with Bengio and Hochreiter
 discussing the problem
 :cite:`bengio1994learning,Hochreiter.Bengio.Frasconi.ea.2001`.
 Hochreiter had articulated this problem as early 
-as 1991 in his masters thesis, although the results 
+as in his 1991 masters thesis, although the results 
 were not widely known because the thesis was written in German.
 While gradient clipping helps with exploding gradients, 
 handling vanishing gradients appears 
