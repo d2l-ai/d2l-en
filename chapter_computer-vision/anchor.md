@@ -44,7 +44,7 @@ Suppose that the input image has a height of $h$ and width of $w$.
 We generate anchor boxes with different shapes centered on each pixel of the image.
 Let the *scale* be $s\in (0, 1]$ and
 the *aspect ratio* (ratio of width to height) is $r > 0$. 
-Then [**the width and height of the anchor box are $hs\sqrt{r}$ and $hs/\sqrt{r}$, respectively.**]
+Then [**the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively.**]
 Note that when the center position is given, an anchor box with known width and height is determined.
 
 To generate multiple anchor boxes with different shapes,
