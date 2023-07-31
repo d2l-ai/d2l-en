@@ -1261,7 +1261,7 @@ In the following,
 two layers of multi-head attention weights
 are presented row by row.
 Each head independently attends
-based on a separate representation subspaces of queries, keys, and values.
+based on separate representation subspaces of queries, keys, and values.
 
 ```{.python .input}
 %%tab mxnet, tensorflow, jax
@@ -1400,9 +1400,9 @@ transforms the representation at all the sequence positions using the same MLP.
 
 1. Train a deeper Transformer in the experiments. How does it affect the training speed and the translation performance?
 1. Is it a good idea to replace scaled dot-product attention with additive attention in the Transformer? Why?
-1. For language modeling, should we use the Transformer encoder, decoder, or both? How to design this method?
-1. What can be challenges to Transformers if input sequences are very long? Why?
-1. How to improve computational and memory efficiency of Transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
+1. For language modeling, should we use the Transformer encoder, decoder, or both? How would we design this method?
+1. What challenges can Transformers face if input sequences are very long? Why?
+1. How can we improve the computational and memory efficiency of Transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/348)

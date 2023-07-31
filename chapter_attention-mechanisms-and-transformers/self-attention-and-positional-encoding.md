@@ -256,7 +256,7 @@ $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2
 At first glance,
 this trigonometric-function
 design looks weird.
-Before explanations of this design,
+Before we give explanations of this design,
 let's first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
@@ -504,7 +504,7 @@ by adding positional encoding to the input representations.
 
 ## Exercises
 
-1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
+1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could the possible issues be?
 1. Can you design a learnable positional encoding method?
 1. Can we assign different learned embeddings according to different offsets between queries and keys that are compared in self-attention? Hint: you may refer to relative position embeddings :cite:`shaw2018self,huang2018music`.
 

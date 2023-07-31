@@ -88,11 +88,11 @@ is computed as
 
 $$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathbf W_i^{(v)}\mathbf v) \in \mathbb R^{p_v},$$
 
-where learnable parameters
+where 
 $\mathbf W_i^{(q)}\in\mathbb R^{p_q\times d_q}$,
-$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$
-and $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$,
-and
+$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$,
+and $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$
+are learnable parameters and
 $f$ is attention pooling,
 such as
 additive attention and scaled dot-product attention
