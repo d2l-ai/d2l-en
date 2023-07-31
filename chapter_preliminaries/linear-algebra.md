@@ -789,7 +789,7 @@ we use the `mv` function.
 Note that the column dimension of `A` 
 (its length along axis 1)
 must be the same as the dimension of `x` (its length). 
-PyTorch has a convenience operator `@` 
+Python has a convenience operator `@` 
 that can execute both matrix-vector
 and matrix-matrix products
 (depending on its arguments). 
