@@ -478,12 +478,19 @@ with those that we learned**] through our training loop.
 Indeed they turn out to be very close to each other.
 
 ```{.python .input  n=21}
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
+with torch.no_grad():
+    print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
+    print(f'error in estimating b: {data.b - model.b}')
+```
+
+```{.python .input  n=22}
+%%tab mxnet, tensorflow
 print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
 
-```{.python .input  n=22}
+```{.python .input  n=23}
 %%tab jax
 params = trainer.state.params
 print(f"error in estimating w: {data.w - d2l.reshape(params['w'], data.w.shape)}")
