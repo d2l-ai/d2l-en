@@ -38,6 +38,29 @@ which serve the dual purposes of
 mitigating the sensitivity of convolutional layers to location
 and of spatially downsampling representations.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## Maximum Pooling and Average Pooling
 
 Like convolutional layers, *pooling* operators
@@ -59,7 +82,7 @@ downsampling an image. Rather than just taking the value of every second (or thi
 pixel for the lower resolution image, we can average over adjacent pixels to obtain 
 an image with better signal to noise ratio since we are combining the information 
 from multiple adjacent pixels. *Max-pooling* was introduced in 
-:cite:`Riesenhuber.Poggio.1999` in the context of cognitive neuroscience to describe 
+:citet:`Riesenhuber.Poggio.1999` in the context of cognitive neuroscience to describe 
 how information aggregation might be aggregated hierarchically for the purpose 
 of object recognition, and an earlier version in speech recognition :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. In almost all cases, max-pooling, as it is also referred to, 
 is preferable. 
@@ -105,29 +128,6 @@ This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
 However, no kernel is needed, computing the output
 as either the maximum or the average of each region in the input.
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -330,7 +330,8 @@ X
 
 ```{.python .input}
 %%tab tensorflow, jax
-X = d2l.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax
+# Concatenate along `dim=3` due to channels-last syntax
+X = d2l.concat([X, X + 1], 3)
 X
 ```
 

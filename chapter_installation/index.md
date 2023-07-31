@@ -95,10 +95,10 @@ then execute the following command:
 
 ```bash
 # For macOS and Linux users
-pip install mxnet-cu102==1.7.0
+pip install mxnet-cu112==1.9.1
 
 # For Windows users
-pip install mxnet-cu102==1.7.0 -f https://dist.mxnet.io/python
+pip install mxnet-cu112==1.9.1 -f https://dist.mxnet.io/python
 ```
 
 
@@ -112,7 +112,7 @@ you can install the CPU version
 as follows:
 
 ```bash
-pip install mxnet==1.7.0.post1
+pip install mxnet==1.9.1
 ```
 
 
@@ -121,10 +121,10 @@ pip install mxnet==1.7.0.post1
 
 :begin_tab:`pytorch`
 
-You can install PyTorch with either CPU or GPU support as follows:
+You can install PyTorch (the specified versions are tested at the time of writing) with either CPU or GPU support as follows:
 
 ```bash
-pip install torch torchvision
+pip install torch==2.0.0 torchvision==0.15.0
 ```
 
 
@@ -199,7 +199,7 @@ cd tensorflow
 
 :end_tab:
 
-If you don't already have `unzip` installed, first run `sudo apt-get install unzip`.
+If you do not already have `unzip` installed, first run `sudo apt-get install unzip`.
 Now we can start the Jupyter Notebook server by running:
 
 ```bash
@@ -221,7 +221,6 @@ To exit the environment,
 run `conda deactivate`.
 
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/23)
 :end_tab:
@@ -233,3 +232,4 @@ run `conda deactivate`.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/436)
 :end_tab:
+

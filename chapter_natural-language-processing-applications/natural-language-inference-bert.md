@@ -1,7 +1,6 @@
 # Natural Language Inference: Fine-Tuning BERT
 :label:`sec_natural-language-inference-bert`
 
-
 In earlier sections of this chapter,
 we have designed an attention-based architecture
 (in :numref:`sec_natural-language-inference-attention`)

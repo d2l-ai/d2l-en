@@ -71,7 +71,7 @@ git clone https://github.com/<UserName>/d2l-en.git
 ```
 
 * Setup your local environment: Create an empty conda environment
-(you may refer to our [Miniconda Installaton](https://d2l.ai/chapter_installation/index.html#installing-miniconda) section in the book).
+(you may refer to our [Miniconda Installation](https://d2l.ai/chapter_installation/index.html#installing-miniconda) section in the book).
 
 * Install the required packages after activating the environment.
 What are the required packages? This depends on the framework you wish to edit. Note that master and release branches may have different
@@ -83,17 +83,17 @@ conda activate d2l
 
 # PyTorch
 pip install torch==<version> torchvision==<version>
-# pip install torch==1.11.0 torchvision==0.12.0
+# pip install torch==2.0.0 torchvision==0.15.0
 
 # MXNet
 pip install mxnet==<version>
-# pip install mxnet==1.7.0
+# pip install mxnet==1.9.1
 # or for gpu
-# pip install mxnet-cu102==1.7.0
+# pip install mxnet-cu112==1.9.1
 
 # Tensorflow
 pip install tensorflow==<version> tensorflow-probability==<version>
-# pip install tensorflow==2.8.0 tensorflow-probability==0.16.0
+# pip install tensorflow==2.12.0 tensorflow-probability==0.19.0
 ```
 
 Compilation of the book is powered by the

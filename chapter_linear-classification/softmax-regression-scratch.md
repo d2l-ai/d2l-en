@@ -205,8 +205,8 @@ before passing the data through our model.
 %%tab all
 @d2l.add_to_class(SoftmaxRegressionScratch)
 def forward(self, X):
-    return softmax(d2l.matmul(d2l.reshape(
-        X, (-1, self.W.shape[0])), self.W) + self.b)
+    X = d2l.reshape(X, (-1, self.W.shape[0]))
+    return softmax(d2l.matmul(X, self.W) + self.b)
 ```
 
 ## The Cross-Entropy Loss
@@ -262,7 +262,7 @@ We refer interested readers to the [JAX documentation](https://jax.readthedocs.i
 ```{.python .input}
 %%tab mxnet, pytorch, jax
 def cross_entropy(y_hat, y):
-    return - d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
+    return -d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
 
 cross_entropy(y_hat, y)
 ```
@@ -270,7 +270,7 @@ cross_entropy(y_hat, y)
 ```{.python .input}
 %%tab tensorflow
 def cross_entropy(y_hat, y):
-    return - tf.reduce_mean(tf.math.log(tf.boolean_mask(
+    return -tf.reduce_mean(tf.math.log(tf.boolean_mask(
         y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))))
 
 cross_entropy(y_hat, y)
@@ -289,7 +289,7 @@ def loss(self, y_hat, y):
 @partial(jax.jit, static_argnums=(0))
 def loss(self, params, X, y, state):
     def cross_entropy(y_hat, y):
-        return - d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
+        return -d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
     y_hat = state.apply_fn({'params': params}, *X)
     # The returned empty dictionary is a placeholder for auxiliary data,
     # which will be used later (e.g., for batch norm)
@@ -306,7 +306,7 @@ are adjustable hyperparameters.
 That means that while these values are not
 learned during our primary training loop,
 they still influence the performance
-of our model, bot vis-a-vis training
+of our model, both vis-a-vis training
 and generalization performance.
 In practice you will want to choose these values
 based on the *validation* split of the data
@@ -363,7 +363,7 @@ with solving linear regression
 and classification problems.
 With it, we have reached what would arguably be
 the state of the art of 1960-1970s of statistical modeling.
-In the next section, we'll show you how to leverage
+In the next section, we will show you how to leverage
 deep learning frameworks to implement this model
 much more efficiently.
 

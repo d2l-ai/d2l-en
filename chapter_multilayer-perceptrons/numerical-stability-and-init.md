@@ -28,6 +28,36 @@ and discuss some useful heuristics
 that you will find useful
 throughout your career in deep learning.
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import autograd, np, npx
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+```
 
 ## Vanishing and Exploding Gradients
 
@@ -92,11 +122,6 @@ to see why it can cause vanishing gradients.
 
 ```{.python .input}
 %%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import autograd, np, npx
-npx.set_np()
-
 x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
@@ -108,10 +133,6 @@ d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 
 ```{.python .input}
 %%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-
 x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)
 y = torch.sigmoid(x)
 y.backward(torch.ones_like(x))
@@ -122,10 +143,6 @@ d2l.plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],
 
 ```{.python .input}
 %%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 x = tf.Variable(tf.range(-8.0, 8.0, 0.1))
 with tf.GradientTape() as t:
     y = tf.nn.sigmoid(x)
@@ -135,12 +152,6 @@ d2l.plot(x.numpy(), [y.numpy(), t.gradient(y, x).numpy()],
 
 ```{.python .input}
 %%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-from jax import grad, vmap
-
 x = jnp.arange(-8.0, 8.0, 0.1)
 y = jax.nn.sigmoid(x)
 grad_sigmoid = vmap(grad(jax.nn.sigmoid))
@@ -183,7 +194,6 @@ M = np.random.normal(size=(4, 4))
 print('a single matrix', M)
 for i in range(100):
     M = np.dot(M, np.random.normal(size=(4, 4)))
-
 print('after multiplying 100 matrices', M)
 ```
 
@@ -193,7 +203,6 @@ M = torch.normal(0, 1, size=(4, 4))
 print('a single matrix \n',M)
 for i in range(100):
     M = M @ torch.normal(0, 1, size=(4, 4))
-
 print('after multiplying 100 matrices\n', M)
 ```
 
@@ -203,7 +212,6 @@ M = tf.random.normal((4, 4))
 print('a single matrix \n', M)
 for i in range(100):
     M = tf.matmul(M, tf.random.normal((4, 4)))
-
 print('after multiplying 100 matrices\n', M.numpy())
 ```
 
@@ -214,7 +222,6 @@ M = jax.random.normal(get_key(), (4, 4))
 print('a single matrix \n', M)
 for i in range(100):
     M = jnp.matmul(M, jax.random.normal(get_key(), (4, 4)))
-
 print('after multiplying 100 matrices\n', M)
 ```
 

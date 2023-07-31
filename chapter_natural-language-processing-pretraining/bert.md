@@ -496,7 +496,7 @@ nsp_Y_hat.shape
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch by default won't flatten the tensor as seen in mxnet where, if
+# PyTorch by default will not flatten the tensor as seen in mxnet where, if
 # flatten=True, all but the first axis of input data are collapsed together
 encoded_X = torch.flatten(encoded_X, start_dim=1)
 # input_shape for NSP: (batch size, `num_hiddens`)
@@ -601,7 +601,6 @@ class BERTModel(nn.Module):
 * BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
 * The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
 * Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the latter explicitly models the logical relationship between text pairs.
-
 
 
 ## Exercises

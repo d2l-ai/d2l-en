@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(["pytorch"])
 ```
@@ -40,7 +40,6 @@ cost $c(\mathbf{x}, r)$ increases. Typically, $r$ represents the number of
 epochs for training the neural network, but it could also be the training
 subset size or the number of cross-validation folds.
 
-
 ```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
@@ -49,7 +48,6 @@ from scipy import stats
 from collections import defaultdict
 d2l.set_figsize()
 ```
-
 
 ## Successive Halving
 :label:`sec_mf_hpo_sh`

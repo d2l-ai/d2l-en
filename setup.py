@@ -3,14 +3,11 @@ import d2l
 
 requirements = [
     'jupyter',
-    'numpy',
+    'numpy<=1.23.5',
     'matplotlib',
     'matplotlib-inline',
     'requests',
-    'pandas',
-    'gym==0.21.0',
-    'gpytorch',
-    'scipy'
+    'pandas'
 ]
 
 setup(

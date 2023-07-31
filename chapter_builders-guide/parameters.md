@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Parameter Management
 
 Once we have chosen an architecture
@@ -29,19 +34,38 @@ In this section, we cover the following:
 * Accessing parameters for debugging, diagnostics, and visualizations.
 * Sharing parameters across different model components.
 
-(**We start by focusing on an MLP with one hidden layer.**)
 
-```{.python .input}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
 
 ```{.python .input}
 %%tab mxnet
 from mxnet import init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
+(**We start by focusing on an MLP with one hidden layer.**)
+
+```{.python .input}
+%%tab mxnet
 net = nn.Sequential()
 net.add(nn.Dense(8, activation='relu'))
 net.add(nn.Dense(1))
@@ -53,18 +77,16 @@ net(X).shape
 
 ```{.python .input}
 %%tab pytorch
-import torch
-from torch import nn
+net = nn.Sequential(nn.LazyLinear(8),
+                    nn.ReLU(),
+                    nn.LazyLinear(1))
 
-net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(), nn.LazyLinear(1))
 X = torch.rand(size=(2, 4))
 net(X).shape
 ```
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(4, activation=tf.nn.relu),
@@ -77,11 +99,6 @@ net(X).shape
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-
 net = nn.Sequential([nn.Dense(8), nn.relu, nn.Dense(1)])
 
 X = jax.random.uniform(d2l.get_key(), (2, 4))
@@ -177,13 +194,13 @@ type(bias), bias
 Parameters are complex objects,
 containing values, gradients,
 and additional information.
-That's why we need to request the value explicitly.
+That is why we need to request the value explicitly.
 
 In addition to the value, each parameter also allows us to access the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
 :end_tab:
 
 :begin_tab:`jax`
-Unlike the other frameworks, JAX doesn't keep a track of the gradients over the
+Unlike the other frameworks, JAX does not keep a track of the gradients over the
 neural network parameters, instead the parameters and the network are decoupled.
 It allows the user to express their computation as a
 Python function, and use the `grad` transformation for the same purpose.
@@ -252,8 +269,8 @@ net.add(nn.Dense(8, activation='relu'),
 net.initialize()
 
 X = np.random.uniform(size=(2, 20))
-net(X)
 
+net(X)
 # Check whether the parameters are the same
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
 net[1].weight.data()[0, 0] = 100
@@ -271,6 +288,7 @@ net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(),
                     shared, nn.ReLU(),
                     shared, nn.ReLU(),
                     nn.LazyLinear(1))
+
 net(X)
 # Check whether the parameters are the same
 print(net[2].weight.data[0] == net[4].weight.data[0])
@@ -291,6 +309,7 @@ net = tf.keras.models.Sequential([
     shared,
     tf.keras.layers.Dense(1),
 ])
+
 net(X)
 # Check whether the parameters are different
 print(len(net.layers) == 3)

@@ -16,7 +16,26 @@ to the most essential concepts,
 starting from scalar arithmetic
 and ramping up to matrix multiplication.
 
+```{.python .input}
+%%tab mxnet
+from mxnet import np, npx
+npx.set_np()
+```
 
+```{.python .input}
+%%tab pytorch
+import torch
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+```
 
 ## Scalars
 
@@ -58,9 +77,6 @@ division, and exponentiation operations.
 
 ```{.python .input}
 %%tab mxnet
-from mxnet import np, npx
-npx.set_np()
-
 x = np.array(3.0)
 y = np.array(2.0)
 
@@ -69,8 +85,6 @@ x + y, x * y, x / y, x ** y
 
 ```{.python .input}
 %%tab pytorch
-import torch
-
 x = torch.tensor(3.0)
 y = torch.tensor(2.0)
 
@@ -79,8 +93,6 @@ x + y, x * y, x / y, x**y
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-
 x = tf.constant(3.0)
 y = tf.constant(2.0)
 
@@ -89,8 +101,6 @@ x + y, x * y, x / y, x**y
 
 ```{.python .input}
 %%tab jax
-from jax import numpy as jnp
-
 x = jnp.array(3.0)
 y = jnp.array(2.0)
 
@@ -383,21 +393,21 @@ same shape as their operands.
 ```{.python .input}
 %%tab mxnet
 A = np.arange(6).reshape(2, 3)
-B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
+B = A.copy()  # Assign a copy of A to B by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 %%tab pytorch
 A = torch.arange(6, dtype=torch.float32).reshape(2, 3)
-B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
+B = A.clone()  # Assign a copy of A to B by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 %%tab tensorflow
 A = tf.reshape(tf.range(6, dtype=tf.float32), (2, 3))
-B = A  # No cloning of `A` to `B` by allocating new memory
+B = A  # No cloning of A to B by allocating new memory
 A, A + B
 ```
 
@@ -548,12 +558,12 @@ is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
-A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
+A.sum(axis=[0, 1]) == A.sum()  # Same as A.sum()
 ```
 
 ```{.python .input}
 %%tab tensorflow
-tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as `tf.reduce_sum(A)`
+tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A)  # Same as tf.reduce_sum(A)
 ```
 
 [**A related quantity is the *mean*, also called the *average*.**]
@@ -779,7 +789,7 @@ we use the `mv` function.
 Note that the column dimension of `A` 
 (its length along axis 1)
 must be the same as the dimension of `x` (its length). 
-PyTorch has a convenience operator `@` 
+Python has a convenience operator `@` 
 that can execute both matrix-vector
 and matrix-matrix products
 (depending on its arguments). 
@@ -816,7 +826,7 @@ A.shape, x.shape, jnp.matmul(A, x)
 
 ## Matrix-Matrix Multiplication
 
-If you've gotten the hang of dot products and matrix-vector products,
+If you have gotten the hang of dot products and matrix-vector products,
 then *matrix-matrix multiplication* should be straightforward.
 
 Say that we have two matrices 
@@ -1097,7 +1107,7 @@ we wrap up this section here.
 If you are eager to learn more linear algebra,
 there are many excellent books and online resources.
 For a more advanced crash course, consider checking out
-:cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
+:citet:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 To recap:
 

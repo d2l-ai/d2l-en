@@ -60,7 +60,7 @@ import torch
 from torch.nn import NLLLoss
 
 def nansum(x):
-    # Define nansum, as pytorch doesn't offer it inbuilt.
+    # Define nansum, as pytorch does not offer it inbuilt.
     return x[~torch.isnan(x)].sum()
 
 def self_information(p):

@@ -64,6 +64,7 @@ is a tunable hyperparameter.
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class RNNScratch(d2l.Module):  #@save
+    """The RNN model implemented from scratch."""
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -89,6 +90,7 @@ class RNNScratch(d2l.Module):  #@save
 ```{.python .input  n=7}
 %%tab jax
 class RNNScratch(nn.Module):  #@save
+    """The RNN model implemented from scratch."""
     num_inputs: int
     num_hiddens: int
     sigma: float = 0.01
@@ -178,9 +180,11 @@ of the hidden state remains unchanged.
 ```{.python .input}
 %%tab all
 def check_len(a, n):  #@save
-    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+    """Check the length of a list."""
+    assert len(a) == n, f'list\'s length {len(a)} != expected length {n}'
     
 def check_shape(a, shape):  #@save
+    """Check the shape of a tensor."""
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
@@ -206,8 +210,34 @@ As discussed in :numref:`subsec_perplexity`, this ensures
 that sequences of different length are comparable.
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
 class RNNLMScratch(d2l.Classifier):  #@save
+    """The RNN-based language model implemented from scratch."""
+    def __init__(self, rnn, vocab_size, lr=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.init_params()
+        
+    def init_params(self):
+        self.W_hq = nn.Parameter(
+            d2l.randn(
+                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
+        self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
+
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=True)
+        return l
+        
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow
+class RNNLMScratch(d2l.Classifier):  #@save
+    """The RNN-based language model implemented from scratch."""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -220,11 +250,6 @@ class RNNLMScratch(d2l.Classifier):  #@save
             self.b_q = d2l.zeros(self.vocab_size)        
             for param in self.get_scratch_params():
                 param.attach_grad()
-        if tab.selected('pytorch'):
-            self.W_hq = nn.Parameter(
-                d2l.randn(
-                    self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
-            self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
         if tab.selected('tensorflow'):
             self.W_hq = tf.Variable(d2l.normal(
                 (self.rnn.num_hiddens, self.vocab_size)) * self.rnn.sigma)
@@ -243,6 +268,7 @@ class RNNLMScratch(d2l.Classifier):  #@save
 ```{.python .input  n=14}
 %%tab jax
 class RNNLMScratch(d2l.Classifier):  #@save
+    """The RNN-based language model implemented from scratch."""
     rnn: nn.Module
     vocab_size: int
     lr: float = 0.01
@@ -277,7 +303,7 @@ This works when we are dealing with numerical inputs
 like price or temperature, where any two values
 sufficiently close together
 should be treated similarly.
-But this doesn't quite make sense. 
+But this does not quite make sense. 
 The $45^{\mathrm{th}}$ and $46^{\mathrm{th}}$ words 
 in our vocabulary happen to be "their" and "said",
 whose meanings are not remotely similar.
@@ -474,7 +500,7 @@ but is unstable owing to massive spikes in the loss.
 
 One way to limit the size of $L \eta \|\mathbf{g}\|$ 
 is to shrink the learning rate $\eta$ to tiny values.
-One advantage here is that we don't bias the updates.
+One advantage here is that we do not bias the updates.
 But what if we only *rarely* get large gradients?
 This drastic move slows down our progress at all steps,
 just to deal with the rare exploding gradient events.
@@ -492,11 +518,11 @@ of limiting the influence any given minibatch
 (and within it any given sample) 
 can exert on the parameter vector. 
 This bestows a certain degree of robustness to the model. 
-To be clear, it's a hack. 
+To be clear, it is a hack. 
 Gradient clipping means that we are not always
-following the true gradient and it's hard 
+following the true gradient and it is hard 
 to reason analytically about the possible side effects.
-However, it's a very useful hack,
+However, it is a very useful hack,
 and is widely adopted in RNN implementations
 in most deep learning frameworks.
 
@@ -593,7 +619,7 @@ it were the next token in the input.
 Sometimes we will just want to generate text
 as though we were starting at the beginning 
 of a document. 
-However, it's often useful to condition
+However, it is often useful to condition
 the language model on a user-supplied prefix.
 For example, if we were developing an
 autocomplete feature for search engine
@@ -603,9 +629,9 @@ had written so far (the prefix),
 and then generate a likely continuation.
 
 
-[**The following `predict` function
+[**The following `predict` method
 generates a continuation, one character at a time,
-after ingesting a user-provided `prefix`**],
+after ingesting a user-provided `prefix`**].
 When looping through the characters in `prefix`,
 we keep passing the hidden state
 to the next time step 
@@ -632,7 +658,7 @@ def predict(self, prefix, num_preds, vocab, device=None):
         rnn_outputs, state = self.rnn(embs, state)
         if i < len(prefix) - 1:  # Warm-up period
             outputs.append(vocab[prefix[i + 1]])
-        else:  # Predict `num_preds` steps
+        else:  # Predict num_preds steps
             Y = self.output_layer(rnn_outputs)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
@@ -650,7 +676,7 @@ def predict(self, prefix, num_preds, vocab, params):
                                             embs, state)
         if i < len(prefix) - 1:  # Warm-up period
             outputs.append(vocab[prefix[i + 1]])
-        else:  # Predict `num_preds` steps
+        else:  # Predict num_preds steps
             Y = self.apply({'params': params}, rnn_outputs,
                            method=self.output_layer)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
@@ -700,7 +726,7 @@ During training, gradient clipping can mitigate the problem of exploding gradien
    e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
 1. Conduct another experiment to evaluate the perplexity of this model
    on books written by other authors. 
-1. Modify the prediction function such as to use sampling 
+1. Modify the prediction method such as to use sampling 
    rather than picking the most likely next character.
     * What happens?
     * Bias the model towards more likely outputs, e.g., 

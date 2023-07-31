@@ -12,6 +12,34 @@ Building on our motivation of convolutional neural networks
 as efficient architectures for exploring structure in image data,
 we stick with images as our running example.
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import autograd, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
 
 ## The Cross-Correlation Operation
 
@@ -82,29 +110,18 @@ and returns an output tensor `Y`.
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import autograd, np, npx
-from mxnet.gluon import nn
-npx.set_np()
+def corr2d(X, K):  #@save
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = d2l.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
+    return Y
 ```
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
-
-```{.python .input}
-%%tab mxnet, pytorch
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
@@ -129,9 +146,6 @@ def corr2d(X, K):  #@save
 
 ```{.python .input}
 %%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
@@ -169,7 +183,7 @@ We are now ready to [**implement a two-dimensional convolutional layer**]
 based on the `corr2d` function defined above.
 In the `__init__` constructor method,
 we declare `weight` and `bias` as the two model parameters.
-The forward propagation function
+The forward propagation method
 calls the `corr2d` function and adds the bias.
 
 ```{.python .input}

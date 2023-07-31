@@ -42,7 +42,7 @@ repeating blocks of elements; the network in network (NiN) that
 convolves whole neural networks patch-wise over inputs
 :cite:`Lin.Chen.Yan.2013`; GoogLeNet that uses networks with
 multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; the residual
-network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains some of
+network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains one of
 the most popular off-the-shelf architectures in computer vision;
 ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017`
 for sparser connections;

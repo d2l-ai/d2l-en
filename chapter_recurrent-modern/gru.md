@@ -15,6 +15,39 @@ that often achieves comparable performance
 but with the advantage of being faster 
 to compute :cite:`Chung.Gulcehre.Cho.ea.2014`.
 
+```{.python .input  n=5}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
+```{.python .input  n=6}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+from mxnet.gluon import rnn
+npx.set_np()
+```
+
+```{.python .input  n=7}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input  n=8}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
 
 ## Reset Gate and Update Gate
 
@@ -133,40 +166,6 @@ In summary, GRUs have the following two distinguishing features:
 ## Implementation from Scratch
 
 To gain a better understanding of the GRU model, let's implement it from scratch.
-
-```{.python .input  n=5}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
-```{.python .input  n=6}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-from mxnet.gluon import rnn
-npx.set_np()
-```
-
-```{.python .input  n=7}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input  n=8}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
 
 ### (**Initializing Model Parameters**)
 

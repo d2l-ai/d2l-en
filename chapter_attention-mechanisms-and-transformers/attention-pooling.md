@@ -66,8 +66,6 @@ All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *tr
 
 ```{.python .input}
 %%tab all
-fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
-
 # Define some kernels
 def gaussian(x):
     return d2l.exp(-x**2 / 2)
@@ -90,9 +88,14 @@ if tab.selected('tensorflow'):
 if tab.selected('jax'):
     def epanechikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
+```
+
+```{.python .input}
+%%tab all
+fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
+
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
-
 x = d2l.arange(-2.5, 2.5, 0.1)
 for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('pytorch', 'mxnet', 'tensorflow'):
@@ -100,6 +103,8 @@ for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('jax'):
         ax.plot(x, kernel(x))
     ax.set_xlabel(name)
+
+d2l.plt.show()
 ```
 
 Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of $1$ (or some otherwise defined hyperparameter) and does so indiscriminately. 
@@ -144,7 +149,8 @@ def nadaraya_watson(x_train, y_train, x_val, kernel):
     dists = d2l.reshape(x_train, (-1, 1)) - d2l.reshape(x_val, (1, -1))
     # Each column/row corresponds to each query/key
     k = d2l.astype(kernel(dists), d2l.float32)
-    attention_w = k / d2l.reduce_sum(k, 0)  # Normalization over keys for each query
+    # Normalization over keys for each query
+    attention_w = k / d2l.reduce_sum(k, 0)
     if tab.selected('pytorch'):
         y_hat = y_train@attention_w
     if tab.selected('mxnet'):
@@ -178,7 +184,10 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
             ax.legend(['y_hat', 'y'])
     if attention:
         fig.colorbar(pcm, ax=axes, shrink=0.7)
-        
+```
+
+```{.python .input}
+%%tab all
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 
@@ -205,7 +214,6 @@ def gaussian_with_width(sigma):
     return (lambda x: d2l.exp(-x**2 / (2*sigma**2)))
 
 kernels = [gaussian_with_width(sigma) for sigma in sigmas]
-
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 

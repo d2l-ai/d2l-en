@@ -1,7 +1,6 @@
 # Language Models
 :label:`sec_language-model`
 
-
 In :numref:`sec_text-sequence`, we see how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 The goal of *language models*
 is to estimate the joint probability of the whole sequence:
@@ -23,6 +22,35 @@ which is easily resolved through a language model that rejects the second transl
 Likewise, in a document summarization algorithm
 it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
 
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
+```{.python .input  n=2}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+npx.set_np()
+```
+
+```{.python .input  n=3}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+```
+
+```{.python .input  n=4}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
+```
 
 ## Learning Language Models
 
@@ -35,7 +63,8 @@ $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 For example, 
 the probability of a text sequence containing four words would be given as:
 
-$$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$
+$$\begin{aligned}&P(\text{deep}, \text{learning}, \text{is}, \text{fun}) \\
+=&P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).\end{aligned}$$
 
 ### Markov Models and $n$-grams
 
@@ -142,8 +171,8 @@ in the rest of the chapter.
 
 Next, let's discuss about how to measure the language model quality, which will be used to evaluate our models in the subsequent sections.
 One way is to check how surprising the text is.
-A good language model is able to predict with
-high-accuracy tokens that what we will see next.
+A good language model is able to predict with high accuracy
+the most probable tokens that follow a given context.
 Consider the following continuations of the phrase "It is raining", as proposed by different language models:
 
 1. "It is raining outside"
@@ -179,41 +208,11 @@ This makes the performance on documents of different lengths comparable. For his
 
 $$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
 
-Perplexity can be best understood as the geometric mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
+Perplexity can be best understood as the reciprocal of the geometric mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
 
 * In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
 * In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
 * At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
-
-```{.python .input  n=1}
-%load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
-```
-
-```{.python .input  n=2}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-npx.set_np()
-```
-
-```{.python .input  n=3}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-```
-
-```{.python .input  n=4}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from jax import numpy as jnp
-```
 
 ## Partitioning Sequences
 :label:`subsec_partitioning-seqs`
@@ -306,10 +305,14 @@ for X, Y in data.train_dataloader():
     break
 ```
 
-## Summary
+## Summary and Discussion
 
 Language models estimate the joint probability of a text sequence. For long sequences, $n$-grams provide a convenient model by truncating the dependence. However, there is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing. Thus, we will focus on neural language modeling in subsequent sections.
 To train language models, we can randomly sample pairs of input sequences and target sequences in minibatches. After training, we will use perplexity to measure the language model quality.
+
+Language models can be scaled up with increased data size, model size, and amount in training compute. Large language models can perform desired tasks by predicting output text given input text instructions. As we will discuss later (e.g., :numref:`sec_large-pretraining-transformers`),
+at the present moment,
+large language models form the basis of state-of-the-art systems across diverse tasks.
 
 
 ## Exercises

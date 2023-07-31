@@ -16,7 +16,7 @@ The house price prediction competition
 is a great place to start.
 The data is fairly generic and do not exhibit exotic structure
 that might require specialized models (as audio or video might).
-This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`,
+This dataset, collected by :citet:`De-Cock.2011`,
 covers house prices in Ames, IA from the period of 2006--2010.
 It is considerably larger than the famous [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
 boasting both more examples and more features.
@@ -28,6 +28,43 @@ We hope that through a hands-on approach,
 you will gain some intuitions that will guide you
 in your career as a data scientist.
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+from mxnet import gluon, autograd, init, np, npx
+from mxnet.gluon import nn
+import pandas as pd
+
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch import nn
+import pandas as pd
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import pandas as pd
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+import numpy as np
+import pandas as pd
+```
 
 ## Downloading Data
 
@@ -39,7 +76,6 @@ Again, we defer their implementations into :numref:`sec_utils`.
 
 ```{.python .input  n=2}
 %%tab all
-
 def download(url, folder, sha1_hash=None):
     """Download a file to folder and return the local filepath."""
 
@@ -109,43 +145,6 @@ after uploading predictions to Kaggle.
 The "Data" tab on the competition tab
 in :numref:`fig_house_pricing`
 has links to download the data.
-
-```{.python .input  n=14}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-from mxnet import gluon, autograd, init, np, npx
-from mxnet.gluon import nn
-import pandas as pd
-npx.set_np()
-```
-
-```{.python .input  n=4}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-from torch import nn
-import pandas as pd
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-import pandas as pd
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-import jax
-from jax import numpy as jnp
-import numpy as np
-import pandas as pd
-```
 
 To get started, we will [**read in and process the data
 using `pandas`**], which we have introduced in :numref:`sec_pandas`.
@@ -246,12 +245,12 @@ def preprocess(self):
         (self.raw_train.drop(columns=['Id', label]),
          self.raw_val.drop(columns=['Id'])))
     # Standardize numerical columns
-    numeric_features = features.dtypes[features.dtypes != 'object'].index
+    numeric_features = features.dtypes[features.dtypes!='object'].index
     features[numeric_features] = features[numeric_features].apply(
         lambda x: (x - x.mean()) / (x.std()))
     # Replace NAN numerical features by 0
     features[numeric_features] = features[numeric_features].fillna(0)
-    # Replace discrete features by one-hot encoding.
+    # Replace discrete features by one-hot encoding
     features = pd.get_dummies(features, dummy_na=True)
     # Save preprocessed features
     self.train = features[:self.raw_train.shape[0]].copy()

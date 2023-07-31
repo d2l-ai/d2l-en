@@ -16,6 +16,35 @@ convolution kernels in an ingenious way. While other works tried to identify whi
 In what follows we introduce a slightly simplified version of GoogLeNet: the original design included a number of tricks to stabilize training through intermediate loss functions, applied to multiple layers of the network. 
 They are no longer necessary due to the availability of improved training algorithms. 
 
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+```
 
 ## (**Inception Blocks**)
 
@@ -43,13 +72,8 @@ are the number of output channels per layer, i.e., how to allocate capacity amon
 
 ```{.python .input}
 %%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
 class Inception(nn.Block):
-    # `c1`--`c4` are the number of output channels for each branch
+    # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Branch 1
@@ -76,13 +100,8 @@ class Inception(nn.Block):
 
 ```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
 class Inception(nn.Module):
-    # `c1`--`c4` are the number of output channels for each branch
+    # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Branch 1
@@ -107,11 +126,8 @@ class Inception(nn.Module):
 
 ```{.python .input}
 %%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
 class Inception(tf.keras.Model):
-    # `c1`--`c4` are the number of output channels for each branch
+    # c1--c4 are the number of output channels for each branch
     def __init__(self, c1, c2, c3, c4):
         super().__init__()
         self.b1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')
@@ -134,11 +150,6 @@ class Inception(tf.keras.Model):
 
 ```{.python .input}
 %%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-from jax import numpy as jnp
-import jax
-
 class Inception(nn.Module):
     # `c1`--`c4` are the number of output channels for each branch
     c1: int
@@ -395,7 +406,7 @@ def b5(self):
     if tab.selected('jax'):
         return nn.Sequential([Inception(256, (160, 320), (32, 128), 128),
                               Inception(384, (192, 384), (48, 128), 128),
-                              # Flax doesn't provide a GlobalAvgPool2D layer
+                              # Flax does not provide a GlobalAvgPool2D layer
                               lambda x: nn.avg_pool(x,
                                                     window_shape=x.shape[1:3],
                                                     strides=x.shape[1:3],
@@ -403,7 +414,7 @@ def b5(self):
                               lambda x: x.reshape((x.shape[0], -1))])
 ```
 
-Now that we defined all blocks `b1` through `b5`, it's just a matter of assembling them all into a full network.
+Now that we defined all blocks `b1` through `b5`, it is just a matter of assembling them all into a full network.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -488,9 +499,9 @@ Over the following sections we will encounter a number of design choices (e.g., 
    1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
       later in :numref:`sec_batch_norm`.
    1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in
-      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+      :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
    1. Use label smoothing for model regularization, as described in
-      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+      :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
    1. Make further adjustments to the Inception block by adding residual connection
       :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
       :numref:`sec_resnet`.

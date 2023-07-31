@@ -89,6 +89,37 @@ Almost all other sections do *not* require multiple GPUs.
 Instead, this is simply to illustrate
 how data flow between different devices.
 
+
+
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## [**Computing Devices**]
 
 We can specify devices, such as CPUs and GPUs,
@@ -124,51 +155,33 @@ Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
 
 ```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
 %%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
-
-```{.python .input}
-%%tab all
 def cpu():  #@save
+    """Get the CPU device."""
+    return torch.device('cpu')
+
+def gpu(i=0):  #@save
+    """Get a GPU device."""
+    return torch.device(f'cuda:{i}')
+
+cpu(), gpu(), gpu(1)
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow, jax
+def cpu():  #@save
+    """Get the CPU device."""
     if tab.selected('mxnet'):
         return npx.cpu()
-    if tab.selected('pytorch'):
-        return torch.device('cpu')
     if tab.selected('tensorflow'):
         return tf.device('/CPU:0')
     if tab.selected('jax'):
         return jax.devices('cpu')[0]
 
 def gpu(i=0):  #@save
+    """Get a GPU device."""
     if tab.selected('mxnet'):
         return npx.gpu(i)
-    if tab.selected('pytorch'):
-        return torch.device(f'cuda:{i}')
     if tab.selected('tensorflow'):
         return tf.device(f'/GPU:{i}')
     if tab.selected('jax'):
@@ -180,12 +193,20 @@ cpu(), gpu(), gpu(1)
 We can (**query the number of available GPUs.**)
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
 def num_gpus():  #@save
+    """Get the number of available GPUs."""
+    return torch.cuda.device_count()
+
+num_gpus()
+```
+
+```{.python .input}
+%%tab mxnet, tensorflow, jax
+def num_gpus():  #@save
+    """Get the number of available GPUs."""
     if tab.selected('mxnet'):
         return npx.num_gpus()
-    if tab.selected('pytorch'):
-        return torch.cuda.device_count()
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
     if tab.selected('jax'):
@@ -301,7 +322,7 @@ X
 
 ```{.python .input}
 %%tab jax
-# By default jax puts arrays to GPUs or TPUs if available
+# By default JAX puts arrays to GPUs or TPUs if available
 X = jax.device_put(jnp.ones((2, 3)), try_gpu())
 X
 ```

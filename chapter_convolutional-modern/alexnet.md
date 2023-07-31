@@ -66,6 +66,35 @@ that a slightly bigger or cleaner dataset
 or a slightly improved feature-extraction pipeline
 mattered far more to the final accuracy than any learning algorithm.
 
+```{.python .input  n=2}
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, init, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input  n=3}
+%%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
+```{.python .input  n=4}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ## Representation Learning
 
 Another way to cast the state of affairs is that
@@ -148,13 +177,13 @@ Challenge :cite:`russakovsky2015imagenet`,
 pushed computer vision and machine learning research forward,
 challenging researchers to identify which models performed best
 at a greater scale than academics had previously considered. The largest vision datasets, such as LAION-5B 
-:cite:`schuhmannlaion` contain billions of images with additional metadata.
+:cite:`schuhmann2022laion` contain billions of images with additional metadata.
 
 ### Missing Ingredient: Hardware
 
 Deep learning models are voracious consumers of compute cycles.
 Training can take hundreds of epochs, and each iteration
-requires passing data through many layers of computationally-expensive
+requires passing data through many layers of computationally expensive
 linear algebra operations.
 This is one of the main reasons why in the 1990s and early 2000s,
 simple algorithms based on the more-efficiently optimized
@@ -209,7 +238,7 @@ which yields $16 \times \frac{1}{4} = 4$ times the performance.
 Second, GPU cores are much simpler
 (in fact, for a long time they were not even *able*
 to execute general-purpose code),
-which makes them more energy efficient. For instance, (i) they tend not to support speculative evaluation, (ii) it typically isn't possible to program each processing element individually, and (iii) the caches per core tend to be much smaller.
+which makes them more energy efficient. For instance, (i) they tend not to support speculative evaluation, (ii) it typically is not possible to program each processing element individually, and (iii) the caches per core tend to be much smaller.
 Last, many operations in deep learning require high memory bandwidth.
 Again, GPUs shine here with buses that are at least 10 times as wide as many CPUs.
 
@@ -291,36 +320,7 @@ To augment the data even further, the training loop of AlexNet
 added a great deal of image augmentation,
 such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
-We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
-
-```{.python .input  n=2}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, init, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input  n=3}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
-```{.python .input  n=4}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
-
-```{.python .input}
-%%tab jax
-from d2l import jax as d2l
-from flax import linen as nn
-import jax
-from jax import numpy as jnp
-```
+We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :citet:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
 
 ```{.python .input  n=5}
 %%tab pytorch, mxnet, tensorflow
@@ -429,7 +429,7 @@ AlexNet(training=False).layer_summary((1, 224, 224, 1))
 
 ## Training
 
-Although AlexNet was trained on ImageNet in :cite:`Krizhevsky.Sutskever.Hinton.2012`,
+Although AlexNet was trained on ImageNet in :citet:`Krizhevsky.Sutskever.Hinton.2012`,
 we use Fashion-MNIST here
 since training an ImageNet model to convergence could take hours or days
 even on a modern GPU.

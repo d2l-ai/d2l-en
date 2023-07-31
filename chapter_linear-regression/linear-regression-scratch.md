@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
@@ -32,7 +32,7 @@ Later on, we will introduce a more concise implementation,
 taking advantage of bells and whistles of deep learning frameworks 
 while retaining the structure of what follows below.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -40,21 +40,21 @@ from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab jax
 %matplotlib inline
 from d2l import jax as d2l
@@ -78,9 +78,10 @@ Moreover we set the bias to 0.
 Note that for object-oriented design
 we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`subsec_oo-design-models`).
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch, mxnet, tensorflow
 class LinearRegressionScratch(d2l.Module):  #@save
+    """The linear regression model implemented from scratch."""
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -99,9 +100,10 @@ class LinearRegressionScratch(d2l.Module):  #@save
             self.b = tf.Variable(b, trainable=True)
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab jax
 class LinearRegressionScratch(d2l.Module):  #@save
+    """The linear regression model implemented from scratch."""
     num_inputs: int
     lr: float
     sigma: float = 0.01
@@ -124,15 +126,14 @@ Due to the broadcasting mechanism
 (see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,
 the scalar is added to each component of the vector.
-The resulting `forward` function 
-is registered as a method in the `LinearRegressionScratch` class
+The resulting `forward` method 
+is registered in the `LinearRegressionScratch` class
 via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def forward(self, X):
-    """The linear regression model."""
     return d2l.matmul(X, self.w) + self.b
 ```
 
@@ -145,12 +146,12 @@ Here we use the squared loss function
 in :eqref:`eq_mse`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
-The result returned by the following function
+The result returned by the following method
 will also have the same shape as `y_hat`. 
 We also return the averaged loss value
 among all examples in the minibatch.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, y_hat, y):
@@ -158,7 +159,7 @@ def loss(self, y_hat, y):
     return d2l.reduce_mean(l)
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab jax
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, params, X, y, state):
@@ -187,7 +188,7 @@ in the direction that may reduce the loss.
 The following code applies the update, 
 given a set of parameters, a learning rate `lr`.
 Since our loss is computed as an average over the minibatch, 
-we don't need to adjust the learning rate against the batch size. 
+we do not need to adjust the learning rate against the batch size. 
 In later chapters we will investigate 
 how learning rates should be adjusted
 for very large minibatches as they arise 
@@ -222,11 +223,11 @@ We update the parameters in the `apply_gradients` method.
 It accepts a list of parameter and gradient pairs.
 :end_tab:
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet, pytorch
 class SGD(d2l.HyperParameters):  #@save
+    """Minibatch stochastic gradient descent."""
     def __init__(self, params, lr):
-        """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
     if tab.selected('mxnet'):
@@ -245,11 +246,11 @@ class SGD(d2l.HyperParameters):  #@save
                     param.grad.zero_()
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab tensorflow
 class SGD(d2l.HyperParameters):  #@save
+    """Minibatch stochastic gradient descent."""
     def __init__(self, lr):
-        """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
     def apply_gradients(self, grads_and_vars):
@@ -257,18 +258,15 @@ class SGD(d2l.HyperParameters):  #@save
             param.assign_sub(self.lr * grad)
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab jax
 class SGD(d2l.HyperParameters):  #@save
+    """Minibatch stochastic gradient descent."""
+    # The key transformation of Optax is the GradientTransformation
+    # defined by two methods, the init and the update.
+    # The init initializes the state and the update transforms the gradients.
+    # https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
     def __init__(self, lr):
-        """
-        Minibatch stochastic gradient descent.
-        The key transformation of Optax is the GradientTransformation
-        defined by two methods, the init and the update.
-        The init initializes the state and the update transforms
-        the gradients.
-        https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
-        """
         self.save_hyperparameters()
 
     def init(self, params):
@@ -290,7 +288,7 @@ class SGD(d2l.HyperParameters):  #@save
 
 We next define the `configure_optimizers` method, which returns an instance of the `SGD` class.
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def configure_optimizers(self):
@@ -335,18 +333,18 @@ to measure our model quality.
 Here we pass the validation dataloader 
 once in each epoch to measure the model performance.
 Following our object-oriented design,
-the `prepare_batch` and `fit_epoch` functions
-are registered as methods of the `d2l.Trainer` class
+the `prepare_batch` and `fit_epoch` methods
+are registered in the `d2l.Trainer` class
 (introduced in :numref:`oo-design-training`).
 
-```{.python .input}
+```{.python .input  n=15}
 %%tab all    
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_batch(self, batch):
     return batch
 ```
 
-```{.python .input}
+```{.python .input  n=16}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -369,7 +367,7 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
+```{.python .input  n=17}
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -388,7 +386,7 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
+```{.python .input  n=18}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -409,7 +407,7 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
+```{.python .input  n=19}
 %%tab jax
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
@@ -459,12 +457,12 @@ and the learning rate are hyperparameters.
 In general, setting hyperparameters is tricky
 and we will usually want to use a 3-way split,
 one set for training, 
-a second for hyperparameter seclection,
+a second for hyperparameter selection,
 and the third reserved for the final evaluation.
 We elide these details for now but will revise them
 later.
 
-```{.python .input}
+```{.python .input  n=20}
 %%tab all
 model = LinearRegressionScratch(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
@@ -479,13 +477,20 @@ by comparing the true parameters
 with those that we learned**] through our training loop.
 Indeed they turn out to be very close to each other.
 
-```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+```{.python .input  n=21}
+%%tab pytorch
+with torch.no_grad():
+    print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
+    print(f'error in estimating b: {data.b - model.b}')
+```
+
+```{.python .input  n=22}
+%%tab mxnet, tensorflow
 print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
 
-```{.python .input}
+```{.python .input  n=23}
 %%tab jax
 params = trainer.state.params
 print(f"error in estimating w: {data.w - d2l.reshape(params['w'], data.w.shape)}")

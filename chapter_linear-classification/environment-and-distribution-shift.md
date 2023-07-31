@@ -580,12 +580,12 @@ In *batch learning*, we have access to training features and labels $\{(\mathbf{
 ### Online Learning
 
 Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward or incur a loss, given our decision.
-Many real problems fall into this category. For example, we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations.
+Many real problems fall into this category. For example, we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations:
 
 $$
 \mathrm{model} ~ f_t \longrightarrow
 \mathrm{data} ~ \mathbf{x}_t \longrightarrow
-\mathrm{estimate} ~ f_t(\mathbf{x}_t) \longrightarrow
+\mathrm{estimate} ~ f_t(\mathbf{x}_t) \longrightarrow\\
 \mathrm{observation} ~ y_t \longrightarrow
 \mathrm{loss} ~ l(y_t, f_t(\mathbf{x}_t)) \longrightarrow
 \mathrm{model} ~ f_{t+1}

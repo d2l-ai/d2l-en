@@ -1,3 +1,9 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(["pytorch"])
+#required_libs("setuptools==66", "wheel==0.38.4", "gym==0.21.0")
+```
+
 # Value Iteration
 :label:`sec_valueiter`
 

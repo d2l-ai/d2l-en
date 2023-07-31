@@ -30,6 +30,44 @@ The variables (age and area)
 upon which the predictions are based
 are called *features* (or *covariates*).
 
+```{.python .input}
+%%tab mxnet
+%matplotlib inline
+from d2l import mxnet as d2l
+import math
+from mxnet import np
+import time
+```
+
+```{.python .input}
+%%tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import math
+import torch
+import numpy as np
+import time
+```
+
+```{.python .input}
+%%tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
+import numpy as np
+import time
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from jax import numpy as jnp
+import math
+import time
+```
+
 ## Basics
 
 *Linear regression* may be both the simplest
@@ -91,7 +129,7 @@ explicitly expressing models long-form,
 as in :eqref:`eq_price-area`, is common.
 In machine learning, we usually work
 with high-dimensional datasets,
-where it's more convenient to employ
+where it is more convenient to employ
 compact linear algebra notation.
 When our inputs consist of $d$ features,
 we can assign each an index (between $1$ and $d$)
@@ -346,7 +384,7 @@ with a global minimum
 (whenever $\mathbf{X}$ is full rank, or equivalently,
 whenever $\mathbf{X}^\top \mathbf{X}$ is invertible).
 However, the loss surfaces for deep networks contain many saddle points and minima.
-Fortunately, we typically don't care about finding
+Fortunately, we typically do not care about finding
 an exact set of parameters but merely any set of parameters
 that leads to accurate predictions (and thus low loss).
 In practice, deep learning practitioners
@@ -377,7 +415,6 @@ In the following we will stick to *prediction* whenever possible.
 
 
 
-
 ## Vectorization for Speed
 
 When training our models, we typically want to process
@@ -386,44 +423,6 @@ Doing this efficiently requires that (**we**) (~~should~~)
 (**vectorize the calculations and leverage
 fast linear algebra libraries
 rather than writing costly for-loops in Python.**)
-
-```{.python .input}
-%%tab mxnet
-%matplotlib inline
-from d2l import mxnet as d2l
-import math
-from mxnet import np
-import time
-```
-
-```{.python .input}
-%%tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import math
-import torch
-import numpy as np
-import time
-```
-
-```{.python .input}
-%%tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import math
-import tensorflow as tf
-import numpy as np
-import time
-```
-
-```{.python .input}
-%%tab jax
-%matplotlib inline
-from d2l import jax as d2l
-from jax import numpy as jnp
-import math
-import time
-```
 
 To illustrate why this matters so much,
 we can (**consider two methods for adding vectors.**)
@@ -492,7 +491,7 @@ reducing the potential for errors and increasing portability of the code.
 ## The Normal Distribution and Squared Loss
 :label:`subsec_normal_distribution_and_squared_loss`
 
-So far we've given a fairly functional motivation
+So far we have given a fairly functional motivation
 of the squared loss objective:
 the optimal parameters return the conditional expectation $E[Y\mid X]$
 whenever the underlying pattern is truly linear,
@@ -688,7 +687,7 @@ than any one neuron alone could express
 owes to our study of real biological neural systems.
 At the same time, most research in deep learning today
 draws inspiration from a much wider source.
-We invoke Stuart Russell and Peter Norvig :cite:`Russell.Norvig.2016`
+We invoke :citet:`Russell.Norvig.2016`
 who pointed out that although airplanes might have been *inspired* by birds,
 ornithology has not been the primary driver
 of aeronautics innovation for some centuries.
@@ -734,7 +733,7 @@ and ultimately, evaluation on previously unseen data.
     1. What happens if this is not the case?
     1. How could you fix it? What happens if you add a small amount of coordinate-wise independent Gaussian noise to all entries of $\mathbf{X}$?
     1. What is the expected value of the design matrix $\mathbf{X}^\top \mathbf{X}$ in this case?
-    1. What happens with stochastic gradient descent when $\mathbf{X}^\top \mathbf{X}$ doesn't have full rank?
+    1. What happens with stochastic gradient descent when $\mathbf{X}^\top \mathbf{X}$ does not have full rank?
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
     1. Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
     1. Can you find a closed form solution?

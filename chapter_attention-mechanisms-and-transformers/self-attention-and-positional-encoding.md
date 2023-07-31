@@ -69,13 +69,23 @@ where
 
 $$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
 
-according to the definition of attention pooling $f$ in
-:eqref:`eq_attn-pooling-def`.
+according to the definition of attention pooling in
+:eqref:`eq_attention_pooling`.
 Using multi-head attention,
 the following code snippet
 computes the self-attention of a tensor
 with shape (batch size, number of time steps or sequence length in tokens, $d$).
 The output tensor has the same shape.
+
+```{.python .input}
+%%tab pytorch
+num_hiddens, num_heads = 100, 5
+attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
+batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+d2l.check_shape(attention(X, X, X, valid_lens),
+                (batch_size, num_queries, num_hiddens))
+```
 
 ```{.python .input}
 %%tab mxnet
@@ -85,7 +95,7 @@ attention.initialize()
 ```
 
 ```{.python .input}
-%%tab pytorch, jax
+%%tab jax
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
@@ -98,7 +108,7 @@ attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab mxnet
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 d2l.check_shape(attention(X, X, X, valid_lens),
@@ -223,7 +233,7 @@ information about the order of tokens
 is to represent this to the model 
 as an additional input associated 
 with each token. 
-These inputs are called *positional encodings*.
+These inputs are called *positional encodings*, 
 and they can either be learned or fixed a priori.
 We now describe a simple scheme for fixed positional encodings
 based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
@@ -491,7 +501,6 @@ for very long sequences.
 To use the sequence order information, 
 we can inject absolute or relative positional information 
 by adding positional encoding to the input representations.
-
 
 ## Exercises
 

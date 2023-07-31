@@ -140,7 +140,7 @@ Suppose that $x^{\ast} \in \mathcal{X}$ is a local minimum:
 there exists a small positive value $p$ so that for $x \in \mathcal{X}$ that satisfies $0 < |x - x^{\ast}| \leq p$ we have $f(x^{\ast}) < f(x)$.
 
 Assume that the local minimum $x^{\ast}$
-is not the global minumum of $f$:
+is not the global minimum of $f$:
 there exists $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. 
 There also exists 
 $\lambda \in [0, 1)$ such as $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$
@@ -181,7 +181,7 @@ Concretely,
 given a convex function $f$ defined on a convex set $\mathcal{X}$,
 any below set
 
-$$\mathcal{S}_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
+$$\mathcal{S}_b \stackrel{\mathrm{def}}{=} \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
 
 is convex. 
 
