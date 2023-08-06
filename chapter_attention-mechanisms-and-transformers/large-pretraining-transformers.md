@@ -116,7 +116,7 @@ You may note that these downstream tasks include text pair understanding.
 BERT pretraining has another loss for predicting
 whether one sentence immediately follows the other.
 However, this loss was later found not useful when pretraining RoBERTa,
-a BERT variant of the same size, on 2000 billion tokens :cite:`liu2019roberta`.
+a BERT variant of the same size, on 2000 billion tokens :cite:`Liu.Ott.Goyal.ea.2019`.
 Other derivatives of BERT improved model architectures or pretraining objectives,
 such as ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
 SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
@@ -340,7 +340,6 @@ can take both text and images as input
 and generate text output.
 
 
-
 ## Scalability
 
 :numref:`fig_gpt3-xshot-scaling` empirically demonstrates scalability
@@ -414,10 +413,8 @@ can generate human-like responses (e.g., code debugging and creative writing)
 based on conversations with humans
 and can perform many natural language processing
 tasks zero-shot :cite:`qin2023chatgpt`.
-:citet:`bai2022constitutional`
-replaced human inputs (e.g., human-labeled data) with model outputs
-to partially automate the instruction tuning process,
-which is also known as *reinforcement learning from AI feedback*.
+:citet:`bai2022constitutional` replaced human inputs (e.g., human-labeled data) with model outputs
+to partially automate the instruction tuning process, which is also known as *reinforcement learning from AI feedback*.
 
 
 Large language models offer an exciting prospect
