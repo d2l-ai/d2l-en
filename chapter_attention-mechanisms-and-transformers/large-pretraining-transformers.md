@@ -388,13 +388,13 @@ The GPT-2 Transformer decoder was used in training the 530-billion-parameter Meg
 Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks and emphasizing more on the number of tokens than the number of parameters.
 To continue the scaling line of language modeling, 
 PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Its next version, PaLM 2 :cite:`anil2023palm`, scaled data and model roughly 1:1 and improved multilingual and reasoning capabilities. 
-Large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, showed promising quantitative and scientific reasoning capabilities.
+Other large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, showed promising quantitative and scientific reasoning capabilities.
 
 
 Open-sourced releases, such as OPT (Open Pretrained Transformers) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom`, and FALCON :cite:`penedo2023refinedweb`,
 democratized research and use of large language models.
 Focusing on computational efficiency at inference time,
-the open-sourced Llama 1 :cite:`touvron2023llama` outperforms much larger models by training on more tokens than usual. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
+the open-sourced Llama 1 :cite:`touvron2023llama` outperformed much larger models by training on more tokens than what was typically used. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
 
 
 
@@ -415,9 +415,9 @@ based on conversations with humans
 and can perform many natural language processing
 tasks zero-shot :cite:`qin2023chatgpt`.
 :citet:`bai2022constitutional`
-replaced human inputs with model outputs
+replaced human inputs (e.g., human-labeled data) with model outputs
 to partially automate the instruction tuning process,
-calling it "reinforcement learning from AI feedback".
+which is also known as *reinforcement learning from AI feedback*.
 
 
 Large language models offer an exciting prospect
@@ -445,7 +445,7 @@ language models can perform multimodal chain-of-thought reasoning with further i
 
 Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on Transformer scalability in multi-modal pretraining yet, a recent all-Transformer text-to-image model, Parti :cite:`yu2022scaling`, shows potential of scalability across modalities:
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on Transformer scalability in multi-modal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
 a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
