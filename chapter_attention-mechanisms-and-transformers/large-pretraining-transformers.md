@@ -290,7 +290,7 @@ and promising results on multiple other tasks
 *without updating the parameters or architecture*.
 
 
-### GPT-3
+### GPT-3 and Beyond
 
 GPT-2 demonstrated potential of using the same language model
 for multiple tasks without updating the model.
@@ -333,6 +333,12 @@ Pretrained with 300 billion tokens,
 GPT-3 performs better with larger model size,
 where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`).
 
+The subsequent GPT-4 model did not fully disclose technical details in its report :cite:`openai2023gpt4`.
+Different from its predecessors, GPT-4
+is a large-scale, multimodal model that
+can take both text and images as input
+and generate text output.
+
 
 
 ## Scalability
@@ -373,6 +379,8 @@ The empirical scaling behaviors in :citet:`kaplan2020scaling` have been tested i
 
 
 
+
+
 ## Large Language Models
 
 The scalability of Transformers in the GPT series has inspired subsequent large language models. 
@@ -386,25 +394,36 @@ Large language models, such as Minerva  :cite:`lewkowycz2022solving` that furthe
 Open-sourced releases, such as OPT (Open Pretrained Transformers) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom`, and FALCON :cite:`penedo2023refinedweb`,
 democratized research and use of large language models.
 Focusing on computational efficiency at inference time,
-the open-sourced Llama 1 :cite:`touvron2023llama` outperforms much larger models by training on more tokens than usual. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that can match competitive close-source models. 
+the open-sourced Llama 1 :cite:`touvron2023llama` outperforms much larger models by training on more tokens than usual. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
 
 
 
 :citet:`wei2022emergent` discussed emergent abilities of large language models that are only present in larger models, but not present in smaller models.
 However, simply increasing model size does not inherently make models follow human instructions better.
-Following InstructGPT that
+:citet:`wei2021finetuned,sanh2021multitask` found that fine-tuning large language models
+on a range of datasets described via *instructions*
+can improve zero-shot performance on held-out tasks.
+Using *reinforcement learning from human feedback*,
+:citet:`ouyang2022training` fine-tuned GPT-3
+to follow a diverse set of instructions.
+Following the resultant InstructGPT that
 aligns language models with human intent
 via fine-tuning :cite:`ouyang2022training`,
 [ChatGPT](https://chat.openai.com/)
-is able to follow instructions,
-such as code debugging and note drafting,
-from its conversations with humans.
+can generate human-like responses (e.g., code debugging and creative writing)
+based on conversations with humans
+and can perform many natural language processing
+tasks zero-shot :cite:`qin2023chatgpt`.
+:citet:`bai2022constitutional`
+replaced human inputs with model outputs
+to partially automate the instruction tuning process,
+calling it "reinforcement learning from AI feedback".
 
 
 Large language models offer an exciting prospect
 of formulating text input to induce models to perform desired tasks via in-context learning,
 which is also known as *prompting*.
-For example,
+Notably,
 *chain-of-thought prompting* :cite:`wei2022chain`,
 an in-context learning method
 with few-shot "question, intermediate reasoning steps, answer" demonstrations,
@@ -418,7 +437,6 @@ large language models can even perform *zero-shot*
 chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
 Even for multimodal inputs consisting of both text and images,
 language models can perform multimodal chain-of-thought reasoning with further improved accuracy than using text input only :cite:`zhang2023multicot`.
-
 
 
 
