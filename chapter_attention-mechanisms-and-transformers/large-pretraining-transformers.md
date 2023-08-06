@@ -290,7 +290,7 @@ and promising results on multiple other tasks
 *without updating the parameters or architecture*.
 
 
-### GPT-3
+### GPT-3 and Beyond
 
 GPT-2 demonstrated potential of using the same language model
 for multiple tasks without updating the model.
@@ -333,24 +333,11 @@ Pretrained with 300 billion tokens,
 GPT-3 performs better with larger model size,
 where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`).
 
-Large language models offer an exciting prospect
-of formulating text input to induce models to perform desired tasks via in-context learning,
-which is also known as *prompting*.
-For example,
-*chain-of-thought prompting* :cite:`wei2022chain`,
-an in-context learning method
-with few-shot "question, intermediate reasoning steps, answer" demonstrations,
-elicits the complex reasoning capabilities of
-large language models
-to solve mathematical, commonsense, and symbolic reasoning tasks.
-Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`,
-and reducing complex problems to sub-problems :cite:`zhou2023least`
-can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
-large language models can even perform *zero-shot*
-chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
-Even for multimodal inputs consisting of both text and images,
-language models can perform multimodal chain-of-thought reasoning with further improved accuracy than using text input only :cite:`zhang2023multicot`.
-
+The subsequent GPT-4 model did not fully disclose technical details in its report :cite:`openai2023gpt4`.
+Different from its predecessors, GPT-4
+is a large-scale, multimodal model that
+can take both text and images as input
+and generate text output.
 
 
 ## Scalability
@@ -391,19 +378,63 @@ The empirical scaling behaviors in :citet:`kaplan2020scaling` have been tested i
 
 
 
-The scalability of Transformers in the GPT series has inspired subsequent Transformer language models. While the Transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 Transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on about 150 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Further training PaLM on 38.5 billion tokens containing scientific and mathematical content results in Minerva :cite:`lewkowycz2022solving`, a large language model that can answer nearly a third of
-undergraduate-level problems that require quantitative reasoning, such as in physics, chemistry, biology, and economics.
+
+
+## Large Language Models
+
+The scalability of Transformers in the GPT series has inspired subsequent large language models. 
+The GPT-2 Transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens performed competitively across diverse tasks. 
+Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks and emphasizing more on the number of tokens than the number of parameters.
+To continue the scaling line of language modeling, 
+PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Its next version, PaLM 2 :cite:`anil2023palm`, scaled data and model roughly 1:1 and improved multilingual and reasoning capabilities. 
+Other large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, showed promising quantitative and scientific reasoning capabilities.
+
+
+Open-sourced releases, such as OPT (Open Pretrained Transformers) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom`, and FALCON :cite:`penedo2023refinedweb`,
+democratized research and use of large language models.
+Focusing on computational efficiency at inference time,
+the open-sourced Llama 1 :cite:`touvron2023llama` outperformed much larger models by training on more tokens than what was typically used. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
+
 
 
 :citet:`wei2022emergent` discussed emergent abilities of large language models that are only present in larger models, but not present in smaller models.
 However, simply increasing model size does not inherently make models follow human instructions better.
-Following InstructGPT that
+:citet:`wei2021finetuned,sanh2021multitask` found that fine-tuning large language models
+on a range of datasets described via *instructions*
+can improve zero-shot performance on held-out tasks.
+Using *reinforcement learning from human feedback*,
+:citet:`ouyang2022training` fine-tuned GPT-3
+to follow a diverse set of instructions.
+Following the resultant InstructGPT that
 aligns language models with human intent
 via fine-tuning :cite:`ouyang2022training`,
 [ChatGPT](https://chat.openai.com/)
-is able to follow instructions,
-such as code debugging and note drafting,
-from its conversations with humans.
+can generate human-like responses (e.g., code debugging and creative writing)
+based on conversations with humans
+and can perform many natural language processing
+tasks zero-shot :cite:`qin2023chatgpt`.
+:citet:`bai2022constitutional` replaced human inputs (e.g., human-labeled data) with model outputs
+to partially automate the instruction tuning process, which is also known as *reinforcement learning from AI feedback*.
+
+
+Large language models offer an exciting prospect
+of formulating text input to induce models to perform desired tasks via in-context learning,
+which is also known as *prompting*.
+Notably,
+*chain-of-thought prompting* :cite:`wei2022chain`,
+an in-context learning method
+with few-shot "question, intermediate reasoning steps, answer" demonstrations,
+elicits the complex reasoning capabilities of
+large language models
+to solve mathematical, commonsense, and symbolic reasoning tasks.
+Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
+and reducing complex problems to sub-problems :cite:`zhou2023least`
+can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
+large language models can even perform *zero-shot*
+chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
+Even for multimodal inputs consisting of both text and images,
+language models can perform multimodal chain-of-thought reasoning with further improved accuracy than using text input only :cite:`zhang2023multicot`.
+
 
 
 
@@ -411,7 +442,7 @@ from its conversations with humans.
 
 Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on Transformer scalability in multi-modal pretraining yet, a recent all-Transformer text-to-image model, Parti :cite:`yu2022scaling`, shows potential of scalability across modalities:
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on Transformer scalability in multi-modal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
 a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
