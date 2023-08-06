@@ -371,10 +371,23 @@ Besides increased performance, large models also enjoy better sample efficiency 
 
 The empirical scaling behaviors in :citet:`kaplan2020scaling` have been tested in subsequent large Transformer models. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
 
+
+
 ## Large Language Models
 
-The scalability of Transformers in the GPT series has inspired subsequent large language models. While the Transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 Transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on about 150 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Further training PaLM on 38.5 billion tokens containing scientific and mathematical content results in Minerva :cite:`lewkowycz2022solving`, a large language model that can answer nearly a third of
-undergraduate-level problems that require quantitative reasoning, such as in physics, chemistry, biology, and economics.
+The scalability of Transformers in the GPT series has inspired subsequent large language models. 
+The GPT-2 Transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens performed competitively across diverse tasks. 
+Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks and emphasizing more on the number of tokens than the number of parameters.
+To continue the scaling line of language modeling, 
+PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Its next version, PaLM 2 :cite:`anil2023palm`, scaled data and model roughly 1:1 and improved multilingual and reasoning capabilities. 
+Large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, showed promising quantitative and scientific reasoning capabilities.
+
+
+Open-sourced releases, such as OPT (Open Pretrained Transformers) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom`, and FALCON :cite:`penedo2023refinedweb`,
+democratized research and use of large language models.
+Focusing on computational efficiency at inference time,
+the open-sourced Llama 1 :cite:`touvron2023llama` outperforms much larger models by training on more tokens than usual. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that can match competitive close-source models. 
+
 
 
 :citet:`wei2022emergent` discussed emergent abilities of large language models that are only present in larger models, but not present in smaller models.
