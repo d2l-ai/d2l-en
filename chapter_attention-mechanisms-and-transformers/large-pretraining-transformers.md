@@ -116,7 +116,7 @@ You may note that these downstream tasks include text pair understanding.
 BERT pretraining has another loss for predicting
 whether one sentence immediately follows the other.
 However, this loss was later found not useful when pretraining RoBERTa,
-a BERT variant of the same size, on 2000 billion tokens :cite:`liu2019roberta`.
+a BERT variant of the same size, on 2000 billion tokens :cite:`Liu.Ott.Goyal.ea.2019`.
 Other derivatives of BERT improved model architectures or pretraining objectives,
 such as ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
 SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
@@ -343,7 +343,7 @@ with few-shot "question, intermediate reasoning steps, answer" demonstrations,
 elicits the complex reasoning capabilities of
 large language models
 to solve mathematical, commonsense, and symbolic reasoning tasks.
-Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
+Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`,
 and reducing complex problems to sub-problems :cite:`zhou2023least`
 can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
 large language models can even perform *zero-shot*

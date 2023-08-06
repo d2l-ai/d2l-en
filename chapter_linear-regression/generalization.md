@@ -227,7 +227,7 @@ However, this is not necessarily true.
 For instance, kernel methods operate in spaces
 with infinite numbers of parameters,
 yet their complexity is controlled
-by other means :cite:`scholkopf2002learning`.
+by other means :cite:`Scholkopf.Smola.2002`.
 One notion of complexity that often proves useful
 is the range of values that the parameters can take.
 Here, a model whose parameters are permitted
