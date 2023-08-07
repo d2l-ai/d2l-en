@@ -29,9 +29,6 @@ provide such documentation.
 This section provides some guidance for how to explore the TensorFlow API.
 :end_tab:
 
-
-
-
 ```{.python .input}
 %%tab mxnet
 from mxnet import np
@@ -150,7 +147,7 @@ Our emphasis lies on covering important use cases
 that will allow you to get started quickly with practical problems, 
 rather than completeness of coverage. 
 We also encourage you to study the source code of the libraries 
-to see examples of high quality implementations for production code. 
+to see examples of high-quality implementations of production code. 
 By doing this you will become a better engineer 
 in addition to becoming a better scientist.
 

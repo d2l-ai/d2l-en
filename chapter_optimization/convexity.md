@@ -203,7 +203,7 @@ For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is con
 
 
 Formally, a twice-differentiable one-dimensional function $f: \mathbb{R} \rightarrow \mathbb{R}$ is convex
-if and only if its second derivative $f'' \geq 0$. For any twice-differentiable multi-dimensional function $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$,
+if and only if its second derivative $f'' \geq 0$. For any twice-differentiable multidimensional function $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$,
 it is convex if and only if its Hessian $\nabla^2f \succeq 0$.
 
 First, we need to prove the one-dimensional case.
@@ -240,7 +240,7 @@ $$\lambda f(b) + (1-\lambda)f(a) \geq f((1-\lambda)a + \lambda b),$$
 thus proving convexity.
 
 Second, we need a lemma before 
-proving the multi-dimensional case:
+proving the multidimensional case:
 $f: \mathbb{R}^n \rightarrow \mathbb{R}$
 is convex if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
 
@@ -272,9 +272,9 @@ $$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
 
 Finally,
 using the lemma above and the result of the one-dimensional case,
-the multi-dimensional case
+the multidimensional case
 can be proven as follows.
-A multi-dimensional function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is convex
+A multidimensional function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is convex
 if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ $g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y})$, where $z \in [0,1]$,
 is convex.
 According to the one-dimensional case,

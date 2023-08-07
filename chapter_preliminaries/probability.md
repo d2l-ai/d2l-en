@@ -28,7 +28,7 @@ we often care about uncertainty.
 To determine whether a set of measurements are anomalous,
 it helps to know how likely one is
 to observe values in a population of interest.
-Moreover, in reinforcement learning,
+Furthermore, in reinforcement learning,
 we wish to develop agents
 that act intelligently in various environments.
 This requires reasoning about
@@ -49,14 +49,14 @@ to an interpretation of probability
 that applies *only* to such repeatable events.
 By contrast *Bayesian* scholars
 use the language of probability more broadly
-to formalize our reasoning under uncertainty.
+to formalize reasoning under uncertainty.
 Bayesian probability is characterized
 by two unique features:
 (i) assigning degrees of belief
 to non-repeatable events,
 e.g., what is the *probability*
-that the moon is made out of cheese?;
-and (ii) subjectivity---while Bayesian
+that a dam will collapse?;
+and (ii) subjectivity. While Bayesian
 probability provides unambiguous rules
 for how one should update their beliefs
 in light of new evidence,
@@ -70,7 +70,7 @@ that generated the data.
 Whenever we analyze a dataset, hunting for patterns
 that we hope might characterize a broader population,
 we are employing statistical thinking.
-Most courses, majors, theses, careers, departments,
+Many courses, majors, theses, careers, departments,
 companies, and institutions have been devoted
 to the study of probability and statistics.
 While this section only scratches the surface,
@@ -132,9 +132,9 @@ the *expected* fraction of tails.
 One intuitive way to see this
 is by symmetry:
 for every possible outcome
-with $n_h$ heads and $n_t = (n - n_h)$ tails,
+with $n_\text{h}$ heads and $n_\text{t} = (n - n_\text{h})$ tails,
 there is an equally likely outcome
-with $n_t$ heads and $n_h$ tails.
+with $n_\text{t}$ heads and $n_\text{h}$ tails.
 Note that this is only possible
 if on average we expect to see
 $1/2$ of tosses come up heads
@@ -142,7 +142,7 @@ and $1/2$ come up tails.
 Of course, if you conduct this experiment
 many times with $n=1000000$ tosses each,
 you might never see a trial
-where $n_h = n_t$ exactly.
+where $n_\text{h} = n_\text{t}$ exactly.
 
 
 Formally, the quantity $1/2$ is called a *probability*
@@ -156,7 +156,7 @@ A probability of $1$ indicates absolute certainty
 (imagine a trick coin where both sides were heads)
 and a probability of $0$ indicates impossibility
 (e.g., if both sides were tails).
-The frequencies $n_h/n$ and $n_t/n$ are not probabilities
+The frequencies $n_\text{h}/n$ and $n_\text{t}/n$ are not probabilities
 but rather *statistics*.
 Probabilities are *theoretical* quantities
 that underly the data generating process.
@@ -168,7 +168,7 @@ Our interests in probabilistic and statistical quantities
 are inextricably intertwined.
 We often design special statistics called *estimators*
 that, given a dataset, produce *estimates*
-of model parameters like probabilities.
+of model parameters such as probabilities.
 Moreover, when those estimators satisfy
 a nice property called *consistency*,
 our estimates will converge
@@ -187,21 +187,21 @@ we need to (i) collect some data;
 and (ii) design an estimator.
 Data acquisition here is easy;
 we can toss the coin many times
-and record all of the outcomes.
+and record all the outcomes.
 Formally, drawing realizations
 from some underlying random process
 is called *sampling*.
 As you might have guessed,
 one natural estimator
-is the fraction between
+is the ratio of
 the number of observed *heads*
-by the total number of tosses.
+to the total number of tosses.
 
 Now, suppose that the coin was in fact fair,
 i.e., $P(\textrm{heads}) = 0.5$.
 To simulate tosses of a fair coin,
 we can invoke any random number generator.
-Some easy ways to draw samples
+There are some easy ways to draw samples
 of an event with probability $0.5$.
 For example Python's `random.random`
 yields numbers in the interval $[0,1]$
@@ -209,7 +209,7 @@ where the probability of lying
 in any sub-interval $[a, b] \subset [0,1]$
 is equal to $b-a$.
 Thus we can get out `0` and `1` with probability `0.5` each
-by testing whether the returned float is greater than `0.5`
+by testing whether the returned float number is greater than `0.5`
 
 ```{.python .input}
 %%tab all
@@ -272,7 +272,7 @@ Dividing by the number of tosses
 gives us the *frequency*
 of each outcome in our data.
 Note that these frequencies,
-like the probabilities
+just like the probabilities
 that they are intended
 to estimate, sum to $1$.
 
@@ -297,15 +297,15 @@ np.random.multinomial(100, fair_probs) / 100
 ```
 
 Here, even though our simulated coin is fair
-(we set the probabilities `[0.5, 0.5]` ourselves),
+(we ourselves set the probabilities `[0.5, 0.5]`),
 the counts of heads and tails may not be identical.
-That is because we only drew a finite number of samples.
+That is because we only drew a relatively small number of samples.
 If we did not implement the simulation ourselves,
 and only saw the outcome,
 how would we know if the coin were slightly unfair
 or if the possible deviation from $1/2$ was
 just an artifact of the small sample size?
-Let's see what happens when we simulate `10000` tosses.
+Let's see what happens when we simulate 10,000 tosses.
 
 ```{.python .input}
 %%tab mxnet
@@ -335,7 +335,7 @@ In general, for averages of repeated events (like coin tosses),
 as the number of repetitions grows,
 our estimates are guaranteed to converge
 to the true underlying probabilities.
-The mathematical proof of this phenomenon
+The mathematical formulation of this phenomenon
 is called the *law of large numbers*
 and the *central limit theorem*
 tells us that in many situations,
@@ -344,7 +344,7 @@ these errors should go down
 at a rate of $(1/\sqrt{n})$.
 Let's get some more intuition by studying
 how our estimate evolves as we grow
-the number of tosses from `1` to `10000`.
+the number of tosses from 1 to 10,000.
 
 ```{.python .input}
 %%tab pytorch
@@ -438,8 +438,8 @@ $z \in \mathcal{A}$, then event $\mathcal{A}$ has occurred.
 For a single roll of a die, we could define the events
 "seeing a $5$" ($\mathcal{A} = \{5\}$)
 and "seeing an odd number"  ($\mathcal{B} = \{1, 3, 5\}$).
-In this case, if the die came up `5`,
-we would say that both $A$ and $B$ occurred.
+In this case, if the die came up $5$,
+we would say that both $\mathcal{A}$ and $\mathcal{B}$ occurred.
 On the other hand, if $z = 3$,
 then $\mathcal{A}$ did not occur
 but $\mathcal{B}$ did.
@@ -447,14 +447,13 @@ but $\mathcal{B}$ did.
 
 A *probability* function maps events
 onto real values ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$.
-The probability of an event $\mathcal{A}$
+The probability, denoted $P(\mathcal{A})$, of an event $\mathcal{A}$
 in the given sample space $\mathcal{S}$,
-denoted $P(\mathcal{A})$,
 satisfies the following properties:
 
-* The probability of any event $\mathcal{A}$ is a non-negative real number, i.e., $P(\mathcal{A}) \geq 0$;
+* The probability of any event $\mathcal{A}$ is a nonnegative real number, i.e., $P(\mathcal{A}) \geq 0$;
 * The probability of the entire sample space is $1$, i.e., $P(\mathcal{S}) = 1$;
-* For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any of them happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
+* For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* (i.e., $\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any of them happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
 
 These axioms of probability theory,
 proposed by :citet:`Kolmogorov.1933`,
@@ -488,11 +487,11 @@ Importantly, random variables can be much coarser
 than the raw sample space.
 We can define a binary random variable like "greater than 0.5"
 even when the underlying sample space is infinite,
-e.g., the line segment between $0$ and $1$.
+e.g., points on the line segment between $0$ and $1$.
 Additionally, multiple random variables
 can share the same underlying sample space.
 For example "whether my home alarm goes off"
-and "whether my house was burglarized"
+and "whether my house was burgled"
 are both binary random variables
 that share an underlying sample space.
 Consequently, knowing the value taken by one random variable
@@ -548,14 +547,14 @@ say between 1.79 and 1.81 meters.
 In these cases we work with probability *densities*.
 The height of exactly 1.80 meters
 has no probability, but nonzero density.
-To get out the probability assigned to an interval,
+To work out the probability assigned to an interval,
 we must take an *integral* of the density
 over that interval.
 
 ## Multiple Random Variables
 
-You might have noticed that we couldn't even
-make it past the last section without
+You might have noticed that we could not even
+make it through the previous section without
 making statements involving interactions
 among multiple random variables
 (recall $P(X,Y) = P(X) P(Y)$).
@@ -564,7 +563,7 @@ is concerned with such relationships.
 Here, the sample space would be
 the population of interest,
 say customers who transact with a business,
-photographs on the internet,
+photographs on the Internet,
 or proteins known to biologists.
 Each random variable would represent
 the (unknown) value of a different attribute.
@@ -576,7 +575,7 @@ that could be overlapping, partially overlapping,
 or entirely disjoint,
 knowing the value taken by one random variable
 can cause us to update our beliefs
-about what values of another random variable are likely.
+about which values of another random variable are likely.
 If a patient walks into a hospital
 and we observe that they
 are having trouble breathing
@@ -604,9 +603,10 @@ take values $a$ and $b$, respectively,
 is denoted $P(A = a, B = b)$,
 where the comma indicates "and".
 Note that for any values $a$ and $b$,
-it holds that
-$P(A=a, B=b) \leq P(A=a)$
-and $P(A=a, B=b) \leq P(B = b)$,
+it follows that
+
+$$P(A=a, B=b) \leq P(A=a) \text{ and } P(A=a, B=b) \leq P(B = b),$$
+
 since for $A=a$ and $B=b$ to happen,
 $A=a$ has to happen *and* $B=b$ also has to happen.
 Interestingly, the joint probability
@@ -624,8 +624,10 @@ $P(A=a) = \sum_v P(A=a, B=v)$.
 The ratio $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$
 turns out to be extremely important.
 It is called the *conditional probability*,
-and is denoted via the "$\mid$" symbol,
-$P(B=b \mid A=a) = P(A=a,B=b)/P(A=a)$.
+and is denoted via the "$\mid$" symbol:
+
+$$P(B=b \mid A=a) = P(A=a,B=b)/P(A=a).$$
+
 It tells us the new probability
 associated with the event $B=b$,
 once we condition on the fact $A=a$ took place.
@@ -635,9 +637,9 @@ of the sample space associated with $A=a$
 and then renormalizing so that
 all probabilities sum to 1.
 Conditional probabilities
-are in fact probabilities
+are in fact just ordinary probabilities
 and thus respect all of the axioms,
-so long as we condition all terms
+as long as we condition all terms
 on the same event and thus
 restrict attention to the same sample space.
 For instance, for disjoint events
@@ -746,7 +748,7 @@ For example, broken bones and lung cancer might be independent
 in the general population but if we condition on being in the hospital
 then we might find that broken bones are negatively correlated with lung cancer.
 That is because the broken bone *explains away* why some person is in the hospital
-and thus lowers the probability that they have lung cancer.
+and thus lowers the probability that they are hospitalized because of having lung cancer.
 
 
 And conversely, two dependent random variables
@@ -765,7 +767,7 @@ but this correlation disappears if we condition on age.
 Let's put our skills to the test.
 Assume that a doctor administers an HIV test to a patient.
 This test is fairly accurate and it fails only with 1% probability
-if the patient is healthy but reporting him as diseased.
+if the patient is healthy but reported as diseased.
 Moreover, it never fails to detect HIV if the patient actually has it.
 We use $D_1 \in \{0, 1\}$ to indicate the diagnosis
 ($0$ if negative and $1$ if positive)
@@ -782,7 +784,7 @@ Let's compute the probability of the patient having HIV
 if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$.
 Intuitively this is going to depend on how common the disease is,
 since it affects the number of false alarms.
-Assume that the population is fairly healthy, e.g., $P(H=1) = 0.0015$.
+Assume that the population is fairly free of the disease, e.g., $P(H=1) = 0.0015$.
 To apply Bayes' theorem, we need to apply marginalization
 to determine
 
@@ -800,7 +802,7 @@ $$P(H = 1 \mid D_1 = 1) = \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} = 0.1306.$$
 
 In other words, there is only a 13.06% chance
 that the patient actually has HIV,
-despite using a very accurate test.
+despite the test being pretty accurate.
 As we can see, probability can be counterintuitive.
 What should a patient do upon receiving such terrifying news?
 Likely, the patient would ask the physician
@@ -838,7 +840,7 @@ $$\begin{aligned}
 \end{aligned}
 $$
 
-Finally, the probability of the patient having HIV given both tests being positive is
+Finally, the probability of the patient having HIV given that both tests are positive is
 
 $$P(H = 1 \mid D_1 = 1, D_2 = 1)
 = \frac{P(D_1 = 1, D_2 = 1 \mid H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)}
@@ -847,10 +849,10 @@ $$P(H = 1 \mid D_1 = 1, D_2 = 1)
 That is, the second test allowed us to gain much higher confidence that not all is well.
 Despite the second test being considerably less accurate than the first one,
 it still significantly improved our estimate.
-The assumption of both tests being conditional independent of each other
+The assumption of both tests being conditionally independent of each other
 was crucial for our ability to generate a more accurate estimate.
 Take the extreme case where we run the same test twice.
-In this situation we would expect the same outcome in both times,
+In this situation we would expect the same outcome both times,
 hence no additional insight is gained from running the same test again.
 The astute reader might have noticed that the diagnosis behaved
 like a classifier hiding in plain sight
@@ -915,9 +917,9 @@ Reasoning like this motivates the cliché
 that "the utility of money is logarithmic".
 
 
-If  the utility associated with a total loss were -1,
-and the utilities associated with returns of 1, 2, and 10
-were 1, 2 and 4, respectively,
+If  the utility associated with a total loss were $-1$,
+and the utilities associated with returns of $1$, $2$, and $10$
+were $1$, $2$ and $4$, respectively,
 then the expected happiness of investing
 would be $0.5 \cdot (-1) + 0.4 \cdot 2 + 0.1 \cdot 4 = 0.7$
 (an expected loss of utility of 30%).
@@ -933,13 +935,13 @@ relative to this value.
 Note that we cannot just take
 the expectation of the difference
 between the actual and expected values.
-That is because the expectation of a difference
+This is because the expectation of a difference
 is the difference of the expectations,
-and thus $E[X - E[X]] = E[X] - E[E[X]] = 0$.
+i.e., $E[X - E[X]] = E[X] - E[E[X]] = 0$.
 However, we can look at the expectation
 of any non-negative function of this difference.
 The *variance* of a random variable is calculated by looking
-at the expected value of the *squared* deviations:
+at the expected value of the *squared* differences:
 
 $$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] = E[X^2] - E[X]^2.$$
 
@@ -948,7 +950,7 @@ $(X - E[X])^2 = X^2 - 2 X E[X] + E[X]^2$
 and taking expectations for each term.
 The square root of the variance is another
 useful quantity called the *standard deviation*.
-While the variance and standard deviation
+While this and the variance
 convey the same information (either can be calculated from the other),
 the standard deviation has the nice property
 that it is expressed in the same units
@@ -967,7 +969,7 @@ It is given by $0.5 \cdot 0 + 0.4 \cdot 2^2 + 0.1 \cdot 10^2 - 1.8^2 = 8.36$.
 For all intents and purposes this is a risky investment.
 Note that by mathematical convention mean and variance
 are often referenced as $\mu$ and $\sigma^2$.
-This is particularly common whenever we use it
+This is particularly the case whenever we use it
 to parametrize a Gaussian distribution.
 
 In the same way as we introduced expectations
@@ -976,9 +978,9 @@ we can do so for vector-valued ones.
 Expectations are easy, since we can apply them elementwise.
 For instance, $\boldsymbol{\mu} \stackrel{\mathrm{def}}{=} E_{\mathbf{x} \sim P}[\mathbf{x}]$
 has coordinates $\mu_i = E_{\mathbf{x} \sim P}[x_i]$.
-Covariances are more complicated.
-We resolve the problem by taking expectations of the *outer product*
-of the difference between random variables and their mean.
+*Covariances* are more complicated.
+We define them by taking expectations of the *outer product*
+of the difference between random variables and their mean:
 
 $$\boldsymbol{\Sigma} \stackrel{\mathrm{def}}{=} \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top\right].$$
 
@@ -992,7 +994,7 @@ $$\mathbf{v}^\top \boldsymbol{\Sigma} \mathbf{v} = E_{\mathbf{x} \sim P}\left[\m
 As such, $\boldsymbol{\Sigma}$ allows us to compute the variance
 for any linear function of $\mathbf{x}$
 by a simple matrix multiplication.
-The off-diagonal elements tell us how correlated coordinates are:
+The off-diagonal elements tell us how correlated the coordinates are:
 a value of 0 means no correlation,
 where a larger positive value
 means that they are more strongly correlated.
@@ -1007,11 +1009,11 @@ We can be uncertain about the estimated value of a parameter.
 We can even be uncertain about whether data arriving at deployment
 is even from the same distribution as the training data.
 
-By *aleatoric uncertainty*, we denote that uncertainty
+By *aleatoric uncertainty*, we mean uncertainty
 that is intrinsic to the problem,
 and due to genuine randomness
 unaccounted for by the observed variables.
-By *epistemic uncertainty*, we denote uncertainty
+By *epistemic uncertainty*, we mean uncertainty
 over a model's parameters, the sort of uncertainty
 that we can hope to reduce by collecting more data.
 We might have epistemic uncertainty
@@ -1023,9 +1025,9 @@ about the outcome of any future toss.
 No matter how long we watch someone tossing a fair coin,
 we will never be more or less than 50% certain
 that the next toss will come up heads.
-These terms owe to literature in mechanical modeling,
+These terms come from mechanical modeling,
 (see e.g., :citet:`Der-Kiureghian.Ditlevsen.2009` for a review on this aspect of [uncertainty quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
-It is worth noting that these terms constitute a slight abuse of language.
+It is worth noting, however, that these terms constitute a slight abuse of language.
 The term *epistemic* refers to anything concerning *knowledge*
 and thus in the philosophical sense, all uncertainty is epistemic.
 
@@ -1092,8 +1094,8 @@ interval centered on the expectation.
 1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? Hint: this is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain).
 1. In :numref:`subsec_probability_hiv_app`, assume that the outcomes of the two tests are not independent. In particular assume that either test on its own has a false positive rate of 10% and a false negative rate of 1%. That is, assume that $P(D =1 \mid H=0) = 0.1$ and that $P(D = 0 \mid H=1) = 0.01$. Moreover, assume that for $H = 1$ (infected) the test outcomes are conditionally independent, i.e., that $P(D_1, D_2 \mid H=1) = P(D_1 \mid H=1) P(D_2 \mid H=1)$ but that for healthy patients the outcomes are coupled via $P(D_1 = D_2 = 1 \mid H=0) = 0.02$.
     1. Work out the joint probability table for $D_1$ and $D_2$, given $H=0$ based on the information you have so far.
-    1. Derive the probability of the patient being positive ($H=1$) after one test returns positive. You can assume the same baseline probability $P(H=1) = 0.0015$ as before.
-    1. Derive the probability of the patient being positive ($H=1$) after both tests return positive.
+    1. Derive the probability that the patient is diseased ($H=1$) after one test returns positive. You can assume the same baseline probability $P(H=1) = 0.0015$ as before.
+    1. Derive the probability that the patient is diseased ($H=1$) after both tests return positive.
 1. Assume that you are an asset manager for an investment bank and you have a choice of stocks $s_i$ to invest in. Your portfolio needs to add up to $1$ with weights $\alpha_i$ for each stock. The stocks have an average return $\boldsymbol{\mu} = E_{\mathbf{s} \sim P}[\mathbf{s}]$ and covariance $\boldsymbol{\Sigma} = \mathrm{Cov}_{\mathbf{s} \sim P}[\mathbf{s}]$.
     1. Compute the expected return for a given portfolio $\boldsymbol{\alpha}$.
     1. If you wanted to maximize the return of the portfolio, how should you choose your investment?

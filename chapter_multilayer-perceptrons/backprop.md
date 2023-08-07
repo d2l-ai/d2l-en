@@ -84,7 +84,7 @@ that we will introduce later,
 given the hyperparameter $\lambda$,
 the regularization term is
 
-$$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_F^2 + \|\mathbf{W}^{(2)}\|_F^2\right),$$
+$$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_\text{F}^2 + \|\mathbf{W}^{(2)}\|_\text{F}^2\right),$$
 :eqlabel:`eq_forward-s`
 
 where the Frobenius norm of the matrix
