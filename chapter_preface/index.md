@@ -20,25 +20,24 @@ that we focus on in this book---were
 generally regarded as outmoded.
 
 
-In just the past few years, deep learning has taken the world by surprise,
+Yet in just few years, deep learning has taken the world by surprise,
 driving rapid progress in such diverse fields
 as computer vision, natural language processing,
 automatic speech recognition, reinforcement learning,
 and biomedical informatics.
 Moreover, the success of deep learning
-on so many tasks of practical interest
+in so many tasks of practical interest
 has even catalyzed developments
 in theoretical machine learning and statistics.
 With these advances in hand,
 we can now build cars that drive themselves
 with more autonomy than ever before
-(and less autonomy than some companies might have you believe),
+(though less autonomy than some companies might have you believe),
 dialogue systems that debug code by asking clarifying questions,
-and software agents that dominate the world's best humans
-at board games like Go, a feat once thought to be decades away.
-Already, these tools exert ever-wider impacts on industry and society,
+and software agents beating the best human players in the world at board games like Go, a feat once thought to be decades away.
+Already, these tools exert ever-wider influence on industry and society,
 changing the way movies are made, diseases are diagnosed,
-and playing a growing role in basic sciences---from astrophysics to biology.
+and playing a growing role in basic sciences---from astrophysics, to climate modeling, to weather prediction, to biomedicine.
 
 
 
@@ -58,11 +57,13 @@ to bring new practitioners up to date.
 Mature libraries should automate common tasks,
 and exemplar code should make it easy for practitioners
 to modify, apply, and extend common applications to suit their needs.
-Take dynamic web applications as an example.
-Despite a large number of companies, like Amazon,
+
+
+As an example, take dynamic web applications.
+Despite a large number of companies, such as Amazon,
 developing successful database-driven web applications in the 1990s,
 the potential of this technology to aid creative entrepreneurs
-has been realized to a far greater degree in the past ten years,
+was realized to a far greater degree only in the past ten years,
 owing in part to the development of powerful, well-documented frameworks.
 
 
@@ -166,11 +167,13 @@ using such an integrated workflow.
 
 Many textbooks present concepts in succession,
 covering each in exhaustive detail.
-For example, Chris Bishop's excellent textbook :cite:`Bishop.2006`,
+For example, 
+the excellent textbook of 
+:citet:`Bishop.2006`,
 teaches each topic so thoroughly
 that getting to the chapter
 on linear regression requires
-a non-trivial amount of work.
+a nontrivial amount of work.
 While experts love this book
 precisely for its thoroughness,
 for true beginners, this property limits
@@ -186,13 +189,13 @@ before worrying about more esoteric concepts.
 
 Aside from a few preliminary notebooks that provide a crash course
 in the basic mathematical background,
-each subsequent chapter introduces both a reasonable number of new concepts
+each subsequent chapter both introduces a reasonable number of new concepts
 and provides several self-contained working examples, using real datasets.
 This presented an organizational challenge.
 Some models might logically be grouped together in a single notebook.
 And some ideas might be best taught
 by executing several models in succession.
-On the other hand, there is a big advantage to adhering
+By contrast, there is a big advantage to adhering
 to a policy of *one working example, one notebook*:
 This makes it as easy as possible for you to
 start your own research projects by leveraging our code.
@@ -205,7 +208,7 @@ available before explaining them fully
 (often filling in the background later).
 For instance, we might use *stochastic gradient descent*
 before explaining why it is useful 
-or offering intuitions for why it works.
+or offering some intuition for why it works.
 This helps to give practitioners the necessary
 ammunition to solve problems quickly,
 at the expense of requiring the reader
@@ -233,7 +236,7 @@ we rely on the high-level API in subsequent tutorials.
 ### Content and Structure
 
 The book can be divided into roughly three parts,
-focusing on preliminaries, 
+dealing with preliminaries, 
 deep learning techniques,
 and advanced topics
 focused on real systems
@@ -244,7 +247,7 @@ and applications (:numref:`fig_book_org`).
 
 
 * **Part 1: Basics and Preliminaries**.
-:numref:`chap_introduction` offers 
+:numref:`chap_introduction` is 
 an introduction to deep learning.
 Then, in :numref:`chap_preliminaries`,
 we quickly bring you up to speed
@@ -252,10 +255,10 @@ on the prerequisites required
 for hands-on deep learning,
 such as how to store and manipulate data,
 and how to apply various numerical operations
-based on basic concepts from linear algebra,
+based on elementary concepts from linear algebra,
 calculus, and probability.
 :numref:`chap_regression` and :numref:`chap_perceptrons`
-cover the most basic concepts and techniques in deep learning,
+cover the most fundamental concepts and techniques in deep learning,
 including regression and classification;
 linear models; multilayer perceptrons;
 and overfitting and regularization.
@@ -268,7 +271,7 @@ and lays the groundwork
 for our subsequent implementations
 of more complex models.
 Next, :numref:`chap_cnn` and :numref:`chap_modern_cnn`
-introduce convolutional neural networks (CNNs), 
+present convolutional neural networks (CNNs), 
 powerful tools that form the backbone 
 of most modern computer vision systems.
 Similarly, :numref:`chap_rnn` and :numref:`chap_modern_rnn`
@@ -278,8 +281,8 @@ structure in data and are commonly used
 for natural language processing
 and time series prediction.
 In :numref:`chap_attention-and-transformers`, 
-we introduce a relatively new class of models
-based on so-called *attention mechanisms*
+we describe a relatively new class of models,
+based on so-called *attention mechanisms*,
 that has displaced RNNs as the dominant architecture
 for most natural language processing tasks.
 These sections will bring you up to speed
@@ -314,18 +317,18 @@ precisely how to tweak our code to achieve a desired result.
 However, deep learning practitioners today
 must often tread where no solid theory provides guidance. 
 Despite our best attempts, formal explanations 
-for the efficacy of various techniques are still lacking,
-both because the mathematics to characterize these models
-can be so difficult,
-because the explanation likely depends on properties 
-of the data that currently lack clear definitions,
-and because serious inquiry on these topics
-has just recently kicked into high gear.
+for the efficacy of various techniques are
+still lacking, for a variety of reasons: the mathematics to characterize these models
+can be so difficult;
+the explanation likely depends on properties 
+of the data that currently lack clear definitions;
+and serious inquiry on these topics
+has only recently kicked into high gear.
 We are hopeful that as the theory of deep learning progresses,
 each future edition of this book will provide insights 
 that eclipse those presently available.
 
-To avoid unnecessary repetition, we encapsulate
+To avoid unnecessary repetition, we capture
 some of our most frequently imported and used
 functions and classes in the `d2l` package.
 Throughout, we mark blocks of code
@@ -373,7 +376,7 @@ under the newest MXNet version.
 However, due to the rapid development of deep learning,
 some code *in the print edition*
 may not work properly in future versions of MXNet.
-We plan to keep the online version up-to-date.
+We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
@@ -391,7 +394,7 @@ under the latest stable version of PyTorch.
 However, due to the rapid development of deep learning,
 some code *in the print edition*
 may not work properly in future versions of PyTorch.
-We plan to keep the online version up-to-date.
+We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
@@ -409,7 +412,7 @@ under the latest stable version TensorFlow.
 However, due to the rapid development of deep learning,
 some code *in the print edition*
 may not work properly in future versions of TensorFlow.
-We plan to keep the online version up-to-date.
+We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
@@ -430,7 +433,7 @@ code could be as simple as changing a single import statement!
 However, due to the rapid development of deep learning,
 some code *in the print edition*
 may not work properly in future versions of Jax.
-We plan to keep the online version up-to-date.
+We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
@@ -493,22 +496,22 @@ Because we explain every concept from scratch,
 no previous background in deep learning or machine learning is required.
 Fully explaining the methods of deep learning
 requires some mathematics and programming,
-but we will only assume that you come in with some basics,
+but we will only assume that you enter with some basics,
 including modest amounts of linear algebra,
 calculus, probability, and Python programming.
-Just in case you forget the basics,
+Just in case you have forgotten anything,
 the [online Appendix](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html) provides a refresher
 on most of the mathematics
 you will find in this book.
-Most of the time, we will prioritize
+Usually, we will prioritize
 intuition and ideas
 over mathematical rigor.
 If you would like to extend these foundations
 beyond the prerequisites to understand our book,
 we happily recommend some other terrific resources:
-Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
+*Linear Analysis* by :citet:`Bollobas.1999`
 covers linear algebra and functional analysis in great depth.
-All of Statistics :cite:`Wasserman.2013`
+*All of Statistics* :cite:`Wasserman.2013`
 provides a marvelous introduction to statistics.
 Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918)
 and [courses](https://projects.iq.harvard.edu/stat110/home)
@@ -521,7 +524,7 @@ you may want to peruse this [Python tutorial](http://learnpython.org/).
 
 Associated with this book, we have launched a discussion forum,
 located at [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
-When you have questions on any section of the book,
+Whenever you have questions on any section of the book,
 you can find a link to the associated discussion page
 at the end of each notebook.
 

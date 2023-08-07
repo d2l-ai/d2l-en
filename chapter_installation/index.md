@@ -208,7 +208,7 @@ jupyter notebook
 
 
 At this point, you can open http://localhost:8888
-(it may have already opened automatically) in your Web browser.
+(it may have already opened automatically) in your web browser.
 Then we can run the code for each section of the book.
 Whenever you open a new command line window,
 you will need to execute `conda activate d2l`
@@ -232,4 +232,3 @@ run `conda deactivate`.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/436)
 :end_tab:
-

@@ -51,17 +51,17 @@ refers specifically to the symbol $\mathbb{Z}$.
 
 * $f(\cdot)$: a function
 * $\log(\cdot)$: the natural logarithm (base $e$)
-* $\log_2(\cdot)$: logarithm with base $2$
+* $\log_2(\cdot)$: logarithm to base $2$
 * $\exp(\cdot)$: the exponential function
-* $\mathbf{1}(\cdot)$: the indicator function, evaluates to $1$ if the boolean argument is true and $0$ otherwise
-* $\mathbf{1}_{\mathcal{X}}(z)$: the set-membership indicator function, evaluates to $1$ if the element $z$ belongs to the set $\mathcal{X}$ and $0$ otherwise
+* $\mathbf{1}(\cdot)$: the indicator function; evaluates to $1$ if the boolean argument is true, and $0$ otherwise
+* $\mathbf{1}_{\mathcal{X}}(z)$: the set-membership indicator function; evaluates to $1$ if the element $z$ belongs to the set $\mathcal{X}$ and $0$ otherwise
 * $\mathbf{(\cdot)}^\top$: transpose of a vector or a matrix
 * $\mathbf{X}^{-1}$: inverse of matrix $\mathbf{X}$
 * $\odot$: Hadamard (elementwise) product
 * $[\cdot, \cdot]$: concatenation
 * $\|\cdot\|_p$: $\ell_p$ norm
 * $\|\cdot\|$: $\ell_2$ norm
-* $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
+* $\langle \mathbf{x}, \mathbf{y} \rangle$: inner (dot) product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements
 * $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
@@ -85,7 +85,7 @@ refers specifically to the symbol $\mathbb{Z}$.
 * $X \sim P$: the random variable $X$ follows distribution $P$
 * $P(X=x)$: the probability assigned to the event where random variable $X$ takes value $x$
 * $P(X \mid Y)$: the conditional probability distribution of $X$ given $Y$
-* $p(\cdot)$: a probability density function (PDF) associated with distribution P
+* $p(\cdot)$: a probability density function (PDF) associated with distribution $P$
 * ${E}[X]$: expectation of a random variable $X$
 * $X \perp Y$: random variables $X$ and $Y$ are independent
 * $X \perp Y \mid Z$: random variables  $X$  and  $Y$ are conditionally independent given $Z$
