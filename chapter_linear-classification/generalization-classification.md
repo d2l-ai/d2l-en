@@ -300,7 +300,7 @@ remains a persistent problem plaguing scientific research.
 
 
 If that is not enough to worry you,
-there's a special reason to distrust
+there is a special reason to distrust
 the results that you get on subsequent evaluations.
 Recall that our analysis of test set performance
 rested on the assumption that the classifier
@@ -374,7 +374,7 @@ on the training set $\mathcal{S}$,
 and the true error $\epsilon(f_\mathcal{S})$
 of that same classifier on the underlying population.
 This might look similar to the evaluation problem
-that we just addressed but there's a major difference.
+that we just addressed but there is a major difference.
 Before, the classifier $f$ was fixed
 and we only needed a dataset
 for evaluative purposes.

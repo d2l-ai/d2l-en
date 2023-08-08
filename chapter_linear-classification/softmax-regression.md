@@ -30,7 +30,7 @@ in a specialized subfield called *survival modeling*.
 The point here is not to overwhelm you but just
 to let you know that there is a lot more to estimation
 than simply minimizing squared errors.
-And more broadly, there's a lot more to supervised learning than regression.
+And more broadly, there is a lot more to supervised learning than regression.
 In this section, we focus on *classification* problems
 where we put aside *how much?* questions
 and instead focus on *which category?* questions.

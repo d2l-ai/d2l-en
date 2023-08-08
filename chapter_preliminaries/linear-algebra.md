@@ -476,7 +476,7 @@ a + X, (a * X).shape
 
 Often, we wish to calculate [**the sum of a tensor's elements.**]
 To express the sum of the elements in a vector $\mathbf{x}$ of length $n$,
-we write $\sum_{i=1}^n x_i$. There's a simple function for it:
+we write $\sum_{i=1}^n x_i$. There is a simple function for it:
 
 ```{.python .input}
 %%tab mxnet

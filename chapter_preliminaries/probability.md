@@ -538,7 +538,7 @@ have the exact same height.
 In fact, with fine enough measurements,
 you would never have the same height
 when you wake up and when you go to sleep.
-There's little point in asking about
+There is little point in asking about
 the exact probability that someone
 is 1.801392782910287192 meters tall.
 Instead, we typically care more about being able to say

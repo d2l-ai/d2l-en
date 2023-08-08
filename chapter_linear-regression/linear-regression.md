@@ -9,8 +9,8 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 *Regression* problems pop up whenever we want to predict a numerical value.
 Common examples include predicting prices (of homes, stocks, etc.),
 predicting the length of stay (for patients in the hospital),
-forecasting demand (for retail sales), among countless others.
-Not every prediction problem is a classic regression problem.
+forecasting demand (for retail sales), among numerous others.
+Not every prediction problem is one of classical regression.
 Later on, we will introduce classification problems,
 where the goal is to predict membership among a set of categories.
 
@@ -18,7 +18,7 @@ As a running example, suppose that we wish
 to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
 To develop a model for predicting house prices,
-we need to get our hands on data consisting of sales,
+we need to get our hands on data,
 including the sales price, area, and age for each home.
 In the terminology of machine learning,
 the dataset is called a *training dataset* or *training set*,
@@ -70,7 +70,7 @@ import time
 
 ## Basics
 
-*Linear regression* may be both the simplest
+*Linear regression* is both the simplest
 and most popular among the standard tools
 for tackling regression problems.
 Dating back to the dawn of the 19th century :cite:`Legendre.1805,Gauss.1809`,
@@ -85,7 +85,7 @@ This setup allows that the target value
 may still deviate from its expected value
 on account of observation noise.
 Next, we can impose the assumption that any such noise
-is well-behaved, following a Gaussian distribution.
+is well behaved, following a Gaussian distribution.
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
 We use superscripts to enumerate samples and targets,
@@ -115,8 +115,8 @@ The bias determines the value of the estimate when all features are zero.
 Even though we will never see any newly-built homes with precisely zero area,
 we still need the bias because it allows us
 to express all linear functions of our features
-(versus restricting us to lines that pass through the origin).
-Strictly speaking, :eqref:`eq_price-area` is an *affine transformation* of input features, which is characterized by a *linear transformation* of features via weighted sum, combined with a *translation* via the added bias.
+(rather than restricting us to lines that pass through the origin).
+Strictly speaking, :eqref:`eq_price-area` is an *affine transformation* of input features, which is characterized by a *linear transformation* of features via a weighted sum, combined with a *translation* via the added bias.
 Given a dataset, our goal is to choose
 the weights $\mathbf{w}$ and the bias $b$
 that, on average, make our model's predictions
@@ -136,7 +136,7 @@ we can assign each an index (between $1$ and $d$)
 and express our prediction $\hat{y}$
 (in general the "hat" symbol denotes an estimate) as
 
-$$\hat{y} = w_1  x_1 + ... + w_d  x_d + b.$$
+$$\hat{y} = w_1  x_1 + \cdots + w_d  x_d + b.$$
 
 Collecting all features into a vector $\mathbf{x} \in \mathbb{R}^d$
 and all weights into a vector $\mathbf{w} \in \mathbb{R}^d$,
@@ -155,7 +155,7 @@ Here, $\mathbf{X}$ contains one row for every example
 and one column for every feature.
 For a collection of features $\mathbf{X}$,
 the predictions $\hat{\mathbf{y}} \in \mathbb{R}^n$
-can be expressed via the matrix-vector product:
+can be expressed via the matrix--vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
 :eqlabel:`eq_linreg-y-vec`
@@ -165,10 +165,10 @@ Given features of a training dataset $\mathbf{X}$
 and corresponding (known) labels $\mathbf{y}$,
 the goal of linear regression is to find
 the weight vector $\mathbf{w}$ and the bias term $b$
-that given features of a new data example
+such that, given features of a new data example
 sampled from the same distribution as $\mathbf{X}$,
 the new example's label will (in expectation)
-be predicted with the lowest error.
+be predicted with the smallest error.
 
 Even if we believe that the best model for
 predicting $y$ given $\mathbf{x}$ is linear,
@@ -176,8 +176,7 @@ we would not expect to find a real-world dataset of $n$ examples where
 $y^{(i)}$ exactly equals $\mathbf{w}^\top \mathbf{x}^{(i)}+b$
 for all $1 \leq i \leq n$.
 For example, whatever instruments we use to observe
-the features $\mathbf{X}$ and labels $\mathbf{y}$
-might suffer small amount of measurement error.
+the features $\mathbf{X}$ and labels $\mathbf{y}$, there might be a small amount of measurement error.
 Thus, even when we are confident
 that the underlying relationship is linear,
 we will incorporate a noise term to account for such errors.
@@ -185,7 +184,7 @@ we will incorporate a noise term to account for such errors.
 Before we can go about searching for the best *parameters*
 (or *model parameters*) $\mathbf{w}$ and $b$,
 we will need two more things:
-(i) a quality measure for some given model;
+(i) a measure of the quality of some given model;
 and (ii) a procedure for updating the model to improve its quality.
 
 ### Loss Function
@@ -196,10 +195,10 @@ that we agree on some measure of *fitness*
 (or, equivalently, of *unfitness*).
 *Loss functions* quantify the distance
 between the *real* and *predicted* values of the target.
-The loss will usually be a non-negative number
+The loss will usually be a nonnegative number
 where smaller values are better
 and perfect predictions incur a loss of 0.
-For regression problems, the most common loss function is squared error.
+For regression problems, the most common loss function is the squared error.
 When our prediction for an example $i$ is $\hat{y}^{(i)}$
 and the corresponding true label is $y^{(i)}$,
 the *squared error* is given by:
@@ -211,10 +210,10 @@ The constant $\frac{1}{2}$ makes no real difference
 but proves to be notationally convenient,
 since it cancels out when we take the derivative of the loss.
 Because the training dataset is given to us,
-and thus out of our control,
+and thus is out of our control,
 the empirical error is only a function of the model parameters.
-Below, we visualize the fit of a linear regression model
-in a problem with one-dimensional inputs (:numref:`fig_fit_linreg`).
+In :numref:`fig_fit_linreg`, we visualize the fit of a linear regression model
+in a problem with one-dimensional inputs.
 
 ![Fitting a linear regression model to one-dimensional data.](../img/fit-linreg.svg)
 :label:`fig_fit_linreg`
@@ -222,9 +221,8 @@ in a problem with one-dimensional inputs (:numref:`fig_fit_linreg`).
 Note that large differences between
 estimates $\hat{y}^{(i)}$ and targets $y^{(i)}$
 lead to even larger contributions to the loss,
-due to the quadratic form of the loss
-(this can be a double-edge sword.
-While it encourages the model to avoid large errors
+due to its quadratic form
+(this quadraticity can be a double-edge sword; while it encourages the model to avoid large errors
 it can also lead to excessive sensitivity to anomalous data).
 To measure the quality of a model on the entire dataset of $n$ examples,
 we simply average (or equivalently, sum)
@@ -232,7 +230,7 @@ the losses on the training set:
 
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-When training the model, we want to find parameters ($\mathbf{w}^*, b^*$)
+When training the model, we seek parameters ($\mathbf{w}^*, b^*$)
 that minimize the total loss across all training examples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
@@ -246,9 +244,9 @@ In particular, we can find the optimal parameters
 (as assessed on the training data)
 analytically by applying a simple formula as follows.
 First, we can subsume the bias $b$ into the parameter $\mathbf{w}$
-by appending a column to the design matrix consisting of all ones.
+by appending a column to the design matrix consisting of all 1s.
 Then our prediction problem is to minimize $\|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2$.
-So long as the design matrix $\mathbf{X}$ has full rank
+As long as the design matrix $\mathbf{X}$ has full rank
 (no feature is linearly dependent on the others),
 then there will be just one critical point on the loss surface
 and it corresponds to the minimum of the loss over the entire domain.
@@ -286,11 +284,11 @@ that it would exclude almost all exciting aspects of deep learning.
 
 Fortunately, even in cases where we cannot solve the models analytically,
 we can still often train models effectively in practice.
-Moreover, for many tasks, those difficult-to-optimize models
+Moreover, for many tasks, those hard-to-optimize models
 turn out to be so much better that figuring out how to train them
 ends up being well worth the trouble.
 
-The key technique for optimizing nearly any deep learning model,
+The key technique for optimizing nearly every deep learning model,
 and which we will call upon throughout this book,
 consists of iteratively reducing the error
 by updating the parameters in the direction
@@ -305,7 +303,7 @@ In practice, this can be extremely slow:
 we must pass over the entire dataset before making a single update,
 even if the update steps might be very powerful :cite:`Liu.Nocedal.1989`.
 Even worse, if there is a lot of redundancy in the training data,
-the benefit of a full update is even lower.
+the benefit of a full update is limited.
 
 The other extreme is to consider only a single example at a time and to take
 update steps based on one observation at a time.
@@ -316,8 +314,8 @@ One problem arises from the fact that processors are a lot faster
 multiplying and adding numbers than they are
 at moving data from main memory to processor cache.
 It is up to an order of magnitude more efficient to
-perform a matrix-vector multiplication
-than a corresponding number of vector-vector operations.
+perform a matrix--vector multiplication
+than a corresponding number of vector--vector operations.
 This means that it can take a lot longer to process
 one sample at a time compared to a full batch.
 A second problem is that some of the layers,
@@ -331,7 +329,7 @@ we take a *minibatch* of observations :cite:`Li.Zhang.Chen.ea.2014`.
 The specific choice of the size of the said minibatch depends on many factors,
 such as the amount of memory, the number of accelerators,
 the choice of layers, and the total dataset size.
-Despite all of that, a number between 32 and 256,
+Despite all that, a number between 32 and 256,
 preferably a multiple of a large power of $2$, is a good start.
 This leads us to *minibatch stochastic gradient descent*.
 
@@ -372,11 +370,11 @@ After training for some predetermined number of iterations
 we record the estimated model parameters,
 denoted $\hat{\mathbf{w}}, \hat{b}$.
 Note that even if our function is truly linear and noiseless,
-these parameters will not be the exact minimizers of the loss, or even deterministic.
+these parameters will not be the exact minimizers of the loss, nor even deterministic.
 Although the algorithm converges slowly towards the minimizers
-it typically cannot achieve it exactly in a finite number of steps.
+it typically will not find them exactly in a finite number of steps.
 Moreover, the minibatches $\mathcal{B}$
-used to update the parameters are chosen at random.
+used for updating the parameters are chosen at random.
 This breaks determinism.
 
 Linear regression happens to be a learning problem
@@ -400,7 +398,7 @@ We return to these topics throughout the book.
 
 Given the model $\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 we can now make *predictions* for a new example,
-e.g., to predict the sales price of a previously unseen house
+e.g., predicting the sales price of a previously unseen house
 given its area $x_1$ and age $x_2$.
 Deep learning practitioners have taken to calling the prediction phase *inference*
 but this is a bit of a misnomer---*inference* refers broadly
@@ -427,9 +425,9 @@ rather than writing costly for-loops in Python.**)
 To illustrate why this matters so much,
 we can (**consider two methods for adding vectors.**)
 To start, we instantiate two 10,000-dimensional vectors
-containing all ones.
-In one method, we loop over the vectors with a Python for-loop.
-In the other method, we rely on a single call to `+`.
+containing all 1s.
+In the first method, we loop over the vectors with a Python for-loop.
+In the second, we rely on a single call to `+`.
 
 ```{.python .input}
 %%tab all
@@ -484,7 +482,7 @@ f'{time.time() - t:.5f} sec'
 The second method is dramatically faster than the first.
 Vectorizing code often yields order-of-magnitude speedups.
 Moreover, we push more of the mathematics to the library
-without the need to write as many calculations ourselves,
+so we do not have to write as many calculations ourselves,
 reducing the potential for errors and increasing portability of the code.
 
 
@@ -495,7 +493,7 @@ So far we have given a fairly functional motivation
 of the squared loss objective:
 the optimal parameters return the conditional expectation $E[Y\mid X]$
 whenever the underlying pattern is truly linear,
-and the loss assigns outsize penalties for outliers.
+and the loss assigns large penalties for outliers.
 We can also provide a more formal motivation
 for the squared loss objective
 by making probabilistic assumptions
@@ -567,7 +565,8 @@ lowering its peak.
 
 One way to motivate linear regression with squared loss
 is to assume that observations arise from noisy measurements,
-where the noise is normally distributed as follows:
+where the noise $\epsilon$ follows the normal distribution 
+$\mathcal{N}(0, \sigma^2)$:
 
 $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
 
@@ -607,17 +606,17 @@ to the squared error loss introduced earlier,
 except for the multiplicative constant $\frac{1}{\sigma^2}$.
 Fortunately, the solution does not depend on $\sigma$ either.
 It follows that minimizing the mean squared error
-is equivalent to maximum likelihood estimation
+is equivalent to the maximum likelihood estimation
 of a linear model under the assumption of additive Gaussian noise.
 
 
 ## Linear Regression as a Neural Network
 
 While linear models are not sufficiently rich
-to express the many complicated neural networks
+to express the many complicated networks
 that we will introduce in this book,
-neural networks are rich enough
-to subsume linear models as neural networks
+(artificial) neural networks are rich enough
+to subsume linear models as networks
 in which every feature is represented by an input neuron,
 all of which are connected directly to the output.
 
@@ -632,7 +631,7 @@ but not the specific values taken by the weights or biases.
 
 The inputs are $x_1, \ldots, x_d$.
 We refer to $d$ as the *number of inputs*
-or *feature dimensionality* in the input layer.
+or the *feature dimensionality* in the input layer.
 The output of the network is $o_1$.
 Because we are just trying to predict
 a single numerical value,
@@ -643,7 +642,7 @@ In summary, we can think of linear regression
 as a single-layer fully connected neural network.
 We will encounter networks
 with far more layers
-in future chapters.
+in later chapters.
 
 ### Biology
 
@@ -673,18 +672,18 @@ e.g., activation or inhibition via the product $x_i w_i$.
 The weighted inputs arriving from multiple sources
 are aggregated in the nucleus
 as a weighted sum $y = \sum_i x_i w_i + b$,
-possibly subject to some nonlinear postprocessing via $\sigma(y)$.
+possibly subject to some nonlinear postprocessing via a function $\sigma(y)$.
 This information is then sent via the axon to the axon terminals,
 where it reaches its destination
 (e.g., an actuator such as a muscle)
 or it is fed into another neuron via its dendrites.
 
 Certainly, the high-level idea that many such units
-could be combined with the right connectivity
-and right learning algorithm,
+could be combined, provided they have connectivity
+and correct learning algorithm,
 to produce far more interesting and complex behavior
 than any one neuron alone could express
-owes to our study of real biological neural systems.
+arises from our study of real biological neural systems.
 At the same time, most research in deep learning today
 draws inspiration from a much wider source.
 We invoke :citet:`Russell.Norvig.2016`
@@ -742,8 +741,7 @@ and ultimately, evaluation on previously unseen data.
 1. What happens if you want to use regression for realistic price estimation of houses or stock prices?
     1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
     1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \text{price}$?
-    1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock?
-    1. For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
+    1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock? For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
 1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
     1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.
     1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k \mid \lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.

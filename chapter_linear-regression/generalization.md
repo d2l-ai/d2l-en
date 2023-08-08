@@ -8,12 +8,12 @@ of practicing and testing their abilities
 by taking exams administered in previous years.
 Nonetheless, doing well on past exams is no guarantee
 that they will excel when it matters.
-For instance, imagine a student, Elephantine Ellie,
+For instance, imagine a student, Extraordinary Ellie,
 whose preparation consisted entirely
 of memorizing the answers
 to previous years' exam questions.
 Even if Ellie were endowed
-with an elephantine memory,
+with an extraordinary memory,
 and thus could perfectly recall the answer
 to any *previously seen* question,
 she might nevertheless freeze
@@ -54,20 +54,20 @@ of a far grander question
 that engulfs all of science:
 when are we ever justified
 in making the leap from particular observations
-to more general statements :cite:`popper2005logic`?
+to more general statements?
 
 
 In real life, we must fit out models
 using a finite collection of data.
 The typical scales of that data
 vary wildly across domains.
-For many important  medical problem,
+For many important medical problems,
 we can only access a few thousand data points.
 When studying rare diseases,
 we might be lucky to access hundreds.
 By contrast, the largest public datasets
-consisting of labeled photographs
-(e.g., ImageNet :cite:`Deng.Dong.Socher.ea.2009`),
+consisting of labeled photographs,
+e.g., ImageNet :cite:`Deng.Dong.Socher.ea.2009`,
 contain millions of images.
 And some unlabeled image collections
 such as the Flickr YFC100M dataset
@@ -77,7 +77,7 @@ However, even at this extreme scale,
 the number of available data points
 remains infinitesimally small
 compared to the space of all possible images
-at 1 megapixel resolution.
+at a megapixel resolution.
 Whenever we work with finite samples,
 we must keep in mind the risk
 that we might fit our training data,
@@ -88,7 +88,7 @@ The phenomenon of fitting closer to our training data
 than to the underlying distribution is called *overfitting*,
 and techniques for combatting overfitting
 are often called *regularization* methods.
-While there is no substitute for a proper introduction
+While it is no substitute for a proper introduction
 to statistical learning theory (see :citet:`Vapnik98,boucheron2005theory`),
 we will give you just enough intuition to get going.
 We will revisit generalization in many chapters
@@ -135,7 +135,7 @@ You can think of the generalization error as
 what you would see  if you applied your model
 to an infinite stream of additional data examples
 drawn from the same underlying data distribution.
-Formally the training error is expressed as a *sum* (with the same notation in :numref:`sec_linear_regression`):
+Formally the training error is expressed as a *sum* (with the same notation as :numref:`sec_linear_regression`):
 
 $$R_\text{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$
 
@@ -156,7 +156,7 @@ constituted of a random selection of examples
 $\mathbf{X}'$ and labels $\mathbf{y}'$
 that were withheld from our training set.
 This consists of applying the same formula
-as for calculating the empirical training error
+that was used for calculating the empirical training error
 but to a test set $\mathbf{X}', \mathbf{y}'$.
 
 
@@ -248,7 +248,7 @@ low training error does not necessarily
 imply low generalization error.
 *However, it does not necessarily
 imply high generalization error either!*
-All we can say confidently is that
+All we can say with confidence is that
 low training error alone is not enough
 to certify low generalization error.
 Deep neural networks turn out to be just such models:
@@ -305,7 +305,7 @@ we try to find the polynomial of degree $d$
 
 $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
-to estimate the label $y$.
+for estimating the label $y$.
 This is just a linear regression problem
 where our features are given by the powers of $x$,
 the model's weights are given by $w_i$,
@@ -321,16 +321,16 @@ and the model function's selection range is wider.
 Fixing the training dataset,
 higher-order polynomial functions should always
 achieve lower (at worst, equal) training error
-relative to lower degree polynomials.
+relative to lower-degree polynomials.
 In fact, whenever each data example
 has a distinct value of $x$,
 a polynomial function with degree
 equal to the number of data examples
 can fit the training set perfectly.
-We visualize the relationship between polynomial degree (model complexity)
-and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.
+We compare the relationship between polynomial degree (model complexity)
+and both underfitting and overfitting in :numref:`fig_capacity_vs_error`.
 
-![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
+![Influence of model complexity on underfitting and overfitting.](../img/capacity-vs-error.svg)
 :label:`fig_capacity_vs_error`
 
 
@@ -364,7 +364,7 @@ connected devices, and the broad digitization of the economy.
 ## Model Selection
 :label:`subsec_generalization-model-selection`
 
-Typically, we select our final model,
+Typically, we select our final model
 only after evaluating multiple models
 that differ in various ways
 (different architectures, training objectives,
@@ -404,11 +404,11 @@ development of algorithms,
 e.g., for [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
 and [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
 
-The common practice to address the problem of *training on the test set*
+The common practice for addressing the problem of *training on the test set*
 is to split our data three ways,
 incorporating a *validation set*
 in addition to the training and test datasets.
-The result is a murky practice where the boundaries
+The result is a murky business where the boundaries
 between validation and test data are worryingly ambiguous.
 Unless explicitly stated otherwise, in the experiments in this book
 we are really working with what should rightly be called
@@ -437,8 +437,7 @@ by averaging over the results from the $K$ experiments.
 This section explored some of the  underpinnings
 of generalization in  machine learning.
 Some of these ideas become complicated
-and counterintuitive when we get to deeper models,
-there, models are capable of overfitting data badly,
+and counterintuitive when we get to deeper models; here, models are capable of overfitting data badly,
 and the relevant notions of complexity
 can be both implicit and counterintuitive
 (e.g., larger architectures with more parameters
@@ -459,7 +458,7 @@ We leave you with a few rules of thumb:
 1. Can you ever expect to see zero training error? Under which circumstances would you see zero generalization error?
 1. Why is $K$-fold cross-validation very expensive to compute?
 1. Why is the $K$-fold cross-validation error estimate biased?
-1. The VC dimension is defined as the maximum number of points that can be classified with arbitrary labels $\{\pm 1\}$ by a function of a class of functions. Why might this not be a good idea to measure how complex the class of functions is? Hint: what about the magnitude of the functions?
+1. The VC dimension is defined as the maximum number of points that can be classified with arbitrary labels $\{\pm 1\}$ by a function of a class of functions. Why might this not be a good idea for measuring how complex the class of functions is? Hint: consider the magnitude of the functions.
 1. Your manager gives you a difficult dataset on which your current algorithm does not perform so well. How would you justify to him that you need more data? Hint: you cannot increase the data but you can decrease it.
 
 :begin_tab:`mxnet`
