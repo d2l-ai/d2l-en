@@ -22,4 +22,9 @@ ENV PATH="/home/ci/.local/bin:$PATH"
 # Install d2lbook using pip + dependencies for tensorflow d2l
 RUN pip3 install git+https://github.com/d2l-ai/d2l-book tensorflow-probability==0.19.0
 
-CMD ["/bin/bash"]
+# Python script to print framework versions
+ADD print_versions.py .
+# Entry point script
+ADD entry.sh .
+
+CMD ["/usr/bin/bash", "entry.sh", "tensorflow"]
