@@ -24,7 +24,5 @@ RUN pip3 install git+https://github.com/d2l-ai/d2l-book gym==0.21.0 gpytorch sci
 
 # Python script to print framework versions
 ADD print_versions.py .
-# Entry point script
-ADD entry.sh .
 
-CMD ["/usr/bin/bash", "entry.sh", "pytorch"]
+CMD ["/bin/bash"]
