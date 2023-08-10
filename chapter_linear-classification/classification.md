@@ -39,7 +39,7 @@ import optax
 ## The `Classifier` Class
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the final batch contains fewer examples, but we ignore this minor difference to keep the code simple.
 :end_tab:
 
 
@@ -199,8 +199,8 @@ Classification is a sufficiently common problem that it warrants its own conveni
 
 ## Exercises
 
-1. Denote by $L_v$ the validation loss, and let $L_v^q$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_v^b$ the loss on the last minibatch. Express $L_v$ in terms of $L_v^q$, $l_v^b$, and the sample and minibatch sizes.
-1. Show that the quick and dirty estimate $L_v^q$ is unbiased. That is, show that $E[L_v] = E[L_v^q]$. Why would you still want to use $L_v$ instead?
+1. Denote by $L_\text{v}$ the validation loss, and let $L_\text{v}^\text{q}$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_\text{v}^\text{b}$ the loss on the last minibatch. Express $L_\text{v}$ in terms of $L_\text{v}^\text{q}$, $l_\text{v}^\text{b}$, and the sample and minibatch sizes.
+1. Show that the quick and dirty estimate $L_\text{v}^\text{q}$ is unbiased. That is, show that $E[L_\text{v}] = E[L_\text{v}^\text{q}]$. Why would you still want to use $L_\text{v}$ instead?
 1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y \mid x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y \mid x)$.
 
 :begin_tab:`mxnet`

@@ -4,7 +4,7 @@
 Like most of our from-scratch implementations,
 :numref:`sec_rnn-scratch` was designed 
 to provide insight into how each component works.
-But when you're using RNNs every day 
+But when you are using RNNs every day 
 or writing production code,
 you will want to rely more on libraries
 that cut down on both implementation time 

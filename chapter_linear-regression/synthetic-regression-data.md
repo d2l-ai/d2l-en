@@ -65,12 +65,12 @@ The resulting design matrix $\mathbf{X}$
 belongs to $\mathbb{R}^{1000 \times 2}$. 
 We generate each label by applying 
 a *ground truth* linear function, 
-corrupting them via additive noise $\epsilon$, 
+corrupting them via additive noise $\boldsymbol{\epsilon}$, 
 drawn independently and identically for each example:
 
-(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \epsilon.$$**)
+(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \boldsymbol{\epsilon}.$$**)
 
-For convenience we assume that $\epsilon$ is drawn 
+For convenience we assume that $\boldsymbol{\epsilon}$ is drawn 
 from a normal distribution with mean $\mu= 0$ 
 and standard deviation $\sigma = 0.01$.
 Note that for object-oriented design

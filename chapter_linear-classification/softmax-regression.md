@@ -117,7 +117,7 @@ we need a model with multiple outputs, one per class.
 To address classification with linear models,
 we will need as many affine functions as we have outputs.
 Strictly speaking, we only need one fewer,
-since the last category has to be the difference
+since the final category has to be the difference
 between $1$ and the sum of the other categories
 but for reasons of symmetry
 we use a slightly redundant parametrization.
@@ -139,7 +139,7 @@ is shown in :numref:`fig_softmaxreg`.
 Just as in linear regression,
 we use a single-layer neural network.
 And since the calculation of each output, $o_1, o_2$, and $o_3$,
-depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
+depends on every input, $x_1$, $x_2$, $x_3$, and $x_4$,
 the output layer can also be described as a *fully connected layer*.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
@@ -159,7 +159,7 @@ we could try, directly, to minimize the difference
 between $\mathbf{o}$ and the labels $\mathbf{y}$.
 While it turns out that treating classification
 as a vector-valued regression problem works surprisingly well,
-it is nonetheless lacking in the following ways:
+it is nonetheless unsatisfactory in the following ways:
 
 * There is no guarantee that the outputs $o_i$ sum up to $1$ in the way we expect probabilities to behave.
 * There is no guarantee that the outputs $o_i$ are even nonnegative, even if their outputs sum up to $1$, or that they do not exceed $1$.
@@ -174,12 +174,12 @@ the probability might exceed $1$
 when it comes to buying a mansion!
 As such, we need a mechanism to "squish" the outputs.
 
-There are many ways we might to accomplish this goal.
+There are many ways we might accomplish this goal.
 For instance, we could assume that the outputs
 $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
-where the corruption occurs by means of adding noise $\mathbf{\epsilon}$
+where the corruption occurs by means of adding noise $\boldsymbol{\epsilon}$
 drawn from a normal distribution.
-In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
+In other words, $\mathbf{y} = \mathbf{o} + \boldsymbol{\epsilon}$,
 where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 This is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model),
 first introduced by :citet:`Fechner.1860`.
@@ -215,10 +215,10 @@ $$
 $$
 
 
-The idea of a softmax dates back to Gibbs,
-who adapted ideas from physics :cite:`Gibbs.1902`.
+The idea of a softmax dates back to :citet:`Gibbs.1902`,
+who adapted ideas from physics.
 Dating even further back, Boltzmann,
-the father of modern thermodynamics,
+the father of modern statistical physics,
 used this trick to model a distribution
 over energy states in gas molecules.
 In particular, he discovered that the prevalence
@@ -251,7 +251,7 @@ $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\ma
 :eqlabel:`eq_minibatch_softmax_reg`
 
 This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{X} \mathbf{W}$.
+a matrix--matrix product $\mathbf{X} \mathbf{W}$.
 Moreover, since each row in $\mathbf{X}$ represents a data example,
 the softmax operation itself can be computed *rowwise*:
 for each row of $\mathbf{O}$, exponentiate all entries
@@ -268,7 +268,7 @@ Now that we have a mapping from features $\mathbf{x}$
 to probabilities $\mathbf{\hat{y}}$,
 we need a way to optimize the accuracy of this mapping.
 We will rely on maximum likelihood estimation,
-the very same concept that we encountered
+the very same method that we encountered
 when providing a probabilistic justification
 for the mean squared error loss in
 :numref:`subsec_normal_distribution_and_squared_loss`.
@@ -338,7 +338,7 @@ and the corresponding cross-entropy loss are so common,
 it is worth understanding a bit better how they are computed.
 Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss
 in :eqref:`eq_l_cross_entropy`
-and using the definition of the softmax we obtain:
+and using the definition of the softmax we obtain
 
 $$
 \begin{aligned}
@@ -378,7 +378,7 @@ say $(0, 0, 1)$, we now have a generic probability vector,
 say $(0.1, 0.2, 0.7)$.
 The math that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
-still works out fine,
+still works well,
 just that the interpretation is slightly more general.
 It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
@@ -430,14 +430,14 @@ Take the extreme example where every token in the stream
 always takes the same value.
 That is a very boring data stream!
 And not only it is boring, but it is also easy to predict.
-Because they are always the same,
+Because the tokens are always the same,
 we do not have to transmit any information
 to communicate the contents of the stream.
 Easy to predict, easy to compress.
 
 However if we cannot perfectly predict every event,
 then we might sometimes be surprised.
-Our surprise is greater when we assigned an event lower probability.
+Our surprise is greater when we assigned lower probability.
 Claude Shannon settled on $\log \frac{1}{P(j)} = -\log P(j)$
 to quantify one's *surprisal* at observing an event $j$
 having assigned it a (subjective) probability $P(j)$.
@@ -474,10 +474,10 @@ As a side effect, we encountered the softmax,
 a convenient activation function that transforms
 outputs of an ordinary neural network layer
 into valid discrete probability distributions.
-We saw that the derivative of the cross entropy loss
+We saw that the derivative of the cross-entropy loss
 when combined with softmax
 behaves very similarly
-to the derivative of squared error,
+to the derivative of squared error;
 namely by taking the difference between
 the expected behavior and its prediction.
 And, while we were only able to
@@ -500,7 +500,7 @@ Fourier transforms, and scaling
 to reduce the cost from quadratic to log-linear.
 Similar techniques work for more advanced
 structural matrix approximations :cite:`sindhwani2015structured`.
-Lastly, we can use Quaternion-like decompositions
+Lastly, we can use quaternion-like decompositions
 to reduce the cost to $\mathcal{O}(\frac{dq}{n})$,
 again if we are willing to trade off a small amount of accuracy
 for computational and storage cost :cite:`Zhang.Tay.Zhang.ea.2021`
@@ -515,7 +515,7 @@ that can be executed most efficiently on modern GPUs.
 
 ## Exercises
 
-1. We can explore the connection between exponential families and the softmax in some more depth.
+1. We can explore the connection between exponential families and softmax in some more depth.
     1. Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for the softmax.
     1. Compute the variance of the distribution given by $\mathrm{softmax}(\mathbf{o})$ and show that it matches the second derivative computed above.
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
@@ -526,15 +526,15 @@ that can be executed most efficiently on modern GPUs.
 a logistic model to capture preferences. For a user to choose between apples and oranges one
 assumes scores $o_{\mathrm{apple}}$ and $o_{\mathrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
 the item with the largest score is the most likely one to be chosen :cite:`Bradley.Terry.1952`.
-    1. Prove that the softmax satisfies this requirement.
-    1. What happens if you want to allow for a default option of choosing neither apples nor oranges? Hint: now the user has 3 choices.
-1. Softmax derives its name from the following mapping: $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
+    1. Prove that softmax satisfies this requirement.
+    1. What happens if you want to allow for a default option of choosing neither apples nor oranges? Hint: now the user has three choices.
+1. Softmax gets its name from the following mapping: $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
     1. Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     1. How small can you make the difference between both functions? Hint: without loss of
     generality you can set $b = 0$ and $a \geq b$.
     1. Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
     1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
-    1. What does the soft-min look like?
+    1. Construct an analogous softmin function.
     1. Extend this to more than two numbers.
 1. The function $g(\mathbf{x}) \stackrel{\mathrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
     1. Prove that the function is convex. Hint: to do so, use the fact that the first derivative amounts to the probabilities from the softmax function and show that the second derivative is the variance.
@@ -543,7 +543,7 @@ the item with the largest score is the most likely one to be chosen :cite:`Bradl
     1. Show that if we choose $b = \mathrm{max}_i x_i$ we end up with a numerically stable implementation.
 1. Assume that we have some probability distribution $P$. Suppose we pick another distribution $Q$ with $Q(i) \propto P(i)^\alpha$ for $\alpha > 0$.
     1. Which choice of $\alpha$ corresponds to doubling the temperature? Which choice corresponds to halving it?
-    1. What happens if we let the temperature converge to $0$?
-    1. What happens if we let the temperature converge to $\infty$?
+    1. What happens if we let the temperature approach $0$?
+    1. What happens if we let the temperature approach $\infty$?
 
 [Discussions](https://discuss.d2l.ai/t/46)
