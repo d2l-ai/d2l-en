@@ -404,7 +404,7 @@ of vanishing gradients that plagued
 previous versions of neural networks (more on this later).
 
 Note that there are many variants to the ReLU function,
-including the *parameterized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
+including the *parametrized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
 This variation adds a linear term to ReLU,
 so some information still gets through,
 even when the argument is negative:

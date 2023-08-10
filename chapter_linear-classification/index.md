@@ -10,7 +10,7 @@ generating output, calculating the loss,
 taking gradients with respect to weights,
 and updating the model.
 However, the precise form of the targets,
-the parameterization of the output layer,
+the parametrization of the output layer,
 and the choice of loss function will adapt
 to suit the *classification* setting.
 

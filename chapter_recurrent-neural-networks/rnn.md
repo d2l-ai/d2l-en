@@ -129,7 +129,7 @@ of the output layer.
 It is worth mentioning that
 even at different time steps,
 RNNs always use these model parameters.
-Therefore, the parameterization cost of an RNN
+Therefore, the parametrization cost of an RNN
 does not grow as the number of time steps increases.
 
 :numref:`fig_rnn` illustrates the computational logic of an RNN at three adjacent time steps.

@@ -10,9 +10,9 @@ Recall the example of a convolution in :numref:`fig_correlation`.
 The input had both a height and width of 3
 and the convolution kernel had both a height and width of 2,
 yielding an output representation with dimension $2\times2$.
-Assuming that the input shape is $n_h\times n_w$
-and the convolution kernel shape is $k_h\times k_w$,
-the output shape will be $(n_h-k_h+1) \times (n_w-k_w+1)$: 
+Assuming that the input shape is $n_\text{h}\times n_\text{w}$
+and the convolution kernel shape is $k_\text{h}\times k_\text{w}$,
+the output shape will be $(n_\text{h}-k_\text{h}+1) \times (n_\text{w}-k_\text{w}+1)$: 
 we can only shift the convolution kernel so far until it runs out
 of pixels to apply the convolution to. 
 
@@ -25,7 +25,7 @@ after applying many successive convolutions,
 we tend to wind up with outputs that are
 considerably smaller than our input.
 If we start with a $240 \times 240$ pixel image,
-$10$ layers of $5 \times 5$ convolutions
+ten layers of $5 \times 5$ convolutions
 reduce the image to $200 \times 200$ pixels,
 slicing off $30 \%$ of the image and with it
 obliterating any interesting information
@@ -70,8 +70,8 @@ is that we tend to lose pixels on the perimeter of our image. Consider :numref:`
 :label:`img_conv_reuse`
 
 Since we typically use small kernels,
-for any given convolution,
-we might only lose a few pixels,
+for any given convolution
+we might only lose a few pixels
 but this can add up as we apply
 many successive convolutional layers.
 One straightforward solution to this problem
@@ -86,26 +86,26 @@ The shaded portions are the first output element as well as the input and kernel
 ![Two-dimensional cross-correlation with padding.](../img/conv-pad.svg)
 :label:`img_conv_pad`
 
-In general, if we add a total of $p_h$ rows of padding
+In general, if we add a total of $p_\text{h}$ rows of padding
 (roughly half on top and half on bottom)
-and a total of $p_w$ columns of padding
+and a total of $p_\text{w}$ columns of padding
 (roughly half on the left and half on the right),
 the output shape will be
 
-$$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1).$$
+$$(n_\text{h}-k_\text{h}+p_\text{h}+1)\times(n_\text{w}-k_\text{w}+p_\text{w}+1).$$
 
 This means that the height and width of the output
-will increase by $p_h$ and $p_w$, respectively.
+will increase by $p_\text{h}$ and $p_\text{w}$, respectively.
 
-In many cases, we will want to set $p_h=k_h-1$ and $p_w=k_w-1$
+In many cases, we will want to set $p_\text{h}=k_\text{h}-1$ and $p_\text{w}=k_\text{w}-1$
 to give the input and output the same height and width.
 This will make it easier to predict the output shape of each layer
 when constructing the network.
-Assuming that $k_h$ is odd here,
-we will pad $p_h/2$ rows on both sides of the height.
-If $k_h$ is even, one possibility is to
-pad $\lceil p_h/2\rceil$ rows on the top of the input
-and $\lfloor p_h/2\rfloor$ rows on the bottom.
+Assuming that $k_\text{h}$ is odd here,
+we will pad $p_\text{h}/2$ rows on both sides of the height.
+If $k_\text{h}$ is even, one possibility is to
+pad $\lceil p_\text{h}/2\rceil$ rows on the top of the input
+and $\lfloor p_\text{h}/2\rfloor$ rows on the bottom.
 We will pad both sides of the width in the same way.
 
 CNNs commonly use convolution kernels
@@ -273,17 +273,17 @@ there is no output because the input element cannot fill the window
 ![Cross-correlation with strides of 3 and 2 for height and width, respectively.](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
-In general, when the stride for the height is $s_h$
-and the stride for the width is $s_w$, the output shape is
+In general, when the stride for the height is $s_\text{h}$
+and the stride for the width is $s_\text{w}$, the output shape is
 
-$$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$$
+$$\lfloor(n_\text{h}-k_\text{h}+p_\text{h}+s_\text{h})/s_\text{h}\rfloor \times \lfloor(n_\text{w}-k_\text{w}+p_\text{w}+s_\text{w})/s_\text{w}\rfloor.$$
 
-If we set $p_h=k_h-1$ and $p_w=k_w-1$,
+If we set $p_\text{h}=k_\text{h}-1$ and $p_\text{w}=k_\text{w}-1$,
 then the output shape can be simplified to
-$\lfloor(n_h+s_h-1)/s_h\rfloor \times \lfloor(n_w+s_w-1)/s_w\rfloor$.
+$\lfloor(n_\text{h}+s_\text{h}-1)/s_\text{h}\rfloor \times \lfloor(n_\text{w}+s_\text{w}-1)/s_\text{w}\rfloor$.
 Going a step further, if the input height and width
 are divisible by the strides on the height and width,
-then the output shape will be $(n_h/s_h) \times (n_w/s_w)$.
+then the output shape will be $(n_\text{h}/s_\text{h}) \times (n_\text{w}/s_\text{w})$.
 
 Below, we [**set the strides on both the height and width to 2**],
 thus halving the input height and width.
@@ -341,16 +341,16 @@ comp_conv2d(conv2d, X).shape
 
 ## Summary and Discussion
 
-Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_h, p_w)$ padding. Most commonly we set $p_h = p_w$, in which case we simply state that we choose padding $p$. 
+Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_\text{h}, p_\text{w})$ padding. Most commonly we set $p_\text{h} = p_\text{w}$, in which case we simply state that we choose padding $p$. 
 
-A similar convention applies to strides. When horizontal stride $s_h$ and vertical stride $s_w$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
+A similar convention applies to strides. When horizontal stride $s_\text{h}$ and vertical stride $s_\text{w}$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
 
-So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provided an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
+So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provided an extensive overview of those (albeit without a clear case for when to use nonzero paddings unless artifacts occur). 
 
 
 ## Exercises
 
-1. Given the last code example in this section with kernel size $(3, 5)$, padding $(0, 1)$, and stride $(3, 4)$, 
+1. Given the final code example in this section with kernel size $(3, 5)$, padding $(0, 1)$, and stride $(3, 4)$, 
    calculate the output shape to check if it is consistent with the experimental result.
 1. For audio signals, what does a stride of 2 correspond to?
 1. Implement mirror padding, i.e., padding where the border values are simply mirrored to extend tensors. 

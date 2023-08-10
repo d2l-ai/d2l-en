@@ -115,7 +115,7 @@ than the simple weighted average can be expressed.
 In our implementation,
 we [**choose the scaled dot-product attention
 for each head**] of the multi-head attention.
-To avoid significant growth of computational cost and parameterization cost,
+To avoid significant growth of computational cost and parametrization cost,
 we set $p_q = p_k = p_v = p_o / h$.
 Note that $h$ heads can be computed in parallel
 if we set the number of outputs 

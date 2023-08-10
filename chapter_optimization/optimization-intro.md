@@ -220,7 +220,7 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 * Minimizing the training error does *not* guarantee that we find the best set of parameters to minimize the generalization error.
 * The optimization problems may have many local minima.
 * The problem may have even more saddle points, as generally the problems are not convex.
-* Vanishing gradients can cause optimization to stall. Often a reparameterization of the problem helps. Good initialization of the parameters can be beneficial, too.
+* Vanishing gradients can cause optimization to stall. Often a reparametrization of the problem helps. Good initialization of the parameters can be beneficial, too.
 
 
 ## Exercises

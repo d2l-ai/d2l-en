@@ -1,11 +1,10 @@
 # Convolutional Neural Networks
 :label:`chap_cnn`
 
-Image data is represented as a two-dimensional grid of pixels, be it
+Image data is represented as a two-dimensional grid of pixels, be the image
 monochromatic or in color. Accordingly each pixel corresponds to one
 or multiple numerical values respectively. So far we ignored this rich
-structure and treated them as vectors of numbers by *flattening* the
-images, irrespective of the spatial relation between pixels. This
+structure and treated images as vectors of numbers by *flattening* them, irrespective of the spatial relation between pixels. This
 deeply unsatisfying approach was necessary in order to feed the
 resulting one-dimensional vectors through a fully connected MLP.
 
@@ -13,7 +12,7 @@ Because these networks are invariant to the order of the features, we
 could get similar results regardless of whether we preserve an order
 corresponding to the spatial structure of the pixels or if we permute
 the columns of our design matrix before fitting the MLP's parameters.
-Preferably, we would leverage our prior knowledge that nearby pixels
+Ideally, we would leverage our prior knowledge that nearby pixels
 are typically related to each other, to build efficient models for
 learning from image data.
 

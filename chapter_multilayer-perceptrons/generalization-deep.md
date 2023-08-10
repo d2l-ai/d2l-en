@@ -215,7 +215,7 @@ and the performance of the different predictors
 will depend on how compatible the assumptions
 are with the observed data.
 
-In a sense, because neural networks are over-parameterized,
+In a sense, because neural networks are over-parametrized,
 possessing many more parameters than are needed to fit the training data,
 they tend to *interpolate* the training data (fitting it perfectly)
 and thus behave, in some ways, more like nonparametric models.
@@ -233,7 +233,7 @@ While current neural tangent kernel models may not fully explain
 the behavior of modern deep networks,
 their success as an analytical tool
 underscores the usefulness of nonparametric modeling
-for understanding the behavior of over-parameterized deep networks.
+for understanding the behavior of over-parametrized deep networks.
 
 
 ## Early Stopping
@@ -337,7 +337,7 @@ remains similarly mysterious.
 
 Unlike classical linear models,
 which tend to have fewer parameters than examples,
-deep networks tend to be over-parameterized,
+deep networks tend to be over-parametrized,
 and for most tasks are capable
 of perfectly fitting the training set.
 This *interpolation regime* challenges

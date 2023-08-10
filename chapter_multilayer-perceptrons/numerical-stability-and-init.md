@@ -64,7 +64,7 @@ from jax import grad, vmap
 Consider a deep network with $L$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
 With each layer $l$ defined by a transformation $f_l$
-parameterized by weights $\mathbf{W}^{(l)}$,
+parametrized by weights $\mathbf{W}^{(l)}$,
 whose hidden layer output is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
 our network can be expressed as:
 

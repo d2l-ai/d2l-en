@@ -490,7 +490,7 @@ and hopefully enough to whet your appetite,
 we hardly dived deep here.
 Among other things, we skipped over computational considerations.
 Specifically, for any fully connected layer with $d$ inputs and $q$ outputs,
-the parameterization and computational cost is $\mathcal{O}(dq)$,
+the parametrization and computational cost is $\mathcal{O}(dq)$,
 which can be prohibitively high in practice.
 Fortunately, this cost of transforming $d$ inputs into $q$ outputs
 can be reduced through approximation and compression.
