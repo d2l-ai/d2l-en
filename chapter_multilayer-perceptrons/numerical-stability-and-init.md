@@ -14,7 +14,7 @@ Until now, we took the initialization scheme for granted,
 glossing over the details of how these choices are made.
 You might have even gotten the impression that these choices
 are not especially important.
-To the contrary, the choice of initialization scheme
+On the contrary, the choice of initialization scheme
 plays a significant role in neural network learning,
 and it can be crucial for maintaining numerical stability.
 Moreover, these choices can be tied up in interesting ways
@@ -23,7 +23,7 @@ Which function we choose and how we initialize parameters
 can determine how quickly our optimization algorithm converges.
 Poor choices here can cause us to encounter
 exploding or vanishing gradients while training.
-In this section, we delve into these topics with greater detail
+In this section, we delve into these topics in greater detail
 and discuss some useful heuristics
 that you will find useful
 throughout your career in deep learning.
@@ -68,17 +68,17 @@ parameterized by weights $\mathbf{W}^{(l)}$,
 whose hidden layer output is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
 our network can be expressed as:
 
-$$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \text{ and thus } \mathbf{o} = f_L \circ \ldots \circ f_1(\mathbf{x}).$$
+$$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \text{ and thus } \mathbf{o} = f_L \circ \cdots \circ f_1(\mathbf{x}).$$
 
 If all the hidden layer output and the input are vectors,
 we can write the gradient of $\mathbf{o}$ with respect to
 any set of parameters $\mathbf{W}^{(l)}$ as follows:
 
-$$\partial_{\mathbf{W}^{(l)}} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{(L-1)}} \mathbf{h}^{(L)}}_{ \mathbf{M}^{(L)} \stackrel{\mathrm{def}}{=}} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{(l)}} \mathbf{h}^{(l+1)}}_{ \mathbf{M}^{(l+1)} \stackrel{\mathrm{def}}{=}} \underbrace{\partial_{\mathbf{W}^{(l)}} \mathbf{h}^{(l)}}_{ \mathbf{v}^{(l)} \stackrel{\mathrm{def}}{=}}.$$
+$$\partial_{\mathbf{W}^{(l)}} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{(L-1)}} \mathbf{h}^{(L)}}_{ \mathbf{M}^{(L)} \stackrel{\mathrm{def}}{=}} \cdots \underbrace{\partial_{\mathbf{h}^{(l)}} \mathbf{h}^{(l+1)}}_{ \mathbf{M}^{(l+1)} \stackrel{\mathrm{def}}{=}} \underbrace{\partial_{\mathbf{W}^{(l)}} \mathbf{h}^{(l)}}_{ \mathbf{v}^{(l)} \stackrel{\mathrm{def}}{=}}.$$
 
 In other words, this gradient is
 the product of $L-l$ matrices
-$\mathbf{M}^{(L)} \cdot \ldots \cdot \mathbf{M}^{(l+1)}$
+$\mathbf{M}^{(L)} \cdots \mathbf{M}^{(l+1)}$
 and the gradient vector $\mathbf{v}^{(l)}$.
 Thus we are susceptible to the same
 problems of numerical underflow that often crop up
@@ -184,7 +184,7 @@ and multiply them with some initial matrix.
 For the scale that we picked
 (the choice of the variance $\sigma^2=1$),
 the matrix product explodes.
-When this happens due to the initialization
+When this happens because of the initialization
 of a deep network, we have no chance of getting
 a gradient descent optimizer to converge.
 
@@ -236,7 +236,7 @@ of the first layer and likewise permute
 the weights of the output layer
 to obtain the same function.
 There is nothing special differentiating
-the first hidden unit vs. the second hidden unit.
+the first and second hidden units.
 In other words, we have permutation symmetry
 among the hidden units of each layer.
 
@@ -246,18 +246,18 @@ with two hidden units.
 For illustration,
 suppose that the output layer transforms the two hidden units into only one output unit.
 Imagine what would happen if we initialized
-all of the parameters of the hidden layer
+all the parameters of the hidden layer
 as $\mathbf{W}^{(1)} = c$ for some constant $c$.
 In this case, during forward propagation
-either hidden unit takes the same inputs and parameters,
-producing the same activation,
+either hidden unit takes the same inputs and parameters
+producing the same activation
 which is fed to the output unit.
 During backpropagation,
-differentiating the output unit with respect to parameters $\mathbf{W}^{(1)}$ gives a gradient whose elements all take the same value.
+differentiating the output unit with respect to parameters $\mathbf{W}^{(1)}$ gives a gradient all of whose elements take the same value.
 Thus, after gradient-based iteration (e.g., minibatch stochastic gradient descent),
 all the elements of $\mathbf{W}^{(1)}$ still take the same value.
 Such iterations would
-never *break the symmetry* on its own
+never *break the symmetry* on their own
 and we might never be able to realize
 the network's expressive power.
 The hidden layer would behave
@@ -310,11 +310,16 @@ just that the mean and variance need to exist.
 For now, let's assume that the inputs to the layer $x_j$
 also have zero mean and variance $\gamma^2$
 and that they are independent of $w_{ij}$ and independent of each other.
-In this case, we can compute the mean and variance of $o_i$ as follows:
+In this case, we can compute the mean of $o_i$:
 
 $$
 \begin{aligned}
-    E[o_i] & = \sum_{j=1}^{n_\mathrm{in}} E[w_{ij} x_j] \\&= \sum_{j=1}^{n_\mathrm{in}} E[w_{ij}] E[x_j] \\&= 0, \\
+    E[o_i] & = \sum_{j=1}^{n_\mathrm{in}} E[w_{ij} x_j] \\&= \sum_{j=1}^{n_\mathrm{in}} E[w_{ij}] E[x_j] \\&= 0, \end{aligned}$$
+
+and the variance:
+
+$$
+\begin{aligned}
     \mathrm{Var}[o_i] & = E[o_i^2] - (E[o_i])^2 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[w^2_{ij} x^2_j] - 0 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[w^2_{ij}] E[x^2_j] \\
@@ -354,7 +359,7 @@ choose the variance when sampling weights
 from a uniform distribution.
 Note that the uniform distribution $U(-a, a)$ has variance $\frac{a^2}{3}$.
 Plugging $\frac{a^2}{3}$ into our condition on $\sigma^2$
-yields the suggestion to initialize according to
+prompts us to initialize according to
 
 $$U\left(-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right).$$
 
@@ -377,7 +382,7 @@ tied (shared) parameters, super-resolution,
 sequence models, and other situations.
 For instance,
 :citet:`Xiao.Bahri.Sohl-Dickstein.ea.2018` demonstrated the possibility of training
-10000-layer neural networks without architectural tricks
+10,000-layer neural networks without architectural tricks
 by using a carefully-designed initialization method.
 
 If the topic interests you we suggest
@@ -392,13 +397,13 @@ a clever idea and contribute an implementation to deep learning frameworks.
 
 Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
 Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
-Random initialization is key to ensure that symmetry is broken before optimization.
+Random initialization is key to ensuring that symmetry is broken before optimization.
 Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
 ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
 
 ## Exercises
 
-1. Can you design other cases where a neural network might exhibit symmetry requiring breaking besides the permutation symmetry in an MLP's layers?
+1. Can you design other cases where a neural network might exhibit symmetry that needs breaking, besides the permutation symmetry in an MLP's layers?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
 1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on layerwise adaptive rate scaling  for inspiration :cite:`You.Gitman.Ginsburg.2017`.

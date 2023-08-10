@@ -9,7 +9,8 @@ in *forward propagation* through the model.
 When it came time to calculate the gradients,
 we just invoked the backpropagation function provided by the deep learning framework.
 
-The automatic calculation of gradients (automatic differentiation) profoundly simplifies
+The automatic calculation of gradients
+profoundly simplifies
 the implementation of deep learning algorithms.
 Before automatic differentiation,
 even small changes to complicated models required
@@ -58,14 +59,14 @@ is the weight parameter of the hidden layer.
 After running the intermediate variable
 $\mathbf{z}\in \mathbb{R}^h$ through the
 activation function $\phi$
-we obtain our hidden activation vector of length $h$,
+we obtain our hidden activation vector of length $h$:
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$
 
 The hidden layer output $\mathbf{h}$
 is also an intermediate variable.
 Assuming that the parameters of the output layer
-only possess a weight of
+possess only a weight of
 $\mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$,
 we can obtain an output layer variable
 with a vector of length $q$:
@@ -79,8 +80,8 @@ for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
 
-According to the definition of $\ell_2$ regularization
-that we will introduce later,
+As we will see the definition of $\ell_2$ regularization
+to be introduced later,
 given the hyperparameter $\lambda$,
 the regularization term is
 
@@ -145,10 +146,10 @@ after the necessary operations,
 such as transposition and swapping input positions,
 have been carried out.
 For vectors, this is straightforward:
-it is simply matrix-matrix multiplication.
+it is simply matrix--matrix multiplication.
 For higher dimensional tensors,
 we use the appropriate counterpart.
-The operator $\text{prod}$ hides all the notation overhead.
+The operator $\text{prod}$ hides all the notational overhead.
 
 Recall that
 the parameters of the simple network with one hidden layer,
@@ -167,7 +168,7 @@ and work our way towards the parameters.
 The first step is to calculate the gradients
 of the objective function $J=L+s$
 with respect to the loss term $L$
-and the regularization term $s$.
+and the regularization term $s$:
 
 $$\frac{\partial J}{\partial L} = 1 \; \text{and} \; \frac{\partial J}{\partial s} = 1.$$
 
@@ -246,12 +247,12 @@ and compute all the variables on its path.
 These are then used for backpropagation
 where the compute order on the graph is reversed.
 
-Take the aforementioned simple network as an example to illustrate.
+Take the aforementioned simple network as an illustrative example.
 On the one hand,
 computing the regularization term :eqref:`eq_forward-s`
 during forward propagation
 depends on the current values of model parameters $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.
-They are given by the optimization algorithm according to backpropagation in the latest iteration.
+They are given by the optimization algorithm according to backpropagation in the most recent iteration.
 On the other hand,
 the gradient calculation for the parameter
 :eqref:`eq_backprop-J-h` during backpropagation
@@ -259,7 +260,7 @@ depends on the current value of the hidden layer output $\mathbf{h}$,
 which is given by forward propagation.
 
 
-Therefore when training neural networks, after model parameters are initialized,
+Therefore when training neural networks, once model parameters are initialized,
 we alternate forward propagation with backpropagation,
 updating model parameters using gradients given by backpropagation.
 Note that backpropagation reuses the stored intermediate values from forward propagation to avoid duplicate calculations.
@@ -271,14 +272,14 @@ Besides, the size of such intermediate values is roughly
 proportional to the number of network layers and the batch size.
 Thus,
 training deeper networks using larger batch sizes
-more easily leads to *out of memory* errors.
+more easily leads to *out-of-memory* errors.
 
 
 ## Summary
 
 Forward propagation sequentially calculates and stores intermediate variables within the computational graph defined by the neural network. It proceeds from the input to the output layer.
 Backpropagation sequentially calculates and stores the gradients of intermediate variables and parameters within the neural network in the reversed order.
-When training deep learning models, forward propagation and back propagation are interdependent,
+When training deep learning models, forward propagation and backpropagation are interdependent,
 and training requires significantly more memory than prediction.
 
 
