@@ -584,12 +584,16 @@ Atishay Garg, Marcel Flygare, adtygan, Nik Vaessen, bolded, Louis Schlessinger, 
 atgctg, Kaixin Li, Victor Barbaros, Riccardo Musto, Elizabeth Ho, azimjonn, Guilherme Miotto, Alessandro Finamore,
 Joji Joseph, Anthony Biel, Zeming Zhao, shjustinbaek, gab-chen, nantekoto, Yutaro Nishiyama, Oren Amsalem,
 Tian-MaoMao, Amin Allahyar, Gijs van Tulder, Mikhail Berkov, iamorphen, Matthew Caseres, Andrew Walsh,
-pggPL, RohanKarthikeyan, Ryan Choi, Likun Lei.
+pggPL, RohanKarthikeyan, Ryan Choi, and Likun Lei.
 
-We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
+We thank Amazon Web Services, especially Wen-Ming Ye, George Karypis, Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
 and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement, this book would not have happened.
+During preparation of publication of this book,
+Cambridge University Press has offered excellent support.
+We thank our commissioning editor David Tranah
+for his help and professionalism.
 
 
 ## Summary
