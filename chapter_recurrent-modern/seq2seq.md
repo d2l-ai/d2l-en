@@ -10,11 +10,11 @@ In so-called seq2seq problems like machine translation
 (as discussed in :numref:`sec_machine_translation`),
 where inputs and outputs both consist 
 of variable-length unaligned sequences,
-we generally rely on encoder-decoder architectures
+we generally rely on encoder--decoder architectures
 (:numref:`sec_encoder-decoder`).
 In this section,
 we will demonstrate the application 
-of an encoder-decoder architecture,
+of an encoder--decoder architecture,
 where both the encoder and decoder 
 are implemented as RNNs,
 to the task of machine translation
@@ -550,10 +550,10 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 ```
 
-To summarize, the layers in the above RNN encoder-decoder model 
+To summarize, the layers in the above RNN encoder--decoder model 
 are illustrated in :numref:`fig_seq2seq_details`.
 
-![Layers in an RNN encoder-decoder model.](../img/seq2seq-details.svg)
+![Layers in an RNN encoder--decoder model.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
 
 
@@ -566,7 +566,7 @@ Putting it all together in code yields the following:
 ```{.python .input}
 %%tab pytorch, tensorflow, mxnet
 class Seq2Seq(d2l.EncoderDecoder):  #@save
-    """The RNN encoder-decoder for sequence to sequence learning."""
+    """The RNN encoder--decoder for sequence to sequence learning."""
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__(encoder, decoder)
         self.save_hyperparameters()
@@ -589,7 +589,7 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
 ```{.python .input}
 %%tab jax
 class Seq2Seq(d2l.EncoderDecoder):  #@save
-    """The RNN encoder-decoder for sequence to sequence learning."""
+    """The RNN encoder--decoder for sequence to sequence learning."""
     encoder: nn.Module
     decoder: nn.Module
     tgt_pad: int
@@ -653,7 +653,7 @@ def loss(self, params, X, Y, state, averaged=False):
 ## [**Training**]
 :label:`sec_seq2seq_training`
 
-Now we can [**create and train an RNN encoder-decoder model**]
+Now we can [**create and train an RNN encoder--decoder model**]
 for sequence to sequence learning on the machine translation dataset.
 
 ```{.python .input}
@@ -703,7 +703,7 @@ When the end-of-sequence ("&lt;eos&gt;") token is predicted,
 the prediction of the output sequence is complete.
 
 
-![Predicting the output sequence token by token using an RNN encoder-decoder.](../img/seq2seq-predict.svg)
+![Predicting the output sequence token by token using an RNN encoder--decoder.](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
 
 In the next section, we will introduce 
@@ -846,7 +846,7 @@ def bleu(pred_seq, label_seq, k):  #@save
 ```
 
 In the end,
-we use the trained RNN encoder-decoder
+we use the trained RNN encoder--decoder
 to [**translate a few English sentences into French**]
 and compute the BLEU of the results.
 
@@ -872,8 +872,8 @@ for en, fr, p in zip(engs, fras, preds):
 
 ## Summary
 
-Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
-In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
+Following the design of the encoder--decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
+In encoder--decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
 When implementing the encoder and the decoder, we can use multilayer RNNs.
 We can use masks to filter out irrelevant computations, such as when calculating the loss.
 As for evaluating output sequences,

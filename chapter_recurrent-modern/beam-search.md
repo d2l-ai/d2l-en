@@ -2,7 +2,7 @@
 :label:`sec_beam-search`
 
 In :numref:`sec_seq2seq`, 
-we introduced the encoder-decoder architecture,
+we introduced the encoder--decoder architecture,
 and the standard techniques for training them end-to-end. However, when it came to test-time prediction,
 we mentioned only the *greedy* strategy,
 where we select at each time step 

@@ -38,7 +38,7 @@ the Transformer architecture in :numref:`fig_transformer`
 consists of an encoder for representing input sequences
 and a decoder for generating target sequences.
 Primarily, Transformers can be used in three different modes:
-*encoder-only*, *encoder-decoder*, and *decoder-only*.
+*encoder-only*, *encoder--decoder*, and *decoder-only*.
 To conclude this chapter, we will review these three modes
 and explain the scalability in pretraining Transformers.
 
@@ -137,7 +137,7 @@ the Transformer architecture can be outfitted with a decoder
 that autoregressively predicts the target sequence
 of arbitrary length, token by token,
 conditional on both encoder output and decoder output:
-(i) for conditioning on encoder output, encoder-decoder cross-attention
+(i) for conditioning on encoder output, encoder--decoder cross-attention
 (multi-head attention of decoder in :numref:`fig_transformer`)
 allows target tokens to attend to *all* input tokens;
 (ii) conditioning on decoder output is achieved
@@ -147,9 +147,9 @@ as it has little connection to the proper study of causality)
 pattern (masked multi-head attention of decoder in :numref:`fig_transformer`),
 where any target token can only attend to *past* and *present* tokens in the target sequence.
 
-To pretrain encoder-decoder Transformers beyond human-labeled machine translation data,
+To pretrain encoder--decoder Transformers beyond human-labeled machine translation data,
 BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring`
-are two concurrently proposed encoder-decoder Transformers
+are two concurrently proposed encoder--decoder Transformers
 pretrained on large-scale text corpora.
 Both attempt to reconstruct original text in their pretraining objectives,
 while the former emphasizes noising input
@@ -161,7 +161,7 @@ with comprehensive ablation studies.
 ### Pretraining T5
 
 
-As an example of the pretrained Transformer encoder-decoder,
+As an example of the pretrained Transformer encoder--decoder,
 T5 (Text-to-Text Transfer Transformer)
 unifies many tasks as the same text-to-text problem:
 for any task, the input of the encoder is a task description
@@ -173,7 +173,7 @@ To perform as text-to-text, T5 is trained
 to generate some target text conditional on input text.
 
 
-![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the Transformer encoder-decoder. In the encoder self-attention (lower square), all input tokens attend to each other; In the encoder-decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
+![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the Transformer encoder--decoder. In the encoder self-attention (lower square), all input tokens attend to each other; In the encoder--decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
 :label:`fig_t5-encoder-decoder`
 
 To obtain input and output from any original text,
@@ -245,11 +245,11 @@ represent text even without fine-tuning.
 ## Decoder-Only
 
 
-We have reviewed encoder-only and encoder-decoder Transformers.
+We have reviewed encoder-only and encoder--decoder Transformers.
 Alternatively, decoder-only Transformers
 remove the entire encoder and the decoder sublayer
-with the encoder-decoder cross-attention
-from the original encoder-decoder architecture
+with the encoder--decoder cross-attention
+from the original encoder--decoder architecture
 depicted in :numref:`fig_transformer`.
 Nowadays, decoder-only Transformers have been the de facto architecture
 in large-scale language modeling (:numref:`sec_language-model`),
@@ -440,7 +440,7 @@ language models can perform multimodal chain-of-thought reasoning with further i
 
 ## Summary and Discussion
 
-Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
+Transformers have been pretrained as encoder-only (e.g., BERT), encoder--decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
 (ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on Transformer scalability in multi-modal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
 a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).

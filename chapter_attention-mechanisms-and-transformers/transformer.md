@@ -66,7 +66,7 @@ import pandas as pd
 
 ## Model
 
-As an instance of the encoder-decoder
+As an instance of the encoder--decoder
 architecture,
 the overall architecture of
 the Transformer
@@ -119,9 +119,9 @@ with residual connections and layer normalizations.
 Besides the two sublayers described in
 the encoder, the decoder inserts
 a third sublayer, known as
-the encoder-decoder attention,
+the encoder--decoder attention,
 between these two.
-In the encoder-decoder attention,
+In the encoder--decoder attention,
 queries are from the
 outputs of the decoder's self-attention sublayer,
 and the keys and values are
@@ -721,7 +721,7 @@ Each layer is implemented in the following
 `TransformerDecoderBlock` class,
 which contains three sublayers:
 decoder self-attention,
-encoder-decoder attention,
+encoder--decoder attention,
 and positionwise feed-forward networks.
 These sublayers employ
 a residual connection around them
@@ -950,7 +950,7 @@ class TransformerDecoderBlock(nn.Module):
 ```
 
 To facilitate scaled dot-product operations
-in the encoder-decoder attention
+in the encoder--decoder attention
 and addition operations in the residual connections,
 [**the feature dimension (`num_hiddens`) of the decoder is
 the same as that of the encoder.**]
@@ -996,7 +996,7 @@ In the end,
 a fully connected layer computes the prediction
 for all the `vocab_size` possible output tokens.
 Both of the decoder self-attention weights
-and the encoder-decoder attention weights
+and the encoder--decoder attention weights
 are stored for later visualization.
 
 ```{.python .input}
@@ -1155,7 +1155,7 @@ class TransformerDecoder(nn.Module):
 
 ## [**Training**]
 
-Let's instantiate an encoder-decoder model
+Let's instantiate an encoder--decoder model
 by following the Transformer architecture.
 Here we specify that
 both the Transformer encoder and the Transformer decoder
@@ -1278,13 +1278,13 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-[**To visualize both the decoder self-attention weights and the encoder-decoder attention weights,
+[**To visualize both the decoder self-attention weights and the encoder--decoder attention weights,
 we need more data manipulations.**]
 For example,
 we fill the masked attention weights with zero.
 Note that
 the decoder self-attention weights
-and the encoder-decoder attention weights
+and the encoder--decoder attention weights
 both have the same queries:
 the beginning-of-sequence token followed by
 the output tokens and possibly
@@ -1385,7 +1385,7 @@ for different deep learning tasks.
 
 ## Summary
 
-The Transformer is an instance of the encoder-decoder architecture,
+The Transformer is an instance of the encoder--decoder architecture,
 though either the encoder or the decoder can be used individually in practice.
 In the Transformer architecture, multi-head self-attention is used
 for representing the input sequence and the output sequence,

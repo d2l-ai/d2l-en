@@ -56,7 +56,7 @@ and graph neural networks :cite:`dwivedi2020generalization`.
 
 The core idea behind the Transformer model is the *attention mechanism*,
 an innovation that was originally envisioned as an enhancement
-for encoder-decoder RNNs applied to sequence-to-sequence applications,
+for encoder--decoder RNNs applied to sequence-to-sequence applications,
 like machine translations :cite:`Bahdanau.Cho.Bengio.2014`.
 You might recall that in the first sequence-to-sequence models
 for machine translation :cite:`Sutskever.Vinyals.Le.2014`,
@@ -86,7 +86,7 @@ Initially, the idea was a remarkably successful
 enhancement to the recurrent neural networks
 that already dominated machine translation applications.
 The models performed better than the original
-encoder-decoder sequence-to-sequence architectures.
+encoder--decoder sequence-to-sequence architectures.
 Moreover, researchers noted that some nice qualitative insights
 sometimes emerged form inspecting the pattern of attention weights.
 In translation tasks, attention models
@@ -101,7 +101,7 @@ although what precisely the attention weights mean---i.e.,
 how, if at all, they should be *interpreted* remains a hazy research topic.
 
 However, attention mechanisms soon emerged as more significant concerns,
-beyond their usefulness as an enhancement for encoder-decoder recurrent neural networks
+beyond their usefulness as an enhancement for encoder--decoder recurrent neural networks
 and their putative usefulness for picking out salient inputs.
 In 2017, :citet:`Vaswani.Shazeer.Parmar.ea.2017` proposed
 the Transformer architecture for machine translation,

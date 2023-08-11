@@ -12,7 +12,7 @@ like machine translation
 inputs and outputs are of varying lengths
 that are unaligned. 
 The standard approach to handling this sort of data
-is to design an *encoder-decoder* architecture (:numref:`fig_encoder_decoder`)
+is to design an *encoder--decoder* architecture (:numref:`fig_encoder_decoder`)
 consisting of two major components:
 an *encoder* that takes a variable-length sequence as input,
 and a *decoder* that acts as a conditional language model,
@@ -21,25 +21,23 @@ and the leftwards context of the target sequence
 and predicting the subsequent token in the target sequence. 
 
 
-![The encoder-decoder architecture.](../img/encoder-decoder.svg)
+![The encoder--decoder architecture.](../img/encoder--decoder.svg)
 :label:`fig_encoder_decoder`
 
 Let's take machine translation from English to French as an example.
 Given an input sequence in English:
 "They", "are", "watching", ".",
-this encoder-decoder architecture
+this encoder--decoder architecture
 first encodes the variable-length input into a state,
 then decodes the state 
 to generate the translated sequence,
 token by token, as output:
 "Ils", "regardent", ".".
-Since the encoder-decoder architecture
+Since the encoder--decoder architecture
 forms the basis of different seq2seq models
 in subsequent sections,
 this section will convert this architecture
 into an interface that will be implemented later.
-
-
 
 ```{.python .input}
 %%tab mxnet
@@ -76,7 +74,7 @@ by any model that inherits this base `Encoder` class.
 ```{.python .input}
 %%tab mxnet
 class Encoder(nn.Block):  #@save
-    """The base encoder interface for the encoder-decoder architecture."""
+    """The base encoder interface for the encoder--decoder architecture."""
     def __init__(self):
         super().__init__()
 
@@ -88,7 +86,7 @@ class Encoder(nn.Block):  #@save
 ```{.python .input}
 %%tab pytorch
 class Encoder(nn.Module):  #@save
-    """The base encoder interface for the encoder-decoder architecture."""
+    """The base encoder interface for the encoder--decoder architecture."""
     def __init__(self):
         super().__init__()
 
@@ -100,7 +98,7 @@ class Encoder(nn.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class Encoder(tf.keras.layers.Layer):  #@save
-    """The base encoder interface for the encoder-decoder architecture."""
+    """The base encoder interface for the encoder--decoder architecture."""
     def __init__(self):
         super().__init__()
 
@@ -112,7 +110,7 @@ class Encoder(tf.keras.layers.Layer):  #@save
 ```{.python .input}
 %%tab jax
 class Encoder(nn.Module):  #@save
-    """The base encoder interface for the encoder-decoder architecture."""
+    """The base encoder interface for the encoder--decoder architecture."""
     def setup(self):
         raise NotImplementedError
 
@@ -141,7 +139,7 @@ into an output token at the current time step.
 ```{.python .input}
 %%tab mxnet
 class Decoder(nn.Block):  #@save
-    """The base decoder interface for the encoder-decoder architecture."""
+    """The base decoder interface for the encoder--decoder architecture."""
     def __init__(self):
         super().__init__()
 
@@ -156,7 +154,7 @@ class Decoder(nn.Block):  #@save
 ```{.python .input}
 %%tab pytorch
 class Decoder(nn.Module):  #@save
-    """The base decoder interface for the encoder-decoder architecture."""
+    """The base decoder interface for the encoder--decoder architecture."""
     def __init__(self):
         super().__init__()
 
@@ -171,7 +169,7 @@ class Decoder(nn.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class Decoder(tf.keras.layers.Layer):  #@save
-    """The base decoder interface for the encoder-decoder architecture."""
+    """The base decoder interface for the encoder--decoder architecture."""
     def __init__(self):
         super().__init__()
 
@@ -186,7 +184,7 @@ class Decoder(tf.keras.layers.Layer):  #@save
 ```{.python .input}
 %%tab jax
 class Decoder(nn.Module):  #@save
-    """The base decoder interface for the encoder-decoder architecture."""
+    """The base decoder interface for the encoder--decoder architecture."""
     def setup(self):
         raise NotImplementedError
 
@@ -209,7 +207,7 @@ by the decoder as one of its input.
 ```{.python .input}
 %%tab mxnet, pytorch
 class EncoderDecoder(d2l.Classifier):  #@save
-    """The base class for the encoder-decoder architecture."""
+    """The base class for the encoder--decoder architecture."""
     def __init__(self, encoder, decoder):
         super().__init__()
         self.encoder = encoder
@@ -225,7 +223,7 @@ class EncoderDecoder(d2l.Classifier):  #@save
 ```{.python .input}
 %%tab tensorflow
 class EncoderDecoder(d2l.Classifier):  #@save
-    """The base class for the encoder-decoder architecture."""
+    """The base class for the encoder--decoder architecture."""
     def __init__(self, encoder, decoder):
         super().__init__()
         self.encoder = encoder
@@ -241,7 +239,7 @@ class EncoderDecoder(d2l.Classifier):  #@save
 ```{.python .input}
 %%tab jax
 class EncoderDecoder(d2l.Classifier):  #@save
-    """The base class for the encoder-decoder architecture."""
+    """The base class for the encoder--decoder architecture."""
     encoder: nn.Module
     decoder: nn.Module
     training: bool
@@ -256,7 +254,7 @@ class EncoderDecoder(d2l.Classifier):  #@save
 In the next section, 
 we will see how to apply RNNs to design 
 seq2seq models based on 
-this encoder-decoder architecture.
+this encoder--decoder architecture.
 
 
 ## Summary
@@ -274,8 +272,8 @@ to a variable-length sequence.
 
 ## Exercises
 
-1. Suppose that we use neural networks to implement the encoder-decoder architecture. Do the encoder and the decoder have to be the same type of neural network?  
-1. Besides machine translation, can you think of another application where the encoder-decoder architecture can be applied?
+1. Suppose that we use neural networks to implement the encoder--decoder architecture. Do the encoder and the decoder have to be the same type of neural network?  
+1. Besides machine translation, can you think of another application where the encoder--decoder architecture can be applied?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/341)

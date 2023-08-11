@@ -7,7 +7,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 :label:`sec_seq2seq_attention`
 
 When we encountered machine translation in :numref:`sec_seq2seq`,
-we designed an encoder-decoder architecture for sequence to sequence (seq2seq) learning
+we designed an encoder--decoder architecture for sequence to sequence (seq2seq) learning
 based on two RNNs :cite:`Sutskever.Vinyals.Le.2014`.
 Specifically, the RNN encoder transforms a variable-length sequence
 into a *fixed-shape* context variable.
@@ -73,15 +73,15 @@ We used $\mathbf{s}_{t' - 1}$ as the query, and
 $\mathbf{h}_{t}$ as both the key and the value. Note that $\mathbf{c}_{t'}$ is then used to generate the state $\mathbf{s}_{t'}$ and to generate a new token (see :eqref:`eq_seq2seq_s_t`). In particular, the attention weight $\alpha$ is computed as in :eqref:`eq_attn-scoring-alpha`
 using the additive attention scoring function
 defined by :eqref:`eq_additive-attn`.
-This RNN encoder-decoder architecture
+This RNN encoder--decoder architecture
 using attention is depicted in :numref:`fig_s2s_attention_details`. Note that later this model was modified such as to include the already generated tokens in the decoder as further context (i.e., the attention sum does not stop at $T$ but rather it proceeds up to $t'-1$). For instance, see :citet:`chan2015listen` for a description of this strategy, as applied to speech recognition.
 
-![Layers in an RNN encoder-decoder model with the Bahdanau attention mechanism.](../img/seq2seq-details-attention.svg)
+![Layers in an RNN encoder--decoder model with the Bahdanau attention mechanism.](../img/seq2seq-details-attention.svg)
 :label:`fig_s2s_attention_details`
 
 ## Defining the Decoder with Attention
 
-To implement the RNN encoder-decoder with attention,
+To implement the RNN encoder--decoder with attention,
 we only need to redefine the decoder (omitting the generated symbols from the attention function simplifies the design). Let's begin with [**the base interface for decoders with attention**] by defining the quite unsurprisingly named `AttentionDecoder` class.
 
 ```{.python .input}
@@ -463,8 +463,8 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 
 ## Summary
 
-When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with the Bahdanau attention mechanism selectively aggregates different parts of the input sequence. This is achieved by treating the state (context variable) as an output of additive attention pooling.
-In the RNN encoder-decoder, the Bahdanau attention mechanism treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
+When predicting a token, if not all the input tokens are relevant, the RNN encoder--decoder with the Bahdanau attention mechanism selectively aggregates different parts of the input sequence. This is achieved by treating the state (context variable) as an output of additive attention pooling.
+In the RNN encoder--decoder, the Bahdanau attention mechanism treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
 
 
 ## Exercises
