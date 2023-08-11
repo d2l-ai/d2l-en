@@ -1562,7 +1562,7 @@ over the past decade.
   and :citet:`Jia.Song.He.ea.2018` pushed the size up to 64,000 observations,
   reducing training time for the ResNet-50 model
   on the ImageNet dataset to less than 7 minutes.
-  By comparison, training times were initially in the order of days.
+  By comparison, training times were initially of the order of days.
 * The ability to parallelize computation
   has also contributed to progress in *reinforcement learning*.
   This has led to significant progress in computers achieving
