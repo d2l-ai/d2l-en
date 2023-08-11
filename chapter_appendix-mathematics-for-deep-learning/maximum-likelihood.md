@@ -9,19 +9,19 @@ This has a Bayesian interpretation which can be helpful to think about.  Suppose
 
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
-$$\mathop{\textrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
+$$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
 :eqlabel:`eq_max_like`
 
 By Bayes' rule, this is the same thing as
 
 $$
-\mathop{\textrm{argmax}} \frac{P(X \mid \boldsymbol{\theta})P(\boldsymbol{\theta})}{P(X)}.
+\mathop{\mathrm{argmax}} \frac{P(X \mid \boldsymbol{\theta})P(\boldsymbol{\theta})}{P(X)}.
 $$
 
 The expression $P(X)$, a parameter agnostic probability of generating the data, does not depend on $\boldsymbol{\theta}$ at all, and so can be dropped without changing the best choice of $\boldsymbol{\theta}$.  Similarly, we may now posit that we have no prior assumption on which set of parameters are better than any others, so we may declare that $P(\boldsymbol{\theta})$ does not depend on theta either!  This, for instance, makes sense in our coin flipping example where the probability it comes up heads could be any value in $[0,1]$ without any prior belief it is fair or not (often referred to as an *uninformative prior*).  Thus we see that our application of Bayes' rule shows that our best choice of $\boldsymbol{\theta}$ is the maximum likelihood estimate for $\boldsymbol{\theta}$:
 
 $$
-\hat{\boldsymbol{\theta}} = \mathop{\textrm{argmax}} _ {\boldsymbol{\theta}} P(X \mid \boldsymbol{\theta}).
+\hat{\boldsymbol{\theta}} = \mathop{\mathrm{argmax}} _ {\boldsymbol{\theta}} P(X \mid \boldsymbol{\theta}).
 $$
 
 As a matter of common terminology, the probability of the data given the parameters ($P(X \mid \boldsymbol{\theta})$) is referred to as the *likelihood*.

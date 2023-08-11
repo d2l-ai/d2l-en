@@ -40,7 +40,7 @@ where $\mathbb{1}_{s_{t+1}^i \textrm{ is terminal}}$ is an indicator variable th
 
 Given the solution of these updates $\hat{Q}$, which is an approximation of the optimal value function $Q^*$, we can obtain the optimal deterministic policy corresponding to this value function easily using
 
-$$\hat{\pi}(s) = \textrm{argmax}_{a} \hat{Q}(s, a).$$
+$$\hat{\pi}(s) = \mathrm{argmax}_{a} \hat{Q}(s, a).$$
 
 There can be situations when there are multiple deterministic policies that correspond to the same optimal value function; such ties can be broken arbitrarily because they have the same value function.
 
@@ -52,7 +52,7 @@ We can mitigate this concern by picking a completely random policy $\pi_e$ that 
 
 We thus arrive at the second key idea in Q-Learning, namely exploration. Typical implementations of Q-Learning tie together the current estimate of $Q$ and the policy $\pi_e$ to set
 
-$$\pi_e(a \mid s) = \begin{cases}\textrm{argmax}_{a'} \hat{Q}(s, a') & \textrm{with prob. } 1-\epsilon \\ \textrm{uniform}(\mathcal{A}) & \textrm{with prob. } \epsilon,\end{cases}$$
+$$\pi_e(a \mid s) = \begin{cases}\mathrm{argmax}_{a'} \hat{Q}(s, a') & \textrm{with prob. } 1-\epsilon \\ \textrm{uniform}(\mathcal{A}) & \textrm{with prob. } \epsilon,\end{cases}$$
 :eqlabel:`epsilon_greedy`
 
 where $\epsilon$ is called the "exploration parameter" and is chosen by the user. The policy $\pi_e$ is called an exploration policy. This particular $\pi_e$ is called an $\epsilon$-greedy exploration policy because it chooses the optimal action (under the current estimate $\hat{Q}$) with probability $1-\epsilon$ but explores randomly with the remainder probability $\epsilon$. We can also use the so-called softmax exploration policy

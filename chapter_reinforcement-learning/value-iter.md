@@ -50,13 +50,13 @@ This version is the analog of :eqref:`eq_dynamic_programming_val` for the action
 ## Optimal Stochastic Policy
 
 Both the value function and the action-value function depend upon the policy that the robot chooses. We will next think of the "optimal policy" that achieves the maximal average *return*
-$$\pi^* = \underset{\pi}{\textrm{argmax}} V^\pi(s_0).$$
+$$\pi^* = \underset{\pi}{\mathrm{argmax}} V^\pi(s_0).$$
 
 Of all possible stochastic policies that the robot could have taken, the optimal policy $\pi^*$  achieves the largest average discounted *return* for trajectories starting from state $s_0$. Let us denote the value function and the action-value function of the optimal policy as $V^* \equiv V^{\pi^*}$ and $Q^* \equiv Q^{\pi^*}$.
 
 Let us observe that for a deterministic policy where there is only one action that is possible under the policy at any given state. This gives us
 
-$$\pi^*(s) = \underset{a \in \mathcal{A}}{\textrm{argmax}} \Big[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a)\ V^*(s') \Big].$$
+$$\pi^*(s) = \underset{a \in \mathcal{A}}{\mathrm{argmax}} \Big[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a)\ V^*(s') \Big].$$
 
 A good mnemonic to remember this is that the optimal action at state $s$ (for a deterministic policy) is the one that maximizes the sum of reward $r(s, a)$ from the first stage and the average *return* of the trajectories starting from the next sate $s'$, averaged over all possible next states $s'$ from the second stage.
 
@@ -67,7 +67,7 @@ $$ V^*(s) = \sum_{a \in \mathcal{A}} \pi^*(a \mid s) \Big[ r(s,  a) + \gamma\  \
 
 For a deterministic optimal policy $\pi^*$, since there is only one action that can be taken at state $s$, we can also write 
 
-$$V^*(s) = \textrm{argmax}_{a \in \mathcal{A}} \Big\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big\}$$
+$$V^*(s) = \mathrm{argmax}_{a \in \mathcal{A}} \Big\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big\}$$
 
 for all states $s \in \mathcal{S}$. This identity is called the "principle of dynamic programming" :cite:`BellmanDPPaper,BellmanDPBook`. It was formulated by Richard Bellman in 1950s and we can remember it as "the remainder of an optimal trajectory is also optimal".
 
