@@ -37,7 +37,7 @@ of word $w_j$ given word $w_i$
 in the skip-gram model,
 we have
 
-$$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \textrm{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
+$$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \exp(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 
 where
 for any index $i$

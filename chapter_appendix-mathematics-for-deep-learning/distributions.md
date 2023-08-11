@@ -752,7 +752,7 @@ belong to which is known as the *exponential family*. The exponential family
 is a set of distributions whose density can be expressed in the following 
 form:
 
-$$p(\mathbf{x} \mid \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \textrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
+$$p(\mathbf{x} \mid \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \exp \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
 As this definition can be a little subtle, let's examine it closely.  
@@ -777,7 +777,7 @@ Third, we have $A(\boldsymbol{\eta})$, which is referred to as the *cumulant
 function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
 integrates to one, i.e.,
 
-$$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \textrm{exp}
+$$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \exp
 \left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
 
 To be concrete, let's consider the Gaussian. Assuming that $\mathbf{x}$ is 
@@ -785,9 +785,9 @@ an univariate variable, we saw that it had a density of
 
 $$
 \begin{aligned}
-p(x \mid \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \textrm{exp} 
+p(x \mid \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \exp 
 \left\{ \frac{-(x-\mu)^2}{2 \sigma^2} \right\} \\
-&= \frac{1}{\sqrt{2 \pi}} \cdot \textrm{exp} \left\{ \frac{\mu}{\sigma^2}x
+&= \frac{1}{\sqrt{2 \pi}} \cdot \exp \left\{ \frac{\mu}{\sigma^2}x
 -\frac{1}{2 \sigma^2} x^2 - \left( \frac{1}{2 \sigma^2} \mu^2
 +\log(\sigma) \right) \right\}.
 \end{aligned}
