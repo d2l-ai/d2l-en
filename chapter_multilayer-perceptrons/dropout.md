@@ -97,8 +97,8 @@ $$
 \begin{aligned}
 h' =
 \begin{cases}
-    0 & \text{ with probability } p \\
-    \frac{h}{1-p} & \text{ otherwise}
+    0 & \textrm{ with probability } p \\
+    \frac{h}{1-p} & \textrm{ otherwise}
 \end{cases}
 \end{aligned}
 $$

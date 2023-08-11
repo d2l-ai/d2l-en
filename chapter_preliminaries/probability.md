@@ -132,9 +132,9 @@ the *expected* fraction of tails.
 One intuitive way to see this
 is by symmetry:
 for every possible outcome
-with $n_\text{h}$ heads and $n_\text{t} = (n - n_\text{h})$ tails,
+with $n_\textrm{h}$ heads and $n_\textrm{t} = (n - n_\textrm{h})$ tails,
 there is an equally likely outcome
-with $n_\text{t}$ heads and $n_\text{h}$ tails.
+with $n_\textrm{t}$ heads and $n_\textrm{h}$ tails.
 Note that this is only possible
 if on average we expect to see
 $1/2$ of tosses come up heads
@@ -142,7 +142,7 @@ and $1/2$ come up tails.
 Of course, if you conduct this experiment
 many times with $n=1000000$ tosses each,
 you might never see a trial
-where $n_\text{h} = n_\text{t}$ exactly.
+where $n_\textrm{h} = n_\textrm{t}$ exactly.
 
 
 Formally, the quantity $1/2$ is called a *probability*
@@ -156,7 +156,7 @@ A probability of $1$ indicates absolute certainty
 (imagine a trick coin where both sides were heads)
 and a probability of $0$ indicates impossibility
 (e.g., if both sides were tails).
-The frequencies $n_\text{h}/n$ and $n_\text{t}/n$ are not probabilities
+The frequencies $n_\textrm{h}/n$ and $n_\textrm{t}/n$ are not probabilities
 but rather *statistics*.
 Probabilities are *theoretical* quantities
 that underly the data generating process.
@@ -605,7 +605,7 @@ where the comma indicates "and".
 Note that for any values $a$ and $b$,
 it follows that
 
-$$P(A=a, B=b) \leq P(A=a) \text{ and } P(A=a, B=b) \leq P(B = b),$$
+$$P(A=a, B=b) \leq P(A=a) \textrm{ and } P(A=a, B=b) \leq P(B = b),$$
 
 since for $A=a$ and $B=b$ to happen,
 $A=a$ has to happen *and* $B=b$ also has to happen.
@@ -896,7 +896,7 @@ Sometimes we are interested in the expected value
 of some function of $x$.
 We can calculate these expectations as
 
-$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) p(x) \;dx$$
+$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \textrm{ and } E_{x \sim P}[f(x)] = \int f(x) p(x) \;dx$$
 
 for discrete probabilities and densities, respectively.
 Returning to the investment example from above,
@@ -943,7 +943,7 @@ of any non-negative function of this difference.
 The *variance* of a random variable is calculated by looking
 at the expected value of the *squared* differences:
 
-$$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] = E[X^2] - E[X]^2.$$
+$$\textrm{Var}[X] = E\left[(X - E[X])^2\right] = E[X^2] - E[X]^2.$$
 
 Here the equality follows by expanding
 $(X - E[X])^2 = X^2 - 2 X E[X] + E[X]^2$
@@ -961,7 +961,7 @@ Lastly, the variance of a function
 of a random variable
 is defined analogously as
 
-$$\mathrm{Var}_{x \sim P}[f(x)] = E_{x \sim P}[f^2(x)] - E_{x \sim P}[f(x)]^2.$$
+$$\textrm{Var}_{x \sim P}[f(x)] = E_{x \sim P}[f^2(x)] - E_{x \sim P}[f(x)]^2.$$
 
 Returning to our investment example,
 we can now compute the variance of the investment.
@@ -976,20 +976,20 @@ In the same way as we introduced expectations
 and variance for *scalar* random variables,
 we can do so for vector-valued ones.
 Expectations are easy, since we can apply them elementwise.
-For instance, $\boldsymbol{\mu} \stackrel{\mathrm{def}}{=} E_{\mathbf{x} \sim P}[\mathbf{x}]$
+For instance, $\boldsymbol{\mu} \stackrel{\textrm{def}}{=} E_{\mathbf{x} \sim P}[\mathbf{x}]$
 has coordinates $\mu_i = E_{\mathbf{x} \sim P}[x_i]$.
 *Covariances* are more complicated.
 We define them by taking expectations of the *outer product*
 of the difference between random variables and their mean:
 
-$$\boldsymbol{\Sigma} \stackrel{\mathrm{def}}{=} \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top\right].$$
+$$\boldsymbol{\Sigma} \stackrel{\textrm{def}}{=} \textrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top\right].$$
 
 This matrix $\boldsymbol{\Sigma}$ is referred to as the covariance matrix.
 An easy way to see its effect is to consider some vector $\mathbf{v}$
 of the same size as $\mathbf{x}$.
 It follows that
 
-$$\mathbf{v}^\top \boldsymbol{\Sigma} \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top \mathbf{v}\right] = \mathrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}].$$
+$$\mathbf{v}^\top \boldsymbol{\Sigma} \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top \mathbf{v}\right] = \textrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}].$$
 
 As such, $\boldsymbol{\Sigma}$ allows us to compute the variance
 for any linear function of $\mathbf{x}$
@@ -1089,14 +1089,14 @@ interval centered on the expectation.
     1. How does the variance scale with the number of observations?
     1. Use Chebyshev's inequality to bound the deviation from the expectation.
     1. How does it relate to the central limit theorem?
-1. Assume that we draw $m$ samples $x_i$ from a probability distribution with zero mean and unit variance. Compute the averages $z_m \stackrel{\mathrm{def}}{=} m^{-1} \sum_{i=1}^m x_i$. Can we apply Chebyshev's inequality for every $z_m$ independently? Why not?
+1. Assume that we draw $m$ samples $x_i$ from a probability distribution with zero mean and unit variance. Compute the averages $z_m \stackrel{\textrm{def}}{=} m^{-1} \sum_{i=1}^m x_i$. Can we apply Chebyshev's inequality for every $z_m$ independently? Why not?
 1. Given two events with probability $P(\mathcal{A})$ and $P(\mathcal{B})$, compute upper and lower bounds on $P(\mathcal{A} \cup \mathcal{B})$ and $P(\mathcal{A} \cap \mathcal{B})$. Hint: graph the situation using a [Venn diagram](https://en.wikipedia.org/wiki/Venn_diagram).
 1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? Hint: this is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain).
 1. In :numref:`subsec_probability_hiv_app`, assume that the outcomes of the two tests are not independent. In particular assume that either test on its own has a false positive rate of 10% and a false negative rate of 1%. That is, assume that $P(D =1 \mid H=0) = 0.1$ and that $P(D = 0 \mid H=1) = 0.01$. Moreover, assume that for $H = 1$ (infected) the test outcomes are conditionally independent, i.e., that $P(D_1, D_2 \mid H=1) = P(D_1 \mid H=1) P(D_2 \mid H=1)$ but that for healthy patients the outcomes are coupled via $P(D_1 = D_2 = 1 \mid H=0) = 0.02$.
     1. Work out the joint probability table for $D_1$ and $D_2$, given $H=0$ based on the information you have so far.
     1. Derive the probability that the patient is diseased ($H=1$) after one test returns positive. You can assume the same baseline probability $P(H=1) = 0.0015$ as before.
     1. Derive the probability that the patient is diseased ($H=1$) after both tests return positive.
-1. Assume that you are an asset manager for an investment bank and you have a choice of stocks $s_i$ to invest in. Your portfolio needs to add up to $1$ with weights $\alpha_i$ for each stock. The stocks have an average return $\boldsymbol{\mu} = E_{\mathbf{s} \sim P}[\mathbf{s}]$ and covariance $\boldsymbol{\Sigma} = \mathrm{Cov}_{\mathbf{s} \sim P}[\mathbf{s}]$.
+1. Assume that you are an asset manager for an investment bank and you have a choice of stocks $s_i$ to invest in. Your portfolio needs to add up to $1$ with weights $\alpha_i$ for each stock. The stocks have an average return $\boldsymbol{\mu} = E_{\mathbf{s} \sim P}[\mathbf{s}]$ and covariance $\boldsymbol{\Sigma} = \textrm{Cov}_{\mathbf{s} \sim P}[\mathbf{s}]$.
     1. Compute the expected return for a given portfolio $\boldsymbol{\alpha}$.
     1. If you wanted to maximize the return of the portfolio, how should you choose your investment?
     1. Compute the *variance* of the portfolio.

@@ -461,8 +461,8 @@ the difference between the empirical error
 and the population error as a function
 of the VC dimension and the number of samples:
 
-$$P\left(R[p, f] - R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \alpha\right) \geq 1-\delta
-\ \text{ for }\ \alpha \geq c \sqrt{(\mathrm{VC} - \log \delta)/n}.$$
+$$P\left(R[p, f] - R_\textrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \alpha\right) \geq 1-\delta
+\ \textrm{ for }\ \alpha \geq c \sqrt{(\textrm{VC} - \log \delta)/n}.$$
 
 Here $\delta > 0$ is the probability that the bound is violated,
 $\alpha$ is the upper bound on the generalization gap,

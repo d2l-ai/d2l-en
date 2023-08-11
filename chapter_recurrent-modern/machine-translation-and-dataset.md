@@ -155,7 +155,7 @@ can suggest that the output sequence is complete.
 In the end, the method below returns
 two lists of token lists: `src` and `tgt`.
 Specifically, `src[i]` is a list of tokens from the
-$i^\mathrm{th}$ text sequence in the source language (English here) 
+$i^\textrm{th}$ text sequence in the source language (English here) 
 and `tgt[i]` is that in the target language (French here).
 
 ```{.python .input  n=7}

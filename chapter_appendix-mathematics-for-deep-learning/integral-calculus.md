@@ -98,7 +98,7 @@ d2l.plt.show()
 We will denote this area by the integral symbol below:
 
 $$
-\mathrm{Area}(\mathcal{A}) = \int_a^b f(x) \;dx.
+\textrm{Area}(\mathcal{A}) = \int_a^b f(x) \;dx.
 $$
 
 The inner variable is a dummy variable, much like the index of a sum in a $\sum$, and so this can be equivalently written with any inner value we like:

@@ -125,7 +125,7 @@ but first we need to understand the IID case,
 where $P(\cdot) = Q(\cdot)$.
 
 To begin with, we need to differentiate between
-the *training error* $R_\text{emp}$,
+the *training error* $R_\textrm{emp}$,
 which is a *statistic*
 calculated on the training dataset,
 and the *generalization error* $R$,
@@ -137,7 +137,7 @@ to an infinite stream of additional data examples
 drawn from the same underlying data distribution.
 Formally the training error is expressed as a *sum* (with the same notation as :numref:`sec_linear_regression`):
 
-$$R_\text{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$
+$$R_\textrm{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$
 
 
 while the generalization error is expressed as an integral:
@@ -272,7 +272,7 @@ If the model is unable to reduce the training error,
 that could mean that our model is too simple
 (i.e., insufficiently expressive)
 to capture the pattern that we are trying to model.
-Moreover, since the *generalization gap* ($R_\text{emp} - R$)
+Moreover, since the *generalization gap* ($R_\textrm{emp} - R$)
 between our training and generalization errors is small,
 we have reason to believe that we could get away with a more complex model.
 This phenomenon is known as *underfitting*.

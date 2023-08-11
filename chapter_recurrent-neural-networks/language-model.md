@@ -63,8 +63,8 @@ $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 For example, 
 the probability of a text sequence containing four words would be given as:
 
-$$\begin{aligned}&P(\text{deep}, \text{learning}, \text{is}, \text{fun}) \\
-=&P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).\end{aligned}$$
+$$\begin{aligned}&P(\textrm{deep}, \textrm{learning}, \textrm{is}, \textrm{fun}) \\
+=&P(\textrm{deep}) P(\textrm{learning}  \mid  \textrm{deep}) P(\textrm{is}  \mid  \textrm{deep}, \textrm{learning}) P(\textrm{fun}  \mid  \textrm{deep}, \textrm{learning}, \textrm{is}).\end{aligned}$$
 
 ### Markov Models and $n$-grams
 
@@ -99,7 +99,7 @@ and all text posted on the
 Web.
 The probability of words can be calculated from the relative word
 frequency of a given word in the training dataset.
-For example, the estimate $\hat{P}(\text{deep})$ can be calculated as the
+For example, the estimate $\hat{P}(\textrm{deep})$ can be calculated as the
 probability of any sentence starting with the word "deep". A
 slightly less accurate approach would be to count all occurrences of
 the word "deep" and divide it by the total number of words in
@@ -107,7 +107,7 @@ the corpus.
 This works fairly well, particularly for frequent
 words. Moving on, we could attempt to estimate
 
-$$\hat{P}(\text{learning} \mid \text{deep}) = \frac{n(\text{deep, learning})}{n(\text{deep})},$$
+$$\hat{P}(\textrm{learning} \mid \textrm{deep}) = \frac{n(\textrm{deep, learning})}{n(\textrm{deep})},$$
 
 where $n(x)$ and $n(x, x')$ are the number of occurrences of singletons
 and consecutive word pairs, respectively.

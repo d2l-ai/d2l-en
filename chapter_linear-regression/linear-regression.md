@@ -104,10 +104,10 @@ The assumption of linearity means that
 the expected value of the target (price) can be expressed
 as a weighted sum of the features (area and age):
 
-$$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$
+$$\textrm{price} = w_{\textrm{area}} \cdot \textrm{area} + w_{\textrm{age}} \cdot \textrm{age} + b.$$
 :eqlabel:`eq_price-area`
 
-Here $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
+Here $w_{\textrm{area}}$ and $w_{\textrm{age}}$
 are called *weights*, and $b$ is called a *bias*
 (or *offset* or *intercept*).
 The weights determine the influence of each feature on our prediction.
@@ -256,7 +256,7 @@ and setting it equal to zero yields:
 $$\begin{aligned}
     \partial_{\mathbf{w}} \|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2 =
     2 \mathbf{X}^\top (\mathbf{X} \mathbf{w} - \mathbf{y}) = 0
-    \text{ and hence }
+    \textrm{ and hence }
     \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}.
 \end{aligned}$$
 
@@ -568,7 +568,7 @@ is to assume that observations arise from noisy measurements,
 where the noise $\epsilon$ follows the normal distribution 
 $\mathcal{N}(0, \sigma^2)$:
 
-$$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
+$$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \textrm{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
 
 Thus, we can now write out the *likelihood*
 of seeing a particular $y$ for a given $\mathbf{x}$ via
@@ -740,7 +740,7 @@ and ultimately, evaluation on previously unseen data.
 1. Assume that we want to design a neural network with two layers by composing two linear layers. That is, the output of the first layer becomes the input of the second layer. Why would such a naive composition not work?
 1. What happens if you want to use regression for realistic price estimation of houses or stock prices?
     1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
-    1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \text{price}$?
+    1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \textrm{price}$?
     1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock? For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
 1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
     1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.

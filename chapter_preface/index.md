@@ -34,7 +34,7 @@ we can now build cars that drive themselves
 with more autonomy than ever before
 (though less autonomy than some companies might have you believe),
 dialogue systems that debug code by asking clarifying questions,
-and software agents beating the best human players in the world at board games like Go, a feat once thought to be decades away.
+and software agents beating the best human players in the world at board games such as Go, a feat once thought to be decades away.
 Already, these tools exert ever-wider influence on industry and society,
 changing the way movies are made, diseases are diagnosed,
 and playing a growing role in basic sciences---from astrophysics, to climate modeling, to weather prediction, to biomedicine.
@@ -49,7 +49,7 @@ teaching you the *concepts*, the *context*, and the *code*.
 ### One Medium Combining Code, Math, and HTML
 
 For any computing technology to reach its full impact,
-it must be well-understood, well-documented, and supported by
+it must be well understood, well documented, and supported by
 mature, well-maintained tools.
 The key ideas should be clearly distilled,
 minimizing the onboarding time needed
@@ -99,7 +99,7 @@ and (iii) interleaved exposition of
 the quality one expects of a textbook 
 with the clean runnable code
 that one expects of a hands-on tutorial.
-We found plenty of code examples for
+We found plenty of code examples illustrating
 how to use a given deep learning framework
 (e.g., how to do basic numerical computing with matrices in TensorFlow)
 or for implementing particular techniques

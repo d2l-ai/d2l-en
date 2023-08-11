@@ -159,7 +159,7 @@ into a fixed-shape *context variable* $\mathbf{c}$ (see :numref:`fig_seq2seq`).
 
 Consider a single sequence example (batch size 1).
 Suppose that the input sequence is $x_1, \ldots, x_T$, 
-such that $x_t$ is the $t^{\mathrm{th}}$ token.
+such that $x_t$ is the $t^{\textrm{th}}$ token.
 At time step $t$, the RNN transforms
 the input feature vector $\mathbf{x}_t$ for $x_t$
 and the hidden state $\mathbf{h} _{t-1}$ 
@@ -200,7 +200,7 @@ the size of the input vocabulary (`vocab_size`)
 and number of columns corresponds to 
 the feature vector's dimension (`embed_size`).
 For any input token index $i$,
-the embedding layer fetches the $i^{\mathrm{th}}$ row 
+the embedding layer fetches the $i^{\textrm{th}}$ row 
 (starting from 0) of the weight matrix
 to return its feature vector.
 Here we implement the encoder with a multilayer GRU.
@@ -796,12 +796,12 @@ to the number of $n$-grams in the predicted sequence.
 To explain, given a target sequence $A$, $B$, $C$, $D$, $E$, $F$,
 and a predicted sequence $A$, $B$, $B$, $C$, $D$,
 we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
-Besides, let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
+Besides, let $\textrm{len}_{\textrm{label}}$ and $\textrm{len}_{\textrm{pred}}$
 be the numbers of tokens in the target sequence 
 and the predicted sequence, respectively.
 Then, BLEU is defined as
 
-$$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
+$$ \exp\left(\min\left(0, 1 - \frac{\textrm{len}_{\textrm{label}}}{\textrm{len}_{\textrm{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
 :eqlabel:`eq_bleu`
 
 where $k$ is the longest $n$-grams for matching.

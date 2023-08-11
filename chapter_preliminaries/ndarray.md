@@ -89,7 +89,7 @@ In the one-dimensional case, i.e., when only one axis is needed for the data,
 a tensor is called a *vector*.
 With two axes, a tensor is called a *matrix*.
 With $k > 2$ axes, we drop the specialized names
-and just refer to the object as a $k^\mathrm{th}$ *order tensor*.
+and just refer to the object as a $k^\textrm{th}$ *order tensor*.
 
 :begin_tab:`mxnet`
 MXNet provides a variety of functions 
@@ -367,7 +367,7 @@ via slicing (e.g., `X[start:stop]`),
 where the returned value includes 
 the first index (`start`) *but not the last* (`stop`).
 Finally, when only one index (or slice)
-is specified for a $k^\mathrm{th}$ order tensor,
+is specified for a $k^\textrm{th}$ order tensor,
 it is applied along axis 0.
 Thus, in the following code,
 [**`[-1]` selects the last row and `[1:3]`
@@ -498,7 +498,7 @@ and $\mathbf{v}$ *of the same shape*,
 and a binary operator $f$, we can produce a vector
 $\mathbf{c} = F(\mathbf{u},\mathbf{v})$
 by setting $c_i \gets f(u_i, v_i)$ for all $i$,
-where $c_i, u_i$, and $v_i$ are the $i^\mathrm{th}$ elements
+where $c_i, u_i$, and $v_i$ are the $i^\textrm{th}$ elements
 of vectors $\mathbf{c}, \mathbf{u}$, and $\mathbf{v}$.
 Here, we produced the vector-valued
 $F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$

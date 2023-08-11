@@ -53,14 +53,14 @@ Formally, suppose that we have a minibatch input
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
 (number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
 At the same time step, 
-let the hidden state of the $l^\mathrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
+let the hidden state of the $l^\textrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
 (number of hidden units: $h$)
 and the output layer variable be 
 $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ 
 (number of outputs: $q$).
 Setting $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
 the hidden state of
-the $l^\mathrm{th}$ hidden layer
+the $l^\textrm{th}$ hidden layer
 that uses the activation function $\phi_l$
 is calculated as follows:
 
@@ -69,11 +69,11 @@ $$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \math
 
 where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with
 the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, 
-are the model parameters of the $l^\mathrm{th}$ hidden layer.
+are the model parameters of the $l^\textrm{th}$ hidden layer.
 
 In the end, the calculation of the output layer 
 is only based on the hidden state 
-of the final $L^\mathrm{th}$ hidden layer:
+of the final $L^\textrm{th}$ hidden layer:
 
 $$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$
 

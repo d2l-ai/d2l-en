@@ -418,7 +418,7 @@ Dimensionality and storage for networks are automatically inferred
    with an average over the loss on the minibatch?
 1. Review the framework documentation to see which loss functions are provided. In particular,
    replace the squared loss with Huber's robust loss function. That is, use the loss function
-   $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \text{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \text{ otherwise}\end{cases}$$
+   $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \textrm{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \textrm{ otherwise}\end{cases}$$
 1. How do you access the gradient of the weights of the model?
 1. What is the effect on the solution if you change the learning rate and the number of epochs? Does it keep on improving?
 1. How does the solution change as you vary the amount of data generated?

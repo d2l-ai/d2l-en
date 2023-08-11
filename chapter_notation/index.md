@@ -25,7 +25,7 @@ refers specifically to the symbol $\mathbb{Z}$.
 * $\mathbf{X}$: a matrix
 * $\mathsf{X}$: a general tensor
 * $\mathbf{I}$: the identity matrix (of some given dimension), i.e., a square matrix with $1$ on all diagonal entries and $0$ on all off-diagonals
-* $x_i$, $[\mathbf{x}]_i$: the $i^\mathrm{th}$ element of vector $\mathbf{x}$
+* $x_i$, $[\mathbf{x}]_i$: the $i^\textrm{th}$ element of vector $\mathbf{x}$
 * $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: the element of matrix $\mathbf{X}$ at row $i$ and column $j$.
 
 
@@ -64,7 +64,7 @@ refers specifically to the symbol $\mathbb{Z}$.
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: inner (dot) product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements
-* $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
+* $\stackrel{\textrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
 
 
 
@@ -90,11 +90,11 @@ refers specifically to the symbol $\mathbb{Z}$.
 * $X \perp Y$: random variables $X$ and $Y$ are independent
 * $X \perp Y \mid Z$: random variables  $X$  and  $Y$ are conditionally independent given $Z$
 * $\sigma_X$: standard deviation of random variable $X$
-* $\mathrm{Var}(X)$: variance of random variable $X$, equal to $\sigma^2_X$
-* $\mathrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
-* $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
+* $\textrm{Var}(X)$: variance of random variable $X$, equal to $\sigma^2_X$
+* $\textrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
+* $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\textrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: entropy of random variable $X$
-* $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
+* $D_{\textrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
 
 
 

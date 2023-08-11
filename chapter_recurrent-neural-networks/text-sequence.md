@@ -259,7 +259,7 @@ Transformer-based neural models.
 If you look further down the list,
 you will notice
 that word frequency decays quickly.
-The $10^{\mathrm{th}}$ most frequent word
+The $10^{\textrm{th}}$ most frequent word
 is less than $1/5$ as common as the most popular.
 Word frequency tends to follow a power law distribution
 (specifically the Zipfian) as we go down the ranks.
@@ -276,7 +276,7 @@ After dealing with the first few words as exceptions,
 all the remaining words roughly follow a straight line on a log-log plot.
 This phenomena is captured by *Zipf's law*,
 which states that the frequency $n_i$
-of the $i^\mathrm{th}$ most frequent word is:
+of the $i^\textrm{th}$ most frequent word is:
 
 $$n_i \propto \frac{1}{i^\alpha},$$
 :eqlabel:`eq_zipf_law`

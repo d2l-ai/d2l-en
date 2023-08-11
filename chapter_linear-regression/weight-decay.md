@@ -225,7 +225,7 @@ through a simple synthetic example.
 
 First, we [**generate some data as before**]:
 
-(**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
+(**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \textrm{ where }
 \epsilon \sim \mathcal{N}(0, 0.01^2).$$**)
 
 In this synthetic dataset, our label is given 

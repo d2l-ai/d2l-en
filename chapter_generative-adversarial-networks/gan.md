@@ -36,7 +36,7 @@ which is just feeding $\mathbf x'=G(\mathbf z)$ into the discriminator but givin
 
 To sum up, $D$ and $G$ are playing a "minimax" game with the comprehensive objective function:
 
-$$\min_D \max_G \{ -E_{x \sim \text{Data}} \log D(\mathbf x) - E_{z \sim \text{Noise}} \log(1 - D(G(\mathbf z))) \}.$$
+$$\min_D \max_G \{ -E_{x \sim \textrm{Data}} \log D(\mathbf x) - E_{z \sim \textrm{Noise}} \log(1 - D(G(\mathbf z))) \}.$$
 
 
 

@@ -135,7 +135,7 @@ Every second, the microphone will collect roughly
 44,000 samples.
 Each sample is a measurement of the amplitude of the sound wave.
 What rule could map reliably from a snippet of raw audio to confident predictions
-$\{\text{yes}, \text{no}\}$
+$\{\textrm{yes}, \textrm{no}\}$
 about whether the snippet contains the wake word?
 If you are stuck, do not worry.
 We do not know how to write such a program from scratch either.
@@ -167,7 +167,7 @@ with respect to a chosen performance measure.
 You can think of the parameters as knobs that we can turn,
 manipulating the behavior of the program.
 Once the parameters are fixed, we call the program a *model*.
-The set of all distinct programs (input output mappings)
+The set of all distinct programs (input--output mappings)
 that we can produce just by manipulating the parameters
 is called a *family* of models.
 And the "meta-program" that uses our dataset
@@ -181,7 +181,7 @@ In this case,
 our model receives a snippet of audio as *input*,
 and the model
 generates a selection among
-$\{\text{yes}, \text{no}\}$ as *output*.
+$\{\textrm{yes}, \textrm{no}\}$ as *output*.
 If all goes according to plan
 the model's guesses will
 typically be correct as to
@@ -214,7 +214,7 @@ we *train* our model with data.
 As shown in :numref:`fig_ml_loop`, the training process usually looks like the following:
 
 1. Start off with a randomly initialized model that cannot do anything useful.
-1. Grab some of your data (e.g., audio snippets and corresponding $\{\text{yes}, \text{no}\}$ labels).
+1. Grab some of your data (e.g., audio snippets and corresponding $\{\textrm{yes}, \textrm{no}\}$ labels).
 1. Tweak the knobs to make the model perform better as assessed on those examples.
 1. Repeat Steps 2 and 3 until the model is awesome.
 
@@ -667,7 +667,7 @@ corresponding to the digits 0 through 9.
 The simplest form of classification is when there are only two classes,
 a problem which we call *binary classification*.
 For example, our dataset could consist of images of animals
-and our labels  might be the classes $\mathrm{\{cat, dog\}}$.
+and our labels  might be the classes $\textrm{\{cat, dog\}}$.
 Whereas in regression we sought a regressor to output a numerical value,
 in classification we seek a classifier,
 whose output is the predicted class assignment.
@@ -682,7 +682,7 @@ Given features of an example,
 our model assigns a probability
 to each possible class.
 Returning to our animal classification example
-where the classes are $\mathrm{\{cat, dog\}}$,
+where the classes are $\textrm{\{cat, dog\}}$,
 a classifier might see an image and output the probability
 that the image is a cat as 0.9.
 We can interpret this number by saying that the classifier
@@ -695,7 +695,7 @@ and we will discuss others in chapters dealing with more advanced topics.
 When we have more than two possible classes,
 we call the problem *multiclass classification*.
 Common examples include handwritten character recognition
-$\mathrm{\{0, 1, 2, ... 9, a, b, c, ...\}}$.
+$\textrm{\{0, 1, 2, ... 9, a, b, c, ...\}}$.
 While we attacked regression problems by trying
 to minimize the squared error loss function,
 the common loss function for classification problems is called *cross-entropy*,

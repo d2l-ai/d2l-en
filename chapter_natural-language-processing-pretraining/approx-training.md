@@ -178,7 +178,7 @@ the number of nodes (including both ends)
 on the path
 from the root node to the leaf node representing word $w$
 in the binary tree.
-Let $n(w,j)$ be the $j^\mathrm{th}$ node on this path,
+Let $n(w,j)$ be the $j^\textrm{th}$ node on this path,
 with its context word vector being
 $\mathbf{u}_{n(w, j)}$.
 For example,
@@ -186,11 +186,11 @@ $L(w_3) = 4$ in  :numref:`fig_hi_softmax`.
 Hierarchical softmax approximates the conditional probability in :eqref:`eq_skip-gram-softmax` as
 
 
-$$P(w_o \mid w_c) = \prod_{j=1}^{L(w_o)-1} \sigma\left( [\![  n(w_o, j+1) = \text{leftChild}(n(w_o, j)) ]\!] \cdot \mathbf{u}_{n(w_o, j)}^\top \mathbf{v}_c\right),$$
+$$P(w_o \mid w_c) = \prod_{j=1}^{L(w_o)-1} \sigma\left( [\![  n(w_o, j+1) = \textrm{leftChild}(n(w_o, j)) ]\!] \cdot \mathbf{u}_{n(w_o, j)}^\top \mathbf{v}_c\right),$$
 
 where function $\sigma$
 is defined in :eqref:`eq_sigma-f`,
-and $\text{leftChild}(n)$ is the left child node of node $n$: if $x$ is true, $[\![x]\!] = 1$; otherwise $[\![x]\!] = -1$.
+and $\textrm{leftChild}(n)$ is the left child node of node $n$: if $x$ is true, $[\![x]\!] = 1$; otherwise $[\![x]\!] = -1$.
 
 To illustrate,
 let's calculate
@@ -219,7 +219,7 @@ sum up to one:
 $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
 :eqlabel:`eq_hi-softmax-sum-one`
 
-Fortunately, since $L(w_o)-1$ is on the order of $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ due to the binary tree structure,
+Fortunately, since $L(w_o)-1$ is on the order of $\mathcal{O}(\textrm{log}_2|\mathcal{V}|)$ due to the binary tree structure,
 when the dictionary size $\mathcal{V}$ is huge,
 the computational cost for  each training step using hierarchical softmax
 is significantly reduced compared with that

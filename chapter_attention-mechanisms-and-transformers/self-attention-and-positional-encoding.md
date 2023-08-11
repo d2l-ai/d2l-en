@@ -246,9 +246,9 @@ The positional encoding outputs
 $\mathbf{X} + \mathbf{P}$
 using a positional embedding matrix 
 $\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
-whose element on the $i^\mathrm{th}$ row 
-and the $(2j)^\mathrm{th}$
-or the $(2j + 1)^\mathrm{th}$ column is
+whose element on the $i^\textrm{th}$ row 
+and the $(2j)^\textrm{th}$
+or the $(2j + 1)^\textrm{th}$ column is
 
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 :eqlabel:`eq_positional-encoding-def`
@@ -348,13 +348,13 @@ In the positional embedding matrix $\mathbf{P}$,
 and columns represent different positional encoding dimensions**].
 In the example below,
 we can see that
-the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
+the $6^{\textrm{th}}$ and the $7^{\textrm{th}}$
 columns of the positional embedding matrix 
 have a higher frequency than 
-the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$
+the $8^{\textrm{th}}$ and the $9^{\textrm{th}}$
 columns.
 The offset between 
-the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$ (same for the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$) columns
+the $6^{\textrm{th}}$ and the $7^{\textrm{th}}$ (same for the $8^{\textrm{th}}$ and the $9^{\textrm{th}}$) columns
 is due to the alternation of sine and cosine functions.
 
 ```{.python .input}

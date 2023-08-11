@@ -383,11 +383,11 @@ Note that there are many more ways of reducing resolution beyond pooling. For in
 
 1. Implement average pooling through a convolution. 
 1. Prove that max-pooling cannot be implemented through a convolution alone. 
-1. Max-pooling can be accomplished using ReLU operations, i.e., $\mathrm{ReLU}(x) = \max(0, x)$.
+1. Max-pooling can be accomplished using ReLU operations, i.e., $\textrm{ReLU}(x) = \max(0, x)$.
     1. Express $\max (a, b)$ by using only ReLU operations.
     1. Use this to implement max-pooling by means of convolutions and ReLU layers. 
     1. How many channels and layers do you need for a $2 \times 2$ convolution? How many for a $3 \times 3$ convolution?
-1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_\text{h}\times p_\text{w}$ with a padding of $(p_\text{h}, p_\text{w})$ and a stride of $(s_\text{h}, s_\text{w})$.
+1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_\textrm{h}\times p_\textrm{w}$ with a padding of $(p_\textrm{h}, p_\textrm{w})$ and a stride of $(s_\textrm{h}, s_\textrm{w})$.
 1. Why do you expect max-pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. We could use the softmax operation for pooling. Why might it not be so popular?

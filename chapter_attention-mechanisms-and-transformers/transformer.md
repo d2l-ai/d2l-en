@@ -94,7 +94,7 @@ Transformer architecture in :numref:`fig_transformer`.
 On a high level,
 the Transformer encoder is a stack of multiple identical layers,
 where each layer
-has two sublayers (either is denoted as $\mathrm{sublayer}$).
+has two sublayers (either is denoted as $\textrm{sublayer}$).
 The first
 is a multi-head self-attention pooling
 and the second is a positionwise feed-forward network.
@@ -107,8 +107,8 @@ a residual connection is employed
 around both sublayers.
 In the Transformer,
 for any input $\mathbf{x} \in \mathbb{R}^d$ at any position of the sequence,
-we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
-the residual connection $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
+we require that $\textrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
+the residual connection $\mathbf{x} + \textrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
 This addition from the residual connection is immediately
 followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
 As a result, the Transformer encoder outputs a $d$-dimensional vector representation

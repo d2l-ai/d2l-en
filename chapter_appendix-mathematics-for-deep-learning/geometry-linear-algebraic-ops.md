@@ -113,7 +113,7 @@ The dot product :eqref:`eq_dot_def` also admits a geometric interpretation: it i
 To start, let's consider two specific vectors:
 
 $$
-\mathbf{v} = (r,0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
+\mathbf{v} = (r,0) \; \textrm{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
 $$
 
 The vector $\mathbf{v}$ is length $r$ and runs parallel to the $x$-axis,
@@ -611,7 +611,7 @@ $$
 \end{bmatrix},
 $$
 
-has $\mathrm{rank}(B)=1$, since the two columns are linearly dependent,
+has $\textrm{rank}(B)=1$, since the two columns are linearly dependent,
 but either column by itself is not linearly dependent.
 For a more challenging example, we can consider
 
@@ -738,7 +738,7 @@ Even if $\mathbf{A}$ was a $1$ million by $1$ million matrix
 with only $5$ million non-zero entries
 (and thus we need only store those $5$ million),
 the inverse will typically have almost every entry non-negative,
-requiring us to store all $1\text{M}^2$ entries---that is $1$ trillion entries!
+requiring us to store all $1\textrm{M}^2$ entries---that is $1$ trillion entries!
 
 While we do not have time to dive all the way into the thorny numerical issues
 frequently encountered when working with linear algebra,
@@ -898,7 +898,7 @@ we have seen before can be expressed in this compressed tensor notation:
 * $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
 * $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
 * $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
-* $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
+* $\textrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
 
 In this way, we can replace a myriad of specialized notations with short tensor expressions.
 
@@ -1035,7 +1035,7 @@ $$
 \end{bmatrix}?
 $$
 2. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-3. Suppose that we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
+3. Suppose that we draw a shape in the plane with area $100\textrm{m}^2$.  What is the area after transforming the figure by the matrix
 $$
 \begin{bmatrix}
 2 & 3\\
@@ -1048,7 +1048,7 @@ $$
  * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}, \begin{pmatrix}0\\1\\-1\end{pmatrix}, \begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
 5. Suppose that you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a, b, c$, and $d$.  True or false: the determinant of such a matrix is always $0$?
 6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
-7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
+7. How can you write $\textrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/410)

@@ -319,9 +319,9 @@ with model selection.
 We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
-the $i^\mathrm{th}$ fold of the data
+the $i^\textrm{th}$ fold of the data
 in a $K$-fold cross-validation procedure.
-It proceeds by slicing out the $i^\mathrm{th}$ segment
+It proceeds by slicing out the $i^\textrm{th}$ segment
 as validation data and returning the rest as training data.
 Note that this is not the most efficient way of handling data
 and we would definitely do something much smarter

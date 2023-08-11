@@ -93,11 +93,11 @@ is slightly smaller than the input size.
 Because the kernel has width and height greater than $1$,
 we can only properly compute the cross-correlation
 for locations where the kernel fits wholly within the image,
-the output size is given by the input size $n_\text{h} \times n_\text{w}$
-minus the size of the convolution kernel $k_\text{h} \times k_\text{w}$
+the output size is given by the input size $n_\textrm{h} \times n_\textrm{w}$
+minus the size of the convolution kernel $k_\textrm{h} \times k_\textrm{w}$
 via
 
-$$(n_\text{h}-k_\text{h}+1) \times (n_\text{w}-k_\text{w}+1).$$
+$$(n_\textrm{h}-k_\textrm{h}+1) \times (n_\textrm{w}-k_\textrm{w}+1).$$
 
 This is the case since we need enough space
 to "shift" the convolution kernel across the image.

@@ -304,7 +304,7 @@ like price or temperature, where any two values
 sufficiently close together
 should be treated similarly.
 But this does not quite make sense. 
-The $45^{\mathrm{th}}$ and $46^{\mathrm{th}}$ words 
+The $45^{\textrm{th}}$ and $46^{\textrm{th}}$ words 
 in our vocabulary happen to be "their" and "said",
 whose meanings are not remotely similar.
 

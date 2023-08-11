@@ -82,11 +82,11 @@ We have two obvious choices.
 Perhaps the most natural impulse would be
 to choose $y \in \{1, 2, 3\}$,
 where the integers represent
-$\{\text{dog}, \text{cat}, \text{chicken}\}$ respectively.
+$\{\textrm{dog}, \textrm{cat}, \textrm{chicken}\}$ respectively.
 This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
 say if we were trying to predict
-$\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
+$\{\textrm{baby}, \textrm{toddler}, \textrm{adolescent}, \textrm{young adult}, \textrm{adult}, \textrm{geriatric}\}$,
 then it might even make sense to cast this as
 an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem
 and keep the labels in this format.
@@ -200,7 +200,7 @@ This process is called *normalization*.
 Putting these two pieces together
 gives us the *softmax* function:
 
-$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.$$
+$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \quad \textrm{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.$$
 :eqlabel:`eq_softmax_y_and_o`
 
 Note that the largest coordinate of $\mathbf{o}$
@@ -278,7 +278,7 @@ for the mean squared error loss in
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
 which we can interpret as (estimated) conditional probabilities
 of each class, given any input $\mathbf{x}$,
-such as $\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
+such as $\hat{y}_1$ = $P(y=\textrm{cat} \mid \mathbf{x})$.
 In the following we assume that for a dataset
 with features $\mathbf{X}$ the labels $\mathbf{Y}$
 are represented using a one-hot encoding label vector.
@@ -455,7 +455,7 @@ then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $P$ *to* $Q$, denoted $H(P, Q)$,
 is the expected surprisal of an observer with subjective probabilities $Q$
 upon seeing data that was actually generated according to probabilities $P$.
-This is given by $H(P, Q) \stackrel{\mathrm{def}}{=} \sum_j - P(j) \log Q(j)$.
+This is given by $H(P, Q) \stackrel{\textrm{def}}{=} \sum_j - P(j) \log Q(j)$.
 The lowest possible cross-entropy is achieved when $P=Q$.
 In this case, the cross-entropy from $P$ to $Q$ is $H(P, P)= H(P)$.
 
@@ -524,19 +524,19 @@ that can be executed most efficiently on modern GPUs.
 1. When encoding signals transmitted over a physical wire, engineers do not always use binary codes. For instance, [PAM-3](https://en.wikipedia.org/wiki/Ternary_signal) uses three signal levels $\{-1, 0, 1\}$ as opposed to two levels $\{0, 1\}$. How many ternary units do you need to transmit an integer in the range $\{0, \ldots, 7\}$? Why might this be a better idea in terms of electronics?
 1. The [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
 a logistic model to capture preferences. For a user to choose between apples and oranges one
-assumes scores $o_{\mathrm{apple}}$ and $o_{\mathrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
+assumes scores $o_{\textrm{apple}}$ and $o_{\textrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
 the item with the largest score is the most likely one to be chosen :cite:`Bradley.Terry.1952`.
     1. Prove that softmax satisfies this requirement.
     1. What happens if you want to allow for a default option of choosing neither apples nor oranges? Hint: now the user has three choices.
-1. Softmax gets its name from the following mapping: $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
-    1. Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
+1. Softmax gets its name from the following mapping: $\textrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
+    1. Prove that $\textrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     1. How small can you make the difference between both functions? Hint: without loss of
     generality you can set $b = 0$ and $a \geq b$.
-    1. Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
-    1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
+    1. Prove that this holds for $\lambda^{-1} \textrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
+    1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \textrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
     1. Construct an analogous softmin function.
     1. Extend this to more than two numbers.
-1. The function $g(\mathbf{x}) \stackrel{\mathrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
+1. The function $g(\mathbf{x}) \stackrel{\textrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
     1. Prove that the function is convex. Hint: to do so, use the fact that the first derivative amounts to the probabilities from the softmax function and show that the second derivative is the variance.
     1. Show that $g$ is translation invariant, i.e., $g(\mathbf{x} + b) = g(\mathbf{x})$.
     1. What happens if some of the coordinates $x_i$ are very large? What happens if they're all very small?

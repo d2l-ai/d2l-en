@@ -142,7 +142,7 @@ if every argument is a very large negative number, we will get *underflow*.
 For instance, single precision floating point numbers approximately
 cover the range of $10^{-38}$ to $10^{38}$. As such, if the largest term in $\mathbf{o}$
 lies outside the interval $[-90, 90]$, the result will not be stable.
-A way round this problem is to subtract $\bar{o} \stackrel{\mathrm{def}}{=} \max_k o_k$ from
+A way round this problem is to subtract $\bar{o} \stackrel{\textrm{def}}{=} \max_k o_k$ from
 all entries:
 
 $$

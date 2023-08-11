@@ -366,7 +366,7 @@ by the ratio of the
 probability
 that it would have been drawn from the correct distribution to that from the wrong one:
 
-$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
+$$\beta_i \stackrel{\textrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
 Plugging in the weight $\beta_i$ for
 each data example $(\mathbf{x}_i, y_i)$
@@ -417,7 +417,7 @@ Now denote by $z$ labels that are $1$
 for data drawn from $p$ and $-1$ for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
-$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
+$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \textrm{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
 Thus, if we use a logistic regression approach,
 where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parametrized function),
@@ -488,7 +488,7 @@ $$
 Here, our importance weights will correspond to the
 label likelihood ratios
 
-$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
+$$\beta_i \stackrel{\textrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
 One nice thing about label shift is that
 if we have a reasonably good model
@@ -517,7 +517,7 @@ that we see in the wild,
 unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our model's predictions
 at test time together, yielding the mean model outputs $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
-where the $i^\mathrm{th}$ element $\mu(\hat{y}_i)$
+where the $i^\textrm{th}$ element $\mu(\hat{y}_i)$
 is the fraction of total predictions on the test set
 where our model predicted $i$.
 
@@ -532,7 +532,7 @@ by solving a simple linear system
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
 
 because as an estimate $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ holds for all $1 \leq i \leq k$,
-where $p(y_j)$ is the $j^\mathrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
+where $p(y_j)$ is the $j^\textrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
 If our classifier is sufficiently accurate to begin with,
 then the confusion matrix $\mathbf{C}$ will be invertible,
 and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
@@ -582,7 +582,7 @@ In *batch learning*, we have access to training features and labels $\{(\mathbf{
 Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$. Only once we have done this do we observe $y_i$ and so receive a reward or incur a loss, given our decision.
 Many real problems fall into this category. For example, we need to predict tomorrow's stock price, which allows us to trade based on that estimate and at the end of the day we find out whether our estimate made us a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations:
 
-$$\begin{aligned}&\text{model } f_t \longrightarrow \text{data }  \mathbf{x}_t \longrightarrow \text{estimate } f_t(\mathbf{x}_t) \longrightarrow\\ \text{obs}&\text{ervation } y_t \longrightarrow \text{loss } l(y_t, f_t(\mathbf{x}_t)) \longrightarrow \text{model } f_{t+1}\end{aligned}$$
+$$\begin{aligned}&\textrm{model } f_t \longrightarrow \textrm{data }  \mathbf{x}_t \longrightarrow \textrm{estimate } f_t(\mathbf{x}_t) \longrightarrow\\ \textrm{obs}&\textrm{ervation } y_t \longrightarrow \textrm{loss } l(y_t, f_t(\mathbf{x}_t)) \longrightarrow \textrm{model } f_{t+1}\end{aligned}$$
 
 ### Bandits
 

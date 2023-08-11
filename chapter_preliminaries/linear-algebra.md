@@ -129,7 +129,7 @@ minutes of exercise per day, etc.
 We denote vectors by bold lowercase letters, 
 (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$).
 
-Vectors are implemented as $1^{\mathrm{st}}$-order tensors.
+Vectors are implemented as $1^{\textrm{st}}$-order tensors.
 In general, such tensors can have arbitrary lengths,
 subject to memory limitations. Caution: in Python, as in most programming languages, vector indices start at $0$, also known as *zero-based indexing*, whereas in linear algebra subscripts begin at $1$ (one-based indexing).
 
@@ -207,9 +207,9 @@ to the number of components.
 
 ## Matrices
 
-Just as scalars are $0^{\mathrm{th}}$-order tensors
-and vectors are $1^{\mathrm{st}}$-order tensors,
-matrices are $2^{\mathrm{nd}}$-order tensors.
+Just as scalars are $0^{\textrm{th}}$-order tensors
+and vectors are $1^{\textrm{st}}$-order tensors,
+matrices are $2^{\textrm{nd}}$-order tensors.
 We denote matrices by bold capital letters
 (e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
 and represent them in code by tensors with two axes.
@@ -222,14 +222,14 @@ Visually, we can illustrate any matrix as a table.
 To refer to an individual element,
 we subscript both the row and column indices, e.g.,
 $a_{ij}$ is the value that belongs to $\mathbf{A}$'s
-$i^{\mathrm{th}}$ row and $j^{\mathrm{th}}$ column:
+$i^{\textrm{th}}$ row and $j^{\textrm{th}}$ column:
 
 $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \\ \end{bmatrix}.$$
 :eqlabel:`eq_matrix_def`
 
 
 In code, we represent a matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
-by a $2^{\mathrm{nd}}$-order tensor with shape ($m$, $n$).
+by a $2^{\textrm{nd}}$-order tensor with shape ($m$, $n$).
 [**We can convert any appropriately sized $m \times n$ tensor 
 into an $m \times n$ matrix**] 
 by passing the desired shape to `reshape`:
@@ -331,7 +331,7 @@ with only scalars, vectors, and matrices,
 eventually you may need to work with 
 higher-order [**tensors**].
 Tensors (**give us a generic way of describing 
-extensions to $n^{\mathrm{th}}$-order arrays.**)
+extensions to $n^{\textrm{th}}$-order arrays.**)
 We call software objects of the *tensor class* "tensors"
 precisely because they too can have arbitrary numbers of axes.
 While it may be confusing to use the word
@@ -347,13 +347,13 @@ follows naturally from that of matrices.
 
 Tensors will become more important 
 when we start working with images.
-Each image arrives as a $3^{\mathrm{rd}}$-order tensor
+Each image arrives as a $3^{\textrm{rd}}$-order tensor
 with axes corresponding to the height, width, and *channel*.
 At each spatial location, the intensities 
 of each color (red, green, and blue)
 are stacked along the channel. 
 Furthermore, a collection of images is represented 
-in code by a $4^{\mathrm{th}}$-order tensor,
+in code by a $4^{\textrm{th}}$-order tensor,
 where distinct images are indexed
 along the first axis.
 Higher-order tensors are constructed, as were vectors and matrices,
@@ -735,12 +735,12 @@ $$\mathbf{A}=
 \end{bmatrix},$$
 
 where each $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
-is a row vector representing the $i^\mathrm{th}$ row 
+is a row vector representing the $i^\textrm{th}$ row 
 of the matrix $\mathbf{A}$.
 
 [**The matrix--vector product $\mathbf{A}\mathbf{x}$
 is simply a column vector of length $m$,
-whose $i^\mathrm{th}$ element is the dot product 
+whose $i^\textrm{th}$ element is the dot product 
 $\mathbf{a}^\top_i \mathbf{x}$:**]
 
 $$
@@ -846,10 +846,10 @@ $$\mathbf{A}=\begin{bmatrix}
 
 
 Let $\mathbf{a}^\top_{i} \in \mathbb{R}^k$ denote 
-the row vector representing the $i^\mathrm{th}$ row 
+the row vector representing the $i^\textrm{th}$ row 
 of the matrix $\mathbf{A}$
 and let $\mathbf{b}_{j} \in \mathbb{R}^k$ denote 
-the column vector from the $j^\mathrm{th}$ column 
+the column vector from the $j^\textrm{th}$ column 
 of the matrix $\mathbf{B}$:
 
 $$\mathbf{A}=
@@ -868,8 +868,8 @@ $$
 To form the matrix product $\mathbf{C} \in \mathbb{R}^{n \times m}$,
 we simply compute each element $c_{ij}$
 as the dot product between 
-the $i^{\mathrm{th}}$ row of $\mathbf{A}$
-and the $j^{\mathrm{th}}$ column of $\mathbf{B}$,
+the $i^{\textrm{th}}$ row of $\mathbf{A}$
+and the $j^{\textrm{th}}$ column of $\mathbf{B}$,
 i.e., $\mathbf{a}^\top_i \mathbf{b}_j$:
 
 $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
@@ -949,7 +949,7 @@ to a scalar and satisfies the following three properties:
    norms satisfy the triangle inequality:
    $$\|\mathbf{x} + \mathbf{y}\| \leq \|\mathbf{x}\| + \|\mathbf{y}\|.$$
 3. The norm of a vector is nonnegative and it only vanishes if the vector is zero:
-   $$\|\mathbf{x}\| > 0 \text{ for all } \mathbf{x} \neq 0.$$
+   $$\|\mathbf{x}\| > 0 \textrm{ for all } \mathbf{x} \neq 0.$$
 
 Many functions are valid norms and different norms 
 encode different notions of size. 
@@ -1035,7 +1035,7 @@ which is much easier to compute**] and defined as
 the square root of the sum of the squares 
 of a matrix's elements:
 
-[**$$\|\mathbf{X}\|_\text{F} = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
+[**$$\|\mathbf{X}\|_\textrm{F} = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
 The Frobenius norm behaves as if it were 
 an $\ell_2$ norm of a matrix-shaped vector.

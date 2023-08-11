@@ -10,9 +10,9 @@ Recall the example of a convolution in :numref:`fig_correlation`.
 The input had both a height and width of 3
 and the convolution kernel had both a height and width of 2,
 yielding an output representation with dimension $2\times2$.
-Assuming that the input shape is $n_\text{h}\times n_\text{w}$
-and the convolution kernel shape is $k_\text{h}\times k_\text{w}$,
-the output shape will be $(n_\text{h}-k_\text{h}+1) \times (n_\text{w}-k_\text{w}+1)$: 
+Assuming that the input shape is $n_\textrm{h}\times n_\textrm{w}$
+and the convolution kernel shape is $k_\textrm{h}\times k_\textrm{w}$,
+the output shape will be $(n_\textrm{h}-k_\textrm{h}+1) \times (n_\textrm{w}-k_\textrm{w}+1)$: 
 we can only shift the convolution kernel so far until it runs out
 of pixels to apply the convolution to. 
 
@@ -86,26 +86,26 @@ The shaded portions are the first output element as well as the input and kernel
 ![Two-dimensional cross-correlation with padding.](../img/conv-pad.svg)
 :label:`img_conv_pad`
 
-In general, if we add a total of $p_\text{h}$ rows of padding
+In general, if we add a total of $p_\textrm{h}$ rows of padding
 (roughly half on top and half on bottom)
-and a total of $p_\text{w}$ columns of padding
+and a total of $p_\textrm{w}$ columns of padding
 (roughly half on the left and half on the right),
 the output shape will be
 
-$$(n_\text{h}-k_\text{h}+p_\text{h}+1)\times(n_\text{w}-k_\text{w}+p_\text{w}+1).$$
+$$(n_\textrm{h}-k_\textrm{h}+p_\textrm{h}+1)\times(n_\textrm{w}-k_\textrm{w}+p_\textrm{w}+1).$$
 
 This means that the height and width of the output
-will increase by $p_\text{h}$ and $p_\text{w}$, respectively.
+will increase by $p_\textrm{h}$ and $p_\textrm{w}$, respectively.
 
-In many cases, we will want to set $p_\text{h}=k_\text{h}-1$ and $p_\text{w}=k_\text{w}-1$
+In many cases, we will want to set $p_\textrm{h}=k_\textrm{h}-1$ and $p_\textrm{w}=k_\textrm{w}-1$
 to give the input and output the same height and width.
 This will make it easier to predict the output shape of each layer
 when constructing the network.
-Assuming that $k_\text{h}$ is odd here,
-we will pad $p_\text{h}/2$ rows on both sides of the height.
-If $k_\text{h}$ is even, one possibility is to
-pad $\lceil p_\text{h}/2\rceil$ rows on the top of the input
-and $\lfloor p_\text{h}/2\rfloor$ rows on the bottom.
+Assuming that $k_\textrm{h}$ is odd here,
+we will pad $p_\textrm{h}/2$ rows on both sides of the height.
+If $k_\textrm{h}$ is even, one possibility is to
+pad $\lceil p_\textrm{h}/2\rceil$ rows on the top of the input
+and $\lfloor p_\textrm{h}/2\rfloor$ rows on the bottom.
 We will pad both sides of the width in the same way.
 
 CNNs commonly use convolution kernels
@@ -273,17 +273,17 @@ there is no output because the input element cannot fill the window
 ![Cross-correlation with strides of 3 and 2 for height and width, respectively.](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
-In general, when the stride for the height is $s_\text{h}$
-and the stride for the width is $s_\text{w}$, the output shape is
+In general, when the stride for the height is $s_\textrm{h}$
+and the stride for the width is $s_\textrm{w}$, the output shape is
 
-$$\lfloor(n_\text{h}-k_\text{h}+p_\text{h}+s_\text{h})/s_\text{h}\rfloor \times \lfloor(n_\text{w}-k_\text{w}+p_\text{w}+s_\text{w})/s_\text{w}\rfloor.$$
+$$\lfloor(n_\textrm{h}-k_\textrm{h}+p_\textrm{h}+s_\textrm{h})/s_\textrm{h}\rfloor \times \lfloor(n_\textrm{w}-k_\textrm{w}+p_\textrm{w}+s_\textrm{w})/s_\textrm{w}\rfloor.$$
 
-If we set $p_\text{h}=k_\text{h}-1$ and $p_\text{w}=k_\text{w}-1$,
+If we set $p_\textrm{h}=k_\textrm{h}-1$ and $p_\textrm{w}=k_\textrm{w}-1$,
 then the output shape can be simplified to
-$\lfloor(n_\text{h}+s_\text{h}-1)/s_\text{h}\rfloor \times \lfloor(n_\text{w}+s_\text{w}-1)/s_\text{w}\rfloor$.
+$\lfloor(n_\textrm{h}+s_\textrm{h}-1)/s_\textrm{h}\rfloor \times \lfloor(n_\textrm{w}+s_\textrm{w}-1)/s_\textrm{w}\rfloor$.
 Going a step further, if the input height and width
 are divisible by the strides on the height and width,
-then the output shape will be $(n_\text{h}/s_\text{h}) \times (n_\text{w}/s_\text{w})$.
+then the output shape will be $(n_\textrm{h}/s_\textrm{h}) \times (n_\textrm{w}/s_\textrm{w})$.
 
 Below, we [**set the strides on both the height and width to 2**],
 thus halving the input height and width.
@@ -341,9 +341,9 @@ comp_conv2d(conv2d, X).shape
 
 ## Summary and Discussion
 
-Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_\text{h}, p_\text{w})$ padding. Most commonly we set $p_\text{h} = p_\text{w}$, in which case we simply state that we choose padding $p$. 
+Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_\textrm{h}, p_\textrm{w})$ padding. Most commonly we set $p_\textrm{h} = p_\textrm{w}$, in which case we simply state that we choose padding $p$. 
 
-A similar convention applies to strides. When horizontal stride $s_\text{h}$ and vertical stride $s_\text{w}$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
+A similar convention applies to strides. When horizontal stride $s_\textrm{h}$ and vertical stride $s_\textrm{w}$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
 
 So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provided an extensive overview of those (albeit without a clear case for when to use nonzero paddings unless artifacts occur). 
 

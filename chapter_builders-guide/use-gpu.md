@@ -133,7 +133,7 @@ will try to use all CPU cores.
 However, `gpu()` only represents one card
 and the corresponding memory.
 If there are multiple GPUs, we use `gpu(i)`
-to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
+to represent the $i^\textrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu(0)` and `gpu()` are equivalent.
 :end_tab:
 
@@ -146,7 +146,7 @@ will try to use all CPU cores.
 However, a `gpu` device only represents one card
 and the corresponding memory.
 If there are multiple GPUs, we use `torch.device(f'cuda:{i}')`
-to represent the $i^\mathrm{th}$ GPU ($i$ starts at 0).
+to represent the $i^\textrm{th}$ GPU ($i$ starts at 0).
 Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
 

@@ -55,19 +55,19 @@ When the input data contains multiple channels,
 we need to construct a convolution kernel
 with the same number of input channels as the input data,
 so that it can perform cross-correlation with the input data.
-Assuming that the number of channels for the input data is $c_\text{i}$,
-the number of input channels of the convolution kernel also needs to be $c_\text{i}$. If our convolution kernel's window shape is $k_\text{h}\times k_\text{w}$,
-then when $c_\text{i}=1$, we can think of our convolution kernel
-as just a two-dimensional tensor of shape $k_\text{h}\times k_\text{w}$.
+Assuming that the number of channels for the input data is $c_\textrm{i}$,
+the number of input channels of the convolution kernel also needs to be $c_\textrm{i}$. If our convolution kernel's window shape is $k_\textrm{h}\times k_\textrm{w}$,
+then when $c_\textrm{i}=1$, we can think of our convolution kernel
+as just a two-dimensional tensor of shape $k_\textrm{h}\times k_\textrm{w}$.
 
-However, when $c_\text{i}>1$, we need a kernel
-that contains a tensor of shape $k_\text{h}\times k_\text{w}$ for *every* input channel. Concatenating these $c_\text{i}$ tensors together
-yields a convolution kernel of shape $c_\text{i}\times k_\text{h}\times k_\text{w}$.
-Since the input and convolution kernel each have $c_\text{i}$ channels,
+However, when $c_\textrm{i}>1$, we need a kernel
+that contains a tensor of shape $k_\textrm{h}\times k_\textrm{w}$ for *every* input channel. Concatenating these $c_\textrm{i}$ tensors together
+yields a convolution kernel of shape $c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$.
+Since the input and convolution kernel each have $c_\textrm{i}$ channels,
 we can perform a cross-correlation operation
 on the two-dimensional tensor of the input
 and the two-dimensional tensor of the convolution kernel
-for each channel, adding the $c_\text{i}$ results together
+for each channel, adding the $c_\textrm{i}$ results together
 (summing over the channels)
 to yield a two-dimensional tensor.
 This is the result of a two-dimensional cross-correlation
@@ -136,16 +136,16 @@ Instead, channels are optimized to be jointly useful.
 This means that rather than mapping a single channel to an edge detector, it may simply mean 
 that some direction in channel space corresponds to detecting edges.
 
-Denote by $c_\text{i}$ and $c_\text{o}$ the number
+Denote by $c_\textrm{i}$ and $c_\textrm{o}$ the number
 of input and output channels, respectively,
-and by $k_\text{h}$ and $k_\text{w}$ the height and width of the kernel.
+and by $k_\textrm{h}$ and $k_\textrm{w}$ the height and width of the kernel.
 To get an output with multiple channels,
 we can create a kernel tensor
-of shape $c_\text{i}\times k_\text{h}\times k_\text{w}$
+of shape $c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$
 for *every* output channel.
 We concatenate them on the output channel dimension,
 so that the shape of the convolution kernel
-is $c_\text{o}\times c_\text{i}\times k_\text{h}\times k_\text{w}$.
+is $c_\textrm{o}\times c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$.
 In cross-correlation operations,
 the result on each output channel is calculated
 from the convolution kernel corresponding to that output channel
@@ -188,7 +188,7 @@ corr2d_multi_in_out(X, K)
 ## $1\times 1$ Convolutional Layer
 :label:`subsec_1x1`
 
-At first, a [**$1 \times 1$ convolution**], i.e., $k_\text{h} = k_\text{w} = 1$,
+At first, a [**$1 \times 1$ convolution**], i.e., $k_\textrm{h} = k_\textrm{w} = 1$,
 does not seem to make much sense.
 After all, a convolution correlates adjacent pixels.
 A $1 \times 1$ convolution obviously does not.
@@ -213,10 +213,10 @@ from a linear combination of elements *at the same position*
 in the input image.
 You could think of the $1\times 1$ convolutional layer
 as constituting a fully connected layer applied at every single pixel location
-to transform the $c_\text{i}$ corresponding input values into $c_\text{o}$ output values.
+to transform the $c_\textrm{i}$ corresponding input values into $c_\textrm{o}$ output values.
 Because this is still a convolutional layer,
 the weights are tied across pixel location.
-Thus the $1\times 1$ convolutional layer requires $c_\text{o}\times c_\text{i}$ weights
+Thus the $1\times 1$ convolutional layer requires $c_\textrm{o}\times c_\textrm{i}$ weights
 (plus the bias). Also note that convolutional layers are typically followed 
 by nonlinearities. This ensures that $1 \times 1$ convolutions cannot simply be 
 folded into other convolutions. 
@@ -277,7 +277,7 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 
 Channels allow us to combine the best of both worlds: MLPs that allow for significant nonlinearities and convolutions that allow for *localized* analysis of features. In particular, channels allow the CNN to reason with multiple features, such as edge and shape detectors at the same time. They also offer a practical trade-off between the drastic parameter reduction arising from translation invariance and locality, and the need for expressive and diverse models in computer vision. 
 
-Note, though, that this flexibility comes at a price. Given an image of size $(h \times w)$, the cost for computing a $k \times k$ convolution is $\mathcal{O}(h \cdot w \cdot k^2)$. For $c_\text{i}$ and $c_\text{o}$ input and output channels respectively this increases to $\mathcal{O}(h \cdot w \cdot k^2 \cdot c_\text{i} \cdot c_\text{o})$. For a $256 \times 256$ pixel image with a $5 \times 5$ kernel and $128$ input and output channels respectively this amounts to over 53 billion operations (we count multiplications and additions separately). Later on we will encounter effective strategies to cut down on the cost, e.g., by requiring the channel-wise operations to be block-diagonal, leading to architectures such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
+Note, though, that this flexibility comes at a price. Given an image of size $(h \times w)$, the cost for computing a $k \times k$ convolution is $\mathcal{O}(h \cdot w \cdot k^2)$. For $c_\textrm{i}$ and $c_\textrm{o}$ input and output channels respectively this increases to $\mathcal{O}(h \cdot w \cdot k^2 \cdot c_\textrm{i} \cdot c_\textrm{o})$. For a $256 \times 256$ pixel image with a $5 \times 5$ kernel and $128$ input and output channels respectively this amounts to over 53 billion operations (we count multiplications and additions separately). Later on we will encounter effective strategies to cut down on the cost, e.g., by requiring the channel-wise operations to be block-diagonal, leading to architectures such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
 
 ## Exercises
 
@@ -286,14 +286,14 @@ Note, though, that this flexibility comes at a price. Given an image of size $(h
     1. Prove that the result of the operation can be expressed by a single convolution.
     1. What is the dimensionality of the equivalent single convolution?
     1. Is the converse true, i.e., can you always decompose a convolution into two smaller ones?
-1. Assume an input of shape $c_\text{i}\times h\times w$ and a convolution kernel of shape 
-   $c_\text{o}\times c_\text{i}\times k_\text{h}\times k_\text{w}$, padding of $(p_\text{h}, p_\text{w})$, and stride of $(s_\text{h}, s_\text{w})$.
+1. Assume an input of shape $c_\textrm{i}\times h\times w$ and a convolution kernel of shape 
+   $c_\textrm{o}\times c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$, padding of $(p_\textrm{h}, p_\textrm{w})$, and stride of $(s_\textrm{h}, s_\textrm{w})$.
     1. What is the computational cost (multiplications and additions) for the forward propagation?
     1. What is the memory footprint?
     1. What is the memory footprint for the backward computation?
     1. What is the computational cost for the backpropagation?
 1. By what factor does the number of calculations increase if we double the number of input channels 
-   $c_\text{i}$ and the number of output channels $c_\text{o}$? What happens if we double the padding?
+   $c_\textrm{i}$ and the number of output channels $c_\textrm{o}$? What happens if we double the padding?
 1. Are the variables `Y1` and `Y2` in the final example of this section exactly the same? Why?
 1. Express convolutions as a matrix multiplication, even when the convolution window is not $1 \times 1$. 
 1. Your task is to implement fast convolutions with a $k \times k$ kernel. One of the algorithm candidates 

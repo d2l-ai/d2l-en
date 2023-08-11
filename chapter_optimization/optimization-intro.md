@@ -119,7 +119,7 @@ then $f(x)$ is the global minimum.
 
 For example, given the function
 
-$$f(x) = x \cdot \text{cos}(\pi x) \text{ for } -1.0 \leq x \leq 2.0,$$
+$$f(x) = x \cdot \textrm{cos}(\pi x) \textrm{ for } -1.0 \leq x \leq 2.0,$$
 
 we can approximate the local minimum and global minimum of this function.
 

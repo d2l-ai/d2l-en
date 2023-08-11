@@ -85,7 +85,7 @@ to be introduced later,
 given the hyperparameter $\lambda$,
 the regularization term is
 
-$$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_\text{F}^2 + \|\mathbf{W}^{(2)}\|_\text{F}^2\right),$$
+$$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_\textrm{F}^2 + \|\mathbf{W}^{(2)}\|_\textrm{F}^2\right),$$
 :eqlabel:`eq_forward-s`
 
 where the Frobenius norm of the matrix
@@ -138,9 +138,9 @@ By using the chain rule,
 we can compute the derivative
 of $\mathsf{Z}$ with respect to $\mathsf{X}$ via
 
-$$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right).$$
+$$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \textrm{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right).$$
 
-Here we use the $\text{prod}$ operator
+Here we use the $\textrm{prod}$ operator
 to multiply its arguments
 after the necessary operations,
 such as transposition and swapping input positions,
@@ -149,7 +149,7 @@ For vectors, this is straightforward:
 it is simply matrix--matrix multiplication.
 For higher dimensional tensors,
 we use the appropriate counterpart.
-The operator $\text{prod}$ hides all the notational overhead.
+The operator $\textrm{prod}$ hides all the notational overhead.
 
 Recall that
 the parameters of the simple network with one hidden layer,
@@ -170,7 +170,7 @@ of the objective function $J=L+s$
 with respect to the loss term $L$
 and the regularization term $s$:
 
-$$\frac{\partial J}{\partial L} = 1 \; \text{and} \; \frac{\partial J}{\partial s} = 1.$$
+$$\frac{\partial J}{\partial L} = 1 \; \textrm{and} \; \frac{\partial J}{\partial s} = 1.$$
 
 Next, we compute the gradient of the objective function
 with respect to variable of the output layer $\mathbf{o}$
@@ -178,7 +178,7 @@ according to the chain rule:
 
 $$
 \frac{\partial J}{\partial \mathbf{o}}
-= \text{prod}\left(\frac{\partial J}{\partial L}, \frac{\partial L}{\partial \mathbf{o}}\right)
+= \textrm{prod}\left(\frac{\partial J}{\partial L}, \frac{\partial L}{\partial \mathbf{o}}\right)
 = \frac{\partial L}{\partial \mathbf{o}}
 \in \mathbb{R}^q.
 $$
@@ -188,7 +188,7 @@ of the regularization term
 with respect to both parameters:
 
 $$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)}
-\; \text{and} \;
+\; \textrm{and} \;
 \frac{\partial s}{\partial \mathbf{W}^{(2)}} = \lambda \mathbf{W}^{(2)}.$$
 
 Now we are able to calculate the gradient
@@ -196,7 +196,7 @@ $\partial J/\partial \mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$
 of the model parameters closest to the output layer.
 Using the chain rule yields:
 
-$$\frac{\partial J}{\partial \mathbf{W}^{(2)}}= \text{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{W}^{(2)}}\right) + \text{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(2)}}\right)= \frac{\partial J}{\partial \mathbf{o}} \mathbf{h}^\top + \lambda \mathbf{W}^{(2)}.$$
+$$\frac{\partial J}{\partial \mathbf{W}^{(2)}}= \textrm{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{W}^{(2)}}\right) + \textrm{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(2)}}\right)= \frac{\partial J}{\partial \mathbf{o}} \mathbf{h}^\top + \lambda \mathbf{W}^{(2)}.$$
 :eqlabel:`eq_backprop-J-h`
 
 To obtain the gradient with respect to $\mathbf{W}^{(1)}$
@@ -208,7 +208,7 @@ $\partial J/\partial \mathbf{h} \in \mathbb{R}^h$ is given by
 
 $$
 \frac{\partial J}{\partial \mathbf{h}}
-= \text{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{h}}\right)
+= \textrm{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{h}}\right)
 = {\mathbf{W}^{(2)}}^\top \frac{\partial J}{\partial \mathbf{o}}.
 $$
 
@@ -220,7 +220,7 @@ which we denote by $\odot$:
 
 $$
 \frac{\partial J}{\partial \mathbf{z}}
-= \text{prod}\left(\frac{\partial J}{\partial \mathbf{h}}, \frac{\partial \mathbf{h}}{\partial \mathbf{z}}\right)
+= \textrm{prod}\left(\frac{\partial J}{\partial \mathbf{h}}, \frac{\partial \mathbf{h}}{\partial \mathbf{z}}\right)
 = \frac{\partial J}{\partial \mathbf{h}} \odot \phi'\left(\mathbf{z}\right).
 $$
 
@@ -231,7 +231,7 @@ According to the chain rule, we get
 
 $$
 \frac{\partial J}{\partial \mathbf{W}^{(1)}}
-= \text{prod}\left(\frac{\partial J}{\partial \mathbf{z}}, \frac{\partial \mathbf{z}}{\partial \mathbf{W}^{(1)}}\right) + \text{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(1)}}\right)
+= \textrm{prod}\left(\frac{\partial J}{\partial \mathbf{z}}, \frac{\partial \mathbf{z}}{\partial \mathbf{W}^{(1)}}\right) + \textrm{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(1)}}\right)
 = \frac{\partial J}{\partial \mathbf{z}} \mathbf{x}^\top + \lambda \mathbf{W}^{(1)}.
 $$
 
