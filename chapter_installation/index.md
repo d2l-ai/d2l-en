@@ -134,7 +134,28 @@ pip install torch==2.0.0 torchvision==0.15.1
 You can install TensorFlow with either CPU or GPU support as follows:
 
 ```bash
-pip install tensorflow tensorflow-probability
+pip install tensorflow==2.12.0 tensorflow-probability==0.20.0
+```
+
+
+:end_tab:
+
+:begin_tab:`jax`
+You can install JAX and Flax with either CPU or GPU support as follows:
+
+```bash
+# GPU
+pip install "jax[cuda11_pip]==0.4.13" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html flax==0.7.0
+```
+
+If your machine has no NVIDIA GPUs
+or CUDA,
+you can install the CPU version
+as follows:
+
+```bash
+# CPU
+pip install "jax[cpu]==0.4.13" flax==0.7.0
 ```
 
 
@@ -194,6 +215,18 @@ mkdir d2l-en && cd d2l-en
 curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd tensorflow
+```
+
+
+:end_tab:
+
+:begin_tab:`jax`
+
+```bash
+mkdir d2l-en && cd d2l-en
+curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
+unzip d2l-en.zip && rm d2l-en.zip
+cd jax
 ```
 
 

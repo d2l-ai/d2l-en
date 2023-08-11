@@ -11,11 +11,11 @@ dependencies:
     # pip install CUDNN 8.6 required for TF & JAX
     - nvidia-cudnn-cu11==8.6.0.163
     - tensorflow==2.12.0
-    - tensorflow-probability==0.19.0
+    - tensorflow-probability==0.20.0
     - tensorflow-datasets==4.8.3
-    - "jax[cuda11_pip]==0.4.8"
+    - "jax[cuda11_pip]==0.4.13"
     - -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-    - flax==0.6.8
+    - flax==0.7.0
     # Chapter Specific Dependencies for PyTorch
     - syne-tune[gpsearchers]==0.3.2
     - gym==0.21.0
