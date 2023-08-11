@@ -16,7 +16,7 @@ and these issues only grow
 as our models become more complex.
 
 Fortunately all modern deep learning frameworks
-take this work off of our plates
+take this work off our plates
 by offering *automatic differentiation*
 (often shortened to *autograd*). 
 As we pass data through each successive function,
@@ -106,7 +106,7 @@ every time we take a derivative
 because deep learning requires 
 successively computing derivatives
 with respect to the same parameters
-thousands or millions of times,
+a great many times,
 and we might risk running out of memory.
 Note that the gradient of a scalar-valued function
 with respect to a vector $\mathbf{x}$

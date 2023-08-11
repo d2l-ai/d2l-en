@@ -25,7 +25,7 @@ Comma-separated values (CSV) files are ubiquitous
 for the storing of tabular (spreadsheet-like) data.
 In them, each line corresponds to one record
 and consists of several (comma-separated) fields, e.g.,
-"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,Accomplishments in the field of gravitational physics".
+"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,field of gravitational physics".
 To demonstrate how to load CSV files with `pandas`, 
 we (**create a CSV file below**) `../data/house_tiny.csv`. 
 This file represents a dataset of homes,

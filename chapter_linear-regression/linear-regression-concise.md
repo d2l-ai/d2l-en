@@ -114,7 +114,7 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` (available since version 1.8.0). 
+In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` classes (available since version 1.8.0). 
 The latter
 allows users to specify *merely*
 the output dimension,
@@ -123,7 +123,7 @@ additionally asks for
 how many inputs go into this layer.
 Specifying input shapes is inconvenient and may require nontrivial calculations
 (such as in convolutional layers).
-Thus, for simplicity we will use such "lazy" layers
+Thus, for simplicity, we will use such "lazy" layers
 whenever we can. 
 :end_tab:
 

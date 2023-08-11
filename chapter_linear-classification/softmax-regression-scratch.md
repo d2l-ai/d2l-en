@@ -65,7 +65,7 @@ Computing the softmax requires three steps:
 (i) exponentiation of each term;
 (ii) a sum over each row to compute the normalization constant for each example;
 (iii) division of each row by its normalization constant,
-ensuring that the result sums to 1.
+ensuring that the result sums to 1:
 
 (**
 $$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$

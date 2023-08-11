@@ -178,7 +178,7 @@ We will want to keep the conventional softmax function handy
 in case we ever want to evaluate the output probabilities by our model.
 But instead of passing softmax probabilities into our new loss function,
 we just
-[**pass the logits again and compute the softmax and its log
+[**pass the logits and compute the softmax and its log
 all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 

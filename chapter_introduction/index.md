@@ -1211,7 +1211,7 @@ deep learning to reinforcement learning problems,
 has surged in popularity.
 The breakthrough deep Q-network, that beat humans
 at Atari games using only the visual input :cite:`mnih2015human`,
-and the AlphaGo program that dethroned the world champion
+and the AlphaGo program, which dethroned the world champion
 at the board game Go :cite:`Silver.Huang.Maddison.ea.2016`,
 are two prominent examples.
 
@@ -1277,9 +1277,8 @@ That is, the current observation might not
 tell you everything about your current state.
 Say your cleaning robot found itself trapped
 in one of many identical closets in your house.
-Rescuing the robot involves inferring the precise location of the robot
-which might require considering its previous observations
-before entering the closet.
+Rescuing the robot involves inferring
+its precise location which might require considering earlier observations prior to it entering the closet.
 
 Finally, at any given point, reinforcement learners
 might know of one good policy,
@@ -1372,10 +1371,12 @@ which should remind us that the morally dubious use of data science
 has as long and enduring a history as its productive use
 in industry and the natural sciences.
 
+
 Other influences for machine learning
-came from
-[Claude Shannon (1916--2001)](https://en.wikipedia.org/wiki/Claude_Shannon)'s information theory and [Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing)'s
-theory of computation.
+came from the information theory of
+[Claude Shannon (1916--2001)](https://en.wikipedia.org/wiki/Claude_Shannon)
+and the theory of computation proposed by
+[Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing).
 Turing posed the question "can machines think?”
 in his famous paper *Computing Machinery and Intelligence* :cite:`Turing.1950`.
 Describing what is now known as the Turing test, he proposed that a machine
@@ -1417,7 +1418,7 @@ First, training a network is computationally very expensive.
 While random-access memory was plentiful at the end of the past century,
 computational power was scarce.
 Second, datasets were relatively small.
-In fact, Fisher's Iris dataset from 1932
+In fact, Fisher's Iris dataset from 1936
 was still a popular tool for testing the efficacy of algorithms.
 The MNIST dataset with its 60,000 handwritten digits was considered huge.
 
@@ -1544,7 +1545,7 @@ over the past decade.
   and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017`
   are each testimony to this progress.
   Even amateur doodlers can produce
-  photorealistic images based on just sketches describing the layout of a scene :cite:`Park.Liu.Wang.ea.2019`. 
+  photorealistic images just based on sketches describing the layout of a scene :cite:`Park.Liu.Wang.ea.2019`. 
 * Furthermore, while the diffusion process gradually adds random noise to data samples, *diffusion models* :cite:`sohl2015deep,ho2020denoising` learn the denoising process to gradually construct data samples from random noise, reversing the diffusion process. They have started to replace generative adversarial networks in more recent deep generative models, such as in DALL-E 2 :cite:`ramesh2022hierarchical` and Imagen :cite:`saharia2022photorealistic` for creative art and image generation based on text descriptions.
 * In many cases, a single GPU is insufficient for processing the large amounts of data available for training.
   Over the past decade the ability to build parallel and
@@ -1561,7 +1562,7 @@ over the past decade.
   and :citet:`Jia.Song.He.ea.2018` pushed the size up to 64,000 observations,
   reducing training time for the ResNet-50 model
   on the ImageNet dataset to less than 7 minutes.
-  By comparison, initially training times were measured in the order of days.
+  By comparison, training times were initially in the order of days.
 * The ability to parallelize computation
   has also contributed to progress in *reinforcement learning*.
   This has led to significant progress in computers achieving
@@ -1729,7 +1730,7 @@ while trying to solve general tasks.
 
 A much more pressing concern is how AI is being used in our daily lives.
 It is likely that many routine tasks, currently fulfilled by humans, can and will be automated.
-Farm robots will likely reduce the costs for organics farmers
+Farm robots will likely reduce the costs for organic farmers
 but they will also automate harvesting operations.
 This phase of the industrial revolution
 may have profound consequences for large swaths of society,

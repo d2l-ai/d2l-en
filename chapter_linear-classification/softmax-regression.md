@@ -118,7 +118,7 @@ To address classification with linear models,
 we will need as many affine functions as we have outputs.
 Strictly speaking, we only need one fewer,
 since the final category has to be the difference
-between $1$ and the sum of the other categories
+between $1$ and the sum of the other categories,
 but for reasons of symmetry
 we use a slightly redundant parametrization.
 Each output corresponds to its own affine function.
@@ -208,7 +208,7 @@ corresponds to the most likely class according to $\hat{\mathbf{y}}$.
 Moreover, because the softmax operation
 preserves the ordering among its arguments,
 we do not need to compute the softmax
-to determine which class has been assigned the highest probability.
+to determine which class has been assigned the highest probability. Thus,
 
 $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
@@ -276,7 +276,7 @@ for the mean squared error loss in
 ### Log-Likelihood
 
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
-which we can interpret as (estimated) conditional probabilities
+which we can interpret as the (estimated) conditional probabilities
 of each class, given any input $\mathbf{x}$,
 such as $\hat{y}_1$ = $P(y=\textrm{cat} \mid \mathbf{x})$.
 In the following we assume that for a dataset
@@ -364,7 +364,7 @@ In this sense, it is very similar
 to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
-This is not coincidence.
+This is not a coincidence.
 In any exponential family model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
@@ -384,8 +384,8 @@ It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
 one of the most commonly used losses for classification problems.
 We can demystify the name by introducing just the basics of information theory.
-In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
-relative to what we predict that should happen $\hat{\mathbf{y}}$.
+In a nutshell, it measures the number of bits needed to encode what we see, $\mathbf{y}$,
+relative to what we predict that should happen, $\hat{\mathbf{y}}$.
 We provide a very basic explanation in the following. For further
 details on information theory see
 :citet:`Cover.Thomas.1999` or :citet:`mackay2003information`.
@@ -407,7 +407,7 @@ and manipulating information (also known as data).
 The central idea in information theory is to quantify the
 amount of information contained in data.
 This places a  limit on our ability to compress data.
-For a distribution $P$ its *entropy* is defined as:
+For a distribution $P$ its *entropy*, $H[P]$, is defined as:
 
 $$H[P] = \sum_j - P(j) \log P(j).$$
 :eqlabel:`eq_softmax_reg_entropy`
@@ -437,7 +437,7 @@ Easy to predict, easy to compress.
 
 However if we cannot perfectly predict every event,
 then we might sometimes be surprised.
-Our surprise is greater when we assigned lower probability.
+Our surprise is greater when an event is assigned lower probability.
 Claude Shannon settled on $\log \frac{1}{P(j)} = -\log P(j)$
 to quantify one's *surprisal* at observing an event $j$
 having assigned it a (subjective) probability $P(j)$.
@@ -516,13 +516,13 @@ that can be executed most efficiently on modern GPUs.
 ## Exercises
 
 1. We can explore the connection between exponential families and softmax in some more depth.
-    1. Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for the softmax.
+    1. Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for softmax.
     1. Compute the variance of the distribution given by $\mathrm{softmax}(\mathbf{o})$ and show that it matches the second derivative computed above.
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     1. What is the problem if we try to design a binary code for it?
     1. Can you design a better code? Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
 1. When encoding signals transmitted over a physical wire, engineers do not always use binary codes. For instance, [PAM-3](https://en.wikipedia.org/wiki/Ternary_signal) uses three signal levels $\{-1, 0, 1\}$ as opposed to two levels $\{0, 1\}$. How many ternary units do you need to transmit an integer in the range $\{0, \ldots, 7\}$? Why might this be a better idea in terms of electronics?
-1. The [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
+1. The [Bradley--Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
 a logistic model to capture preferences. For a user to choose between apples and oranges one
 assumes scores $o_{\textrm{apple}}$ and $o_{\textrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
 the item with the largest score is the most likely one to be chosen :cite:`Bradley.Terry.1952`.

@@ -68,7 +68,7 @@ d2l.use_svg_display()
 
 ## Loading the Dataset
 
-Since the Fashion-MNIST dataset is so useful, all major major frameworks provide preprocessed versions of it. We can  [**download and read it into memory using built-in framework utilities.**]
+Since the Fashion-MNIST dataset is so useful, all major frameworks provide preprocessed versions of it. We can  [**download and read it into memory using built-in framework utilities.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -129,7 +129,7 @@ len(data.train[0]), len(data.val[0])
 ```
 
 The images are grayscale and upscaled to $32 \times 32$ pixels in resolution above. This is similar to the original MNIST dataset which consisted of (binary) black and white images. Note, though, that most modern image data has three channels (red, green, blue) and that hyperspectral images can have in excess of 100 channels (the HyMap sensor has 126 channels).
-By convention we store image as a $c \times h \times w$ tensor, where $c$ is the number of color channels, $h$ is the height and $w$ is the width.
+By convention we store an image as a $c \times h \times w$ tensor, where $c$ is the number of color channels, $h$ is the height and $w$ is the width.
 
 ```{.python .input}
 %%tab all
@@ -216,7 +216,7 @@ f'{time.time() - tic:.2f} sec'
 ## Visualization
 
 We will often be using the Fashion-MNIST dataset. A convenience function `show_images` can be used to visualize the images and the associated labels. 
-Skipping implementation details, below just shows its interface: we only need to know how to invoke `d2l.show_images` rather than how it works
+Skipping implementation details, we just show the interface below: we only need to know how to invoke `d2l.show_images` rather than how it works
 for such utility functions.
 
 ```{.python .input}

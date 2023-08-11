@@ -121,7 +121,7 @@ for our linear model we simply take the matrix--vector product
 of the input features $\mathbf{X}$ 
 and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
-$\mathbf{Xw}$ is a vector and $b$ is a scalar.
+The product $\mathbf{Xw}$ is a vector and $b$ is a scalar.
 Because of the broadcasting mechanism 
 (see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,

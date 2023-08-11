@@ -57,7 +57,7 @@ in making the leap from particular observations
 to more general statements?
 
 
-In real life, we must fit out models
+In real life, we must fit our models
 using a finite collection of data.
 The typical scales of that data
 vary wildly across domains.
@@ -111,7 +111,7 @@ we assume that the training data and the test data
 are drawn *independently* from *identical* distributions.
 This is commonly called the *IID assumption*.
 While this assumption is strong,
-it is worth noting that absent any such assumption
+it is worth noting that, absent any such assumption,
 we would be dead in the water.
 Why should we believe that training data
 sampled from distribution $P(X,Y)$
@@ -198,7 +198,7 @@ For all we know, our generalization error
 might be no better than random guessing.
 
 In general, absent any restriction on our model class,
-we cannot conclude based on fitting the training data alone
+we cannot conclude, based on fitting the training data alone,
 that our model has discovered any generalizable pattern :cite:`vapnik1994measuring`.
 On the other hand, if our model class
 was not capable of fitting arbitrary labels,
@@ -381,7 +381,7 @@ Then we would be in serious trouble.
 If we overfit our training data,
 there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
-See :citet:`ong2005learning` for an example how
+See :citet:`ong2005learning` for an example of how
 this can lead to absurd results even for models where the complexity
 can be tightly controlled.
 

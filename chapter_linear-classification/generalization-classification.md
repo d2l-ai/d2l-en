@@ -183,7 +183,7 @@ such that one standard deviation corresponds
 to an interval of $\pm 0.01$,
 then we should collect roughly 2500 samples.
 If we want to fit two standard deviations
-in that range and thus be 95%
+in that range and thus be 95% confident
 that $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$,
 then we will need 10,000 samples!
 
@@ -451,7 +451,8 @@ In a series of seminal papers,
 Vapnik and Chervonenkis extended
 the theory on the convergence
 of relative frequencies
-to more general classes of functions.
+to more general classes of functions
+:cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
 One of the key contributions of this line of work
 is the Vapnik--Chervonenkis (VC) dimension,
 which measures (one notion of)
@@ -529,13 +530,13 @@ and to be as conservative as possible about how often they are used.
 Hoping to provide a more satisfying solution,
 statistical learning theorists have developed methods
 for guaranteeing uniform convergence over a model class.
-If indeed every model's empirical error
+If indeed every model's empirical error simultaneously
 converges to its true error,
 then we are free to choose the model that performs
 best, minimizing the training error,
 knowing that it too will perform similarly well
 on the holdout data.
-Crucially, any of such results must depend
+Crucially, any one of such results must depend
 on some property of the model class.
 Vladimir Vapnik and Alexey Chernovenkis
 introduced the VC dimension,
@@ -544,7 +545,7 @@ that hold for all models in a VC class.
 The training errors for all models in the class
 are (simultaneously) guaranteed
 to be close to their true errors,
-and guaranteed to grow closer
+and guaranteed to grow even closer
 at $\mathcal{O}(1/\sqrt{n})$ rates.
 Following the revolutionary discovery of VC dimension,
 numerous alternative complexity measures have been proposed,
@@ -573,7 +574,7 @@ in the context of deep learning.
 1. Suppose that somebody else possesses a labeled test set
    $\mathcal{D}$ and only makes available the unlabeled inputs (features).
    Now suppose that you can only access the test set labels
-   by running a model $f$ (no restrictions placed on the model class)
+   by running a model $f$ (with no restrictions placed on the model class)
    on each of the unlabeled inputs
    and receiving the corresponding error $\epsilon_\mathcal{D}(f)$.
    How many models would you need to evaluate

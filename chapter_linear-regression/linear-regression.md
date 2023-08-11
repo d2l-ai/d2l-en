@@ -91,8 +91,8 @@ the number of examples in our dataset.
 We use superscripts to enumerate samples and targets,
 and subscripts to index coordinates.
 More concretely,
-$\mathbf{x}^{(i)}$ denotes the $i$-th sample
-and $x_j^{(i)}$ denotes its $j$-th coordinate.
+$\mathbf{x}^{(i)}$ denotes the $i^{\textrm{th}}$ sample
+and $x_j^{(i)}$ denotes its $j^{\textrm{th}}$ coordinate.
 
 ### Model
 :label:`subsec_linear_model`
@@ -422,8 +422,8 @@ Doing this efficiently requires that (**we**) (~~should~~)
 fast linear algebra libraries
 rather than writing costly for-loops in Python.**)
 
-To illustrate why this matters so much,
-we can (**consider two methods for adding vectors.**)
+To see why this matters so much,
+let's (**consider two methods for adding vectors.**)
 To start, we instantiate two 10,000-dimensional vectors
 containing all 1s.
 In the first method, we loop over the vectors with a Python for-loop.
@@ -622,7 +622,7 @@ all of which are connected directly to the output.
 
 :numref:`fig_single_neuron` depicts
 linear regression as a neural network.
-The diagram highlights the connectivity pattern
+The diagram highlights the connectivity pattern,
 such as how each input is connected to the output,
 but not the specific values taken by the weights or biases.
 
@@ -679,8 +679,7 @@ where it reaches its destination
 or it is fed into another neuron via its dendrites.
 
 Certainly, the high-level idea that many such units
-could be combined, provided they have connectivity
-and correct learning algorithm,
+could be combined, provided they have the correct connectivity and learning algorithm,
 to produce far more interesting and complex behavior
 than any one neuron alone could express
 arises from our study of real biological neural systems.
@@ -741,7 +740,7 @@ and ultimately, evaluation on previously unseen data.
 1. What happens if you want to use regression for realistic price estimation of houses or stock prices?
     1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
     1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \textrm{price}$?
-    1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock? For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
+    1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock? For more information review the celebrated Black--Scholes model for option pricing :cite:`Black.Scholes.1973`.
 1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
     1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.
     1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k \mid \lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.

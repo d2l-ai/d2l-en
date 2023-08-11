@@ -209,7 +209,7 @@ where the probability of lying
 in any sub-interval $[a, b] \subset [0,1]$
 is equal to $b-a$.
 Thus we can get out `0` and `1` with probability `0.5` each
-by testing whether the returned float number is greater than `0.5`
+by testing whether the returned float number is greater than `0.5`:
 
 ```{.python .input}
 %%tab all
@@ -449,7 +449,7 @@ A *probability* function maps events
 onto real values ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$.
 The probability, denoted $P(\mathcal{A})$, of an event $\mathcal{A}$
 in the given sample space $\mathcal{S}$,
-satisfies the following properties:
+has the following properties:
 
 * The probability of any event $\mathcal{A}$ is a nonnegative real number, i.e., $P(\mathcal{A}) \geq 0$;
 * The probability of the entire sample space is $1$, i.e., $P(\mathcal{S}) = 1$;
@@ -497,7 +497,7 @@ that share an underlying sample space.
 Consequently, knowing the value taken by one random variable
 can tell us something about the likely value of another random variable.
 Knowing that the alarm went off,
-we might suspect that the house was likely burglarized.
+we might suspect that the house was likely burgled.
 
 
 Every value taken by a random variable corresponds
@@ -766,14 +766,15 @@ but this correlation disappears if we condition on age.
 
 Let's put our skills to the test.
 Assume that a doctor administers an HIV test to a patient.
-This test is fairly accurate and it fails only with 1% probability
-if the patient is healthy but reported as diseased.
+This test is fairly accurate and fails only with 1% probability
+if the patient is healthy but reported as diseased,
+i.e., healthy patients test positive in 1% of cases.
 Moreover, it never fails to detect HIV if the patient actually has it.
 We use $D_1 \in \{0, 1\}$ to indicate the diagnosis
 ($0$ if negative and $1$ if positive)
 and $H \in \{0, 1\}$ to denote the HIV status.
 
-| Conditional probability | $H=1$ | $H=0$ |
+| **Conditional probability** | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
 | $P(D_1 = 1 \mid H)$        |     1 |  0.01 |
 | $P(D_1 = 0 \mid H)$        |     0 |  0.99 |
@@ -810,7 +811,7 @@ to administer another test to get clarity.
 The second test has different characteristics
 and it is not as good as the first one.
 
-| Conditional probability | $H=1$ | $H=0$ |
+| **Conditional probability** | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
 | $P(D_2 = 1 \mid H)$          |  0.98 |  0.03 |
 | $P(D_2 = 0 \mid H)$          |  0.02 |  0.97 |
@@ -1029,7 +1030,7 @@ These terms come from mechanical modeling,
 (see e.g., :citet:`Der-Kiureghian.Ditlevsen.2009` for a review on this aspect of [uncertainty quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
 It is worth noting, however, that these terms constitute a slight abuse of language.
 The term *epistemic* refers to anything concerning *knowledge*
-and thus in the philosophical sense, all uncertainty is epistemic.
+and thus, in the philosophical sense, all uncertainty is epistemic.
 
 
 We saw that sampling data from some unknown probability distribution
@@ -1046,7 +1047,7 @@ whereas the next 1000 observations help comparatively little,
 offering only a 1.41 times reduction.
 This is a persistent feature of machine learning:
 while there are often easy gains, it takes a very large amount of data,
-and often with it an enormous amount of computation to make even further gains.
+and often with it an enormous amount of computation, to make further gains.
 For an empirical review of this fact for large scale language models see :citet:`Revels.Lubin.Papamarkou.2016`.
 
 We also sharpened our language and tools for statistical modeling.

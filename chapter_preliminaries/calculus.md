@@ -8,7 +8,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 
 For a long time, how to calculate 
 the area of a circle remained a mystery.
-Then, in Ancient Greece, mathematician Archimedes
+Then, in Ancient Greece, the mathematician Archimedes
 came up with the clever idea 
 to inscribe a series of polygons 
 with increasing numbers of vertices

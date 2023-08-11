@@ -704,8 +704,8 @@ jnp.sum(x * y)
 
 Dot products are useful in a wide range of contexts.
 For example, given some set of values,
-denoted by a vector $\mathbf{x}  \in \mathbb{R}^n$
-and a set of weights denoted by $\mathbf{w} \in \mathbb{R}^n$,
+denoted by a vector $\mathbf{x}  \in \mathbb{R}^n$,
+and a set of weights, denoted by $\mathbf{w} \in \mathbb{R}^n$,
 the weighted sum of the values in $\mathbf{x}$
 according to the weights $\mathbf{w}$
 could be expressed as the dot product $\mathbf{x}^\top \mathbf{w}$.
@@ -1105,7 +1105,7 @@ we wrap up this section here.
 If you are eager to learn more linear algebra,
 there are many excellent books and online resources.
 For a more advanced crash course, consider checking out
-:citet:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
+:citet:`Strang.1993`, :citet:`Kolter.2008`, and :citet:`Petersen.Pedersen.ea.2008`.
 
 To recap:
 
@@ -1122,7 +1122,7 @@ To recap:
   take considerably longer to compute (cubic rather than quadratic time).
 * Norms capture various notions of the magnitude of a vector (or matrix), 
   and are commonly applied to the difference of two vectors 
-  to measure their distance.
+  to measure their distance apart.
 * Common vector norms include the $\ell_1$ and $\ell_2$ norms, 
    and common matrix norms include the *spectral* and *Frobenius* norms.
 

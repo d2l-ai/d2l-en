@@ -213,7 +213,7 @@ and hoped to study it using blood samples
 that they had collected from patients.
 However, it is considerably more difficult
 to obtain blood samples from healthy men
-than sick patients already in the system.
+than from sick patients already in the system.
 To compensate, the startup solicited
 blood donations from students on a university campus
 to serve as healthy controls in developing their test.
@@ -392,7 +392,7 @@ Note however, that we only need features $\mathbf{x} \sim p(\mathbf{x})$;
 we do not need to access labels $y \sim p(y)$.
 
 In this case, there exists a very effective approach
-that will give almost as good results as the original: logistic regression,
+that will give almost as good results as the original: namely, logistic regression,
 which is a special case of softmax regression (see :numref:`sec_softmax`)
 for binary classification.
 This is all that is needed to compute estimated probability ratios.
@@ -444,7 +444,7 @@ Here is a prototypical algorithm
 for correcting covariate shift:
 
 1. Create a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
-1. Train a binary classifier using logistic regression to get function $h$.
+1. Train a binary classifier using logistic regression to get the function $h$.
 1. Weigh training data using $\beta_i = \exp(h(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ for some constant $c$.
 1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
 
@@ -486,7 +486,7 @@ $$
 
 
 Here, our importance weights will correspond to the
-label likelihood ratios
+label likelihood ratios:
 
 $$\beta_i \stackrel{\textrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
@@ -518,7 +518,7 @@ unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our model's predictions
 at test time together, yielding the mean model outputs $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
 where the $i^\textrm{th}$ element $\mu(\hat{y}_i)$
-is the fraction of total predictions on the test set
+is the fraction of the total predictions on the test set
 where our model predicted $i$.
 
 It turns out that under some mild conditions---if
@@ -539,7 +539,7 @@ and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
 Because we observe the labels on the source data,
 it is easy to estimate the distribution $q(y)$.
-Then for any training example $i$ with label $y_i$,
+Then, for any training example $i$ with label $y_i$,
 we can take the ratio of our estimated $p(y_i)/q(y_i)$
 to calculate the weight $\beta_i$,
 and plug this into weighted empirical risk minimization
@@ -574,7 +574,7 @@ Armed with knowledge about how to deal with changes in distributions, we can now
 
 ### Batch Learning
 
-In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
+In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we have trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
 
 
 ### Online Learning
@@ -628,7 +628,7 @@ but also a slew of ethical questions
 that must be carefully considered.
 If we are deploying a medical diagnostic system,
 we need to know for which populations
-it may work and which it may not.
+it may work and for which it may not.
 Overlooking foreseeable risks to the welfare of
 a subpopulation could cause us to administer inferior care.
 Moreover, once we contemplate decision-making systems,

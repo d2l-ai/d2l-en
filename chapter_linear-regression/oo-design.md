@@ -171,7 +171,7 @@ for x in np.arange(0, 10, 0.1):
 ## Models
 :label:`subsec_oo-design-models`
 
-The `Module` class  is the base class of all models we will implement. At the very least we need to define three methods. The first, `__init__`, stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, and finally, `configure_optimizers` returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
+The `Module` class is the base class of all models we will implement. At the very least we need three methods. The first, `__init__`, stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, and finally, `configure_optimizers` returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
 Sometimes we put the code for computing the output into a separate `forward` method to make it more reusable.
 
 :begin_tab:`jax`

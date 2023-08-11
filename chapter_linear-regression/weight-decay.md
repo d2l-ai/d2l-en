@@ -109,7 +109,7 @@ to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 by some norm of its weight vector, e.g., $\| \mathbf{w} \|^2$.
 Recall that we introduced the $\ell_2$ norm and $\ell_1$ norm,
-which are special cases of the more general $\ell_p$ norm
+which are special cases of the more general $\ell_p$ norm,
 in :numref:`subsec_lin-algebra-norms`.
 The most common method for ensuring a small weight vector
 is to add its norm as a penalty term
@@ -379,7 +379,7 @@ the bias parameter $b$ will not decay.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the following code, we specify
+Below, we specify
 the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
@@ -392,7 +392,7 @@ bias (the `net.bias` parameter) will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the following code, we create an $\ell_2$ regularizer with
+Below, we create an $\ell_2$ regularizer with
 the weight decay hyperparameter `wd` and apply it to the layer's weights
 through the `kernel_regularizer` argument.
 :end_tab:
@@ -473,7 +473,7 @@ if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
-So far, we only touched upon one notion of
+So far, we have touched upon one notion of
 what constitutes a simple linear function.
 However, even for simple nonlinear functions, the situation can be much more complex. To see this, the concept of [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
 allows one to apply tools introduced
