@@ -237,7 +237,7 @@ These libraries help you to avoid wasting time reimplementing standard models.
 Moreover,
 framework implementations are often highly optimized, 
   leading to significant (computational) performance gains 
-  as compared to implementations from scratch.
+  when compared with implementations from scratch.
 
 ## Exercises
 

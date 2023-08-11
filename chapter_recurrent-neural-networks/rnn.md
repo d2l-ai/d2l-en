@@ -6,7 +6,7 @@ In :numref:`sec_language-model` we described Markov models and $n$-grams for lan
 If we want to incorporate the possible effect of tokens earlier than time step $t-(n-1)$ on $x_t$,
 we need to increase $n$.
 However, the number of model parameters would also increase exponentially with it, as we need to store $|\mathcal{V}|^n$ numbers for a vocabulary set $\mathcal{V}$.
-Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a latent variable model:
+Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a latent variable model,
 
 $$P(x_t \mid x_{t-1}, \ldots, x_1) \approx P(x_t \mid h_{t-1}),$$
 
@@ -70,8 +70,8 @@ $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 :eqlabel:`rnn_h_without_state`
 
 In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
-Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
-Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer. The output layer is given by
+So armed, we apply broadcasting (see :numref:`subsec_broadcasting`) during the summation.
+Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer, which is given by
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q,$$
 
@@ -94,7 +94,7 @@ for a minibatch of $n$ sequence examples,
 each row of $\mathbf{X}_t$ corresponds to one example at time step $t$ from the sequence.
 Next,
 denote by $\mathbf{H}_t  \in \mathbb{R}^{n \times h}$ the hidden layer output of time step $t$.
-Unlike the MLP, here we save the hidden layer output $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$ to describe how to use the hidden layer output of the previous time step in the current time step. Specifically, the calculation of the hidden layer output of the current time step is determined by the input of the current time step together with the hidden layer output of the previous time step:
+Unlike with MLP, here we save the hidden layer output $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$ to describe how to use the hidden layer output of the previous time step in the current time step. Specifically, the calculation of the hidden layer output of the current time step is determined by the input of the current time step together with the hidden layer output of the previous time step:
 
 $$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}  + \mathbf{b}_h).$$
 :eqlabel:`rnn_h_with_state`
@@ -113,7 +113,7 @@ are called *recurrent layers*.
 
 
 There are many different ways for constructing RNNs.
-RNNs with a hidden state defined by :eqref:`rnn_h_with_state` are very common.
+Those with a hidden state defined by :eqref:`rnn_h_with_state` are very common.
 For time step $t$,
 the output of the output layer is similar to the computation in the MLP:
 
@@ -154,11 +154,11 @@ matrix multiplication of
 concatenation of $\mathbf{X}_t$ and $\mathbf{H}_{t-1}$
 and
 concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$.
-Though this can be proven in mathematics,
-in the following we just use a simple code snippet to show this.
+Though this can be proven mathematically,
+in the following we just use a simple code snippet as a demonstration.
 To begin with,
 we define matrices `X`, `W_xh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4), (3, 4), and (4, 4), respectively.
-Multiplying `X` by `W_xh`, and `H` by `W_hh`, respectively, and then adding these two multiplications,
+Multiplying `X` by `W_xh`, and `H` by `W_hh`, and then adding these two products,
 we obtain a matrix of shape (3, 4).
 
 ```{.python .input}
@@ -201,11 +201,11 @@ as above.
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 ```
 
-## RNN-based Character-Level Language Models
+## RNN-Based Character-Level Language Models
 
 Recall that for language modeling in :numref:`sec_language-model`,
 we aim to predict the next token based on
-the current and past tokens,
+the current and past tokens;
 thus we shift the original sequence by one token
 as the targets (labels).
 :citet:`Bengio.Ducharme.Vincent.ea.2003` first proposed
@@ -222,10 +222,9 @@ and consider a *character-level language model*.
 
 During the training process,
 we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss to compute the error between the model output and the target.
-Due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3 in :numref:`fig_rnn_train`,
-$\mathbf{O}_3$, is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
+Because of the recurrent computation of the hidden state in the hidden layer, the output of time step 3 in :numref:`fig_rnn_train` is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
 
-In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
+In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be an $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
 
 In the following sections, we will implement RNNs
 for character-level language models.

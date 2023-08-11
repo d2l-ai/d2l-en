@@ -774,7 +774,7 @@ We use $D_1 \in \{0, 1\}$ to indicate the diagnosis
 ($0$ if negative and $1$ if positive)
 and $H \in \{0, 1\}$ to denote the HIV status.
 
-| **Conditional probability** | $H=1$ | $H=0$ |
+| Conditional probability | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
 | $P(D_1 = 1 \mid H)$        |     1 |  0.01 |
 | $P(D_1 = 0 \mid H)$        |     0 |  0.99 |
@@ -811,7 +811,7 @@ to administer another test to get clarity.
 The second test has different characteristics
 and it is not as good as the first one.
 
-| **Conditional probability** | $H=1$ | $H=0$ |
+| Conditional probability | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
 | $P(D_2 = 1 \mid H)$          |  0.98 |  0.03 |
 | $P(D_2 = 0 \mid H)$          |  0.02 |  0.97 |

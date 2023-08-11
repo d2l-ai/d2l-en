@@ -4,7 +4,7 @@
 Throughout this book,
 we will often work with text data
 represented as sequences
-of words, characters, or word-pieces.
+of words, characters, or word pieces.
 To get going, we will need some basic
 tools for converting raw text
 into sequences of the appropriate form.
@@ -63,7 +63,7 @@ import re
 
 Here, we will work with H. G. Wells'
 [The Time Machine](http://www.gutenberg.org/ebooks/35),
-a book containing just over 30000 words.
+a book containing just over 30,000 words.
 While real applications will typically
 involve significantly larger datasets,
 this is sufficient to demonstrate
@@ -229,7 +229,7 @@ len(corpus), len(vocab)
 Using the real corpus and the `Vocab` class defined over words,
 we can inspect basic statistics concerning word use in our corpus.
 Below, we construct a vocabulary from words used in *The Time Machine*
-and print the 10 most frequently occurring words.
+and print the ten most frequently occurring of them.
 
 ```{.python .input  n=11}
 %%tab all
@@ -247,7 +247,7 @@ Articles like "the" and "a",
 pronouns like "i" and "my",
 and prepositions like "of", "to", and "in"
 occur often because they serve common syntactic roles.
-Such words that are at once common but particularly descriptive
+Such words that are common but not particularly descriptive
 are often called (***stop words***) and,
 in previous generations of text classifiers
 based on bag-of-words representations,
@@ -273,8 +273,8 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
 ```
 
 After dealing with the first few words as exceptions,
-all the remaining words roughly follow a straight line on a log-log plot.
-This phenomena is captured by *Zipf's law*,
+all the remaining words roughly follow a straight line on a log--log plot.
+This phenomenon is captured by *Zipf's law*,
 which states that the frequency $n_i$
 of the $i^\textrm{th}$ most frequent word is:
 
@@ -287,7 +287,7 @@ $$\log n_i = -\alpha \log i + c,$$
 
 where $\alpha$ is the exponent that characterizes
 the distribution and $c$ is a constant.
-This should already give us pause if we want
+This should already give us pause for thought if we want
 to model words by counting statistics.
 After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But [**what about the other word combinations, such as two consecutive words (bigrams), three consecutive words (trigrams)**], and beyond?
 Let's see whether the bigram frequency behaves in the same manner as the single word (unigram) frequency.
@@ -309,7 +309,7 @@ trigram_vocab = Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
 
-Last, let's [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
+Now, let's [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
 
 ```{.python .input  n=15}
 %%tab all

@@ -1,7 +1,7 @@
 # Language Models
 :label:`sec_language-model`
 
-In :numref:`sec_text-sequence`, we see how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
+In :numref:`sec_text-sequence`, we saw how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 The goal of *language models*
 is to estimate the joint probability of the whole sequence:
 
@@ -11,7 +11,7 @@ where statistical tools
 in :numref:`sec_sequence`
 can be applied.
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
+Language models are incredibly useful. For instance, an ideal language model should generate natural text on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
 Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments.
 Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
@@ -68,7 +68,7 @@ $$\begin{aligned}&P(\textrm{deep}, \textrm{learning}, \textrm{is}, \textrm{fun})
 
 ### Markov Models and $n$-grams
 
-Among those sequence model analysis in :numref:`sec_sequence`,
+Among those sequence model analyses in :numref:`sec_sequence`,
 let's apply Markov models to language modeling.
 A distribution over sequences satisfies the Markov property of first order if $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
 
@@ -96,7 +96,7 @@ Here, we
 assume that the training dataset is a large text corpus, such as all
 Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg),
 and all text posted on the
-Web.
+web.
 The probability of words can be calculated from the relative word
 frequency of a given word in the training dataset.
 For example, the estimate $\hat{P}(\textrm{deep})$ can be calculated as the
@@ -169,19 +169,18 @@ in the rest of the chapter.
 ## Perplexity
 :label:`subsec_perplexity`
 
-Next, let's discuss about how to measure the language model quality, which will be used to evaluate our models in the subsequent sections.
+Next, let's discuss about how to measure the quality of the language model, which we will then use to evaluate our models in the subsequent sections.
 One way is to check how surprising the text is.
-A good language model is able to predict with high accuracy
-the most probable tokens that follow a given context.
+A good language model is able to predict, with high accuracy, the tokens that come next.
 Consider the following continuations of the phrase "It is raining", as proposed by different language models:
 
 1. "It is raining outside"
 1. "It is raining banana tree"
 1. "It is raining piouw;kcj pwepoiut"
 
-In terms of quality, example 1 is clearly the best. The words are sensible and logically coherent.
+In terms of quality, Example 1 is clearly the best. The words are sensible and logically coherent.
 While it might not quite accurately reflect which word follows semantically ("in San Francisco" and "in winter" would have been perfectly reasonable extensions), the model is able to capture which kind of word follows.
-Example 2 is considerably worse by producing a nonsensical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Last, example 3 indicates a poorly trained model that does not fit data properly.
+Example 2 is considerably worse by producing a nonsensical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Last, Example 3 indicates a poorly trained model that does not fit data properly.
 
 We might measure the quality of the model by computing  the likelihood of the sequence.
 Unfortunately this is a number that is hard to understand and difficult to compare.
@@ -212,7 +211,7 @@ Perplexity can be best understood as the reciprocal of the geometric mean of the
 
 * In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
 * In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
-* At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
+* At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do for encoding it. Hence, this provides a nontrivial upper bound that any useful model must beat.
 
 ## Partitioning Sequences
 :label:`subsec_partitioning-seqs`
@@ -253,14 +252,14 @@ Each subsequence will be used as an input sequence into the language model.
 
 
 For language modeling,
-the goal is to predict the next token based on what tokens we have seen so far, hence the targets (labels) are the original sequence, shifted by one token.
+the goal is to predict the next token based on the tokens we have seen so far; hence the targets (labels) are the original sequence, shifted by one token.
 The target sequence for any input sequence $\mathbf x_t$
 is $\mathbf x_{t+1}$ with length $n$.
 
-![Obtaining 5 pairs of input sequences and target sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
+![Obtaining five pairs of input sequences and target sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
 :label:`fig_lang_model_data`
 
-:numref:`fig_lang_model_data` shows an example of obtaining 5 pairs of input sequences and target sequences with $n=5$ and $d=2$.
+:numref:`fig_lang_model_data` shows an example of obtaining five pairs of input sequences and target sequences with $n=5$ and $d=2$.
 
 ```{.python .input  n=5}
 %%tab all
@@ -307,23 +306,23 @@ for X, Y in data.train_dataloader():
 
 ## Summary and Discussion
 
-Language models estimate the joint probability of a text sequence. For long sequences, $n$-grams provide a convenient model by truncating the dependence. However, there is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing. Thus, we will focus on neural language modeling in subsequent sections.
+Language models estimate the joint probability of a text sequence. For long sequences, $n$-grams provide a convenient model by truncating the dependence. However, there is a lot of structure but not enough frequency to deal efficiently with infrequent word combinations via Laplace smoothing. Thus, we will focus on neural language modeling in subsequent sections.
 To train language models, we can randomly sample pairs of input sequences and target sequences in minibatches. After training, we will use perplexity to measure the language model quality.
 
 Language models can be scaled up with increased data size, model size, and amount in training compute. Large language models can perform desired tasks by predicting output text given input text instructions. As we will discuss later (e.g., :numref:`sec_large-pretraining-transformers`),
-at the present moment,
+at the present moment
 large language models form the basis of state-of-the-art systems across diverse tasks.
 
 
 ## Exercises
 
-1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
+1. Suppose there are 100,000 words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
 1. How would you model a dialogue?
 1. What other methods can you think of for reading long sequence data?
 1. Consider our method for discarding a uniformly random number of the first few tokens at the beginning of each epoch.
     1. Does it really lead to a perfectly uniform distribution over the sequences on the document?
     1. What would you have to do to make things even more uniform? 
-1. If we want a sequence example to be a complete sentence, what kind of problem does this introduce in minibatch sampling? How can we fix the problem?
+1. If we want a sequence example to be a complete sentence, what kind of problem does this introduce in minibatch sampling? How can we fix it?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/117)
