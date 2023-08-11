@@ -64,21 +64,21 @@ the $l^\textrm{th}$ hidden layer
 that uses the activation function $\phi_l$
 is calculated as follows:
 
-$$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$
+$$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{\textrm{xh}}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{\textrm{hh}}^{(l)}  + \mathbf{b}_\textrm{h}^{(l)}),$$
 :eqlabel:`eq_deep_rnn_H`
 
-where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with
-the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, 
+where the weights $\mathbf{W}_{\textrm{xh}}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{\textrm{hh}}^{(l)} \in \mathbb{R}^{h \times h}$, together with
+the bias $\mathbf{b}_\textrm{h}^{(l)} \in \mathbb{R}^{1 \times h}$, 
 are the model parameters of the $l^\textrm{th}$ hidden layer.
 
 In the end, the calculation of the output layer 
 is only based on the hidden state 
 of the final $L^\textrm{th}$ hidden layer:
 
-$$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$
+$$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q},$$
 
-where the weight $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ 
-and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ 
+where the weight $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$ 
+and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ 
 are the model parameters of the output layer.
 
 Just as with MLPs, the number of hidden layers $L$ 
