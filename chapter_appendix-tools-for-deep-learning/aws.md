@@ -36,7 +36,7 @@ Before choosing an instance, check if there are quantity
 restrictions by clicking the "Limits" label in the bar on the left as shown in
 :numref:`fig_ec2`. 
 :numref:`fig_limits` shows an example of such a
-limitation. The account currently cannot open "p2.xlarge" instance per region. If
+limitation. The account currently cannot open "p2.xlarge" instances according to the region. If
 you need to open one or more instances, click on the "Request limit increase" link to
 apply for a higher instance quota.
 Generally, it takes one business day to
@@ -129,7 +129,7 @@ chmod 400 D2L_key.pem
 :label:`fig_chmod`
 
 
-Now, copy the ssh command in the lower red box of :numref:`fig_chmod` and paste onto the command line:
+Now, copy the SSH command in the lower red box of :numref:`fig_chmod` and paste onto the command line:
 
 ```bash
 ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com

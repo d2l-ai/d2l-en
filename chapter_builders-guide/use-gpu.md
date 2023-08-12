@@ -28,11 +28,6 @@ Once these preparations are complete,
 the `nvidia-smi` command can be used
 to (**view the graphics card information**).
 
-```{.python .input}
-%%tab all
-!nvidia-smi
-```
-
 :begin_tab:`mxnet`
 You might have noticed that a MXNet tensor
 looks almost identical to a NumPy `ndarray`.
