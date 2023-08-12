@@ -590,7 +590,7 @@ We thank Amazon Web Services, especially Wen-Ming Ye, George Karypis, Swami Siva
 and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement, this book would not have happened.
-During preparation of publication of this book,
+During the preparation of the book for publication,
 Cambridge University Press has offered excellent support.
 We thank our commissioning editor David Tranah
 for his help and professionalism.
