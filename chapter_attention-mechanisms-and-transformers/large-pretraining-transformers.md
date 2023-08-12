@@ -369,7 +369,7 @@ As well as increased performance, large models also enjoy better sample efficien
 
 
 ![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :citet:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :citet:`brown2020language`).](../img/scaling-gpt3.png)
-:width:`320px`
+:width:`250px`
 :label:`fig_scaling-gpt3`
 
 
