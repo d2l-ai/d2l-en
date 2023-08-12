@@ -7,7 +7,7 @@ tab.interact_select(['pytorch', 'jax'])
 :label:`sec_vision-transformer`
 
 The Transformer architecture was initially proposed
-for sequence to sequence learning,
+for sequence-to-sequence learning,
 with a focus on machine translation.
 Subsequently, Transformers emerged as the model of choice
 in various natural language processing tasks :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring`.
@@ -39,7 +39,7 @@ Notably, Transformers show better scalability than CNNs:
 when training larger models on larger datasets,
 vision Transformers outperform ResNets by a significant margin.
 Similar to the landscape of network architecture design in natural language processing,
-Transformers also became a game-changer in computer vision.
+Transformers have also become a game-changer in computer vision.
 
 ```{.python .input}
 %%tab pytorch
@@ -66,7 +66,7 @@ a body based on the multilayer Transformer encoder,
 and a head that transforms the global representation
 into the output label.
 
-![The vision Transformer architecture. In this example, an image is split into 9 patches. A special “&lt;cls&gt;” token and the 9 flattened image patches are transformed via patch embedding and $n$ Transformer encoder blocks into 10 representations, respectively. The “&lt;cls&gt;” representation is further transformed into the output label.](../img/vit.svg)
+![The vision Transformer architecture. In this example, an image is split into nine patches. A special “&lt;cls&gt;” token and the nine flattened image patches are transformed via patch embedding and $n$ Transformer encoder blocks into ten representations, respectively. The “&lt;cls&gt;” representation is further transformed into the output label.](../img/vit.svg)
 :label:`fig_vit`
 
 Consider an input image with height $h$, width $w$,
@@ -81,7 +81,7 @@ into a sequence of $m+1$ vectors,
 summed with learnable positional embeddings.
 The multilayer Transformer encoder
 transforms $m+1$ input vectors
-into the same amount of output vector representations of the same length.
+into the same number of output vector representations of the same length.
 It works exactly the same way as the original Transformer encoder in :numref:`fig_transformer`,
 only differing in the position of normalization.
 Since the “&lt;cls&gt;” token attends to all the image patches
@@ -168,7 +168,7 @@ d2l.check_shape(output, (batch_size, (img_size//patch_size)**2, num_hiddens))
 :label:`subsec_vit-encoder`
 
 The MLP of the vision Transformer encoder is slightly different
-from the position-wise FFN of the original Transformer encoder
+from the positionwise FFN of the original Transformer encoder
 (see :numref:`subsec_positionwise-ffn`).
 First, here the activation function uses the Gaussian error linear unit (GELU),
 which can be considered as a smoother version of the ReLU :cite:`Hendrycks.Gimpel.2016`.
@@ -252,8 +252,8 @@ class ViTBlock(nn.Module):
         return X + self.mlp(nn.LayerNorm()(X), training=training)
 ```
 
-Same as in :numref:`subsec_transformer-encoder`,
-any vision Transformer encoder block does not change its input shape.
+Just as in :numref:`subsec_transformer-encoder`,
+no vision Transformer encoder block changes its input shape.
 
 ```{.python .input}
 %%tab pytorch
@@ -392,14 +392,14 @@ less suitable for higher-resolution images.
 Towards a general-purpose backbone network in computer vision,
 Swin Transformers addressed the quadratic computational complexity
 with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
-and added back convolution-like priors,
+and reinstated convolution-like priors,
 extending the applicability of Transformers to a range of computer vision tasks
 beyond image classification with state-of-the-art results :cite:`liu2021swin`.
 
 ## Exercises
 
 1. How does the value of `img_size` affect training time?
-1. Instead of projecting the “&lt;cls&gt;” token representation to the output, how to project the averaged patch representations? Implement this change and see how it affects the accuracy.
+1. Instead of projecting the “&lt;cls&gt;” token representation to the output, how would you project the averaged patch representations? Implement this change and see how it affects the accuracy.
 1. Can you modify hyperparameters to improve the accuracy of the vision Transformer?
 
 :begin_tab:`pytorch`

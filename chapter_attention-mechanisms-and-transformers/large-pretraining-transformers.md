@@ -2,10 +2,10 @@
 :label:`sec_large-pretraining-transformers`
 
 So far in our image classification and machine translation experiments,
-models were trained on datasets with input-output examples
+models have been trained on datasets with input--output examples
 *from scratch* to perform specific tasks.
 For example, a Transformer was trained
-with English-French pairs (:numref:`sec_transformer`)
+with English--French pairs (:numref:`sec_transformer`)
 so that this model can translate input English text into French.
 As a result, each model becomes a *specific expert*
 that is sensitive to even slight shift in data distribution
@@ -18,7 +18,7 @@ Given larger data for pretraining, the Transformer architecture
 performs better with an increased model size and training compute,
 demonstrating superior *scaling* behavior.
 Specifically, performance of Transformer-based language models
-scales as a power-law with the amount of model parameters,
+scales as a power law with the amount of model parameters,
 training tokens, and training compute :cite:`kaplan2020scaling`.
 The scalability of Transformers is also evidenced
 by the significantly boosted performance
@@ -31,7 +31,7 @@ Notably, all such multi-modal data is serialized into a flat sequence of tokens,
 which can be processed akin to text tokens (:numref:`sec_transformer`)
 or image patches (:numref:`sec_vision-transformer`) by Transformers.
 
-Before compelling success of pretraining Transformers for multi-modal data,
+Prior to the compelling success of pretraining Transformers for multi-modal data,
 Transformers were extensively pretrained  with a wealth of text.
 Originally proposed for machine translation,
 the Transformer architecture in :numref:`fig_transformer`
@@ -115,7 +115,7 @@ text tagging, and question answering.
 You may note that these downstream tasks include text pair understanding.
 BERT pretraining has another loss for predicting
 whether one sentence immediately follows the other.
-However, this loss was later found not useful when pretraining RoBERTa,
+However, this loss was later found to be less useful when pretraining RoBERTa,
 a BERT variant of the same size, on 2000 billion tokens :cite:`Liu.Ott.Goyal.ea.2019`.
 Other derivatives of BERT improved model architectures or pretraining objectives,
 such as ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
@@ -131,7 +131,7 @@ and MAE (masked autoencoders) :cite:`he2022masked`.
 
 Since a Transformer encoder converts a sequence of input tokens
 into the same number of output representations,
-the encoder-only mode cannot generate a sequence of arbitrary length like in machine translation.
+the encoder-only mode cannot generate a sequence of arbitrary length as in machine translation.
 As originally proposed for machine translation,
 the Transformer architecture can be outfitted with a decoder
 that autoregressively predicts the target sequence
@@ -200,7 +200,7 @@ With this objective, T5 is pretrained
 with 1000 billion tokens from the C4
 (Colossal Clean Crawled Corpus) data,
 which consists of clean English text
-from the Web :cite:`raffel2020exploring`.
+from the web :cite:`raffel2020exploring`.
 
 ### Fine-Tuning T5
 
@@ -227,7 +227,7 @@ After fine-tuning, the 11-billion-parameter T5 (T5-11B)
 achieved state-of-the-art results on multiple encoding (e.g., classification)
 and generation (e.g., summarization) benchmarks.
 Since released, T5 has been extensively used in later research.
-For example, switch Transformers are designed based off T5
+For example, switch Transformers are designed based on T5
 to activate a subset of the parameters
 for better computational efficiency :cite:`fedus2022switch`.
 In a text-to-image model called Imagen,
@@ -251,7 +251,7 @@ remove the entire encoder and the decoder sublayer
 with the encoder--decoder cross-attention
 from the original encoder--decoder architecture
 depicted in :numref:`fig_transformer`.
-Nowadays, decoder-only Transformers have been the de facto architecture
+Nowadays, decoder-only Transformers have been the *de facto* architecture
 in large-scale language modeling (:numref:`sec_language-model`),
 which leverages the world's abundant unlabeled text corpora via self-supervised learning.
 
@@ -309,12 +309,11 @@ conditional on some prefix text sequence.
 Thus, a pretrained language model may generate the task output
 as a sequence *without parameter update*,
 conditional on an input sequence with the task description,
-task-specific input-output examples, and a prompt (task input).
+task-specific input--output examples, and a prompt (task input).
 This learning paradigm is called *in-context learning* :cite:`brown2020language`,
 which can be further categorized
 into *zero-shot*, *one-shot*, and *few-shot*,
-when there is no, one, and a few task-specific input-output examples,
-respectively (:numref:`fig_gpt-3-xshot`).
+when there is no, one, and a few task-specific input--output examples (:numref:`fig_gpt-3-xshot`).
 
 
 ![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :citet:`brown2020language`).](../img/gpt3-xshot-scaling.png)
@@ -325,9 +324,9 @@ These three settings were tested in GPT-3 :cite:`brown2020language`,
 whose largest version uses data and model size
 about two orders of magnitude larger than those in GPT-2.
 GPT-3 uses the same Transformer decoder architecture
-in its direct predecessor GPT-2
+as its direct predecessor GPT-2
 except that attention patterns
-(right of :numref:`fig_gpt-decoder-only`)
+(at the right in :numref:`fig_gpt-decoder-only`)
 are sparser at alternating layers.
 Pretrained with 300 billion tokens,
 GPT-3 performs better with larger model size,
@@ -365,12 +364,12 @@ still remains a matter of debate :cite:`hoffmann2022training`.
 :width:`700px`
 :label:`fig_scaling-sample-conv`
 
-Besides increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level achieved by small models, and performance is scaled smoothly with compute.
+As well as increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level achieved by small models, and performance is scaled smoothly with compute.
 
 
 
 ![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :citet:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :citet:`brown2020language`).](../img/scaling-gpt3.png)
-:width:`400px`
+:width:`320px`
 :label:`fig_scaling-gpt3`
 
 
@@ -383,29 +382,29 @@ The empirical scaling behaviors in :citet:`kaplan2020scaling` have been tested i
 ## Large Language Models
 
 The scalability of Transformers in the GPT series has inspired subsequent large language models. 
-The GPT-2 Transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens performed competitively across diverse tasks. 
-Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks and emphasizing more on the number of tokens than the number of parameters.
+The GPT-2 Transformer decoder was used for training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens, performed competitively across diverse tasks. 
+Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains for much longer (1.4 trillion training tokens), outperforming Gopher on many tasks and with more emphasis on the number of tokens than on the number of parameters.
 To continue the scaling line of language modeling, 
-PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Its next version, PaLM 2 :cite:`anil2023palm`, scaled data and model roughly 1:1 and improved multilingual and reasoning capabilities. 
-Other large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, showed promising quantitative and scientific reasoning capabilities.
+PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Its later version, PaLM 2 :cite:`anil2023palm`, scaled data and model roughly 1:1 and improved multilingual and reasoning capabilities. 
+Other large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, have shown promising quantitative and scientific reasoning capabilities.
 
 
 Open-sourced releases, such as OPT (Open Pretrained Transformers) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom`, and FALCON :cite:`penedo2023refinedweb`,
 democratized research and use of large language models.
 Focusing on computational efficiency at inference time,
-the open-sourced Llama 1 :cite:`touvron2023llama` outperformed much larger models by training on more tokens than what was typically used. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
+the open-sourced Llama 1 :cite:`touvron2023llama` outperformed much larger models by training on more tokens than had been typically used. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
 
 
 
-:citet:`wei2022emergent` discussed emergent abilities of large language models that are only present in larger models, but not present in smaller models.
+:citet:`wei2022emergent` discussed emergent abilities of large language models that are present in larger models, but not in smaller models.
 However, simply increasing model size does not inherently make models follow human instructions better.
-:citet:`wei2021finetuned,sanh2021multitask` found that fine-tuning large language models
+:citet:`wei2021finetuned,sanh2021multitask` have found that fine-tuning large language models
 on a range of datasets described via *instructions*
 can improve zero-shot performance on held-out tasks.
 Using *reinforcement learning from human feedback*,
 :citet:`ouyang2022training` fine-tuned GPT-3
 to follow a diverse set of instructions.
-Following the resultant InstructGPT that
+Following the resultant InstructGPT which
 aligns language models with human intent
 via fine-tuning :cite:`ouyang2022training`,
 [ChatGPT](https://chat.openai.com/)
@@ -426,23 +425,23 @@ an in-context learning method
 with few-shot "question, intermediate reasoning steps, answer" demonstrations,
 elicits the complex reasoning capabilities of
 large language models
-to solve mathematical, commonsense, and symbolic reasoning tasks.
+in order to solve mathematical, commonsense, and symbolic reasoning tasks.
 Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
 and reducing complex problems to sub-problems :cite:`zhou2023least`
 can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
 large language models can even perform *zero-shot*
 chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
 Even for multimodal inputs consisting of both text and images,
-language models can perform multimodal chain-of-thought reasoning with further improved accuracy than using text input only :cite:`zhang2023multicot`.
+language models can perform multimodal chain-of-thought reasoning with higher accuracy than using text input only :cite:`zhang2023multicot`.
 
 
 
 
 ## Summary and Discussion
 
-Transformers have been pretrained as encoder-only (e.g., BERT), encoder--decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
+Transformers have been pretrained as encoder-only (e.g., BERT), encoder--decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine-tuning) or not (e.g., few-shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on Transformer scalability in multi-modal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there have been no systematic studies on Transformer scalability in multi-modal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
 a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
@@ -455,10 +454,10 @@ a larger Parti is more capable of high-fidelity image generation and content-ric
 
 ## Exercises
 
-1. Is it possible to fine tune T5 using a minibatch consisting of different tasks? Why or why not? How about for GPT-2?
+1. Is it possible to fine-tune T5 using a minibatch consisting of different tasks? Why or why not? How about for GPT-2?
 1. Given a powerful language model, what applications can you think of?
-1. Say that you are asked to fine tune a language model to perform text classification by adding additional layers. Where will you add them? Why?
-1. Consider sequence to sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only Transformers? Why?
+1. Say that you are asked to fine-tune a language model to perform text classification by adding additional layers. Where will you add them? Why?
+1. Consider sequence-to-sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only Transformers? Why?
 
 
 [Discussions](https://discuss.d2l.ai/t/9232)
