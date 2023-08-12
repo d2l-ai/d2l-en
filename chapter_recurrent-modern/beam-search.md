@@ -44,7 +44,7 @@ possible output sequences.
 Note that this slightly overestimates 
 the number of distinct outputs 
 because there are no subsequent tokens
-after the  "&lt;eos&gt;" token occurs.
+once the  "&lt;eos&gt;" token occurs.
 However, for our purposes, 
 this number roughly captures 
 the size of the search space.
@@ -88,7 +88,7 @@ Suppose that there are four tokens
 In :numref:`fig_s2s-prob1`,
 the four numbers under each time step represent
 the conditional probabilities of generating "A", "B", "C", 
-and "&lt;eos&gt;" at that time step, respectively.
+and "&lt;eos&gt;" at that time step.
 
 ![At each time step, greedy search selects the token with the highest conditional probability.](../img/s2s-prob1.svg)
 :label:`fig_s2s-prob1`
@@ -103,8 +103,7 @@ is $0.5\times0.4\times0.4\times0.6 = 0.048$.
 
 Next, let's look at another example in :numref:`fig_s2s-prob2`. 
 Unlike in :numref:`fig_s2s-prob1`, 
-at time step 2 we select the token "C"
-in :numref:`fig_s2s-prob2`, 
+at time step 2 we select the token "C", 
 which has the *second* highest conditional probability.
 
 ![The four numbers under each time step represent 
@@ -123,7 +122,7 @@ Suppose that we choose the token "B" at time step 3.
 Now time step 4 is conditional on
 the output subsequence at the first three time steps
 "A", "C", and "B", 
-which is different from "A", "B", and "C" in :numref:`fig_s2s-prob1`. 
+which has changed from "A", "B", and "C" in :numref:`fig_s2s-prob1`. 
 Therefore, the conditional probability of generating 
 each token at time step 4 in :numref:`fig_s2s-prob2` 
 is also different from that in :numref:`fig_s2s-prob1`. 
@@ -132,7 +131,7 @@ As a result, the conditional probability of the output sequence
 is $0.5\times0.3 \times0.6\times0.6=0.054$, 
 which is greater than that of greedy search in :numref:`fig_s2s-prob1`. 
 In this example, the output sequence "A", "B", "C", and "&lt;eos&gt;" 
-obtained by the greedy search is not the optimal sequence.
+obtained by the greedy search is not optimal.
 
 
 
@@ -142,7 +141,7 @@ obtained by the greedy search is not the optimal sequence.
 
 If the goal is to obtain the most likely sequence, 
 we may consider using *exhaustive search*: 
-exhaustively enumerate all the possible output sequences 
+enumerate all the possible output sequences 
 with their conditional probabilities,
 and then output the one that scores 
 the highest predicted probability.
@@ -154,9 +153,7 @@ of $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$,
 exponential in the sequence length and with an enormous
 base given by the vocabulary size.
 For example, when $|\mathcal{Y}|=10000$ and $T'=10$, 
-we will need to evaluate $10000^{10} = 10^{40}$ sequences. 
-These are small numbers compared to real applications
-but already beyond the capabilities any foreseeable computers.
+we will need to evaluate $10000^{10} = 10^{40}$ sequences, which is already beyond the capabilities any foreseeable computers.
 On the other hand, the computational cost of greedy search is 
 $\mathcal{O}(\left|\mathcal{Y}\right|T')$: 
 miraculously cheap but far from optimal.
@@ -184,7 +181,7 @@ we continue to select $k$ candidate output sequences
 with the highest predicted probabilities 
 from $k\left|\mathcal{Y}\right|$ possible choices.
 
-![The process of beam search (beam size: 2, maximum length of an output sequence: 3). The candidate output sequences are $A$, $C$, $AB$, $CE$, $ABD$, and $CED$.](../img/beam-search.svg)
+![The process of beam search (beam size $=2$; maximum length of an output sequence $=3$). The candidate output sequences are $A$, $C$, $AB$, $CE$, $ABD$, and $CED$.](../img/beam-search.svg)
 :label:`fig_beam-search`
 
 
@@ -194,8 +191,8 @@ Suppose that the output vocabulary
 contains only five elements: 
 $\mathcal{Y} = \{A, B, C, D, E\}$, 
 where one of them is “&lt;eos&gt;”. 
-Let the beam size be 2 and 
-the maximum length of an output sequence be 3. 
+Let the beam size be two and 
+the maximum length of an output sequence be three. 
 At time step 1, 
 suppose that the tokens with the highest conditional probabilities 
 $P(y_1 \mid \mathbf{c})$ are $A$ and $C$. 
@@ -218,13 +215,12 @@ As a result, we get six candidates output sequences:
 
 In the end, we obtain the set of final candidate output sequences 
 based on these six sequences (e.g., discard portions including and after “&lt;eos&gt;”).
-Then we choose the sequence with the highest 
-of the following score as the output sequence:
+Then we choose the sequence which maximizes the following score:
 
-$$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
+$$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c});$$
 :eqlabel:`eq_beam-search-score`
 
-where $L$ is the length of the final candidate sequence 
+here $L$ is the length of the final candidate sequence 
 and $\alpha$ is usually set to 0.75. 
 Since a longer sequence has more logarithmic terms 
 in the summation of :eqref:`eq_beam-search-score`,
@@ -243,8 +239,8 @@ arising when the beam size is set to 1.
 
 Sequence searching strategies include 
 greedy search, exhaustive search, and beam search.
-Beam search provides a tradeoff between accuracy versus 
-computational cost via its flexible choice of the beam size.
+Beam search provides a tradeoff between accuracy and 
+computational cost via the flexible choice of the beam size.
 
 
 ## Exercises

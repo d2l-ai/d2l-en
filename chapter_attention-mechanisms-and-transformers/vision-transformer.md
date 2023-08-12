@@ -62,7 +62,7 @@ from jax import numpy as jnp
 the model architecture of vision Transformers.
 This architecture consists of a stem
 that patchifies images,
-a body based on the multi-layer Transformer encoder,
+a body based on the multilayer Transformer encoder,
 and a head that transforms the global representation
 into the output label.
 
@@ -79,7 +79,7 @@ A special “&lt;cls&gt;” (class) token and
 the $m$ flattened image patches are linearly projected
 into a sequence of $m+1$ vectors,
 summed with learnable positional embeddings.
-The multi-layer Transformer encoder
+The multilayer Transformer encoder
 transforms $m+1$ input vectors
 into the same amount of output vector representations of the same length.
 It works exactly the same way as the original Transformer encoder in :numref:`fig_transformer`,

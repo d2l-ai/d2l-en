@@ -67,6 +67,7 @@ $$\begin{aligned}&P(\textrm{deep}, \textrm{learning}, \textrm{is}, \textrm{fun})
 =&P(\textrm{deep}) P(\textrm{learning}  \mid  \textrm{deep}) P(\textrm{is}  \mid  \textrm{deep}, \textrm{learning}) P(\textrm{fun}  \mid  \textrm{deep}, \textrm{learning}, \textrm{is}).\end{aligned}$$
 
 ### Markov Models and $n$-grams
+:label:`subsec_markov-models-and-n-grams`
 
 Among those sequence model analyses in :numref:`sec_sequence`,
 let's apply Markov models to language modeling.

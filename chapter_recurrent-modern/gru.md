@@ -4,7 +4,7 @@
 
 As RNNs and particularly the LSTM architecture (:numref:`sec_lstm`)
 rapidly gained popularity during the 2010s,
-a number of papers began to experiment 
+a number of researchers began to experiment 
 with simplified architectures in hopes 
 of retaining the key idea of incorporating
 an internal state and multiplicative gating mechanisms
@@ -58,12 +58,12 @@ forcing their values to lie in the interval $(0, 1)$.
 Intuitively, the reset gate controls how much of the previous state 
 we might still want to remember.
 Likewise, an update gate would allow us to control 
-how much of the new state is just a copy of the old state.
+how much of the new state is just a copy of the old one.
 :numref:`fig_gru_1` illustrates the inputs for both
 the reset and update gates in a GRU, 
 given the input of the current time step
 and the hidden state of the previous time step.
-The outputs of two gates are given 
+The outputs of the gates are given 
 by two fully connected layers
 with a sigmoid activation function.
 
@@ -73,11 +73,11 @@ with a sigmoid activation function.
 Mathematically, for a given time step $t$,
 suppose that the input is a minibatch
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples: $n$, number of inputs: $d$)
+(number of examples $=n$; number of inputs $=d$)
 and the hidden state of the previous time step 
 is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ 
-(number of hidden units: $h$). 
-Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ 
+(number of hidden units $=h$). 
+Then the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ 
 and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
 
 $$
@@ -115,7 +115,7 @@ Here we use a tanh activation function.
 The result is a *candidate*, since we still need 
 to incorporate the action of the update gate.
 Comparing with :eqref:`rnn_h_with_state`,
-now the influence of the previous states
+the influence of the previous states
 can be reduced with the
 elementwise multiplication of
 $\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
@@ -136,7 +136,7 @@ Any pre-existing hidden state is thus *reset* to defaults.
 
 Finally, we need to incorporate the effect of the update gate $\mathbf{Z}_t$.
 This determines the extent to which the new hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ 
-matches the old state $\mathbf{H}_{t-1}$ versus how much 
+matches the old state $\mathbf{H}_{t-1}$ compared with how much 
 it resembles the new candidate state $\tilde{\mathbf{H}}_t$.
 The update gate $\mathbf{Z}_t$ can be used for this purpose, 
 simply by taking elementwise convex combinations 
@@ -150,9 +150,9 @@ Whenever the update gate $\mathbf{Z}_t$ is close to 1,
 we simply retain the old state. 
 In this case the information from $\mathbf{X}_t$ is ignored, 
 effectively skipping time step $t$ in the dependency chain. 
-In contrast, whenever $\mathbf{Z}_t$ is close to 0,
+By contrast, whenever $\mathbf{Z}_t$ is close to 0,
 the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. 
-:numref:`fig_gru_3` illustrates the computational flow after the update gate is in action.
+:numref:`fig_gru_3` shows the computational flow after the update gate is in action.
 
 ![Computing the hidden state in a GRU model.](../img/gru-3.svg)
 :label:`fig_gru_3`
@@ -382,7 +382,7 @@ model.predict('it has', 20, data.vocab, trainer.state.params)
 ## Summary
 
 Compared with LSTMs, GRUs achieve similar performance but tend to be lighter computationally.
-Generally, compared with simple RNNs, gated RNNs like LSTMs and GRUs
+Generally, compared with simple RNNs, gated RNNS, just like LSTMs and GRUs,
 can better capture dependencies for sequences with large time step distances.
 GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. 
 They can also skip subsequences by turning on the update gate.

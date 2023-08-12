@@ -50,7 +50,7 @@ of the two underlying unidirectional RNN layers.
 
 Formally for any time step $t$,
 we consider a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples: $n$, number of inputs in each example: $d$) 
+(number of examples $=n$; number of inputs in each example $=d$) 
 and let the hidden layer activation function be $\phi$.
 In the bidirectional architecture,
 the forward and backward hidden states for this time step 
@@ -71,11 +71,11 @@ where the weights $\mathbf{W}_{\textrm{xh}}^{(f)} \in \mathbb{R}^{d \times h}, \
 
 Next, we concatenate the forward and backward hidden states
 $\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$
-to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ to be fed into the output layer.
+to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ for feeding into the output layer.
 In deep bidirectional RNNs with multiple hidden layers,
 such information is passed on as *input* to the next bidirectional layer. 
 Last, the output layer computes the output 
-$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$):
+$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs $=q$):
 
 $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q}.$$
 
@@ -200,7 +200,7 @@ In bidirectional RNNs, the hidden state for each time step is simultaneously det
 
 1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
 1. Design a bidirectional RNN with multiple hidden layers.
-1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the context will be returned? What type of neural architectures is preferred for handling polysemy?
+1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the correct context will be returned? What type of neural architectures is preferred for handling polysemy?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)

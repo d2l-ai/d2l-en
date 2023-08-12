@@ -51,10 +51,10 @@ at the same time step.
 
 Formally, suppose that we have a minibatch input
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
+(number of examples $=n$; number of inputs in each example $=d$) at time step $t$.
 At the same time step, 
 let the hidden state of the $l^\textrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
-(number of hidden units: $h$)
+(number of hidden units $=h$)
 and the output layer variable be 
 $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ 
 (number of outputs: $q$).
@@ -71,7 +71,7 @@ where the weights $\mathbf{W}_{\textrm{xh}}^{(l)} \in \mathbb{R}^{h \times h}$ a
 the bias $\mathbf{b}_\textrm{h}^{(l)} \in \mathbb{R}^{1 \times h}$, 
 are the model parameters of the $l^\textrm{th}$ hidden layer.
 
-In the end, the calculation of the output layer 
+At the end, the calculation of the output layer 
 is only based on the hidden state 
 of the final $L^\textrm{th}$ hidden layer:
 
@@ -86,7 +86,7 @@ and the number of hidden units $h$ are hyperparameters
 that we can tune.
 Common RNN layer widths ($h$) are in the range $(64, 2056)$,
 and common depths ($L$) are in the range $(1, 8)$. 
-In addition, we can easily get a deep gated RNN
+In addition, we can easily get a deep-gated RNN
 by replacing the hidden state computation in :eqref:`eq_deep_rnn_H`
 with that from an LSTM or a GRU.
 
@@ -126,7 +126,7 @@ from jax import numpy as jnp
 
 ## Implementation from Scratch
 
-To implement a multi-layer RNN from scratch,
+To implement a multilayer RNN from scratch,
 we can treat each layer as an `RNNScratch` instance
 with its own learnable parameters.
 
@@ -166,7 +166,7 @@ class StackedRNNScratch(d2l.Module):
                      for i in range(self.num_layers)]
 ```
 
-The multi-layer forward computation
+The multilayer forward computation
 simply performs forward computation
 layer by layer.
 
@@ -211,8 +211,8 @@ to implement multiple layers of an RNN
 are readily available in high-level APIs.
 Our concise implementation will use such built-in functionalities.
 The code generalizes the one we used previously in :numref:`sec_gru`,
-allowing specification of the number of layers explicitly 
-rather than picking the default of a single layer.
+letting us specify the number of layers explicitly 
+rather than picking the default of only one layer.
 :end_tab:
 
 :begin_tab:`jax`
@@ -229,7 +229,7 @@ rather than picking the default of a single layer.
 ```{.python .input}
 %%tab mxnet
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -239,7 +239,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab pytorch
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -250,7 +250,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab tensorflow
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -267,7 +267,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab jax
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     num_hiddens: int
     num_layers: int
     dropout: float = 0

@@ -3,10 +3,10 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# The Encoder-Decoder Architecture
+# The Encoder--Decoder Architecture
 :label:`sec_encoder-decoder`
 
-In general seq2seq problems 
+In general sequence-to-sequence problems 
 like machine translation 
 (:numref:`sec_machine_translation`),
 inputs and outputs are of varying lengths
@@ -34,7 +34,7 @@ to generate the translated sequence,
 token by token, as output:
 "Ils", "regardent", ".".
 Since the encoder--decoder architecture
-forms the basis of different seq2seq models
+forms the basis of different sequence-to-sequence models
 in subsequent sections,
 this section will convert this architecture
 into an interface that will be implemented later.
@@ -253,7 +253,7 @@ class EncoderDecoder(d2l.Classifier):  #@save
 
 In the next section, 
 we will see how to apply RNNs to design 
-seq2seq models based on 
+sequence-to-sequence models based on 
 this encoder--decoder architecture.
 
 
@@ -262,7 +262,7 @@ this encoder--decoder architecture.
 Encoder-decoder architectures
 can handle inputs and outputs 
 that both consist of variable-length sequences
-and thus are suitable for seq2seq problems 
+and thus are suitable for sequence-to-sequence problems 
 such as machine translation.
 The encoder takes a variable-length sequence as input 
 and transforms it into a state with a fixed shape.
