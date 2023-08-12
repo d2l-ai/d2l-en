@@ -90,7 +90,7 @@ To install a GPU-enabled version of MXNet,
 we need to find out what version of CUDA you have installed.
 You can check this by running `nvcc --version`
 or `cat /usr/local/cuda/version.txt`.
-Assume that you have installed CUDA 10.2,
+Assume that you have installed CUDA 11.2,
 then execute the following command:
 
 ```bash
@@ -147,6 +147,7 @@ You can install JAX and Flax with either CPU or GPU support as follows:
 # GPU
 pip install "jax[cuda11_pip]==0.4.13" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html flax==0.7.0
 ```
+
 
 If your machine has no NVIDIA GPUs
 or CUDA,
