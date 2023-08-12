@@ -71,7 +71,7 @@ gru
 deep-rnn
 bi-rnn
 machine-translation-and-dataset
-encoder--decoder
+encoder-decoder
 seq2seq
 beam-search
 ```
