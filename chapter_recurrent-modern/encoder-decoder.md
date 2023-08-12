@@ -6,22 +6,22 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 # The Encoder--Decoder Architecture
 :label:`sec_encoder-decoder`
 
-In general sequence-to-sequence problems 
-like machine translation 
+In general sequence-to-sequence problems
+like machine translation
 (:numref:`sec_machine_translation`),
 inputs and outputs are of varying lengths
-that are unaligned. 
+that are unaligned.
 The standard approach to handling this sort of data
 is to design an *encoder--decoder* architecture (:numref:`fig_encoder_decoder`)
 consisting of two major components:
 an *encoder* that takes a variable-length sequence as input,
 and a *decoder* that acts as a conditional language model,
-taking in the encoded input 
-and the leftwards context of the target sequence 
-and predicting the subsequent token in the target sequence. 
+taking in the encoded input
+and the leftwards context of the target sequence
+and predicting the subsequent token in the target sequence.
 
 
-![The encoder--decoder architecture.](../img/encoder--decoder.svg)
+![The encoder--decoder architecture.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
 
 Let's take machine translation from English to French as an example.
@@ -29,7 +29,7 @@ Given an input sequence in English:
 "They", "are", "watching", ".",
 this encoder--decoder architecture
 first encodes the variable-length input into a state,
-then decodes the state 
+then decodes the state
 to generate the translated sequence,
 token by token, as output:
 "Ils", "regardent", ".".
@@ -68,7 +68,7 @@ from flax import linen as nn
 In the encoder interface,
 we just specify that
 the encoder takes variable-length sequences as input `X`.
-The implementation will be provided 
+The implementation will be provided
 by any model that inherits this base `Encoder` class.
 
 ```{.python .input}
@@ -131,9 +131,9 @@ such as the valid length of the input,
 which was explained
 in :numref:`sec_machine_translation`.
 To generate a variable-length sequence token by token,
-every time the decoder may map an input 
+every time the decoder may map an input
 (e.g., the generated token at the previous time step)
-and the encoded state 
+and the encoded state
 into an output token at the current time step.
 
 ```{.python .input}
@@ -251,20 +251,20 @@ class EncoderDecoder(d2l.Classifier):  #@save
         return self.decoder(dec_X, dec_state, training=self.training)[0]
 ```
 
-In the next section, 
-we will see how to apply RNNs to design 
-sequence-to-sequence models based on 
+In the next section,
+we will see how to apply RNNs to design
+sequence-to-sequence models based on
 this encoder--decoder architecture.
 
 
 ## Summary
 
 Encoder-decoder architectures
-can handle inputs and outputs 
+can handle inputs and outputs
 that both consist of variable-length sequences
-and thus are suitable for sequence-to-sequence problems 
+and thus are suitable for sequence-to-sequence problems
 such as machine translation.
-The encoder takes a variable-length sequence as input 
+The encoder takes a variable-length sequence as input
 and transforms it into a state with a fixed shape.
 The decoder maps the encoded state of a fixed shape
 to a variable-length sequence.
@@ -272,7 +272,7 @@ to a variable-length sequence.
 
 ## Exercises
 
-1. Suppose that we use neural networks to implement the encoder--decoder architecture. Do the encoder and the decoder have to be the same type of neural network?  
+1. Suppose that we use neural networks to implement the encoder--decoder architecture. Do the encoder and the decoder have to be the same type of neural network?
 1. Besides machine translation, can you think of another application where the encoder--decoder architecture can be applied?
 
 :begin_tab:`mxnet`
