@@ -827,7 +827,7 @@ class RNNLM(d2l.RNNLMScratch):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
 class GRU(d2l.RNN):
-    """The multi-layer GRU model.
+    """The multilayer GRU model.
 
     Defined in :numref:`sec_deep_rnn`"""
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
@@ -924,7 +924,7 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
     d2l.plt.legend(legend)
 
 class Encoder(nn.Module):
-    """The base encoder interface for the encoder-decoder architecture.
+    """The base encoder interface for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self):
@@ -935,7 +935,7 @@ class Encoder(nn.Module):
         raise NotImplementedError
 
 class Decoder(nn.Module):
-    """The base decoder interface for the encoder-decoder architecture.
+    """The base decoder interface for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self):
@@ -949,7 +949,7 @@ class Decoder(nn.Module):
         raise NotImplementedError
 
 class EncoderDecoder(d2l.Classifier):
-    """The base class for the encoder-decoder architecture.
+    """The base class for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self, encoder, decoder):
@@ -980,7 +980,7 @@ class EncoderDecoder(d2l.Classifier):
         return d2l.concat(outputs[1:], 1), attention_weights
 
 def init_seq2seq(module):
-    """Initialize weights for Seq2Seq.
+    """Initialize weights for sequence-to-sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
     if type(module) == nn.Linear:
@@ -991,7 +991,7 @@ def init_seq2seq(module):
                 nn.init.xavier_uniform_(module._parameters[param])
 
 class Seq2SeqEncoder(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning.
+    """The RNN encoder for sequence-to-sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -1011,7 +1011,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
-    """The RNN encoder-decoder for sequence to sequence learning.
+    """The RNN encoder--decoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
