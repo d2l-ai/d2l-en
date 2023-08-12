@@ -150,21 +150,21 @@ sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's [official repository](https://developer.nvidia.com/cuda-toolkit-archive) to find the download link as shown in :numref:`fig_cuda`.
+Here we download CUDA 12.1. Visit NVIDIA's [official repository](https://developer.nvidia.com/cuda-toolkit-archive) to find the download link as shown in :numref:`fig_cuda`.
 
-![Find the CUDA 10.1 download address.](../img/cuda101.png)
+![Find the CUDA 12.1 download address.](../img/cuda121.png)
 :width:`500px`
 :label:`fig_cuda`
 
-Copy the instructions and paste them onto the terminal to install CUDA 10.1.
+Copy the instructions and paste them onto the terminal to install CUDA 12.1.
 
 ```bash
 # The link and file name are subject to changes
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
-sudo apt-key add /var/cuda-repo-10-1-local-10.1.243-418.87.00/7fa2af80.pub
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda-repo-ubuntu2204-12-1-local_12.1.0-530.30.02-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2204-12-1-local_12.1.0-530.30.02-1_amd64.deb
+sudo cp /var/cuda-repo-ubuntu2204-12-1-local/cuda-*-keyring.gpg /usr/share/keyrings/
 sudo apt-get update
 sudo apt-get -y install cuda
 ```
@@ -177,10 +177,11 @@ nvidia-smi
 ```
 
 
-Finally, add CUDA to the library path to help other libraries find it.
+Finally, add CUDA to the library path to help other libraries find it, such as appending the following lines to the end of `~/.bashrc`.
 
 ```bash
-echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
+export PATH="/usr/local/cuda-12.1/bin:$PATH"
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-12.1/lib64
 ```
 
 
