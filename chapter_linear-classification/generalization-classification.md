@@ -29,14 +29,13 @@ on random guessing whenever we encounter new examples.
 
 A number of burning questions demand immediate attention:
 
-1. How many test examples do we need to precisely estimate
-   the accuracy of our classifiers on the underlying population?
+1. How many test examples do we need to give a good estimate of the accuracy of our classifiers on the underlying population?
 1. What happens if we keep evaluating models on the same test repeatedly?
 1. Why should we expect that fitting our linear models to the training set
    should fare any better than our naive memorization scheme?
 
 
-While :numref:`sec_generalization_basics` introduced
+Whereas :numref:`sec_generalization_basics` introduced
 the basics of overfitting and generalization
 in the context of linear regression,
 this chapter will go a little deeper,
@@ -48,7 +47,7 @@ and for any desired upper bound
 on the generalization gap $\epsilon$,
 we can often determine some required number of samples $n$
 such that if our training set contains at least $n$
-samples, then our empirical error will lie
+samples, our empirical error will lie
 within $\epsilon$ of the true error,
 *for any data generating distribution*.
 Unfortunately, it also turns out
@@ -65,9 +64,9 @@ even when we find that, on the tasks we care about,
 deep neural networks typically generalize
 remarkably well with far fewer examples (thousands).
 Thus deep learning practitioners often forgo
-a priori guarantees altogether,
-instead employing methods on the basis
-that they have generalized well
+*a priori* guarantees altogether,
+instead employing methods
+that have generalized well
 on similar problems in the past,
 and certifying generalization *post hoc*
 through empirical evaluations.
@@ -132,7 +131,7 @@ An important classical result from probability theory
 called the *central limit theorem* guarantees
 that whenever we possess $n$ random samples $a_1, ..., a_n$
 drawn from any distribution with mean $\mu$ and standard deviation $\sigma$,
-as the number of samples $n$ approaches infinity,
+then, as the number of samples $n$ approaches infinity,
 the sample average $\hat{\mu}$ approximately
 tends towards a normal distribution centered
 at the true mean and with standard deviation $\sigma/\sqrt{n}$.
@@ -184,9 +183,9 @@ such that one standard deviation corresponds
 to an interval of $\pm 0.01$,
 then we should collect roughly 2500 samples.
 If we want to fit two standard deviations
-in that range and thus be 95%
+in that range and thus be 95% confident
 that $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$,
-then we will need 10000 samples!
+then we will need 10,000 samples!
 
 This turns out to be the size of the test sets
 for many popular benchmarks in machine learning.
@@ -213,8 +212,8 @@ with 95% confidence that the distance $t$
 between our estimate $\epsilon_\mathcal{D}(f)$
 and the true error rate $\epsilon(f)$
 does not exceed $0.01$,
-you will find that roughly $15000$ examples are required
-as compared to the $10000$ examples suggested
+you will find that roughly 15,000 examples are required
+as compared to the 10,000 examples suggested
 by the asymptotic analysis above.
 If you go deeper into statistics
 you will find that this trend holds generally.
@@ -224,7 +223,7 @@ Note that in the scheme of things,
 these numbers are not so far apart,
 reflecting the general usefulness
 of asymptotic analysis for giving
-us ballpark figures even if not
+us ballpark figures even if they are not
 guarantees we can take to court.
 
 ## Test Set Reuse
@@ -235,7 +234,7 @@ Nearly all practical models are developed
 and validated based on test set performance
 and you are now a master of the test set.
 For any fixed classifier $f$,
-you know to evaluate its test error $\epsilon_\mathcal{D}(f)$,
+you know how to evaluate its test error $\epsilon_\mathcal{D}(f)$,
 and know precisely what can (and cannot)
 be said about its population error $\epsilon(f)$.
 
@@ -264,7 +263,7 @@ with a brilliant idea for a new modeling approach.
 The next day, you code up your new model,
 tune its hyperparameters on the validation set
 and not only are you getting your new model $f_2$ to work
-but it is error rate appears to be much lower than $f_1$'s.
+but its error rate appears to be much lower than $f_1$'s.
 However, the thrill of discovery suddenly fades
 as you prepare for the final evaluation.
 You do not have a test set!
@@ -300,7 +299,7 @@ remains a persistent problem plaguing scientific research.
 
 
 If that is not enough to worry you,
-there's a special reason to distrust
+there is a special reason to distrust
 the results that you get on subsequent evaluations.
 Recall that our analysis of test set performance
 rested on the assumption that the classifier
@@ -336,13 +335,13 @@ the old test set can be demoted to a validation set.
 
 ## Statistical Learning Theory
 
-At once, *test sets are all that we really have*,
+Put simply, *test sets are all that we really have*,
 and yet this fact seems strangely unsatisfying.
 First, we seldom possess a *true test set*---unless
 we are the ones creating the dataset,
 someone else has probably already evaluated
 their own classifier on our ostensible "test set".
-And even when we get first dibs,
+And even when we have first dibs,
 we soon find ourselves frustrated, wishing we could
 evaluate our subsequent modeling attempts
 without the gnawing feeling
@@ -360,11 +359,11 @@ whose practitioners aim to elucidate the
 fundamental principles that explain
 why/when models trained on empirical data
 can/will generalize to unseen data.
-One of the primary aims for several decades
+One of the primary aims
 of statistical learning researchers
 has been to bound the generalization gap,
-relating the properties of the model class,
-the number of samples in the dataset.
+relating the properties of the model class
+to the number of samples in the dataset.
 
 Learning theorists aim to bound the difference
 between the *empirical error* $\epsilon_\mathcal{S}(f_\mathcal{S})$
@@ -374,8 +373,8 @@ on the training set $\mathcal{S}$,
 and the true error $\epsilon(f_\mathcal{S})$
 of that same classifier on the underlying population.
 This might look similar to the evaluation problem
-that we just addressed but there's a major difference.
-Before, the classifier $f$ was fixed
+that we just addressed but there is a major difference.
+Earlier, the classifier $f$ was fixed
 and we only needed a dataset
 for evaluative purposes.
 And indeed, any fixed classifier does generalize:
@@ -388,7 +387,7 @@ will be close to the testing error?
 
 
 Suppose that our learned classifier $f_\mathcal{S}$ must be chosen
-among some pre-specified set of functions $\mathcal{F}$.
+from some pre-specified set of functions $\mathcal{F}$.
 Recall from our discussion of test sets
 that while it is easy to estimate
 the error of a single classifier,
@@ -400,17 +399,14 @@ will be close to its true error
 with high probability,
 once we consider a collection of classifiers,
 we need to worry about the possibility
-that *just one* classifier in the set
-will receive a badly misestimated error.
-The worry is that if just one classifier
-in our collection receives
-a misleadingly low error
-then we might pick it
+that *just one* of them
+will receive a badly estimated error.
+The worry is that we might pick such a classifier
 and thereby grossly underestimate
 the population error.
 Moreover, even for linear models,
 because their parameters are continuously valued,
-we are typically choosing among
+we are typically choosing from
 an infinite class of functions ($|\mathcal{F}| = \infty$).
 
 One ambitious solution to the problem
@@ -458,7 +454,7 @@ of relative frequencies
 to more general classes of functions
 :cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
 One of the key contributions of this line of work
-is the Vapnik-Chervonenkis (VC) dimension,
+is the Vapnik--Chervonenkis (VC) dimension,
 which measures (one notion of)
 the complexity (flexibility) of a model class.
 Moreover, one of their key results bounds
@@ -466,8 +462,8 @@ the difference between the empirical error
 and the population error as a function
 of the VC dimension and the number of samples:
 
-$$P\left(R[p, f] - R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \alpha\right) \geq 1-\delta
-\ \text{ for }\ \alpha \geq c \sqrt{(\mathrm{VC} - \log \delta)/n}.$$
+$$P\left(R[p, f] - R_\textrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \alpha\right) \geq 1-\delta
+\ \textrm{ for }\ \alpha \geq c \sqrt{(\textrm{VC} - \log \delta)/n}.$$
 
 Here $\delta > 0$ is the probability that the bound is violated,
 $\alpha$ is the upper bound on the generalization gap,
@@ -490,7 +486,7 @@ but not to four.
 Unfortunately, the theory tends to be
 overly pessimistic for more complex models
 and obtaining this guarantee typically requires
-far more examples than are actually required
+far more examples than are actually needed
 to achieve the desired error rate.
 Note also that fixing the model class and $\delta$,
 our error rate again decays
@@ -534,13 +530,13 @@ and to be as conservative as possible about how often they are used.
 Hoping to provide a more satisfying solution,
 statistical learning theorists have developed methods
 for guaranteeing uniform convergence over a model class.
-If indeed every model's empirical error
-converges to its true error simultaneously,
+If indeed every model's empirical error simultaneously
+converges to its true error,
 then we are free to choose the model that performs
 best, minimizing the training error,
 knowing that it too will perform similarly well
 on the holdout data.
-Crucially, any of such results must depend
+Crucially, any one of such results must depend
 on some property of the model class.
 Vladimir Vapnik and Alexey Chernovenkis
 introduced the VC dimension,
@@ -549,7 +545,7 @@ that hold for all models in a VC class.
 The training errors for all models in the class
 are (simultaneously) guaranteed
 to be close to their true errors,
-and guaranteed to grow closer
+and guaranteed to grow even closer
 at $\mathcal{O}(1/\sqrt{n})$ rates.
 Following the revolutionary discovery of VC dimension,
 numerous alternative complexity measures have been proposed,
@@ -566,7 +562,7 @@ and can easily assign random labels to large collections of points.
 Nevertheless, they generalize well on practical problems
 and, surprisingly, they often generalize better,
 when they are larger and deeper,
-despite incurring larger VC dimensions.
+despite incurring higher VC dimensions.
 In the next chapter, we will revisit generalization
 in the context of deep learning.
 
@@ -578,14 +574,14 @@ in the context of deep learning.
 1. Suppose that somebody else possesses a labeled test set
    $\mathcal{D}$ and only makes available the unlabeled inputs (features).
    Now suppose that you can only access the test set labels
-   by running a model $f$ (no restrictions placed on the model class)
+   by running a model $f$ (with no restrictions placed on the model class)
    on each of the unlabeled inputs
    and receiving the corresponding error $\epsilon_\mathcal{D}(f)$.
    How many models would you need to evaluate
    before you leak the entire test set
    and thus could appear to have error $0$,
    regardless of your true error?
-1. What is the VC dimension of the class of $5^\mathrm{th}$-order polynomials?
+1. What is the VC dimension of the class of fifth-order polynomials?
 1. What is the VC dimension of axis-aligned rectangles on two-dimensional data?
 
 [Discussions](https://discuss.d2l.ai/t/6829)

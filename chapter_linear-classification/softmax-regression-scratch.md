@@ -65,7 +65,7 @@ Computing the softmax requires three steps:
 (i) exponentiation of each term;
 (ii) a sum over each row to compute the normalization constant for each example;
 (iii) division of each row by its normalization constant,
-ensuring that the result sums to 1.
+ensuring that the result sums to 1:
 
 (**
 $$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
@@ -86,9 +86,9 @@ def softmax(X):
 ```
 
 For any input `X`, [**we turn each element
-into a non-negative number.
+into a nonnegative number.
 Each row sums up to 1,**]
-as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While this is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep learning frameworks have such protections built-in and we will be using the built-in softmax going forward.
+as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While it is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep learning frameworks have such protections built in and we will be using the built-in softmax going forward.
 
 ```{.python .input}
 %%tab mxnet
@@ -134,7 +134,7 @@ should be equal to the number of classes.
 (**Since our dataset has 10 classes,
 our network has an output dimension of 10.**)
 Consequently, our weights constitute a $784 \times 10$ matrix
-plus a $1 \times 10$ dimensional row vector for the biases.
+plus a $1 \times 10$ row vector for the biases.
 As with linear regression,
 we initialize the weights `W`
 with Gaussian noise.
@@ -216,7 +216,7 @@ Next we need to implement the cross-entropy loss function
 This may be the most common loss function
 in all of deep learning.
 At the moment, applications of deep learning
-easily cast classification problems
+easily cast as classification problems
 far outnumber those better treated as regression problems.
 
 Recall that cross-entropy takes the negative log-likelihood
@@ -299,21 +299,21 @@ def loss(self, params, X, y, state):
 ## Training
 
 We reuse the `fit` method defined in :numref:`sec_linear_scratch` to [**train the model with 10 epochs.**]
-Note that both the number of epochs (`max_epochs`),
+Note that the number of epochs (`max_epochs`),
 the minibatch size (`batch_size`),
 and learning rate (`lr`)
 are adjustable hyperparameters.
 That means that while these values are not
 learned during our primary training loop,
 they still influence the performance
-of our model, both vis-a-vis training
+of our model, both vis-à-vis training
 and generalization performance.
 In practice you will want to choose these values
 based on the *validation* split of the data
-and then to ultimately evaluate your final model
+and then, ultimately, to evaluate your final model
 on the *test* split.
 As discussed in :numref:`subsec_generalization-model-selection`,
-we will treat the test data of Fashion-MNIST
+we will regard the test data of Fashion-MNIST
 as the validation set, thus
 reporting validation loss and validation accuracy
 on this split.
@@ -362,7 +362,7 @@ By now we are starting to get some experience
 with solving linear regression
 and classification problems.
 With it, we have reached what would arguably be
-the state of the art of 1960-1970s of statistical modeling.
+the state of the art of 1960--1970s of statistical modeling.
 In the next section, we will show you how to leverage
 deep learning frameworks to implement this model
 much more efficiently.
@@ -370,17 +370,17 @@ much more efficiently.
 ## Exercises
 
 1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. As discussed in :numref:`sec_softmax` this can cause numerical instabilities.
-    1. Test whether `softmax` still works correctly if an input has a value of $100$?
+    1. Test whether `softmax` still works correctly if an input has a value of $100$.
     1. Test whether `softmax` still works correctly if the largest of all inputs is smaller than $-100$?
     1. Implement a fix by looking at the value relative to the largest entry in the argument.
 1. Implement a `cross_entropy` function that follows the definition of the cross-entropy loss function $\sum_i y_i \log \hat{y}_i$.
-    1. Try it out in the code example above.
+    1. Try it out in the code example of this section.
     1. Why do you think it runs more slowly?
-    1. Should you use it? In which cases would it make sense?
+    1. Should you use it? When would it make sense to?
     1. What do you need to be careful of? Hint: consider the domain of the logarithm.
 1. Is it always a good idea to return the most likely label? For example, would you do this for medical diagnosis? How would you try to address this?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
-1. Experiment with the hyperparameters of the code above. In particular:
+1. Experiment with the hyperparameters of the code in this section. In particular:
     1. Plot how the validation loss changes as you change the learning rate.
     1. Do the validation and training loss change as you change the minibatch size? How large or small do you need to go before you see an effect?
 

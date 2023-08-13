@@ -3,18 +3,18 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-#  Encoder-Decoder Seq2Seq for Machine Translation
+#  Sequence-to-Sequence Learning for Machine Translation
 :label:`sec_seq2seq`
 
-In so-called seq2seq problems like machine translation
+In so-called sequence-to-sequence problems such as machine translation
 (as discussed in :numref:`sec_machine_translation`),
-where inputs and outputs both consist 
+where inputs and outputs each consist 
 of variable-length unaligned sequences,
-we generally rely on encoder-decoder architectures
+we generally rely on encoder--decoder architectures
 (:numref:`sec_encoder-decoder`).
 In this section,
 we will demonstrate the application 
-of an encoder-decoder architecture,
+of an encoder--decoder architecture,
 where both the encoder and decoder 
 are implemented as RNNs,
 to the task of machine translation
@@ -41,15 +41,15 @@ in the official "ground-truth" label.
 However, at test time, we will want to condition
 each output of the decoder on the tokens already predicted. 
 Note that if we ignore the encoder,
-the decoder in a seq2seq architecture 
+the decoder in a sequence-to-sequence architecture 
 behaves just like a normal language model.
 :numref:`fig_seq2seq` illustrates
 how to use two RNNs
-for sequence to sequence learning
+for sequence-to-sequence learning
 in machine translation.
 
 
-![Sequence to sequence learning with an RNN encoder and an RNN decoder.](../img/seq2seq.svg)
+![Sequence-to-sequence learning with an RNN encoder and an RNN decoder.](../img/seq2seq.svg)
 :label:`fig_seq2seq`
 
 In :numref:`fig_seq2seq`,
@@ -66,7 +66,7 @@ the final hidden state of the encoder
 into the decoder
 at every single decoding time step :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 In some other designs,
-such as :citet:`Sutskever.Vinyals.Le.2014`,
+such as that of :citet:`Sutskever.Vinyals.Le.2014`,
 the final hidden state of the RNN encoder
 is used
 to initiate the hidden state of the decoder
@@ -116,7 +116,7 @@ import optax
 
 While running the encoder on the input sequence
 is relatively straightforward,
-how to handle the input and output 
+handling the input and output 
 of the decoder requires more care. 
 The most common approach is sometimes called *teacher forcing*.
 Here, the original target sequence (token labels)
@@ -148,7 +148,7 @@ In the following, we explain the design
 depicted in :numref:`fig_seq2seq`
 in greater detail.
 We will train this model for machine translation
-on the English-French dataset as introduced in
+on the English--French dataset as introduced in
 :numref:`sec_machine_translation`.
 
 ## Encoder
@@ -158,8 +158,8 @@ into a fixed-shape *context variable* $\mathbf{c}$ (see :numref:`fig_seq2seq`).
 
 
 Consider a single sequence example (batch size 1).
-Suppose that the input sequence is $x_1, \ldots, x_T$, 
-such that $x_t$ is the $t^{\mathrm{th}}$ token.
+Suppose the input sequence is $x_1, \ldots, x_T$, 
+such that $x_t$ is the $t^{\textrm{th}}$ token.
 At time step $t$, the RNN transforms
 the input feature vector $\mathbf{x}_t$ for $x_t$
 and the hidden state $\mathbf{h} _{t-1}$ 
@@ -200,7 +200,7 @@ the size of the input vocabulary (`vocab_size`)
 and number of columns corresponds to 
 the feature vector's dimension (`embed_size`).
 For any input token index $i$,
-the embedding layer fetches the $i^{\mathrm{th}}$ row 
+the embedding layer fetches the $i^{\textrm{th}}$ row 
 (starting from 0) of the weight matrix
 to return its feature vector.
 Here we implement the encoder with a multilayer GRU.
@@ -208,7 +208,7 @@ Here we implement the encoder with a multilayer GRU.
 ```{.python .input}
 %%tab mxnet
 class Seq2SeqEncoder(d2l.Encoder):  #@save
-    """The RNN encoder for sequence to sequence learning."""
+    """The RNN encoder for sequence-to-sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
         super().__init__()
@@ -229,7 +229,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 ```{.python .input}
 %%tab pytorch
 def init_seq2seq(module):  #@save
-    """Initialize weights for Seq2Seq."""
+    """Initialize weights for sequence-to-sequence learning."""
     if type(module) == nn.Linear:
          nn.init.xavier_uniform_(module.weight)
     if type(module) == nn.GRU:
@@ -241,7 +241,7 @@ def init_seq2seq(module):  #@save
 ```{.python .input}
 %%tab pytorch
 class Seq2SeqEncoder(d2l.Encoder):  #@save
-    """The RNN encoder for sequence to sequence learning."""
+    """The RNN encoder for sequence-to-sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
         super().__init__()
@@ -262,7 +262,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 ```{.python .input}
 %%tab tensorflow
 class Seq2SeqEncoder(d2l.Encoder):  #@save
-    """The RNN encoder for sequence to sequence learning."""
+    """The RNN encoder for sequence-to-sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
         super().__init__()
@@ -282,7 +282,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 ```{.python .input}
 %%tab jax
 class Seq2SeqEncoder(d2l.Encoder):  #@save
-    """The RNN encoder for sequence to sequence learning."""
+    """The RNN encoder for sequence-to-sequence learning."""
     vocab_size: int
     embed_size: int
     num_hiddens: int
@@ -308,8 +308,8 @@ to [**illustrate the above encoder implementation.**]
 Below, we instantiate a two-layer GRU encoder
 whose number of hidden units is 16.
 Given a minibatch of sequence inputs `X`
-(batch size: 4, number of time steps: 9),
-the hidden states of the last layer
+(batch size $=4$; number of time steps $=9$),
+the hidden states of the final layer
 at all the time steps
 (`enc_outputs` returned by the encoder's recurrent layers)
 are a tensor of shape
@@ -528,7 +528,7 @@ class Seq2SeqDecoder(d2l.Decoder):
 To [**illustrate the implemented decoder**],
 below we instantiate it with the same hyperparameters from the aforementioned encoder.
 As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
-where the last dimension of the tensor stores the predicted token distribution.
+where the final dimension of the tensor stores the predicted token distribution.
 
 ```{.python .input}
 %%tab all
@@ -550,15 +550,15 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 ```
 
-To summarize, the layers in the above RNN encoder-decoder model 
-are illustrated in :numref:`fig_seq2seq_details`.
+The layers in the above RNN encoder--decoder model 
+are summarized in :numref:`fig_seq2seq_details`.
 
-![Layers in an RNN encoder-decoder model.](../img/seq2seq-details.svg)
+![Layers in an RNN encoder--decoder model.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
 
 
 
-## Encoder-Decoder for Sequence to Sequence Learning
+## Encoder--Decoder for Sequence-to-Sequence Learning
 
 
 Putting it all together in code yields the following:
@@ -566,7 +566,7 @@ Putting it all together in code yields the following:
 ```{.python .input}
 %%tab pytorch, tensorflow, mxnet
 class Seq2Seq(d2l.EncoderDecoder):  #@save
-    """The RNN encoder-decoder for sequence to sequence learning."""
+    """The RNN encoder--decoder for sequence to sequence learning."""
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__(encoder, decoder)
         self.save_hyperparameters()
@@ -589,7 +589,7 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
 ```{.python .input}
 %%tab jax
 class Seq2Seq(d2l.EncoderDecoder):  #@save
-    """The RNN encoder-decoder for sequence to sequence learning."""
+    """The RNN encoder--decoder for sequence to sequence learning."""
     encoder: nn.Module
     decoder: nn.Module
     tgt_pad: int
@@ -612,10 +612,10 @@ As with language modeling,
 we can apply softmax 
 to obtain the distribution
 and calculate the cross-entropy loss for optimization.
-Recall :numref:`sec_machine_translation`
+Recall from :numref:`sec_machine_translation`
 that the special padding tokens
 are appended to the end of sequences
-so sequences of varying lengths
+and so sequences of varying lengths
 can be efficiently loaded
 in minibatches of the same shape.
 However, prediction of padding tokens
@@ -624,7 +624,7 @@ To this end, we can
 [**mask irrelevant entries with zero values**]
 so that multiplication 
 of any irrelevant prediction
-with zero equals to zero.
+with zero equates to zero.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -653,8 +653,8 @@ def loss(self, params, X, Y, state, averaged=False):
 ## [**Training**]
 :label:`sec_seq2seq_training`
 
-Now we can [**create and train an RNN encoder-decoder model**]
-for sequence to sequence learning on the machine translation dataset.
+Now we can [**create and train an RNN encoder--decoder model**]
+for sequence-to-sequence learning on the machine translation dataset.
 
 ```{.python .input}
 %%tab all
@@ -692,7 +692,7 @@ at each step,
 the predicted token from the previous
 time step is fed into the decoder as an input.
 One simple strategy is to sample whichever token
-the decoder has assigned the highest probability
+that has been assigned by the decoder the highest probability
 when predicting at each step.
 As in training, at the initial time step
 the beginning-of-sequence ("&lt;bos&gt;") token
@@ -703,7 +703,7 @@ When the end-of-sequence ("&lt;eos&gt;") token is predicted,
 the prediction of the output sequence is complete.
 
 
-![Predicting the output sequence token by token using an RNN encoder-decoder.](../img/seq2seq-predict.svg)
+![Predicting the output sequence token by token using an RNN encoder--decoder.](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
 
 In the next section, we will introduce 
@@ -779,45 +779,45 @@ But what precisely is the appropriate measure
 for comparing similarity between two sequences?
 
 
-BLEU (Bilingual Evaluation Understudy),
+Bilingual Evaluation Understudy (BLEU),
 though originally proposed for evaluating
 machine translation results :cite:`Papineni.Roukos.Ward.ea.2002`,
 has been extensively used in measuring
 the quality of output sequences for different applications.
-In principle, for any $n$-grams in the predicted sequence,
-BLEU evaluates whether this $n$-grams appears
+In principle, for any $n$-gram (:numref:`subsec_markov-models-and-n-grams`) in the predicted sequence,
+BLEU evaluates whether this $n$-gram appears
 in the target sequence.
 
-Denote by $p_n$ the precision of $n$-grams,
-which is the ratio 
+Denote by $p_n$ the precision of an $n$-gram,
+defined as the ratio 
 of the number of matched $n$-grams in
 the predicted and target sequences
 to the number of $n$-grams in the predicted sequence.
 To explain, given a target sequence $A$, $B$, $C$, $D$, $E$, $F$,
 and a predicted sequence $A$, $B$, $B$, $C$, $D$,
 we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
-Besides, let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
+Now let $\textrm{len}_{\textrm{label}}$ and $\textrm{len}_{\textrm{pred}}$
 be the numbers of tokens in the target sequence 
 and the predicted sequence, respectively.
 Then, BLEU is defined as
 
-$$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
+$$ \exp\left(\min\left(0, 1 - \frac{\textrm{len}_{\textrm{label}}}{\textrm{len}_{\textrm{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
 :eqlabel:`eq_bleu`
 
-where $k$ is the longest $n$-grams for matching.
+where $k$ is the longest $n$-gram for matching.
 
 Based on the definition of BLEU in :eqref:`eq_bleu`,
 whenever the predicted sequence is the same as the target sequence, BLEU is 1.
 Moreover,
 since matching longer $n$-grams is more difficult,
 BLEU assigns a greater weight
-to a longer $n$-gram precision.
+when a longer $n$-gram has high precision.
 Specifically, when $p_n$ is fixed,
 $p_n^{1/2^n}$ increases as $n$ grows (the original paper uses $p_n^{1/n}$).
 Furthermore,
 since
 predicting shorter sequences
-tends to obtain a higher $p_n$ value,
+tends to yield a higher $p_n$ value,
 the coefficient before the multiplication term in :eqref:`eq_bleu`
 penalizes shorter predicted sequences.
 For example, when $k=2$,
@@ -846,7 +846,7 @@ def bleu(pred_seq, label_seq, k):  #@save
 ```
 
 In the end,
-we use the trained RNN encoder-decoder
+we use the trained RNN encoder--decoder
 to [**translate a few English sentences into French**]
 and compute the BLEU of the results.
 
@@ -872,12 +872,12 @@ for en, fr, p in zip(engs, fras, preds):
 
 ## Summary
 
-Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
-In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
+Following the design of the encoder--decoder architecture, we can use two RNNs to design a model for sequence-to-sequence learning.
+In encoder--decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
 When implementing the encoder and the decoder, we can use multilayer RNNs.
 We can use masks to filter out irrelevant computations, such as when calculating the loss.
-As for evaluating output sequences,
-BLEU is a popular measure by matching $n$-grams between the predicted sequence and the target sequence.
+For evaluating output sequences,
+BLEU is a popular measure that matches $n$-grams between the predicted sequence and the target sequence.
 
 
 ## Exercises

@@ -151,7 +151,7 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 1. Edit and run the code in this book with the Jupyter Notebook on your local machine.
 1. Edit and run the code in this book with the Jupyter Notebook *remotely* via port forwarding.
-1. Measure running time of operations $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
+1. Compare the running time of the operations $\mathbf{A}^\top \mathbf{B}$ and $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
 
 
 [Discussions](https://discuss.d2l.ai/t/421)

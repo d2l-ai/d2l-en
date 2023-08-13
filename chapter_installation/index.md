@@ -90,7 +90,7 @@ To install a GPU-enabled version of MXNet,
 we need to find out what version of CUDA you have installed.
 You can check this by running `nvcc --version`
 or `cat /usr/local/cuda/version.txt`.
-Assume that you have installed CUDA 10.2,
+Assume that you have installed CUDA 11.2,
 then execute the following command:
 
 ```bash
@@ -134,7 +134,29 @@ pip install torch==2.0.0 torchvision==0.15.1
 You can install TensorFlow with either CPU or GPU support as follows:
 
 ```bash
-pip install tensorflow tensorflow-probability
+pip install tensorflow==2.12.0 tensorflow-probability==0.20.0
+```
+
+
+:end_tab:
+
+:begin_tab:`jax`
+You can install JAX and Flax with either CPU or GPU support as follows:
+
+```bash
+# GPU
+pip install "jax[cuda11_pip]==0.4.13" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html flax==0.7.0
+```
+
+
+If your machine has no NVIDIA GPUs
+or CUDA,
+you can install the CPU version
+as follows:
+
+```bash
+# CPU
+pip install "jax[cpu]==0.4.13" flax==0.7.0
 ```
 
 
@@ -199,6 +221,18 @@ cd tensorflow
 
 :end_tab:
 
+:begin_tab:`jax`
+
+```bash
+mkdir d2l-en && cd d2l-en
+curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
+unzip d2l-en.zip && rm d2l-en.zip
+cd jax
+```
+
+
+:end_tab:
+
 If you do not already have `unzip` installed, first run `sudo apt-get install unzip`.
 Now we can start the Jupyter Notebook server by running:
 
@@ -208,7 +242,7 @@ jupyter notebook
 
 
 At this point, you can open http://localhost:8888
-(it may have already opened automatically) in your Web browser.
+(it may have already opened automatically) in your web browser.
 Then we can run the code for each section of the book.
 Whenever you open a new command line window,
 you will need to execute `conda activate d2l`
@@ -232,4 +266,3 @@ run `conda deactivate`.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/436)
 :end_tab:
-

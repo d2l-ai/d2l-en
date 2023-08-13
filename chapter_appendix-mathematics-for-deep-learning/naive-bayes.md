@@ -189,8 +189,8 @@ If we can estimate $p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value
 $$
 p(x_i = t_i \mid y) =
 \begin{cases}
-    P_{xy}[i, y] & \text{for } t_i=1 ;\\
-    1 - P_{xy}[i, y] & \text{for } t_i = 0 .
+    P_{xy}[i, y] & \textrm{for } t_i=1 ;\\
+    1 - P_{xy}[i, y] & \textrm{for } t_i = 0 .
 \end{cases}
 $$
 

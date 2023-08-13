@@ -5,15 +5,15 @@ In the previous sections, we worked through
 a number of hands-on applications of machine learning,
 fitting models to a variety of datasets.
 And yet, we never stopped to contemplate
-either where data comes from in the first place
-or what we plan to ultimately do
+either where data came from in the first place
+or what we ultimately plan to do
 with the outputs from our models.
 Too often, machine learning developers
 in possession of data rush to develop models
 without pausing to consider these fundamental issues.
 
 Many failed machine learning deployments
-can be traced back to this pattern.
+can be traced back to this failure.
 Sometimes models appear to perform marvelously
 as measured by test set accuracy
 but fail catastrophically in deployment
@@ -21,12 +21,13 @@ when the distribution of data suddenly shifts.
 More insidiously, sometimes the very deployment of a model
 can be the catalyst that perturbs the data distribution.
 Say, for example, that we trained a model
-to predict who will repay vs. default on a loan,
+to predict who will repay rather than default on a loan,
 finding that an applicant's choice of footwear
 was associated with the risk of default
 (Oxfords indicate repayment, sneakers indicate default).
-We might be inclined to thereafter grant loans
-to all applicants wearing Oxfords
+We might be inclined 
+thereafter to grant a loan
+to any applicant wearing Oxfords
 and to deny all applicants wearing sneakers.
 
 In this case, our ill-considered leap from
@@ -37,7 +38,7 @@ For starters, as soon as we began
 making decisions based on footwear,
 customers would catch on and change their behavior.
 Before long, all applicants would be wearing Oxfords,
-without any coinciding improvement in credit-worthiness.
+without any coincident improvement in credit-worthiness.
 Take a minute to digest this because similar issues abound
 in many applications of machine learning:
 by introducing our model-based decisions to the environment,
@@ -47,7 +48,7 @@ While we cannot possibly give these topics
 a complete treatment in one section,
 we aim here to expose some common concerns,
 and to stimulate the critical thinking
-required to detect these situations early,
+required to detect such situations early,
 mitigate damage, and use machine learning responsibly.
 Some of the solutions are simple
 (ask for the "right" data),
@@ -173,7 +174,7 @@ we will find considerable concept shift regarding
 the distribution of names for *soft drinks*
 as shown in :numref:`fig_popvssoda`.
 
-![Concept shift on soft drink names in the United States.](../img/popvssoda.png)
+![Concept shift for soft drink names in the United States (CC-BY: Alan McConchie, PopVsSoda.com).](../img/popvssoda.png)
 :width:`400px`
 :label:`fig_popvssoda`
 
@@ -205,14 +206,14 @@ for a successful career in medical diagnostics.
 The distributions that gave rise to the training data
 and those you will encounter in the wild might differ considerably.
 This happened to an unfortunate startup
-that some of us (authors) worked with years ago.
+that some of we authors worked with years ago.
 They were developing a blood test for a disease
 that predominantly affects older men
 and hoped to study it using blood samples
 that they had collected from patients.
 However, it is considerably more difficult
 to obtain blood samples from healthy men
-than sick patients already in the system.
+than from sick patients already in the system.
 To compensate, the startup solicited
 blood donations from students on a university campus
 to serve as healthy controls in developing their test.
@@ -275,13 +276,13 @@ and the model is not updated adequately.
 Below are some typical cases.
 
 * We train a computational advertising model and then fail to update it frequently (e.g., we forget to incorporate that an obscure new device called an iPad was just launched).
-* We build a spam filter. It works well at detecting all spam that we have seen so far. But then the spammers wisen up and craft new messages that look unlike anything we have seen before.
+* We build a spam filter. It works well at detecting all spam that we have seen so far. But then the spammers wise up and craft new messages that look unlike anything we have seen before.
 * We build a product recommendation system. It works throughout the winter but then continues to recommend Santa hats long after Christmas.
 
 ### More Anecdotes
 
 * We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
-* We build a Web search engine for the US market and want to deploy it in the UK.
+* We build a web search engine for the US market and want to deploy it in the UK.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
 
@@ -305,7 +306,7 @@ as this material is not prerequisite to subsequent concepts.
 ### Empirical Risk and  Risk
 :label:`subsec_empirical-risk-and-risk`
 
-Let's first reflect about what exactly
+Let's first reflect on what exactly
 is happening during model training:
 we iterate over features and associated labels
 of training data
@@ -321,7 +322,7 @@ where $l$ is the loss function
 measuring "how bad" the prediction $f(\mathbf{x}_i)$ is given the associated label $y_i$.
 Statisticians call the term in :eqref:`eq_empirical-risk-min` *empirical risk*.
 The *empirical risk* is an average loss over the training data
-to approximate the *risk*,
+for approximating the *risk*,
 which is the
 expectation of the loss over the entire population of data drawn from their true distribution
 $p(\mathbf{x},y)$:
@@ -333,7 +334,7 @@ However, in practice we typically cannot obtain the entire population of data.
 Thus, *empirical risk minimization*,
 which is minimizing the empirical risk in :eqref:`eq_empirical-risk-min`,
 is a practical strategy for machine learning,
-with the hope to approximate
+with the hope of approximately
 minimizing the risk.
 
 
@@ -365,7 +366,7 @@ by the ratio of the
 probability
 that it would have been drawn from the correct distribution to that from the wrong one:
 
-$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
+$$\beta_i \stackrel{\textrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
 Plugging in the weight $\beta_i$ for
 each data example $(\mathbf{x}_i, y_i)$
@@ -391,7 +392,7 @@ Note however, that we only need features $\mathbf{x} \sim p(\mathbf{x})$;
 we do not need to access labels $y \sim p(y)$.
 
 In this case, there exists a very effective approach
-that will give almost as good results as the original: logistic regression,
+that will give almost as good results as the original: namely, logistic regression,
 which is a special case of softmax regression (see :numref:`sec_softmax`)
 for binary classification.
 This is all that is needed to compute estimated probability ratios.
@@ -402,7 +403,7 @@ If it is impossible to distinguish
 between the two distributions
 then it means that the associated instances
 are equally likely to come from
-either one of the two distributions.
+either one of those two distributions.
 On the other hand, any instances
 that can be well discriminated
 should be significantly overweighted
@@ -416,10 +417,10 @@ Now denote by $z$ labels that are $1$
 for data drawn from $p$ and $-1$ for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
-$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
+$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \textrm{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
 Thus, if we use a logistic regression approach,
-where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parameterized function),
+where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parametrized function),
 it follows that
 
 $$
@@ -427,7 +428,7 @@ $$
 $$
 
 As a result, we need to solve two problems:
-first one to distinguish between
+the first, to distinguish between
 data drawn from both distributions,
 and then a weighted empirical risk minimization problem
 in :eqref:`eq_weighted-empirical-risk-min`
@@ -442,8 +443,8 @@ are drawn from the target distribution.
 Here is a prototypical algorithm
 for correcting covariate shift:
 
-1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
-1. Train a binary classifier using logistic regression to get function $h$.
+1. Create a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
+1. Train a binary classifier using logistic regression to get the function $h$.
 1. Weigh training data using $\beta_i = \exp(h(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ for some constant $c$.
 1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
 
@@ -485,9 +486,9 @@ $$
 
 
 Here, our importance weights will correspond to the
-label likelihood ratios
+label likelihood ratios:
 
-$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
+$$\beta_i \stackrel{\textrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
 One nice thing about label shift is that
 if we have a reasonably good model
@@ -501,7 +502,7 @@ while the labels are often simpler objects like categories.
 To estimate the target label distribution,
 we first take our reasonably good off-the-shelf classifier
 (typically trained on the training data)
-and compute its confusion matrix using the validation set
+and compute its "confusion" matrix using the validation set
 (also from the training distribution).
 The *confusion matrix*, $\mathbf{C}$, is simply a $k \times k$ matrix,
 where each column corresponds to the label category (ground truth)
@@ -510,14 +511,14 @@ Each cell's value $c_{ij}$ is the fraction of total predictions on the validatio
 where the true label was $j$ and our model predicted $i$.
 
 Now, we cannot calculate the confusion matrix
-on the target data directly,
+on the target data directly
 because we do not get to see the labels for the examples
 that we see in the wild,
 unless we invest in a complex real-time annotation pipeline.
-What we can do, however, is average all of our models predictions
+What we can do, however, is average all of our model's predictions
 at test time together, yielding the mean model outputs $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
-whose $i^\mathrm{th}$ element $\mu(\hat{y}_i)$
-is the fraction of total predictions on the test set
+where the $i^\textrm{th}$ element $\mu(\hat{y}_i)$
+is the fraction of the total predictions on the test set
 where our model predicted $i$.
 
 It turns out that under some mild conditions---if
@@ -525,21 +526,20 @@ our classifier was reasonably accurate in the first place,
 and if the target data contains only categories
 that we have seen before,
 and if the label shift assumption holds in the first place
-(the strongest assumption here),
-then we can estimate the test set label distribution
+(the strongest assumption here)---we can estimate the test set label distribution
 by solving a simple linear system
 
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
 
 because as an estimate $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ holds for all $1 \leq i \leq k$,
-where $p(y_j)$ is the $j^\mathrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
+where $p(y_j)$ is the $j^\textrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
 If our classifier is sufficiently accurate to begin with,
 then the confusion matrix $\mathbf{C}$ will be invertible,
 and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
 Because we observe the labels on the source data,
 it is easy to estimate the distribution $q(y)$.
-Then for any training example $i$ with label $y_i$,
+Then, for any training example $i$ with label $y_i$,
 we can take the ratio of our estimated $p(y_i)/q(y_i)$
 to calculate the weight $\beta_i$,
 and plug this into weighted empirical risk minimization
@@ -574,22 +574,15 @@ Armed with knowledge about how to deal with changes in distributions, we can now
 
 ### Batch Learning
 
-In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
+In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we have trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
 
 
 ### Online Learning
 
-Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward or incur a loss, given our decision.
-Many real problems fall into this category. For example, we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations:
+Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$. Only once we have done this do we observe $y_i$ and so receive a reward or incur a loss, given our decision.
+Many real problems fall into this category. For example, we need to predict tomorrow's stock price, which allows us to trade based on that estimate and at the end of the day we find out whether our estimate made us a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations:
 
-$$
-\mathrm{model} ~ f_t \longrightarrow
-\mathrm{data} ~ \mathbf{x}_t \longrightarrow
-\mathrm{estimate} ~ f_t(\mathbf{x}_t) \longrightarrow\\
-\mathrm{observation} ~ y_t \longrightarrow
-\mathrm{loss} ~ l(y_t, f_t(\mathbf{x}_t)) \longrightarrow
-\mathrm{model} ~ f_{t+1}
-$$
+$$\begin{aligned}&\textrm{model } f_t \longrightarrow \textrm{data }  \mathbf{x}_t \longrightarrow \textrm{estimate } f_t(\mathbf{x}_t) \longrightarrow\\ \textrm{obs}&\textrm{ervation } y_t \longrightarrow \textrm{loss } l(y_t, f_t(\mathbf{x}_t)) \longrightarrow \textrm{model } f_{t+1}\end{aligned}$$
 
 ### Bandits
 
@@ -599,7 +592,7 @@ $$
 ### Control
 
 In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. For instance, a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional-integral-derivative) controller algorithms are a popular choice there.
-Likewise, a user's behavior on a news site will depend on what we showed him previously (e.g., he will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random.
+Likewise, a user's behavior on a news site will depend on what we showed them previously (e.g., they will read most news only once). Many such algorithms form a model of the environment in which they act so as to make their decisions appear less random.
 Recently,
 control theory (e.g., PID variants) has also been used
 to automatically tune hyperparameters
@@ -611,11 +604,11 @@ and improve the diversity of generated text and the reconstruction quality of ge
 
 ### Reinforcement Learning
 
-In the more general case of an environment with memory, we may encounter situations where the environment is trying to cooperate with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to win. Chess, Go, Backgammon, or StarCraft are some of the cases in *reinforcement learning*. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, and trying to cooperate with it.
+In the more general case of an environment with memory, we may encounter situations where the environment is trying to cooperate with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to win. Chess, Go, Backgammon, or StarCraft are some of the cases in *reinforcement learning*. Likewise, we might want to build a good controller for autonomous cars. Other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, or trying to cooperate with it.
 
 ### Considering the Environment
 
-One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that he is trying to solve changes over time.
+One key distinction between the different situations above is that a strategy that might have worked throughout in the case of a stationary environment, might not work throughout in an environment that can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once it is exploited. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist in dealing with concept shift, i.e., when the problem that is being solved can change over time.
 
 
 
@@ -628,14 +621,14 @@ you are not merely optimizing a predictive model---you
 are typically providing a tool that will
 be used to (partially or fully) automate decisions.
 These technical systems can impact the lives
-of individuals subject to the resulting decisions.
-The leap from considering predictions to decisions
+of individuals who are subject to the resulting decisions.
+The leap from considering predictions to making decisions
 raises not only new technical questions,
 but also a slew of ethical questions
 that must be carefully considered.
 If we are deploying a medical diagnostic system,
 we need to know for which populations
-it may work and which it may not.
+it may work and for which it may not.
 Overlooking foreseeable risks to the welfare of
 a subpopulation could cause us to administer inferior care.
 Moreover, once we contemplate decision-making systems,

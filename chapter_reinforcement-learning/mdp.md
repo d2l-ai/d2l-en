@@ -18,7 +18,7 @@ A Markov decision process (MDP) :cite:`BellmanMDP` is a model for how the state 
 ## Return and Discount Factor
 
 The different components above together form a Markov decision process (MDP)
-$$\text{MDP}: (\mathcal{S}, \mathcal{A}, T, r).$$
+$$\textrm{MDP}: (\mathcal{S}, \mathcal{A}, T, r).$$
 
 Let's now consider the situation when the robot starts at a particular state $s_0 \in \mathcal{S}$ and continues taking actions to result in a trajectory
 $$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, s_2, a_2, r_2, \ldots).$$
@@ -37,11 +37,11 @@ Note that if $\gamma$ is very small, the rewards earned by the robot in the far 
 
 Let us think of a new robot where the state $s_t$ is the location as above but the action $a_t$ is the acceleration that the robot applies to its wheels instead of an abstract command like "go forward". If this robot has some non-zero velocity at state $s_t$, then the next location $s_{t+1}$ is a function of the past location $s_t$, the acceleration $a_t$, also the velocity of the robot at time $t$ which is proportional to $s_t - s_{t-1}$. This indicates that we should have
 
-$$s_{t+1} = \text{some function}(s_t, a_t, s_{t-1});$$
+$$s_{t+1} = \textrm{some function}(s_t, a_t, s_{t-1});$$
 
 the "some function" in our case would be Newton's law of motion. This is quite different from our transition function that simply depends upon $s_t$ and $a_t$.
 
-Markov systems are all systems where the next state $s_{t+1}$ is only a function of the current state $s_t$ and the action $a_t$ taken at the current state. In Markov systems, the next state does not depend on which actions were taken in the past or the states that the robot was at in the past. For example, the new robot that has acceleration as the action above is not Markovian because the next location $s_{t+1}$ depends upon the previous state $s_{t-1}$ through the velocity. It may seem that Markovian nature of a system is a restrictive assumption, but it is not so. Markov Decision Processes are still capable of modeling a very large class of real systems. For example, for our new robot, if we chose our state $s_t$ to the tuple $(\text{location}, \text{velocity})$ then the system is Markovian because its next state $(\text{location}_{t+1}, \text{velocity}_{t+1})$ depends only upon the current state $(\text{location}_t, \text{velocity}_t)$ and the action at the current state $a_t$.
+Markov systems are all systems where the next state $s_{t+1}$ is only a function of the current state $s_t$ and the action $a_t$ taken at the current state. In Markov systems, the next state does not depend on which actions were taken in the past or the states that the robot was at in the past. For example, the new robot that has acceleration as the action above is not Markovian because the next location $s_{t+1}$ depends upon the previous state $s_{t-1}$ through the velocity. It may seem that Markovian nature of a system is a restrictive assumption, but it is not so. Markov Decision Processes are still capable of modeling a very large class of real systems. For example, for our new robot, if we chose our state $s_t$ to the tuple $(\textrm{location}, \textrm{velocity})$ then the system is Markovian because its next state $(\textrm{location}_{t+1}, \textrm{velocity}_{t+1})$ depends only upon the current state $(\textrm{location}_t, \textrm{velocity}_t)$ and the action at the current state $a_t$.
 
 ## Summary
 The reinforcement learning problem is typically modeled using Markov Decision Processes. A Markov decision process (MDP) is defined by a tuple of four entities $(\mathcal{S}, \mathcal{A}, T, r)$ where $\mathcal{S}$ is the state space, $\mathcal{A}$ is the action space, $T$ is the transition function that encodes the transition probabilities of the MDP and $r$ is the immediate reward obtained by taking action at a particular state.

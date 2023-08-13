@@ -16,7 +16,7 @@ making it impossible in the short run.
 For now, we can assume that we already have
 as much high-quality data as our resources permit
 and focus the tools at our disposal
-even when the dataset is taken as a given.
+when the dataset is taken as a given.
 
 Recall that in our polynomial regression example
 (:numref:`subsec_polynomial-curve-fitting`)
@@ -24,7 +24,7 @@ we could limit our model's capacity
 by tweaking the degree
 of the fitted polynomial.
 Indeed, limiting the number of features
-is a popular technique to mitigate overfitting.
+is a popular technique for mitigating overfitting.
 However, simply tossing aside features
 can be too blunt an instrument.
 Sticking with the polynomial regression
@@ -40,7 +40,7 @@ are both monomials of degree 3.
 Note that the number of terms with degree $d$
 blows up rapidly as $d$ grows larger.
 Given $k$ variables, the number of monomials
-of degree $d$ (i.e., $k$ multichoose $d$) is ${k - 1 + d} \choose {k - 1}$.
+of degree $d$ is ${k - 1 + d} \choose {k - 1}$.
 Even small changes in degree, say from $2$ to $3$,
 dramatically increase the complexity of our model.
 Thus we often need a more fine-grained tool
@@ -98,7 +98,7 @@ and that we can measure the complexity
 of a function by the distance of its parameters from zero.
 But how precisely should we measure
 the distance between a function and zero?
-There's no single right answer.
+There is no single right answer.
 In fact, entire branches of mathematics,
 including parts of functional analysis
 and the theory of Banach spaces,
@@ -109,7 +109,7 @@ to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 by some norm of its weight vector, e.g., $\| \mathbf{w} \|^2$.
 Recall that we introduced the $\ell_2$ norm and $\ell_1$ norm,
-which are special cases of the more general $\ell_p$ norm
+which are special cases of the more general $\ell_p$ norm,
 in :numref:`subsec_lin-algebra-norms`.
 The most common method for ensuring a small weight vector
 is to add its norm as a penalty term
@@ -121,7 +121,7 @@ with new objective,
 Now, if our weight vector grows too large,
 our learning algorithm might focus
 on minimizing the weight norm $\| \mathbf{w} \|^2$
-vs. minimizing the training error.
+rather than minimizing the training error.
 That is exactly what we want.
 To illustrate things in code,
 we revive our previous example
@@ -139,7 +139,7 @@ but how should the model trade off the
 standard loss for this new additive penalty?
 In practice, we characterize this tradeoff
 via the *regularization constant* $\lambda$,
-a non-negative hyperparameter
+a nonnegative hyperparameter
 that we fit using validation data:
 
 $$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
@@ -188,8 +188,8 @@ then we may not need to collect, store, or transmit data
 for the other (dropped) features. 
 
 Using the same notation in :eqref:`eq_linreg_batch_update`,
-the minibatch stochastic gradient descent updates
-for $\ell_2$-regularized regression follow:
+minibatch stochastic gradient descent updates
+for $\ell_2$-regularized regression as follows:
 
 $$\begin{aligned}
 \mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
@@ -203,8 +203,7 @@ given the penalty term alone,
 our optimization algorithm *decays*
 the weight at each step of training.
 In contrast to feature selection,
-weight decay offers us a continuous mechanism
-for adjusting the complexity of a function.
+weight decay offers us a mechanism for continuously adjusting the complexity of a function.
 Smaller values of $\lambda$ correspond
 to less constrained $\mathbf{w}$,
 whereas larger values of $\lambda$
@@ -226,7 +225,7 @@ through a simple synthetic example.
 
 First, we [**generate some data as before**]:
 
-(**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
+(**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \textrm{ where }
 \epsilon \sim \mathcal{N}(0, 0.01^2).$$**)
 
 In this synthetic dataset, our label is given 
@@ -271,8 +270,8 @@ to the original loss function.
 
 ### (**Defining $\ell_2$ Norm Penalty**)
 
-Perhaps the most convenient way to implement this penalty
-is to square all terms in place and sum them up.
+Perhaps the most convenient way of implementing this penalty
+is to square all terms in place and sum them.
 
 ```{.python .input}
 %%tab all
@@ -367,7 +366,7 @@ depends only on the current value of each parameter,
 the optimizer must touch each parameter once anyway.
 
 :begin_tab:`mxnet`
-In the following code, we specify
+Below, we specify
 the weight decay hyperparameter directly
 through `wd` when instantiating our `Trainer`.
 By default, Gluon decays both
@@ -380,7 +379,7 @@ the bias parameter $b$ will not decay.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the following code, we specify
+Below, we specify
 the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
@@ -393,7 +392,7 @@ bias (the `net.bias` parameter) will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the following code, we create an $\ell_2$ regularizer with
+Below, we create an $\ell_2$ regularizer with
 the weight decay hyperparameter `wd` and apply it to the layer's weights
 through the `kernel_regularizer` argument.
 :end_tab:
@@ -474,11 +473,9 @@ if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
-So far, we only touched upon one notion of
+So far, we have touched upon one notion of
 what constitutes a simple linear function.
-Moreover, what constitutes a simple nonlinear function
-can be an even more complex question.
-For instance, [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
+However, even for simple nonlinear functions, the situation can be much more complex. To see this, the concept of [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
 allows one to apply tools introduced
 for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
@@ -502,7 +499,7 @@ Different sets of parameters can have different update behaviors within the same
 1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
 1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice ($\ell_1$ regularization)?
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (see the Frobenius norm in :numref:`subsec_lin-algebra-norms`)?
-1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
+1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways might help us deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
 :begin_tab:`mxnet`

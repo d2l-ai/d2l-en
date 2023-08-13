@@ -28,7 +28,7 @@ across myriad prediction problems, spanning computer vision;
 natural language processing; time series data; recommender systems;
 electronic health records; protein folding;
 value function approximation in video games
-and board games; and countless other domains.
+and board games; and numerous other domains.
 On the downside, if you were looking
 for a straightforward account
 of either the optimization story
@@ -42,8 +42,8 @@ are both described well by a comprehensive body of theory,
 our understanding of deep learning
 still resembles the wild west on both fronts.
 
-The theory and practice of deep learning
-are rapidly evolving on both fronts,
+Both the theory and practice of deep learning
+are rapidly evolving,
 with theorists adopting new strategies
 to explain what's going on,
 even as practitioners continue
@@ -53,7 +53,7 @@ and a body of intuitions and folk knowledge
 that provide guidance for deciding
 which techniques to apply in which situations.
 
-The TL;DR of the present moment is that the theory of deep learning
+The summary of the present moment is that the theory of deep learning
 has produced promising lines of attack and scattered fascinating results,
 but still appears far from a comprehensive account
 of both (i) why we are able to optimize neural networks
@@ -74,7 +74,7 @@ of the state of research and practice.
 
 ## Revisiting Overfitting and Regularization
 
-According to the "no free lunch" theorem by :citet:`wolpert1995no`,
+According to the "no free lunch" theorem of :citet:`wolpert1995no`,
 any learning algorithm generalizes better on data with certain distributions, and worse with other distributions.
 Thus, given a finite training set,
 a model relies on certain assumptions: 
@@ -85,7 +85,7 @@ Such inductive biases show preferences
 for solutions with certain properties.
 For example,
 a deep MLP has an inductive bias
-towards building up a complicated function by composing simpler functions together.
+towards building up a complicated function by the composition of simpler functions.
 
 With machine learning models encoding inductive biases,
 our approach to training them
@@ -94,7 +94,7 @@ and (ii) estimate the *generalization error*
 (the true error on the underlying population)
 by evaluating the model on holdout data.
 The difference between our fit on the training data
-and our fit on the test data is called the *generalization gap* and when the generalization gap is large,
+and our fit on the test data is called the *generalization gap* and when this is large,
 we say that our models *overfit* to the training data.
 In extreme cases of overfitting,
 we might exactly fit the training data,
@@ -104,7 +104,7 @@ the interpretation is that our models are too complex,
 requiring that we either shrink the number of features,
 the number of nonzero parameters learned,
 or the size of the parameters as quantified.
-Recall the plot of model complexity vs loss
+Recall the plot of model complexity compared with loss
 (:numref:`fig_capacity_vs_error`)
 from :numref:`sec_generalization_basics`.
 
@@ -139,8 +139,7 @@ further by making the model *even more expressive*,
 e.g., adding layers, nodes, or training
 for a larger number of epochs.
 Stranger yet, the pattern relating the generalization gap
-to the *complexity* of the model (as captured, e.g.,
-in the depth or width of the networks)
+to the *complexity* of the model (as captured, for example, in the depth or width of the networks)
 can be non-monotonic,
 with greater complexity hurting at first
 but subsequently helping in a so-called "double-descent" pattern
@@ -157,7 +156,7 @@ they appear powerless to explain why it is
 that deep neural networks generalize in the first place.
 Because deep neural networks are capable of fitting
 arbitrary labels even for large datasets,
-and despite the use of familiar methods like $\ell_2$ regularization,
+and despite the use of familiar methods such as $\ell_2$ regularization,
 traditional complexity-based generalization bounds,
 e.g., those based on the VC dimension
 or Rademacher complexity of a hypothesis class
@@ -172,9 +171,9 @@ When we update the models, we update their parameters.
 When we save the models, we write their parameters to disk.
 However, mathematics and computer science are riddled
 with counterintuitive changes of perspective,
-and surprising isomorphisms seemingly different problems.
-While neural networks, clearly *have* parameters,
-in some ways, it can be more fruitful
+and surprising isomorphisms between seemingly different problems.
+While neural networks clearly *have* parameters,
+in some ways it can be more fruitful
 to think of them as behaving like nonparametric models.
 So what precisely makes a model nonparametric?
 While the name covers a diverse set of approaches,
@@ -183,7 +182,7 @@ tend to have a level of complexity that grows
 as the amount of available data grows.
 
 Perhaps the simplest example of a nonparametric model
-is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_attention-pooling`).
+is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, for example in :numref:`sec_attention-pooling`).
 Here, at training time,
 the learner simply memorizes the dataset.
 Then, at prediction time,
@@ -191,7 +190,7 @@ when confronted with a new point $\mathbf{x}$,
 the learner looks up the $k$ nearest neighbors
 (the $k$ points $\mathbf{x}_i'$ that minimize
 some distance $d(\mathbf{x}, \mathbf{x}_i')$).
-When $k=1$, this is algorithm is called 1-nearest neighbors,
+When $k=1$, this algorithm is called $1$-nearest neighbors,
 and the algorithm will always achieve a training error of zero.
 That however, does not mean that the algorithm will not generalize.
 In fact, it turns out that under some mild conditions,
@@ -199,12 +198,12 @@ the 1-nearest neighbor algorithm is consistent
 (eventually converging to the optimal predictor).
 
 
-Note that 1 nearest neighbor requires that we specify
+Note that $1$-nearest neighbor requires that we specify
 some distance function $d$, or equivalently,
 that we specify some vector-valued basis function $\phi(\mathbf{x})$
 for featurizing our data.
 For any choice of the distance metric,
-we will achieve 0 training error
+we will achieve zero training error
 and eventually reach an optimal predictor,
 but different distance metrics $d$
 encode different inductive biases
@@ -216,7 +215,7 @@ and the performance of the different predictors
 will depend on how compatible the assumptions
 are with the observed data.
 
-In a sense, because neural networks are over-parameterized,
+In a sense, because neural networks are over-parametrized,
 possessing many more parameters than are needed to fit the training data,
 they tend to *interpolate* the training data (fitting it perfectly)
 and thus behave, in some ways, more like nonparametric models.
@@ -234,7 +233,7 @@ While current neural tangent kernel models may not fully explain
 the behavior of modern deep networks,
 their success as an analytical tool
 underscores the usefulness of nonparametric modeling
-for understanding the behavior of over-parameterized deep networks.
+for understanding the behavior of over-parametrized deep networks.
 
 
 ## Early Stopping
@@ -242,12 +241,12 @@ for understanding the behavior of over-parameterized deep networks.
 While deep neural networks are capable of fitting arbitrary labels,
 even when labels are assigned incorrectly or randomly
 :cite:`zhang2021understanding`,
-this ability only emerges over many iterations of training.
+this capability only emerges over many iterations of training.
 A new line of work :cite:`Rolnick.Veit.Belongie.Shavit.2017`
 has revealed that in the setting of label noise,
 neural networks tend to fit cleanly labeled data first
 and only subsequently to interpolate the mislabeled data.
-Moreover, it is been established that this phenomenon
+Moreover, it has been established that this phenomenon
 translates directly into a guarantee on generalization:
 whenever a model has fitted the cleanly labeled data
 but not randomly labeled examples included in the training set,
@@ -257,19 +256,19 @@ Together these findings help to motivate *early stopping*,
 a classic technique for regularizing deep neural networks.
 Here, rather than directly constraining the values of the weights,
 one constrains the number of epochs of training.
-The most common way to determine the stopping criteria
+The most common way to determine the stopping criterion
 is to monitor validation error throughout training
 (typically by checking once after each epoch)
 and to cut off training when the validation error
 has not decreased by more than some small amount $\epsilon$
 for some number of epochs.
-This is sometimes called a *patience criteria*.
-Besides the potential to lead to better generalization,
+This is sometimes called a *patience criterion*.
+As well as the potential to lead to better generalization
 in the setting of noisy labels,
 another benefit of early stopping is the time saved.
-Once the patience criteria is met, one can terminate training.
+Once the patience criterion is met, one can terminate training.
 For large models that might require days of training
-simultaneously across 8 GPUs or more,
+simultaneously across eight or more GPUs,
 well-tuned early stopping can save researchers days of time
 and can save their employers many thousands of dollars.
 
@@ -291,14 +290,13 @@ for constraining the complexity of our models.
 In particular, :numref:`sec_weight_decay`
 introduced a method called weight decay,
 which consists of adding a regularization term to the loss function
-to penalize large values of the weights.
+in order to penalize large values of the weights.
 Depending on which weight norm is penalized
 this technique is known either as ridge regularization (for $\ell_2$ penalty)
 or lasso regularization (for an $\ell_1$ penalty).
 In the classical analysis of these regularizers,
-they are considered to restrict the values
-that the weights can take sufficiently
-to prevent the model from fitting arbitrary labels.
+they are considered as sufficiently restrictive on the values
+that the weights can take to prevent the model from fitting arbitrary labels.
 
 In deep learning implementations,
 weight decay remains a popular tool.
@@ -307,7 +305,7 @@ that typical strengths of $\ell_2$ regularization
 are insufficient to prevent the networks
 from interpolating the data :cite:`zhang2021understanding` and thus the benefits if interpreted
 as regularization might only make sense
-in combination with the early stopping criteria.
+in combination with the early stopping criterion.
 Absent early stopping, it is possible
 that just like the number of layers
 or number of nodes (in deep learning)
@@ -339,11 +337,11 @@ remains similarly mysterious.
 
 Unlike classical linear models,
 which tend to have fewer parameters than examples,
-deep networks tend to be over-parameterized,
+deep networks tend to be over-parametrized,
 and for most tasks are capable
 of perfectly fitting the training set.
 This *interpolation regime* challenges
-many of hard fast-held intuitions.
+many hard fast-held intuitions.
 Functionally, neural networks look like parametric models.
 But thinking of them as nonparametric models
 can sometimes be a more reliable source of intuition.
@@ -367,7 +365,7 @@ despite the concerted efforts of many brilliant researchers.
 
 1. In what sense do traditional complexity-based measures fail to account for generalization of deep neural networks?
 1. Why might *early stopping* be considered a regularization technique?
-1. How do researchers typically determine the stopping criteria?
+1. How do researchers typically determine the stopping criterion?
 1. What important factor seems to differentiate cases when early stopping leads to big improvements in generalization?
 1. Beyond generalization, describe another benefit of early stopping.
 

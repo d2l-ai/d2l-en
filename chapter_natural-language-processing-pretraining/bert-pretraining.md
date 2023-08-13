@@ -33,9 +33,9 @@ train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ## Pretraining BERT
 
 The original BERT has two versions of different model sizes :cite:`Devlin.Chang.Lee.ea.2018`.
-The base model ($\text{BERT}_{\text{BASE}}$) uses 12 layers (Transformer encoder blocks)
+The base model ($\textrm{BERT}_{\textrm{BASE}}$) uses 12 layers (Transformer encoder blocks)
 with 768 hidden units (hidden size) and 12 self-attention heads.
-The large model ($\text{BERT}_{\text{LARGE}}$) uses 24 layers
+The large model ($\textrm{BERT}_{\textrm{LARGE}}$) uses 24 layers
 with 1024 hidden units and 16 self-attention heads.
 Notably, the former has 110 million parameters while the latter has 340 million parameters.
 For demonstration with ease,
@@ -305,7 +305,7 @@ for downstream natural language processing applications.
 ## Exercises
 
 1. In the experiment, we can see that the masked language modeling loss is significantly higher than the next sentence prediction loss. Why?
-2. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
+2. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\textrm{BERT}_{\textrm{LARGE}}$. Do you encounter any error when running this section? Why?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/390)
