@@ -326,7 +326,7 @@ using dynamic programming.
 
 ### The Order of Decoding
 
-You might be wondering why we had to represent
+You may be wondering why we represented
 the factorization of a text sequence $P(x_1, \ldots, x_T)$
 as a left-to-right chain of conditional probabilities.
 Why not right-to-left or some other, seemingly random order?
@@ -383,7 +383,7 @@ whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`.
 This is great news, since it is typically the forward direction
 that we are interested in estimating.
 The book by :citet:`Peters.Janzing.Scholkopf.2017` contains more on this topic.
-We are barely scratch the surface of it.
+We barely scratch the surface of it.
 
 
 ## Training

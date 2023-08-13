@@ -153,7 +153,7 @@ of $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$,
 exponential in the sequence length and with an enormous
 base given by the vocabulary size.
 For example, when $|\mathcal{Y}|=10000$ and $T'=10$, 
-both small numbers when compared with ones in real applications, will need to evaluate $10000^{10} = 10^{40}$ sequences, which is already beyond the capabilities of any foreseeable computers.
+both small numbers when compared with ones in real applications, we will need to evaluate $10000^{10} = 10^{40}$ sequences, which is already beyond the capabilities of any foreseeable computers.
 On the other hand, the computational cost of greedy search is 
 $\mathcal{O}(\left|\mathcal{Y}\right|T')$: 
 miraculously cheap but far from optimal.

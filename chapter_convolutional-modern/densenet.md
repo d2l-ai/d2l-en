@@ -49,7 +49,7 @@ Recall the Taylor expansion for functions. At the point $x = 0$ it can be writte
 $$f(x) = f(0) + x \cdot \left[f'(0) + x \cdot \left[\frac{f''(0)}{2!}  + x \cdot \left[\frac{f'''(0)}{3!}  + \cdots \right]\right]\right].$$
 
 
-The key point is that it decomposes a function into increasingly higher order. In a similar vein, ResNet decomposes functions into
+The key point is that it decomposes a function into terms of increasingly higher order. In a similar vein, ResNet decomposes functions into
 
 $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x}).$$
 
