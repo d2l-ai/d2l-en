@@ -69,14 +69,14 @@ we denote $h_t$ as the hidden state,
 $x_t$ as input, and $o_t$ as output
 at time step $t$.
 Recall our discussions in
-:numref:`subsec_rnn_w_\textrm{h}idden_states`
+:numref:`subsec_rnn_w_hidden_states`
 that the input and the hidden state
 can be concatenated before being multiplied 
 by one weight variable in the hidden layer.
 Thus, we use $w_\textrm{h}$ and $w_\textrm{o}$ to indicate the weights 
 of the hidden layer and the output layer, respectively.
 As a result, the hidden states and outputs 
-at each time steps are
+at each time step are
 
 $$\begin{aligned}h_t &= f(x_t, h_{t-1}, w_\textrm{h}),\\o_t &= g(h_t, w_\textrm{o}),\end{aligned}$$
 :eqlabel:`eq_bptt_ht_ot`
@@ -414,7 +414,7 @@ and $\partial L / \partial \mathbf{W}_\textrm{hh}$.
 ## Summary
 
 Backpropagation through time is merely an application of backpropagation to sequence models with a hidden state.
-Truncation is needed for computational convenience and numerical stability.
+Truncation, such as regular or randomized, is needed for computational convenience and numerical stability.
 High powers of matrices can lead to divergent or vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
 For efficient computation, intermediate values are cached during backpropagation through time.
 

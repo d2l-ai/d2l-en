@@ -13,8 +13,6 @@ However, we often want to initialize our weights
 according to various other protocols. The framework provides most commonly
 used protocols, and also allows to create a custom initializer.
 
-
-
 ```{.python .input}
 %%tab mxnet
 from mxnet import init, np, npx
@@ -113,7 +111,7 @@ net.apply(params, X).shape
 Let's begin by calling on built-in initializers.
 The code below initializes all weight parameters
 as Gaussian random variables
-with standard deviation 0.01, while bias parameters cleared to zero.
+with standard deviation 0.01, while bias parameters are cleared to zero.
 
 ```{.python .input}
 %%tab mxnet

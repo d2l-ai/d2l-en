@@ -62,7 +62,7 @@ Standardizing vectors also has the nice side-effect of constraining the function
 Intuitively, this standardization plays nicely with our optimizers
 since it puts the parameters *a priori* on a similar scale.
 As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
-might not be beneficial. While this is not quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework.
+might not be beneficial. While this is not quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016`, within a unified framework.
 
 Second, for a typical MLP or CNN, as we train,
 the variables 
@@ -238,7 +238,7 @@ Note that in the context of convolutions the batch normalization is well defined
 minibatches of size 1: after all, we have all the locations across an image to average. Consequently,
 mean and variance are well defined, even if it is just within a single observation. This consideration
 led :citet:`Ba.Kiros.Hinton.2016` to introduce the notion of *layer normalization*. It works just like
-a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. For an $n$-dimensional vector $\mathbf{x}$ layer norms are given by 
+a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. For an $n$-dimensional vector $\mathbf{x}$, layer norms are given by 
 
 $$\mathbf{x} \rightarrow \textrm{LN}(\mathbf{x}) =  \frac{\mathbf{x} - \hat{\mu}}{\hat\sigma},$$
 
@@ -867,8 +867,9 @@ in a position paper outlining
 troubling trends in machine learning :cite:`Lipton.Steinhardt.2018`.
 Other authors
 have proposed alternative explanations for the success of batch normalization,
-some claiming that batch normalization's success comes despite exhibiting behavior
-that is in some ways opposite to those claimed in the original paper :cite:`Santurkar.Tsipras.Ilyas.ea.2018`.
+some :cite:`Santurkar.Tsipras.Ilyas.ea.2018`
+claiming that batch normalization's success comes despite exhibiting behavior
+that is in some ways opposite to those claimed in the original paper.
 
 
 We note that the *internal covariate shift*
@@ -889,7 +890,7 @@ On a more practical note, there are a number of aspects worth remembering about 
 * During model training, batch normalization continuously adjusts the intermediate output of
   the network by utilizing the mean and standard deviation of the minibatch, so that the
   values of the intermediate output in each layer throughout the neural network are more stable.
-* Batch normalization for fully connected layers and for convolutional layers are slightly different. In fact,
+* Batch normalization is slightly different for fully connected layers than for convolutional layers. In fact,
   for convolutional layers, layer normalization can sometimes be used as an alternative.
 * Like a dropout layer, batch normalization layers have different behaviors
   in training mode than in prediction mode.

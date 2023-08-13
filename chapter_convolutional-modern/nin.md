@@ -69,7 +69,7 @@ Also recall that the inputs and outputs of fully connected layers
 are typically two-dimensional tensors corresponding to the example and feature.
 The idea behind NiN is to apply a fully connected layer
 at each pixel location (for each height and width).
-The resulting $1 \times 1$ convolution can be thought as
+The resulting $1 \times 1$ convolution can be thought of as
 a fully connected layer acting independently on each pixel location.
 
 :numref:`fig_nin` illustrates the main structural

@@ -3,7 +3,7 @@
 
 Image data is represented as a two-dimensional grid of pixels, be the image
 monochromatic or in color. Accordingly each pixel corresponds to one
-or multiple numerical values respectively. So far we ignored this rich
+or multiple numerical values respectively. So far we have ignored this rich
 structure and treated images as vectors of numbers by *flattening* them, irrespective of the spatial relation between pixels. This
 deeply unsatisfying approach was necessary in order to feed the
 resulting one-dimensional vectors through a fully connected MLP.
@@ -23,10 +23,10 @@ CNN-based architectures are
 now ubiquitous in the field of computer vision.
 For instance, on the Imagnet collection
 :cite:`Deng.Dong.Socher.ea.2009` it was only the use of convolutional neural
-networks, in short Convnets that provided significant performance
+networks, in short Convnets, that provided significant performance
 improvements :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
-Modern CNNs, as they are called colloquially owe their design to
+Modern CNNs, as they are called colloquially, owe their design to
 inspirations from biology, group theory, and a healthy dose of
 experimental tinkering.  In addition to their sample efficiency in
 achieving accurate models, CNNs tend to be computationally efficient,

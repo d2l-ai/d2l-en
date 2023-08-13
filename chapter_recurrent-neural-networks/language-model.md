@@ -121,7 +121,7 @@ find enough occurrences to get accurate estimates.
 As suggested by the empirical results in :numref:`subsec_natural-lang-stat`,
 things take a turn for the worse for three-word combinations and beyond.
 There will be many plausible three-word combinations that we likely will not see in our dataset.
-Unless we provide some solution to assign such word combinations nonzero count, we will not be able to use them in a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
+Unless we provide some solution to assign such word combinations a nonzero count, we will not be able to use them in a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
 
 ### Laplace Smoothing
 
@@ -190,7 +190,7 @@ hence evaluating the model on Tolstoy's magnum opus
 *War and Peace* will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella *The Little Prince*. What is missing is the equivalent of an average.
 
 Information theory comes handy here.
-We have defined entropy, surprisal, and cross-entropy
+We defined entropy, surprisal, and cross-entropy
 when we introduced the softmax regression
 (:numref:`subsec_info_theory_basics`).
 If we want to compress text, we can ask about

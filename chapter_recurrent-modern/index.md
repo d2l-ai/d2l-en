@@ -12,7 +12,7 @@ feature mechanisms for mitigating the notorious
 numerical instability faced by RNNs,
 as typified by vanishing and exploding gradients.
 Recall that in :numref:`chap_rnn` we dealt 
-with exploding gradient by applying a blunt
+with exploding gradients by applying a blunt
 gradient clipping heuristic. 
 Despite the efficacy of this hack,
 it leaves open the problem of vanishing gradients. 
@@ -47,7 +47,7 @@ This is in contrast to previous networks,
 in which only past input can affect the output.
 Bidirectional RNNs have become a mainstay 
 for sequence labeling tasks in natural language processing,
-among myriad other tasks. 
+among a myriad of other tasks. 
 Fortunately, the two innovations are not mutually exclusive, 
 and have been successfully combined for phoneme classification
 :cite:`Graves.Schmidhuber.2005` and handwriting recognition :cite:`graves2008novel`.

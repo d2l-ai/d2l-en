@@ -67,7 +67,7 @@ $$
 \end{aligned}
 $$
 
-where the weights $\mathbf{W}_{\textrm{xh}}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{\textrm{xh}}^{(b)} \in \mathbb{R}^{d \times h}, \textrm{ and } \mathbf{W}_{\textrm{hh}}^{(b)} \in \mathbb{R}^{h \times h}$, and biases $\mathbf{b}_\textrm{h}^{(f)} \in \mathbb{R}^{1 \times h}$ and $\mathbf{b}_\textrm{h}^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
+where the weights $\mathbf{W}_{\textrm{xh}}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{\textrm{xh}}^{(b)} \in \mathbb{R}^{d \times h}, \textrm{ and } \mathbf{W}_{\textrm{hh}}^{(b)} \in \mathbb{R}^{h \times h}$, and the biases $\mathbf{b}_\textrm{h}^{(f)} \in \mathbb{R}^{1 \times h}$ and $\mathbf{b}_\textrm{h}^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
 
 Next, we concatenate the forward and backward hidden states
 $\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$

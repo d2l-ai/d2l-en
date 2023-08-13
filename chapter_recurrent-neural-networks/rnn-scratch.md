@@ -349,8 +349,7 @@ where the length along the third axis
 is given by the vocabulary size (`len(vocab)`).**)
 We often transpose the input so that we will obtain an output 
 of shape (number of time steps, batch size, vocabulary size).
-This will allow us to more conveniently
-loop through the outermost dimension
+This will allow us to loop more conveniently through the outermost dimension
 for updating hidden states of a minibatch,
 time step by time step
 (e.g., in the above `forward` method).
@@ -480,7 +479,7 @@ Having a small value for this upper bound
 might be viewed as good or bad.
 On the downside, we are limiting the speed
 at which we can reduce the value of the objective.
-On the bright side, this limits just how much
+On the bright side, this limits by just how much
 we can go wrong in any one gradient step.
 
 
@@ -622,7 +621,7 @@ of a document.
 However, it is often useful to condition
 the language model on a user-supplied prefix.
 For example, if we were developing an
-autocomplete feature for search engine
+autocomplete feature for a search engine
 or to assist users in writing emails,
 we would want to feed in what they 
 had written so far (the prefix), 

@@ -98,7 +98,8 @@ from jax import numpy as jnp
 Another way to cast the state of affairs is that
 the most important part of the pipeline was the representation.
 And up until 2012 the representation was calculated mostly mechanically.
-In fact, engineering a new set of feature functions, improving results, and writing up the method was a prominent genre of paper.
+In fact, engineering a new set of feature functions, improving results, and writing up the method
+all featured prominently in papers.
 SIFT :cite:`Lowe.2004`,
 SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`,
 HOG (histograms of oriented gradient) :cite:`Dalal.Triggs.2005`,
@@ -128,7 +129,7 @@ over LeNet. It achieved excellent performance in the 2012 ImageNet challenge.
 :width:`400px`
 :label:`fig_filters`
 
-Interestingly in the lowest layers of the network,
+Interestingly, in the lowest layers of the network,
 the model learned feature extractors that resembled some traditional filters.
 :numref:`fig_filters`
 shows lower-level image descriptors.
@@ -252,7 +253,7 @@ they implemented fast convolutions.
 The [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/) code
 was good enough that for several years
 it was the industry standard and powered
-the first couple years of the deep learning boom.
+the first couple of years of the deep learning boom.
 
 ## AlexNet
 

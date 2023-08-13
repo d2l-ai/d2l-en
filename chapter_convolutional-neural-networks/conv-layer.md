@@ -480,7 +480,7 @@ or the cross-correlation operations.
 
 To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is here denoted as the matrix $\mathbf{K}$.
 Assuming that other conditions remain unchanged,
-when this layer performs strict *convolution*,
+when this layer instead performs strict *convolution*,
 the learned kernel $\mathbf{K}'$ will be the same as $\mathbf{K}$
 after $\mathbf{K}'$ is
 flipped both horizontally and vertically.

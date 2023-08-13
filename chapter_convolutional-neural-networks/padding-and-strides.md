@@ -122,7 +122,7 @@ For any two-dimensional tensor `X`,
 when the kernel's size is odd
 and the number of padding rows and columns
 on all sides are the same,
-producing an output with the same height and width as the input,
+thereby producing an output with the same height and width as the input,
 we know that the output `Y[i, j]` is calculated
 by cross-correlation of the input and convolution kernel
 with the window centered on `X[i, j]`.

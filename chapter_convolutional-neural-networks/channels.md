@@ -57,7 +57,7 @@ with the same number of input channels as the input data,
 so that it can perform cross-correlation with the input data.
 Assuming that the number of channels for the input data is $c_\textrm{i}$,
 the number of input channels of the convolution kernel also needs to be $c_\textrm{i}$. If our convolution kernel's window shape is $k_\textrm{h}\times k_\textrm{w}$,
-then when $c_\textrm{i}=1$, we can think of our convolution kernel
+then, when $c_\textrm{i}=1$, we can think of our convolution kernel
 as just a two-dimensional tensor of shape $k_\textrm{h}\times k_\textrm{w}$.
 
 However, when $c_\textrm{i}>1$, we need a kernel
@@ -163,7 +163,7 @@ def corr2d_multi_in_out(X, K):
     return d2l.stack([corr2d_multi_in(X, k) for k in K], 0)
 ```
 
-We construct a trivial convolution kernel with 3 output channels
+We construct a trivial convolution kernel with three output channels
 by concatenating the kernel tensor for `K` with `K+1` and `K+2`.
 
 ```{.python .input}
@@ -193,7 +193,7 @@ does not seem to make much sense.
 After all, a convolution correlates adjacent pixels.
 A $1 \times 1$ convolution obviously does not.
 Nonetheless, they are popular operations that are sometimes included
-in the designs of complex deep networks :cite:`Lin.Chen.Yan.2013,Szegedy.Ioffe.Vanhoucke.ea.2017`
+in the designs of complex deep networks :cite:`Lin.Chen.Yan.2013,Szegedy.Ioffe.Vanhoucke.ea.2017`.
 Let's see in some detail what it actually does.
 
 Because the minimum window is used,
@@ -292,7 +292,7 @@ Note, though, that this flexibility comes at a price. Given an image of size $(h
     1. What is the memory footprint?
     1. What is the memory footprint for the backward computation?
     1. What is the computational cost for the backpropagation?
-1. By what factor does the number of calculations increase if we double the number of input channels 
+1. By what factor does the number of calculations increase if we double both the number of input channels 
    $c_\textrm{i}$ and the number of output channels $c_\textrm{o}$? What happens if we double the padding?
 1. Are the variables `Y1` and `Y2` in the final example of this section exactly the same? Why?
 1. Express convolutions as a matrix multiplication, even when the convolution window is not $1 \times 1$. 

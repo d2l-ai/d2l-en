@@ -250,7 +250,7 @@ occur often because they serve common syntactic roles.
 Such words that are common but not particularly descriptive
 are often called (***stop words***) and,
 in previous generations of text classifiers
-based on bag-of-words representations,
+based on so-called bag-of-words representations,
 they were most often filtered out.
 However, they carry meaning and
 it is not necessary to filter them out

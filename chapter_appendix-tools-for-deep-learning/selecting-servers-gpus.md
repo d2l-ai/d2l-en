@@ -39,7 +39,7 @@ GPU vendors typically release a new generation every one to two years, such as t
 
 For most users, it is enough to look at compute power. Note that many GPUs offer different types of acceleration. For example, NVIDIA's TensorCores accelerate a subset of operators by 5$\times$. Ensure that your libraries support this. The GPU memory should be no less than 4 GB (8 GB is much better). Try to avoid using the GPU also for displaying a GUI (use the built-in graphics instead). If you cannot avoid it, add an extra 2 GB of RAM for safety.
 
-:numref:`fig_flopsvsprice` compares the 32-bit floating-point compute power and price of the various GTX 900, GTX 1000 and RTX 2000 series models. The prices are the suggested those found on Wikipedia.
+:numref:`fig_flopsvsprice` compares the 32-bit floating-point compute power and price of the various GTX 900, GTX 1000 and RTX 2000 series models. The prices suggested are those found on Wikipedia at the time of writing.
 
 ![Floating-point compute power and price comparison. ](../img/flopsvsprice.svg)
 :label:`fig_flopsvsprice`

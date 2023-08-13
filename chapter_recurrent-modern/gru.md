@@ -116,12 +116,12 @@ The result is a *candidate*, since we still need
 to incorporate the action of the update gate.
 Comparing with :eqref:`rnn_h_with_state`,
 the influence of the previous states
-can be reduced with the
+can now be reduced with the
 elementwise multiplication of
 $\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
 in :eqref:`gru_tilde_H`.
 Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, 
-we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
+we recover a vanilla RNN such as that in :eqref:`rnn_h_with_state`.
 For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, 
 the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as input. 
 Any pre-existing hidden state is thus *reset* to defaults.

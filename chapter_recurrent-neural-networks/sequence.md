@@ -7,7 +7,7 @@ The main change of perspective when developing models
 capable of processing sequences is that we now
 focus on inputs that consist of an ordered list
 of feature vectors $\mathbf{x}_1, \dots, \mathbf{x}_T$,
-where each feature vector $\mathbf{x}_t$
+where each feature vector $\mathbf{x}_t$ is
 indexed by a time step $t \in \mathbb{Z}^+$
 lying in $\mathbb{R}^d$.
 
@@ -50,7 +50,7 @@ Consider the usefulness of the auto-fill features
 that are popular on search tools and modern email clients.
 They are useful precisely because it is often possible
 to predict (imperfectly, but better than random guessing)
-what likely continuations of a sequence might be,
+what the likely continuations of a sequence might be,
 given some initial prefix.
 For most sequence models,
 we do not require independence,
@@ -67,7 +67,7 @@ or (ii) patient status evolving either
 towards recovery or towards death
 over the course of a hospital stay;
 or (iii) customer taste evolving in predictable ways
-over course of continued interaction with a recommender system.
+over the course of continued interaction with a recommender system.
 
 
 We sometimes wish to predict a fixed target $y$
@@ -259,7 +259,7 @@ the capacity to *evaluate* likelihood,
 but the ability to *sample* sequences,
 and even to optimize for the most likely sequences.
 
-While language modeling might not, at first glance, look,
+While language modeling might not, at first glance, look
 like an autoregressive problem,
 we can reduce language modeling to autoregressive prediction
 by decomposing the joint density  of a sequence $p(x_1, \ldots, x_T)$
@@ -383,7 +383,7 @@ whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`.
 This is great news, since it is typically the forward direction
 that we are interested in estimating.
 The book by :citet:`Peters.Janzing.Scholkopf.2017` contains more on this topic.
-We are barely scratching the surface of it.
+We are barely scratch the surface of it.
 
 
 ## Training
@@ -478,7 +478,7 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
 ```
 
 These predictions look good,
-even near the end $t=1000$.
+even near the end at $t=1000$.
 
 But what if we only observed sequence data
 up until time step 604 (`n_train + tau`)

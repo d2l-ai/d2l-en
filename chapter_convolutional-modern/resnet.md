@@ -92,7 +92,7 @@ Note that residual networks are predated by highway networks :cite:`srivastava20
 :label:`subsec_residual-blks`
 
 Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
-We assume that $f(\mathbf{x})$, the desired underlying mapping we want to obtain by learning is to be used as input to the activation function on the top.
+We assume that $f(\mathbf{x})$, the desired underlying mapping we want to obtain by learning, is to be used as input to the activation function on the top.
 On the left,
 the portion within the dotted-line box
 must directly learn $f(\mathbf{x})$.

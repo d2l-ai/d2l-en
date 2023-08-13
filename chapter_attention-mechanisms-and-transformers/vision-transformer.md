@@ -36,7 +36,7 @@ and feed them into a Transformer encoder
 to obtain a global representation,
 which will finally be transformed for classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 Notably, Transformers show better scalability than CNNs:
-when training larger models on larger datasets,
+and when training larger models on larger datasets,
 vision Transformers outperform ResNets by a significant margin.
 Similar to the landscape of network architecture design in natural language processing,
 Transformers have also become a game-changer in computer vision.
@@ -372,7 +372,7 @@ trainer.fit(model, data)
 
 ## Summary and Discussion
 
-You may notice that for small datasets like Fashion-MNIST,
+You may have noticed that for small datasets like Fashion-MNIST,
 our implemented vision Transformer
 does not outperform the ResNet in :numref:`sec_resnet`.
 Similar observations can be made even on the ImageNet dataset (1.2 million images).
@@ -383,9 +383,9 @@ where vision Transformers outperform ResNets by a large margin in image classifi
 intrinsic superiority of Transformers in scalability :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 The introduction of vision Transformers
 has changed the landscape of network design for modeling image data.
-They were soon shown effective on the ImageNet dataset
+They were soon shown to be effective on the ImageNet dataset
 with data-efficient training strategies of DeiT :cite:`touvron2021training`.
-However, quadratic complexity of self-attention
+However, the quadratic complexity of self-attention
 (:numref:`sec_self-attention-and-positional-encoding`)
 makes the Transformer architecture
 less suitable for higher-resolution images.

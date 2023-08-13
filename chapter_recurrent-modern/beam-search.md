@@ -26,7 +26,7 @@ At any time step $t'$, the decoder outputs
 predictions representing the probability 
 of each token in the vocabulary 
 coming next in the sequence 
-(the likely value of $y_{t'+1}$, 
+(the likely value of $y_{t'+1}$), 
 conditioned on the previous tokens
 $y_1, \ldots, y_{t'}$ and 
 the context variable $\mathbf{c}$,
@@ -88,7 +88,7 @@ Suppose that there are four tokens
 In :numref:`fig_s2s-prob1`,
 the four numbers under each time step represent
 the conditional probabilities of generating "A", "B", "C", 
-and "&lt;eos&gt;" at that time step.
+and "&lt;eos&gt;" respectively, at that time step.
 
 ![At each time step, greedy search selects the token with the highest conditional probability.](../img/s2s-prob1.svg)
 :label:`fig_s2s-prob1`
@@ -153,7 +153,7 @@ of $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$,
 exponential in the sequence length and with an enormous
 base given by the vocabulary size.
 For example, when $|\mathcal{Y}|=10000$ and $T'=10$, 
-we will need to evaluate $10000^{10} = 10^{40}$ sequences, which is already beyond the capabilities any foreseeable computers.
+both small numbers when compared with ones in real applications, will need to evaluate $10000^{10} = 10^{40}$ sequences, which is already beyond the capabilities of any foreseeable computers.
 On the other hand, the computational cost of greedy search is 
 $\mathcal{O}(\left|\mathcal{Y}\right|T')$: 
 miraculously cheap but far from optimal.
@@ -169,7 +169,8 @@ between the efficiency of greedy search
 and the optimality of exhaustive search.
 The most straightforward version of beam search 
 is characterized by a single hyperparameter,
-the *beam size*, $k$. 
+the *beam size*, $k$.
+Let's explain this terminology.
 At time step 1, we select the $k$ tokens 
 with the highest predicted probabilities.
 Each of them will be the first token of 
@@ -215,7 +216,7 @@ As a result, we get six candidates output sequences:
 
 In the end, we obtain the set of final candidate output sequences 
 based on these six sequences (e.g., discard portions including and after “&lt;eos&gt;”).
-Then we choose the sequence which maximizes the following score:
+Then we choose the output sequence which maximizes the following score:
 
 $$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c});$$
 :eqlabel:`eq_beam-search-score`

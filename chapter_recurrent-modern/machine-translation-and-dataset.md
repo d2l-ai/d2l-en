@@ -35,7 +35,7 @@ and an example dataset that we will use in the subsequent examples.
 For decades, statistical formulations of translation between languages
 had been popular :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`,
 even before researchers got neural network approaches working
-(methods often lumped together under the term *neural machine translation*).
+(methods were often lumped together under the term *neural machine translation*).
 
 
 First we will need some new code to process our data.
@@ -79,8 +79,8 @@ import os
 To begin, we download an English--French dataset
 that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
 Each line in the dataset is a tab-delimited pair 
-consisting of an English text sequence 
-and the translated French text sequence.
+consisting of an English text sequence (the *source*) 
+and the translated French text sequence (the *target*).
 Note that each text sequence
 can be just one sentence,
 or a paragraph of multiple sentences.

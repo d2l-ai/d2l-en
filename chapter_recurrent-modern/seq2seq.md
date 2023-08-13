@@ -66,7 +66,7 @@ the final hidden state of the encoder
 into the decoder
 at every single decoding time step :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 In some other designs,
-such as :citet:`Sutskever.Vinyals.Le.2014`,
+such as that of :citet:`Sutskever.Vinyals.Le.2014`,
 the final hidden state of the RNN encoder
 is used
 to initiate the hidden state of the decoder
@@ -612,7 +612,7 @@ As with language modeling,
 we can apply softmax 
 to obtain the distribution
 and calculate the cross-entropy loss for optimization.
-Recall :numref:`sec_machine_translation`
+Recall from :numref:`sec_machine_translation`
 that the special padding tokens
 are appended to the end of sequences
 and so sequences of varying lengths
@@ -788,7 +788,7 @@ In principle, for any $n$-gram (:numref:`subsec_markov-models-and-n-grams`) in t
 BLEU evaluates whether this $n$-gram appears
 in the target sequence.
 
-Denote by $p_n$ the precision of $n$-gram,
+Denote by $p_n$ the precision of an $n$-gram,
 defined as the ratio 
 of the number of matched $n$-grams in
 the predicted and target sequences
@@ -804,7 +804,7 @@ Then, BLEU is defined as
 $$ \exp\left(\min\left(0, 1 - \frac{\textrm{len}_{\textrm{label}}}{\textrm{len}_{\textrm{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
 :eqlabel:`eq_bleu`
 
-where $k$ is the longest $n$-grams for matching.
+where $k$ is the longest $n$-gram for matching.
 
 Based on the definition of BLEU in :eqref:`eq_bleu`,
 whenever the predicted sequence is the same as the target sequence, BLEU is 1.

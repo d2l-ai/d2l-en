@@ -36,7 +36,7 @@ of each subsequent layer.
 Hence the ability to set parameters
 without the need to know,
 at the time of writing the code,
-the value of the dimension, is
+the value of the dimension
 can greatly simplify the task of specifying
 and subsequently modifying our models.
 Next, we go deeper into the mechanics of initialization.

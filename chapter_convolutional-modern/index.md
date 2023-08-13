@@ -31,7 +31,7 @@ so that you can form your own intuitions about where the field is
 heading and perhaps develop your own architectures.  For instance,
 batch normalization and residual connections described in this chapter
 have offered two popular ideas for training and designing deep models,
-both of which have since been applied to architectures beyond computer
+both of which have since also been applied to architectures beyond computer
 vision.
 
 We begin our tour of modern CNNs with AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,

@@ -90,7 +90,7 @@ is preferable to average pooling.
 In both cases, as with the cross-correlation operator,
 we can think of the pooling window
 as starting from the upper-left of the input tensor
-and sliding across the it from left to right and top to bottom.
+and sliding across it from left to right and top to bottom.
 At each location that the pooling window hits,
 it computes the maximum or average
 value of the input subtensor in the window,

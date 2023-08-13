@@ -9,7 +9,7 @@ became salient, with Bengio and Hochreiter
 discussing the problem
 :cite:`bengio1994learning,Hochreiter.Bengio.Frasconi.ea.2001`.
 Hochreiter had articulated this problem as early 
-as in his Masters thesis, although the results 
+as 1991 in his Master's thesis, although the results 
 were not widely known because the thesis was written in German.
 While gradient clipping helps with exploding gradients, 
 handling vanishing gradients appears 
@@ -90,7 +90,7 @@ The key distinction between vanilla RNNs and LSTMs
 is that the latter support gating of the hidden state.
 This means that we have dedicated mechanisms for
 when a hidden state should be *updated* and
-also when it should be *reset*.
+also for when it should be *reset*.
 These mechanisms are learned and they address the concerns listed above.
 For instance, if the first token is of great importance
 we will learn not to update the hidden state after the first observation.

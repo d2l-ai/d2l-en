@@ -150,9 +150,9 @@ $\mathbf{O}_t$ of the current time step $t$.
 :label:`fig_rnn`
 
 We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ for the hidden state is equivalent to
-matrix multiplication of
+matrix multiplication of the
 concatenation of $\mathbf{X}_t$ and $\mathbf{H}_{t-1}$
-and
+and the
 concatenation of $\mathbf{W}_{\textrm{xh}}$ and $\mathbf{W}_{\textrm{hh}}$.
 Though this can be proven mathematically,
 in the following we just use a simple code snippet as a demonstration.
@@ -222,7 +222,7 @@ and consider a *character-level language model*.
 
 During the training process,
 we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss to compute the error between the model output and the target.
-Because of the recurrent computation of the hidden state in the hidden layer, the output of time step 3 in :numref:`fig_rnn_train` is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
+Because of the recurrent computation of the hidden state in the hidden layer, the output, $\mathbf{O}_3$,  of time step 3 in :numref:`fig_rnn_train` is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
 
 In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be an $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
 

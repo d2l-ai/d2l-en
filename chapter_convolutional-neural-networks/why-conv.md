@@ -14,8 +14,7 @@ interactions among the features,
 but we do not assume any structure *a priori*
 concerning how the features interact.
 
-Sometimes, we truly lack knowledge to guide
-the construction of fancier architectures.
+Sometimes, we truly lack the knowledge to be able to guide the construction of fancier architectures.
 In these cases, an MLP
 may be the best that we can do.
 However, for high-dimensional perceptual data,
@@ -221,7 +220,7 @@ That is, we measure the overlap between $f$ and $g$
 when one function is "flipped" and shifted by $\mathbf{x}$.
 Whenever we have discrete objects, the integral turns into a sum.
 For instance, for vectors from
-the set of square summable infinite dimensional vectors
+the set of square-summable infinite-dimensional vectors
 with index running over $\mathbb{Z}$ we obtain the following definition:
 
 $$(f * g)(i) = \sum_a f(a) g(i-a).$$
@@ -318,7 +317,7 @@ A second principle that we encountered in our reasoning is how to reduce the num
 
 Adding channels allowed us to bring back some of the complexity that was lost due to the restrictions imposed on the convolutional kernel by locality and translation invariance. Note that it is quite natural to add channels other than just red, green, and blue. Many satellite 
 images, in particular for agriculture and meteorology, have tens to hundreds of channels, 
-generating hyperspectral images instead. They report data on many different wavelengths. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations and how to deal with large numbers of categories efficiently. 
+generating hyperspectral images instead. They report data on many different wavelengths. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations, and how to deal with large numbers of categories efficiently. 
 
 ## Exercises
 

@@ -493,18 +493,12 @@ Over the following sections we will encounter a number of design choices (e.g., 
 
 ## Exercises
 
-1. GoogLeNet was so successful that it went through a number of iterations, progressively improving speed and accuracy. Try to implement and run some of them.
-   They include the following:
-   1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
-      later in :numref:`sec_batch_norm`.
-   1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in
-      :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-   1. Use label smoothing for model regularization, as described in
-      :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-   1. Make further adjustments to the Inception block by adding residual connection
-      :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
-      :numref:`sec_resnet`.
-1. What is the minimum image size for GoogLeNet to work?
+1. GoogLeNet was so successful that it went through a number of iterations, progressively improving speed and accuracy. Try to implement and run some of them. They include the following:
+    1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described later in :numref:`sec_batch_norm`.
+    1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+    1. Use label smoothing for model regularization, as described in :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+    1. Make further adjustments to the Inception block by adding residual connection :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in :numref:`sec_resnet`.
+1. What is the minimum image size needed for GoogLeNet to work?
 1. Can you design a variant of GoogLeNet that works on Fashion-MNIST's native resolution of $28 \times 28$ pixels? How would you need to change the stem, the body, and the head of the network, if anything at all?
 1. Compare the model parameter sizes of AlexNet, VGG, NiN, and GoogLeNet. How do the latter two network
    architectures significantly reduce the model parameter size?

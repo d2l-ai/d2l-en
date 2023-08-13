@@ -5,7 +5,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 
 # File I/O
 
-So far we discussed how to process data and how
+So far we have discussed how to process data and how
 to build, train, and test deep learning models.
 However, at some point we will hopefully be happy enough
 with the learned models that we will want

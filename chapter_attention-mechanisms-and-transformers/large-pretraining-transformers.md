@@ -8,7 +8,7 @@ For example, a Transformer was trained
 with English--French pairs (:numref:`sec_transformer`)
 so that this model can translate input English text into French.
 As a result, each model becomes a *specific expert*
-that is sensitive to even slight shift in data distribution
+that is sensitive to even a slight shift in data distribution
 (:numref:`sec_environment-and-distribution-shift`).
 For better generalized models, or even more competent *generalists*
 that can perform multiple tasks with or without adaptation,
@@ -127,7 +127,7 @@ such as with vision Transformers :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`,
 Swin Transformers :cite:`liu2021swin`,
 and MAE (masked autoencoders) :cite:`he2022masked`.
 
-## Encoder-Decoder
+## Encoder--Decoder
 
 Since a Transformer encoder converts a sequence of input tokens
 into the same number of output representations,
@@ -333,7 +333,7 @@ GPT-3 performs better with larger model size,
 where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`).
 
 The subsequent GPT-4 model did not fully disclose technical details in its report :cite:`openai2023gpt4`.
-Different from its predecessors, GPT-4
+By contrast with its predecessors, GPT-4
 is a large-scale, multimodal model that
 can take both text and images as input
 and generate text output.
