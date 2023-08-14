@@ -367,3 +367,7 @@ A second difference is the relative ease with which we were able to implement Le
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18000)
+:end_tab:

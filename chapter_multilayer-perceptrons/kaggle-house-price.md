@@ -464,3 +464,7 @@ we can use $K$-fold cross-validation .
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/237)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17988)
+:end_tab:

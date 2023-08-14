@@ -355,3 +355,7 @@ In natural language processing, *machine translation* refers to the task of auto
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3863)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18020)
+:end_tab:

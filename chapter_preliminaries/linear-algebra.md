@@ -1153,3 +1153,7 @@ To recap:
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/196)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17968)
+:end_tab:

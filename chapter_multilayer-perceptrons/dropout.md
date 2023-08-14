@@ -503,3 +503,7 @@ it replaces an activation $h$ with a random variable with expected value $h$.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/261)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17987)
+:end_tab:

@@ -1114,3 +1114,7 @@ interval centered on the expectation.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17971)
+:end_tab:

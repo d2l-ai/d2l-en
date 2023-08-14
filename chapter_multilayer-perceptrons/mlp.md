@@ -653,3 +653,7 @@ in many cases.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/226)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17984)
+:end_tab:

@@ -443,3 +443,7 @@ throughout this book will require calculating the gradient.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/197)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17969)
+:end_tab:

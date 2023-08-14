@@ -590,3 +590,7 @@ In terms of convolutions themselves, they can be used for many purposes, for exa
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/271)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17996)
+:end_tab:

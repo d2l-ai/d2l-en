@@ -660,3 +660,7 @@ often dramatically.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1048)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18010)
+:end_tab:

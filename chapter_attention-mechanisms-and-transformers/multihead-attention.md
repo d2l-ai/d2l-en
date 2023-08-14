@@ -470,3 +470,7 @@ proper tensor manipulation is needed.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3869)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18029)
+:end_tab:

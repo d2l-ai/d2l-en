@@ -927,3 +927,7 @@ On a more practical note, there are a number of aspects worth remembering about 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/330)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18005)
+:end_tab:

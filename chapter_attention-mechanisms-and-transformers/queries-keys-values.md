@@ -136,3 +136,7 @@ by which a neural network can select elements from a set and to construct an ass
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1710)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18024)
+:end_tab:

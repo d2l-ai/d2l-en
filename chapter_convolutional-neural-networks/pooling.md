@@ -403,3 +403,8 @@ Note that there are many more ways of reducing resolution beyond pooling. For in
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/274)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17999)
+:end_tab:
+

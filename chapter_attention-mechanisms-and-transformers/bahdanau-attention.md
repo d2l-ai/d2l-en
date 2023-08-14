@@ -483,3 +483,7 @@ In the RNN encoder--decoder, the Bahdanau attention mechanism treats the decoder
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3868)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18028)
+:end_tab:

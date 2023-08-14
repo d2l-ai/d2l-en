@@ -472,3 +472,7 @@ We leave you with a few rules of thumb:
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/234)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17978)
+:end_tab:

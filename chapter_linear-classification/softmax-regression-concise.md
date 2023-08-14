@@ -260,3 +260,7 @@ FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (ver
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/260)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17983)
+:end_tab:

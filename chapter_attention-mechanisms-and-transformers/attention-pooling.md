@@ -255,3 +255,7 @@ The attention weight is assigned according to the similarity (or distance) betwe
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3866)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18026)
+:end_tab:

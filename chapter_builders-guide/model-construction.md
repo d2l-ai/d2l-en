@@ -782,3 +782,7 @@ Sequential concatenations of layers and modules are handled by the `Sequential` 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/264)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17989)
+:end_tab:

@@ -405,3 +405,7 @@ beyond image classification with state-of-the-art results :cite:`liu2021swin`.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/8943)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18032)
+:end_tab:

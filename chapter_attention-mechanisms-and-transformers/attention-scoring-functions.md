@@ -672,3 +672,7 @@ we can use the additive attention scoring function instead. Optimizing these lay
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3867)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18027)
+:end_tab:

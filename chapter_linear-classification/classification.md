@@ -214,3 +214,7 @@ Classification is a sufficiently common problem that it warrants its own conveni
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/6810)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17981)
+:end_tab:

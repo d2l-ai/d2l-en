@@ -664,3 +664,7 @@ You can lose significant performance by moving data without care.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/270)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17995)
+:end_tab:

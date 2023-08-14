@@ -360,3 +360,7 @@ Layers can have local parameters, which can be created through built-in function
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/279)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17993)
+:end_tab:

@@ -732,3 +732,7 @@ A common feature of the designs we have discussed so far is that the network des
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/8737)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18006)
+:end_tab:

@@ -274,3 +274,7 @@ Lastly, data iterators are a key component for efficient performance. For instan
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/224)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17980)
+:end_tab:

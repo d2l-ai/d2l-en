@@ -255,3 +255,7 @@ The hidden state of an RNN can capture historical information of the sequence up
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1051)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/180013)
+:end_tab:

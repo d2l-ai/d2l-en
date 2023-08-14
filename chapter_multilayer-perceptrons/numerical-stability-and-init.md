@@ -420,3 +420,7 @@ ReLU activation functions mitigate the vanishing gradient problem. This can acce
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/235)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17986)
+:end_tab:

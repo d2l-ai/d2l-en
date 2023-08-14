@@ -162,3 +162,7 @@ in addition to becoming a better scientist.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/199)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17972)
+:end_tab:

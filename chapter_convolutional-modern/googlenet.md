@@ -515,3 +515,7 @@ Over the following sections we will encounter a number of design choices (e.g., 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/316)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18004)
+:end_tab:

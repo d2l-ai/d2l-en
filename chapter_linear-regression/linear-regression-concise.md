@@ -437,3 +437,7 @@ Dimensionality and storage for networks are automatically inferred
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/204)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17977)
+:end_tab:

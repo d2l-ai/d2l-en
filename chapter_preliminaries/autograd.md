@@ -691,3 +691,7 @@ For now, try to remember these basics: (i) attach gradients to those variables w
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/200)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17970)
+:end_tab:

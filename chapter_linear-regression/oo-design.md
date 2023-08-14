@@ -490,3 +490,7 @@ this degree of modularity pays dividends throughout the book in terms of concise
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/6647)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17974)
+:end_tab:

@@ -209,3 +209,7 @@ the type of problems you may need to address.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/195)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17967)
+:end_tab:

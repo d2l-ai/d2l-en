@@ -336,3 +336,7 @@ large language models form the basis of state-of-the-art systems across diverse 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1049)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18012)
+:end_tab:

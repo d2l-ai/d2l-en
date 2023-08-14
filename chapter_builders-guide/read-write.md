@@ -357,3 +357,7 @@ Saving the architecture has to be done in code rather than in parameters.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/327)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17994)
+:end_tab:
