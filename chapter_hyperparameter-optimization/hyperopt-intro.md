@@ -1,4 +1,4 @@
-```{.python .input  n=2}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(["pytorch"])
 ```
@@ -178,7 +178,7 @@ ranges.
 | learning rate       | float       |      $[10^{-6},10^{-1}]$       |    yes    |
 | batch size          | integer     |           $[8,256]$            |    yes    |
 | momentum            | float       |           $[0,0.99]$           |    no     |
-| activation function | categorical | $\{\text{tanh}, \text{relu}\}$ |     -     |
+| activation function | categorical | $\{\textrm{tanh}, \textrm{relu}\}$ |     -     |
 | number of units     | integer     |          $[32, 1024]$          |    yes    |
 | number of layers    | integer     |            $[1, 6]$            |    no     |
 
@@ -188,7 +188,7 @@ In general, the structure of the configuration space $\mathcal{X}$ can be comple
 and it can be quite different from $\mathbb{R}^d$. In practice, some
 hyperparameters may depend on the value of others. For example, assume we try
 to tune the number of layers for a multi-layer perceptron, and for each layer
-the number of units. The number of units of the $l\mathrm{-th}$ layer is
+the number of units. The number of units of the $l\textrm{-th}$ layer is
 relevant only if the network has at least $l+1$ layers. These advanced HPO
 problems are beyond the scope of this chapter. We refer the interested reader
 to :cite:`hutter-lion11a,jenatton-icml17a,baptista-icml18a`.

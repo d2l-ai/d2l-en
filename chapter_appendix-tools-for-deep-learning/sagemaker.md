@@ -26,7 +26,7 @@ avoid any surprise,
 e.g., 
 when forgetting to stop running instances.
 After logging into your AWS account, 
-o to your [console](http://console.aws.amazon.com/) and search for "Amazon SageMaker" (see :numref:`fig_sagemaker`), 
+go to your [console](http://console.aws.amazon.com/) and search for "Amazon SageMaker" (see :numref:`fig_sagemaker`), 
 then click it to open the SageMaker panel.
 
 ![Search for and open the SageMaker panel.](../img/sagemaker.png)
@@ -70,7 +70,7 @@ The entire book in the ipynb format for running with SageMaker is available at h
 
 Creating an instance
 may take a few minutes.
-When the instance is ready,
+When it is ready,
 click on the "Open Jupyter" link next to it (:numref:`fig_sagemaker-open`) so you can
 edit and run all the Jupyter notebooks
 of this book on this instance

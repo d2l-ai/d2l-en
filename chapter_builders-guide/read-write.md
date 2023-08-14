@@ -5,21 +5,19 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 
 # File I/O
 
-So far we discussed how to process data and how
+So far we have discussed how to process data and how
 to build, train, and test deep learning models.
-However, at some point, we will hopefully be happy enough
+However, at some point we will hopefully be happy enough
 with the learned models that we will want
 to save the results for later use in various contexts
 (perhaps even to make predictions in deployment).
 Additionally, when running a long training process,
 the best practice is to periodically save intermediate results (checkpointing)
-to ensure that we do not lose several days worth of computation
+to ensure that we do not lose several days' worth of computation
 if we trip over the power cord of our server.
 Thus it is time to learn how to load and store
 both individual weight vectors and entire models.
 This section addresses both issues.
-
-
 
 ```{.python .input}
 %%tab mxnet
@@ -345,7 +343,7 @@ Saving the architecture has to be done in code rather than in parameters.
 ## Exercises
 
 1. Even if there is no need to deploy trained models to a different device, what are the practical benefits of storing model parameters?
-1. Assume that we want to reuse only parts of a network to be incorporated into a network of a different architecture. How would you go about using, say the first two layers from a previous network in a new network?
+1. Assume that we want to reuse only parts of a network to be incorporated into a network having a different architecture. How would you go about using, say the first two layers from a previous network in a new network?
 1. How would you go about saving the network architecture and parameters? What restrictions would you impose on the architecture?
 
 :begin_tab:`mxnet`
@@ -358,4 +356,8 @@ Saving the architecture has to be done in code rather than in parameters.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/327)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17994)
 :end_tab:

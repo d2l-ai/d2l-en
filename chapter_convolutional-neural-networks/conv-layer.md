@@ -90,14 +90,14 @@ $$
 
 Note that along each axis, the output size
 is slightly smaller than the input size.
-Because the kernel has width and height greater than one,
+Because the kernel has width and height greater than $1$,
 we can only properly compute the cross-correlation
 for locations where the kernel fits wholly within the image,
-the output size is given by the input size $n_h \times n_w$
-minus the size of the convolution kernel $k_h \times k_w$
+the output size is given by the input size $n_\textrm{h} \times n_\textrm{w}$
+minus the size of the convolution kernel $k_\textrm{h} \times k_\textrm{w}$
 via
 
-$$(n_h-k_h+1) \times (n_w-k_w+1).$$
+$$(n_\textrm{h}-k_\textrm{h}+1) \times (n_\textrm{w}-k_\textrm{w}+1).$$
 
 This is the case since we need enough space
 to "shift" the convolution kernel across the image.
@@ -242,11 +242,11 @@ class Conv2D(nn.Module):
 
 In
 $h \times w$ convolution
-or a $h \times w$ convolution kernel,
+or an $h \times w$ convolution kernel,
 the height and width of the convolution kernel are $h$ and $w$, respectively.
 We also refer to
-a convolutional layer with a $h \times w$
-convolution kernel simply as a $h \times w$ convolutional layer.
+a convolutional layer with an $h \times w$
+convolution kernel simply as an $h \times w$ convolutional layer.
 
 
 ## Object Edge Detection in Images
@@ -255,7 +255,7 @@ Let's take a moment to parse [**a simple application of a convolutional layer:
 detecting the edge of an object in an image**]
 by finding the location of the pixel change.
 First, we construct an "image" of $6\times 8$ pixels.
-The middle four columns are black (0) and the rest are white (1).
+The middle four columns are black ($0$) and the rest are white ($1$).
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -281,8 +281,8 @@ X
 Next, we construct a kernel `K` with a height of 1 and a width of 2.
 When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
-the output is 0. Otherwise, the output is non-zero.
-Note that this kernel is special case of a finite difference operator. At location $(i,j)$ it computes $x_{i,j} - x_{(i+1),j}$, i.e., it computes the difference between the values of horizontally adjacent pixels. This is a discrete approximation of the first derivative in the horizontal direction. After all, for a function $f(i,j)$ its derivative $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Let's see how this works in practice.
+the output is 0. Otherwise, the output is nonzero.
+Note that this kernel is a special case of a finite difference operator. At location $(i,j)$ it computes $x_{i,j} - x_{(i+1),j}$, i.e., it computes the difference between the values of horizontally adjacent pixels. This is a discrete approximation of the first derivative in the horizontal direction. After all, for a function $f(i,j)$ its derivative $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Let's see how this works in practice.
 
 ```{.python .input}
 %%tab all
@@ -291,9 +291,9 @@ K = d2l.tensor([[1.0, -1.0]])
 
 We are ready to perform the cross-correlation operation
 with arguments `X` (our input) and `K` (our kernel).
-As you can see, [**we detect 1 for the edge from white to black
-and -1 for the edge from black to white.**]
-All other outputs take value 0.
+As you can see, [**we detect $1$ for the edge from white to black
+and $-1$ for the edge from black to white.**]
+All other outputs take value $0$.
 
 ```{.python .input}
 %%tab all
@@ -478,9 +478,9 @@ perform
 either the strict convolution operations
 or the cross-correlation operations.
 
-To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is denoted as the matrix $\mathbf{K}$ here.
+To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is here denoted as the matrix $\mathbf{K}$.
 Assuming that other conditions remain unchanged,
-when this layer performs strict *convolution* instead,
+when this layer instead performs strict *convolution*,
 the learned kernel $\mathbf{K}'$ will be the same as $\mathbf{K}$
 after $\mathbf{K}'$ is
 flipped both horizontally and vertically.
@@ -493,10 +493,10 @@ the same output in :numref:`fig_correlation`
 (cross-correlation of the input and $\mathbf{K}$)
 will be obtained.
 
-In keeping with standard terminology with deep learning literature,
+In keeping with standard terminology in deep learning literature,
 we will continue to refer to the cross-correlation operation
 as a convolution even though, strictly-speaking, it is slightly different.
-Besides,
+Furthermore,
 we use the term *element* to refer to
 an entry (or component) of any tensor representing a layer representation or a convolution kernel.
 
@@ -543,8 +543,10 @@ needs a larger receptive field
 to detect input features over a broader area,
 we can build a deeper network.
 
-Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` on a range of animals
-and different stimuli, Hubel and Wiesel explored the response of what is called the visual
+
+Receptive fields derive their name from neurophysiology.
+A series of experiments on a range of animals using different stimuli
+:cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` explored the response of what is called the visual
 cortex on said stimuli. By and large they found that lower levels respond to edges and related
 shapes. Later on, :citet:`Field.1987` illustrated this effect on natural
 images with, what can only be called, convolutional kernels.
@@ -553,14 +555,13 @@ We reprint a key figure in :numref:`field_visual` to illustrate the striking sim
 ![Figure and caption taken from :citet:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
 :label:`field_visual`
 
-As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g.,
-in :citet:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in deep learning.
+As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated in, for example, :citet:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in deep learning.
 
 ## Summary
 
-The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix-matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible due to that. After all, it means that chip designers can invest into fast computation rather than memory, when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it opens the door to ubiquitous and affordable computer vision.
+The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix--matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible because of that. After all, it means that chip designers can invest in fast computation rather than memory when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it does open the door to ubiquitous and affordable computer vision.
 
-In terms of convolutions themselves, they can be used for many purposes such as to detect edges and lines, to blur images, or to sharpen them. Most importantly, it is not necessary that the statistician (or engineer) invents suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature maps in the brain. This gives us confidence that we are on the right track.
+In terms of convolutions themselves, they can be used for many purposes, for example detecting edges and lines, blurring images, or sharpening them. Most importantly, it is not necessary that the statistician (or engineer) invents suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature maps in the brain. This gives us confidence that we are on the right track.
 
 ## Exercises
 
@@ -572,7 +573,7 @@ In terms of convolutions themselves, they can be used for many purposes such as 
     1. Given a directional vector $\mathbf{v} = (v_1, v_2)$, derive an edge-detection kernel that detects
        edges orthogonal to $\mathbf{v}$, i.e., edges in the direction $(v_2, -v_1)$.
     1. Derive a finite difference operator for the second derivative. What is the minimum
-       size of the convolutional kernel associate with it? Which structures in images respond most strongly to it?
+       size of the convolutional kernel associated with it? Which structures in images respond most strongly to it?
     1. How would you design a blur kernel? Why might you want to use such a kernel?
     1. What is the minimum size of a kernel to obtain a derivative of order $d$?
 1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
@@ -588,4 +589,8 @@ In terms of convolutions themselves, they can be used for many purposes such as 
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/271)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17996)
 :end_tab:

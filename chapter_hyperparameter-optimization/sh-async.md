@@ -1,6 +1,7 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(["pytorch"])
+#required_libs("syne-tune[gpsearchers]==0.3.2")
 ```
 
 # Asynchronous Successive Halving
@@ -15,7 +16,7 @@ successive halving (SH) asynchronously in a distributed setting. Before we can
 decide which configuration to run next, we first have to collect all
 observations at the current rung level. This requires to
 synchronize workers at each rung level. For example, for the lowest rung level
-$r_{\text{min}}$, we first have to evaluate all $N = \eta^K$ configurations, before we
+$r_{\mathrm{min}}$, we first have to evaluate all $N = \eta^K$ configurations, before we
 can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
 In any distributed system, synchronization typically implies idle time for workers.
@@ -52,7 +53,7 @@ performance, not only because the ranking of hyperparameter configurations is of
 fairly consistent across rung levels, but also because rungs grow over time and
 reflect the distribution of metric values at this level better and better. If a
 worker is free, but no configuration can be promoted, we start a new configuration
-with $r = r_{\text{min}}$, i.e the first rung level.
+with $r = r_{\mathrm{min}}$, i.e the first rung level.
 
 :numref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
 finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
@@ -160,7 +161,7 @@ scheduler = ASHA(
 
 Here, `metric` and `resource_attr` specify the key names used with the `report`
 callback, and `max_resource_attr` denotes which input to the objective function
-corresponds to $r_{\text{max}}$. Moreover, `grace_period` provides $r_{\text{min}}$, and
+corresponds to $r_{\mathrm{max}}$. Moreover, `grace_period` provides $r_{\mathrm{min}}$, and
 `reduction_factor` is $\eta$. We can run Syne Tune as before (this will
 take about 12 minutes):
 
@@ -202,7 +203,7 @@ e.plot()
 Once more, we visualize the learning curves of every trial (each color in the plot represents a trial). Compare this to
 asynchronous random search in :numref:`sec_rs_async`. As we have seen for
 successive halving in :numref:`sec_mf_hpo`, most of the trials are stopped
-at 1 or 2 epochs ($r_{\text{min}}$ or $\eta * r_{\text{min}}$). However, trials do not stop
+at 1 or 2 epochs ($r_{\mathrm{min}}$ or $\eta * r_{\mathrm{min}}$). However, trials do not stop
 at the same point, because they require different amount of time per epoch. If
 we ran standard successive halving instead of ASHA, we would need to synchronize
 our workers, before we can promote configurations to the next rung level.

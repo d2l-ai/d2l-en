@@ -2,13 +2,13 @@
 
 :label:`sec_attention-pooling`
 
-Now that we introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification via kernel density estimation :cite:`Nadaraya.1964,Watson.1964`. This detour simply provides additional background: it is entirely optional and can be skipped if needed. 
-At their core, Nadaraya-Watson estimators rely on some similarity kernel $\alpha(\mathbf{q}, \mathbf{k})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
+Now that we have introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification via kernel density estimation :cite:`Nadaraya.1964,Watson.1964`. This detour simply provides additional background: it is entirely optional and can be skipped if needed. 
+At their core, Nadaraya--Watson estimators rely on some similarity kernel $\alpha(\mathbf{q}, \mathbf{k})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
 
 $$\begin{aligned}
-\alpha(\mathbf{q}, \mathbf{k}) & = \exp\left(-\frac{1}{2} \|\mathbf{q} - \mathbf{k}\|^2 \right) && \mathrm{Gaussian} \\
-\alpha(\mathbf{q}, \mathbf{k}) & = 1 \text{ if } \|\mathbf{q} - \mathbf{k}\| \leq 1 && \mathrm{Boxcar} \\
-\alpha(\mathbf{q}, \mathbf{k}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right) && \mathrm{Epanechikov}
+\alpha(\mathbf{q}, \mathbf{k}) & = \exp\left(-\frac{1}{2} \|\mathbf{q} - \mathbf{k}\|^2 \right) && \textrm{Gaussian;} \\
+\alpha(\mathbf{q}, \mathbf{k}) & = 1 \textrm{ if } \|\mathbf{q} - \mathbf{k}\| \leq 1 && \textrm{Boxcar;} \\
+\alpha(\mathbf{q}, \mathbf{k}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right) && \textrm{Epanechikov.}
 \end{aligned}
 $$
 
@@ -62,12 +62,10 @@ from flax import linen as nn
 
 ## [**Kernels and Data**]
 
-All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *translation and rotation invariant*, that is, if we shift and rotate $\mathbf{k}$ and $\mathbf{q}$ in the same manner, the value of $\alpha$ remains unchanged. For simplicity we thus pick scalar arguments $k, q \in \mathbb{R}$ and pick the key $k = 0$ as the origin. This yields:
+All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *translation and rotation invariant*; that is, if we shift and rotate $\mathbf{k}$ and $\mathbf{q}$ in the same manner, the value of $\alpha$ remains unchanged. For simplicity we thus pick scalar arguments $k, q \in \mathbb{R}$ and pick the key $k = 0$ as the origin. This yields:
 
 ```{.python .input}
 %%tab all
-fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
-
 # Define some kernels
 def gaussian(x):
     return d2l.exp(-x**2 / 2)
@@ -94,6 +92,8 @@ if tab.selected('jax'):
 
 ```{.python .input}
 %%tab all
+fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
+
 kernels = (gaussian, boxcar, constant, epanechikov)
 names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
 x = d2l.arange(-2.5, 2.5, 0.1)
@@ -103,11 +103,13 @@ for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('jax'):
         ax.plot(x, kernel(x))
     ax.set_xlabel(name)
+
+d2l.plt.show()
 ```
 
 Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of $1$ (or some otherwise defined hyperparameter) and does so indiscriminately. 
 
-To see Nadaraya-Watson estimation in action, let's define some training data. In the following we use the dependency
+To see Nadaraya--Watson estimation in action, let's define some training data. In the following we use the dependency
 
 $$y_i = 2\sin(x_i) + x_i + \epsilon,$$
 
@@ -135,11 +137,11 @@ x_val = d2l.arange(0, 5, 0.1)
 y_val = f(x_val)
 ```
 
-## [**Attention Pooling via Nadaraya-Watson Regression**]
+## [**Attention Pooling via Nadaraya--Watson Regression**]
 
 Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics. Hence we first compute the kernel between all training features (covariates) `x_train` and all validation features `x_val`. This yields a matrix, which we subsequently normalize. When multiplied with the training labels `y_train` we obtain the estimates.
 
-Recall attention pooling in :eqref:`eq_attention_pooling`. Let each validation feature be a query, and each training feature-label pair be a key-value pair. As a result, the  normalized relative kernel weights (`attention_w` below) are the *attention weights*.
+Recall attention pooling in :eqref:`eq_attention_pooling`. Let each validation feature be a query, and each training feature--label pair be a key--value pair. As a result, the  normalized relative kernel weights (`attention_w` below) are the *attention weights*.
 
 ```{.python .input}
 %%tab all
@@ -222,25 +224,25 @@ Clearly, the narrower the kernel, the less smooth the estimate. At the same time
 plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)
 ```
 
-As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal. In fact, :citet:`Silverman86` proposed a heuristic that depends on the local density. Many more such "tricks" have been proposed. It remains a valuable technique to date. For instance, :citet:`norelli2022asif` used a similar nearest-neighbor interpolation technique to design cross-modal image and text representations. 
+As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal. In fact, :citet:`Silverman86` proposed a heuristic that depends on the local density. Many more such "tricks" have been proposed. For instance, :citet:`norelli2022asif` used a similar nearest-neighbor interpolation technique for designing cross-modal image and text representations. 
 
-The astute reader might wonder why this deep dive on a method that is over half a century old. First, it is one of the earliest precursors of modern attention mechanisms. Second, it is great for visualization. Third, and just as importantly, it demonstrates the limits of hand-crafted attention mechanisms. A much better strategy is to *learn* the mechanism, by learning the representations for queries and keys. This is what we will embark on in the following sections.
+The astute reader might wonder why we are providing this deep dive for a method that is over half a century old. First, it is one of the earliest precursors of modern attention mechanisms. Second, it is great for visualization. Third, and just as importantly, it demonstrates the limits of hand-crafted attention mechanisms. A much better strategy is to *learn* the mechanism, by learning the representations for queries and keys. This is what we will embark on in the following sections.
 
 
 ## Summary
 
-Nadaraya-Watson kernel regression is an early precursor of the current attention mechanisms. 
-It can be used directly with little to no training or tuning, both for classification and regression. 
+Nadaraya--Watson kernel regression is an early precursor of the current attention mechanisms. 
+It can be used directly with little to no training or tuning, either for classification or regression. 
 The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available. 
 
 ## Exercises
 
-1. Parzen windows density estimates are given by $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Prove that for binary classification the function $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, as obtained by Parzen windows is equivalent to Nadaraya-Watson classification. 
-1. Implement stochastic gradient descent to learn a good value for kernel widths in Nadaraya-Watson regression. 
+1. Parzen windows density estimates are given by $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Prove that for binary classification the function $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, as obtained by Parzen windows is equivalent to Nadaraya--Watson classification. 
+1. Implement stochastic gradient descent to learn a good value for kernel widths in Nadaraya--Watson regression. 
     1. What happens if you just use the above estimates to minimize $(f(\mathbf{x_i}) - y_i)^2$ directly? Hint: $y_i$ is part of the terms used to compute $f$.
     1. Remove $(\mathbf{x}_i, y_i)$ from the estimate for $f(\mathbf{x}_i)$ and optimize over the kernel widths. Do you still observe overfitting?
-1. Assume that all $\mathbf{x}$ lie on the unit sphere, i.e., all satisfy $\|\mathbf{x}\| = 1$. Can you simplify the $\|\mathbf{x} - \mathbf{x}_i\|^2$ term in the exponential? Hint: we will later see that this is very closely related to dot-product attention. 
-1. Recall that :citet:`mack1982weak` proved that Nadaraya-Watson estimation is consistent. How quickly should you reduce the scale for the attention mechanism as you get more data? Provide some intuition for your answer. Does it depend on the dimensionality of the data? How?
+1. Assume that all $\mathbf{x}$ lie on the unit sphere, i.e., all satisfy $\|\mathbf{x}\| = 1$. Can you simplify the $\|\mathbf{x} - \mathbf{x}_i\|^2$ term in the exponential? Hint: we will later see that this is very closely related to dot product attention. 
+1. Recall that :citet:`mack1982weak` proved that Nadaraya--Watson estimation is consistent. How quickly should you reduce the scale for the attention mechanism as you get more data? Provide some intuition for your answer. Does it depend on the dimensionality of the data? How?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1598)
@@ -252,4 +254,8 @@ The attention weight is assigned according to the similarity (or distance) betwe
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3866)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18026)
 :end_tab:

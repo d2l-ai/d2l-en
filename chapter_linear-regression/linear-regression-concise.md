@@ -6,13 +6,13 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
-Deep learning has witnessed a Cambrian explosion
-of sorts over the past decade.
+Deep learning has witnessed a sort of Cambrian explosion
+over the past decade.
 The sheer number of techniques, applications and algorithms by far surpasses the
 progress of previous decades. 
 This is due to a fortuitous combination of multiple factors,
 one of which is the powerful free tools
-offered by a number of open source deep learning frameworks.
+offered by a number of open-source deep learning frameworks.
 Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010`,
 DistBelief :cite:`Dean.Corrado.Monga.ea.2012`,
 and Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014`
@@ -79,7 +79,7 @@ using basic linear algebra operations.
 You *should* know how to do this.
 But once your models get more complex,
 and once you have to do this nearly every day,
-you will be glad for the assistance.
+you will be glad of the assistance.
 The situation is similar to coding up your own blog from scratch.
 Doing it once or twice is rewarding and instructive,
 but you would be a lousy web developer
@@ -95,7 +95,7 @@ as described in :numref:`fig_single_neuron`.
 The layer is called *fully connected*,
 since each of its inputs is connected
 to each of its outputs
-by means of a matrix-vector multiplication.
+by means of a matrix--vector multiplication.
 
 :begin_tab:`mxnet`
 In Gluon, the fully connected layer is defined in the `Dense` class.
@@ -114,17 +114,16 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` (available since version 1.8.0) classes. 
+In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` classes (available since version 1.8.0). 
 The latter
-allows users to *only* specify
+allows users to specify *merely*
 the output dimension,
 while the former
 additionally asks for
 how many inputs go into this layer.
-Specifying input shapes is inconvenient,
-which may require nontrivial calculations
+Specifying input shapes is inconvenient and may require nontrivial calculations
 (such as in convolutional layers).
-Thus, for simplicity we will use such "lazy" layers
+Thus, for simplicity, we will use such "lazy" layers
 whenever we can. 
 :end_tab:
 
@@ -173,7 +172,7 @@ class LinearRegression(d2l.Module):  #@save
         self.net = nn.Dense(1, kernel_init=nn.initializers.normal(0.01))
 ```
 
-In the `forward` method, we just invoke the built-in `__call__` method of the predefined layers to compute the outputs.
+In the `forward` method we just invoke the built-in `__call__` method of the predefined layers to compute the outputs.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -298,6 +297,7 @@ We did not have to allocate parameters individually,
 define our loss function, or implement minibatch SGD.
 Once we start working with much more complex models,
 the advantages of the high-level API will grow considerably.
+
 Now that we have all the basic pieces in place,
 [**the training loop itself is the same
 as the one we implemented from scratch.**]
@@ -375,7 +375,7 @@ and properly tested for reliability.
 At the same time, try not to forget
 that these modules *can* be implemented directly.
 This is especially important for aspiring researchers
-who wish to live on the bleeding edge of model development,
+who wish to live on the leading edge of model development,
 where you will be inventing new components
 that cannot possibly exist in any current library.
 
@@ -418,11 +418,11 @@ Dimensionality and storage for networks are automatically inferred
    with an average over the loss on the minibatch?
 1. Review the framework documentation to see which loss functions are provided. In particular,
    replace the squared loss with Huber's robust loss function. That is, use the loss function
-   $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \text{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \text{ otherwise}\end{cases}$$
+   $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \textrm{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \textrm{ otherwise}\end{cases}$$
 1. How do you access the gradient of the weights of the model?
-1. How does the solution change if you change the learning rate and the number of epochs? Does it keep on improving?
-1. How does the solution change as you change the amount of data generated?
-    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e., 5, 10, 20, 50, ..., 10,000 rather than 1,000, 2,000, ..., 10,000.
+1. What is the effect on the solution if you change the learning rate and the number of epochs? Does it keep on improving?
+1. How does the solution change as you vary the amount of data generated?
+    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e., 5, 10, 20, 50, ..., 10,000 rather than 1000, 2000, ..., 10,000.
     2. Why is the suggestion in the hint appropriate?
 
 
@@ -436,4 +436,8 @@ Dimensionality and storage for networks are automatically inferred
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/204)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17977)
 :end_tab:

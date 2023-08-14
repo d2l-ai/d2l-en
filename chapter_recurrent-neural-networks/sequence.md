@@ -7,9 +7,9 @@ The main change of perspective when developing models
 capable of processing sequences is that we now
 focus on inputs that consist of an ordered list
 of feature vectors $\mathbf{x}_1, \dots, \mathbf{x}_T$,
-where each feature vector $\mathbf{x}_t$
+where each feature vector $\mathbf{x}_t$ is
 indexed by a time step $t \in \mathbb{Z}^+$
-lies in $\mathbb{R}^d$.
+lying in $\mathbb{R}^d$.
 
 Some datasets consist of a single massive sequence.
 Consider, for example, the extremely long streams
@@ -36,9 +36,9 @@ While we still assume that entire sequences
 are sampled independently,
 we cannot assume that the data arriving
 at each time step are independent of each other.
-For example, what words are likely to appear later in a document
-depends heavily on what words occurred earlier in the document.
-What medicine a patient is likely to receive
+For example, the words that likely to appear later in a document
+depend heavily on words occurring earlier in the document.
+The medicine a patient is likely to receive
 on the 10th day of a hospital visit
 depends heavily on what transpired
 in the previous nine days.
@@ -50,7 +50,7 @@ Consider the usefulness of the auto-fill features
 that are popular on search tools and modern email clients.
 They are useful precisely because it is often possible
 to predict (imperfectly, but better than random guessing)
-what likely continuations of a sequence might be,
+what the likely continuations of a sequence might be,
 given some initial prefix.
 For most sequence models,
 we do not require independence,
@@ -60,14 +60,14 @@ the sequences themselves are sampled
 from some fixed underlying distribution
 over entire sequences.
 
-This flexible approach, allows for such phenomena
+This flexible approach allows for such phenomena
 as (i) documents looking significantly different
-at the beginning than at the end,
+at the beginning than at the end;
 or (ii) patient status evolving either
 towards recovery or towards death
 over the course of a hospital stay;
-and (iii) customer taste evolving in predictable ways
-over course of continued interaction with a recommender system.
+or (iii) customer taste evolving in predictable ways
+over the course of continued interaction with a recommender system.
 
 
 We sometimes wish to predict a fixed target $y$
@@ -80,9 +80,9 @@ Still other times, our goal is to predict sequentially structured targets
 based on sequentially structured inputs
 (e.g., machine translation or video captioning).
 Such sequence-to-sequence tasks take two forms:
-(i) **aligned**: where the input at each time step
+(i) *aligned*: where the input at each time step
 aligns with a corresponding target (e.g., part of speech tagging);
-(ii) **unaligned**: where the input and target
+(ii) *unaligned*: where the input and target
 do not necessarily exhibit a step-for-step correspondence
 (e.g., machine translation).
 
@@ -142,7 +142,7 @@ and build up some basic intuitions and statistical tools.
 In particular, we will focus on stock price data
 from the FTSE 100 index (:numref:`fig_ftse100`).
 At each *time step* $t \in \mathbb{Z}^+$, we observe
-the price of the index at that time, denoted by $x_t$.
+the price, $x_t$, of the index at that time.
 
 
 ![FTSE 100 index over about 30 years.](../img/ftse100.png)
@@ -150,7 +150,7 @@ the price of the index at that time, denoted by $x_t$.
 :label:`fig_ftse100`
 
 
-Now suppose that a trader would like to make short term trades,
+Now suppose that a trader would like to make short-term trades,
 strategically getting into or out of the index,
 depending on whether they believe
 that it will rise or decline
@@ -167,7 +167,7 @@ $$P(x_t \mid x_{t-1}, \ldots, x_1)$$
 over prices that the index might take
 in the subsequent time step.
 While estimating the entire distribution
-over a continuous-valued random variable
+over a continuously valued random variable
 can be difficult, the trader would be happy
 to focus on a few key statistics of the distribution,
 particularly the expected value and the variance.
@@ -182,7 +182,7 @@ on the previous values of that same signal
 are naturally called *autoregressive models*.
 There is just one major problem: the number of inputs,
 $x_{t-1}, \ldots, x_1$ varies, depending on $t$.
-Namely, the number of inputs increases
+In other words, the number of inputs increases
 with the amount of data that we encounter.
 Thus if we want to treat our historical data
 as a training set, we are left with the problem
@@ -214,9 +214,9 @@ some summary $h_t$ of the past observations
 (see :numref:`fig_sequence-model`)
 and at the same time update $h_t$
 in addition to the prediction $\hat{x}_t$.
-This leads to models that estimate $x_t$
+This leads to models that estimate not only $x_t$
 with $\hat{x}_t = P(x_t \mid h_{t})$
-and moreover updates of the form
+but also updates of the form
 $h_t = g(h_{t-1}, x_{t-1})$.
 Since $h_t$ is never observed,
 these models are also called
@@ -259,20 +259,20 @@ the capacity to *evaluate* likelihood,
 but the ability to *sample* sequences,
 and even to optimize for the most likely sequences.
 
-While language modeling might not look, at first glance,
+While language modeling might not, at first glance, look
 like an autoregressive problem,
 we can reduce language modeling to autoregressive prediction
-by decomposing the joint density  of a sequence $p(x_t \mid x_1, \ldots, x_T)$
+by decomposing the joint density  of a sequence $p(x_1, \ldots, x_T)$
 into the product of conditional densities
 in a left-to-right fashion
 by applying the chain rule of probability:
 
 $$P(x_1, \ldots, x_T) = P(x_1) \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
-Note that if we are working with discrete signals like words,
+Note that if we are working with discrete signals such as words,
 then the autoregressive model must be a probabilistic classifier,
 outputting a full probability distribution
-over the vocabulary for what word will come next,
+over the vocabulary for whatever word will come next,
 given the leftwards context.
 
 
@@ -286,7 +286,7 @@ where we condition only on the $\tau$ previous time steps,
 i.e., $x_{t-1}, \ldots, x_{t-\tau}$, rather than
 the entire sequence history $x_{t-1}, \ldots, x_1$.
 Whenever we can throw away the history
-beyond the precious $\tau$ steps
+beyond the previous $\tau$ steps
 without any loss in predictive power,
 we say that the sequence satisfies a *Markov condition*,
 i.e., *that the future is conditionally independent of the past,
@@ -294,7 +294,7 @@ given the recent history*.
 When $\tau = 1$, we say that the data is characterized
 by a *first-order Markov model*,
 and when $\tau = k$, we say that the data is characterized
-by a $k$-th order Markov model.
+by a $k^{\textrm{th}}$-order Markov model.
 For when the first-order Markov condition holds ($\tau = 1$)
 the factorization of our joint probability becomes a product
 of probabilities of each word given the previous *word*:
@@ -309,7 +309,7 @@ as we include more and more leftwards context.
 But these gains diminish rapidly.
 Thus, sometimes we compromise, obviating computational and statistical difficulties
 by training models whose validity depends
-on a $k$-th order Markov condition.
+on a $k^{\textrm{th}}$-order Markov condition.
 Even today's massive RNN- and Transformer-based language models
 seldom incorporate more than thousands of words of context.
 
@@ -326,7 +326,7 @@ using dynamic programming.
 
 ### The Order of Decoding
 
-You might be wondering, why did we have to represent
+You may be wondering why we represented
 the factorization of a text sequence $P(x_1, \ldots, x_T)$
 as a left-to-right chain of conditional probabilities.
 Why not right-to-left or some other, seemingly random order?
@@ -334,18 +334,18 @@ In principle, there is nothing wrong with unfolding
 $P(x_1, \ldots, x_T)$ in reverse order.
 The result is a valid factorization:
 
-$$P(x_1, \ldots, x_T) = \prod_{t=T}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
+$$P(x_1, \ldots, x_T) = P(x_T) \prod_{t=T-1}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
 
 
 However, there are many reasons why factorizing text
-in the same directions as we read it
+in the same direction in which we read it
 (left-to-right for most languages,
 but right-to-left for Arabic and Hebrew)
 is preferred for the task of language modeling.
 First, this is just a more natural direction for us to think about.
 After all we all read text every day,
 and this process is guided by our ability
-to anticipate what words and phrases
+to anticipate which words and phrases
 are likely to come next.
 Just think of how many times you have completed
 someone else's sentence.
@@ -363,7 +363,7 @@ of the additional token given the previous ones:
 $P(x_{t+1}, \ldots, x_1) = P(x_{t}, \ldots, x_1) \cdot P(x_{t+1} \mid x_{t}, \ldots, x_1)$.
 
 Third, we have stronger predictive models
-for predicting adjacent words versus
+for predicting adjacent words than
 words at arbitrary other locations.
 While all orders of factorization are valid,
 they do not necessarily all represent equally easy
@@ -382,8 +382,8 @@ for some additive noise $\epsilon$,
 whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`.
 This is great news, since it is typically the forward direction
 that we are interested in estimating.
-The book by :citet:`Peters.Janzing.Scholkopf.2017` has explained more on this topic.
-We are barely scratching the surface of it.
+The book by :citet:`Peters.Janzing.Scholkopf.2017` contains more on this topic.
+We barely scratch the surface of it.
 
 
 ## Training
@@ -422,8 +422,8 @@ data = Data()
 d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-To begin, we try a model that acts as though
-the data satisfied a $\tau$-order Markov condition,
+To begin, we try a model that acts as if
+the data satisfied a $\tau^{\textrm{th}}$-order Markov condition,
 and thus predicts $x_t$ using only the past $\tau$ observations.
 [**Thus for each time step we have an example
 with label $y  = x_t$ and features
@@ -461,7 +461,7 @@ trainer.fit(model, data)
 ## Prediction
 
 [**To evaluate our model, we first check
-how well our model performs at one-step-ahead prediction**].
+how well it performs at one-step-ahead prediction**].
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -477,13 +477,13 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
 
-The one-step-ahead predictions look good,
-even near the end $t=1000$.
+These predictions look good,
+even near the end at $t=1000$.
 
-Now consider, what if we only observed sequence data
+But what if we only observed sequence data
 up until time step 604 (`n_train + tau`)
-but wished to make predictions several steps
-into the future.
+and wished to make predictions several steps
+into the future?
 Unfortunately, we cannot directly compute
 the one-step-ahead prediction for time step 609,
 because we do not know the corresponding inputs,
@@ -494,14 +494,13 @@ for making subsequent predictions,
 projecting forward, one step at a time,
 until reaching the desired time step:
 
-$$
-\hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
-\hat{x}_{606} = f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
-\hat{x}_{607} = f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
-\hat{x}_{608} = f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
-\hat{x}_{609} = f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}),\\
-\ldots
-$$
+$$\begin{aligned}
+\hat{x}_{605} &= f(x_{601}, x_{602}, x_{603}, x_{604}), \\
+\hat{x}_{606} &= f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
+\hat{x}_{607} &= f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
+\hat{x}_{608} &= f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
+\hat{x}_{609} &= f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}),\\
+&\vdots\end{aligned}$$
 
 Generally, for an observed sequence $x_1, \ldots, x_t$,
 its predicted output $\hat{x}_{t+k}$ at time step $t+k$
@@ -551,10 +550,10 @@ d2l.plot([data.time[data.tau:], data.time[data.num_train+data.tau:]],
 
 Unfortunately, in this case we fail spectacularly.
 The predictions decay to a constant
-pretty quickly after a few prediction steps.
+pretty quickly after a few steps.
 Why did the algorithm perform so much worse
 when predicting further into the future?
-Ultimately, this owes to the fact
+Ultimately, this is down to the fact
 that errors build up.
 Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
 Now the *input* for step 2 is perturbed by $\epsilon_1$,
@@ -639,12 +638,12 @@ often dramatically.
 ## Exercises
 
 1. Improve the model in the experiment of this section.
-    1. Incorporate more than the past 4 observations? How many do you really need?
+    1. Incorporate more than the past four observations? How many do you really need?
     1. How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
     1. Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
     1. Change the neural network architecture and evaluate the performance. You may train the new model with more epochs. What do you observe?
 1. An investor wants to find a good security to buy.
-   He looks at past returns to decide which one is likely to do well.
+   They look at past returns to decide which one is likely to do well.
    What could possibly go wrong with this strategy?
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model
@@ -660,4 +659,8 @@ often dramatically.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1048)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18010)
 :end_tab:

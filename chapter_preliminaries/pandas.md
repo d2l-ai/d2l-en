@@ -22,10 +22,10 @@ on some of the most common routines.
 ## Reading the Dataset
 
 Comma-separated values (CSV) files are ubiquitous 
-for storing tabular (spreadsheet-like) data.
-Here, each line corresponds to one record
+for the storing of tabular (spreadsheet-like) data.
+In them, each line corresponds to one record
 and consists of several (comma-separated) fields, e.g.,
-"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,Accomplishments in the field of gravitational physics".
+"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,field of gravitational physics".
 To demonstrate how to load CSV files with `pandas`, 
 we (**create a CSV file below**) `../data/house_tiny.csv`. 
 This file represents a dataset of homes,
@@ -123,7 +123,7 @@ we can load them into a tensor**] (recall :numref:`sec_ndarray`).
 %%tab mxnet
 from mxnet import np
 
-X, y = np.array(inputs.values), np.array(targets.values)
+X, y = np.array(inputs.to_numpy(dtype=float)), np.array(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -131,7 +131,8 @@ X, y
 %%tab pytorch
 import torch
 
-X, y = torch.tensor(inputs.values), torch.tensor(targets.values)
+X = torch.tensor(inputs.to_numpy(dtype=float))
+y = torch.tensor(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -139,7 +140,8 @@ X, y
 %%tab tensorflow
 import tensorflow as tf
 
-X, y = tf.constant(inputs.values), tf.constant(targets.values)
+X = tf.constant(inputs.to_numpy(dtype=float))
+y = tf.constant(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -147,7 +149,8 @@ X, y
 %%tab jax
 from jax import numpy as jnp
 
-X, y = jnp.array(inputs.values), jnp.array(targets.values)
+X = jnp.array(inputs.to_numpy(dtype=float))
+y = jnp.array(targets.to_numpy(dtype=float))
 X, y
 ```
 
@@ -167,11 +170,11 @@ For instance, in an e-commerce application,
 customer addresses might live in one table
 and purchase data in another.
 Moreover, practitioners face myriad data types
-beyond categorical and numeric. 
-Other data types include text strings, images,
+beyond categorical and numeric, for example,
+text strings, images,
 audio data, and point clouds. 
 Oftentimes, advanced tools and efficient algorithms 
-are required to prevent data processing from becoming
+are required in order to prevent data processing from becoming
 the biggest bottleneck in the machine learning pipeline. 
 These problems will arise when we get to 
 computer vision and natural language processing. 
@@ -184,14 +187,14 @@ Data visualization tools such as [seaborn](https://seaborn.pydata.org/),
 [Bokeh](https://docs.bokeh.org/), or [matplotlib](https://matplotlib.org/)
 can help you to manually inspect the data 
 and develop intuitions about 
-what problems you may need to address.
+the type of problems you may need to address.
 
 
 ## Exercises
 
 1. Try loading datasets, e.g., Abalone from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets.php) and inspect their properties. What fraction of them has missing values? What fraction of the variables is numerical, categorical, or text?
-1. Try out indexing and selecting data columns by name rather than by column number. The pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
-1. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, and memory footprint. Try this out on your laptop. What changes if you try it out on a server? 
+1. Try indexing and selecting data columns by name rather than by column number. The pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
+1. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, and memory footprint. Try this out on your laptop. What happens if you try it out on a server? 
 1. How would you deal with data that has a very large number of categories? What if the category labels are all unique? Should you include the latter?
 1. What alternatives to pandas can you think of? How about [loading NumPy tensors from a file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Check out [Pillow](https://python-pillow.org/), the Python Imaging Library. 
 
@@ -205,4 +208,8 @@ what problems you may need to address.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/195)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17967)
 :end_tab:

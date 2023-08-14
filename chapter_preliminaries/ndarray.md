@@ -84,11 +84,12 @@ import jax
 from jax import numpy as jnp
 ```
 
-[**A tensor represents a (possibly multi-dimensional) array of numerical values.**]
-With one axis, a tensor is called a *vector*.
+[**A tensor represents a (possibly multidimensional) array of numerical values.**]
+In the one-dimensional case, i.e., when only one axis is needed for the data,
+a tensor is called a *vector*.
 With two axes, a tensor is called a *matrix*.
 With $k > 2$ axes, we drop the specialized names
-and just refer to the object as a $k^\mathrm{th}$ *order tensor*.
+and just refer to the object as a $k^\textrm{th}$-*order tensor*.
 
 :begin_tab:`mxnet`
 MXNet provides a variety of functions 
@@ -245,8 +246,8 @@ In our case, instead of calling `x.reshape(3, 4)`,
 we could have equivalently called `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
 
 Practitioners often need to work with tensors
-initialized to contain all zeros or ones.
-[**We can construct a tensor with all elements set to zero**] (~~or one~~)
+initialized to contain all 0s or 1s.
+[**We can construct a tensor with all elements set to 0**] (~~or one~~)
 and a shape of (2, 3, 4) via the `zeros` function.
 
 ```{.python .input}
@@ -270,7 +271,7 @@ jnp.zeros((2, 3, 4))
 ```
 
 Similarly, we can create a tensor 
-with all ones by invoking `ones`.
+with all 1s by invoking `ones`.
 
 ```{.python .input}
 %%tab mxnet
@@ -331,7 +332,7 @@ by supplying (possibly nested) Python list(s)
 containing numerical literals.
 Here, we construct a matrix with a list of lists,
 where the outermost list corresponds to axis 0,
-and the inner list to axis 1.
+and the inner list corresponds to axis 1.
 
 ```{.python .input}
 %%tab mxnet
@@ -366,7 +367,7 @@ via slicing (e.g., `X[start:stop]`),
 where the returned value includes 
 the first index (`start`) *but not the last* (`stop`).
 Finally, when only one index (or slice)
-is specified for a $k^\mathrm{th}$ order tensor,
+is specified for a $k^\textrm{th}$-order tensor,
 it is applied along axis 0.
 Thus, in the following code,
 [**`[-1]` selects the last row and `[1:3]`
@@ -378,7 +379,7 @@ X[-1], X[1:3]
 ```
 
 :begin_tab:`mxnet, pytorch`
-Beyond reading, (**we can also write elements of a matrix by specifying indices.**)
+Beyond reading them, (**we can also *write* elements of a matrix by specifying indices.**)
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -421,7 +422,7 @@ the first and second rows,
 where `:` takes all the elements along axis 1 (column).
 While we discussed indexing for matrices,
 this also works for vectors
-and for tensors of more than 2 dimensions.
+and for tensors of more than two dimensions.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -448,7 +449,7 @@ Now that we know how to construct tensors
 and how to read from and write to their elements,
 we can begin to manipulate them
 with various mathematical operations.
-Among the most useful tools 
+Among the most useful of these 
 are the *elementwise* operations.
 These apply a standard scalar operation
 to each element of a tensor.
@@ -465,8 +466,7 @@ by the signature
 $f: \mathbb{R} \rightarrow \mathbb{R}$.
 This just means that the function maps
 from any real number onto some other real number.
-Most standard operators can be applied elementwise
-including unary operators like $e^x$.
+Most standard operators, including unary ones like $e^x$, can be applied elementwise.
 
 ```{.python .input}
 %%tab mxnet
@@ -498,7 +498,7 @@ and $\mathbf{v}$ *of the same shape*,
 and a binary operator $f$, we can produce a vector
 $\mathbf{c} = F(\mathbf{u},\mathbf{v})$
 by setting $c_i \gets f(u_i, v_i)$ for all $i$,
-where $c_i, u_i$, and $v_i$ are the $i^\mathrm{th}$ elements
+where $c_i, u_i$, and $v_i$ are the $i^\textrm{th}$ elements
 of vectors $\mathbf{c}, \mathbf{u}$, and $\mathbf{v}$.
 Here, we produced the vector-valued
 $F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$
@@ -540,18 +540,18 @@ x + y, x - y, x * y, x / y, x ** y
 ```
 
 In addition to elementwise computations,
-we can also perform linear algebra operations,
+we can also perform linear algebraic operations,
 such as dot products and matrix multiplications.
-We will elaborate on these shortly
+We will elaborate on these
 in :numref:`sec_linear-algebra`.
 
-We can also [***concatenate* multiple tensors together,**]
-stacking them end-to-end to form a larger tensor.
+We can also [***concatenate* multiple tensors,**]
+stacking them end-to-end to form a larger one.
 We just need to provide a list of tensors
 and tell the system along which axis to concatenate.
 The example below shows what happens when we concatenate
 two matrices along rows (axis 0)
-vs. columns (axis 1).
+instead of columns (axis 1).
 We can see that the first output's axis-0 length ($6$)
 is the sum of the two input tensors' axis-0 lengths ($3 + 3$);
 while the second output's axis-1 length ($8$)
@@ -815,7 +815,7 @@ with the same chunk of memory.
 
 :begin_tab:`pytorch`
 [**Converting to a NumPy tensor (`ndarray`)**], or vice versa, is easy.
-The torch Tensor and numpy array 
+The torch tensor and NumPy array 
 will share their underlying memory, 
 and changing one through an in-place operation 
 will also change the other.
@@ -897,4 +897,8 @@ Tensors provide a variety of functionalities including construction routines; in
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/187)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17966)
 :end_tab:

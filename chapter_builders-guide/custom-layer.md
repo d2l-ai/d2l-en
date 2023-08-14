@@ -15,12 +15,10 @@ specifically for handling images, text,
 looping over sequential data,
 and
 performing dynamic programming.
-Sooner or later, you will encounter or invent
+Sooner or later, you will need
 a layer that does not exist yet in the deep learning framework.
 In these cases, you must build a custom layer.
 In this section, we show you how.
-
-
 
 ```{.python .input}
 %%tab mxnet
@@ -57,7 +55,7 @@ from jax import numpy as jnp
 To start, we construct a custom layer
 that does not have any parameters of its own.
 This should look familiar if you recall our
-introduction to module in :numref:`sec_model_construction`.
+introduction to modules in :numref:`sec_model_construction`.
 The following `CenteredLayer` class simply
 subtracts the mean from its input.
 To build it, we simply need to inherit
@@ -361,4 +359,8 @@ Layers can have local parameters, which can be created through built-in function
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/279)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17993)
 :end_tab:

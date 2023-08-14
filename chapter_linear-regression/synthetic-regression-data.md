@@ -15,7 +15,7 @@ such datasets are nevertheless useful for didactic purposes,
 helping us to evaluate the properties of our learning 
 algorithms and to confirm that our implementations work as expected.
 For example, if we create data for which the correct parameters are known *a priori*,
-then we can verify that our model can in fact recover them.
+then we can check that our model can in fact recover them.
 
 ```{.python .input}
 %%tab mxnet
@@ -56,7 +56,7 @@ import tensorflow_datasets as tfds
 
 ## Generating the Dataset
 
-For this example, we will work low-dimensional
+For this example, we will work in low dimension
 for succinctness.
 The following code snippet generates 1000 examples
 with 2-dimensional features drawn 
@@ -65,19 +65,19 @@ The resulting design matrix $\mathbf{X}$
 belongs to $\mathbb{R}^{1000 \times 2}$. 
 We generate each label by applying 
 a *ground truth* linear function, 
-corrupted them via additive noise $\epsilon$, 
+corrupting them via additive noise $\boldsymbol{\epsilon}$, 
 drawn independently and identically for each example:
 
-(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$**)
+(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \boldsymbol{\epsilon}.$$**)
 
-For convenience we assume that $\epsilon$ is drawn 
+For convenience we assume that $\boldsymbol{\epsilon}$ is drawn 
 from a normal distribution with mean $\mu= 0$ 
 and standard deviation $\sigma = 0.01$.
 Note that for object-oriented design
 we add the code to the `__init__` method of a subclass of `d2l.DataModule` (introduced in :numref:`oo-design-data`). 
-It is good practice to allow setting any additional hyperparameters. 
+It is good practice to allow the setting of any additional hyperparameters. 
 We accomplish this with `save_hyperparameters()`. 
-The `batch_size` will be determined later on.
+The `batch_size` will be determined later.
 
 ```{.python .input}
 %%tab all
@@ -173,7 +173,7 @@ the *ex post facto* addition of functionality to the class.
 Throughout the iteration we obtain distinct minibatches
 until the entire dataset has been exhausted (try this).
 While the iteration implemented above is good for didactic purposes,
-it is inefficient in ways that might get us in trouble on real problems.
+it is inefficient in ways that might get us into trouble with real problems.
 For example, it requires that we load all the data in memory
 and that we perform lots of random memory access.
 The built-in iterators implemented in a deep learning framework
@@ -234,7 +234,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader((self.X, self.y), train, i)
 ```
 
-The new data loader behaves just as the previous one, except that it is more efficient and has some added functionality.
+The new data loader behaves just like the previous one, except that it is more efficient and has some added functionality.
 
 ```{.python .input  n=4}
 %%tab all
@@ -262,25 +262,25 @@ without the need for modification.
 One of the nice things about data loaders 
 is that they can be composed. 
 For instance, we might be loading images 
-and then have a post-processing filter 
-that crops them or modifies them otherwise. 
+and then have a postprocessing filter 
+that crops them or modifies them in other ways. 
 As such, data loaders can be used 
 to describe an entire data processing pipeline. 
 
 As for the model itself, the two-dimensional linear model 
-is about as simple a model as we might encounter. 
+is about the simplest we might encounter. 
 It lets us test out the accuracy of regression models 
-without worry about having insufficient amounts of data 
+without worrying about having insufficient amounts of data 
 or an underdetermined system of equations. 
 We will put this to good use in the next section.  
 
 
 ## Exercises
 
-1. What will happen if the number of examples cannot be divided by the batch size. How to change this behavior by specifying a different argument by using framework's API?
-1. What if we want to generate a huge dataset, where both the size of the parameter vector `w` and the number of examples `num_examples` are large? 
+1. What will happen if the number of examples cannot be divided by the batch size. How would you change this behavior by specifying a different argument by using the framework's API?
+1. Suppose that we want to generate a huge dataset, where both the size of the parameter vector `w` and the number of examples `num_examples` are large.
     1. What happens if we cannot hold all data in memory?
-    1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
+    1. How would you shuffle the data if it is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
 1. How would you design a random data generator that generates *the same* data each time it is called?
 
@@ -295,4 +295,8 @@ We will put this to good use in the next section.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/6664)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17975)
 :end_tab:

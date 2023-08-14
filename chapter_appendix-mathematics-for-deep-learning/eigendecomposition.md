@@ -77,7 +77,7 @@ $$
 \begin{bmatrix}
 2 & 1\\
 2 & 3
-\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x \\ y\end{bmatrix}  \; \text{and} \;
+\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x \\ y\end{bmatrix}  \; \textrm{and} \;
 \begin{bmatrix}
 2 & 1\\
 2 & 3
@@ -105,8 +105,7 @@ from d2l import torch as d2l
 from IPython import display
 import torch
 
-torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64),
-          eigenvectors=True)
+torch.linalg.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64))
 ```
 
 ```{.python .input}
@@ -168,7 +167,7 @@ we can write many operations we usually encounter cleanly
 in terms of the eigendecomposition. As a first example, consider:
 
 $$
-\mathbf{A}^n = \overbrace{\mathbf{A}\cdots \mathbf{A}}^{\text{$n$ times}} = \overbrace{(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})\cdots(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})}^{\text{$n$ times}} =  \mathbf{W}\overbrace{\boldsymbol{\Sigma}\cdots\boldsymbol{\Sigma}}^{\text{$n$ times}}\mathbf{W}^{-1} = \mathbf{W}\boldsymbol{\Sigma}^n \mathbf{W}^{-1}.
+\mathbf{A}^n = \overbrace{\mathbf{A}\cdots \mathbf{A}}^{\textrm{$n$ times}} = \overbrace{(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})\cdots(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})}^{\textrm{$n$ times}} =  \mathbf{W}\overbrace{\boldsymbol{\Sigma}\cdots\boldsymbol{\Sigma}}^{\textrm{$n$ times}}\mathbf{W}^{-1} = \mathbf{W}\boldsymbol{\Sigma}^n \mathbf{W}^{-1}.
 $$
 
 This tells us that for any positive power of a matrix,
@@ -295,7 +294,7 @@ A = torch.tensor([[1.0, 0.1, 0.1, 0.1],
               [0.1, 0.2, 5.0, 0.5],
               [0.1, 0.3, 0.5, 9.0]])
 
-v, _ = torch.eig(A)
+v, _ = torch.linalg.eig(A)
 v
 ```
 
@@ -497,7 +496,7 @@ print(f'norms of eigenvalues: {norm_eigs}')
 ```{.python .input}
 #@tab pytorch
 # Compute the eigenvalues
-eigs = torch.eig(A)[0][:,0].tolist()
+eigs = torch.linalg.eig(A).eigenvalues.tolist()
 norm_eigs = [torch.abs(torch.tensor(x)) for x in eigs]
 norm_eigs.sort()
 print(f'norms of eigenvalues: {norm_eigs}')
@@ -544,7 +543,7 @@ for all practical purposes, our random vector has been transformed
 into the principle eigenvector!
 Indeed this algorithm is the basis
 for what is known as the *power iteration*
-for finding the largest eigenvalue and eigenvector of a matrix. For details see, for example, :cite:`Van-Loan.Golub.1983`.
+for finding the largest eigenvalue and eigenvector of a matrix. For details see, for example, :cite:`Golub.Van-Loan.1996`.
 
 ### Fixing the Normalization
 

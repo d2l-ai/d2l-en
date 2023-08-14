@@ -14,12 +14,11 @@ interactions among the features,
 but we do not assume any structure *a priori*
 concerning how the features interact.
 
-Sometimes, we truly lack knowledge to guide
-the construction of craftier architectures.
+Sometimes, we truly lack the knowledge to be able to guide the construction of fancier architectures.
 In these cases, an MLP
 may be the best that we can do.
 However, for high-dimensional perceptual data,
-such structure-less networks can grow unwieldy.
+such structureless networks can grow unwieldy.
 
 For instance, let's return to our running example
 of distinguishing cats from dogs.
@@ -116,8 +115,8 @@ with two-dimensional images $\mathbf{X}$ as inputs
 and their immediate hidden representations
 $\mathbf{H}$ similarly represented as matrices (they are two-dimensional tensors in code), where both $\mathbf{X}$ and $\mathbf{H}$ have the same shape.
 Let that sink in.
-We now conceive of not only the inputs but
-also the hidden representations as possessing spatial structure.
+We now imagine that not only the inputs but
+also the hidden representations possess spatial structure.
 
 Let $[\mathbf{X}]_{i, j}$ and $[\mathbf{H}]_{i, j}$ denote the pixel
 at location $(i,j)$
@@ -164,7 +163,7 @@ We are effectively weighting pixels at $(i+a, j+b)$
 in the vicinity of location $(i, j)$ with coefficients $[\mathbf{V}]_{a, b}$
 to obtain the value $[\mathbf{H}]_{i, j}$.
 Note that $[\mathbf{V}]_{a, b}$ needs many fewer coefficients than $[\mathsf{V}]_{i, j, a, b}$ since it
-no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \cdot 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. Time-delay neural networks (TDNNs) are some of the first examples to exploit this idea :cite:`Waibel.Hanazawa.Hinton.ea.1989`.
+no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \times 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. Time-delay neural networks (TDNNs) are some of the first examples to exploit this idea :cite:`Waibel.Hanazawa.Hinton.ea.1989`.
 
 ###  Locality
 
@@ -180,7 +179,7 @@ Equivalently, we can rewrite $[\mathbf{H}]_{i, j}$ as
 $$[\mathbf{H}]_{i, j} = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} [\mathbf{V}]_{a, b}  [\mathbf{X}]_{i+a, j+b}.$$
 :eqlabel:`eq_conv-layer`
 
-This reduces the number of parameters from $4 \cdot 10^6$ to $4 \Delta^2$, where $\Delta$ is typically smaller than $10$. As such, we reduced the number of parameters by another 4 orders of magnitude. Note that :eqref:`eq_conv-layer`, in a nutshell, is what is called a *convolutional layer*. 
+This reduces the number of parameters from $4 \times 10^6$ to $4 \Delta^2$, where $\Delta$ is typically smaller than $10$. As such, we reduced the number of parameters by another four orders of magnitude. Note that :eqref:`eq_conv-layer`, is what is called, in a nutshell, a *convolutional layer*. 
 *Convolutional neural networks* (CNNs)
 are a special family of neural networks that contain convolutional layers.
 In the deep learning research community,
@@ -221,7 +220,7 @@ That is, we measure the overlap between $f$ and $g$
 when one function is "flipped" and shifted by $\mathbf{x}$.
 Whenever we have discrete objects, the integral turns into a sum.
 For instance, for vectors from
-the set of square summable infinite dimensional vectors
+the set of square-summable infinite-dimensional vectors
 with index running over $\mathbb{Z}$ we obtain the following definition:
 
 $$(f * g)(i) = \sum_a f(a) g(i-a).$$
@@ -258,7 +257,7 @@ we should find a peak in the hidden layer representations.
 
 There is just one problem with this approach.
 So far, we blissfully ignored that images consist
-of 3 channels: red, green, and blue. 
+of three channels: red, green, and blue. 
 In sum, images are not two-dimensional objects
 but rather third-order tensors,
 characterized by a height, width, and channel,
@@ -282,7 +281,7 @@ a number of two-dimensional grids stacked on top of each other.
 As in the inputs, these are sometimes called *channels*.
 They are also sometimes called *feature maps*,
 as each provides a spatialized set
-of learned features to the subsequent layer.
+of learned features for the subsequent layer.
 Intuitively, you might imagine that at lower layers that are closer to inputs,
 some channels could become specialized to recognize edges while
 others could recognize textures.
@@ -295,8 +294,9 @@ $$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta}
 :eqlabel:`eq_conv-layer-channels`
 
 where $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as input.
-Being more general,
-:eqref:`eq_conv-layer-channels` is
+We take
+:eqref:`eq_conv-layer-channels`,
+because of its generality, as
 the definition of a convolutional layer for multiple channels, where $\mathsf{V}$ is a kernel or filter of the layer.
 
 There are still many operations that we need to address.
@@ -311,13 +311,13 @@ We turn to these issues in the remainder of the chapter.
 
 ## Summary and Discussion
 
-In this section we derived the structure of convolutional neural networks from first principles. While it is unclear whether this is what led to the invention of CNNs, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations. Some of the earliest references to CNNs are in the form of the Neocognitron :cite:`Fukushima.1982`. 
+In this section we derived the structure of convolutional neural networks from first principles. While it is unclear whether this was the route taken to the invention of CNNs, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations. Some of the earliest references to CNNs are in the form of the Neocognitron :cite:`Fukushima.1982`. 
 
 A second principle that we encountered in our reasoning is how to reduce the number of parameters in a function class without limiting its expressive power, at least, whenever certain assumptions on the model hold. We saw a dramatic reduction of complexity as a result of this restriction, turning computationally and statistically infeasible problems into tractable models. 
 
-Adding channels allowed us to bring back some of the complexity that was lost due to the restrictions imposed on the convolutional kernel by locality and translation invariance. Note that channels are quite a natural addition beyond red, green, and blue. Many satellite 
+Adding channels allowed us to bring back some of the complexity that was lost due to the restrictions imposed on the convolutional kernel by locality and translation invariance. Note that it is quite natural to add channels other than just red, green, and blue. Many satellite 
 images, in particular for agriculture and meteorology, have tens to hundreds of channels, 
-generating hyperspectral images instead. They report data on many different wavelengths. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations and how to deal with large numbers of categories efficiently. 
+generating hyperspectral images instead. They report data on many different wavelengths. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations, and how to deal with large numbers of categories efficiently. 
 
 ## Exercises
 
@@ -332,9 +332,7 @@ generating hyperspectral images instead. They report data on many different wave
 1. Why might translation invariance not be a good idea after all? Give an example. 
 1. Do you think that convolutional layers might also be applicable for text data?
    Which problems might you encounter with language?
-1. What happens with convolutions when an object is at the boundary of an image. 
+1. What happens with convolutions when an object is at the boundary of an image?
 1. Prove that the convolution is symmetric, i.e., $f * g = g * f$.
-1. Prove the convolution theorem, i.e., $f * g = \mathcal{F}^{-1}\left[\mathcal{F}[f] \cdot \mathcal{F}[g]\right]$. 
-   Can you use it to accelerate convolutions? 
 
 [Discussions](https://discuss.d2l.ai/t/64)

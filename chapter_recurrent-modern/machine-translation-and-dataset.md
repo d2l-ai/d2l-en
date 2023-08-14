@@ -11,7 +11,7 @@ widespread interest in modern RNNs
 was a major advance in the applied field of 
 statistical  *machine translation*.
 Here, the model is presented with a sentence in one language
-and must predict the corresponding sentence in another language. 
+and must predict the corresponding sentence in another. 
 Note that here the sentences may be of different lengths,
 and that corresponding words in the two sentences 
 may not occur in the same order, 
@@ -35,7 +35,7 @@ and an example dataset that we will use in the subsequent examples.
 For decades, statistical formulations of translation between languages
 had been popular :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`,
 even before researchers got neural network approaches working
-(methods often lumped together under the term *neural machine translation*).
+(methods were often lumped together under the term *neural machine translation*).
 
 
 First we will need some new code to process our data.
@@ -76,18 +76,14 @@ import os
 
 ## [**Downloading and Preprocessing the Dataset**]
 
-To begin, we download an English-French dataset
+To begin, we download an English--French dataset
 that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
 Each line in the dataset is a tab-delimited pair 
-consisting of an English text sequence 
-and the translated French text sequence.
+consisting of an English text sequence (the *source*) 
+and the translated French text sequence (the *target*).
 Note that each text sequence
 can be just one sentence,
 or a paragraph of multiple sentences.
-In this machine translation problem
-where English is translated into French,
-English is called the *source language*
-and French is called the *target language*.
 
 ```{.python .input  n=5}
 %%tab all
@@ -155,7 +151,7 @@ can suggest that the output sequence is complete.
 In the end, the method below returns
 two lists of token lists: `src` and `tgt`.
 Specifically, `src[i]` is a list of tokens from the
-$i^\mathrm{th}$ text sequence in the source language (English here) 
+$i^\textrm{th}$ text sequence in the source language (English here) 
 and `tgt[i]` is that in the target language (French here).
 
 ```{.python .input  n=7}
@@ -180,7 +176,7 @@ src[:6], tgt[:6]
 ```
 
 Let's [**plot the histogram of the number of tokens per text sequence.**]
-In this simple English-French dataset,
+In this simple English--French dataset,
 most of the text sequences have fewer than 20 tokens.
 
 ```{.python .input  n=8}
@@ -213,7 +209,7 @@ either a segment of one sentence
 or a span over multiple sentences,
 (**had a fixed length.**)
 This was specified by the `num_steps`
-(number of time steps or tokens) argument in :numref:`sec_language-model`.
+(number of time steps or tokens) argument from :numref:`sec_language-model`.
 In machine translation, each example is
 a pair of source and target text sequences,
 where the two text sequences may have different lengths.
@@ -232,7 +228,7 @@ and discarding the remaining.
 In this way, every text sequence
 will have the same length
 to be loaded in minibatches of the same shape.
-Besides, we also record length of the source sequence excluding padding tokens.
+Furthermore, we also record length of the source sequence excluding padding tokens.
 This information will be needed by some models that we will cover later.
 
 
@@ -246,7 +242,7 @@ the vocabulary size will be significantly larger
 than that using character-level tokenization.
 To alleviate this,
 here we treat infrequent tokens
-that appear less than 2 times
+that appear less than twice
 as the same unknown ("&lt;unk&gt;") token.
 As we will explain later (:numref:`fig_seq2seq`),
 when training with target sequences,
@@ -304,7 +300,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader(self.arrays, train, idx)
 ```
 
-Let's [**read the first minibatch from the English-French dataset.**]
+Let's [**read the first minibatch from the English--French dataset.**]
 
 ```{.python .input  n=11}
 %%tab all
@@ -316,8 +312,8 @@ print('source len excluding pad:', d2l.astype(src_valid_len, d2l.int32))
 print('label:', d2l.astype(label, d2l.int32))
 ```
 
-Below we show a pair of source and target sequences
-that are processed by the above `_build_arrays` method
+We show a pair of source and target sequences
+processed by the above `_build_arrays` method
 (in the string format).
 
 ```{.python .input  n=12}
@@ -358,4 +354,8 @@ In natural language processing, *machine translation* refers to the task of auto
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3863)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18020)
 :end_tab:

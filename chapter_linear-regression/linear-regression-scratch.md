@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 # Linear Regression Implementation from Scratch
 :label:`sec_linear_scratch`
 
-We're now ready to work through 
+We are now ready to work through 
 a fully functioning implementation 
 of linear regression. 
 In this section, 
@@ -23,13 +23,13 @@ While modern deep learning frameworks
 can automate nearly all of this work,
 implementing things from scratch is the only way
 to make sure that you really know what you are doing.
-Moreover, when it comes time to customize models,
+Moreover, when it is time to customize models,
 defining our own layers or loss functions,
 understanding how things work under the hood will prove handy.
 In this section, we will rely only 
 on tensors and automatic differentiation.
-Later on, we will introduce a more concise implementation,
-taking advantage of bells and whistles of deep learning frameworks 
+Later, we will introduce a more concise implementation,
+taking advantage of the bells and whistles of deep learning frameworks 
 while retaining the structure of what follows below.
 
 ```{.python .input  n=2}
@@ -114,15 +114,15 @@ class LinearRegressionScratch(d2l.Module):  #@save
         self.b = self.param('b', nn.initializers.zeros, (1))
 ```
 
-Next, we must [**define our model,
+Next we must [**define our model,
 relating its input and parameters to its output.**]
-Using the same notation in :eqref:`eq_linreg-y-vec`,
-for our linear model we simply take the matrix-vector product
+Using the same notation as :eqref:`eq_linreg-y-vec`
+for our linear model we simply take the matrix--vector product
 of the input features $\mathbf{X}$ 
 and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
-$\mathbf{Xw}$ is a vector and $b$ is a scalar.
-Due to the broadcasting mechanism 
+The product $\mathbf{Xw}$ is a vector and $b$ is a scalar.
+Because of the broadcasting mechanism 
 (see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,
 the scalar is added to each component of the vector.
@@ -192,7 +192,7 @@ we do not need to adjust the learning rate against the batch size.
 In later chapters we will investigate 
 how learning rates should be adjusted
 for very large minibatches as they arise 
-in distributed large scale learning.
+in distributed large-scale learning.
 For now, we can ignore this dependency.
 
 :begin_tab:`mxnet`
@@ -303,7 +303,7 @@ def configure_optimizers(self):
 Now that we have all of the parts in place
 (parameters, loss function, model, and optimizer),
 we are ready to [**implement the main training loop.**]
-It is crucial that you understand this code well
+It is crucial that you understand this code fully
 since you will employ similar training loops
 for every other deep learning model
 covered in this book.
@@ -312,9 +312,9 @@ the entire training dataset,
 passing once through every example
 (assuming that the number of examples 
 is divisible by the batch size). 
-In each iteration, we grab a minibatch of training examples,
+In each *iteration*, we grab a minibatch of training examples,
 and compute its loss through the model's `training_step` method. 
-Next, we compute the gradients with respect to each parameter. 
+Then we compute the gradients with respect to each parameter. 
 Finally, we will call the optimization algorithm
 to update the model parameters. 
 In summary, we will execute the following loop:
@@ -328,7 +328,7 @@ Recall that the synthetic regression dataset
 that we generated in :numref:``sec_synthetic-regression-data`` 
 does not provide a validation dataset. 
 In most cases, however, 
-we will use a validation dataset 
+we will want a validation dataset 
 to measure our model quality. 
 Here we pass the validation dataloader 
 once in each epoch to measure the model performance.
@@ -446,18 +446,18 @@ def fit_epoch(self):
 ```
 
 We are almost ready to train the model,
-but first we need some data to train on.
+but first we need some training data.
 Here we use the `SyntheticRegressionData` class 
 and pass in some ground-truth parameters.
-Then, we train our model with 
+Then we train our model with 
 the learning rate `lr=0.03` 
 and set `max_epochs=3`. 
 Note that in general, both the number of epochs 
 and the learning rate are hyperparameters.
 In general, setting hyperparameters is tricky
-and we will usually want to use a 3-way split,
+and we will usually want to use a three-way split,
 one set for training, 
-a second for hyperparameter seclection,
+a second for hyperparameter selection,
 and the third reserved for the final evaluation.
 We elide these details for now but will revise them
 later.
@@ -478,12 +478,19 @@ with those that we learned**] through our training loop.
 Indeed they turn out to be very close to each other.
 
 ```{.python .input  n=21}
-%%tab pytorch, mxnet, tensorflow
+%%tab pytorch
+with torch.no_grad():
+    print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
+    print(f'error in estimating b: {data.b - model.b}')
+```
+
+```{.python .input  n=22}
+%%tab mxnet, tensorflow
 print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
 
-```{.python .input  n=22}
+```{.python .input  n=23}
 %%tab jax
 params = trainer.state.params
 print(f"error in estimating w: {data.w - d2l.reshape(params['w'], data.w.shape)}")
@@ -501,7 +508,7 @@ is linearly dependent on the others.
 However, in machine learning, 
 we are often less concerned
 with recovering true underlying parameters,
-and more concerned with parameters 
+but rather with parameters 
 that lead to highly accurate prediction :cite:`Vapnik.1992`.
 Fortunately, even on difficult optimization problems,
 stochastic gradient descent can often find remarkably good solutions,
@@ -524,23 +531,23 @@ that contains all relevant components for training a model.
 While this is not yet a professional-grade implementation
 it is perfectly functional and code like this 
 could already help you to solve small problems quickly.
-In the next sections, we will see how to do this
+In the coming sections, we will see how to do this
 both *more concisely* (avoiding boilerplate code)
-and *more efficiently* (use our GPUs to their full potential).
+and *more efficiently* (using our GPUs to their full potential).
 
 
 
 ## Exercises
 
 1. What would happen if we were to initialize the weights to zero. Would the algorithm still work? What if we
-   initialized the parameters with variance $1,000$ rather than $0.01$?
+   initialized the parameters with variance $1000$ rather than $0.01$?
 1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
-   with a model for resistors that relate voltage and current. Can you use automatic
+   with a model for resistance that relates voltage and current. Can you use automatic
    differentiation to learn the parameters of your model?
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object
    using spectral energy density? For reference, the spectral density $B$ of radiation emanating from a black body is
    $B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$. Here
-   $\lambda$ is the wavelength, $T$ is the temperature, $c$ is the speed of light, $h$ is Planck's quantum, and $k$ is the
+   $\lambda$ is the wavelength, $T$ is the temperature, $c$ is the speed of light, $h$ is Planck's constant, and $k$ is the
    Boltzmann constant. You measure the energy for different wavelengths $\lambda$ and you now need to fit the spectral
    density curve to Planck's law.
 1. What are the problems you might encounter if you wanted to compute the second derivatives of the loss? How would
@@ -551,12 +558,10 @@ and *more efficiently* (use our GPUs to their full potential).
 1. If the number of examples cannot be divided by the batch size, what happens to `data_iter` at the end of an epoch?
 1. Try implementing a different loss function, such as the absolute value loss `(y_hat - d2l.reshape(y, y_hat.shape)).abs().sum()`.
     1. Check what happens for regular data.
-    1. Check whether there is a difference in behavior if you actively perturb some entries of $\mathbf{y}$,
-       such as $y_5 = 10,000$.
+    1. Check whether there is a difference in behavior if you actively perturb some entries, such as $y_5 = 10000$, of $\mathbf{y}$.
     1. Can you think of a cheap solution for combining the best aspects of squared loss and absolute value loss?
        Hint: how can you avoid really large gradient values?
-1. Why do we need to reshuffle the dataset? Can you design a case where a maliciously dataset would break the
-   optimization algorithm otherwise?
+1. Why do we need to reshuffle the dataset? Can you design a case where a maliciously constructed dataset would break the optimization algorithm otherwise?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/42)
@@ -568,4 +573,8 @@ and *more efficiently* (use our GPUs to their full potential).
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/201)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17976)
 :end_tab:

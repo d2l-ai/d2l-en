@@ -54,20 +54,20 @@ The built-in `__call__` method then invokes `forward`
 whenever we need to apply the network to some input.
 
 :begin_tab:`mxnet`
-Even though the input `X` is a 4th order tensor, 
+Even though the input `X` is a fourth-order tensor, 
 the built-in `Dense` layer 
-will automatically convert `X` into a 2nd order tensor 
+will automatically convert `X` into a second-order tensor 
 by keeping the dimensionality along the first axis unchanged.
 :end_tab:
 
 :begin_tab:`pytorch`
-We use a `Flatten` layer to convert the 4th order tensor `X` to 2nd order 
+We use a `Flatten` layer to convert the fourth-order tensor `X` to second order 
 by keeping the dimensionality along the first axis unchanged.
 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We use a `Flatten` layer to convert the 4th order tensor `X` 
+We use a `Flatten` layer to convert the fourth-order tensor `X` 
 by keeping the dimension along the first axis unchanged.
 :end_tab:
 
@@ -130,7 +130,7 @@ class SoftmaxRegression(d2l.Classifier):  #@save
 
 In :numref:`sec_softmax_scratch` we calculated our model's output
 and applied the cross-entropy loss. While this is perfectly
-reasonable mathematically, it is risky computationally, due to
+reasonable mathematically, it is risky computationally, because of
 numerical underflow and overflow in the exponentiation.
 
 Recall that the softmax function computes probabilities via
@@ -138,11 +138,11 @@ $\hat y_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$.
 If some of the $o_k$ are very large, i.e., very positive,
 then $\exp(o_k)$ might be larger than the largest number
 we can have for certain data types. This is called *overflow*. Likewise,
-if all arguments are very negative, we will get *underflow*.
+if every argument is a very large negative number, we will get *underflow*.
 For instance, single precision floating point numbers approximately
 cover the range of $10^{-38}$ to $10^{38}$. As such, if the largest term in $\mathbf{o}$
 lies outside the interval $[-90, 90]$, the result will not be stable.
-A solution to this problem is to subtract $\bar{o} \stackrel{\mathrm{def}}{=} \max_k o_k$ from
+A way round this problem is to subtract $\bar{o} \stackrel{\textrm{def}}{=} \max_k o_k$ from
 all entries:
 
 $$
@@ -229,13 +229,13 @@ trainer.fit(model, data)
 ```
 
 As before, this algorithm converges to a solution
-that achieves a decent accuracy,
+that is reasonably accurate,
 albeit this time with fewer lines of code than before.
 
 
 ## Summary
 
-High-level APIs are very convenient at hiding potentially dangerous aspects from their user, such as numerical stability. Moreover, they allow users to design models concisely with very few lines of code. This is both a blessing and a curse. The obvious benefit is that it makes things highly accessible, even to engineers who never took a single class of statistics in their life (in fact, this is one of the target audiences of the book). But hiding the sharp edges also comes with a price: a disincentive to add new and different components on your own, since there's little muscle memory for doing it. Moreover, it makes it more difficult to *fix* things whenever the protective padding of
+High-level APIs are very convenient at hiding from their user potentially dangerous aspects, such as numerical stability. Moreover, they allow users to design models concisely with very few lines of code. This is both a blessing and a curse. The obvious benefit is that it makes things highly accessible, even to engineers who never took a single class of statistics in their life (in fact, they are part of the target audience of the book). But hiding the sharp edges also comes with a price: a disincentive to add new and different components on your own, since there is little muscle memory for doing it. Moreover, it makes it more difficult to *fix* things whenever the protective padding of
 a framework fails to cover all the corner cases entirely. Again, this is due to lack of familiarity.
 
 As such, we strongly urge you to review *both* the bare bones and the elegant versions of many of the implementations that follow. While we emphasize ease of understanding, the implementations are nonetheless usually quite performant (convolutions are the big exception here). It is our intention to allow you to build on these when you invent something new that no framework can give you.
@@ -244,8 +244,8 @@ As such, we strongly urge you to review *both* the bare bones and the elegant ve
 ## Exercises
 
 1. Deep learning uses many different number formats, including FP64 double precision (used extremely rarely),
-FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (very unstable), TF32 (a new format from NVIDIA), and INT8. Compute the smallest and largest argument of the exponential function for which the result does not lead to a numerical underflow or overflow.
-1. INT8 is a very limited format with nonzero numbers from $1$ to $255$. How could you extend its dynamic range without using more bits? Do standard multiplication and addition still work?
+FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (very unstable), TF32 (a new format from NVIDIA), and INT8. Compute the smallest and largest argument of the exponential function for which the result does not lead to numerical underflow or overflow.
+1. INT8 is a very limited format consisting of nonzero numbers from $1$ to $255$. How could you extend its dynamic range without using more bits? Do standard multiplication and addition still work?
 1. Increase the number of epochs for training. Why might the validation accuracy decrease after a while? How could we fix this?
 1. What happens as you increase the learning rate? Compare the loss curves for several learning rates. Which one works better? When?
 
@@ -259,4 +259,8 @@ FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (ver
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/260)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17983)
 :end_tab:

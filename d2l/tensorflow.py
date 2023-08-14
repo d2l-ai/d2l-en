@@ -24,13 +24,11 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
-import gym
 import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
-from scipy.spatial import distance_matrix
 
 d2l = sys.modules[__name__]
 
@@ -789,7 +787,7 @@ class RNNLM(d2l.RNNLMScratch):
         return d2l.transpose(self.linear(hiddens), (1, 0, 2))
 
 class GRU(d2l.RNN):
-    """The multi-layer GRU model.
+    """The multilayer GRU model.
 
     Defined in :numref:`sec_deep_rnn`"""
     def __init__(self, num_hiddens, num_layers, dropout=0):
@@ -892,7 +890,7 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
     d2l.plt.legend(legend)
 
 class Encoder(tf.keras.layers.Layer):
-    """The base encoder interface for the encoder-decoder architecture.
+    """The base encoder interface for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self):
@@ -903,7 +901,7 @@ class Encoder(tf.keras.layers.Layer):
         raise NotImplementedError
 
 class Decoder(tf.keras.layers.Layer):
-    """The base decoder interface for the encoder-decoder architecture.
+    """The base decoder interface for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self):
@@ -917,7 +915,7 @@ class Decoder(tf.keras.layers.Layer):
         raise NotImplementedError
 
 class EncoderDecoder(d2l.Classifier):
-    """The base class for the encoder-decoder architecture.
+    """The base class for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def __init__(self, encoder, decoder):
@@ -947,7 +945,7 @@ class EncoderDecoder(d2l.Classifier):
         return d2l.concat(outputs[1:], 1), attention_weights
 
 class Seq2SeqEncoder(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning.
+    """The RNN encoder for sequence-to-sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -966,7 +964,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
-    """The RNN encoder-decoder for sequence to sequence learning.
+    """The RNN encoder--decoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):

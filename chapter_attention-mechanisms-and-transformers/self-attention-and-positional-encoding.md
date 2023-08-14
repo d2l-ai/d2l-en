@@ -10,16 +10,16 @@ In deep learning, we often use CNNs or RNNs to encode sequences.
 Now with attention mechanisms in mind, 
 imagine feeding a sequence of tokens 
 into an attention mechanism
-such that at each step,
+such that at every step,
 each token has its own query, keys, and values.
 Here, when computing the value of a token's representation at the next layer,
-the token can attend (via its query vector) to each other token 
+the token can attend (via its query vector) to any other's token 
 (matching based on their key vectors).
 Using the full set of query-key compatibility scores,
 we can compute, for each token, a representation
 by building the appropriate weighted sum
 over the other tokens. 
-Because each token is attending to each other token
+Because every token is attending to each other token
 (unlike the case where decoder steps attend to encoder steps),
 such architectures are typically described as *self-attention* models :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, 
 and elsewhere described as *intra-attention* model :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
@@ -138,7 +138,7 @@ d2l.check_shape(attention.init_with_output(d2l.get_key(), X, X, X, valid_lens,
 Let's
 compare architectures for mapping
 a sequence of $n$ tokens
-to another sequence of equal length,
+to another one of equal length,
 where each input or output token is represented by
 a $d$-dimensional vector.
 Specifically,
@@ -157,13 +157,13 @@ within the sequence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
 ![Comparing CNN (padding tokens are omitted), RNN, and self-attention architectures.](../img/cnn-rnn-self-attention.svg)
 :label:`fig_cnn-rnn-self-attention`
 
-Consider a convolutional layer whose kernel size is $k$.
-We will provide more details about sequence processing
-using CNNs in later chapters.
-For now, we only need to know that
-since the sequence length is $n$,
-the numbers of input and output channels are both $d$,
-the computational complexity of the convolutional layer is $\mathcal{O}(knd^2)$.
+
+
+Let's regard any text sequence as a "one-dimensional image". Similarly, one-dimensional CNNs can process local features such as $n$-grams in text.
+Given a sequence of length $n$,
+consider a convolutional layer whose kernel size is $k$,
+and whose numbers of input and output channels are both $d$.
+The computational complexity of the convolutional layer is $\mathcal{O}(knd^2)$.
 As :numref:`fig_cnn-rnn-self-attention` shows,
 CNNs are hierarchical,
 so there are $\mathcal{O}(1)$ sequential operations
@@ -187,16 +187,16 @@ and the maximum path length is also $\mathcal{O}(n)$.
 In self-attention,
 the queries, keys, and values 
 are all $n \times d$ matrices.
-Consider the scaled dot-product attention in
+Consider the scaled dot product attention in
 :eqref:`eq_softmax_QK_V`,
-where a $n \times d$ matrix is multiplied by
+where an $n \times d$ matrix is multiplied by
 a $d \times n$ matrix,
 then the output $n \times n$ matrix is multiplied
-by a $n \times d$ matrix.
+by an $n \times d$ matrix.
 As a result,
 the self-attention
 has a $\mathcal{O}(n^2d)$ computational complexity.
-As we can see in :numref:`fig_cnn-rnn-self-attention`,
+As we can see from :numref:`fig_cnn-rnn-self-attention`,
 each token is directly connected
 to any other token via self-attention.
 Therefore,
@@ -218,11 +218,11 @@ makes self-attention prohibitively slow for very long sequences.
 
 
 Unlike RNNs, which recurrently process
-tokens of a sequence one by one,
+tokens of a sequence one-by-one,
 self-attention ditches
 sequential operations in favor of 
 parallel computation.
-Note, however, that self-attention by itself
+Note that self-attention by itself
 does not preserve the order of the sequence. 
 What do we do if it really matters 
 that the model knows in which order
@@ -233,8 +233,8 @@ information about the order of tokens
 is to represent this to the model 
 as an additional input associated 
 with each token. 
-These inputs are called *positional encodings*.
-and they can either be learned or fixed a priori.
+These inputs are called *positional encodings*,
+and they can either be learned or fixed *a priori*.
 We now describe a simple scheme for fixed positional encodings
 based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 
@@ -246,17 +246,17 @@ The positional encoding outputs
 $\mathbf{X} + \mathbf{P}$
 using a positional embedding matrix 
 $\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
-whose element on the $i^\mathrm{th}$ row 
-and the $(2j)^\mathrm{th}$
-or the $(2j + 1)^\mathrm{th}$ column is
+whose element on the $i^\textrm{th}$ row 
+and the $(2j)^\textrm{th}$
+or the $(2j + 1)^\textrm{th}$ column is
 
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 :eqlabel:`eq_positional-encoding-def`
 
 At first glance,
-this trigonometric-function
+this trigonometric function
 design looks weird.
-Before explanations of this design,
+Before we give explanations of this design,
 let's first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
@@ -348,13 +348,13 @@ In the positional embedding matrix $\mathbf{P}$,
 and columns represent different positional encoding dimensions**].
 In the example below,
 we can see that
-the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
+the $6^{\textrm{th}}$ and the $7^{\textrm{th}}$
 columns of the positional embedding matrix 
 have a higher frequency than 
-the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$
+the $8^{\textrm{th}}$ and the $9^{\textrm{th}}$
 columns.
 The offset between 
-the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$ (same for the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$) columns
+the $6^{\textrm{th}}$ and the $7^{\textrm{th}}$ (same for the $8^{\textrm{th}}$ and the $9^{\textrm{th}}$) columns
 is due to the alternation of sine and cosine functions.
 
 ```{.python .input}
@@ -479,8 +479,8 @@ be linearly projected to $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
 for any fixed offset $\delta$:
 
 $$\begin{aligned}
-&\begin{bmatrix} \cos(\delta \omega_j) & \sin(\delta \omega_j) \\  -\sin(\delta \omega_j) & \cos(\delta \omega_j) \\ \end{bmatrix}
-\begin{bmatrix} p_{i, 2j} \\  p_{i, 2j+1} \\ \end{bmatrix}\\
+\begin{bmatrix} \cos(\delta \omega_j) & \sin(\delta \omega_j) \\  -\sin(\delta \omega_j) & \cos(\delta \omega_j) \\ \end{bmatrix}
+\begin{bmatrix} p_{i, 2j} \\  p_{i, 2j+1} \\ \end{bmatrix}
 =&\begin{bmatrix} \cos(\delta \omega_j) \sin(i \omega_j) + \sin(\delta \omega_j) \cos(i \omega_j) \\  -\sin(\delta \omega_j) \sin(i \omega_j) + \cos(\delta \omega_j) \cos(i \omega_j) \\ \end{bmatrix}\\
 =&\begin{bmatrix} \sin\left((i+\delta) \omega_j\right) \\  \cos\left((i+\delta) \omega_j\right) \\ \end{bmatrix}\\
 =& 
@@ -504,7 +504,7 @@ by adding positional encoding to the input representations.
 
 ## Exercises
 
-1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
+1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could the possible issues be?
 1. Can you design a learnable positional encoding method?
 1. Can we assign different learned embeddings according to different offsets between queries and keys that are compared in self-attention? Hint: you may refer to relative position embeddings :cite:`shaw2018self,huang2018music`.
 
@@ -518,4 +518,8 @@ by adding positional encoding to the input representations.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3870)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18030)
 :end_tab:

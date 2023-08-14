@@ -3,7 +3,7 @@
 
 If you completed the exercises in :numref:`sec_rnn-scratch`,
 you would have seen that gradient clipping is vital 
-to prevent the occasional massive gradients
+for preventing the occasional massive gradients
 from destabilizing training.
 We hinted that the exploding gradients
 stem from backpropagating across long sequences.
@@ -73,12 +73,12 @@ Recall our discussions in
 that the input and the hidden state
 can be concatenated before being multiplied 
 by one weight variable in the hidden layer.
-Thus, we use $w_h$ and $w_o$ to indicate the weights 
+Thus, we use $w_\textrm{h}$ and $w_\textrm{o}$ to indicate the weights 
 of the hidden layer and the output layer, respectively.
 As a result, the hidden states and outputs 
-at each time steps are
+at each time step are
 
-$$\begin{aligned}h_t &= f(x_t, h_{t-1}, w_h),\\o_t &= g(h_t, w_o),\end{aligned}$$
+$$\begin{aligned}h_t &= f(x_t, h_{t-1}, w_\textrm{h}),\\o_t &= g(h_t, w_\textrm{o}),\end{aligned}$$
 :eqlabel:`eq_bptt_ht_ot`
 
 where $f$ and $g$ are transformations
@@ -92,32 +92,32 @@ The discrepancy between output $o_t$ and the desired target $y_t$
 is then evaluated by an objective function 
 across all the $T$ time steps as
 
-$$L(x_1, \ldots, x_T, y_1, \ldots, y_T, w_h, w_o) = \frac{1}{T}\sum_{t=1}^T l(y_t, o_t).$$
+$$L(x_1, \ldots, x_T, y_1, \ldots, y_T, w_\textrm{h}, w_\textrm{o}) = \frac{1}{T}\sum_{t=1}^T l(y_t, o_t).$$
 
 
 
 For backpropagation, matters are a bit trickier, 
 especially when we compute the gradients 
-with regard to the parameters $w_h$ of the objective function $L$. 
+with regard to the parameters $w_\textrm{h}$ of the objective function $L$. 
 To be specific, by the chain rule,
 
-$$\begin{aligned}\frac{\partial L}{\partial w_h}  & = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial w_h}  \\& = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial o_t} \frac{\partial g(h_t, w_o)}{\partial h_t}  \frac{\partial h_t}{\partial w_h}.\end{aligned}$$
+$$\begin{aligned}\frac{\partial L}{\partial w_\textrm{h}}  & = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial w_\textrm{h}}  \\& = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial o_t} \frac{\partial g(h_t, w_\textrm{o})}{\partial h_t}  \frac{\partial h_t}{\partial w_\textrm{h}}.\end{aligned}$$
 :eqlabel:`eq_bptt_partial_L_wh`
 
 The first and the second factors of the
 product in :eqref:`eq_bptt_partial_L_wh`
 are easy to compute.
-The third factor $\partial h_t/\partial w_h$ is where things get tricky, 
-since we need to recurrently compute the effect of the parameter $w_h$ on $h_t$.
+The third factor $\partial h_t/\partial w_\textrm{h}$ is where things get tricky, 
+since we need to recurrently compute the effect of the parameter $w_\textrm{h}$ on $h_t$.
 According to the recurrent computation
 in :eqref:`eq_bptt_ht_ot`,
-$h_t$ depends on both $h_{t-1}$ and $w_h$,
+$h_t$ depends on both $h_{t-1}$ and $w_\textrm{h}$,
 where computation of $h_{t-1}$
-also depends on $w_h$.
+also depends on $w_\textrm{h}$.
 Thus, evaluating the total derivate of $h_t$ 
-with respect to $w_h$ using the chain rule yields
+with respect to $w_\textrm{h}$ using the chain rule yields
 
-$$\frac{\partial h_t}{\partial w_h}= \frac{\partial f(x_{t},h_{t-1},w_h)}{\partial w_h} +\frac{\partial f(x_{t},h_{t-1},w_h)}{\partial h_{t-1}} \frac{\partial h_{t-1}}{\partial w_h}.$$
+$$\frac{\partial h_t}{\partial w_\textrm{h}}= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}} +\frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial h_{t-1}} \frac{\partial h_{t-1}}{\partial w_\textrm{h}}.$$
 :eqlabel:`eq_bptt_partial_ht_wh_recur`
 
 
@@ -131,9 +131,9 @@ $$a_{t}=b_{t}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}c_{j}\right)b_{i}.$$
 
 By substituting $a_t$, $b_t$, and $c_t$ according to
 
-$$\begin{aligned}a_t &= \frac{\partial h_t}{\partial w_h},\\
-b_t &= \frac{\partial f(x_{t},h_{t-1},w_h)}{\partial w_h}, \\
-c_t &= \frac{\partial f(x_{t},h_{t-1},w_h)}{\partial h_{t-1}},\end{aligned}$$
+$$\begin{aligned}a_t &= \frac{\partial h_t}{\partial w_\textrm{h}},\\
+b_t &= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}}, \\
+c_t &= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial h_{t-1}},\end{aligned}$$
 
 the gradient computation in :eqref:`eq_bptt_partial_ht_wh_recur` satisfies
 $a_{t}=b_{t}+c_{t}a_{t-1}$.
@@ -141,10 +141,10 @@ Thus, per :eqref:`eq_bptt_at`,
 we can remove the recurrent computation 
 in :eqref:`eq_bptt_partial_ht_wh_recur` with
 
-$$\frac{\partial h_t}{\partial w_h}=\frac{\partial f(x_{t},h_{t-1},w_h)}{\partial w_h}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t} \frac{\partial f(x_{j},h_{j-1},w_h)}{\partial h_{j-1}} \right) \frac{\partial f(x_{i},h_{i-1},w_h)}{\partial w_h}.$$
+$$\frac{\partial h_t}{\partial w_\textrm{h}}=\frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t} \frac{\partial f(x_{j},h_{j-1},w_\textrm{h})}{\partial h_{j-1}} \right) \frac{\partial f(x_{i},h_{i-1},w_\textrm{h})}{\partial w_\textrm{h}}.$$
 :eqlabel:`eq_bptt_partial_ht_wh_gen`
 
-While we can use the chain rule to compute $\partial h_t/\partial w_h$ recursively, 
+While we can use the chain rule to compute $\partial h_t/\partial w_\textrm{h}$ recursively, 
 this chain can get very long whenever $t$ is large.
 Let's discuss a number of strategies for dealing with this problem.
 
@@ -169,7 +169,7 @@ we can truncate the sum in
 after $\tau$ steps. 
 This is what we have been discussing so far. 
 This leads to an *approximation* of the true gradient,
-simply by terminating the sum at $\partial h_{t-\tau}/\partial w_h$. 
+simply by terminating the sum at $\partial h_{t-\tau}/\partial w_\textrm{h}$. 
 In practice this works quite well. 
 It is what is commonly referred to as truncated 
 backpropgation through time :cite:`Jaeger.2002`.
@@ -182,7 +182,7 @@ towards simpler and more stable models.
 
 ### Randomized Truncation ### 
 
-Last, we can replace $\partial h_t/\partial w_h$
+Last, we can replace $\partial h_t/\partial w_\textrm{h}$
 by a random variable which is correct in expectation 
 but truncates the sequence.
 This is achieved by using a sequence of $\xi_t$
@@ -190,15 +190,15 @@ with predefined $0 \leq \pi_t \leq 1$,
 where $P(\xi_t = 0) = 1-\pi_t$ and 
 $P(\xi_t = \pi_t^{-1}) = \pi_t$, thus $E[\xi_t] = 1$.
 We use this to replace the gradient
-$\partial h_t/\partial w_h$
+$\partial h_t/\partial w_\textrm{h}$
 in :eqref:`eq_bptt_partial_ht_wh_recur`
 with
 
-$$z_t= \frac{\partial f(x_{t},h_{t-1},w_h)}{\partial w_h} +\xi_t \frac{\partial f(x_{t},h_{t-1},w_h)}{\partial h_{t-1}} \frac{\partial h_{t-1}}{\partial w_h}.$$
+$$z_t= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}} +\xi_t \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial h_{t-1}} \frac{\partial h_{t-1}}{\partial w_\textrm{h}}.$$
 
 
 It follows from the definition of $\xi_t$ 
-that $E[z_t] = \partial h_t/\partial w_h$.
+that $E[z_t] = \partial h_t/\partial w_\textrm{h}$.
 Whenever $\xi_t = 0$ the recurrent computation
 terminates at that time step $t$.
 This leads to a weighted sum of sequences of varying lengths,
@@ -240,7 +240,7 @@ has a slight regularizing effect that can be desirable.
 
 After discussing the general principle,
 let's discuss backpropagation through time in detail.
-Different from the analysis in :numref:`subsec_bptt_analysis`,
+In contrast to the analysis in :numref:`subsec_bptt_analysis`,
 in the following we will show how to compute
 the gradients of the objective function
 with respect to all the decomposed model parameters.
@@ -254,11 +254,11 @@ The hidden state $\mathbf{h}_t \in \mathbb{R}^h$
 and the output $\mathbf{o}_t \in \mathbb{R}^q$
 are computed as
 
-$$\begin{aligned}\mathbf{h}_t &= \mathbf{W}_{hx} \mathbf{x}_t + \mathbf{W}_{hh} \mathbf{h}_{t-1},\\
-\mathbf{o}_t &= \mathbf{W}_{qh} \mathbf{h}_{t},\end{aligned}$$
+$$\begin{aligned}\mathbf{h}_t &= \mathbf{W}_\textrm{hx} \mathbf{x}_t + \mathbf{W}_\textrm{hh} \mathbf{h}_{t-1},\\
+\mathbf{o}_t &= \mathbf{W}_\textrm{qh} \mathbf{h}_{t},\end{aligned}$$
 
-where $\mathbf{W}_{hx} \in \mathbb{R}^{h \times d}$, $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$, and
-$\mathbf{W}_{qh} \in \mathbb{R}^{q \times h}$
+where $\mathbf{W}_\textrm{hx} \in \mathbb{R}^{h \times d}$, $\mathbf{W}_\textrm{hh} \in \mathbb{R}^{h \times h}$, and
+$\mathbf{W}_\textrm{qh} \in \mathbb{R}^{q \times h}$
 are the weight parameters.
 Denote by $l(\mathbf{o}_t, y_t)$
 the loss at time step $t$. 
@@ -276,25 +276,25 @@ we can draw a computational graph for the model,
 as shown in :numref:`fig_rnn_bptt`.
 For example, the computation of the hidden states of time step 3,
 $\mathbf{h}_3$, depends on the model parameters
-$\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$,
-the hidden state of the last time step $\mathbf{h}_2$,
+$\mathbf{W}_\textrm{hx}$ and $\mathbf{W}_\textrm{hh}$,
+the hidden state of the previous time step $\mathbf{h}_2$,
 and the input of the current time step $\mathbf{x}_3$.
 
 ![Computational graph showing dependencies for an RNN model with three time steps. Boxes represent variables (not shaded) or parameters (shaded) and circles represent operators.](../img/rnn-bptt.svg)
 :label:`fig_rnn_bptt`
 
 As just mentioned, the model parameters in :numref:`fig_rnn_bptt` 
-are $\mathbf{W}_{hx}$, $\mathbf{W}_{hh}$, and $\mathbf{W}_{qh}$. 
+are $\mathbf{W}_\textrm{hx}$, $\mathbf{W}_\textrm{hh}$, and $\mathbf{W}_\textrm{qh}$. 
 Generally, training this model requires 
 gradient computation with respect to these parameters
-$\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{qh}$.
+$\partial L/\partial \mathbf{W}_\textrm{hx}$, $\partial L/\partial \mathbf{W}_\textrm{hh}$, and $\partial L/\partial \mathbf{W}_\textrm{qh}$.
 According to the dependencies in :numref:`fig_rnn_bptt`,
 we can traverse in the opposite direction of the arrows
 to calculate and store the gradients in turn.
 To flexibly express the multiplication of 
 matrices, vectors, and scalars of different shapes
 in the chain rule,
-we continue to use the $\text{prod}$ operator 
+we continue to use the $\textrm{prod}$ operator 
 as described in :numref:`sec_backprop`.
 
 
@@ -305,18 +305,18 @@ is fairly straightforward:
 $$\frac{\partial L}{\partial \mathbf{o}_t} =  \frac{\partial l (\mathbf{o}_t, y_t)}{T \cdot \partial \mathbf{o}_t} \in \mathbb{R}^q.$$
 :eqlabel:`eq_bptt_partial_L_ot`
 
-Now, we can calculate the gradient of the objective 
-with respect to the parameter $\mathbf{W}_{qh}$
+Now we can calculate the gradient of the objective 
+with respect to the parameter $\mathbf{W}_\textrm{qh}$
 in the output layer:
-$\partial L/\partial \mathbf{W}_{qh} \in \mathbb{R}^{q \times h}$. 
+$\partial L/\partial \mathbf{W}_\textrm{qh} \in \mathbb{R}^{q \times h}$. 
 Based on :numref:`fig_rnn_bptt`, 
-the objective $L$ depends on $\mathbf{W}_{qh}$ 
+the objective $L$ depends on $\mathbf{W}_\textrm{qh}$ 
 via $\mathbf{o}_1, \ldots, \mathbf{o}_T$. 
 Using the chain rule yields
 
 $$
-\frac{\partial L}{\partial \mathbf{W}_{qh}}
-= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \mathbf{o}_t}, \frac{\partial \mathbf{o}_t}{\partial \mathbf{W}_{qh}}\right)
+\frac{\partial L}{\partial \mathbf{W}_\textrm{qh}}
+= \sum_{t=1}^T \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{o}_t}, \frac{\partial \mathbf{o}_t}{\partial \mathbf{W}_\textrm{qh}}\right)
 = \sum_{t=1}^T \frac{\partial L}{\partial \mathbf{o}_t} \mathbf{h}_t^\top,
 $$
 
@@ -332,7 +332,7 @@ Therefore, we can easily find the gradient
 $\partial L/\partial \mathbf{h}_T \in \mathbb{R}^h$
 using the chain rule:
 
-$$\frac{\partial L}{\partial \mathbf{h}_T} = \text{prod}\left(\frac{\partial L}{\partial \mathbf{o}_T}, \frac{\partial \mathbf{o}_T}{\partial \mathbf{h}_T} \right) = \mathbf{W}_{qh}^\top \frac{\partial L}{\partial \mathbf{o}_T}.$$
+$$\frac{\partial L}{\partial \mathbf{h}_T} = \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{o}_T}, \frac{\partial \mathbf{o}_T}{\partial \mathbf{h}_T} \right) = \mathbf{W}_\textrm{qh}^\top \frac{\partial L}{\partial \mathbf{o}_T}.$$
 :eqlabel:`eq_bptt_partial_L_hT_final_step`
 
 It gets trickier for any time step $t < T$,
@@ -344,19 +344,19 @@ $\partial L/\partial \mathbf{h}_t \in \mathbb{R}^h$
 at any time step $t < T$ can be recurrently computed as:
 
 
-$$\frac{\partial L}{\partial \mathbf{h}_t} = \text{prod}\left(\frac{\partial L}{\partial \mathbf{h}_{t+1}}, \frac{\partial \mathbf{h}_{t+1}}{\partial \mathbf{h}_t} \right) + \text{prod}\left(\frac{\partial L}{\partial \mathbf{o}_t}, \frac{\partial \mathbf{o}_t}{\partial \mathbf{h}_t} \right) = \mathbf{W}_{hh}^\top \frac{\partial L}{\partial \mathbf{h}_{t+1}} + \mathbf{W}_{qh}^\top \frac{\partial L}{\partial \mathbf{o}_t}.$$
+$$\frac{\partial L}{\partial \mathbf{h}_t} = \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{h}_{t+1}}, \frac{\partial \mathbf{h}_{t+1}}{\partial \mathbf{h}_t} \right) + \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{o}_t}, \frac{\partial \mathbf{o}_t}{\partial \mathbf{h}_t} \right) = \mathbf{W}_\textrm{hh}^\top \frac{\partial L}{\partial \mathbf{h}_{t+1}} + \mathbf{W}_\textrm{qh}^\top \frac{\partial L}{\partial \mathbf{o}_t}.$$
 :eqlabel:`eq_bptt_partial_L_ht_recur`
 
 For analysis, expanding the recurrent computation
 for any time step $1 \leq t \leq T$ gives
 
-$$\frac{\partial L}{\partial \mathbf{h}_t}= \sum_{i=t}^T {\left(\mathbf{W}_{hh}^\top\right)}^{T-i} \mathbf{W}_{qh}^\top \frac{\partial L}{\partial \mathbf{o}_{T+t-i}}.$$
+$$\frac{\partial L}{\partial \mathbf{h}_t}= \sum_{i=t}^T {\left(\mathbf{W}_\textrm{hh}^\top\right)}^{T-i} \mathbf{W}_\textrm{qh}^\top \frac{\partial L}{\partial \mathbf{o}_{T+t-i}}.$$
 :eqlabel:`eq_bptt_partial_L_ht`
 
 We can see from :eqref:`eq_bptt_partial_L_ht` 
 that this simple linear example already
 exhibits some key problems of long sequence models:
-it involves potentially very large powers of $\mathbf{W}_{hh}^\top$.
+it involves potentially very large powers of $\mathbf{W}_\textrm{hh}^\top$.
 In it, eigenvalues smaller than 1 vanish
 and eigenvalues larger than 1 diverge.
 This is numerically unstable,
@@ -372,26 +372,26 @@ such as long short-term memory can alleviate this further.
 
 Finally, :numref:`fig_rnn_bptt` shows 
 that the objective function $L$ 
-depends on model parameters $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$
+depends on model parameters $\mathbf{W}_\textrm{hx}$ and $\mathbf{W}_\textrm{hh}$
 in the hidden layer via hidden states
 $\mathbf{h}_1, \ldots, \mathbf{h}_T$.
 To compute gradients with respect to such parameters
-$\partial L / \partial \mathbf{W}_{hx} \in \mathbb{R}^{h \times d}$ and $\partial L / \partial \mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$,
-we apply the chain rule that gives
+$\partial L / \partial \mathbf{W}_\textrm{hx} \in \mathbb{R}^{h \times d}$ and $\partial L / \partial \mathbf{W}_\textrm{hh} \in \mathbb{R}^{h \times h}$,
+we apply the chain rule giving
 
 $$
 \begin{aligned}
-\frac{\partial L}{\partial \mathbf{W}_{hx}}
-&= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \mathbf{h}_t}, \frac{\partial \mathbf{h}_t}{\partial \mathbf{W}_{hx}}\right)
+\frac{\partial L}{\partial \mathbf{W}_\textrm{hx}}
+&= \sum_{t=1}^T \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{h}_t}, \frac{\partial \mathbf{h}_t}{\partial \mathbf{W}_\textrm{hx}}\right)
 = \sum_{t=1}^T \frac{\partial L}{\partial \mathbf{h}_t} \mathbf{x}_t^\top,\\
-\frac{\partial L}{\partial \mathbf{W}_{hh}}
-&= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \mathbf{h}_t}, \frac{\partial \mathbf{h}_t}{\partial \mathbf{W}_{hh}}\right)
+\frac{\partial L}{\partial \mathbf{W}_\textrm{hh}}
+&= \sum_{t=1}^T \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{h}_t}, \frac{\partial \mathbf{h}_t}{\partial \mathbf{W}_\textrm{hh}}\right)
 = \sum_{t=1}^T \frac{\partial L}{\partial \mathbf{h}_t} \mathbf{h}_{t-1}^\top,
 \end{aligned}
 $$
 
 where $\partial L/\partial \mathbf{h}_t$
-that is recurrently computed by
+which is recurrently computed by
 :eqref:`eq_bptt_partial_L_hT_final_step`
 and :eqref:`eq_bptt_partial_L_ht_recur`
 is the key quantity that affects the numerical stability.
@@ -402,19 +402,19 @@ Since backpropagation through time is the application of backpropagation in RNNs
 as we have explained in :numref:`sec_backprop`,
 training RNNs alternates forward propagation with
 backpropagation through time.
-Besides, backpropagation through time
+Moreover, backpropagation through time
 computes and stores the above gradients in turn.
 Specifically, stored intermediate values
 are reused to avoid duplicate calculations,
 such as storing $\partial L/\partial \mathbf{h}_t$
-to be used in computation of both $\partial L / \partial \mathbf{W}_{hx}$ 
-and $\partial L / \partial \mathbf{W}_{hh}$.
+to be used in computation of both $\partial L / \partial \mathbf{W}_\textrm{hx}$ 
+and $\partial L / \partial \mathbf{W}_\textrm{hh}$.
 
 
 ## Summary
 
 Backpropagation through time is merely an application of backpropagation to sequence models with a hidden state.
-Truncation is needed for computational convenience and numerical stability, such as regular truncation and randomized truncation.
+Truncation, such as regular or randomized, is needed for computational convenience and numerical stability.
 High powers of matrices can lead to divergent or vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
 For efficient computation, intermediate values are cached during backpropagation through time.
 

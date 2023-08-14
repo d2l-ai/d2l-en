@@ -14,7 +14,7 @@ After training, we will need these parameters
 in order to make future predictions.
 Additionally, we will sometimes wish
 to extract the parameters
-either to reuse them in some other context,
+perhaps to reuse them in some other context,
 to save our model to disk so that
 it may be executed in other software,
 or for examination in the hope of
@@ -33,8 +33,6 @@ In this section, we cover the following:
 
 * Accessing parameters for debugging, diagnostics, and visualizations.
 * Sharing parameters across different model components.
-
-
 
 ```{.python .input}
 %%tab mxnet
@@ -221,7 +219,7 @@ net[2].weight.grad == None
 When we need to perform operations on all parameters,
 accessing them one-by-one can grow tedious.
 The situation can grow especially unwieldy
-when we work with more complex modules (e.g., nested modules),
+when we work with more complex, e.g., nested, modules,
 since we would need to recurse
 through the entire tree to extract
 each sub-module's parameters. Below we demonstrate accessing the parameters of all layers.
@@ -351,7 +349,7 @@ during backpropagation.
 
 ## Summary
 
-We have several ways to access and tie model parameters.
+We have several ways of accessing and tying model parameters.
 
 
 ## Exercises
@@ -370,4 +368,8 @@ We have several ways to access and tie model parameters.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/269)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17990)
 :end_tab:

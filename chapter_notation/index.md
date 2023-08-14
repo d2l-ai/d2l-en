@@ -25,7 +25,7 @@ refers specifically to the symbol $\mathbb{Z}$.
 * $\mathbf{X}$: a matrix
 * $\mathsf{X}$: a general tensor
 * $\mathbf{I}$: the identity matrix (of some given dimension), i.e., a square matrix with $1$ on all diagonal entries and $0$ on all off-diagonals
-* $x_i$, $[\mathbf{x}]_i$: the $i^\mathrm{th}$ element of vector $\mathbf{x}$
+* $x_i$, $[\mathbf{x}]_i$: the $i^\textrm{th}$ element of vector $\mathbf{x}$
 * $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: the element of matrix $\mathbf{X}$ at row $i$ and column $j$.
 
 
@@ -51,20 +51,20 @@ refers specifically to the symbol $\mathbb{Z}$.
 
 * $f(\cdot)$: a function
 * $\log(\cdot)$: the natural logarithm (base $e$)
-* $\log_2(\cdot)$: logarithm with base $2$
+* $\log_2(\cdot)$: logarithm to base $2$
 * $\exp(\cdot)$: the exponential function
-* $\mathbf{1}(\cdot)$: the indicator function, evaluates to $1$ if the boolean argument is true and $0$ otherwise
-* $\mathbf{1}_{\mathcal{X}}(z)$: the set-membership indicator function, evaluates to $1$ if the element $z$ belongs to the set $\mathcal{X}$ and $0$ otherwise
+* $\mathbf{1}(\cdot)$: the indicator function; evaluates to $1$ if the boolean argument is true, and $0$ otherwise
+* $\mathbf{1}_{\mathcal{X}}(z)$: the set-membership indicator function; evaluates to $1$ if the element $z$ belongs to the set $\mathcal{X}$ and $0$ otherwise
 * $\mathbf{(\cdot)}^\top$: transpose of a vector or a matrix
 * $\mathbf{X}^{-1}$: inverse of matrix $\mathbf{X}$
 * $\odot$: Hadamard (elementwise) product
 * $[\cdot, \cdot]$: concatenation
 * $\|\cdot\|_p$: $\ell_p$ norm
 * $\|\cdot\|$: $\ell_2$ norm
-* $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
+* $\langle \mathbf{x}, \mathbf{y} \rangle$: inner (dot) product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements
-* $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
+* $\stackrel{\textrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
 
 
 
@@ -85,16 +85,16 @@ refers specifically to the symbol $\mathbb{Z}$.
 * $X \sim P$: the random variable $X$ follows distribution $P$
 * $P(X=x)$: the probability assigned to the event where random variable $X$ takes value $x$
 * $P(X \mid Y)$: the conditional probability distribution of $X$ given $Y$
-* $p(\cdot)$: a probability density function (PDF) associated with distribution P
+* $p(\cdot)$: a probability density function (PDF) associated with distribution $P$
 * ${E}[X]$: expectation of a random variable $X$
 * $X \perp Y$: random variables $X$ and $Y$ are independent
 * $X \perp Y \mid Z$: random variables  $X$  and  $Y$ are conditionally independent given $Z$
 * $\sigma_X$: standard deviation of random variable $X$
-* $\mathrm{Var}(X)$: variance of random variable $X$, equal to $\sigma^2_X$
-* $\mathrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
-* $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
+* $\textrm{Var}(X)$: variance of random variable $X$, equal to $\sigma^2_X$
+* $\textrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
+* $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\textrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: entropy of random variable $X$
-* $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
+* $D_{\textrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
 
 
 

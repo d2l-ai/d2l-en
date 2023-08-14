@@ -119,7 +119,7 @@ then $f(x)$ is the global minimum.
 
 For example, given the function
 
-$$f(x) = x \cdot \text{cos}(\pi x) \text{ for } -1.0 \leq x \leq 2.0,$$
+$$f(x) = x \cdot \textrm{cos}(\pi x) \textrm{ for } -1.0 \leq x \leq 2.0,$$
 
 we can approximate the local minimum and global minimum of this function.
 
@@ -220,7 +220,7 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 * Minimizing the training error does *not* guarantee that we find the best set of parameters to minimize the generalization error.
 * The optimization problems may have many local minima.
 * The problem may have even more saddle points, as generally the problems are not convex.
-* Vanishing gradients can cause optimization to stall. Often a reparameterization of the problem helps. Good initialization of the parameters can be beneficial, too.
+* Vanishing gradients can cause optimization to stall. Often a reparametrization of the problem helps. Good initialization of the parameters can be beneficial, too.
 
 
 ## Exercises

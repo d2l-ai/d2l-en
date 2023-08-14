@@ -51,34 +51,34 @@ at the same time step.
 
 Formally, suppose that we have a minibatch input
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
+(number of examples $=n$; number of inputs in each example $=d$) at time step $t$.
 At the same time step, 
-let the hidden state of the $l^\mathrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
-(number of hidden units: $h$)
+let the hidden state of the $l^\textrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
+(number of hidden units $=h$)
 and the output layer variable be 
 $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ 
 (number of outputs: $q$).
 Setting $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
 the hidden state of
-the $l^\mathrm{th}$ hidden layer
+the $l^\textrm{th}$ hidden layer
 that uses the activation function $\phi_l$
 is calculated as follows:
 
-$$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$
+$$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{\textrm{xh}}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{\textrm{hh}}^{(l)}  + \mathbf{b}_\textrm{h}^{(l)}),$$
 :eqlabel:`eq_deep_rnn_H`
 
-where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with
-the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, 
-are the model parameters of the $l^\mathrm{th}$ hidden layer.
+where the weights $\mathbf{W}_{\textrm{xh}}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{\textrm{hh}}^{(l)} \in \mathbb{R}^{h \times h}$, together with
+the bias $\mathbf{b}_\textrm{h}^{(l)} \in \mathbb{R}^{1 \times h}$, 
+are the model parameters of the $l^\textrm{th}$ hidden layer.
 
-In the end, the calculation of the output layer 
+At the end, the calculation of the output layer 
 is only based on the hidden state 
-of the final $L^\mathrm{th}$ hidden layer:
+of the final $L^\textrm{th}$ hidden layer:
 
-$$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$
+$$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q},$$
 
-where the weight $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ 
-and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ 
+where the weight $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$ 
+and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ 
 are the model parameters of the output layer.
 
 Just as with MLPs, the number of hidden layers $L$ 
@@ -86,7 +86,7 @@ and the number of hidden units $h$ are hyperparameters
 that we can tune.
 Common RNN layer widths ($h$) are in the range $(64, 2056)$,
 and common depths ($L$) are in the range $(1, 8)$. 
-In addition, we can easily get a deep gated RNN
+In addition, we can easily get a deep-gated RNN
 by replacing the hidden state computation in :eqref:`eq_deep_rnn_H`
 with that from an LSTM or a GRU.
 
@@ -126,7 +126,7 @@ from jax import numpy as jnp
 
 ## Implementation from Scratch
 
-To implement a multi-layer RNN from scratch,
+To implement a multilayer RNN from scratch,
 we can treat each layer as an `RNNScratch` instance
 with its own learnable parameters.
 
@@ -166,7 +166,7 @@ class StackedRNNScratch(d2l.Module):
                      for i in range(self.num_layers)]
 ```
 
-The multi-layer forward computation
+The multilayer forward computation
 simply performs forward computation
 layer by layer.
 
@@ -211,8 +211,8 @@ to implement multiple layers of an RNN
 are readily available in high-level APIs.
 Our concise implementation will use such built-in functionalities.
 The code generalizes the one we used previously in :numref:`sec_gru`,
-allowing specification of the number of layers explicitly 
-rather than picking the default of a single layer.
+letting us specify the number of layers explicitly 
+rather than picking the default of only one layer.
 :end_tab:
 
 :begin_tab:`jax`
@@ -229,7 +229,7 @@ rather than picking the default of a single layer.
 ```{.python .input}
 %%tab mxnet
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -239,7 +239,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab pytorch
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -250,7 +250,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab tensorflow
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
@@ -267,7 +267,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab jax
 class GRU(d2l.RNN):  #@save
-    """The multi-layer GRU model."""
+    """The multilayer GRU model."""
     num_hiddens: int
     num_layers: int
     dropout: float = 0
@@ -373,4 +373,8 @@ to ensure proper convergence.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3862)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18018)
 :end_tab:

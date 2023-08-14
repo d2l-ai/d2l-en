@@ -94,8 +94,6 @@ when defining our own module,
 we only need to worry about parameters
 and the forward propagation method.
 
-
-
 ```{.python .input}
 %%tab mxnet
 from mxnet import np, npx
@@ -131,7 +129,7 @@ The following code generates a network
 with one fully connected hidden layer
 with 256 units and ReLU activation,
 followed by a fully connected output layer
-with 10 units (no activation function).
+with ten units (no activation function).
 
 ```{.python .input}
 %%tab mxnet
@@ -238,7 +236,7 @@ the module class's `__call__` method.
 Perhaps the easiest way to develop intuition
 about how a module works
 is to implement one ourselves.
-Before we implement our own custom module,
+Before we do that,
 we briefly summarize the basic functionality
 that each module must provide:
 
@@ -247,7 +245,7 @@ that each module must provide:
 1. Generate an output by having the forward propagation method return a value. Note that the output may have a different shape from the input. For example, the first fully connected layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256.
 1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation method. Typically this happens automatically.
 1. Store and provide access to those parameters necessary
-   to execute the forward propagation computation.
+   for executing the forward propagation computation.
 1. Initialize model parameters as needed.
 
 
@@ -374,7 +372,7 @@ We can subclass a module to create layers
 entire models (such as the `MLP` class above),
 or various components of intermediate complexity.
 We exploit this versatility
-throughout the following chapters,
+throughout the coming chapters,
 such as when addressing
 convolutional neural networks.
 
@@ -389,8 +387,8 @@ to daisy-chain other modules together.
 To build our own simplified `MySequential`,
 we just need to define two key methods:
 
-1. A method to append modules one by one to a list.
-1. A forward propagation method to pass an input through the chain of modules, in the same order as they were appended.
+1. A method for appending modules one by one to a list.
+1. A forward propagation method for passing an input through the chain of modules, in the same order as they were appended.
 
 The following `MySequential` class delivers the same
 functionality of the default `Sequential` class.
@@ -468,7 +466,7 @@ parameters also need to be initialized.
 
 :begin_tab:`pytorch`
 In the `__init__` method, we add every module
-by calling the `add_modules` method. These modules can be accessed by the `children` method later.
+by calling the `add_modules` method. These modules can be accessed by the `children` method at a later date.
 In this way the system knows the added modules,
 and it will properly initialize each module's parameters.
 :end_tab:
@@ -529,7 +527,7 @@ Moreover, we might want to perform
 arbitrary mathematical operations,
 not simply relying on predefined neural network layers.
 
-You might have noticed that until now,
+You may have noticed that until now,
 all of the operations in our networks
 have acted upon our network's activations
 and its parameters.
@@ -640,7 +638,7 @@ class FixedHiddenMLP(nn.Module):
         return X.sum()
 ```
 
-In this `FixedHiddenMLP` model,
+In this model,
 we implement a hidden layer whose weights
 (`self.rand_weight`) are initialized randomly
 at instantiation and are thereafter constant.
@@ -758,7 +756,7 @@ chimera.apply(params, X)
 
 ## Summary
 
-Layers are modules.
+Individual layers can be modules.
 Many layers can comprise a module.
 Many modules can comprise a module.
 
@@ -770,7 +768,7 @@ Sequential concatenations of layers and modules are handled by the `Sequential` 
 ## Exercises
 
 1. What kinds of problems will occur if you change `MySequential` to store modules in a Python list?
-1. Implement a module that takes two modules as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward propagation. This is also called a parallel module.
+1. Implement a module that takes two modules as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward propagation. This is also called a *parallel module*.
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same module and build a larger network from it.
 
 :begin_tab:`mxnet`
@@ -783,4 +781,8 @@ Sequential concatenations of layers and modules are handled by the `Sequential` 
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/264)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17989)
 :end_tab:

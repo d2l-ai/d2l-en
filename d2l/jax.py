@@ -31,13 +31,11 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
-import gym
 import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
-from scipy.spatial import distance_matrix
 
 d2l = sys.modules[__name__]
 
@@ -975,7 +973,7 @@ class RNNLM(d2l.RNNLMScratch):
         return self.output_layer(rnn_outputs)
 
 class GRU(d2l.RNN):
-    """The multi-layer GRU model.
+    """The multilayer GRU model.
 
     Defined in :numref:`sec_deep_rnn`"""
     num_hiddens: int
@@ -1093,7 +1091,7 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
     d2l.plt.legend(legend)
 
 class Encoder(nn.Module):
-    """The base encoder interface for the encoder-decoder architecture.
+    """The base encoder interface for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def setup(self):
@@ -1104,7 +1102,7 @@ class Encoder(nn.Module):
         raise NotImplementedError
 
 class Decoder(nn.Module):
-    """The base decoder interface for the encoder-decoder architecture.
+    """The base decoder interface for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     def setup(self):
@@ -1118,7 +1116,7 @@ class Decoder(nn.Module):
         raise NotImplementedError
 
 class EncoderDecoder(d2l.Classifier):
-    """The base class for the encoder-decoder architecture.
+    """The base class for the encoder--decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
     encoder: nn.Module
@@ -1163,7 +1161,7 @@ class EncoderDecoder(d2l.Classifier):
                                             enc_attention_weights)
 
 class Seq2SeqEncoder(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning.
+    """The RNN encoder for sequence-to-sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
     vocab_size: int
@@ -1186,7 +1184,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return outputs, state
 
 class Seq2Seq(d2l.EncoderDecoder):
-    """The RNN encoder-decoder for sequence to sequence learning.
+    """The RNN encoder--decoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq_decoder`"""
     encoder: nn.Module

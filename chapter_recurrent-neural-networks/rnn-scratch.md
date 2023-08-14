@@ -193,7 +193,7 @@ check_shape(outputs[0], (batch_size, num_hiddens))
 check_shape(state, (batch_size, num_hiddens))
 ```
 
-## RNN-based Language Model
+## RNN-Based Language Model
 
 The following `RNNLMScratch` class defines 
 an RNN-based language model,
@@ -295,7 +295,7 @@ class RNNLMScratch(d2l.Classifier):  #@save
 Recall that each token is represented 
 by a numerical index indicating the
 position in the vocabulary of the 
-corresponding word/character/word-piece.
+corresponding word/character/word piece.
 You might be tempted to build a neural network
 with a single input node (at each time step),
 where the index could be fed in as a scalar value.
@@ -304,7 +304,7 @@ like price or temperature, where any two values
 sufficiently close together
 should be treated similarly.
 But this does not quite make sense. 
-The $45^{\mathrm{th}}$ and $46^{\mathrm{th}}$ words 
+The $45^{\textrm{th}}$ and $46^{\textrm{th}}$ words 
 in our vocabulary happen to be "their" and "said",
 whose meanings are not remotely similar.
 
@@ -317,7 +317,7 @@ is given by the size of the vocabulary $N$,
 where all entries are set to $0$,
 except for the entry corresponding 
 to our token, which is set to $1$.
-For example, if the vocabulary had 5 elements,
+For example, if the vocabulary had five elements,
 then the one-hot vectors corresponding 
 to indices 0 and 2 would be the following.
 
@@ -349,8 +349,7 @@ where the length along the third axis
 is given by the vocabulary size (`len(vocab)`).**)
 We often transpose the input so that we will obtain an output 
 of shape (number of time steps, batch size, vocabulary size).
-This will allow us to more conveniently
-loop through the outermost dimension
+This will allow us to loop more conveniently through the outermost dimension
 for updating hidden states of a minibatch,
 time step by time step
 (e.g., in the above `forward` method).
@@ -427,10 +426,10 @@ at the final time step.
 Taking the backwards view, in each iteration,
 we backpropagate gradients through time,
 resulting in a chain of matrix-products 
-with length  $\mathcal{O}(T)$.
+of length  $\mathcal{O}(T)$.
 As mentioned in :numref:`sec_numerical_stability`, 
 this can result in numerical instability, 
-causing the gradients to either explode or vanish
+causing the gradients either to explode or vanish,
 depending on the properties of the weight matrices. 
 
 Dealing with vanishing and exploding gradients 
@@ -440,7 +439,7 @@ in modern neural network architectures.
 In the next chapter, we will talk about
 specialized architectures that were designed
 in hopes of mitigating the vanishing gradient problem.
-However, even modern RNNs still often suffer
+However, even modern RNNs often suffer
 from exploding gradients.
 One inelegant but ubiquitous solution
 is to simply clip the gradients 
@@ -477,10 +476,10 @@ $$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|.$$
 In other words, the objective cannot
 change by more than $L \eta \|\mathbf{g}\|$. 
 Having a small value for this upper bound 
-might be viewed as a good thing or a bad thing.
+might be viewed as good or bad.
 On the downside, we are limiting the speed
 at which we can reduce the value of the objective.
-On the bright side, this limits just how much
+On the bright side, this limits by just how much
 we can go wrong in any one gradient step.
 
 
@@ -500,7 +499,7 @@ but is unstable owing to massive spikes in the loss.
 
 One way to limit the size of $L \eta \|\mathbf{g}\|$ 
 is to shrink the learning rate $\eta$ to tiny values.
-One advantage here is that we do not bias the updates.
+This has the advantage that we do not bias the updates.
 But what if we only *rarely* get large gradients?
 This drastic move slows down our progress at all steps,
 just to deal with the rare exploding gradient events.
@@ -613,16 +612,16 @@ trainer.fit(model, data)
 
 Once a language model has been learned,
 we can use it not only to predict the next token
-but to continue predicting each subsequent token,
+but to continue predicting each subsequent one,
 treating the previously predicted token as though
-it were the next token in the input. 
+it were the next in the input. 
 Sometimes we will just want to generate text
 as though we were starting at the beginning 
 of a document. 
 However, it is often useful to condition
 the language model on a user-supplied prefix.
 For example, if we were developing an
-autocomplete feature for search engine
+autocomplete feature for a search engine
 or to assist users in writing emails,
 we would want to feed in what they 
 had written so far (the prefix), 
@@ -631,7 +630,7 @@ and then generate a likely continuation.
 
 [**The following `predict` method
 generates a continuation, one character at a time,
-after ingesting a user-provided `prefix`**],
+after ingesting a user-provided `prefix`**].
 When looping through the characters in `prefix`,
 we keep passing the hidden state
 to the next time step 
@@ -640,7 +639,7 @@ This is called the *warm-up* period.
 After ingesting the prefix, we are now
 ready to begin emitting the subsequent characters,
 each of which will be fed back into the model 
-as the input at the subsequent time step.
+as the input at the next time step.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -723,10 +722,10 @@ During training, gradient clipping can mitigate the problem of exploding gradien
 1. Replace one-hot encoding with learnable embeddings. Does this lead to better performance?
 1. Conduct an experiment to determine how well this language model 
    trained on *The Time Machine* works on other books by H. G. Wells,
-   e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
+   e.g., *The War of the Worlds*.
 1. Conduct another experiment to evaluate the perplexity of this model
    on books written by other authors. 
-1. Modify the prediction method such as to use sampling 
+1. Modify the prediction method so as to use sampling 
    rather than picking the most likely next character.
     * What happens?
     * Bias the model towards more likely outputs, e.g., 
@@ -745,4 +744,8 @@ During training, gradient clipping can mitigate the problem of exploding gradien
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1052)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18014)
 :end_tab:

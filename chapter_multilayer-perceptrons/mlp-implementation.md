@@ -71,18 +71,18 @@ and then enable gradient tracking.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the code below we use [`nn.Parameter`](https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html)
+In the code below we use `nn.Parameter`
 to automatically register
 a class attribute as a parameter to be tracked by `autograd` (:numref:`sec_autograd`).
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the code below we use [`tf.Variable`](https://www.tensorflow.org/api_docs/python/tf/Variable)
+In the code below we use `tf.Variable`
 to define the model parameter.
 :end_tab:
 
 :begin_tab:`jax`
-In the code below we use [`flax.linen.Module.param`](https://flax.readthedocs.io/en/latest/api_reference/flax.linen.html#flax.linen.Module.param)
+In the code below we use `flax.linen.Module.param`
 to define the model parameter.
 :end_tab:
 
@@ -193,7 +193,7 @@ def forward(self, X):
 ### Training
 
 Fortunately, [**the training loop for MLPs
-is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` method on model and data.
+is exactly the same as for softmax regression.**] We define the model, data, and trainer, then finally invoke the `fit` method on model and data.
 
 ```{.python .input}
 %%tab all
@@ -209,7 +209,7 @@ As you might expect, by relying on the high-level APIs, we can implement MLPs ev
 
 ### Model
 
-As compared with our concise implementation
+Compared with our concise implementation
 of softmax regression implementation
 (:numref:`sec_softmax_concise`),
 the only difference is that we add
@@ -317,7 +317,7 @@ Nonetheless, you have now reached the state of the art of the late 1980s when fu
     1. Why it is much more challenging to deal with multiple hyperparameters?
     1. Describe an efficient strategy for optimizing over multiple parameters jointly.
 1. Compare the speed of the framework and the from-scratch implementation for a challenging problem. How does it change with the complexity of the network?
-1. Measure the speed of tensor-matrix multiplications for well-aligned and misaligned matrices. For instance, test for matrices with dimension 1024, 1025, 1026, 1028, and 1032.
+1. Measure the speed of tensor--matrix multiplications for well-aligned and misaligned matrices. For instance, test for matrices with dimension 1024, 1025, 1026, 1028, and 1032.
     1. How does this change between GPUs and CPUs?
     1. Determine the memory bus width of your CPU and GPU.
 1. Try out different activation functions. Which one works best?
@@ -333,4 +333,8 @@ Nonetheless, you have now reached the state of the art of the late 1980s when fu
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/227)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17985)
 :end_tab:

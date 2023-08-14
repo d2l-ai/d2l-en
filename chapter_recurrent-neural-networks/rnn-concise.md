@@ -4,7 +4,7 @@
 Like most of our from-scratch implementations,
 :numref:`sec_rnn-scratch` was designed 
 to provide insight into how each component works.
-But when you're using RNNs every day 
+But when you are using RNNs every day 
 or writing production code,
 you will want to rely more on libraries
 that cut down on both implementation time 
@@ -237,7 +237,7 @@ These libraries help you to avoid wasting time reimplementing standard models.
 Moreover,
 framework implementations are often highly optimized, 
   leading to significant (computational) performance gains 
-  as compared to implementations from scratch.
+  when compared with implementations from scratch.
 
 ## Exercises
 
@@ -254,4 +254,8 @@ framework implementations are often highly optimized,
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/2211)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18015)
 :end_tab:

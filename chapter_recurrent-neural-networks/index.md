@@ -19,7 +19,7 @@ assume any particular structure over the columns.
 Subsequently, in :numref:`chap_cnn`,
 we moved on to image data, where inputs consist
 of the raw pixel values at each coordinate in an image.
-Image data hardly fit the bill
+Image data hardly fitted the bill
 of a protypical tabular dataset.
 There, we needed to call upon convolutional neural networks (CNNs)
 to handle the hierarchical structure and invariances.
@@ -28,14 +28,14 @@ Every Fashion-MNIST image is represented
 as a $28 \times 28$ grid of pixel values.
 Moreover, our goal was to develop a model
 that looked at just one image and then
-output a single prediction.
+outputted a single prediction.
 But what should we do when faced with a
 sequence of images, as in a video,
 or when tasked with producing
 a sequentially structured prediction,
 as in the case of image captioning?
 
-Countless learning tasks require dealing with sequential data.
+A great many learning tasks require dealing with sequential data.
 Image captioning, speech synthesis, and music generation
 all require that models produce outputs consisting of sequences.
 In other domains, such as time series prediction,
@@ -46,7 +46,7 @@ tasks such as translating passages of text
 from one natural language to another,
 engaging in dialogue, or controlling a robot,
 demand that models both ingest and output
-sequentially-structured data.
+sequentially structured data.
 
 
 Recurrent neural networks (RNNs) are deep learning models
@@ -81,9 +81,9 @@ originating as models of the brain popularized
 by cognitive scientists and subsequently adopted
 as practical modeling tools employed
 by the machine learning community.
-As with deep learning more broadly,
-this book adopts the machine learning perspective,
-focusing on RNNs as practical tools which rose
+As we do for deep learning more broadly,
+in this book we adopt the machine learning perspective,
+focusing on RNNs as practical tools that rose
 to popularity in the 2010s owing to
 breakthrough results on such diverse tasks
 as handwriting recognition :cite:`graves2008novel`,
@@ -110,27 +110,27 @@ as it is a chapter about RNNs.
 
 One key insight paved the way for a revolution in sequence modeling.
 While the inputs and targets for many fundamental tasks in machine learning
-cannot easily be represented as fixed length vectors,
+cannot easily be represented as fixed-length vectors,
 they can often nevertheless be represented as
-varying-length sequences of fixed length vectors.
-For example, documents can be represented as sequences of words.
-Medical records can often be represented as sequences of events
-(encounters, medications, procedures, lab tests, diagnoses).
-Videos can be represented as varying-length sequences of still images.
+varying-length sequences of fixed-length vectors.
+For example, documents can be represented as sequences of words;
+medical records can often be represented as sequences of events
+(encounters, medications, procedures, lab tests, diagnoses);
+videos can be represented as varying-length sequences of still images.
 
 
-While sequence models have popped up in countless application areas,
+While sequence models have popped up in numerous application areas,
 basic research in the area has been driven predominantly
 by advances on core tasks in natural language processing.
 Thus, throughout this chapter, we will focus
 our exposition and examples on text data.
 If you get the hang of these examples,
-then applying these models to other data modalities
+then applying the models to other data modalities
 should be relatively straightforward.
 In the next few sections, we introduce basic
 notation for sequences and some evaluation measures
 for assessing the quality of sequentially structured model outputs.
-Next, we discuss basic concepts of a language model
+After that, we discuss basic concepts of a language model
 and use this discussion to motivate our first RNN models.
 Finally, we describe the method for calculating gradients
 when backpropagating through RNNs and explore some challenges

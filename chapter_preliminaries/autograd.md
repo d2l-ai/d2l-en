@@ -8,15 +8,15 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 
 Recall from :numref:`sec_calculus` 
 that calculating derivatives is the crucial step
-in all of the optimization algorithms
+in all the optimization algorithms
 that we will use to train deep networks.
 While the calculations are straightforward,
 working them out by hand can be tedious and error-prone, 
-and this problem only grows
+and these issues only grow
 as our models become more complex.
 
 Fortunately all modern deep learning frameworks
-take this work off of our plates
+take this work off our plates
 by offering *automatic differentiation*
 (often shortened to *autograd*). 
 As we pass data through each successive function,
@@ -43,9 +43,6 @@ For instance, the Julia programming language employs
 forward propagation :cite:`Revels.Lubin.Papamarkou.2016`. 
 Before exploring methods, 
 let's first master the autograd package.
-
-
-
 
 ```{.python .input}
 %%tab mxnet
@@ -109,11 +106,11 @@ every time we take a derivative
 because deep learning requires 
 successively computing derivatives
 with respect to the same parameters
-thousands or millions of times,
+a great many times,
 and we might risk running out of memory.
 Note that the gradient of a scalar-valued function
 with respect to a vector $\mathbf{x}$
-is vector-valued and has 
+is vector-valued with 
 the same shape as $\mathbf{x}$.
 :end_tab:
 
@@ -270,7 +267,7 @@ This behavior comes in handy
 when we want to optimize the sum 
 of multiple objective functions.
 To reset the gradient buffer,
-we can call `x.grad.zero()` as follows:
+we can call `x.grad.zero_()` as follows:
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -313,7 +310,7 @@ grad(y)(x)
 ## Backward for Non-Scalar Variables
 
 When `y` is a vector, 
-the most natural interpretation 
+the most natural representation 
 of the derivative of  `y`
 with respect to a vector `x` 
 is a matrix called the *Jacobian*
@@ -321,7 +318,7 @@ that contains the partial derivatives
 of each component of `y` 
 with respect to each component of `x`.
 Likewise, for higher-order `y` and `x`,
-the differentiation result could be an even higher-order tensor.
+the result of differentiation could be an even higher-order tensor.
 
 While Jacobians do show up in some
 advanced machine learning techniques,
@@ -422,7 +419,7 @@ has been wiped out.
 Thus `u` has no ancestors in the graph
 and gradients do not flow through `u` to `x`.
 For example, taking the gradient of `z = x * u`
-will yield the result `x`,
+will yield the result `u`,
 (not `3 * x * x` as you might have 
 expected since `z = x * x * x`).
 
@@ -505,7 +502,7 @@ grad(lambda x: y(x).sum())(x) == 2 * x
 ## Gradients and Python Control Flow
 
 So far we reviewed cases where the path from input to output 
-was well-defined via a function such as `z = x * x * x`.
+was well defined via a function such as `z = x * x * x`.
 Programming offers us a lot more freedom in how we compute results. 
 For instance, we can make them depend on auxiliary variables 
 or condition choices on intermediate results. 
@@ -571,7 +568,7 @@ def f(a):
     return c
 ```
 
-Below, we call this function, passing in a random value as input.
+Below, we call this function, passing in a random value, as input.
 Since the input is a random variable, 
 we do not know what form 
 the computational graph will take.
@@ -613,8 +610,7 @@ d = f(a)
 d_grad = grad(f)(a)
 ```
 
-Even though our function `f` is a bit 
-contrived for demonstration purposes,
+Even though our function `f` is, for demonstration purposes, a bit contrived,
 its dependence on the input is quite simple: 
 it is a *linear* function of `a` 
 with piecewise defined scale. 
@@ -647,7 +643,7 @@ For instance, when processing text, the computational graph
 depends on the length of the input. 
 In these cases, automatic differentiation 
 becomes vital for statistical modeling 
-since it is impossible to compute the gradient a priori. 
+since it is impossible to compute the gradient *a priori*. 
 
 ## Discussion
 
@@ -656,8 +652,8 @@ The development of libraries for calculating derivatives
 both automatically and efficiently 
 has been a massive productivity booster
 for deep learning practitioners,
-liberating them to focus on loftier concerns.
-Moreover, autograd permits us to design massive models
+liberating them so they can focus on less menial.
+Moreover, autograd lets us design massive models
 for which pen and paper gradient computations 
 would be prohibitively time consuming.
 Interestingly, while we use autograd to *optimize* models
@@ -676,13 +672,13 @@ For now, try to remember these basics: (i) attach gradients to those variables w
 ## Exercises
 
 1. Why is the second derivative much more expensive to compute than the first derivative?
-1. After running the function for backpropagation, immediately run it again and see what happens. Why?
+1. After running the function for backpropagation, immediately run it again and see what happens. Investigate.
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or a matrix? At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Let $f(x) = \sin(x)$. Plot the graph of $f$ and of its derivative $f'$. Do not exploit the fact that $f'(x) = \cos(x)$ but rather use automatic differentiation to get the result. 
 1. Let $f(x) = ((\log x^2) \cdot \sin x) + x^{-1}$. Write out a dependency graph tracing results from $x$ to $f(x)$. 
 1. Use the chain rule to compute the derivative $\frac{df}{dx}$ of the aforementioned function, placing each term on the dependency graph that you constructed previously. 
 1. Given the graph and the intermediate derivative results, you have a number of options when computing the gradient. Evaluate the result once starting from $x$ to $f$ and once from $f$ tracing back to $x$. The path from $x$ to $f$ is commonly known as *forward differentiation*, whereas the path from $f$ to $x$ is known as backward differentiation. 
-1. When might you want to use forward differentiation and when backward differentiation? Hint: consider the amount of intermediate data needed, the ability to parallelize steps, and the size of matrices and vectors involved. 
+1. When might you want to use forward, and when backward, differentiation? Hint: consider the amount of intermediate data needed, the ability to parallelize steps, and the size of matrices and vectors involved. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/34)
@@ -694,4 +690,8 @@ For now, try to remember these basics: (i) attach gradients to those variables w
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/200)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17970)
 :end_tab:

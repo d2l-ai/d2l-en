@@ -40,7 +40,7 @@ tf.pi = tf.acos(tf.zeros(1)) * 2  # Define pi in TensorFlow
 This is the simplest random variable usually encountered.  This random variable encodes a coin flip which comes up $1$ with probability $p$ and $0$ with probability $1-p$.  If we have a random variable $X$ with this distribution, we will write
 
 $$
-X \sim \mathrm{Bernoulli}(p).
+X \sim \textrm{Bernoulli}(p).
 $$
 
 The cumulative distribution function is 
@@ -93,7 +93,7 @@ def F(x):
 d2l.plot(x, tf.constant([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Bernoulli}(p)$, then:
+If $X \sim \textrm{Bernoulli}(p)$, then:
 
 * $\mu_X = p$,
 * $\sigma_X^2 = p(1-p)$.
@@ -125,7 +125,7 @@ $$
 
 The cumulative distribution function is 
 
-$$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \textrm{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_discrete_uniform_cdf`
 
 Let's first plot the probability mass function.
@@ -294,7 +294,7 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 
 Let's make things a little more complex and examine the *binomial* random variable.  This random variable originates from performing a sequence of $n$ independent experiments, each of which has probability $p$ of succeeding, and asking how many successes we expect to see.
 
-Let's express this mathematically.  Each experiment is an independent random variable $X_i$ where we will use $1$ to encode success, and $0$ to encode failure.  Since each is an independent coin flip which is successful with probability $p$, we can say that $X_i \sim \mathrm{Bernoulli}(p)$.  Then, the binomial random variable is
+Let's express this mathematically.  Each experiment is an independent random variable $X_i$ where we will use $1$ to encode success, and $0$ to encode failure.  Since each is an independent coin flip which is successful with probability $p$, we can say that $X_i \sim \textrm{Bernoulli}(p)$.  Then, the binomial random variable is
 
 $$
 X = \sum_{i=1}^n X_i.
@@ -303,12 +303,12 @@ $$
 In this case, we will write
 
 $$
-X \sim \mathrm{Binomial}(n, p).
+X \sim \textrm{Binomial}(n, p).
 $$
 
 To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^k(1-p)^{n-k}$ of occurring.  Thus the cumulative distribution function is
 
-$$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \textrm{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_binomial_cdf`
 
 Let's first plot the probability mass function.
@@ -405,7 +405,7 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Binomial}(n, p)$, then:
+If $X \sim \textrm{Binomial}(n, p)$, then:
 
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
@@ -430,7 +430,7 @@ m.sample(sample_shape=(10, 10))
 ```
 
 ## Poisson
-Let's now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let's start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
+Let's now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let's start by considering $X^{(1)} \sim \textrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
 
 However, if we are in a busy area, it is possible or even likely that two buses will arrive.  We can model this by splitting our random variable into two parts for the first 30 seconds, or the second 30 seconds.  In this case we can write
 
@@ -438,18 +438,18 @@ $$
 X^{(2)} \sim X^{(2)}_1 + X^{(2)}_2,
 $$
 
-where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \mathrm{Binomial}(2, p/2)$.
+where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \textrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \textrm{Binomial}(2, p/2)$.
 
 Why stop here?  Let's continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
 
-$$X^{(n)} \sim \mathrm{Binomial}(n, p/n).$$
+$$X^{(n)} \sim \textrm{Binomial}(n, p/n).$$
 :eqlabel:`eq_eq_poisson_approx`
 
 Consider these random variables.  By the previous section, we know that :eqref:`eq_eq_poisson_approx` has mean $\mu_{X^{(n)}} = n(p/n) = p$, and variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  If we take $n \rightarrow \infty$, we can see that these numbers stabilize to $\mu_{X^{(\infty)}} = p$, and variance $\sigma_{X^{(\infty)}}^2 = p$.  This indicates that there *could be* some random variable we can define in this infinite subdivision limit.  
 
 This should not come as too much of a surprise, since in the real world we can just count the number of bus arrivals, however it is nice to see that our mathematical model is well defined.  This discussion can be made formal as the *law of rare events*.
 
-Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2, \ldots\}$ with probability
+Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \textrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2, \ldots\}$ with probability
 
 $$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
 :eqlabel:`eq_poisson_mass`
@@ -458,7 +458,7 @@ The value $\lambda > 0$ is known as the *rate* (or the *shape* parameter), and d
 
 We may sum this probability mass function to get the cumulative distribution function.
 
-$$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k. \end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \textrm{ with } 0 \le k. \end{cases}$$
 :eqlabel:`eq_poisson_cdf`
 
 Let's first plot the probability mass function :eqref:`eq_poisson_mass`.
@@ -536,7 +536,7 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-As we saw above, the means and variances are particularly concise.  If $X \sim \mathrm{Poisson}(\lambda)$, then:
+As we saw above, the means and variances are particularly concise.  If $X \sim \textrm{Poisson}(\lambda)$, then:
 
 * $\mu_X = \lambda$,
 * $\sigma_X^2 = \lambda$.
@@ -561,7 +561,7 @@ m.sample((10, 10))
 ```
 
 ## Gaussian
-Now Let's try a different, but related experiment.  Let's say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let's fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
+Now Let's try a different, but related experiment.  Let's say we again are performing $n$ independent $\textrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \textrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let's fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
 
 However, not all hope is lost!  Let's just make the mean and variance be well behaved by defining
 
@@ -752,7 +752,7 @@ belong to which is known as the *exponential family*. The exponential family
 is a set of distributions whose density can be expressed in the following 
 form:
 
-$$p(\mathbf{x} \mid \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
+$$p(\mathbf{x} \mid \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \exp \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
 As this definition can be a little subtle, let's examine it closely.  
@@ -777,7 +777,7 @@ Third, we have $A(\boldsymbol{\eta})$, which is referred to as the *cumulant
 function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
 integrates to one, i.e.,
 
-$$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp}
+$$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \exp
 \left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
 
 To be concrete, let's consider the Gaussian. Assuming that $\mathbf{x}$ is 
@@ -785,9 +785,9 @@ an univariate variable, we saw that it had a density of
 
 $$
 \begin{aligned}
-p(x \mid \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \mathrm{exp} 
+p(x \mid \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \exp 
 \left\{ \frac{-(x-\mu)^2}{2 \sigma^2} \right\} \\
-&= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \left\{ \frac{\mu}{\sigma^2}x
+&= \frac{1}{\sqrt{2 \pi}} \cdot \exp \left\{ \frac{\mu}{\sigma^2}x
 -\frac{1}{2 \sigma^2} x^2 - \left( \frac{1}{2 \sigma^2} \mu^2
 +\log(\sigma) \right) \right\}.
 \end{aligned}
@@ -824,8 +824,8 @@ powerful family of distributions encountered frequently in machine learning.
 
 ## Exercises
 
-1. What is the standard deviation of a random variable that is the difference $X-Y$ of two independent binomial random variables $X, Y \sim \mathrm{Binomial}(16, 1/2)$.
-2. If we take a Poisson random variable $X \sim \mathrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
+1. What is the standard deviation of a random variable that is the difference $X-Y$ of two independent binomial random variables $X, Y \sim \textrm{Binomial}(16, 1/2)$.
+2. If we take a Poisson random variable $X \sim \textrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
 
 
