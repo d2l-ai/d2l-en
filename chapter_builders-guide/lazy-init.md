@@ -264,3 +264,7 @@ We can pass data through the model to make the framework finally initialize para
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/281)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17992)
+:end_tab:

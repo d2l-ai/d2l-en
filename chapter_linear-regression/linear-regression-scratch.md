@@ -574,3 +574,7 @@ and *more efficiently* (using our GPUs to their full potential).
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17976)
+:end_tab:

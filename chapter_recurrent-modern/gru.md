@@ -406,3 +406,7 @@ They can also skip subsequences by turning on the update gate.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3860)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18017)
+:end_tab:

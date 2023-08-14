@@ -334,3 +334,7 @@ Nonetheless, you have now reached the state of the art of the late 1980s when fu
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/227)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17985)
+:end_tab:

@@ -498,3 +498,7 @@ Although it seems that there are only a few more lines in AlexNet's implementati
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18001)
+:end_tab:

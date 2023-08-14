@@ -634,3 +634,7 @@ and on [GitHub](https://github.com/d2l-ai/d2l-en).
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/186)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17963)
+:end_tab:

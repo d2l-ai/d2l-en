@@ -745,3 +745,7 @@ During training, gradient clipping can mitigate the problem of exploding gradien
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1052)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18014)
+:end_tab:

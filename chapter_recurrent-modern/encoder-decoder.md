@@ -286,3 +286,7 @@ to a variable-length sequence.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3864)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18021)
+:end_tab:

@@ -318,3 +318,7 @@ More recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/277)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18002)
+:end_tab:

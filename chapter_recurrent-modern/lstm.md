@@ -553,3 +553,7 @@ LSTMs can alleviate vanishing and exploding gradients.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3861)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18016)
+:end_tab:

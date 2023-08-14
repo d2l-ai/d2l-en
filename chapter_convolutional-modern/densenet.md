@@ -512,3 +512,7 @@ applying DenseNet may require more memory-efficient implementations that may inc
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/331)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18008)
+:end_tab:

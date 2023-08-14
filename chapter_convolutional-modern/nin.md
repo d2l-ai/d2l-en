@@ -272,3 +272,7 @@ Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18003)
+:end_tab:

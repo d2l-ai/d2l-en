@@ -296,3 +296,7 @@ We will put this to good use in the next section.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/6664)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17975)
+:end_tab:

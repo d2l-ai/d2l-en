@@ -255,3 +255,7 @@ framework implementations are often highly optimized,
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/2211)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18015)
+:end_tab:

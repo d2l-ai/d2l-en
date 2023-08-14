@@ -898,3 +898,7 @@ Tensors provide a variety of functionalities including construction routines; in
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/187)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17966)
+:end_tab:

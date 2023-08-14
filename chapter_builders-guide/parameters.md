@@ -369,3 +369,7 @@ We have several ways of accessing and tying model parameters.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/269)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17990)
+:end_tab:

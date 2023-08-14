@@ -1415,3 +1415,7 @@ transforms the representation at all the sequence positions using the same MLP.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3871)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18031)
+:end_tab:

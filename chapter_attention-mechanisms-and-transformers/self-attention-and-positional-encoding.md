@@ -519,3 +519,7 @@ by adding positional encoding to the input representations.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3870)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18030)
+:end_tab:

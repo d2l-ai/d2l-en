@@ -360,3 +360,7 @@ In practice, the frequency of words tends to follow Zipf's law. This is true not
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1049)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18011)
+:end_tab:

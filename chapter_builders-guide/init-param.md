@@ -416,3 +416,7 @@ Look up the online documentation for more built-in initializers.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/8091)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17991)
+:end_tab:

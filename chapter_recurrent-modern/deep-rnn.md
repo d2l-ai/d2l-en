@@ -374,3 +374,7 @@ to ensure proper convergence.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3862)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18018)
+:end_tab:
