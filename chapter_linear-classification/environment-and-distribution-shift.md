@@ -114,13 +114,13 @@ where we believe that $\mathbf{x}$ causes $y$.
 Consider the challenge of distinguishing cats and dogs.
 Our training data might consist of images of the kind in :numref:`fig_cat-dog-train`.
 
-![Training data for distinguishing cats and dogs.](../img/cat-dog-train.svg)
+![Training data for distinguishing cats and dogs. Illustrations: Lafeez Hossain / 500px / Getty Images; ilkermetinkursova / iStock / Getty Images Plus; GlobalP / iStock / Getty Images Plus; Musthafa Aboobakuru / 500px / Getty Images.](../img/cat-dog-train.png)
 :label:`fig_cat-dog-train`
 
 
 At test time we are asked to classify the images in :numref:`fig_cat-dog-test`.
 
-![Test data for distinguishing cats and dogs.](../img/cat-dog-test.svg)
+![Test data for distinguishing cats and dogs. Illustrations: SIBAS_minich / iStock / Getty Images Plus; Ghrzuzudu / iStock / Getty Images Plus; id-work / DigitalVision Vectors / Getty Images; Yime / iStock / Getty Images Plus.](../img/cat-dog-test.png)
 :label:`fig_cat-dog-test`
 
 The training set consists of photos,
