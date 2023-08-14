@@ -9,7 +9,7 @@ became salient, with Bengio and Hochreiter
 discussing the problem
 :cite:`bengio1994learning,Hochreiter.Bengio.Frasconi.ea.2001`.
 Hochreiter had articulated this problem as early 
-as in his 1991 masters thesis, although the results 
+as 1991 in his Master's thesis, although the results 
 were not widely known because the thesis was written in German.
 While gradient clipping helps with exploding gradients, 
 handling vanishing gradients appears 
@@ -90,7 +90,7 @@ The key distinction between vanilla RNNs and LSTMs
 is that the latter support gating of the hidden state.
 This means that we have dedicated mechanisms for
 when a hidden state should be *updated* and
-also when it should be *reset*.
+also for when it should be *reset*.
 These mechanisms are learned and they address the concerns listed above.
 For instance, if the first token is of great importance
 we will learn not to update the hidden state after the first observation.
@@ -137,14 +137,14 @@ They are calculated as follows:
 
 $$
 \begin{aligned}
-\mathbf{I}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{xi} + \mathbf{H}_{t-1} \mathbf{W}_{hi} + \mathbf{b}_i),\\
-\mathbf{F}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{xf} + \mathbf{H}_{t-1} \mathbf{W}_{hf} + \mathbf{b}_f),\\
-\mathbf{O}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{xo} + \mathbf{H}_{t-1} \mathbf{W}_{ho} + \mathbf{b}_o),
+\mathbf{I}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{\textrm{xi}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hi}} + \mathbf{b}_\textrm{i}),\\
+\mathbf{F}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{\textrm{xf}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hf}} + \mathbf{b}_\textrm{f}),\\
+\mathbf{O}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{\textrm{xo}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{ho}} + \mathbf{b}_\textrm{o}),
 \end{aligned}
 $$
 
-where $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters 
-and $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ are bias parameters.
+where $\mathbf{W}_{\textrm{xi}}, \mathbf{W}_{\textrm{xf}}, \mathbf{W}_{\textrm{xo}} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{\textrm{hi}}, \mathbf{W}_{\textrm{hf}}, \mathbf{W}_{\textrm{ho}} \in \mathbb{R}^{h \times h}$ are weight parameters 
+and $\mathbf{b}_\textrm{i}, \mathbf{b}_\textrm{f}, \mathbf{b}_\textrm{o} \in \mathbb{R}^{1 \times h}$ are bias parameters.
 Note that broadcasting 
 (see :numref:`subsec_broadcasting`)
 is triggered during the summation.
@@ -160,12 +160,12 @@ Since we have not specified the action of the various gates yet,
 we first introduce the *input node* 
 $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$.
 Its computation is similar to that of the three gates described above, 
-but using a $\tanh$ function with a value range for $(-1, 1)$ as the activation function. 
+but uses a $\tanh$ function with a value range for $(-1, 1)$ as the activation function. 
 This leads to the following equation at time step $t$:
 
-$$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{t-1} \mathbf{W}_{hc} + \mathbf{b}_c),$$
+$$\tilde{\mathbf{C}}_t = \textrm{tanh}(\mathbf{X}_t \mathbf{W}_{\textrm{xc}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hc}} + \mathbf{b}_\textrm{c}),$$
 
-where $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ is a bias parameter.
+where $\mathbf{W}_{\textrm{xc}} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{\textrm{hc}} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_\textrm{c} \in \mathbb{R}^{1 \times h}$ is a bias parameter.
 
 A quick illustration of the input node is shown in :numref:`fig_lstm_1`.
 
@@ -189,7 +189,7 @@ the memory cell internal state $\mathbf{C}_{t-1}$
 will remain constant forever, 
 passing unchanged to each subsequent time step.
 However, input gates and forget gates
-give the model the flexibility to learn 
+give the model the flexibility of being able to learn 
 when to keep this value unchanged
 and when to perturb it in response 
 to subsequent inputs. 
@@ -225,14 +225,10 @@ we prevent the current memory from impacting other layers of the network
 at the current time step. 
 Note that a memory cell can accrue information 
 across many time steps without impacting the rest of the network
-(so long as the output gate takes values close to 0),
+(as long as the output gate takes values close to 0),
 and then suddenly impact the network at a subsequent time step
 as soon as the output gate flips from values close to 0
-to values close to 1.
-
-
-
-:numref:`fig_lstm_3` has a graphical illustration of the data flow.
+to values close to 1. :numref:`fig_lstm_3` has a graphical illustration of the data flow.
 
 ![Computing the hidden state in an LSTM model.](../img/lstm-3.svg)
 :label:`fig_lstm_3`
@@ -395,7 +391,7 @@ def forward(self, inputs, H_C=None):
 
 ### [**Training**] and Prediction
 
-Let's train an LSTM model by instantiating the `RNNLMScratch` class as introduced in :numref:`sec_rnn-scratch`.
+Let's train an LSTM model by instantiating the `RNNLMScratch` class from :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
@@ -513,25 +509,27 @@ model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
-Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) are quite costly due to the long range dependency of the sequence.
+Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) is quite costly because of the long range dependency of the sequence.
 Later we will encounter alternative models such as Transformers that can be used in some cases.
 
 
 ## Summary
 
 While LSTMs were published in 1997, 
-they rose to greater prominence 
+they rose to great prominence 
 with some victories in prediction competitions in the mid-2000s,
 and became the dominant models for sequence learning from 2011 
-until more recently with the rise of Transformer models, starting in 2017.
-Even tranformers owe some of their key ideas 
+until the rise of Transformer models, starting in 2017.
+Even Tranformers owe some of their key ideas 
 to architecture design innovations introduced by the LSTM.
+
+
 LSTMs have three types of gates: 
 input gates, forget gates, and output gates 
 that control the flow of information.
 The hidden layer output of LSTM includes the hidden state and the memory cell internal state. 
 Only the hidden state is passed into the output layer while 
-the memory cell internal state is entirely internal.
+the memory cell internal state remains entirely internal.
 LSTMs can alleviate vanishing and exploding gradients.
 
 
@@ -539,7 +537,7 @@ LSTMs can alleviate vanishing and exploding gradients.
 ## Exercises
 
 1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
-1. How would you need to change the model to generate proper words as opposed to sequences of characters?
+1. How would you need to change the model to generate proper words rather than just sequences of characters?
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
 1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
 1. Implement an LSTM model for time series prediction rather than character sequence prediction.
@@ -554,4 +552,8 @@ LSTMs can alleviate vanishing and exploding gradients.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3861)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18016)
 :end_tab:

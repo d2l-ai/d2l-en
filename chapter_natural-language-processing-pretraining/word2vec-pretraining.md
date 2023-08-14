@@ -79,7 +79,7 @@ index of a token (word).
 For any token index $i$,
 its vector representation
 can be obtained from
-the $i^\mathrm{th}$ row of the weight matrix
+the $i^\textrm{th}$ row of the weight matrix
 in the embedding layer.
 Since the vector dimension (`output_dim`)
 was set to 4,

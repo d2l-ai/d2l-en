@@ -15,12 +15,12 @@ Indeed,
 linear regression is
 one of the simplest machine learning models.
 Training it,
-however, uses many of the same components as other models in this book require.
+however, uses many of the same components that other models in this book require.
 Therefore, 
 before diving into the implementation details
 it is worth 
 designing some of the APIs
-used throughout this book. 
+that we use throughout. 
 Treating components in deep learning
 as objects,
 we can start by
@@ -33,7 +33,7 @@ streamline the presentation and you might even want to use it in your projects.
 
 
 Inspired by open-source libraries such as [PyTorch Lightning](https://www.pytorchlightning.ai/),
-on a high level
+at a high level
 we wish to have three classes: 
 (i) `Module` contains models, losses, and optimization methods; 
 (ii) `DataModule` provides data loaders for training and validation; 
@@ -62,7 +62,7 @@ from torch import nn
 %%tab tensorflow
 import time
 import numpy as np
-from d2l import torch as d2l
+from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
@@ -105,7 +105,7 @@ class A:
 a = A()
 ```
 
-Next we define the method `do` as we normally would, but not in class `A`'s scope. Instead, we decorate this method by `add_to_class` with class `A` as its argument. In doing so, the method is able to access the member variables of `A` as we would expect if it had been defined as part of `A`'s definition. Let's see what happens when we invoke it for the instance `a`.
+Next we define the method `do` as we normally would, but not in class `A`'s scope. Instead, we decorate this method by `add_to_class` with class `A` as its argument. In doing so, the method is able to access the member variables of `A` just as we would expect had it been included as part of `A`'s definition. Let's see what happens when we invoke it for the instance `a`.
 
 ```{.python .input}
 %%tab all
@@ -140,7 +140,7 @@ class B(d2l.HyperParameters):
 b = B(a=1, b=2, c=3)
 ```
 
-The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [TensorBoard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
+The final utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [TensorBoard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
 
 The `draw` method plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
 
@@ -171,8 +171,8 @@ for x in np.arange(0, 10, 0.1):
 ## Models
 :label:`subsec_oo-design-models`
 
-The `Module` class  is the base class of all models we will implement. At a minimum we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
-Sometimes we put the code to compute the output into a separate `forward` method to make it more reusable.
+The `Module` class is the base class of all models we will implement. At the very least we need three methods. The first, `__init__`, stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, and finally, `configure_optimizers` returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
+Sometimes we put the code for computing the output into a separate `forward` method to make it more reusable.
 
 :begin_tab:`jax`
 With the introduction of [dataclasses](https://docs.python.org/3/library/dataclasses.html)
@@ -324,22 +324,22 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
 :begin_tab:`mxnet`
 You may notice that `Module` is a subclass of `nn.Block`, the base class of neural networks in Gluon.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
+It provides convenient features for handling neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`pytorch`
 You may notice that `Module` is a subclass of `nn.Module`, the base class of neural networks in PyTorch.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
+It provides convenient features for handling neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`tensorflow`
 You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
-It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` method, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
+It provides convenient features for handling neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` method, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
 :begin_tab:`jax`
 You may notice that `Module` is a subclass of `linen.Module`, the base class of neural networks in Flax.
-It provides convenient features to handle neural networks. For example, it handles the model parameters, provides the `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
+It provides convenient features for handling neural networks. For example, it handles the model parameters, provides the `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
 Here we also redirect `__call__` to the `forward` method. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
@@ -461,7 +461,7 @@ class Trainer(d2l.HyperParameters):  #@save
 
 To highlight the object-oriented design
 for our future deep learning implementation,
-the above classes just show how their objects 
+the above classes simply show how their objects 
 store data and interact with each other.
 We will keep enriching implementations of these classes,
 such as via `@add_to_class`,
@@ -489,4 +489,8 @@ this degree of modularity pays dividends throughout the book in terms of concise
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/6647)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17974)
 :end_tab:

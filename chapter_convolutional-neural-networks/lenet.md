@@ -27,8 +27,8 @@ The model was introduced by (and named for) Yann LeCun,
 then a researcher at AT&T Bell Labs,
 for the purpose of recognizing handwritten digits in images :cite:`LeCun.Bottou.Bengio.ea.1998`.
 This work represented the culmination
-of a decade of research developing the technology.
-In 1989, LeCun's team published the first study to successfully
+of a decade of research developing the technology;
+LeCun's team published the first study to successfully
 train CNNs via backpropagation :cite:`LeCun.Boser.Denker.ea.1989`.
 
 At the time LeNet achieved outstanding results
@@ -73,17 +73,17 @@ from types import FunctionType
 
 At a high level, (**LeNet (LeNet-5) consists of two parts:
 (i) a convolutional encoder consisting of two convolutional layers; and
-(ii) a dense block consisting of three fully connected layers**);
+(ii) a dense block consisting of three fully connected layers**).
 The architecture is summarized in :numref:`img_lenet`.
 
-![Data flow in LeNet. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
+![Data flow in LeNet. The input is a handwritten digit, the output is a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
 The basic units in each convolutional block
 are a convolutional layer, a sigmoid activation function,
 and a subsequent average pooling operation.
 Note that while ReLUs and max-pooling work better,
-these discoveries had not yet been made at the time.
+they had not yet been discovered.
 Each convolutional layer uses a $5\times 5$ kernel
 and a sigmoid activation function.
 These layers map spatially arranged inputs
@@ -111,7 +111,7 @@ to the number of possible output classes.
 
 While getting to the point where you truly understand
 what is going on inside LeNet may have taken a bit of work,
-hopefully the following code snippet will convince you
+we hope that the following code snippet will convince you
 that implementing such models with modern deep learning frameworks
 is remarkably simple.
 We need only to instantiate a `Sequential` block
@@ -197,8 +197,8 @@ class LeNet(d2l.Classifier):  #@save
         ])
 ```
 
-We take some liberty in the reproduction of LeNet insofar as we replace the Gaussian activation layer by
-a softmax layer. This greatly simplifies the implementation, not the least due to the
+We have taken some liberty in the reproduction of LeNet insofar as we have replaced the Gaussian activation layer by
+a softmax layer. This greatly simplifies the implementation, not least due to the
 fact that the Gaussian decoder is rarely used nowadays. Other than that, this network matches
 the original LeNet-5 architecture.
 
@@ -207,7 +207,7 @@ Let's see what happens inside the network. By passing a
 single-channel (black and white)
 $28 \times 28$ image through the network
 and printing the output shape at each layer,
-we can [**inspect the model**] to make sure
+we can [**inspect the model**] to ensure
 that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
 :end_tab:
@@ -217,7 +217,7 @@ Let's see what happens inside the network. By passing a
 single-channel (black and white)
 $28 \times 28$ image through the network
 and printing the output shape at each layer,
-we can [**inspect the model**] to make sure
+we can [**inspect the model**] to ensure
 that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
 Flax provides `nn.tabulate`, a nifty method to summarise the layers and
@@ -277,16 +277,16 @@ model.layer_summary((1, 28, 28, 1))
 Note that the height and width of the representation
 at each layer throughout the convolutional block
 is reduced (compared with the previous layer).
-The first convolutional layer uses 2 pixels of padding
+The first convolutional layer uses two pixels of padding
 to compensate for the reduction in height and width
 that would otherwise result from using a $5 \times 5$ kernel.
 As an aside, the image size of $28 \times 28$ pixels in the original
-MNIST OCR dataset is a result of *trimming* 2 pixel rows (and columns) from the
+MNIST OCR dataset is a result of *trimming* two pixel rows (and columns) from the
 original scans that measured $32 \times 32$ pixels. This was done primarily to
-save space (a 30% reduction) at a time when Megabytes mattered.
+save space (a 30% reduction) at a time when megabytes mattered.
 
 In contrast, the second convolutional layer forgoes padding,
-and thus the height and width are both reduced by 4 pixels.
+and thus the height and width are both reduced by four pixels.
 As we go up the stack of layers,
 the number of channels increases layer-over-layer
 from 1 in the input to 6 after the first convolutional layer
@@ -337,21 +337,21 @@ with d2l.try_gpu():
 
 ## Summary
 
-In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp-implementation`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
+We have made significant progress in this chapter. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp-implementation`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation enabled significantly more complex architectures.
 
-A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
+A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp-based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will journey down this rabbit to hole to see where it takes us.
 
 ## Exercises
 
 1. Let's modernize LeNet. Implement and test the following changes:
-    1. Replace the average pooling with max-pooling.
+    1. Replace average pooling with max-pooling.
     1. Replace the softmax layer with ReLU.
 1. Try to change the size of the LeNet style network to improve its accuracy in addition to max-pooling and ReLU.
     1. Adjust the convolution window size.
     1. Adjust the number of output channels.
     1. Adjust the number of convolution layers.
     1. Adjust the number of fully connected layers.
-    1. Adjust the learning rates and other training details (e.g., initialization and number of epochs.)
+    1. Adjust the learning rates and other training details (e.g., initialization and number of epochs).
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters and coats).
 1. What happens to the activations when you feed significantly different images into the network (e.g., cats, cars, or even random noise)?
@@ -366,4 +366,8 @@ A second difference is the relative ease with which we were able to implement Le
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/275)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18000)
 :end_tab:

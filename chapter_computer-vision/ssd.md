@@ -92,7 +92,7 @@ are generated with
 each spatial position of these feature maps as their center,
 a total of $hwa$ anchor boxes need to be classified.
 This often makes classification with fully connected layers infeasible due to likely
-heavy parameterization costs.
+heavy parametrization costs.
 Recall how we used channels of
 convolutional layers
 to predict classes in :numref:`sec_nin`.
@@ -884,8 +884,8 @@ display(img, output.cpu(), threshold=0.9)
 $$
 f(x) =
     \begin{cases}
-    (\sigma x)^2/2,& \text{if }|x| < 1/\sigma^2\\
-    |x|-0.5/\sigma^2,& \text{otherwise}
+    (\sigma x)^2/2,& \textrm{if }|x| < 1/\sigma^2\\
+    |x|-0.5/\sigma^2,& \textrm{otherwise}
     \end{cases}
 $$
 

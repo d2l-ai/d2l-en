@@ -37,7 +37,7 @@ of word $w_j$ given word $w_i$
 in the skip-gram model,
 we have
 
-$$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
+$$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \exp(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 
 where
 for any index $i$
@@ -191,7 +191,7 @@ GloVe sums them up as the output vector.
 We can also interpret the GloVe model from another perspective.
 Using the same notation in
 :numref:`subsec_skipgram-global`,
-let $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ be the conditional probability of generating the context word $w_j$ given $w_i$ as the center word in the corpus.
+let $p_{ij} \stackrel{\textrm{def}}{=} P(w_j \mid w_i)$ be the conditional probability of generating the context word $w_j$ given $w_i$ as the center word in the corpus.
 :numref:`tab_glove`
 lists several co-occurrence probabilities
 given words "ice" and "steam"
@@ -203,18 +203,18 @@ and their ratios based on  statistics from a large corpus.
 
 |$w_k$=|solid|gas|water|fashion|
 |:--|:-|:-|:-|:-|
-|$p_1=P(w_k\mid \text{ice})$|0.00019|0.000066|0.003|0.000017|
-|$p_2=P(w_k\mid\text{steam})$|0.000022|0.00078|0.0022|0.000018|
+|$p_1=P(w_k\mid \textrm{ice})$|0.00019|0.000066|0.003|0.000017|
+|$p_2=P(w_k\mid\textrm{steam})$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
 
 
 
 We can observe the following from :numref:`tab_glove`:
 
-* For a word $w_k$ that is related to "ice" but unrelated to "steam", such as $w_k=\text{solid}$, we expect a larger ratio of co-occurence probabilities, such as 8.9.
-* For a word $w_k$ that is related to "steam" but unrelated to "ice", such as $w_k=\text{gas}$, we expect a smaller ratio of co-occurence probabilities, such as 0.085.
-* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=\text{water}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 1.36.
-* For a word $w_k$ that is unrelated to both "ice" and "steam", such as $w_k=\text{fashion}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 0.96.
+* For a word $w_k$ that is related to "ice" but unrelated to "steam", such as $w_k=\textrm{solid}$, we expect a larger ratio of co-occurence probabilities, such as 8.9.
+* For a word $w_k$ that is related to "steam" but unrelated to "ice", such as $w_k=\textrm{gas}$, we expect a smaller ratio of co-occurence probabilities, such as 0.085.
+* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=\textrm{water}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 1.36.
+* For a word $w_k$ that is unrelated to both "ice" and "steam", such as $w_k=\textrm{fashion}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 0.96.
 
 
 

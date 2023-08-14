@@ -50,7 +50,7 @@ of the two underlying unidirectional RNN layers.
 
 Formally for any time step $t$,
 we consider a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples: $n$, number of inputs in each example: $d$) 
+(number of examples $=n$; number of inputs in each example $=d$) 
 and let the hidden layer activation function be $\phi$.
 In the bidirectional architecture,
 the forward and backward hidden states for this time step 
@@ -62,25 +62,25 @@ The forward and backward hidden state updates are as follows:
 
 $$
 \begin{aligned}
-\overrightarrow{\mathbf{H}}_t &= \phi(\mathbf{X}_t \mathbf{W}_{xh}^{(f)} + \overrightarrow{\mathbf{H}}_{t-1} \mathbf{W}_{hh}^{(f)}  + \mathbf{b}_h^{(f)}),\\
-\overleftarrow{\mathbf{H}}_t &= \phi(\mathbf{X}_t \mathbf{W}_{xh}^{(b)} + \overleftarrow{\mathbf{H}}_{t+1} \mathbf{W}_{hh}^{(b)}  + \mathbf{b}_h^{(b)}),
+\overrightarrow{\mathbf{H}}_t &= \phi(\mathbf{X}_t \mathbf{W}_{\textrm{xh}}^{(f)} + \overrightarrow{\mathbf{H}}_{t-1} \mathbf{W}_{\textrm{hh}}^{(f)}  + \mathbf{b}_\textrm{h}^{(f)}),\\
+\overleftarrow{\mathbf{H}}_t &= \phi(\mathbf{X}_t \mathbf{W}_{\textrm{xh}}^{(b)} + \overleftarrow{\mathbf{H}}_{t+1} \mathbf{W}_{\textrm{hh}}^{(b)}  + \mathbf{b}_\textrm{h}^{(b)}),
 \end{aligned}
 $$
 
-where the weights $\mathbf{W}_{xh}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{xh}^{(b)} \in \mathbb{R}^{d \times h}, \text{ and } \mathbf{W}_{hh}^{(b)} \in \mathbb{R}^{h \times h}$, and biases $\mathbf{b}_h^{(f)} \in \mathbb{R}^{1 \times h}$ and $\mathbf{b}_h^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
+where the weights $\mathbf{W}_{\textrm{xh}}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{\textrm{xh}}^{(b)} \in \mathbb{R}^{d \times h}, \textrm{ and } \mathbf{W}_{\textrm{hh}}^{(b)} \in \mathbb{R}^{h \times h}$, and the biases $\mathbf{b}_\textrm{h}^{(f)} \in \mathbb{R}^{1 \times h}$ and $\mathbf{b}_\textrm{h}^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
 
 Next, we concatenate the forward and backward hidden states
 $\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$
-to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ to be fed into the output layer.
+to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ for feeding into the output layer.
 In deep bidirectional RNNs with multiple hidden layers,
 such information is passed on as *input* to the next bidirectional layer. 
 Last, the output layer computes the output 
-$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$):
+$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs $=q$):
 
-$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$
+$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q}.$$
 
-Here, the weight matrix $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ 
-and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ 
+Here, the weight matrix $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{2h \times q}$ 
+and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ 
 are the model parameters of the output layer. 
 While technically, the two directions can have different numbers of hidden units,
 this design choice is seldom made in practice. 
@@ -200,7 +200,7 @@ In bidirectional RNNs, the hidden state for each time step is simultaneously det
 
 1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
 1. Design a bidirectional RNN with multiple hidden layers.
-1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the context will be returned? What type of neural architectures is preferred for handling polysemy?
+1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the correct context will be returned? What type of neural architectures is preferred for handling polysemy?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)
@@ -208,4 +208,8 @@ In bidirectional RNNs, the hidden state for each time step is simultaneously det
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1059)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18019)
 :end_tab:

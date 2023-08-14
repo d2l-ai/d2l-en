@@ -221,11 +221,11 @@ the word analogy completion task
 can be defined as:
 for a word analogy 
 $a : b :: c : d$, given the first three words $a$, $b$ and $c$, find $d$. 
-Denote the vector of word $w$ by $\text{vec}(w)$. 
+Denote the vector of word $w$ by $\textrm{vec}(w)$. 
 To complete the analogy,
 we will find the word 
 whose vector is most similar
-to the result of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
+to the result of $\textrm{vec}(c)+\textrm{vec}(b)-\textrm{vec}(a)$.
 
 ```{.python .input}
 #@tab all

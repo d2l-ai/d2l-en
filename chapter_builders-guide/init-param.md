@@ -13,8 +13,6 @@ However, we often want to initialize our weights
 according to various other protocols. The framework provides most commonly
 used protocols, and also allows to create a custom initializer.
 
-
-
 ```{.python .input}
 %%tab mxnet
 from mxnet import init, np, npx
@@ -63,7 +61,7 @@ TensorFlow provides a variety of initialization methods both in the root module 
 :begin_tab:`jax`
 By default, Flax initializes weights using `jax.nn.initializers.lecun_normal`,
 i.e., by drawing samples from a truncated normal distribution centered on 0 with
-the standard deviation set as the squared root of $1 / \text{fan}_{\text{in}}$
+the standard deviation set as the squared root of $1 / \textrm{fan}_{\textrm{in}}$
 where `fan_in` is the number of input units in the weight tensor. The bias
 parameters are all set to zero.
 Jax's `nn.initializers` module provides a variety
@@ -113,7 +111,7 @@ net.apply(params, X).shape
 Let's begin by calling on built-in initializers.
 The code below initializes all weight parameters
 as Gaussian random variables
-with standard deviation 0.01, while bias parameters cleared to zero.
+with standard deviation 0.01, while bias parameters are cleared to zero.
 
 ```{.python .input}
 %%tab mxnet
@@ -279,9 +277,9 @@ for any weight parameter $w$ using the following strange distribution:
 $$
 \begin{aligned}
     w \sim \begin{cases}
-        U(5, 10) & \text{ with probability } \frac{1}{4} \\
-            0    & \text{ with probability } \frac{1}{2} \\
-        U(-10, -5) & \text{ with probability } \frac{1}{4}
+        U(5, 10) & \textrm{ with probability } \frac{1}{4} \\
+            0    & \textrm{ with probability } \frac{1}{2} \\
+        U(-10, -5) & \textrm{ with probability } \frac{1}{4}
     \end{cases}
 \end{aligned}
 $$
@@ -417,4 +415,8 @@ Look up the online documentation for more built-in initializers.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/8091)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17991)
 :end_tab:

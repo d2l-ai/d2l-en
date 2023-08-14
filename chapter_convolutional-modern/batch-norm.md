@@ -52,22 +52,23 @@ Choices regarding data preprocessing often make an enormous difference in the fi
 Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_house`).
 Our first step when working with real data
 was to standardize our input features to have
-zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \boldsymbol{1}$ across multiple observations :cite:`friedman1987exploratory`.
-At a minimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
+zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \boldsymbol{1}$ across multiple observations :cite:`friedman1987exploratory`, frequently rescaling the latter so  that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
-This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are
-beneficial to keep the estimation problem well controlled. See e.g., the articles by :citet:`guyon2008feature` for a review of feature selection and extraction techniques. Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in support vector machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
+This can work well, e.g., for spatial sensor data. These preprocessing techniques and many others, are
+beneficial for keeping the estimation problem well controlled. 
+For a review of feature selection and extraction see the article of :citet:`guyon2008feature`, for example.
+Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in support vector machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
 
 Intuitively, this standardization plays nicely with our optimizers
-since it puts the parameters *a priori* at a similar scale.
+since it puts the parameters *a priori* on a similar scale.
 As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
-might not be beneficial. While this is not quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework.
+might not be beneficial. While this is not quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016`, within a unified framework.
 
 Second, for a typical MLP or CNN, as we train,
 the variables 
 in intermediate layers (e.g., affine transformation outputs in MLP)
 may take values with widely varying magnitudes:
-both along the layers from input to output, across units in the same layer,
+whether along the layers from input to output, across units in the same layer,
 and over time due to our updates to the model parameters.
 The inventors of batch normalization postulated informally
 that this drift in the distribution of such variables could hamper the convergence of the network.
@@ -77,7 +78,7 @@ this might necessitate compensatory adjustments in the learning rates. Adaptive 
 such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018`, or Distributed Shampoo :cite:`anil2020scalable` aim to address this from the viewpoint of optimization, e.g., by adding aspects of second-order methods. 
 The alternative is to prevent the problem from occurring, simply by adaptive normalization.
 
-Third, deeper networks are complex and tend to be more easily capable of overfitting.
+Third, deeper networks are complex and tend to be more liable to overfitting.
 This means that regularization becomes more critical. A common technique for regularization is noise
 injection. This has been known for a long time, e.g., with regard to noise injection for the
 inputs :cite:`Bishop.1995`. It also forms the basis of dropout in :numref:`sec_dropout`. As it turns out, quite serendipitously, batch normalization conveys all three benefits: preprocessing, numerical stability, and regularization.
@@ -97,16 +98,16 @@ we would not be able to learn anything.
 That is because after subtracting the means,
 each hidden unit would take value 0.
 As you might guess, since we are devoting a whole section to batch normalization,
-with large enough minibatches, the approach proves effective and stable.
+with large enough minibatches the approach proves effective and stable.
 One takeaway here is that when applying batch normalization,
 the choice of batch size is
 even more significant than without batch normalization, or at least,
-suitable calibration is needed as we might adjust it.
+suitable calibration is needed as we might adjust batch size.
 
 Denote by $\mathcal{B}$ a minibatch and let $\mathbf{x} \in \mathcal{B}$ be an input to 
-batch normalization ($\mathrm{BN}$). In this case the batch normalization is defined as follows:
+batch normalization ($\textrm{BN}$). In this case the batch normalization is defined as follows:
 
-$$\mathrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$
+$$\textrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$
 :eqlabel:`eq_batchnorm`
 
 In :eqref:`eq_batchnorm`,
@@ -116,7 +117,7 @@ After applying standardization,
 the resulting minibatch
 has zero mean and unit variance.
 The choice of unit variance
-(vs. some other magic number) is an arbitrary choice. We recover this degree of freedom
+(rather than some other magic number) is arbitrary. We recover this degree of freedom
 by including an elementwise
 *scale parameter* $\boldsymbol{\gamma}$ and *shift parameter* $\boldsymbol{\beta}$
 that have the same shape as $\mathbf{x}$. Both are parameters that
@@ -130,17 +131,17 @@ Practical experience confirms that, as alluded to when discussing feature rescal
 We calculate $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ in :eqref:`eq_batchnorm` as follows:
 
 $$\hat{\boldsymbol{\mu}}_\mathcal{B} = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} \mathbf{x}
-\text{ and }
+\textrm{ and }
 \hat{\boldsymbol{\sigma}}_\mathcal{B}^2 = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} (\mathbf{x} - \hat{\boldsymbol{\mu}}_{\mathcal{B}})^2 + \epsilon.$$
 
 Note that we add a small constant $\epsilon > 0$
 to the variance estimate
 to ensure that we never attempt division by zero,
-even in cases where the empirical variance estimate might be very small or even vanish.
+even in cases where the empirical variance estimate might be very small or vanish.
 The estimates $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ counteract the scaling issue
 by using noisy estimates of mean and variance.
 You might think that this noisiness should be a problem.
-Quite to the contrary, this is actually beneficial.
+On the contrary, it is actually beneficial.
 
 This turns out to be a recurring theme in deep learning.
 For reasons that are not yet well-characterized theoretically,
@@ -150,7 +151,7 @@ this variation appears to act as a form of regularization.
 :citet:`Teye.Azizpour.Smith.2018` and :citet:`Luo.Wang.Shao.ea.2018`
 related the properties of batch normalization to Bayesian priors and penalties, respectively. 
 In particular, this sheds some light on the puzzle
-of why batch normalization works best for moderate minibatches sizes in the $50 \sim 100$ range.
+of why batch normalization works best for moderate minibatch sizes in the 50--100 range.
 This particular size of minibatch seems to inject just the "right amount" of noise per layer, both in terms of scale via $\hat{\boldsymbol{\sigma}}$, and in terms of offset via $\hat{\boldsymbol{\mu}}$: a
 larger minibatch regularizes less due to the more stable estimates, whereas tiny minibatches
 destroy useful signal due to high variance. Exploring this direction further, considering alternative types
@@ -170,10 +171,10 @@ However, once the model is trained,
 we can calculate the means and variances
 of each layer's variables based on the entire dataset.
 Indeed this is standard practice for
-models employing batch normalization
-and thus batch normalization layers function differently
+models employing batch normalization;
+thus batch normalization layers function differently
 in *training mode* (normalizing by minibatch statistics)
-and in *prediction mode* (normalizing by dataset statistics).
+than in *prediction mode* (normalizing by dataset statistics).
 In this form they closely resemble the behavior of dropout regularization of :numref:`sec_dropout`,
 where noise is only injected during training.
 
@@ -183,16 +184,16 @@ where noise is only injected during training.
 Batch normalization implementations for fully connected layers
 and convolutional layers are slightly different.
 One key difference between batch normalization and other layers
-is that because batch normalization operates on a full minibatch at a time,
+is that because the former operates on a full minibatch at a time,
 we cannot just ignore the batch dimension
 as we did before when introducing other layers.
 
 ### Fully Connected Layers
 
 When applying batch normalization to fully connected layers,
-the original paper inserted batch normalization after the affine transformation
+:citet:`Ioffe.Szegedy.2015`, in their original paper inserted batch normalization after the affine transformation
 and *before* the nonlinear activation function. Later applications experimented with
-inserting batch normalization right *after* activation functions :cite:`Ioffe.Szegedy.2015`.
+inserting batch normalization right *after* activation functions.
 Denoting the input to the fully connected layer by $\mathbf{x}$,
 the affine transformation
 by $\mathbf{W}\mathbf{x} + \mathbf{b}$ (with the weight parameter $\mathbf{W}$ and the bias parameter $\mathbf{b}$),
@@ -200,7 +201,7 @@ and the activation function by $\phi$,
 we can express the computation of a batch-normalization-enabled,
 fully connected layer output $\mathbf{h}$ as follows:
 
-$$\mathbf{h} = \phi(\mathrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
+$$\mathbf{h} = \phi(\textrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
 
 Recall that mean and variance are computed
 on the *same* minibatch
@@ -210,7 +211,7 @@ on which the transformation is applied.
 
 Similarly, with convolutional layers,
 we can apply batch normalization after the convolution
-and before the nonlinear activation function. The key difference from batch normalization
+but before the nonlinear activation function. The key difference from batch normalization
 in fully connected layers is that we apply the operation on a per-channel basis
 *across all locations*. This is compatible with our assumption of translation
 invariance that led to convolutions: we assumed that the specific location of a pattern
@@ -233,31 +234,31 @@ both of which are scalars.
 ### Layer Normalization
 :label:`subsec_layer-normalization-in-bn`
 
-Note that in the context of convolutions the batch normalization is well-defined even for
+Note that in the context of convolutions the batch normalization is well defined even for
 minibatches of size 1: after all, we have all the locations across an image to average. Consequently,
 mean and variance are well defined, even if it is just within a single observation. This consideration
 led :citet:`Ba.Kiros.Hinton.2016` to introduce the notion of *layer normalization*. It works just like
-a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. Given an $n$-dimensional vector $\mathbf{x}$ layer norms are given by 
+a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. For an $n$-dimensional vector $\mathbf{x}$, layer norms are given by 
 
-$$\mathbf{x} \rightarrow \mathrm{LN}(\mathbf{x}) =  \frac{\mathbf{x} - \hat{\mu}}{\hat\sigma},$$
+$$\mathbf{x} \rightarrow \textrm{LN}(\mathbf{x}) =  \frac{\mathbf{x} - \hat{\mu}}{\hat\sigma},$$
 
 where scaling and offset are applied coefficient-wise
 and given by 
 
-$$\hat{\mu} \stackrel{\mathrm{def}}{=} \frac{1}{n} \sum_{i=1}^n x_i \text{ and }
-\hat{\sigma}^2 \stackrel{\mathrm{def}}{=} \frac{1}{n} \sum_{i=1}^n (x_i - \hat{\mu})^2 + \epsilon.$$
+$$\hat{\mu} \stackrel{\textrm{def}}{=} \frac{1}{n} \sum_{i=1}^n x_i \textrm{ and }
+\hat{\sigma}^2 \stackrel{\textrm{def}}{=} \frac{1}{n} \sum_{i=1}^n (x_i - \hat{\mu})^2 + \epsilon.$$
 
-As before we add a small offset $\epsilon > 0$ to prevent division by zero. One of the major benefits of using layer normalization is that it prevents divergence. After all, ignoring $\epsilon$, the output of the layer normalization is scale independent. That is, we have $\mathrm{LN}(\mathbf{x}) \approx \mathrm{LN}(\alpha \mathbf{x})$ for any choice of $\alpha \neq 0$. This becomes an equality for $|\alpha| \to \infty$ (the approximate equality is due to the offset $\epsilon$ for the variance). 
+As before we add a small offset $\epsilon > 0$ to prevent division by zero. One of the major benefits of using layer normalization is that it prevents divergence. After all, ignoring $\epsilon$, the output of the layer normalization is scale independent. That is, we have $\textrm{LN}(\mathbf{x}) \approx \textrm{LN}(\alpha \mathbf{x})$ for any choice of $\alpha \neq 0$. This becomes an equality for $|\alpha| \to \infty$ (the approximate equality is due to the offset $\epsilon$ for the variance). 
 
-Another advantage of the layer normalization is that it does not depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transformation that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend the interested reader to consult the original paper.
+Another advantage of the layer normalization is that it does not depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transformation that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend that interested readers consult the original paper.
 
 ### Batch Normalization During Prediction
 
 As we mentioned earlier, batch normalization typically behaves differently
-in training mode and prediction mode.
+in training mode than in prediction mode.
 First, the noise in the sample mean and the sample variance
 arising from estimating each on minibatches
-are no longer desirable once we have trained the model.
+is no longer desirable once we have trained the model.
 Second, we might not have the luxury
 of computing per-batch normalization statistics.
 For example,
@@ -266,7 +267,7 @@ we might need to apply our model to make one prediction at a time.
 Typically, after training, we use the entire dataset
 to compute stable estimates of the variable statistics
 and then fix them at prediction time.
-Consequently, batch normalization behaves differently during training and at test time.
+Hence, batch normalization behaves differently during training than at test time.
 Recall that dropout also exhibits this characteristic.
 
 ## (**Implementation from Scratch**)
@@ -395,7 +396,7 @@ allocating and initializing any required variables,
 keeping track of moving averages (here for mean and variance), and so on.
 This pattern enables a clean separation of mathematics from boilerplate code.
 Also note that for the sake of convenience
-we did not worry about automatically inferring the input shape here,
+we did not worry about automatically inferring the input shape here;
 thus we need to specify the number of features throughout.
 By now all modern deep learning frameworks offer automatic detection of size and shape in the
 high-level batch normalization APIs (in practice we will use this instead).
@@ -553,7 +554,7 @@ class BatchNorm(nn.Module):
         return Y
 ```
 
-We used `momentum` to govern the aggregation over past mean and variance estimates. This is somewhat of a misnomer as it has nothing whatsoever to do with the *momentum* term of optimization in :numref:`sec_momentum`. Nonetheless, it is the commonly adopted name for this term and in deference to API naming convention we use the same variable name in our code, too.
+We used `momentum` to govern the aggregation over past mean and variance estimates. This is somewhat of a misnomer as it has nothing whatsoever to do with the *momentum* term of optimization. Nonetheless, it is the commonly adopted name for this term and in deference to API naming convention we use the same variable name in our code.
 
 ## [**LeNet with Batch Normalization**]
 
@@ -829,10 +830,10 @@ Even with dropout and weight decay,
 they remain so flexible that their ability to generalize to unseen data
 likely needs significantly more refined learning-theoretic generalization guarantees.
 
-In the original paper proposing batch normalization :cite:`Ioffe.Szegedy.2015`, in addition to introducing a powerful and useful tool,
+The original paper proposing batch normalization :cite:`Ioffe.Szegedy.2015`, in addition to introducing a powerful and useful tool,
 offered an explanation for why it works:
 by reducing *internal covariate shift*.
-Presumably by *internal covariate shift* the authors
+Presumably by *internal covariate shift* they
 meant something like the intuition expressed above---the
 notion that the distribution of variable values changes
 over the course of training.
@@ -866,8 +867,9 @@ in a position paper outlining
 troubling trends in machine learning :cite:`Lipton.Steinhardt.2018`.
 Other authors
 have proposed alternative explanations for the success of batch normalization,
-some claiming that batch normalization's success comes despite exhibiting behavior
-that is in some ways opposite to those claimed in the original paper :cite:`Santurkar.Tsipras.Ilyas.ea.2018`.
+some :cite:`Santurkar.Tsipras.Ilyas.ea.2018`
+claiming that batch normalization's success comes despite exhibiting behavior
+that is in some ways opposite to those claimed in the original paper.
 
 
 We note that the *internal covariate shift*
@@ -875,7 +877,7 @@ is no more worthy of criticism than any of
 thousands of similarly vague claims
 made every year in the technical machine learning literature.
 Likely, its resonance as a focal point of these debates
-owes to its broad recognizability to the target audience.
+owes to its broad recognizability for the target audience.
 Batch normalization has proven an indispensable method,
 applied in nearly all deployed image classifiers,
 earning the paper that introduced the technique
@@ -888,11 +890,11 @@ On a more practical note, there are a number of aspects worth remembering about 
 * During model training, batch normalization continuously adjusts the intermediate output of
   the network by utilizing the mean and standard deviation of the minibatch, so that the
   values of the intermediate output in each layer throughout the neural network are more stable.
-* Batch normalization for fully connected layers and convolutional layers are slightly different. In fact,
+* Batch normalization is slightly different for fully connected layers than for convolutional layers. In fact,
   for convolutional layers, layer normalization can sometimes be used as an alternative.
 * Like a dropout layer, batch normalization layers have different behaviors
-  in training mode and prediction mode.
-* Batch normalization is useful for regularization and improving convergence in optimization. On the other hand,
+  in training mode than in prediction mode.
+* Batch normalization is useful for regularization and improving convergence in optimization. By contrast,
   the original motivation of reducing internal covariate shift seems not to be a valid explanation.
 * For more robust models that are less sensitive to input perturbations, consider removing batch normalization :cite:`wang2022removing`.
 
@@ -902,14 +904,14 @@ On a more practical note, there are a number of aspects worth remembering about 
 1. Compare the learning rates for LeNet with and without batch normalization.
     1. Plot the increase in validation accuracy.
     1. How large can you make the learning rate before the optimization fails in both cases?
-1. Do we need batch normalization in every layer? Experiment with it?
+1. Do we need batch normalization in every layer? Experiment with it.
 1. Implement a "lite" version of batch normalization that only removes the mean, or alternatively one that
    only removes the variance. How does it behave?
 1. Fix the parameters `beta` and `gamma`. Observe and analyze the results.
 1. Can you replace dropout by batch normalization? How does the behavior change?
 1. Research ideas: think of other normalization transforms that you can apply:
     1. Can you apply the probability integral transform?
-    1. Can you use a full rank covariance estimate? Why should you probably not do that? 
+    1. Can you use a full-rank covariance estimate? Why should you probably not do that? 
     1. Can you use other compact matrix variants (block-diagonal, low-displacement rank, Monarch, etc.)?
     1. Does a sparsification compression act as a regularizer?
     1. Are there other projections (e.g., convex cone, symmetry group-specific transforms) that you can use?
@@ -924,4 +926,8 @@ On a more practical note, there are a number of aspects worth remembering about 
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/330)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18005)
 :end_tab:

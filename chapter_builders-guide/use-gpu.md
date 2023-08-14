@@ -6,17 +6,17 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 # GPUs
 :label:`sec_use_gpu`
 
-In :numref:`tab_intro_decade`, we discussed the rapid growth
+In :numref:`tab_intro_decade`, we illustrated the rapid growth
 of computation over the past two decades.
 In a nutshell, GPU performance has increased
 by a factor of 1000 every decade since 2000.
 This offers great opportunities but it also suggests
-a significant need to provide such performance.
+that there was significant demand for such performance.
 
 
 In this section, we begin to discuss how to harness
 this computational performance for your research.
-First by using single GPUs and at a later point,
+First by using a single GPU and at a later point,
 how to use multiple GPUs and multiple servers (with multiple GPUs).
 
 Specifically, we will discuss how
@@ -27,11 +27,6 @@ and follow the prompts to set the appropriate path.
 Once these preparations are complete,
 the `nvidia-smi` command can be used
 to (**view the graphics card information**).
-
-```{.python .input}
-%%tab all
-!nvidia-smi
-```
 
 :begin_tab:`mxnet`
 You might have noticed that a MXNet tensor
@@ -66,7 +61,7 @@ that supports CUDA 10.0 via `pip install mxnet-cu100`.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, every array has a device, we often refer it as a context.
+In PyTorch, every array has a device; we often refer it as a *context*.
 So far, by default, all variables
 and associated computation
 have been assigned to the CPU.
@@ -85,11 +80,7 @@ you need at least two GPUs.
 Note that this might be extravagant for most desktop computers
 but it is easily available in the cloud, e.g.,
 by using the AWS EC2 multi-GPU instances.
-Almost all other sections do *not* require multiple GPUs.
-Instead, this is simply to illustrate
-how data flow between different devices.
-
-
+Almost all other sections do *not* require multiple GPUs, but here we simply wish to illustrate data flow between different devices.
 
 ```{.python .input}
 %%tab mxnet
@@ -125,7 +116,7 @@ from jax import numpy as jnp
 We can specify devices, such as CPUs and GPUs,
 for storage and calculation.
 By default, tensors are created in the main memory
-and then use the CPU to calculate it.
+and then the CPU is used for calculations.
 
 :begin_tab:`mxnet`
 In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`.
@@ -137,7 +128,7 @@ will try to use all CPU cores.
 However, `gpu()` only represents one card
 and the corresponding memory.
 If there are multiple GPUs, we use `gpu(i)`
-to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
+to represent the $i^\textrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu(0)` and `gpu()` are equivalent.
 :end_tab:
 
@@ -150,7 +141,7 @@ will try to use all CPU cores.
 However, a `gpu` device only represents one card
 and the corresponding memory.
 If there are multiple GPUs, we use `torch.device(f'cuda:{i}')`
-to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
+to represent the $i^\textrm{th}$ GPU ($i$ starts at 0).
 Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
 
@@ -327,7 +318,7 @@ X = jax.device_put(jnp.ones((2, 3)), try_gpu())
 X
 ```
 
-Assuming that you have at least two GPUs, the following code will (**create a random tensor on the second GPU.**)
+Assuming that you have at least two GPUs, the following code will (**create a random tensor, `Y`, on the second GPU.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -401,9 +392,7 @@ print(X)
 print(Z)
 ```
 
-Now that [**the data is on the same GPU
-(both `Z` and `Y` are),
-we can add them up.**]
+Now that [**the data (both `Z` and `Y`) are on the same GPU), we can add them up.**]
 
 ```{.python .input}
 %%tab all
@@ -427,7 +416,7 @@ Unless you specifically want to make a copy,
 :end_tab:
 
 :begin_tab:`pytorch`
-Imagine that your variable `Z` already lives on your second GPU.
+But what if your variable `Z` already lived on your second GPU?
 What happens if we still call `Z.cuda(1)`?
 It will return `Z` instead of making a copy and allocating new memory.
 :end_tab:
@@ -471,16 +460,14 @@ Z2 is Z
 
 People use GPUs to do machine learning
 because they expect them to be fast.
-But transferring variables between devices is slow.
+But transferring variables between devices is slow: much slower than computation.
 So we want you to be 100% certain
 that you want to do something slow before we let you do it.
 If the deep learning framework just did the copy automatically
 without crashing then you might not realize
 that you had written some slow code.
 
-Also, transferring data between devices (CPU, GPUs, and other machines)
-is something that is much slower than computation.
-It also makes parallelization a lot more difficult,
+Transferring data is not only slow, it also makes parallelization a lot more difficult,
 since we have to wait for data to be sent (or rather to be received)
 before we can proceed with more operations.
 This is why copy operations should be taken with great care.
@@ -540,9 +527,9 @@ params = net.init(key2, x)  # Initialization call
 
 We will see many more examples of
 how to run models on GPUs in the following chapters,
-simply since they will become somewhat more computationally intensive.
+simply because the models will become somewhat more computationally intensive.
 
-When the input is a tensor on the GPU, the model will calculate the result on the same GPU.
+For example, when the input is a tensor on the GPU, the model will calculate the result on the same GPU.
 
 ```{.python .input}
 %%tab mxnet, pytorch, tensorflow
@@ -657,14 +644,13 @@ You can lose significant performance by moving data without care.
 
 1. Try a larger computation task, such as the multiplication of large matrices,
    and see the difference in speed between the CPU and GPU.
-   What about a task with a small amount of calculations?
+   What about a task with a small number of calculations?
 1. How should we read and write model parameters on the GPU?
 1. Measure the time it takes to compute 1000
-   matrix-matrix multiplications of $100 \times 100$ matrices
-   and log the Frobenius norm of the output matrix one result at a time
-   vs. keeping a log on the GPU and transferring only the final result.
-1. Measure how much time it takes to perform two matrix-matrix multiplications
-   on two GPUs at the same time vs. in sequence
+   matrix--matrix multiplications of $100 \times 100$ matrices
+   and log the Frobenius norm of the output matrix one result at a time. Compare it with keeping a log on the GPU and transferring only the final result.
+1. Measure how much time it takes to perform two matrix--matrix multiplications
+   on two GPUs at the same time. Compare it with computing in in sequence
    on one GPU. Hint: you should see almost linear scaling.
 
 :begin_tab:`mxnet`
@@ -677,4 +663,8 @@ You can lose significant performance by moving data without care.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/270)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17995)
 :end_tab:

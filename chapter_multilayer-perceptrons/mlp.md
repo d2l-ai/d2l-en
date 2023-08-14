@@ -6,8 +6,8 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 # Multilayer Perceptrons
 :label:`sec_mlp`
 
-In :numref:`chap_classification`, we introduced
-softmax regression (:numref:`sec_softmax`),
+In :numref:`sec_softmax`, we introduced
+softmax regression,
 implementing the algorithm from scratch
 (:numref:`sec_softmax_scratch`) and using high-level APIs
 (:numref:`sec_softmax_concise`). This allowed us to
@@ -88,11 +88,11 @@ would always be more likely to repay
 than one with a lower income.
 While monotonic, this relationship likely
 is not linearly associated with the probability of
-repayment. An increase in income from \\$0 to \\$50,000
+repayment. An increase in income from \$0 to \$50,000
 likely corresponds to a bigger increase
 in likelihood of repayment
-than an increase from \\$1 million to \\$1.05 million.
-One way to handle this might be to post-process our outcome
+than an increase from \$1 million to \$1.05 million.
+One way to handle this might be to postprocess our outcome
 such that linearity becomes more plausible,
 by using the logistic map (and thus the logarithm of the probability of outcome).
 
@@ -100,10 +100,10 @@ Note that we can easily come up with examples
 that violate monotonicity.
 Say for example that we want to predict health as a function
 of body temperature.
-For individuals with a body temperature
+For individuals with a normal body temperature
 above 37°C (98.6°F),
 higher temperatures indicate greater risk.
-However, for individuals with body temperatures
+However, if the body temperatures drops
 below 37°C, lower temperatures indicate greater risk!
 Again, we might resolve the problem
 with some clever preprocessing, such as using the distance from 37°C
@@ -117,7 +117,7 @@ always increase (or always decrease)
 the likelihood that the image depicts a dog?
 Reliance on a linear model corresponds to the implicit
 assumption that the only requirement
-for differentiating cats vs. dogs is to assess
+for differentiating cats and dogs is to assess
 the brightness of individual pixels.
 This approach is doomed to fail in a world
 where inverting an image preserves the category.
@@ -143,7 +143,7 @@ century :cite:`Fisher.1928`. For instance, decision trees
 in their most basic form use a sequence of binary decisions to
 decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel
 methods have been used for many decades to model nonlinear dependencies
-:cite:`Aronszajn.1950`. This has found its way, e.g., into
+:cite:`Aronszajn.1950`. This has found its way into
 nonparametric spline models :cite:`Wahba.1990` and kernel methods
 :cite:`Scholkopf.Smola.2002`. It is also something that the brain solves
 quite naturally. After all, neurons feed into other neurons which,
@@ -155,7 +155,7 @@ Consequently we have a sequence of relatively simple transformations.
 We can overcome the limitations of linear models
 by incorporating one or more hidden layers.
 The easiest way to do this is to stack
-many fully connected layers on top of each other.
+many fully connected layers on top of one another.
 Each layer feeds into the layer above it,
 until we generate outputs.
 We can think of the first $L-1$ layers
@@ -165,16 +165,16 @@ This architecture is commonly called
 a *multilayer perceptron*,
 often abbreviated as *MLP* (:numref:`fig_mlp`).
 
-![An MLP with a hidden layer of 5 hidden units. ](../img/mlp.svg)
+![An MLP with a hidden layer of five hidden units.](../img/mlp.svg)
 :label:`fig_mlp`
 
-This MLP has 4 inputs, 3 outputs,
-and its hidden layer contains 5 hidden units.
+This MLP has four inputs, three outputs,
+and its hidden layer contains five hidden units.
 Since the input layer does not involve any calculations,
 producing outputs with this network
 requires implementing the computations
 for both the hidden and output layers;
-thus, the number of layers in this MLP is 2.
+thus, the number of layers in this MLP is two.
 Note that both layers are fully connected.
 Every input influences every neuron in the hidden layer,
 and each of these in turn influences
@@ -233,7 +233,7 @@ nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
 following the affine transformation. For instance, a popular
 choice is the ReLU (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
-$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise.
+$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments elementwise.
 The outputs of activation functions $\sigma(\cdot)$
 are called *activations*.
 In general, with activation functions in place,
@@ -248,12 +248,12 @@ $$
 
 Since each row in $\mathbf{X}$ corresponds to an example in the minibatch,
 with some abuse of notation, we define the nonlinearity
-$\sigma$ to apply to its inputs in a row-wise fashion,
+$\sigma$ to apply to its inputs in a rowwise fashion,
 i.e., one example at a time.
 Note that we used the same notation for softmax
-when we denoted a row-wise operation in :numref:`subsec_softmax_vectorization`.
-Quite frequently the activation functions we use apply not merely row-wise but
-element-wise. That means that after computing the linear portion of the layer,
+when we denoted a rowwise operation in :numref:`subsec_softmax_vectorization`.
+Quite frequently the activation functions we use apply not merely rowwise but
+elementwise. That means that after computing the linear portion of the layer,
 we can calculate each activation
 without looking at the values taken by the other hidden units.
 
@@ -286,11 +286,11 @@ Moreover, just because a single-hidden-layer network
 *can* learn any function
 does not mean that you should try
 to solve all of your problems
-with single-hidden-layer networks. In fact, in this case kernel methods
+with one. In fact, in this case kernel methods
 are way more effective, since they are capable of solving the problem
 *exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`.
 In fact, we can approximate many functions
-much more compactly by using deeper (vs. wider) networks :cite:`Simonyan.Zisserman.2014`.
+much more compactly by using deeper (rather than wider) networks :cite:`Simonyan.Zisserman.2014`.
 We will touch upon more rigorous arguments in subsequent chapters.
 
 
@@ -298,11 +298,11 @@ We will touch upon more rigorous arguments in subsequent chapters.
 :label:`subsec_activation-functions`
 
 Activation functions decide whether a neuron should be activated or not by
-calculating the weighted sum and further adding bias with it.
-They are differentiable operators to transform input signals to outputs,
-while most of them add non-linearity.
+calculating the weighted sum and further adding bias to it.
+They are differentiable operators for transforming input signals to outputs,
+while most of them add nonlinearity.
 Because activation functions are fundamental to deep learning,
-(**let's briefly survey some common activation functions**).
+(**let's briefly survey some common ones**).
 
 ### ReLU Function
 
@@ -367,7 +367,7 @@ There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here, or at least, the fact that
 we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`.
-We plot the derivative of the ReLU function plotted below.
+We plot the derivative of the ReLU function below.
 
 ```{.python .input}
 %%tab mxnet
@@ -404,7 +404,7 @@ of vanishing gradients that plagued
 previous versions of neural networks (more on this later).
 
 Note that there are many variants to the ReLU function,
-including the *parameterized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
+including the *parametrized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
 This variation adds a linear term to ReLU,
 so some information still gets through,
 even when the argument is negative:
@@ -413,8 +413,8 @@ $$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
 
 ### Sigmoid Function
 
-[**The *sigmoid function* transforms its inputs**],
-for which values lie in the domain $\mathbb{R}$,
+[**The *sigmoid function* transforms those inputs**]
+whose values lie in the domain $\mathbb{R}$,
 (**to outputs that lie on the interval (0, 1).**)
 For that reason, the sigmoid is
 often called a *squashing function*:
@@ -425,7 +425,7 @@ $$\operatorname{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
 In the earliest neural networks, scientists
 were interested in modeling biological neurons
-which either *fire* or *do not fire*.
+that either *fire* or *do not fire*.
 Thus the pioneers of this field,
 going all the way back to McCulloch and Pitts,
 the inventors of the artificial neuron,
@@ -434,15 +434,15 @@ A thresholding activation takes value 0
 when its input is below some threshold
 and value 1 when the input exceeds the threshold.
 
-When attention shifted to gradient based learning,
+When attention shifted to gradient-based learning,
 the sigmoid function was a natural choice
 because it is a smooth, differentiable
 approximation to a thresholding unit.
 Sigmoids are still widely used as
-activation functions on the output units,
+activation functions on the output units
 when we want to interpret the outputs as probabilities
 for binary classification problems: you can think of the sigmoid as a special case of the softmax.
-However, the sigmoid has mostly been replaced
+However, the sigmoid has largely been replaced
 by the simpler and more easily trainable ReLU
 for most use in hidden layers. Much of this has to do
 with the fact that the sigmoid poses challenges for optimization
@@ -527,7 +527,7 @@ d2l.plot(x, grad_sigmoid(x), 'x', 'grad of sigmoid', figsize=(5, 2.5))
 
 Like the sigmoid function, [**the tanh (hyperbolic tangent)
 function also squashes its inputs**],
-transforming them into elements on the interval (**between -1 and 1**):
+transforming them into elements on the interval (**between $-1$ and $1$**):
 
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
@@ -605,7 +605,7 @@ As a side note, your knowledge already
 puts you in command of a similar toolkit
 to a practitioner circa 1990.
 In some ways, you have an advantage
-over anyone working in the 1990s,
+over anyone working back then,
 because you can leverage powerful
 open-source deep learning frameworks
 to build models rapidly, using only a few lines of code.
@@ -620,8 +620,8 @@ of deep learning over the past decade. Note, though, that research in
 activation functions has not stopped.
 For instance, 
 the GELU (Gaussian error linear unit)
-activation function $x \Phi(x)$ :cite:`Hendrycks.Gimpel.2016`, where $\Phi(x)$
-is the standard Gaussian cumulative distribution function 
+activation function $x \Phi(x)$ by :citet:`Hendrycks.Gimpel.2016` ($\Phi(x)$
+is the standard Gaussian cumulative distribution function) 
 and
 the Swish activation
 function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in :citet:`Ramachandran.Zoph.Le.2017` can yield better accuracy
@@ -652,4 +652,8 @@ in many cases.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/226)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17984)
 :end_tab:

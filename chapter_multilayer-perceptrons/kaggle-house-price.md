@@ -17,7 +17,7 @@ is a great place to start.
 The data is fairly generic and do not exhibit exotic structure
 that might require specialized models (as audio or video might).
 This dataset, collected by :citet:`De-Cock.2011`,
-covers house prices in Ames, IA from the period of 2006--2010.
+covers house prices in Ames, Iowa from the period 2006--2010.
 It is considerably larger than the famous [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
 boasting both more examples and more features.
 
@@ -71,8 +71,9 @@ import pandas as pd
 Throughout the book, we will train and test models
 on various downloaded datasets.
 Here, we (**implement two utility functions**)
-to download files and extract zip or tar files.
-Again, we defer their implementations into :numref:`sec_utils`.
+for downloading and extracting zip or tar files.
+Again, we skip implementation details of
+such utility functions.
 
 ```{.python .input  n=2}
 %%tab all
@@ -144,13 +145,13 @@ but we only get to evaluate our models on the official test set
 after uploading predictions to Kaggle.
 The "Data" tab on the competition tab
 in :numref:`fig_house_pricing`
-has links to download the data.
+has links for downloading the data.
 
 To get started, we will [**read in and process the data
-using `pandas`**], which we have introduced in :numref:`sec_pandas`.
+using `pandas`**], which we introduced in :numref:`sec_pandas`.
 For convenience, we can download and cache
 the Kaggle housing dataset.
-If a file corresponding to this dataset already exists in the cache directory and its SHA-1 matches `sha1_hash`, our code will use the cached file to avoid clogging up your internet with redundant downloads.
+If a file corresponding to this dataset already exists in the cache directory and its SHA-1 matches `sha1_hash`, our code will use the cached file to avoid clogging up your Internet with redundant downloads.
 
 ```{.python .input  n=30}
 %%tab all
@@ -168,7 +169,7 @@ class KaggleHouse(d2l.DataModule):
 ```
 
 The training dataset includes 1460 examples,
-80 features, and 1 label, while the validation data
+80 features, and one label, while the validation data
 contains 1459 examples and 80 features.
 
 ```{.python .input  n=31}
@@ -180,7 +181,7 @@ print(data.raw_val.shape)
 
 ## Data Preprocessing
 
-Let's [**take a look at the first four and last two features
+Let's [**take a look at the first four and final two features
 as well as the label (SalePrice)**] from the first four examples.
 
 ```{.python .input  n=10}
@@ -188,13 +189,13 @@ as well as the label (SalePrice)**] from the first four examples.
 print(data.raw_train.iloc[:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
-We can see that in each example, the first feature is the ID.
-This helps the model identify each training example.
+We can see that in each example, the first feature is the identifier.
+This helps the model determine each training example.
 While this is convenient, it does not carry
 any information for prediction purposes.
 Hence, we will remove it from the dataset
 before feeding the data into the model.
-Besides, given a wide variety of data types,
+Furthermore, given a wide variety of data types,
 we will need to preprocess the data before we can start modeling.
 
 
@@ -219,12 +220,12 @@ First, it proves convenient for optimization.
 Second, because we do not know *a priori*
 which features will be relevant,
 we do not want to penalize coefficients
-assigned to one feature more than on any other.
+assigned to one feature more than any other.
 
 [**Next we deal with discrete values.**]
-This includes features such as "MSZoning".
+These include features such as "MSZoning".
 (**We replace them by a one-hot encoding**)
-in the same way that we previously transformed
+in the same way that we earlier transformed
 multiclass labels into vectors (see :numref:`subsec_classification-problem`).
 For instance, "MSZoning" assumes the values "RL" and "RM".
 Dropping the "MSZoning" feature,
@@ -269,7 +270,7 @@ data.train.shape
 
 ## Error Measure
 
-To get started we will train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it provides a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
+To get started we will train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it does provide a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
 
 With house prices, as with stock prices,
 we care about relative quantities
@@ -277,14 +278,14 @@ more than absolute quantities.
 Thus [**we tend to care more about
 the relative error $\frac{y - \hat{y}}{y}$**]
 than about the absolute error $y - \hat{y}$.
-For instance, if our prediction is off by USD 100,000
-when estimating the price of a house in Rural Ohio,
-where the value of a typical house is 125,000 USD,
+For instance, if our prediction is off by \$100,000
+when estimating the price of a house in rural Ohio,
+where the value of a typical house is \$125,000,
 then we are probably doing a horrible job.
 On the other hand, if we err by this amount
 in Los Altos Hills, California,
 this might represent a stunningly accurate prediction
-(there, the median house price exceeds 4 million USD).
+(there, the median house price exceeds \$4 million).
 
 (**One way to address this problem is to
 measure the discrepancy in the logarithm of the price estimates.**)
@@ -318,9 +319,9 @@ with model selection.
 We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
-the $i^\mathrm{th}$ fold of the data
+the $i^\textrm{th}$ fold of the data
 in a $K$-fold cross-validation procedure.
-It proceeds by slicing out the $i^\mathrm{th}$ segment
+It proceeds by slicing out the $i^\textrm{th}$ segment
 as validation data and returning the rest as training data.
 Note that this is not the most efficient way of handling data
 and we would definitely do something much smarter
@@ -369,7 +370,7 @@ and the normal sorts of hyperparameters,
 $K$-fold cross-validation tends to be
 reasonably resilient against multiple testing.
 However, if we try an unreasonably large number of options
-we might just get lucky and find that our validation
+we might find that our validation
 performance is no longer representative of the true error.
 
 ```{.python .input}
@@ -381,7 +382,7 @@ models = k_fold(trainer, data, k=5, lr=0.01)
 Notice that sometimes the number of training errors
 for a set of hyperparameters can be very low,
 even as the number of errors on $K$-fold cross-validation
-is considerably higher.
+grows considerably higher.
 This indicates that we are overfitting.
 Throughout training you will want to monitor both numbers.
 Less overfitting might indicate that our data can support a more powerful model.
@@ -422,7 +423,7 @@ on the test set.
 The steps are quite simple:
 
 * Log in to the Kaggle website and visit the house price prediction competition page.
-* Click the “Submit Predictions” or “Late Submission” button (as of this writing, the button is located on the right).
+* Click the “Submit Predictions” or “Late Submission” button.
 * Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.
 * Click the “Make Submission” button at the bottom of the page to view your results.
 
@@ -430,11 +431,11 @@ The steps are quite simple:
 :width:`400px`
 :label:`fig_kaggle_submit2`
 
-## Summary
+## Summary and Discussion
 
 Real data often contains a mix of different data types and needs to be preprocessed.
 Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
-Besides, transforming categorical features into indicator features allows us to treat them like one-hot vectors.
+Furthermore, transforming categorical features into indicator features allows us to treat them like one-hot vectors.
 When we tend to care more about
 the relative error than about the absolute error,
 we can 
@@ -446,11 +447,11 @@ we can use $K$-fold cross-validation .
 
 ## Exercises
 
-1. Submit your predictions for this section to Kaggle. How good are your predictions?
-1. Is it always a good idea to replace missing values by their mean? Hint: can you construct a situation where the values are not missing at random?
-1. Improve the score on Kaggle by tuning the hyperparameters through $K$-fold cross-validation.
+1. Submit your predictions for this section to Kaggle. How good are they?
+1. Is it always a good idea to replace missing values by a mean? Hint: can you construct a situation where the values are not missing at random?
+1. Improve the score by tuning the hyperparameters through $K$-fold cross-validation.
 1. Improve the score by improving the model (e.g., layers, weight decay, and dropout).
-1. What happens if we do not standardize the continuous numerical features like what we have done in this section?
+1. What happens if we do not standardize the continuous numerical features as we have done in this section?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/106)
@@ -462,4 +463,8 @@ we can use $K$-fold cross-validation .
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/237)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17988)
 :end_tab:

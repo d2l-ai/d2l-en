@@ -337,7 +337,7 @@ during training.
 
 
 In a minibatch,
-the $i^\mathrm{th}$ example includes a center word
+the $i^\textrm{th}$ example includes a center word
 and its $n_i$ context words and $m_i$ noise words. 
 Due to varying context window sizes,
 $n_i+m_i$ varies for different $i$.

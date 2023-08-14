@@ -30,13 +30,13 @@ to infer the sizes of each layer on the fly.
 Later on, when working with convolutional neural networks,
 this technique will become even more convenient
 since the input dimensionality
-(i.e., the resolution of an image)
+(e.g., the resolution of an image)
 will affect the dimensionality
 of each subsequent layer.
-Hence, the ability to set parameters
+Hence the ability to set parameters
 without the need to know,
 at the time of writing the code,
-what the dimensionality is
+the value of the dimension
 can greatly simplify the task of specifying
 and subsequently modifying our models.
 Next, we go deeper into the mechanics of initialization.
@@ -188,7 +188,7 @@ net(X)
 ```{.python .input}
 %%tab jax
 params = net.init(d2l.get_key(), jnp.zeros((2, 20)))
-jax.tree_util.tree_map(lambda x: x.shape, params).tree_flatten()
+jax.tree_util.tree_map(lambda x: x.shape, params).tree_flatten_with_keys()
 ```
 
 As soon as we know the input dimensionality,
@@ -263,4 +263,8 @@ We can pass data through the model to make the framework finally initialize para
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/281)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17992)
 :end_tab:

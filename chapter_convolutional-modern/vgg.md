@@ -159,7 +159,7 @@ The convolutional part of the network connects several VGG blocks from :numref:`
 in succession. This grouping of convolutions is a pattern that has 
 remained almost unchanged over the past decade, although the specific choice of 
 operations has undergone considerable modifications. 
-The variable `conv_arch` consists of a list of tuples (one per block),
+The variable `arch` consists of a list of tuples (one per block),
 where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments required to call
@@ -227,14 +227,14 @@ class VGG(d2l.Classifier):
             nn.Dense(self.num_classes)])
 ```
 
-The original VGG network had 5 convolutional blocks,
+The original VGG network had five convolutional blocks,
 among which the first two have one convolutional layer each
 and the latter three contain two convolutional layers each.
 The first block has 64 output channels
 and each subsequent block doubles the number of output channels,
 until that number reaches 512.
-Since this network uses 8 convolutional layers
-and 3 fully connected layers, it is often called VGG-11.
+Since this network uses eight convolutional layers
+and three fully connected layers, it is often called VGG-11.
 
 ```{.python .input  n=6}
 %%tab pytorch, mxnet
@@ -260,7 +260,7 @@ before flattening the representations
 for processing by the fully connected part of the network. 
 :citet:`Simonyan.Zisserman.2014` described several other variants of VGG. 
 In fact, it has become the norm to propose *families* of networks with 
-different speed-accuracy trade-off when introducing a new architecture. 
+different speed--accuracy trade-off when introducing a new architecture. 
 
 ## Training
 
@@ -292,9 +292,9 @@ with d2l.try_gpu():
 
 ## Summary
 
-One might argue that VGG is the first truly modern convolutional neural network. While AlexNet introduced many of the components of what make deep learning effective at scale, it is VGG that arguably introduced key properties such as blocks of multiple convolutions and a preference for deep and narrow networks. It is also the first network that is actually an entire family of similarly parametrized models, giving the practitioner ample trade-off between complexity and speed. This is also the place where modern deep learning frameworks shine. It is no longer necessary to generate XML config files to specify a network but rather, to assemble said networks through simple Python code. 
+One might argue that VGG is the first truly modern convolutional neural network. While AlexNet introduced many of the components of what make deep learning effective at scale, it is VGG that arguably introduced key properties such as blocks of multiple convolutions and a preference for deep and narrow networks. It is also the first network that is actually an entire family of similarly parametrized models, giving the practitioner ample trade-off between complexity and speed. This is also the place where modern deep learning frameworks shine. It is no longer necessary to generate XML configuration files to specify a network but rather, to assemble said networks through simple Python code. 
 
-Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it is possible to achieve competitive performance using a much more shallow architecture through a large number of parallel computations. This is an exciting development and there's hope that it will influence architecture designs in the future. For the remainder of the chapter, though, we will follow the path of scientific progress over the past decade. 
+More recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it is possible to achieve competitive performance using a much more shallow architecture through a large number of parallel computations. This is an exciting development and there is hope that it will influence architecture designs in the future. For the remainder of the chapter, though, we will follow the path of scientific progress over the past decade. 
 
 ## Exercises
 
@@ -303,9 +303,9 @@ Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it
     1. Compare the number of parameters needed for AlexNet and VGG.
     1. Compare the number of floating point operations used in the convolutional layers and in the fully connected layers. 
     1. How could you reduce the computational cost created by the fully connected layers?
-1. When displaying the dimensions associated with the various layers of the network, we only see the information associated with 8 blocks (plus some auxiliary transforms), even though the network has 11 layers. Where did the remaining 3 layers go?
+1. When displaying the dimensions associated with the various layers of the network, we only see the information associated with eight blocks (plus some auxiliary transforms), even though the network has 11 layers. Where did the remaining three layers go?
 1. Use Table 1 in the VGG paper :cite:`Simonyan.Zisserman.2014` to construct other common models, such as VGG-16 or VGG-19.
-1. Upsampling the resolution in Fashion-MNIST by a factor of $8$ from $28 \times 28$ to $224 \times 224$ dimensions is very wasteful. Try modifying the network architecture and resolution conversion, e.g., to 56 or to 84 dimensions for its input instead. Can you do so without reducing the accuracy of the network? Consider the VGG paper :cite:`Simonyan.Zisserman.2014` for ideas on adding more nonlinearities prior to downsampling.
+1. Upsampling the resolution in Fashion-MNIST eight-fold from $28 \times 28$ to $224 \times 224$ dimensions is very wasteful. Try modifying the network architecture and resolution conversion, e.g., to 56 or to 84 dimensions for its input instead. Can you do so without reducing the accuracy of the network? Consult the VGG paper :cite:`Simonyan.Zisserman.2014` for ideas on adding more nonlinearities prior to downsampling.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/77)
@@ -317,4 +317,8 @@ Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/277)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18002)
 :end_tab:

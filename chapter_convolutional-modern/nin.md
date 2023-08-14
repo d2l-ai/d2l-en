@@ -16,7 +16,7 @@ in how these later networks widen and deepen these two modules.
 This design poses two major challenges.
 First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
-model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
+model such as VGG-11 requires a monstrous matrix, occupying almost
 400MB of RAM in single precision (FP32). This is a significant impediment to computation, in particular on
 mobile and embedded devices. After all, even high-end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4S had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
 
@@ -62,19 +62,19 @@ from jax import numpy as jnp
 
 ## (**NiN Blocks**)
 
-Recall :numref:`subsec_1x1`. In it we discussed that the inputs and outputs of convolutional layers
+Recall :numref:`subsec_1x1`. In it we said that the inputs and outputs of convolutional layers
 consist of four-dimensional tensors with axes
 corresponding to the example, channel, height, and width.
 Also recall that the inputs and outputs of fully connected layers
 are typically two-dimensional tensors corresponding to the example and feature.
 The idea behind NiN is to apply a fully connected layer
 at each pixel location (for each height and width).
-The resulting $1 \times 1$ convolution can be thought as
+The resulting $1 \times 1$ convolution can be thought of as
 a fully connected layer acting independently on each pixel location.
 
 :numref:`fig_nin` illustrates the main structural
 differences between VGG and NiN, and their blocks.
-Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully connected layer.
+Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and at the end where we no longer require a giant fully connected layer.
 
 ![Comparing the architectures of VGG and NiN, and of their blocks.](../img/nin.svg)
 :width:`600px`
@@ -248,9 +248,9 @@ with d2l.try_gpu():
 
 ## Summary
 
-NiN has dramatically fewer parameters than AlexNet and VGG. This stems primarily from the fact that it needs no giant fully connected layers. Instead, it uses global average pooling to aggregate across all image locations after the last stage of the network body. This obviates the need for expensive (learned) reduction operations and replaces them by a simple average. What was surprising at the time is the fact that this averaging operation did not harm accuracy. Note that averaging across a low-resolution representation (with many channels) also adds to the amount of translation invariance that the network can handle. 
+NiN has dramatically fewer parameters than AlexNet and VGG. This stems primarily from the fact that it needs no giant fully connected layers. Instead, it uses global average pooling to aggregate across all image locations after the last stage of the network body. This obviates the need for expensive (learned) reduction operations and replaces them by a simple average. What surprised researchers at the time was the fact that this averaging operation did not harm accuracy. Note that averaging across a low-resolution representation (with many channels) also adds to the amount of translation invariance that the network can handle. 
 
-Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$ convolutions aids the quest for fewer parameters further. It affords for a significant amount of nonlinearity across channels within any given location. Both $1 \times 1$ convolutions and global average pooling significantly influenced subsequent CNN designs. 
+Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$ convolutions aids the quest for fewer parameters further. It can cater for a significant amount of nonlinearity across channels within any given location. Both $1 \times 1$ convolutions and global average pooling significantly influenced subsequent CNN designs. 
 
 ## Exercises
 
@@ -271,4 +271,8 @@ Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18003)
 :end_tab:

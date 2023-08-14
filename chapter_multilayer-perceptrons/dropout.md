@@ -30,15 +30,15 @@ For instance, when we classify images,
 we would expect that adding some random noise
 to the pixels should be mostly harmless.
 
-In 1995, Christopher Bishop formalized
+:citet:`Bishop.1995` formalized
 this idea when he proved that training with input noise
-is equivalent to Tikhonov regularization :cite:`Bishop.1995`.
+is equivalent to Tikhonov regularization.
 This work drew a clear mathematical connection
 between the requirement that a function be smooth (and thus simple),
 and the requirement that it be resilient
 to perturbations in the input.
 
-Then, in 2014, :citet:`Srivastava.Hinton.Krizhevsky.ea.2014`
+Then, :citet:`Srivastava.Hinton.Krizhevsky.ea.2014`
 developed a clever idea for how to apply Bishop's idea
 to the internal layers of a network, too.
 Their idea, called *dropout*, involves
@@ -63,19 +63,19 @@ is characterized by a state in which
 each layer relies on a specific
 pattern of activations in the previous layer,
 calling this condition *co-adaptation*.
-dropout, they claim, breaks up co-adaptation
+Dropout, they claim, breaks up co-adaptation
 just as sexual reproduction is argued to
 break up co-adapted genes.
-While the explanatory of this theory is certainly up for debate,
+While such an justification of this theory is certainly up for debate,
 the dropout technique itself has proved enduring,
 and various forms of dropout are implemented
 in most deep learning libraries. 
 
 
 The key challenge is how to inject this noise.
-One idea is to inject the noise in an *unbiased* manner
+One idea is to inject it in an *unbiased* manner
 so that the expected value of each layer---while fixing
-the others---equals to the value it would have taken absent noise.
+the others---equals the value it would have taken absent noise.
 In Bishop's work, he added Gaussian noise
 to the inputs to a linear model.
 At each training iteration, he added noise
@@ -97,8 +97,8 @@ $$
 \begin{aligned}
 h' =
 \begin{cases}
-    0 & \text{ with probability } p \\
-    \frac{h}{1-p} & \text{ otherwise}
+    0 & \textrm{ with probability } p \\
+    \frac{h}{1-p} & \textrm{ otherwise}
 \end{cases}
 \end{aligned}
 $$
@@ -138,8 +138,8 @@ import optax
 
 ## Dropout in Practice
 
-Recall the MLP with a hidden layer and 5 hidden units
-in :numref:`fig_mlp`.
+Recall the MLP with a hidden layer and five hidden units
+from :numref:`fig_mlp`.
 When we apply dropout to a hidden layer,
 zeroing out each hidden unit with probability $p$,
 the result can be viewed as a network
@@ -163,7 +163,7 @@ and thus do not need to normalize.
 However, there are some exceptions:
 some researchers use dropout at test time as a heuristic
 for estimating the *uncertainty* of neural network predictions:
-if the predictions agree across many different dropout masks,
+if the predictions agree across many different dropout outputs,
 then we might say that the network is more confident.
 
 ## Implementation from Scratch
@@ -247,7 +247,7 @@ print('dropout_p = 1:', dropout_layer(X, 1))
 The model below applies dropout to the output
 of each hidden layer (following the activation function).
 We can set dropout probabilities for each layer separately.
-A common trend is to set
+A common choice is to set
 a lower dropout probability closer to the input layer.
 We ensure that dropout is only active during training.
 
@@ -476,7 +476,7 @@ trainer.fit(model, data)
 
 ## Summary
 
-Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
+Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool for avoiding overfitting. Often tools are used jointly.
 Note that dropout is
 used only during training:
 it replaces an activation $h$ with a random variable with expected value $h$.
@@ -502,4 +502,8 @@ it replaces an activation $h$ with a random variable with expected value $h$.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/261)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17987)
 :end_tab:

@@ -30,7 +30,7 @@ in a specialized subfield called *survival modeling*.
 The point here is not to overwhelm you but just
 to let you know that there is a lot more to estimation
 than simply minimizing squared errors.
-And more broadly, there's a lot more to supervised learning than regression.
+And more broadly, there is a lot more to supervised learning than regression.
 In this section, we focus on *classification* problems
 where we put aside *how much?* questions
 and instead focus on *which category?* questions.
@@ -82,11 +82,11 @@ We have two obvious choices.
 Perhaps the most natural impulse would be
 to choose $y \in \{1, 2, 3\}$,
 where the integers represent
-$\{\text{dog}, \text{cat}, \text{chicken}\}$ respectively.
+$\{\textrm{dog}, \textrm{cat}, \textrm{chicken}\}$ respectively.
 This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
 say if we were trying to predict
-$\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
+$\{\textrm{baby}, \textrm{toddler}, \textrm{adolescent}, \textrm{young adult}, \textrm{adult}, \textrm{geriatric}\}$,
 then it might even make sense to cast this as
 an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem
 and keep the labels in this format.
@@ -117,8 +117,8 @@ we need a model with multiple outputs, one per class.
 To address classification with linear models,
 we will need as many affine functions as we have outputs.
 Strictly speaking, we only need one fewer,
-since the last category has to be the difference
-between $1$ and the sum of the other categories
+since the final category has to be the difference
+between $1$ and the sum of the other categories,
 but for reasons of symmetry
 we use a slightly redundant parametrization.
 Each output corresponds to its own affine function.
@@ -139,7 +139,7 @@ is shown in :numref:`fig_softmaxreg`.
 Just as in linear regression,
 we use a single-layer neural network.
 And since the calculation of each output, $o_1, o_2$, and $o_3$,
-depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
+depends on every input, $x_1$, $x_2$, $x_3$, and $x_4$,
 the output layer can also be described as a *fully connected layer*.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
@@ -159,7 +159,7 @@ we could try, directly, to minimize the difference
 between $\mathbf{o}$ and the labels $\mathbf{y}$.
 While it turns out that treating classification
 as a vector-valued regression problem works surprisingly well,
-it is nonetheless lacking in the following ways:
+it is nonetheless unsatisfactory in the following ways:
 
 * There is no guarantee that the outputs $o_i$ sum up to $1$ in the way we expect probabilities to behave.
 * There is no guarantee that the outputs $o_i$ are even nonnegative, even if their outputs sum up to $1$, or that they do not exceed $1$.
@@ -174,12 +174,12 @@ the probability might exceed $1$
 when it comes to buying a mansion!
 As such, we need a mechanism to "squish" the outputs.
 
-There are many ways we might to accomplish this goal.
+There are many ways we might accomplish this goal.
 For instance, we could assume that the outputs
 $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
-where the corruption occurs by means of adding noise $\mathbf{\epsilon}$
+where the corruption occurs by means of adding noise $\boldsymbol{\epsilon}$
 drawn from a normal distribution.
-In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
+In other words, $\mathbf{y} = \mathbf{o} + \boldsymbol{\epsilon}$,
 where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 This is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model),
 first introduced by :citet:`Fechner.1860`.
@@ -200,7 +200,7 @@ This process is called *normalization*.
 Putting these two pieces together
 gives us the *softmax* function:
 
-$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.$$
+$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \quad \textrm{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.$$
 :eqlabel:`eq_softmax_y_and_o`
 
 Note that the largest coordinate of $\mathbf{o}$
@@ -208,17 +208,17 @@ corresponds to the most likely class according to $\hat{\mathbf{y}}$.
 Moreover, because the softmax operation
 preserves the ordering among its arguments,
 we do not need to compute the softmax
-to determine which class has been assigned the highest probability.
+to determine which class has been assigned the highest probability. Thus,
 
 $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
 
 
-The idea of a softmax dates back to Gibbs,
-who adapted ideas from physics :cite:`Gibbs.1902`.
+The idea of a softmax dates back to :citet:`Gibbs.1902`,
+who adapted ideas from physics.
 Dating even further back, Boltzmann,
-the father of modern thermodynamics,
+the father of modern statistical physics,
 used this trick to model a distribution
 over energy states in gas molecules.
 In particular, he discovered that the prevalence
@@ -251,7 +251,7 @@ $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\ma
 :eqlabel:`eq_minibatch_softmax_reg`
 
 This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{X} \mathbf{W}$.
+a matrix--matrix product $\mathbf{X} \mathbf{W}$.
 Moreover, since each row in $\mathbf{X}$ represents a data example,
 the softmax operation itself can be computed *rowwise*:
 for each row of $\mathbf{O}$, exponentiate all entries
@@ -268,7 +268,7 @@ Now that we have a mapping from features $\mathbf{x}$
 to probabilities $\mathbf{\hat{y}}$,
 we need a way to optimize the accuracy of this mapping.
 We will rely on maximum likelihood estimation,
-the very same concept that we encountered
+the very same method that we encountered
 when providing a probabilistic justification
 for the mean squared error loss in
 :numref:`subsec_normal_distribution_and_squared_loss`.
@@ -276,9 +276,9 @@ for the mean squared error loss in
 ### Log-Likelihood
 
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
-which we can interpret as (estimated) conditional probabilities
+which we can interpret as the (estimated) conditional probabilities
 of each class, given any input $\mathbf{x}$,
-such as $\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
+such as $\hat{y}_1$ = $P(y=\textrm{cat} \mid \mathbf{x})$.
 In the following we assume that for a dataset
 with features $\mathbf{X}$ the labels $\mathbf{Y}$
 are represented using a one-hot encoding label vector.
@@ -316,7 +316,7 @@ Since $\mathbf{y}$ is a one-hot vector of length $q$,
 the sum over all its coordinates $j$ vanishes for all but one term.
 Note that the loss $l(\mathbf{y}, \hat{\mathbf{y}})$
 is bounded from below by $0$
-whenever $\hat{y}$ is a probability vector:
+whenever $\hat{\mathbf{y}}$ is a probability vector:
 no single entry is larger than $1$,
 hence their negative logarithm cannot be lower than $0$;
 $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$ only if we predict
@@ -338,7 +338,7 @@ and the corresponding cross-entropy loss are so common,
 it is worth understanding a bit better how they are computed.
 Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss
 in :eqref:`eq_l_cross_entropy`
-and using the definition of the softmax we obtain:
+and using the definition of the softmax we obtain
 
 $$
 \begin{aligned}
@@ -364,7 +364,7 @@ In this sense, it is very similar
 to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
-This is not coincidence.
+This is not a coincidence.
 In any exponential family model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
@@ -378,14 +378,14 @@ say $(0, 0, 1)$, we now have a generic probability vector,
 say $(0.1, 0.2, 0.7)$.
 The math that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
-still works out fine,
+still works well,
 just that the interpretation is slightly more general.
 It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
 one of the most commonly used losses for classification problems.
 We can demystify the name by introducing just the basics of information theory.
-In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
-relative to what we predict that should happen $\hat{\mathbf{y}}$.
+In a nutshell, it measures the number of bits needed to encode what we see, $\mathbf{y}$,
+relative to what we predict that should happen, $\hat{\mathbf{y}}$.
 We provide a very basic explanation in the following. For further
 details on information theory see
 :citet:`Cover.Thomas.1999` or :citet:`mackay2003information`.
@@ -407,7 +407,7 @@ and manipulating information (also known as data).
 The central idea in information theory is to quantify the
 amount of information contained in data.
 This places a  limit on our ability to compress data.
-For a distribution $P$ its *entropy* is defined as:
+For a distribution $P$ its *entropy*, $H[P]$, is defined as:
 
 $$H[P] = \sum_j - P(j) \log P(j).$$
 :eqlabel:`eq_softmax_reg_entropy`
@@ -430,14 +430,14 @@ Take the extreme example where every token in the stream
 always takes the same value.
 That is a very boring data stream!
 And not only it is boring, but it is also easy to predict.
-Because they are always the same,
+Because the tokens are always the same,
 we do not have to transmit any information
 to communicate the contents of the stream.
 Easy to predict, easy to compress.
 
 However if we cannot perfectly predict every event,
 then we might sometimes be surprised.
-Our surprise is greater when we assigned an event lower probability.
+Our surprise is greater when an event is assigned lower probability.
 Claude Shannon settled on $\log \frac{1}{P(j)} = -\log P(j)$
 to quantify one's *surprisal* at observing an event $j$
 having assigned it a (subjective) probability $P(j)$.
@@ -455,7 +455,7 @@ then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $P$ *to* $Q$, denoted $H(P, Q)$,
 is the expected surprisal of an observer with subjective probabilities $Q$
 upon seeing data that was actually generated according to probabilities $P$.
-This is given by $H(P, Q) \stackrel{\mathrm{def}}{=} \sum_j - P(j) \log Q(j)$.
+This is given by $H(P, Q) \stackrel{\textrm{def}}{=} \sum_j - P(j) \log Q(j)$.
 The lowest possible cross-entropy is achieved when $P=Q$.
 In this case, the cross-entropy from $P$ to $Q$ is $H(P, P)= H(P)$.
 
@@ -474,10 +474,10 @@ As a side effect, we encountered the softmax,
 a convenient activation function that transforms
 outputs of an ordinary neural network layer
 into valid discrete probability distributions.
-We saw that the derivative of the cross entropy loss
+We saw that the derivative of the cross-entropy loss
 when combined with softmax
 behaves very similarly
-to the derivative of squared error,
+to the derivative of squared error;
 namely by taking the difference between
 the expected behavior and its prediction.
 And, while we were only able to
@@ -490,7 +490,7 @@ and hopefully enough to whet your appetite,
 we hardly dived deep here.
 Among other things, we skipped over computational considerations.
 Specifically, for any fully connected layer with $d$ inputs and $q$ outputs,
-the parameterization and computational cost is $\mathcal{O}(dq)$,
+the parametrization and computational cost is $\mathcal{O}(dq)$,
 which can be prohibitively high in practice.
 Fortunately, this cost of transforming $d$ inputs into $q$ outputs
 can be reduced through approximation and compression.
@@ -500,7 +500,7 @@ Fourier transforms, and scaling
 to reduce the cost from quadratic to log-linear.
 Similar techniques work for more advanced
 structural matrix approximations :cite:`sindhwani2015structured`.
-Lastly, we can use Quaternion-like decompositions
+Lastly, we can use quaternion-like decompositions
 to reduce the cost to $\mathcal{O}(\frac{dq}{n})$,
 again if we are willing to trade off a small amount of accuracy
 for computational and storage cost :cite:`Zhang.Tay.Zhang.ea.2021`
@@ -515,35 +515,35 @@ that can be executed most efficiently on modern GPUs.
 
 ## Exercises
 
-1. We can explore the connection between exponential families and the softmax in some more depth.
-    1. Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for the softmax.
+1. We can explore the connection between exponential families and softmax in some more depth.
+    1. Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for softmax.
     1. Compute the variance of the distribution given by $\mathrm{softmax}(\mathbf{o})$ and show that it matches the second derivative computed above.
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     1. What is the problem if we try to design a binary code for it?
     1. Can you design a better code? Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
 1. When encoding signals transmitted over a physical wire, engineers do not always use binary codes. For instance, [PAM-3](https://en.wikipedia.org/wiki/Ternary_signal) uses three signal levels $\{-1, 0, 1\}$ as opposed to two levels $\{0, 1\}$. How many ternary units do you need to transmit an integer in the range $\{0, \ldots, 7\}$? Why might this be a better idea in terms of electronics?
-1. The [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
+1. The [Bradley--Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
 a logistic model to capture preferences. For a user to choose between apples and oranges one
-assumes scores $o_{\mathrm{apple}}$ and $o_{\mathrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
+assumes scores $o_{\textrm{apple}}$ and $o_{\textrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
 the item with the largest score is the most likely one to be chosen :cite:`Bradley.Terry.1952`.
-    1. Prove that the softmax satisfies this requirement.
-    1. What happens if you want to allow for a default option of choosing neither apples nor oranges? Hint: now the user has 3 choices.
-1. Softmax derives its name from the following mapping: $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
-    1. Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
+    1. Prove that softmax satisfies this requirement.
+    1. What happens if you want to allow for a default option of choosing neither apples nor oranges? Hint: now the user has three choices.
+1. Softmax gets its name from the following mapping: $\textrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
+    1. Prove that $\textrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     1. How small can you make the difference between both functions? Hint: without loss of
     generality you can set $b = 0$ and $a \geq b$.
-    1. Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
-    1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
-    1. What does the soft-min look like?
+    1. Prove that this holds for $\lambda^{-1} \textrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
+    1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \textrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
+    1. Construct an analogous softmin function.
     1. Extend this to more than two numbers.
-1. The function $g(\mathbf{x}) \stackrel{\mathrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
+1. The function $g(\mathbf{x}) \stackrel{\textrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
     1. Prove that the function is convex. Hint: to do so, use the fact that the first derivative amounts to the probabilities from the softmax function and show that the second derivative is the variance.
     1. Show that $g$ is translation invariant, i.e., $g(\mathbf{x} + b) = g(\mathbf{x})$.
     1. What happens if some of the coordinates $x_i$ are very large? What happens if they're all very small?
     1. Show that if we choose $b = \mathrm{max}_i x_i$ we end up with a numerically stable implementation.
 1. Assume that we have some probability distribution $P$. Suppose we pick another distribution $Q$ with $Q(i) \propto P(i)^\alpha$ for $\alpha > 0$.
     1. Which choice of $\alpha$ corresponds to doubling the temperature? Which choice corresponds to halving it?
-    1. What happens if we let the temperature converge to $0$?
-    1. What happens if we let the temperature converge to $\infty$?
+    1. What happens if we let the temperature approach $0$?
+    1. What happens if we let the temperature approach $\infty$?
 
 [Discussions](https://discuss.d2l.ai/t/46)

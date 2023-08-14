@@ -80,17 +80,17 @@ and *average pooling*, respectively.
 *Average pooling* is essentially as old as CNNs. The idea is akin to 
 downsampling an image. Rather than just taking the value of every second (or third) 
 pixel for the lower resolution image, we can average over adjacent pixels to obtain 
-an image with better signal to noise ratio since we are combining the information 
+an image with better signal-to-noise ratio since we are combining the information 
 from multiple adjacent pixels. *Max-pooling* was introduced in 
 :citet:`Riesenhuber.Poggio.1999` in the context of cognitive neuroscience to describe 
 how information aggregation might be aggregated hierarchically for the purpose 
-of object recognition, and an earlier version in speech recognition :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. In almost all cases, max-pooling, as it is also referred to, 
-is preferable. 
+of object recognition; there already was an earlier version in speech recognition :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. In almost all cases, max-pooling, as it is also referred to, 
+is preferable to average pooling. 
 
 In both cases, as with the cross-correlation operator,
 we can think of the pooling window
 as starting from the upper-left of the input tensor
-and sliding across the input tensor from left to right and top to bottom.
+and sliding across it from left to right and top to bottom.
 At each location that the pooling window hits,
 it computes the maximum or average
 value of the input subtensor in the window,
@@ -181,7 +181,7 @@ X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 pool2d(X, (2, 2))
 ```
 
-Also, we experiment with (**the average pooling layer**).
+Also, we can experiment with (**the average pooling layer**).
 
 ```{.python .input}
 %%tab all
@@ -246,7 +246,7 @@ pool2d(X)
 nn.max_pool(X, window_shape=(3, 3), strides=(3, 3))
 ```
 
-As expected, [**the stride and padding can be manually specified**] to override framework defaults if needed.
+Needless to say, [**the stride and padding can be manually specified**] to override framework defaults if required.
 
 ```{.python .input}
 %%tab mxnet
@@ -315,7 +315,7 @@ as in a convolutional layer.
 This means that the number of output channels for the pooling layer
 is the same as the number of input channels.
 Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with 2 channels.
+on the channel dimension to construct an input with two channels.
 
 :begin_tab:`tensorflow`
 Note that this will require a
@@ -335,7 +335,7 @@ X = d2l.concat([X, X + 1], 3)
 X
 ```
 
-As we can see, the number of output channels is still 2 after pooling.
+As we can see, the number of output channels is still two after pooling.
 
 ```{.python .input}
 %%tab mxnet
@@ -383,11 +383,11 @@ Note that there are many more ways of reducing resolution beyond pooling. For in
 
 1. Implement average pooling through a convolution. 
 1. Prove that max-pooling cannot be implemented through a convolution alone. 
-1. Max-pooling can be accomplished using ReLU operations, i.e., $\mathrm{ReLU}(x) = \max(0, x)$.
+1. Max-pooling can be accomplished using ReLU operations, i.e., $\textrm{ReLU}(x) = \max(0, x)$.
     1. Express $\max (a, b)$ by using only ReLU operations.
     1. Use this to implement max-pooling by means of convolutions and ReLU layers. 
-    1. How many channels and layers do you need for a $2 \times 2$ convolution? How many for a $3 \times 3$ convolution. 
-1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
+    1. How many channels and layers do you need for a $2 \times 2$ convolution? How many for a $3 \times 3$ convolution?
+1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_\textrm{h}\times p_\textrm{w}$ with a padding of $(p_\textrm{h}, p_\textrm{w})$ and a stride of $(s_\textrm{h}, s_\textrm{w})$.
 1. Why do you expect max-pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. We could use the softmax operation for pooling. Why might it not be so popular?
@@ -403,3 +403,8 @@ Note that there are many more ways of reducing resolution beyond pooling. For in
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/274)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/17999)
+:end_tab:
+

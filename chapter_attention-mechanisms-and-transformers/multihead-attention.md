@@ -7,18 +7,11 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 :label:`sec_multihead-attention`
 
 
-In practice, given the same set 
-of queries, keys, and values
-we may want our model to
-combine knowledge from
+In practice, given the same set of queries, keys, and values we may want our model to combine knowledge from
 different behaviors of the same attention mechanism,
 such as capturing dependencies of various ranges
 (e.g., shorter-range vs. longer-range) within a sequence.
-Thus,  it may be beneficial  
-to allow our attention mechanism
-to jointly use different representation subspaces
-of queries, keys, and values.
-
+Thus, it may be beneficial to allow our attention mechanism to jointly use different representation subspaces of queries, keys, and values.
 
 
 To this end, instead of performing 
@@ -29,7 +22,7 @@ with $h$ independently learned linear projections.
 Then these $h$ projected queries, keys, and values
 are fed into attention pooling in parallel.
 In the end,
-$h$ attention pooling outputs
+$h$ attention-pooling outputs
 are concatenated and 
 transformed with another learned linear projection
 to produce the final output.
@@ -88,14 +81,14 @@ is computed as
 
 $$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathbf W_i^{(v)}\mathbf v) \in \mathbb R^{p_v},$$
 
-where learnable parameters
+where 
 $\mathbf W_i^{(q)}\in\mathbb R^{p_q\times d_q}$,
-$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$
-and $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$,
-and
+$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$,
+and $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$
+are learnable parameters and
 $f$ is attention pooling,
 such as
-additive attention and scaled dot-product attention
+additive attention and scaled dot product attention
 in :numref:`sec_attention-scoring-functions`.
 The multi-head attention output
 is another linear transformation via 
@@ -113,9 +106,9 @@ than the simple weighted average can be expressed.
 ## Implementation
 
 In our implementation,
-we [**choose the scaled dot-product attention
+we [**choose the scaled dot product attention
 for each head**] of the multi-head attention.
-To avoid significant growth of computational cost and parameterization cost,
+To avoid significant growth of computational cost and parametrization cost,
 we set $p_q = p_k = p_v = p_o / h$.
 Note that $h$ heads can be computed in parallel
 if we set the number of outputs 
@@ -464,7 +457,7 @@ proper tensor manipulation is needed.
 ## Exercises
 
 1. Visualize attention weights of multiple heads in this experiment.
-1. Suppose that we have a trained model based on multi-head attention and we want to prune least important attention heads to increase the prediction speed. How can we design experiments to measure the importance of an attention head?
+1. Suppose that we have a trained model based on multi-head attention and we want to prune less important attention heads to increase the prediction speed. How can we design experiments to measure the importance of an attention head?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1634)
@@ -476,4 +469,8 @@ proper tensor manipulation is needed.
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3869)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/18029)
 :end_tab:

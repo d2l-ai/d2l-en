@@ -6,7 +6,7 @@ In :numref:`sec_language-model` we described Markov models and $n$-grams for lan
 If we want to incorporate the possible effect of tokens earlier than time step $t-(n-1)$ on $x_t$,
 we need to increase $n$.
 However, the number of model parameters would also increase exponentially with it, as we need to store $|\mathcal{V}|^n$ numbers for a vocabulary set $\mathcal{V}$.
-Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a latent variable model:
+Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a latent variable model,
 
 $$P(x_t \mid x_{t-1}, \ldots, x_1) \approx P(x_t \mid h_{t-1}),$$
 
@@ -66,16 +66,16 @@ Let's take a look at an MLP with a single hidden layer.
 Let the hidden layer's activation function be $\phi$.
 Given a minibatch of examples $\mathbf{X} \in \mathbb{R}^{n \times d}$ with batch size $n$ and $d$ inputs, the hidden layer output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
 
-$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
+$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{\textrm{xh}} + \mathbf{b}_\textrm{h}).$$
 :eqlabel:`rnn_h_without_state`
 
-In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
-Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
-Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer. The output layer is given by
+In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
+So armed, we apply broadcasting (see :numref:`subsec_broadcasting`) during the summation.
+Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer, which is given by
 
-$$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q,$$
+$$\mathbf{O} = \mathbf{H} \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q},$$
 
-where $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ is the weight parameter, and $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output layer.  If it is a classification problem, we can use $\text{softmax}(\mathbf{O})$ to compute the probability distribution of the output categories.
+where $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$ is the weight parameter, and $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output layer.  If it is a classification problem, we can use $\mathrm{softmax}(\mathbf{O})$ to compute the probability distribution of the output categories.
 
 This is entirely analogous to the regression problem we solved previously in :numref:`sec_sequence`, hence we omit details.
 Suffice it to say that we can pick feature-label pairs at random and learn the parameters of our network via automatic differentiation and stochastic gradient descent.
@@ -94,12 +94,12 @@ for a minibatch of $n$ sequence examples,
 each row of $\mathbf{X}_t$ corresponds to one example at time step $t$ from the sequence.
 Next,
 denote by $\mathbf{H}_t  \in \mathbb{R}^{n \times h}$ the hidden layer output of time step $t$.
-Unlike the MLP, here we save the hidden layer output $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$ to describe how to use the hidden layer output of the previous time step in the current time step. Specifically, the calculation of the hidden layer output of the current time step is determined by the input of the current time step together with the hidden layer output of the previous time step:
+Unlike with MLP, here we save the hidden layer output $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$ to describe how to use the hidden layer output of the previous time step in the current time step. Specifically, the calculation of the hidden layer output of the current time step is determined by the input of the current time step together with the hidden layer output of the previous time step:
 
-$$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}  + \mathbf{b}_h).$$
+$$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}  + \mathbf{b}_\textrm{h}).$$
 :eqlabel:`rnn_h_with_state`
 
-Compared with :eqref:`rnn_h_without_state`, :eqref:`rnn_h_with_state` adds one more term $\mathbf{H}_{t-1} \mathbf{W}_{hh}$ and thus
+Compared with :eqref:`rnn_h_without_state`, :eqref:`rnn_h_with_state` adds one more term $\mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ and thus
 instantiates :eqref:`eq_ht_xt`.
 From the relationship between hidden layer outputs $\mathbf{H}_t$ and $\mathbf{H}_{t-1}$ of adjacent time steps,
 we know that these variables captured and retained the sequence's historical information up to their current time step, just like the state or memory of the neural network's current time step. Therefore, such a hidden layer output is called a *hidden state*.
@@ -113,23 +113,23 @@ are called *recurrent layers*.
 
 
 There are many different ways for constructing RNNs.
-RNNs with a hidden state defined by :eqref:`rnn_h_with_state` are very common.
+Those with a hidden state defined by :eqref:`rnn_h_with_state` are very common.
 For time step $t$,
 the output of the output layer is similar to the computation in the MLP:
 
-$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$
+$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q}.$$
 
 Parameters of the RNN
-include the weights $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$,
-and the bias $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$
+include the weights $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$,
+and the bias $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$
 of the hidden layer,
-together with the weights $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$
-and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$
+together with the weights $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$
+and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$
 of the output layer.
 It is worth mentioning that
 even at different time steps,
 RNNs always use these model parameters.
-Therefore, the parameterization cost of an RNN
+Therefore, the parametrization cost of an RNN
 does not grow as the number of time steps increases.
 
 :numref:`fig_rnn` illustrates the computational logic of an RNN at three adjacent time steps.
@@ -139,7 +139,7 @@ the computation of the hidden state can be treated as:
 (ii) feeding the concatenation result into a fully connected layer with the activation function $\phi$.
 The output of such a fully connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
 In this case,
-the model parameters are the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, and a bias of $\mathbf{b}_h$, all from :eqref:`rnn_h_with_state`.
+the model parameters are the concatenation of $\mathbf{W}_{\textrm{xh}}$ and $\mathbf{W}_{\textrm{hh}}$, and a bias of $\mathbf{b}_\textrm{h}$, all from :eqref:`rnn_h_with_state`.
 The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$.
 What is more, $\mathbf{H}_t$ will also be
 fed into the fully connected output layer
@@ -149,16 +149,16 @@ $\mathbf{O}_t$ of the current time step $t$.
 ![An RNN with a hidden state.](../img/rnn.svg)
 :label:`fig_rnn`
 
-We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ for the hidden state is equivalent to
-matrix multiplication of
+We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ for the hidden state is equivalent to
+matrix multiplication of the
 concatenation of $\mathbf{X}_t$ and $\mathbf{H}_{t-1}$
-and
-concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$.
-Though this can be proven in mathematics,
-in the following we just use a simple code snippet to show this.
+and the
+concatenation of $\mathbf{W}_{\textrm{xh}}$ and $\mathbf{W}_{\textrm{hh}}$.
+Though this can be proven mathematically,
+in the following we just use a simple code snippet as a demonstration.
 To begin with,
 we define matrices `X`, `W_xh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4), (3, 4), and (4, 4), respectively.
-Multiplying `X` by `W_xh`, and `H` by `W_hh`, respectively, and then adding these two multiplications,
+Multiplying `X` by `W_xh`, and `H` by `W_hh`, and then adding these two products,
 we obtain a matrix of shape (3, 4).
 
 ```{.python .input}
@@ -201,11 +201,11 @@ as above.
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 ```
 
-## RNN-based Character-Level Language Models
+## RNN-Based Character-Level Language Models
 
 Recall that for language modeling in :numref:`sec_language-model`,
 we aim to predict the next token based on
-the current and past tokens,
+the current and past tokens;
 thus we shift the original sequence by one token
 as the targets (labels).
 :citet:`Bengio.Ducharme.Vincent.ea.2003` first proposed
@@ -222,10 +222,9 @@ and consider a *character-level language model*.
 
 During the training process,
 we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss to compute the error between the model output and the target.
-Due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3 in :numref:`fig_rnn_train`,
-$\mathbf{O}_3$, is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
+Because of the recurrent computation of the hidden state in the hidden layer, the output, $\mathbf{O}_3$,  of time step 3 in :numref:`fig_rnn_train` is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
 
-In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
+In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be an $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
 
 In the following sections, we will implement RNNs
 for character-level language models.
@@ -255,4 +254,8 @@ The hidden state of an RNN can capture historical information of the sequence up
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1051)
+:end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/180013)
 :end_tab:

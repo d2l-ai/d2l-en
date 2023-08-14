@@ -14,7 +14,7 @@ Alternatively,
 image augmentation can be motivated
 by the fact that 
 random tweaks of training examples 
-allow models to less rely on
+allow models to rely less on
 certain attributes, thereby improving their generalization ability.
 For example, we can crop an image in different ways to make the object of interest appear in different positions, thereby reducing the dependence of a model on the position of the object. 
 We can also adjust factors such as brightness and color to reduce a model's sensitivity to color.
