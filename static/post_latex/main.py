@@ -141,6 +141,34 @@ def _protect_hyperlink_in_caption(lines):
         else:
             i += 1
 
+# Vol1: 12. Appendix: Tools -> Appendix A. Tools
+# Full: 22. Appendix: Math; 23. Appendix: Tools -> Appendix A. Math; Appendix B. Tools
+# Bibliography -> References
+def _remove_appendix_numbering_and_rename_bib(lines):
+    BEGIN_APPENDIX = '\\chapter{Appendix'
+    BEGIN_BIB = '\\begin{sphinxthebibliography'
+
+    BEFORE_APPENDIX = '\\oneappendix'
+    END_APPENDIX = ['\\endappendix',
+        '\\renewcommand\\bibname{References}'
+    ]
+
+    found_begin_appendix = False
+    for i, l in enumerate(lines):
+        if l.startswith(BEGIN_APPENDIX):
+            lines[i] = lines[i].replace('\\chapter{Appendix: ', '\\chapter{')
+            # Full: 22. Appendix: Math; 23. Appendix: Tools -> Appendix A. Math; Appendix B. Tools
+            # Insert before the first BEGIN_APPENDIX only
+            if not found_begin_appendix:
+                appendix_i = i
+                found_begin_appendix = True
+        elif l.startswith(BEGIN_BIB):
+            bib_i = i
+    
+    for i, v in enumerate(END_APPENDIX):
+        lines.insert(bib_i + i, v)
+    lines.insert(appendix_i, BEFORE_APPENDIX)
+
 
 def main():
     tex_file = sys.argv[1]
@@ -153,6 +181,8 @@ def main():
     _protect_hyperlink_in_caption(lines)
     _pagenumbering(lines)
     _replace_quote_in_chapter_title(lines)
+    _remove_appendix_numbering_and_rename_bib(lines)
+    
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
