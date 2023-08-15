@@ -87,7 +87,7 @@ CNNs systematize this idea of *spatial invariance*,
 exploiting it to learn useful representations
 with fewer parameters.
 
-![Can you find Waldo (image courtesy of William Murphy (Infomatique))?.](../img/waldo-football.jpg)
+![Can you find Waldo (image courtesy of William Murphy (Infomatique))?](../img/waldo-football.jpg)
 :width:`400px`
 :label:`img_waldo`
 
