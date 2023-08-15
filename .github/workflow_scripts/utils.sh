@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # By default, all builds are cached
-DISABLE_CACHE=false  # Eg. 'true' or 'false'
+DISABLE_CACHE=true  # Eg. 'true' or 'false'
 
 
 # Function to measure command execution time
