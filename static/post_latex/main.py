@@ -224,6 +224,12 @@ def _remove_footnote_trailing_space(lines):
             lines[i] += '.'
             seen_discussion_url = False
 
+# To fix wrong indent of the final bib entry in References
+def _add_extra_line_before_endbib(lines):
+    for i, l in enumerate(lines):
+        if l.startswith('\\end{sphinxthebibliography}'):
+            break
+    lines.insert(i, '')
 
 def main():
     tex_file = sys.argv[1]
@@ -239,7 +245,7 @@ def main():
     _remove_appendix_numbering_and_rename_bib(lines)
     _make_appendix_math_two_lines(lines)
     _remove_footnote_trailing_space(lines)
-
+    _add_extra_line_before_endbib(lines)
 
 
     with open(tex_file, 'w') as f:
