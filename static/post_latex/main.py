@@ -70,12 +70,47 @@ def _pagenumbering(lines):
     for i, v in enumerate(INTRONUMS):
         if chapintro_i > 0:
             lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
+         
 
-# E.g., \chapter{Builders’ Guide} -> \chapter{Builders' Guide}
-def _replace_quote_in_chapter_title(lines):
-    for i, l in enumerate(lines):
-        if l.startswith('\\chapter{'):
-            lines[i] = lines[i].replace('’', '\'')
+# Examples:
+# \chapter{Builders’ Guide} -> \chapter{Builders' Guide}
+# \caption{“Where’s Waldo”.} -> \caption{``Where's Waldo''.}
+# \chapter{``encoder–decoder''} -> \chapter{``encoder--decoder''}
+def _replace_chars_in_chapter_title_and_caption(lines):
+    CAP_CHAP = {'\\chapter{', '\\section{', '\\caption{'}
+
+    def _get_replaced(s):
+        BEFORES = ['’', '“', '”', '–']
+        AFTERS = ['\'', '``', '\'\'', '--']
+        for before, after in zip(BEFORES, AFTERS):
+            s = s.replace(before, after)
+        return s
+
+    i = 0
+    while i < len(lines):
+        if any(lines[i].startswith(cap_chap) for cap_chap in CAP_CHAP):
+            # Replace within, e.g., \chapter{XX{}X}, where XX{}X may span across multiple lines
+            # num_lefts: num of { encountered
+            num_lefts = 0
+            found_end = False
+            while not found_end:
+                j_start = 0
+                j_end = len(lines[i])
+                for j, char in enumerate(lines[i]):
+                    if char == '{':
+                        num_lefts += 1
+                        if num_lefts == 1:
+                            j_start = j + 1
+                    elif char == '}':
+                        num_lefts -= 1
+                        if num_lefts == 0:
+                            j_end = j
+                            found_end = True
+                            break
+                lines[i] = lines[i][:j_start] + _get_replaced(lines[i][j_start:j_end]) + lines[i][j_end:]
+                if not found_end:
+                    i += 1
+        i += 1
 
 
 # Remove date
@@ -147,8 +182,6 @@ def _protect_hyperlink_in_caption(lines):
 def _remove_appendix_numbering_and_rename_bib(lines):
     BEGIN_APPENDIX = '\\chapter{Appendix'
     BEGIN_BIB = '\\begin{sphinxthebibliography'
-
-    
     END_APPENDIX = ['\\endappendix',
         '\\renewcommand\\bibname{References}'
     ]
@@ -176,6 +209,18 @@ def _remove_appendix_numbering_and_rename_bib(lines):
         lines.insert(appendix_i, '\\appendix')
 
 
+def _remove_footnote_trailing_space(lines):
+    seen_discussion_url = False
+    for i, l in enumerate(lines):
+        if l.startswith('\sphinxnolinkurl{'):
+            lines[i] += '\\sphinxAtStartFootnote'
+        if l.startswith('\\sphinxhref{https://discuss.d2l.ai'):
+            seen_discussion_url = True
+        if seen_discussion_url and l.startswith('\\end{footnote}'):
+            lines[i] += '.'
+            seen_discussion_url = False
+
+
 def main():
     tex_file = sys.argv[1]
     with open(tex_file, 'r') as f:
@@ -186,9 +231,11 @@ def main():
     #lines = _delete_discussions_title(lines)
     _protect_hyperlink_in_caption(lines)
     _pagenumbering(lines)
-    _replace_quote_in_chapter_title(lines)
+    _replace_chars_in_chapter_title_and_caption(lines)
     _remove_appendix_numbering_and_rename_bib(lines)
-    
+    _remove_footnote_trailing_space(lines)
+
+
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
