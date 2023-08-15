@@ -208,6 +208,10 @@ def _remove_appendix_numbering_and_rename_bib(lines):
     else:
         lines.insert(appendix_i, '\\appendix')
 
+def _make_appendix_math_two_lines(lines):
+    for i, l in enumerate(lines):
+        if l.startswith('\\chapter{Mathematics for Deep Learning}'):
+            lines[i] = '\\chapter[Mathematics for Deep Learning]{Mathematics for Deep\\\\Learning}'
 
 def _remove_footnote_trailing_space(lines):
     seen_discussion_url = False
@@ -233,6 +237,7 @@ def main():
     _pagenumbering(lines)
     _replace_chars_in_chapter_title_and_caption(lines)
     _remove_appendix_numbering_and_rename_bib(lines)
+    _make_appendix_math_two_lines(lines)
     _remove_footnote_trailing_space(lines)
 
 
