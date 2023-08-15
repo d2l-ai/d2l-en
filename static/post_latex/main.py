@@ -148,18 +148,21 @@ def _remove_appendix_numbering_and_rename_bib(lines):
     BEGIN_APPENDIX = '\\chapter{Appendix'
     BEGIN_BIB = '\\begin{sphinxthebibliography'
 
-    BEFORE_APPENDIX = '\\oneappendix'
+    
     END_APPENDIX = ['\\endappendix',
         '\\renewcommand\\bibname{References}'
     ]
 
     found_begin_appendix = False
+    one_appendix = True
     for i, l in enumerate(lines):
         if l.startswith(BEGIN_APPENDIX):
             lines[i] = lines[i].replace('\\chapter{Appendix: ', '\\chapter{')
             # Full: 22. Appendix: Math; 23. Appendix: Tools -> Appendix A. Math; Appendix B. Tools
             # Insert before the first BEGIN_APPENDIX only
-            if not found_begin_appendix:
+            if found_begin_appendix:
+                one_appendix = False
+            else:
                 appendix_i = i
                 found_begin_appendix = True
         elif l.startswith(BEGIN_BIB):
@@ -167,7 +170,10 @@ def _remove_appendix_numbering_and_rename_bib(lines):
     
     for i, v in enumerate(END_APPENDIX):
         lines.insert(bib_i + i, v)
-    lines.insert(appendix_i, BEFORE_APPENDIX)
+    if one_appendix:
+        lines.insert(appendix_i, '\\oneappendix')
+    else:
+        lines.insert(appendix_i, '\\appendix')
 
 
 def main():
