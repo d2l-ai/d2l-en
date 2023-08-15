@@ -660,7 +660,7 @@ the *nucleus* (CPU), the *axon* (output wire),
 and the *axon terminals* (output terminals),
 enabling connections to other neurons via *synapses*.
 
-![The real neuron.](../img/neuron.svg)
+![The real neuron (source: "Anatomy and Physiology" by the US National Cancer Institute's Surveillance, Epidemiology and End Results (SEER) Program).](../img/neuron.svg)
 :label:`fig_Neuron`
 
 Information $x_i$ arriving from other neurons
