@@ -67,7 +67,7 @@ Nonetheless, we should still recognize
 a pig were one to appear at the top of the image.
 We can draw some inspiration here
 from the children's game "Where's Waldo"
-(depicted in :numref:`img_waldo`).
+(which itself has inspired many real-life imitations, such as that depicted in :numref:`img_waldo`).
 The game consists of a number of chaotic scenes
 bursting with activities.
 Waldo shows up somewhere in each,
@@ -87,7 +87,7 @@ CNNs systematize this idea of *spatial invariance*,
 exploiting it to learn useful representations
 with fewer parameters.
 
-![An image of the "Where's Waldo" game.](../img/where-wally-walker-books.jpg)
+![Can you find Waldo (image courtesy of William Murphy (Infomatique))?.](../img/waldo-football.jpg)
 :width:`400px`
 :label:`img_waldo`
 
@@ -251,7 +251,7 @@ We might aim to learn a model so that
 wherever the "waldoness" is highest,
 we should find a peak in the hidden layer representations.
 
-![Detect Waldo.](../img/waldo-mask.jpg)
+![Detect Waldo (image courtesy of William Murphy (Infomatique)).](../img/waldo-mask.jpg)
 :width:`400px`
 :label:`fig_waldo_mask`
 
