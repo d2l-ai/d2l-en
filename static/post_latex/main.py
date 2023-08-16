@@ -111,7 +111,11 @@ def _replace_chars_in_chapter_title_and_caption(lines):
                 if not found_end:
                     i += 1
         i += 1
-
+    
+    # \section{Encoder--Decoder} -> \section{Encoder\(-\)Decoder}
+    for i, l in enumerate(lines):
+        if l.startswith('\\chapter{') or l.startswith('\\section{'):
+            lines[i] = lines[i].replace('--', '\(-\)')
 
 # Remove date
 def _edit_titlepage(pdf_dir):
