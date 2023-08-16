@@ -212,10 +212,13 @@ def _remove_appendix_numbering_and_rename_bib(lines):
     else:
         lines.insert(appendix_i, '\\appendix')
 
-def _make_appendix_math_two_lines(lines):
+def _fit_chapter_titles(lines):
     for i, l in enumerate(lines):
+        # make_appendix_math_two_lines
         if l.startswith('\\chapter{Mathematics for Deep Learning}'):
             lines[i] = '\\chapter[Mathematics for Deep Learning]{Mathematics for Deep\\\\Learning}'
+        if l.startswith('\\chapter{Linear Neural Networks for Classification}'):
+            lines[i] = '\\chapter[Linear Neural Networks for Classification]{\\raisebox{-12pt}{Linear Neural Networks for Classification}}'
 
 def _remove_footnote_trailing_space(lines):
     seen_discussion_url = False
@@ -235,6 +238,26 @@ def _add_extra_line_before_endbib(lines):
             break
     lines.insert(i, '')
 
+# \index{xx} -> xx
+def _remove_index(lines):
+    for i, l in enumerate(lines):
+        j_start = 0
+        while j_start < len(l)-6:
+            if l[j_start:j_start+7] == '\\index{':
+                j = j_start + 7
+                num_extra_left_braces = 1
+                while num_extra_left_braces > 0:
+                    if l[j] == '{':
+                        num_extra_left_braces += 1
+                    elif l[j] == '}':
+                        num_extra_left_braces -= 1
+                    j += 1
+                enclosed_text = l[j_start+7:j-1]
+                lines[i] = lines[i].replace('\\index{' + enclosed_text + '}', '')
+                j_start = j
+            else:
+                j_start += 1
+
 def main():
     tex_file = sys.argv[1]
     with open(tex_file, 'r') as f:
@@ -247,9 +270,10 @@ def main():
     _pagenumbering(lines)
     _replace_chars_in_chapter_title_and_caption(lines)
     _remove_appendix_numbering_and_rename_bib(lines)
-    _make_appendix_math_two_lines(lines)
+    _fit_chapter_titles(lines)
     _remove_footnote_trailing_space(lines)
     _add_extra_line_before_endbib(lines)
+    _remove_index(lines)
 
 
     with open(tex_file, 'w') as f:
