@@ -13,7 +13,7 @@ interactions between queries and keys. As it turns out, distance functions are s
 with the softmax operation to ensure nonnegative attention weights,
 much of the work has gone into *attention scoring functions* $a$ in :eqref:`eq_softmax_attention` and :numref:`fig_attention_output` that are simpler to compute. 
 
-![Computing the output of attention pooling as a weighted average of values, where weights are computed with the attention scoring function $a$ and the softmax operation.](../img/attention-output.svg)
+![Computing the output of attention pooling as a weighted average of values, where weights are computed with the attention scoring function $\mathit{a}$ and the softmax operation.](../img/attention-output.svg)
 :label:`fig_attention_output`
 
 ```{.python .input}

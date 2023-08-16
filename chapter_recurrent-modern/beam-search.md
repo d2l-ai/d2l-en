@@ -182,7 +182,7 @@ we continue to select $k$ candidate output sequences
 with the highest predicted probabilities 
 from $k\left|\mathcal{Y}\right|$ possible choices.
 
-![The process of beam search (beam size $=2$; maximum length of an output sequence $=3$). The candidate output sequences are $A$, $C$, $AB$, $CE$, $ABD$, and $CED$.](../img/beam-search.svg)
+![The process of beam search (beam size $=2$; maximum length of an output sequence $=3$). The candidate output sequences are $\mathit{A}$, $\mathit{C}$, $\mathit{AB}$, $\mathit{CE}$, $\mathit{ABD}$, and $\mathit{CED}$.](../img/beam-search.svg)
 :label:`fig_beam-search`
 
 

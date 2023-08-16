@@ -53,7 +53,7 @@ by using the components of the vectors to define
 the location of the points in space compared
 to a fixed reference called the *origin*.  This can be seen in :numref:`fig_grid`.
 
-![An illustration of visualizing vectors as points in the plane.  The first component of the vector gives the $x$-coordinate, the second component gives the $y$-coordinate.  Higher dimensions are analogous, although much harder to visualize.](../img/grid-points.svg)
+![An illustration of visualizing vectors as points in the plane.  The first component of the vector gives the $\mathit{x}$-coordinate, the second component gives the $\mathit{y}$-coordinate.  Higher dimensions are analogous, although much harder to visualize.](../img/grid-points.svg)
 :label:`fig_grid`
 
 This geometric point of view allows us to consider the problem on a more abstract level.

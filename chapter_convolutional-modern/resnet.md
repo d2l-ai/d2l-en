@@ -68,7 +68,7 @@ on the right of :numref:`fig_functionclasses`,
 we can avoid the aforementioned issue from the non-nested function classes.
 
 
-![For non-nested function classes, a larger (indicated by area) function class does not guarantee we will get closer to the "truth" function ($f^*$). This does not happen in nested function classes.](../img/functionclasses.svg)
+![For non-nested function classes, a larger (indicated by area) function class does not guarantee we will get closer to the "truth" function ($\mathit{f}^*$). This does not happen in nested function classes.](../img/functionclasses.svg)
 :label:`fig_functionclasses`
 
 Thus,
@@ -121,7 +121,7 @@ a special case of the multi-branch Inception block:
 it has two branches
 one of which is the identity mapping.
 
-![In a regular block (left), the portion within the dotted-line box must directly learn the mapping $f(\mathbf{x})$. In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $g(\mathbf{x}) = f(\mathbf{x}) - \mathbf{x}$, making the identity mapping $f(\mathbf{x}) = \mathbf{x}$ easier to learn.](../img/residual-block.svg)
+![In a regular block (left), the portion within the dotted-line box must directly learn the mapping $\mathit{f}(\mathbf{x})$. In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $\mathit{g}(\mathbf{x}) = \mathit{f}(\mathbf{x}) - \mathbf{x}$, making the identity mapping $\mathit{f}(\mathbf{x}) = \mathbf{x}$ easier to learn.](../img/residual-block.svg)
 :label:`fig_residual_block`
 
 
@@ -511,7 +511,7 @@ Different from the smorgasbord of transformations in Inception,
 ResNeXt adopts the *same* transformation in all branches,
 thus minimizing the need for manual tuning of each branch. 
 
-![The ResNeXt block. The use of grouped convolution with $g$ groups is $g$ times faster than a dense convolution. It is a bottleneck residual block when the number of intermediate channels $b$ is less than $c$.](../img/resnext-block.svg)
+![The ResNeXt block. The use of grouped convolution with $\mathit{g}$ groups is $\mathit{g}$ times faster than a dense convolution. It is a bottleneck residual block when the number of intermediate channels $\mathit{b}$ is less than $\mathit{c}$.](../img/resnext-block.svg)
 :label:`fig_resnext_block`
 
 Breaking up a convolution from $c_\textrm{i}$ to $c_\textrm{o}$ channels into one of $g$ groups of size $c_\textrm{i}/g$ generating $g$ outputs of size $c_\textrm{o}/g$ is called, quite fittingly, a *grouped convolution*. The computational cost (proportionally) is reduced from $\mathcal{O}(c_\textrm{i} \cdot c_\textrm{o})$ to $\mathcal{O}(g \cdot (c_\textrm{i}/g) \cdot (c_\textrm{o}/g)) = \mathcal{O}(c_\textrm{i} \cdot c_\textrm{o} / g)$, i.e., it is $g$ times faster. Even better, the number of parameters needed to generate the output is also reduced from a $c_\textrm{i} \times c_\textrm{o}$ matrix to $g$ smaller matrices of size $(c_\textrm{i}/g) \times (c_\textrm{o}/g)$, again a $g$ times reduction. In what follows we assume that both $c_\textrm{i}$ and $c_\textrm{o}$ are divisible by $g$. 
