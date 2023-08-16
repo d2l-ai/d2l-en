@@ -258,6 +258,15 @@ def _remove_index(lines):
             else:
                 j_start += 1
 
+def _fix_indent_at_chap_start(lines):
+    is_chap_start = False
+    for i, l in enumerate(lines):
+        if l.startswith('\\chapter'):
+            is_chap_start = True
+        if is_chap_start and l.startswith('\\sphinxAtStartPar'):
+            lines[i] = ''
+            is_chap_start = False
+
 def main():
     tex_file = sys.argv[1]
     with open(tex_file, 'r') as f:
@@ -274,6 +283,7 @@ def main():
     _remove_footnote_trailing_space(lines)
     _add_extra_line_before_endbib(lines)
     _remove_index(lines)
+    _fix_indent_at_chap_start(lines)
 
 
     with open(tex_file, 'w') as f:
