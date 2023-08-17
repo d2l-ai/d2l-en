@@ -27,11 +27,11 @@ from larger vision Transformers trained on larger data
 More recent success stories include Gato, a *generalist* model
 that can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Gato is a single  Transformer that scales well when pretrained on diverse modalities,
 including text, images, joint torques, and button presses.
-Notably, all such multi-modal data is serialized into a flat sequence of tokens,
+Notably, all such multimodal data is serialized into a flat sequence of tokens,
 which can be processed akin to text tokens (:numref:`sec_transformer`)
 or image patches (:numref:`sec_vision-transformer`) by Transformers.
 
-Prior to the compelling success of pretraining Transformers for multi-modal data,
+Prior to the compelling success of pretraining Transformers for multimodal data,
 Transformers were extensively pretrained  with a wealth of text.
 Originally proposed for machine translation,
 the Transformer architecture in :numref:`fig_transformer`
@@ -441,7 +441,7 @@ language models can perform multimodal chain-of-thought reasoning with higher ac
 
 Transformers have been pretrained as encoder-only (e.g., BERT), encoder--decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine-tuning) or not (e.g., few-shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there have been no systematic studies on Transformer scalability in multi-modal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there have been no systematic studies on Transformer scalability in multimodal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
 a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
