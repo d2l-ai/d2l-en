@@ -1068,7 +1068,7 @@ In deep learning, we are often trying to solve optimization problems:
 *maximize* the probability assigned to observed data;
 *maximize* the revenue associated with a recommender model; 
 *minimize* the distance between predictions
-and the ground-truth observations; 
+and the ground truth observations; 
 *minimize* the distance between representations 
 of photos of the same person 
 while *maximizing* the distance between representations 
