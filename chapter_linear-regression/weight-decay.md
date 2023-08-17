@@ -137,7 +137,7 @@ To penalize the size of the weight vector,
 we must somehow add $\| \mathbf{w} \|^2$ to the loss function,
 but how should the model trade off the
 standard loss for this new additive penalty?
-In practice, we characterize this tradeoff
+In practice, we characterize this trade-off
 via the *regularization constant* $\lambda$,
 a nonnegative hyperparameter
 that we fit using validation data:

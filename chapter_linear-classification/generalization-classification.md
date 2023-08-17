@@ -436,7 +436,7 @@ On the other hand, a fixed classifier is useless---it
 generalizes perfectly, but fits neither
 the training data nor the test data.
 The central question of learning
-has thus historically been framed as a tradeoff
+has thus historically been framed as a trade-off
 between more flexible (higher variance) model classes
 that better fit the training data but risk overfitting,
 versus more rigid (higher bias) model classes

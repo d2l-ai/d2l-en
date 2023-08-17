@@ -240,7 +240,7 @@ arising when the beam size is set to 1.
 
 Sequence searching strategies include 
 greedy search, exhaustive search, and beam search.
-Beam search provides a tradeoff between accuracy and 
+Beam search provides a trade-off between accuracy and 
 computational cost via the flexible choice of the beam size.
 
 
