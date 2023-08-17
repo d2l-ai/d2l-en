@@ -242,7 +242,7 @@ and advanced topics
 focused on real systems
 and applications (:numref:`fig_book_org`).
 
-![Book structure](../img/book-org.svg)
+![Book structure.](../img/book-org.svg)
 :label:`fig_book_org`
 
 
