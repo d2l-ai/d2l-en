@@ -43,6 +43,9 @@ sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b
 ```
 
 
+A Windows user would download and install Miniconda by following its [online instructions](https://conda.io/en/latest/miniconda.html).
+On Windows, you may search for `cmd` to open the Command Prompt (command-line interpreter) for running commands.
+
 Next, initialize the shell so we can run `conda` directly.
 
 ```bash
