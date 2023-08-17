@@ -1458,8 +1458,8 @@ This is best illustrated in :numref:`tab_intro_decade`.
 |1980|1 K (house prices in Boston)|100 KB|1 MF (Intel 80186)|
 |1990|10 K (optical character recognition)|10 MB|10 MF (Intel 80486)|
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
-|2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
-|2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
+|2010|10 G (advertising)|1 GB|1 TF (NVIDIA C2050)|
+|2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
 
 
 Note that random-access memory has not kept pace with the growth in data.
