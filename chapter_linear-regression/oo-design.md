@@ -468,7 +468,7 @@ such as via `@add_to_class`,
 in the rest of the book.
 Moreover,
 these fully implemented classes
-are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
+are saved in the [D2L library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
 a *lightweight toolkit* that makes structured modeling for deep learning easy. 
 In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.;
 this degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. 
@@ -476,7 +476,7 @@ this degree of modularity pays dividends throughout the book in terms of concise
 
 ## Exercises
 
-1. Locate full implementations of the above classes that are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
+1. Locate full implementations of the above classes that are saved in the [D2L library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
 1. Remove the `save_hyperparameters` statement in the `B` class. Can you still print `self.a` and `self.b`? Optional: if you have dived into the full implementation of the `HyperParameters` class, can you explain why?
 
 :begin_tab:`mxnet`
