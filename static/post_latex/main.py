@@ -225,7 +225,7 @@ def _remove_footnote_trailing_space(lines):
     for i, l in enumerate(lines):
         if l.startswith('\sphinxnolinkurl{'):
             lines[i] += '\\sphinxAtStartFootnote'
-        if l.startswith('\\sphinxhref{https://discuss.d2l.ai'):
+        if l.startswith('\\sphinxhref{https://discuss.d2l.ai/t/'):
             seen_discussion_url = True
         if seen_discussion_url and l.startswith('\\end{footnote}'):
             lines[i] += '.'

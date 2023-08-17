@@ -380,13 +380,12 @@ We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
-
-Here is a list of dependencies in our MXNet implementation.
+Below lists dependencies in our MXNet implementation.
 :end_tab:
 
 :begin_tab:`pytorch`
 Most of the code in this book is based on PyTorch,
-an extremely popular open-source framework
+a popular open-source framework
 that has been enthusiastically embraced
 by the deep learning research community.
 All of the code in this book has passed tests
@@ -398,8 +397,7 @@ We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
-
-Here is a list of dependencies in our PyTorch implementation.
+Below lists dependencies in our PyTorch implementation.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -416,8 +414,7 @@ We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
-
-Here is a list of dependencies in our TensorFlow implementation.
+Below lists dependencies in our TensorFlow implementation.
 :end_tab:
 
 :begin_tab:`jax`
@@ -437,8 +434,7 @@ We plan to keep the online version up to date.
 In case you encounter any problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
-
-Here is a list of dependencies in our JAX implementation.
+Below lists dependencies in our JAX implementation.
 :end_tab:
 
 ```{.python .input}
@@ -520,13 +516,17 @@ And if you have not used Python before,
 you may want to peruse this [Python tutorial](http://learnpython.org/).
 
 
-### Forum
+### Notebooks, Website, GitHub, and Forum
 
+All of our notebooks are available for download
+on the [D2L.ai website](https://d2l.ai)
+and on [GitHub](https://github.com/d2l-ai/d2l-en).
 Associated with this book, we have launched a discussion forum,
 located at [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
 Whenever you have questions on any section of the book,
 you can find a link to the associated discussion page
 at the end of each notebook.
+
 
 
 ## Acknowledgments
@@ -610,11 +610,7 @@ the algorithms for fitting your models to data,
 and the engineering techniques to implement it all.
 This book presents a comprehensive resource, 
 including prose, figures, mathematics, and code, all in one place.
-To ask (or answer) questions related to this book,
-visit our forum at https://discuss.d2l.ai.
-All of our notebooks are available for download
-on the [D2L.ai website](https://d2l.ai)
-and on [GitHub](https://github.com/d2l-ai/d2l-en).
+
 
 
 ## Exercises
