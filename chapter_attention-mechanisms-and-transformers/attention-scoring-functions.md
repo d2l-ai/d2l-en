@@ -13,7 +13,7 @@ interactions between queries and keys. As it turns out, distance functions are s
 with the softmax operation to ensure nonnegative attention weights,
 much of the work has gone into *attention scoring functions* $a$ in :eqref:`eq_softmax_attention` and :numref:`fig_attention_output` that are simpler to compute. 
 
-![Computing the output of attention pooling as a weighted average of values, where weights are computed with the attention scoring function $a$ and the softmax operation.](../img/attention-output.svg)
+![Computing the output of attention pooling as a weighted average of values, where weights are computed with the attention scoring function $\mathit{a}$ and the softmax operation.](../img/attention-output.svg)
 :label:`fig_attention_output`
 
 ```{.python .input}
@@ -653,7 +653,7 @@ d2l.show_heatmaps(d2l.reshape(attention_weights, (1, 1, 2, 10)),
 ## Summary
 
 In this section we introduced the two key attention scoring functions: dot product and additive attention. They are effective tools for aggregating across sequences of variable length. In particular, the dot product attention is the mainstay of modern Transformer architectures. When queries and keys are vectors of different lengths,
-we can use the additive attention scoring function instead. Optimizing these layers is one of the key areas of advance in recent years. For instance, [Nvidia's Transformer Library](https://docs.nvidia.com/deeplearning/transformer-engine/user-guide/index.html) and Megatron :cite:`shoeybi2019megatron` crucially rely on efficient variants of the attention mechanism. We will dive into this in quite a bit more detail as we review Transformers in later sections. 
+we can use the additive attention scoring function instead. Optimizing these layers is one of the key areas of advance in recent years. For instance, [NVIDIA's Transformer Library](https://docs.nvidia.com/deeplearning/transformer-engine/user-guide/index.html) and Megatron :cite:`shoeybi2019megatron` crucially rely on efficient variants of the attention mechanism. We will dive into this in quite a bit more detail as we review Transformers in later sections. 
 
 ## Exercises
 

@@ -43,6 +43,9 @@ sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b
 ```
 
 
+A Windows user would download and install Miniconda by following its [online instructions](https://conda.io/en/latest/miniconda.html).
+On Windows, you may search for `cmd` to open the Command Prompt (command-line interpreter) for running commands.
+
 Next, initialize the shell so we can run `conda` directly.
 
 ```bash
@@ -170,7 +173,7 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l==1.0.0b0
+pip install d2l==1.0.0
 ```
 
 
@@ -188,7 +191,7 @@ from the command line as follows:
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd mxnet
 ```
@@ -201,7 +204,7 @@ cd mxnet
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd pytorch
 ```
@@ -213,7 +216,7 @@ cd pytorch
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd tensorflow
 ```
@@ -225,7 +228,7 @@ cd tensorflow
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd jax
 ```

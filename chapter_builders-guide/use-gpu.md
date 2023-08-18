@@ -239,12 +239,7 @@ By default, tensors are created on the CPU.
 We can [**query the device where the tensor is located.**]
 :end_tab:
 
-:begin_tab:`tensorflow`
-By default, tensors are created on the CPU.
-We can [**query the device where the tensor is located.**]
-:end_tab:
-
-:begin_tab:`jax`
+:begin_tab:`tensorflow, jax`
 By default, tensors are created on the GPU/TPU if they are available,
 else CPU is used if not available.
 We can [**query the device where the tensor is located.**]

@@ -70,13 +70,52 @@ def _pagenumbering(lines):
     for i, v in enumerate(INTRONUMS):
         if chapintro_i > 0:
             lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
+         
 
-# E.g., \chapter{Builders’ Guide} -> \chapter{Builders' Guide}
-def _replace_quote_in_chapter_title(lines):
+# Examples:
+# \chapter{Builders’ Guide} -> \chapter{Builders' Guide}
+# \caption{“Where’s Waldo”.} -> \caption{``Where's Waldo''.}
+# \chapter{``encoder–decoder''} -> \chapter{``encoder--decoder''}
+def _replace_chars_in_chapter_title_and_caption(lines):
+    CAP_CHAP = {'\\chapter{', '\\section{', '\\caption{'}
+
+    def _get_replaced(s):
+        BEFORES = ['’', '“', '”', '–']
+        AFTERS = ['\'', '``', '\'\'', '--']
+        for before, after in zip(BEFORES, AFTERS):
+            s = s.replace(before, after)
+        return s
+
+    i = 0
+    while i < len(lines):
+        if any(lines[i].startswith(cap_chap) for cap_chap in CAP_CHAP):
+            # Replace within, e.g., \chapter{XX{}X}, where XX{}X may span across multiple lines
+            # num_lefts: num of { encountered
+            num_lefts = 0
+            found_end = False
+            while not found_end:
+                j_start = 0
+                j_end = len(lines[i])
+                for j, char in enumerate(lines[i]):
+                    if char == '{':
+                        num_lefts += 1
+                        if num_lefts == 1:
+                            j_start = j + 1
+                    elif char == '}':
+                        num_lefts -= 1
+                        if num_lefts == 0:
+                            j_end = j
+                            found_end = True
+                            break
+                lines[i] = lines[i][:j_start] + _get_replaced(lines[i][j_start:j_end]) + lines[i][j_end:]
+                if not found_end:
+                    i += 1
+        i += 1
+    
+    # \section{Encoder--Decoder} -> \section{Encoder\(-\)Decoder}
     for i, l in enumerate(lines):
-        if l.startswith('\\chapter{'):
-            lines[i] = lines[i].replace('’', '\'')
-
+        if l.startswith('\\chapter{') or l.startswith('\\section{'):
+            lines[i] = lines[i].replace('--', '\(-\)')
 
 # Remove date
 def _edit_titlepage(pdf_dir):
@@ -147,19 +186,20 @@ def _protect_hyperlink_in_caption(lines):
 def _remove_appendix_numbering_and_rename_bib(lines):
     BEGIN_APPENDIX = '\\chapter{Appendix'
     BEGIN_BIB = '\\begin{sphinxthebibliography'
-
-    BEFORE_APPENDIX = '\\oneappendix'
     END_APPENDIX = ['\\endappendix',
         '\\renewcommand\\bibname{References}'
     ]
 
     found_begin_appendix = False
+    one_appendix = True
     for i, l in enumerate(lines):
         if l.startswith(BEGIN_APPENDIX):
             lines[i] = lines[i].replace('\\chapter{Appendix: ', '\\chapter{')
             # Full: 22. Appendix: Math; 23. Appendix: Tools -> Appendix A. Math; Appendix B. Tools
             # Insert before the first BEGIN_APPENDIX only
-            if not found_begin_appendix:
+            if found_begin_appendix:
+                one_appendix = False
+            else:
                 appendix_i = i
                 found_begin_appendix = True
         elif l.startswith(BEGIN_BIB):
@@ -167,8 +207,65 @@ def _remove_appendix_numbering_and_rename_bib(lines):
     
     for i, v in enumerate(END_APPENDIX):
         lines.insert(bib_i + i, v)
-    lines.insert(appendix_i, BEFORE_APPENDIX)
+    if one_appendix:
+        lines.insert(appendix_i, '\\oneappendix')
+    else:
+        lines.insert(appendix_i, '\\appendix')
 
+def _fit_chapter_titles(lines):
+    for i, l in enumerate(lines):
+        # make_appendix_math_two_lines
+        if l.startswith('\\chapter{Mathematics for Deep Learning}'):
+            lines[i] = '\\chapter[Mathematics for Deep Learning]{Mathematics for Deep\\\\Learning}'
+        if l.startswith('\\chapter{Linear Neural Networks for Classification}'):
+            lines[i] = '\\chapter[Linear Neural Networks for Classification]{\\raisebox{-12pt}{Linear Neural Networks for Classification}}'
+
+def _remove_footnote_trailing_space(lines):
+    seen_discussion_url = False
+    for i, l in enumerate(lines):
+        if l.startswith('\sphinxnolinkurl{'):
+            lines[i] += '\\sphinxAtStartFootnote'
+        if l.startswith('\\sphinxhref{https://discuss.d2l.ai/t/'):
+            seen_discussion_url = True
+        if seen_discussion_url and l.startswith('\\end{footnote}'):
+            lines[i] += '.'
+            seen_discussion_url = False
+
+# To fix wrong indent of the final bib entry in References
+def _add_extra_line_before_endbib(lines):
+    for i, l in enumerate(lines):
+        if l.startswith('\\end{sphinxthebibliography}'):
+            break
+    lines.insert(i, '')
+
+# \index{xx} -> xx
+def _remove_index(lines):
+    for i, l in enumerate(lines):
+        j_start = 0
+        while j_start < len(l)-6:
+            if l[j_start:j_start+7] == '\\index{':
+                j = j_start + 7
+                num_extra_left_braces = 1
+                while num_extra_left_braces > 0:
+                    if l[j] == '{':
+                        num_extra_left_braces += 1
+                    elif l[j] == '}':
+                        num_extra_left_braces -= 1
+                    j += 1
+                enclosed_text = l[j_start+7:j-1]
+                lines[i] = lines[i].replace('\\index{' + enclosed_text + '}', '')
+                j_start = j
+            else:
+                j_start += 1
+
+def _fix_indent_at_chap_start(lines):
+    is_chap_start = False
+    for i, l in enumerate(lines):
+        if l.startswith('\\chapter'):
+            is_chap_start = True
+        if is_chap_start and l.startswith('\\sphinxAtStartPar'):
+            lines[i] = ''
+            is_chap_start = False
 
 def main():
     tex_file = sys.argv[1]
@@ -180,9 +277,14 @@ def main():
     #lines = _delete_discussions_title(lines)
     _protect_hyperlink_in_caption(lines)
     _pagenumbering(lines)
-    _replace_quote_in_chapter_title(lines)
+    _replace_chars_in_chapter_title_and_caption(lines)
     _remove_appendix_numbering_and_rename_bib(lines)
-    
+    _fit_chapter_titles(lines)
+    _remove_footnote_trailing_space(lines)
+    _add_extra_line_before_endbib(lines)
+    _remove_index(lines)
+    _fix_indent_at_chap_start(lines)
+
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))

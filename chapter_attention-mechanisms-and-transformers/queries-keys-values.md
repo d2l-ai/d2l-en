@@ -39,8 +39,8 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\s
 This operation is readily available in all deep learning frameworks. It is differentiable and its gradient never vanishes, all of which are desirable properties in a model. Note though, the attention mechanism introduced above is not the only option. For instance, we can design a non-differentiable attention model that can be trained using reinforcement learning methods :cite:`Mnih.Heess.Graves.ea.2014`. As one would expect, training such a model is quite complex. Consequently the bulk of modern attention research 
 follows the framework outlined in :numref:`fig_qkv`. We thus focus our exposition on this family of differentiable mechanisms. 
 
-![The attention mechanism computes a linear combination over values $\mathbf{v}_i$ via attention pooling,
-where weights are derived according to the compatibility between a query $\mathbf{q}$ and keys $\mathbf{k}_i$.](../img/qkv.svg)
+![The attention mechanism computes a linear combination over values $\mathbf{v}_\mathit{i}$ via attention pooling,
+where weights are derived according to the compatibility between a query $\mathbf{q}$ and keys $\mathbf{k}_\mathit{i}$.](../img/qkv.svg)
 :label:`fig_qkv`
 
 What is quite remarkable is that the actual "code" for executing on the set of keys and values, namely the query, can be quite concise, even though the space to operate on is significant. This is a desirable property for a network layer as it does not require too many parameters to learn. Just as convenient is the fact that attention can operate on arbitrarily large databases without the need to change the way the attention pooling operation is performed.

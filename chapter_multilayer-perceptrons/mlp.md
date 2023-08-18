@@ -232,7 +232,7 @@ we need one more key ingredient: a
 nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
 following the affine transformation. For instance, a popular
-choice is the ReLU (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
+choice is the ReLU (rectified linear unit) activation function :cite:`Nair.Hinton.2010`
 $\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments elementwise.
 The outputs of activation functions $\sigma(\cdot)$
 are called *activations*.

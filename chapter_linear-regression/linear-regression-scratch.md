@@ -448,7 +448,7 @@ def fit_epoch(self):
 We are almost ready to train the model,
 but first we need some training data.
 Here we use the `SyntheticRegressionData` class 
-and pass in some ground-truth parameters.
+and pass in some ground truth parameters.
 Then we train our model with 
 the learning rate `lr=0.03` 
 and set `max_epochs=3`. 
@@ -498,7 +498,7 @@ print(f"error in estimating b: {data.b - params['b']}")
 ```
 
 We should not take the ability to exactly recover 
-the ground-truth parameters for granted.
+the ground truth parameters for granted.
 In general, for deep models unique solutions
 for the parameters do not exist,
 and even for linear models,

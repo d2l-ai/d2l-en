@@ -1181,11 +1181,11 @@ if tab.selected('pytorch', 'mxnet', 'jax'):
         num_blks, dropout)
 if tab.selected('mxnet', 'pytorch'):
     model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                        lr=0.0015)
+                        lr=0.001)
     trainer = d2l.Trainer(max_epochs=30, gradient_clip_val=1, num_gpus=1)
 if tab.selected('jax'):
     model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                        lr=0.0015, training=True)
+                        lr=0.001, training=True)
     trainer = d2l.Trainer(max_epochs=30, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -1196,7 +1196,7 @@ if tab.selected('tensorflow'):
             len(data.tgt_vocab), key_size, query_size, value_size, num_hiddens,
             norm_shape, ffn_num_hiddens, num_heads, num_blks, dropout)
         model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                            lr=0.0015)
+                            lr=0.001)
     trainer = d2l.Trainer(max_epochs=30, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
@@ -1419,3 +1419,4 @@ transforms the representation at all the sequence positions using the same MLP.
 :begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/18031)
 :end_tab:
+

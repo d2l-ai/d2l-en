@@ -51,7 +51,7 @@ classical pipelines looked more like this:
 
 If you spoke to machine learning researchers,
 they would reply that machine learning was both important and beautiful.
-Elegant theories proved the properties of various classifiers :cite:`Boucheron.Bousquet.Lugosi.2005` and convex
+Elegant theories proved the properties of various classifiers :cite:`boucheron2005theory` and convex
 optimization :cite:`Boyd.Vandenberghe.2004` had become the mainstay for obtaining them.
 The field of machine learning was thriving, rigorous, and eminently useful. However,
 if you spoke to a computer vision researcher,

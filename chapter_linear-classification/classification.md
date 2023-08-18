@@ -139,7 +139,7 @@ Accuracy is computed as follows.
 First, if `y_hat` is a matrix,
 we assume that the second dimension stores prediction scores for each class.
 We use `argmax` to obtain the predicted class by the index for the largest entry in each row.
-Then we [**compare the predicted class with the ground-truth `y` elementwise.**]
+Then we [**compare the predicted class with the ground truth `y` elementwise.**]
 Since the equality operator `==` is sensitive to data types,
 we convert `y_hat`'s data type to match that of `y`.
 The result is a tensor containing entries of 0 (false) and 1 (true).

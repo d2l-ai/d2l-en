@@ -304,7 +304,8 @@ def get_dataloader(self, train):
     label = 'SalePrice'
     data = self.train if train else self.val
     if label not in data: return
-    get_tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
+    get_tensor = lambda x: d2l.tensor(x.values.astype(float),
+                                      dtype=d2l.float32)
     # Logarithm of prices 
     tensors = (get_tensor(data.drop(columns=[label])),  # X
                d2l.reshape(d2l.log(get_tensor(data[label])), (-1, 1)))  # Y
@@ -403,11 +404,11 @@ The following code will generate a file called `submission.csv`.
 ```{.python .input}
 %%tab all
 if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
+    preds = [model(d2l.tensor(data.val.values.astype(float), dtype=d2l.float32))
              for model in models]
 if tab.selected('jax'):
     preds = [model.apply({'params': trainer.state.params},
-             d2l.tensor(data.val.values, dtype=d2l.float32))
+             d2l.tensor(data.val.values.astype(float), dtype=d2l.float32))
              for model in models]
 # Taking exponentiation of predictions in the logarithm scale
 ensemble_preds = d2l.reduce_mean(d2l.exp(d2l.concat(preds, 1)), 1)

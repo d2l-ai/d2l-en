@@ -5,7 +5,6 @@
 # D2L.ai: Interactive Deep Learning Book with Multi-Framework Code, Math, and Discussions
 
 [![Continuous Integration](https://github.com/d2l-ai/d2l-en/actions/workflows/ci.yml/badge.svg)](https://github.com/d2l-ai/d2l-en/actions/workflows/ci.yml)
-[![Build Docker Image](https://github.com/d2l-ai/d2l-en/actions/workflows/build-docker.yml/badge.svg)](https://github.com/d2l-ai/d2l-en/actions/workflows/build-docker.yml)
 
 [Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley](http://courses.d2l.ai/berkeley-stat-157/index.html)
 
@@ -37,11 +36,12 @@ Our goal is to offer a resource that could
 If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
 
 ```
-@article{zhang2021dive,
+@book{zhang2023dive,
     title={Dive into Deep Learning},
     author={Zhang, Aston and Lipton, Zachary C. and Li, Mu and Smola, Alexander J.},
-    journal={arXiv preprint arXiv:2106.11342},
-    year={2021}
+    publisher={Cambridge University Press},
+    note={\url{https://D2L.ai}},
+    year={2023}
 }
 ```
 

@@ -537,7 +537,7 @@ in depth throughout this book.
 Informally, the learning process looks something like the following.
 First, grab a big collection of examples for which the features are known
 and select from them a random subset,
-acquiring the ground-truth labels for each.
+acquiring the ground truth labels for each.
 Sometimes these labels might be available data that have already been collected
 (e.g., did a patient die within the following year?)
 and other times we might need to employ human annotators to label the data,
@@ -1458,8 +1458,8 @@ This is best illustrated in :numref:`tab_intro_decade`.
 |1980|1 K (house prices in Boston)|100 KB|1 MF (Intel 80186)|
 |1990|10 K (optical character recognition)|10 MB|10 MF (Intel 80486)|
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
-|2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
-|2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
+|2010|10 G (advertising)|1 GB|1 TF (NVIDIA C2050)|
+|2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
 
 
 Note that random-access memory has not kept pace with the growth in data.
@@ -1583,7 +1583,7 @@ over the past decade.
   [Theano](https://github.com/Theano/Theano).
   Many seminal papers were written using these tools.
   These have now been superseded by
-  [TensorFlow](https://github.com/tensorflow/tensorflow) (often used via its high level API [Keras](https://github.com/keras-team/keras)), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MXNet](https://github.com/apache/incubator-mxnet).
+  [TensorFlow](https://github.com/tensorflow/tensorflow) (often used via its high-level API [Keras](https://github.com/keras-team/keras)), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MXNet](https://github.com/apache/incubator-mxnet).
   The third generation of frameworks consists
   of so-called *imperative* tools for deep learning,
   a trend that was arguably ignited by [Chainer](https://github.com/chainer/chainer),

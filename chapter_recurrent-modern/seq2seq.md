@@ -37,7 +37,7 @@ given both the input sequence
 and the preceding tokens in the output.
 During training, the decoder will typically
 be conditioned upon the preceding tokens
-in the official "ground-truth" label. 
+in the official "ground truth" label. 
 However, at test time, we will want to condition
 each output of the decoder on the tokens already predicted. 
 Note that if we ignore the encoder,
@@ -774,7 +774,7 @@ def predict_step(self, params, batch, num_steps,
 
 We can evaluate a predicted sequence
 by comparing it with the
-target sequence (the ground-truth).
+target sequence (the ground truth).
 But what precisely is the appropriate measure 
 for comparing similarity between two sequences?
 
@@ -904,3 +904,4 @@ BLEU is a popular measure that matches $n$-grams between the predicted sequence 
 :begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/18022)
 :end_tab:
+
