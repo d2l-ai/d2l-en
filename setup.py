@@ -7,7 +7,8 @@ requirements = [
     'matplotlib==3.7.2',
     'matplotlib-inline==0.1.6',
     'requests==2.31.0',
-    'pandas==2.0.3'
+    'pandas==2.0.3',
+    'scipy==1.10.1'
 ]
 
 setup(

@@ -173,7 +173,7 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l==1.0.0
+pip install d2l==1.0.3
 ```
 
 

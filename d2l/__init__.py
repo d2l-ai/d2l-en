@@ -9,4 +9,4 @@ from d2l import jax as d2l  # Use Jax as the backend
 
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.3"
