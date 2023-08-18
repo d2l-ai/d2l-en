@@ -191,7 +191,7 @@ from the command line as follows:
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.3.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd mxnet
 ```
@@ -204,7 +204,7 @@ cd mxnet
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.3.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd pytorch
 ```
@@ -216,7 +216,7 @@ cd pytorch
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.3.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd tensorflow
 ```
@@ -228,7 +228,7 @@ cd tensorflow
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-1.0.0.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-1.0.3.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd jax
 ```
