@@ -91,8 +91,6 @@ sudo fc-cache -f -v
 
 ## Release checklist
 
-## release checklist
-
 ### d2l-en
 
 - release d2lbook
