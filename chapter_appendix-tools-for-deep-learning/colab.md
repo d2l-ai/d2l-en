@@ -6,7 +6,7 @@ if you have a Google account.
 
 To run the code of a section on Colab, simply click the `Colab` button as shown in :numref:`fig_colab`. 
 
-![Run the code of a section on Colab](../img/colab.png)
+![Run the code of a section on Colab.](../img/colab.png)
 :width:`300px`
 :label:`fig_colab`
 
