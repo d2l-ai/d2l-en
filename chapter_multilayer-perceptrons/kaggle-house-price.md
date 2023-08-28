@@ -428,7 +428,7 @@ The steps are quite simple:
 * Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.
 * Click the “Make Submission” button at the bottom of the page to view your results.
 
-![Submitting data to Kaggle](../img/kaggle-submit2.png)
+![Submitting data to Kaggle.](../img/kaggle-submit2.png)
 :width:`400px`
 :label:`fig_kaggle_submit2`
 
