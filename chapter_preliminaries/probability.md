@@ -557,7 +557,7 @@ You might have noticed that we could not even
 make it through the previous section without
 making statements involving interactions
 among multiple random variables
-(recall $P(X,Y) = P(X) P(Y)$).
+(recall that $P(X,Y) = P(X) P(Y)$).
 Most of machine learning
 is concerned with such relationships.
 Here, the sample space would be

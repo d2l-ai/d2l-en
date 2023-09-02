@@ -7,11 +7,11 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 :label:`sec_linear-algebra`
 
 By now, we can load datasets into tensors
-and manipulate these tensors 
+and manipulate these tensors
 with basic mathematical operations.
 To start building sophisticated models,
-we will also need a few tools from linear algebra. 
-This section offers a gentle introduction 
+we will also need a few tools from linear algebra.
+This section offers a gentle introduction
 to the most essential concepts,
 starting from scalar arithmetic
 and ramping up to matrix multiplication.
@@ -41,23 +41,23 @@ from jax import numpy as jnp
 
 
 Most everyday mathematics
-consists of manipulating 
+consists of manipulating
 numbers one at a time.
 Formally, we call these values *scalars*.
-For example, the temperature in Palo Alto 
+For example, the temperature in Palo Alto
 is a balmy $72$ degrees Fahrenheit.
 If you wanted to convert the temperature to Celsius
-you would evaluate the expression 
+you would evaluate the expression
 $c = \frac{5}{9}(f - 32)$, setting $f$ to $72$.
-In this equation, the values 
+In this equation, the values
 $5$, $9$, and $32$ are constant scalars.
-The variables $c$ and $f$ 
+The variables $c$ and $f$
 in general represent unknown scalars.
 
 We denote scalars
-by ordinary lower-cased letters 
+by ordinary lower-cased letters
 (e.g., $x$, $y$, and $z$)
-and the space of all (continuous) 
+and the space of all (continuous)
 *real-valued* scalars by $\mathbb{R}$.
 For expedience, we will skip past
 rigorous definitions of *spaces*:
@@ -69,7 +69,7 @@ For example, $x, y \in \{0, 1\}$
 indicates that $x$ and $y$ are variables
 that can only take values $0$ or $1$.
 
-(**Scalars are implemented as tensors 
+(**Scalars are implemented as tensors
 that contain only one element.**)
 Below, we assign two scalars
 and perform the familiar addition, multiplication,
@@ -119,14 +119,14 @@ For example, if we were training a model to predict
 the risk of a loan defaulting,
 we might associate each applicant with a vector
 whose components correspond to quantities
-like their income, length of employment, 
+like their income, length of employment,
 or number of previous defaults.
 If we were studying the risk of heart attack,
 each vector might represent a patient
 and its components might correspond to
-their most recent vital signs, cholesterol levels, 
+their most recent vital signs, cholesterol levels,
 minutes of exercise per day, etc.
-We denote vectors by bold lowercase letters, 
+We denote vectors by bold lowercase letters,
 (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$).
 
 Vectors are implemented as $1^{\textrm{st}}$-order tensors.
@@ -158,12 +158,12 @@ x
 ```
 
 We can refer to an element of a vector by using a subscript.
-For example, $x_2$ denotes the second element of $\mathbf{x}$. 
+For example, $x_2$ denotes the second element of $\mathbf{x}$.
 Since $x_2$ is a scalar, we do not bold it.
-By default, we visualize vectors 
-by stacking their elements vertically.
+By default, we visualize vectors
+by stacking their elements vertically:
 
-$$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix},$$
+$$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix}.$$
 :eqlabel:`eq_vec_def`
 
 Here $x_1, \ldots, x_n$ are elements of the vector.
@@ -197,11 +197,11 @@ x.shape
 ```
 
 Oftentimes, the word "dimension" gets overloaded
-to mean both the number of axes 
+to mean both the number of axes
 and the length along a particular axis.
-To avoid this confusion, 
+To avoid this confusion,
 we use *order* to refer to the number of axes
-and *dimensionality* exclusively to refer 
+and *dimensionality* exclusively to refer
 to the number of components.
 
 
@@ -214,7 +214,7 @@ We denote matrices by bold capital letters
 (e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
 and represent them in code by tensors with two axes.
 The expression $\mathbf{A} \in \mathbb{R}^{m \times n}$
-indicates that a matrix $\mathbf{A}$ 
+indicates that a matrix $\mathbf{A}$
 contains $m \times n$ real-valued scalars,
 arranged as $m$ rows and $n$ columns.
 When $m = n$, we say that a matrix is *square*.
@@ -230,8 +230,8 @@ $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22
 
 In code, we represent a matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 by a $2^{\textrm{nd}}$-order tensor with shape ($m$, $n$).
-[**We can convert any appropriately sized $m \times n$ tensor 
-into an $m \times n$ matrix**] 
+[**We can convert any appropriately sized $m \times n$ tensor
+into an $m \times n$ matrix**]
 by passing the desired shape to `reshape`:
 
 ```{.python .input}
@@ -261,10 +261,10 @@ A
 Sometimes we want to flip the axes.
 When we exchange a matrix's rows and columns,
 the result is called its *transpose*.
-Formally, we signify a matrix $\mathbf{A}$'s transpose 
-by $\mathbf{A}^\top$ and if $\mathbf{B} = \mathbf{A}^\top$, 
+Formally, we signify a matrix $\mathbf{A}$'s transpose
+by $\mathbf{A}^\top$ and if $\mathbf{B} = \mathbf{A}^\top$,
 then $b_{ij} = a_{ji}$ for all $i$ and $j$.
-Thus, the transpose of an $m \times n$ matrix 
+Thus, the transpose of an $m \times n$ matrix
 is an $n \times m$ matrix:
 
 $$
@@ -318,7 +318,7 @@ A = jnp.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == A.T
 ```
 
-Matrices are useful for representing datasets. 
+Matrices are useful for representing datasets.
 Typically, rows correspond to individual records
 and columns correspond to distinct attributes.
 
@@ -328,9 +328,9 @@ and columns correspond to distinct attributes.
 
 While you can go far in your machine learning journey
 with only scalars, vectors, and matrices,
-eventually you may need to work with 
+eventually you may need to work with
 higher-order [**tensors**].
-Tensors (**give us a generic way of describing 
+Tensors (**give us a generic way of describing
 extensions to $n^{\textrm{th}}$-order arrays.**)
 We call software objects of the *tensor class* "tensors"
 precisely because they too can have arbitrary numbers of axes.
@@ -338,21 +338,21 @@ While it may be confusing to use the word
 *tensor* for both the mathematical object
 and its realization in code,
 our meaning should usually be clear from context.
-We denote general tensors by capital letters 
+We denote general tensors by capital letters
 with a special font face
 (e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
-and their indexing mechanism 
-(e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$) 
+and their indexing mechanism
+(e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$)
 follows naturally from that of matrices.
 
-Tensors will become more important 
+Tensors will become more important
 when we start working with images.
 Each image arrives as a $3^{\textrm{rd}}$-order tensor
 with axes corresponding to the height, width, and *channel*.
-At each spatial location, the intensities 
+At each spatial location, the intensities
 of each color (red, green, and blue)
-are stacked along the channel. 
-Furthermore, a collection of images is represented 
+are stacked along the channel.
+Furthermore, a collection of images is represented
 in code by a $4^{\textrm{th}}$-order tensor,
 where distinct images are indexed
 along the first axis.
@@ -381,11 +381,11 @@ jnp.arange(24).reshape(2, 3, 4)
 
 ## Basic Properties of Tensor Arithmetic
 
-Scalars, vectors, matrices, 
+Scalars, vectors, matrices,
 and higher-order tensors
-all have some handy properties. 
+all have some handy properties.
 For example, elementwise operations
-produce outputs that have the 
+produce outputs that have the
 same shape as their operands.
 
 ```{.python .input}
@@ -418,8 +418,8 @@ A, A + B
 
 The [**elementwise product of two matrices
 is called their *Hadamard product***] (denoted $\odot$).
-We can spell out the entries 
-of the Hadamard product of two matrices 
+We can spell out the entries
+of the Hadamard product of two matrices
 $\mathbf{A}, \mathbf{B} \in \mathbb{R}^{m \times n}$:
 
 
@@ -503,9 +503,9 @@ x, x.sum()
 ```
 
 To express [**sums over the elements of tensors of arbitrary shape**],
-we simply sum over all its axes. 
-For example, the sum of the elements 
-of an $m \times n$ matrix $\mathbf{A}$ 
+we simply sum over all its axes.
+For example, the sum of the elements
+of an $m \times n$ matrix $\mathbf{A}$
 could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
@@ -521,7 +521,7 @@ A.shape, tf.reduce_sum(A)
 By default, invoking the sum function
 *reduces* a tensor along all of its axes,
 eventually producing a scalar.
-Our libraries also allow us to [**specify the axes 
+Our libraries also allow us to [**specify the axes
 along which the tensor should be reduced.**]
 To sum over all elements along the rows (axis 0),
 we specify `axis=0` in `sum`.
@@ -565,10 +565,10 @@ tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A)  # Same as tf.reduce_sum(A)
 ```
 
 [**A related quantity is the *mean*, also called the *average*.**]
-We calculate the mean by dividing the sum 
+We calculate the mean by dividing the sum
 by the total number of elements.
 Because computing the mean is so common,
-it gets a dedicated library function 
+it gets a dedicated library function
 that works analogously to `sum`.
 
 ```{.python .input}
@@ -586,7 +586,7 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
-Likewise, the function for calculating the mean 
+Likewise, the function for calculating the mean
 can also reduce a tensor along specific axes.
 
 ```{.python .input}
@@ -603,7 +603,7 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 :label:`subsec_lin-alg-non-reduction`
 
 Sometimes it can be useful to [**keep the number of axes unchanged**]
-when invoking the function for calculating the sum or mean. 
+when invoking the function for calculating the sum or mean.
 This matters when we want to use the broadcast mechanism.
 
 ```{.python .input}
@@ -619,7 +619,7 @@ sum_A, sum_A.shape
 ```
 
 For instance, since `sum_A` keeps its two axes after summing each row,
-we can (**divide `A` by `sum_A` with broadcasting**) 
+we can (**divide `A` by `sum_A` with broadcasting**)
 to create a matrix where each row sums up to $1$.
 
 ```{.python .input}
@@ -643,14 +643,14 @@ tf.cumsum(A, axis=0)
 
 ## Dot Products
 
-So far, we have only performed elementwise operations, sums, and averages. 
-And if this was all we could do, linear algebra 
+So far, we have only performed elementwise operations, sums, and averages.
+And if this was all we could do, linear algebra
 would not deserve its own section.
 Fortunately, this is where things get more interesting.
 One of the most fundamental operations is the dot product.
 Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$,
-their *dot product* $\mathbf{x}^\top \mathbf{y}$ (also known as *inner product*, $\langle \mathbf{x}, \mathbf{y}  \rangle$) 
-is a sum over the products of the elements at the same position: 
+their *dot product* $\mathbf{x}^\top \mathbf{y}$ (also known as *inner product*, $\langle \mathbf{x}, \mathbf{y}  \rangle$)
+is a sum over the products of the elements at the same position:
 $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 
 [~~The *dot product* of two vectors is a sum over the products of the elements at the same position~~]
@@ -679,7 +679,7 @@ y = jnp.ones(3, dtype = jnp.float32)
 x, y, jnp.dot(x, y)
 ```
 
-Equivalently, (**we can calculate the dot product of two vectors 
+Equivalently, (**we can calculate the dot product of two vectors
 by performing an elementwise multiplication followed by a sum:**)
 
 ```{.python .input}
@@ -721,7 +721,7 @@ Later in this section, we will formally introduce this notion of *length*.
 
 Now that we know how to calculate dot products,
 we can begin to understand the *product*
-between an $m \times n$ matrix $\mathbf{A}$ 
+between an $m \times n$ matrix $\mathbf{A}$
 and an $n$-dimensional vector $\mathbf{x}$.
 To start off, we visualize our matrix
 in terms of its row vectors
@@ -735,12 +735,12 @@ $$\mathbf{A}=
 \end{bmatrix},$$
 
 where each $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
-is a row vector representing the $i^\textrm{th}$ row 
+is a row vector representing the $i^\textrm{th}$ row
 of the matrix $\mathbf{A}$.
 
 [**The matrix--vector product $\mathbf{A}\mathbf{x}$
 is simply a column vector of length $m$,
-whose $i^\textrm{th}$ element is the dot product 
+whose $i^\textrm{th}$ element is the dot product
 $\mathbf{a}^\top_i \mathbf{x}$:**]
 
 $$
@@ -766,7 +766,7 @@ from $\mathbb{R}^{n}$ to $\mathbb{R}^{m}$.
 These transformations are remarkably useful.
 For example, we can represent rotations
 as multiplications by certain square matrices.
-Matrix--vector products also describe 
+Matrix--vector products also describe
 the key calculation involved in computing
 the outputs of each layer in a neural network
 given the outputs from the previous layer.
@@ -774,30 +774,30 @@ given the outputs from the previous layer.
 :begin_tab:`mxnet`
 To express a matrix--vector product in code,
 we use the same `dot` function.
-The operation is inferred 
+The operation is inferred
 based on the type of the arguments.
-Note that the column dimension of `A` 
+Note that the column dimension of `A`
 (its length along axis 1)
 must be the same as the dimension of `x` (its length).
 :end_tab:
 
 :begin_tab:`pytorch`
 To express a matrix--vector product in code,
-we use the `mv` function. 
-Note that the column dimension of `A` 
+we use the `mv` function.
+Note that the column dimension of `A`
 (its length along axis 1)
-must be the same as the dimension of `x` (its length). 
-Python has a convenience operator `@` 
+must be the same as the dimension of `x` (its length).
+Python has a convenience operator `@`
 that can execute both matrix--vector
 and matrix--matrix products
-(depending on its arguments). 
+(depending on its arguments).
 Thus we can write `A@x`.
 :end_tab:
 
 :begin_tab:`tensorflow`
 To express a matrix--vector product in code,
-we use the `matvec` function. 
-Note that the column dimension of `A` 
+we use the `matvec` function.
+Note that the column dimension of `A`
 (its length along axis 1)
 must be the same as the dimension of `x` (its length).
 :end_tab:
@@ -827,8 +827,8 @@ A.shape, x.shape, jnp.matmul(A, x)
 Once you have gotten the hang of dot products and matrix--vector products,
 then *matrix--matrix multiplication* should be straightforward.
 
-Say that we have two matrices 
-$\mathbf{A} \in \mathbb{R}^{n \times k}$ 
+Say that we have two matrices
+$\mathbf{A} \in \mathbb{R}^{n \times k}$
 and $\mathbf{B} \in \mathbb{R}^{k \times m}$:
 
 $$\mathbf{A}=\begin{bmatrix}
@@ -845,11 +845,11 @@ $$\mathbf{A}=\begin{bmatrix}
 \end{bmatrix}.$$
 
 
-Let $\mathbf{a}^\top_{i} \in \mathbb{R}^k$ denote 
-the row vector representing the $i^\textrm{th}$ row 
+Let $\mathbf{a}^\top_{i} \in \mathbb{R}^k$ denote
+the row vector representing the $i^\textrm{th}$ row
 of the matrix $\mathbf{A}$
-and let $\mathbf{b}_{j} \in \mathbb{R}^k$ denote 
-the column vector from the $j^\textrm{th}$ column 
+and let $\mathbf{b}_{j} \in \mathbb{R}^k$ denote
+the column vector from the $j^\textrm{th}$ column
 of the matrix $\mathbf{B}$:
 
 $$\mathbf{A}=
@@ -867,7 +867,7 @@ $$
 
 To form the matrix product $\mathbf{C} \in \mathbb{R}^{n \times m}$,
 we simply compute each element $c_{ij}$
-as the dot product between 
+as the dot product between
 the $i^{\textrm{th}}$ row of $\mathbf{A}$
 and the $j^{\textrm{th}}$ column of $\mathbf{B}$,
 i.e., $\mathbf{a}^\top_i \mathbf{b}_j$:
@@ -890,11 +890,11 @@ $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 $$
 
 [**We can think of the matrix--matrix multiplication $\mathbf{AB}$
-as performing $m$ matrix--vector products 
-or $m \times n$ dot products 
-and stitching the results together 
+as performing $m$ matrix--vector products
+or $m \times n$ dot products
+and stitching the results together
 to form an $n \times m$ matrix.**]
-In the following snippet, 
+In the following snippet,
 we perform matrix multiplication on `A` and `B`.
 Here, `A` is a matrix with two rows and three columns,
 and `B` is a matrix with three rows and four columns.
@@ -924,7 +924,7 @@ B = jnp.ones((3, 4))
 jnp.matmul(A, B)
 ```
 
-The term *matrix--matrix multiplication* is 
+The term *matrix--matrix multiplication* is
 often simplified to *matrix multiplication*,
 and should not be confused with the Hadamard product.
 
@@ -933,16 +933,16 @@ and should not be confused with the Hadamard product.
 :label:`subsec_lin-algebra-norms`
 
 Some of the most useful operators in linear algebra are *norms*.
-Informally, the norm of a vector tells us how *big* it is. 
+Informally, the norm of a vector tells us how *big* it is.
 For instance, the $\ell_2$ norm measures
 the (Euclidean) length of a vector.
 Here, we are employing a notion of *size* that concerns the magnitude of a vector's components
-(not its dimensionality). 
+(not its dimensionality).
 
 A norm is a function $\| \cdot \|$ that maps a vector
 to a scalar and satisfies the following three properties:
 
-1. Given any vector $\mathbf{x}$, if we scale (all elements of) the vector 
+1. Given any vector $\mathbf{x}$, if we scale (all elements of) the vector
    by a scalar $\alpha \in \mathbb{R}$, its norm scales accordingly:
    $$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|.$$
 2. For any vectors $\mathbf{x}$ and $\mathbf{y}$:
@@ -951,8 +951,8 @@ to a scalar and satisfies the following three properties:
 3. The norm of a vector is nonnegative and it only vanishes if the vector is zero:
    $$\|\mathbf{x}\| > 0 \textrm{ for all } \mathbf{x} \neq 0.$$
 
-Many functions are valid norms and different norms 
-encode different notions of size. 
+Many functions are valid norms and different norms
+encode different notions of size.
 The Euclidean norm that we all learned in elementary school geometry
 when calculating the hypotenuse of a right triangle
 is the square root of the sum of squares of a vector's elements.
@@ -986,15 +986,15 @@ u = jnp.array([3.0, -4.0])
 jnp.linalg.norm(u)
 ```
 
-[**The $\ell_1$ norm**] is also common 
-and the associated measure is called the Manhattan distance. 
-By definition, the $\ell_1$ norm sums 
+[**The $\ell_1$ norm**] is also common
+and the associated measure is called the Manhattan distance.
+By definition, the $\ell_1$ norm sums
 the absolute values of a vector's elements:
 
 (**$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$**)
 
 Compared to the $\ell_2$ norm, it is less sensitive to outliers.
-To compute the $\ell_1$ norm, 
+To compute the $\ell_1$ norm,
 we compose the absolute value
 with the sum operation.
 
@@ -1023,23 +1023,23 @@ of the more general $\ell_p$ *norms*:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
-In the case of matrices, matters are more complicated. 
-After all, matrices can be viewed both as collections of individual entries 
-*and* as objects that operate on vectors and transform them into other vectors. 
-For instance, we can ask by how much longer 
-the matrix--vector product $\mathbf{X} \mathbf{v}$ 
-could be relative to $\mathbf{v}$. 
-This line of thought leads to what is called the *spectral* norm. 
-For now, we introduce [**the *Frobenius norm*, 
+In the case of matrices, matters are more complicated.
+After all, matrices can be viewed both as collections of individual entries
+*and* as objects that operate on vectors and transform them into other vectors.
+For instance, we can ask by how much longer
+the matrix--vector product $\mathbf{X} \mathbf{v}$
+could be relative to $\mathbf{v}$.
+This line of thought leads to what is called the *spectral* norm.
+For now, we introduce [**the *Frobenius norm*,
 which is much easier to compute**] and defined as
-the square root of the sum of the squares 
+the square root of the sum of the squares
 of a matrix's elements:
 
 [**$$\|\mathbf{X}\|_\textrm{F} = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
-The Frobenius norm behaves as if it were 
+The Frobenius norm behaves as if it were
 an $\ell_2$ norm of a matrix-shaped vector.
-Invoking the following function will calculate 
+Invoking the following function will calculate
 the Frobenius norm of a matrix.
 
 ```{.python .input}
@@ -1066,16 +1066,16 @@ While we do not want to get too far ahead of ourselves,
 we already can plant some intuition about why these concepts are useful.
 In deep learning, we are often trying to solve optimization problems:
 *maximize* the probability assigned to observed data;
-*maximize* the revenue associated with a recommender model; 
+*maximize* the revenue associated with a recommender model;
 *minimize* the distance between predictions
-and the ground truth observations; 
-*minimize* the distance between representations 
-of photos of the same person 
-while *maximizing* the distance between representations 
-of photos of different people. 
-These distances, which constitute 
-the objectives of deep learning algorithms, 
-are often expressed as norms. 
+and the ground truth observations;
+*minimize* the distance between representations
+of photos of the same person
+while *maximizing* the distance between representations
+of photos of different people.
+These distances, which constitute
+the objectives of deep learning algorithms,
+are often expressed as norms.
 
 
 ## Discussion
@@ -1091,14 +1091,14 @@ low-dimensional structure in real-world datasets.
 There are entire subfields of machine learning
 that focus on using matrix decompositions
 and their generalizations to high-order tensors
-to discover structure in datasets 
+to discover structure in datasets
 and solve prediction problems.
 But this book focuses on deep learning.
-And we believe you will be more inclined 
+And we believe you will be more inclined
 to learn more mathematics
 once you have gotten your hands dirty
 applying machine learning to real datasets.
-So while we reserve the right 
+So while we reserve the right
 to introduce more mathematics later on,
 we wrap up this section here.
 
@@ -1109,21 +1109,21 @@ For a more advanced crash course, consider checking out
 
 To recap:
 
-* Scalars, vectors, matrices, and tensors are 
-  the basic mathematical objects used in linear algebra 
+* Scalars, vectors, matrices, and tensors are
+  the basic mathematical objects used in linear algebra
   and have zero, one, two, and an arbitrary number of axes, respectively.
-* Tensors can be sliced or reduced along specified axes 
+* Tensors can be sliced or reduced along specified axes
   via indexing, or operations such as `sum` and `mean`, respectively.
-* Elementwise products are called Hadamard products. 
-  By contrast, dot products, matrix--vector products, and matrix--matrix products 
-  are not elementwise operations and in general return objects 
-  having shapes that are different from the the operands. 
-* Compared to Hadamard products, matrix--matrix products 
+* Elementwise products are called Hadamard products.
+  By contrast, dot products, matrix--vector products, and matrix--matrix products
+  are not elementwise operations and in general return objects
+  having shapes that are different from the the operands.
+* Compared to Hadamard products, matrix--matrix products
   take considerably longer to compute (cubic rather than quadratic time).
-* Norms capture various notions of the magnitude of a vector (or matrix), 
-  and are commonly applied to the difference of two vectors 
+* Norms capture various notions of the magnitude of a vector (or matrix),
+  and are commonly applied to the difference of two vectors
   to measure their distance apart.
-* Common vector norms include the $\ell_1$ and $\ell_2$ norms, 
+* Common vector norms include the $\ell_1$ and $\ell_2$ norms,
    and common matrix norms include the *spectral* and *Frobenius* norms.
 
 
@@ -1132,13 +1132,13 @@ To recap:
 1. Prove that the transpose of the transpose of a matrix is the matrix itself: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
 1. Given two matrices $\mathbf{A}$ and $\mathbf{B}$, show that sum and transposition commute: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
 1. Given any square matrix $\mathbf{A}$, is $\mathbf{A} + \mathbf{A}^\top$ always symmetric? Can you prove the result by using only the results of the previous two exercises?
-1. We defined the tensor `X` of shape (2, 3, 4) in this section. What is the output of `len(X)`? Write your answer without implementing any code, then check your answer using code. 
+1. We defined the tensor `X` of shape (2, 3, 4) in this section. What is the output of `len(X)`? Write your answer without implementing any code, then check your answer using code.
 1. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
 1. Run `A / A.sum(axis=1)` and see what happens. Can you analyze the results?
 1. When traveling between two points in downtown Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
 1. Consider a tensor of shape (2, 3, 4). What are the shapes of the summation outputs along axes 0, 1, and 2?
 1. Feed a tensor with three or more axes to the `linalg.norm` function and observe its output. What does this function compute for tensors of arbitrary shape?
-1. Consider three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{14}}$, initialized with Gaussian random variables. You want to compute the product $\mathbf{A} \mathbf{B} \mathbf{C}$. Is there any difference in memory footprint and speed, depending on whether you compute $(\mathbf{A} \mathbf{B}) \mathbf{C}$ or $\mathbf{A} (\mathbf{B} \mathbf{C})$. Why?
+1. Consider three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{14}}$, initialized with Gaussian random variables. You want to compute the product $\mathbf{A} \mathbf{B} \mathbf{C}$. Is there any difference in memory footprint and speed, depending on whether you compute $(\mathbf{A} \mathbf{B}) \mathbf{C}$ or $\mathbf{A} (\mathbf{B} \mathbf{C})$? Why?
 1. Consider three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{16}}$. Is there any difference in speed depending on whether you compute $\mathbf{A} \mathbf{B}$ or $\mathbf{A} \mathbf{C}^\top$? Why? What changes if you initialize $\mathbf{C} = \mathbf{B}^\top$ without cloning memory? Why?
 1. Consider three matrices, say $\mathbf{A}, \mathbf{B}, \mathbf{C} \in \mathbb{R}^{100 \times 200}$. Construct a tensor with three axes by stacking $[\mathbf{A}, \mathbf{B}, \mathbf{C}]$. What is the dimensionality? Slice out the second coordinate of the third axis to recover $\mathbf{B}$. Check that your answer is correct.
 

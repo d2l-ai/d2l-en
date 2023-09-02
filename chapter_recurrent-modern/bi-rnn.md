@@ -2,19 +2,19 @@
 :label:`sec_bi_rnn`
 
 So far, our working example of a sequence learning task has been language modeling,
-where we aim to predict the next token given all previous tokens in a sequence. 
+where we aim to predict the next token given all previous tokens in a sequence.
 In this scenario, we wish only to condition upon the leftward context,
-and thus the unidirectional chaining of a standard RNN seems appropriate. 
-However, there are many other sequence learning tasks contexts 
+and thus the unidirectional chaining of a standard RNN seems appropriate.
+However, there are many other sequence learning tasks contexts
 where it is perfectly fine to condition the prediction at every time step
-on both the leftward and the rightward context. 
-Consider, for example, part of speech detection. 
+on both the leftward and the rightward context.
+Consider, for example, part of speech detection.
 Why shouldn't we take the context in both directions into account
 when assessing the part of speech associated with a given word?
 
 Another common task---often useful as a pretraining exercise
 prior to fine-tuning a model on an actual task of interest---is
-to mask out random tokens in a text document and then to train 
+to mask out random tokens in a text document and then to train
 a sequence model to predict the values of the missing tokens.
 Note that depending on what comes after the blank,
 the likely value of the missing token changes dramatically:
@@ -24,24 +24,24 @@ the likely value of the missing token changes dramatically:
 * I am `___` hungry, and I can eat half a pig.
 
 In the first sentence "happy" seems to be a likely candidate.
-The words "not" and "very" seem plausible in the second sentence, 
-but "not" seems incompatible with the third sentences. 
+The words "not" and "very" seem plausible in the second sentence,
+but "not" seems incompatible with the third sentences.
 
 
-Fortunately, a simple technique transforms any unidirectional RNN 
+Fortunately, a simple technique transforms any unidirectional RNN
 into a bidirectional RNN :cite:`Schuster.Paliwal.1997`.
 We simply implement two unidirectional RNN layers
-chained together in opposite directions 
+chained together in opposite directions
 and acting on the same input (:numref:`fig_birnn`).
 For the first RNN layer,
 the first input is $\mathbf{x}_1$
 and the last input is $\mathbf{x}_T$,
-but for the second RNN layer, 
+but for the second RNN layer,
 the first input is $\mathbf{x}_T$
 and the last input is $\mathbf{x}_1$.
 To produce the output of this bidirectional RNN layer,
 we simply concatenate together the corresponding outputs
-of the two underlying unidirectional RNN layers. 
+of the two underlying unidirectional RNN layers.
 
 
 ![Architecture of a bidirectional RNN.](../img/birnn.svg)
@@ -49,12 +49,12 @@ of the two underlying unidirectional RNN layers.
 
 
 Formally for any time step $t$,
-we consider a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples $=n$; number of inputs in each example $=d$) 
+we consider a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$
+(number of examples $=n$; number of inputs in each example $=d$)
 and let the hidden layer activation function be $\phi$.
 In the bidirectional architecture,
-the forward and backward hidden states for this time step 
-are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ 
+the forward and backward hidden states for this time step
+are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$
 and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$, respectively,
 where $h$ is the number of hidden units.
 The forward and backward hidden state updates are as follows:
@@ -73,17 +73,17 @@ Next, we concatenate the forward and backward hidden states
 $\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$
 to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ for feeding into the output layer.
 In deep bidirectional RNNs with multiple hidden layers,
-such information is passed on as *input* to the next bidirectional layer. 
-Last, the output layer computes the output 
+such information is passed on as *input* to the next bidirectional layer.
+Last, the output layer computes the output
 $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs $=q$):
 
 $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q}.$$
 
-Here, the weight matrix $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{2h \times q}$ 
-and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ 
-are the model parameters of the output layer. 
+Here, the weight matrix $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{2h \times q}$
+and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$
+are the model parameters of the output layer.
 While technically, the two directions can have different numbers of hidden units,
-this design choice is seldom made in practice. 
+this design choice is seldom made in practice.
 We now demonstrate a simple implementation of a bidirectional RNN.
 
 ```{.python .input}
@@ -120,7 +120,7 @@ from jax import numpy as jnp
 
 ## Implementation from Scratch
 
-To implement a bidirectional RNN from scratch, we can
+If we want to implement a bidirectional RNN from scratch, we can
 include two unidirectional `RNNScratch` instances
 with separate learnable parameters.
 

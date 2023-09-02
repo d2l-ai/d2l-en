@@ -20,7 +20,7 @@ that we focus on in this book---were
 generally regarded as outmoded.
 
 
-Yet in just few years, deep learning has taken the world by surprise,
+Yet in just a few years, deep learning has taken the world by surprise,
 driving rapid progress in such diverse fields
 as computer vision, natural language processing,
 automatic speech recognition, reinforcement learning,
@@ -91,12 +91,12 @@ Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
 When we started this book project,
-there were no resources that simultaneously 
+there were no resources that simultaneously
 (i) remained up to date;
-(ii) covered the breadth of modern machine learning practices 
+(ii) covered the breadth of modern machine learning practices
 with sufficient technical depth;
-and (iii) interleaved exposition of 
-the quality one expects of a textbook 
+and (iii) interleaved exposition of
+the quality one expects of a textbook
 with the clean runnable code
 that one expects of a hands-on tutorial.
 We found plenty of code examples illustrating
@@ -148,15 +148,15 @@ And webpages are native in HTML and JavaScript.
 Furthermore, we want the content to be
 accessible both as executable code, as a physical book,
 as a downloadable PDF, and on the Internet as a website.
-No workflows seemed suited to these demands, 
+No workflows seemed suited to these demands,
 so we decided to assemble our own (:numref:`sec_how_to_contribute`).
-We settled on GitHub to share the source 
+We settled on GitHub to share the source
 and to facilitate community contributions;
 Jupyter notebooks for mixing code, equations and text;
-Sphinx as a rendering engine; 
+Sphinx as a rendering engine;
 and Discourse as a discussion platform.
 While our system is not perfect,
-these choices strike a compromise 
+these choices strike a compromise
 among the competing concerns.
 We believe that *Dive into Deep Learning*
 might be the first book published
@@ -167,9 +167,9 @@ using such an integrated workflow.
 
 Many textbooks present concepts in succession,
 covering each in exhaustive detail.
-For example, 
-the excellent textbook of 
-:citet:`Bishop.2006`,
+For example,
+the excellent textbook of
+:citet:`Bishop.2006`
 teaches each topic so thoroughly
 that getting to the chapter
 on linear regression requires
@@ -207,7 +207,7 @@ In general, we err on the side of making tools
 available before explaining them fully
 (often filling in the background later).
 For instance, we might use *stochastic gradient descent*
-before explaining why it is useful 
+before explaining why it is useful
 or offering some intuition for why it works.
 This helps to give practitioners the necessary
 ammunition to solve problems quickly,
@@ -221,13 +221,13 @@ by modern deep learning frameworks.
 This comes up especially in the basic tutorials,
 where we want you to understand everything
 that happens in a given layer or optimizer.
-In these cases, we often present 
+In these cases, we often present
 two versions of the example:
 one where we implement everything from scratch,
 relying only on NumPy-like functionality
 and automatic differentiation,
 and a more practical example,
-where we write succinct code 
+where we write succinct code
 using the high-level APIs of deep learning frameworks.
 After explaining how some component works,
 we rely on the high-level API in subsequent tutorials.
@@ -236,7 +236,7 @@ we rely on the high-level API in subsequent tutorials.
 ### Content and Structure
 
 The book can be divided into roughly three parts,
-dealing with preliminaries, 
+dealing with preliminaries,
 deep learning techniques,
 and advanced topics
 focused on real systems
@@ -247,7 +247,7 @@ and applications (:numref:`fig_book_org`).
 
 
 * **Part 1: Basics and Preliminaries**.
-:numref:`chap_introduction` is 
+:numref:`chap_introduction` is
 an introduction to deep learning.
 Then, in :numref:`chap_preliminaries`,
 we quickly bring you up to speed
@@ -271,8 +271,8 @@ and lays the groundwork
 for our subsequent implementations
 of more complex models.
 Next, :numref:`chap_cnn` and :numref:`chap_modern_cnn`
-present convolutional neural networks (CNNs), 
-powerful tools that form the backbone 
+present convolutional neural networks (CNNs),
+powerful tools that form the backbone
 of most modern computer vision systems.
 Similarly, :numref:`chap_rnn` and :numref:`chap_modern_rnn`
 introduce recurrent neural networks (RNNs),
@@ -280,7 +280,7 @@ models that exploit sequential (e.g., temporal)
 structure in data and are commonly used
 for natural language processing
 and time series prediction.
-In :numref:`chap_attention-and-transformers`, 
+In :numref:`chap_attention-and-transformers`,
 we describe a relatively new class of models,
 based on so-called *attention mechanisms*,
 that has displaced RNNs as the dominant architecture
@@ -295,13 +295,13 @@ we discuss several common optimization algorithms
 used to train deep learning models.
 Next, in Chapter 13,
 we examine several key factors
-that influence the computational performance 
+that influence the computational performance
 of deep learning code.
 Then, in Chapter 14,
-we illustrate major applications 
+we illustrate major applications
 of deep learning in computer vision.
 Finally, in Chapter 15 and Chapter 16,
-we demonstrate how to pretrain language representation models 
+we demonstrate how to pretrain language representation models
 and apply them to natural language processing tasks.
 
 
@@ -315,17 +315,17 @@ tweaking the code in small ways and observing the results.
 Ideally, an elegant mathematical theory might tell us
 precisely how to tweak our code to achieve a desired result.
 However, deep learning practitioners today
-must often tread where no solid theory provides guidance. 
-Despite our best attempts, formal explanations 
+must often tread where no solid theory provides guidance.
+Despite our best attempts, formal explanations
 for the efficacy of various techniques are
 still lacking, for a variety of reasons: the mathematics to characterize these models
 can be so difficult;
-the explanation likely depends on properties 
+the explanation likely depends on properties
 of the data that currently lack clear definitions;
 and serious inquiry on these topics
 has only recently kicked into high gear.
 We are hopeful that as the theory of deep learning progresses,
-each future edition of this book will provide insights 
+each future edition of this book will provide insights
 that eclipse those presently available.
 
 To avoid unnecessary repetition, we capture
@@ -336,7 +336,7 @@ Throughout, we mark blocks of code
 or collection of import statements) with `#@save`
 to indicate that they will be accessed later
 via the `d2l` package.
-We offer a detailed overview 
+We offer a detailed overview
 of these classes and functions in :numref:`sec_d2l`.
 The `d2l` package is lightweight and only requires
 the following dependencies:
@@ -518,11 +518,11 @@ you may want to peruse this [Python tutorial](http://learnpython.org/).
 
 ### Notebooks, Website, GitHub, and Forum
 
-All of our notebooks are available for download
-on the [D2L.ai website](https://d2l.ai)
-and on [GitHub](https://github.com/d2l-ai/d2l-en).
-Associated with this book, we have launched a discussion forum,
-located at [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
+All our notebooks can be downloaded
+from the [D2L.ai website](https://d2l.ai)
+and from [GitHub](https://github.com/d2l-ai/d2l-en).
+Associated with this book we have launched a discussion forum
+at [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
 Whenever you have questions on any section of the book,
 you can find a link to the associated discussion page
 at the end of each notebook.
@@ -598,17 +598,17 @@ for his help and professionalism.
 
 ## Summary
 
-Deep learning has revolutionized pattern recognition, 
-introducing technology that now powers a wide range of  technologies, 
+Deep learning has revolutionized pattern recognition,
+introducing technology that now powers a wide range of  technologies,
 in such diverse fields as computer vision,
 natural language processing,
 and automatic speech recognition.
-To successfully apply deep learning, 
+To successfully apply deep learning,
 you must understand how to cast a problem,
 the basic mathematics of modeling,
 the algorithms for fitting your models to data,
 and the engineering techniques to implement it all.
-This book presents a comprehensive resource, 
+This book presents a comprehensive resource,
 including prose, figures, mathematics, and code, all in one place.
 
 

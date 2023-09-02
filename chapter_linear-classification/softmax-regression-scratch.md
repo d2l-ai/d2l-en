@@ -371,7 +371,7 @@ much more efficiently.
 
 1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. As discussed in :numref:`sec_softmax` this can cause numerical instabilities.
     1. Test whether `softmax` still works correctly if an input has a value of $100$.
-    1. Test whether `softmax` still works correctly if the largest of all inputs is smaller than $-100$?
+    1. Test whether `softmax` still works correctly if the largest of all inputs is smaller than $-100$.
     1. Implement a fix by looking at the value relative to the largest entry in the argument.
 1. Implement a `cross_entropy` function that follows the definition of the cross-entropy loss function $\sum_i y_i \log \hat{y}_i$.
     1. Try it out in the code example of this section.
