@@ -224,7 +224,7 @@ train_iter = gluon.data.DataLoader(
     True, last_batch="rollover", num_workers=d2l.get_dataloader_workers())
 ```
 
-We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
+We then create and initialize the model. We use a three-layer MLP with constant hidden size 10.
 
 ```{.python .input  n=8}
 #@tab mxnet

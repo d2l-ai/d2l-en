@@ -251,7 +251,7 @@ Where each line has used the following rules:
 
 Two things should be clear after doing this example:
 
-1. Any function we can write down using sums, products, constants, powers, exponentials, and logarithms can have its derivate computed mechanically by following these rules.
+1. Any function we can write down using sums, products, constants, powers, exponentials, and logarithms can have its derivative computed mechanically by following these rules.
 2. Having a human follow these rules can be tedious and error prone!
 
 Thankfully, these two facts together hint towards a way forward: this is a perfect candidate for mechanization!  Indeed backpropagation, which we will revisit later in this section, is exactly that.
