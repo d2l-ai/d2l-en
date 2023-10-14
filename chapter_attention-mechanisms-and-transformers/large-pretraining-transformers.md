@@ -402,8 +402,31 @@ the open-sourced Llama 1 :cite:`touvron2023llama` outperformed much larger model
 
 
 
-:citet:`wei2022emergent` discussed emergent abilities of large language models that are present in larger models, but not in smaller models.
-However, simply increasing model size does not inherently make models follow human instructions better.
+
+
+
+## Prompting
+
+Large language models offer an exciting prospect
+of formulating text input to induce models to perform desired tasks via in-context learning,
+which is also known as *prompting*.
+Besides the few-shot in-context learning with the standard “question, answer” demonstrations mentioned in the previous sections,
+*chain-of-thought prompting* :cite:`wei2022chain`,
+an augmented in-context learning method
+with few-shot "question, intermediate reasoning steps, answer" demonstrations,
+elicits the complex reasoning capabilities of
+large language models
+in order to solve mathematical, commonsense, and symbolic reasoning tasks.
+Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
+and reducing complex problems to sub-problems :cite:`zhou2023least`
+can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
+large language models can even perform *zero-shot*
+chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
+Even for multimodal inputs consisting of both text and images,
+language models can perform multimodal chain-of-thought reasoning with higher accuracy than using text input only :cite:`zhang2023multicot`.
+
+Another growing area of interest is to enable the model to perform unseen tasks 
+simply by following the task instructions in the prompt.
 :citet:`wei2021finetuned,sanh2021multitask` have found that fine-tuning large language models
 on a range of datasets described via *instructions*
 can improve zero-shot performance on held-out tasks.
@@ -421,24 +444,18 @@ tasks zero-shot :cite:`qin2023chatgpt`.
 :citet:`bai2022constitutional` replaced human inputs (e.g., human-labeled data) with model outputs
 to partially automate the instruction tuning process, which is also known as *reinforcement learning from AI feedback*.
 
+:citet:`wei2022emergent` also discussed emergent abilities of large language models
+that are present in larger models, but not in smaller models, 
+including the few-shot prompting abilities and other augmented prompting abilities such as multi-step reasoning, 
+instruction following, model calibration etc.. 
+Such behavior is observed across a wide range of benchmark datasets and shows the importance of scale for improving large language model performance.
+:citet:`wei2022emergent` also pointed out that for certain tasks, 
+there may be natural intuitions for why emergence requires a model larger than a particular threshold scale 
+(e.g. a multi-step reasoning task requires X steps of sequential computation, 
+only possible with a model depth of at least certain number of layers), 
+although for certain tasks, the evaluation metric might disguise compounding incremental improvements as emergence 
+(e.g. metric that does not give credits to partial answers).
 
-Large language models offer an exciting prospect
-of formulating text input to induce models to perform desired tasks via in-context learning,
-which is also known as *prompting*.
-Notably,
-*chain-of-thought prompting* :cite:`wei2022chain`,
-an in-context learning method
-with few-shot "question, intermediate reasoning steps, answer" demonstrations,
-elicits the complex reasoning capabilities of
-large language models
-in order to solve mathematical, commonsense, and symbolic reasoning tasks.
-Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
-and reducing complex problems to sub-problems :cite:`zhou2023least`
-can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
-large language models can even perform *zero-shot*
-chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
-Even for multimodal inputs consisting of both text and images,
-language models can perform multimodal chain-of-thought reasoning with higher accuracy than using text input only :cite:`zhang2023multicot`.
 
 
 
