@@ -322,15 +322,21 @@ when there is no, one, and a few task-specific input--output examples (:numref:`
 
 These three settings were tested in GPT-3 :cite:`brown2020language`,
 whose largest version uses data and model size
-about two orders of magnitude larger than those in GPT-2.
+about two orders of magnitude larger than those in GPT-2 and is pretrained with 300 billion tokens.
 GPT-3 uses the same Transformer decoder architecture
 as its direct predecessor GPT-2
 except that attention patterns
 (at the right in :numref:`fig_gpt-decoder-only`)
 are sparser at alternating layers.
-Pretrained with 300 billion tokens,
-GPT-3 performs better with larger model size,
-where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`).
+Across all 42 accuracy-denominated benchmarks, GPT-3's performance increases steadily with model size,
+where its few-shot performance increases more rapidly, demonstrating that larger models are
+more proficient at in-context learning (:numref:`fig_gpt3-xshot-scaling`). 
+Also worth noting is the performance comparison between GPT3 and other fine-tuned models 
+(e.g. fine-tuned BERT-Large). As benchmarked on the SuperGLUE dataset, 
+with just one random example per task, few-shot GPT3 is able to achieve a comparable SuperGLUE score with the fine-tuned BERT-Large model, 
+which is trained on the full 125K SuperGLUE training set. 
+After scaling up the number of examples per task for the few-shot setup with up to 30 examples, 
+it is observed that GPT-3 requires less than eight total examples per task to outperform a fine-tuned BERT-Large on overall SuperGLUE score. 
 
 The subsequent GPT-4 model did not fully disclose technical details in its report :cite:`openai2023gpt4`.
 By contrast with its predecessors, GPT-4
