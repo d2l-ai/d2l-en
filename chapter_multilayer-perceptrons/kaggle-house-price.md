@@ -292,7 +292,7 @@ measure the discrepancy in the logarithm of the price estimates.**)
 In fact, this is also the official error measure
 used by the competition to evaluate the quality of submissions.
 After all, a small value $\delta$ for $|\log y - \log \hat{y}| \leq \delta$
-translates into $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
+translates into $e^{-\delta} \leq \frac{y}{\hat{y}} \leq e^\delta$.
 This leads to the following root-mean-squared-error between the logarithm of the predicted price and the logarithm of the label price:
 
 $$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
