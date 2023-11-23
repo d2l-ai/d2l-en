@@ -1209,7 +1209,7 @@ for video games.
 *Deep reinforcement learning*, which applies
 deep learning to reinforcement learning problems,
 has surged in popularity.
-The breakthrough deep Q-network, that beat humans
+The breakthrough deep Q-network, that beats humans
 at Atari games using only the visual input :cite:`mnih2015human`,
 and the AlphaGo program, which dethroned the world champion
 at the board game Go :cite:`Silver.Huang.Maddison.ea.2016`,
