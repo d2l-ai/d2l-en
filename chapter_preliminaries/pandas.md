@@ -192,7 +192,7 @@ the type of problems you may need to address.
 
 ## Exercises
 
-1. Try loading datasets, e.g., Abalone from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets.php) and inspect their properties. What fraction of them has missing values? What fraction of the variables is numerical, categorical, or text?
+1. Try loading datasets, e.g., Abalone from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets) and inspect their properties. What fraction of them has missing values? What fraction of the variables is numerical, categorical, or text?
 1. Try indexing and selecting data columns by name rather than by column number. The pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
 1. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, and memory footprint. Try this out on your laptop. What happens if you try it out on a server? 
 1. How would you deal with data that has a very large number of categories? What if the category labels are all unique? Should you include the latter?
