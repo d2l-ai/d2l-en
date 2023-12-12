@@ -521,12 +521,16 @@ def gpu(i=0):
     """Get a GPU device.
 
     Defined in :numref:`sec_use_gpu`"""
+    if torch.backends.mps.is_available():
+        return torch.device(f'mps:{i}')
     return torch.device(f'cuda:{i}')
 
 def num_gpus():
     """Get the number of available GPUs.
 
     Defined in :numref:`sec_use_gpu`"""
+    if torch.backends.mps.is_available():
+        return 1
     return torch.cuda.device_count()
 
 def try_gpu(i=0):
