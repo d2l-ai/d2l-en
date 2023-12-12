@@ -60,6 +60,13 @@ containing**) $s_1$ or $r_1$:
 
 (**$$(s_1, r_1), (s_1, r_2), \ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \ldots, (s_n, r_1).$$**)
 
+||$$s_1$$|$$s_2$$|...|$$s_n$$|
+|-|-|-|-|-|
+|$$r_1$$|$$s_1,r_1$$|$$s_2,r_1$$|$$...,r_1$$|$$s_n,r_1$$|
+|$$r_2$$|$$s_1,r_2$$||||
+|...|$$s_1,...$$||||
+|$$r_m$$|$$s_1,r_m$$||||
+
 That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
 
 The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of scales, and a list of aspect ratios, then this function will return all the anchor boxes.
