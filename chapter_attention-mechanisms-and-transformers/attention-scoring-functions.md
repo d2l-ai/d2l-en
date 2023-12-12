@@ -146,11 +146,7 @@ def masked_softmax(X, valid_lens):  #@save
         maxlen = X.shape[1]
         mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
             None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
-
-        if len(X.shape) == 3:
-            return tf.where(tf.expand_dims(mask, axis=-1), X, value)
-        else:
-            return tf.where(mask, X, value)
+        return tf.where(mask, X, value)
     
     if valid_lens is None:
         return tf.nn.softmax(X, axis=-1)
