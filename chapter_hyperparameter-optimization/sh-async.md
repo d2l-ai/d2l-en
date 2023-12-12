@@ -58,16 +58,16 @@ with $r = r_{\mathrm{min}}$, i.e the first rung level.
 :numref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
 finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
 immediately promote the better of them (Trial-0) to the next rung level. After Trial-0
-finishes on rung 1, there are too few trials there in order to support a further
-promotion. Hence, we continue with rung 0 and evaluate Trial-3. Once Trial-3 finishes,
-Trial-2 is still pending. At this point we have 3 trials evaluated on rung 0 and one
-trial evaluated already on rung 1. Since Trial-3 performs worse than Trial-0 at rung 0,
+finishes on Rung-1, there are too few trials there to support a further
+promotion. Hence, we continue with Rung-0 and evaluate Trial-3. Once Trial-3 finishes,
+Trial-2 is still pending. At this point we have 3 trials evaluated on Rung-0 and one
+trial evaluated already on Rung-1. Since Trial-3 performs worse than Trial-0 at Rung-0,
 and $\eta=2$, we cannot promote any new trial yet, and Worker-1 starts Trial-4 from
 scratch instead. However, once Trial-2 finishes and
-scores worse than Trial-3, the latter is promoted towards rung 1. Afterwards, we
-collected 2 evaluations on rung 1, which means we can now promote Trial-0 towards
-rung 2. At the same time, Worker-1 continues with evaluating new trials (i.e.,
-Trial-5) on rung 0.
+scores worse than Trial-3, the latter is promoted towards Rung-1. Afterwards, we
+collected 2 evaluations on Rung-1, which means we can now promote Trial-0 towards
+Rung-2. At the same time, Worker-1 continues with evaluating new trials (i.e.,
+Trial-5) on Rung-0.
 
 
 ![Asynchronous successive halving (ASHA) with two workers.](../img/asha.svg)

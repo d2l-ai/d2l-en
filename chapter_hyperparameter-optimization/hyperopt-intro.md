@@ -12,7 +12,7 @@ top of these, every neural network has additional *hyperparameters* that need
 to be configured by the user. For example, to ensure that stochastic gradient
 descent converges to a local optimum of the training loss
 (see :numref:`chap_optimization`), we have to adjust the learning rate and batch
-size. To avoid overfitting on training datasets,
+size. To avoid overfitting on the training dataset,
 we might have to set regularization parameters, such as weight decay
 (see :numref:`sec_weight_decay`) or dropout (see :numref:`sec_dropout`). We can
 define the capacity and inductive bias of the model by setting the number of
@@ -33,7 +33,7 @@ in a trial-and-error fashion, in what amounts to a time-consuming and difficult
 part of machine learning workflows. For example, consider training
 a ResNet (see :numref:`sec_resnet`) on CIFAR-10, which requires more than 2 hours
 on an Amazon Elastic Cloud Compute (EC2) `g4dn.xlarge` instance. Even just
-trying ten hyperparameter configurations in sequence, this would already take us
+trying ten hyperparameter configurations in sequence would already take us
 roughly one day. To make matters worse, hyperparameters are usually not directly
 transferable across architectures and datasets
 :cite:`feurer-arxiv22,wistuba-ml18,bardenet-icml13a`, and need to be re-optimized
@@ -170,7 +170,8 @@ Below we show a simple example of a configuration space consisting of typical
 hyperparameters of a multi-layer perceptron including their type and standard
 ranges.
 
-: Example configuration space of multi-layer perceptron
+
+: Example configuration space of a multi-layer perceptron.
 :label:`tab_example_configspace`
 
 | Name                | Type        |Hyperparameter Ranges           | log-scale |
@@ -201,7 +202,7 @@ to find well performing configurations might become infeasible.
 ## Random Search
 :label:`sec_rs`
 
-*Random search* is the first hyperparameter optimization algorithm we will
+*Random search* :cite:`bergstra-jmlr12a` is the first hyperparameter optimization algorithm we will
 consider. The main idea of random search is to independently sample from the
 configuration space until a predefined budget (e.g maximum
 number of iterations) is exhausted, and to return the best observed
@@ -258,7 +259,7 @@ While random search is very simple, it is the better alternative to grid
 search, which simply evaluates a fixed set of hyperparameters. Random search
 somewhat mitigates the curse of dimensionality :cite:`bellman-science66`, and
 can be far more efficient than grid search if the criterion most strongly
-depends on a small subset of the hyperparameters.
+depends on a small subset of the hyperparameters :cite:`bergstra-jmlr12a`.
 
 ## Exercises
 
@@ -272,8 +273,8 @@ depends on a small subset of the hyperparameters.
     3. Give a rough estimate of the number of floating point values you need to store during a forward pass on this graph. Hint: FashionMNIST has 60000 cases. Assume the required memory is dominated by the activations after each layer, and look up the layer widths in :numref:`sec_mlp-implementation`.
     5. Apart from the sheer amount of compute and storage required, what other issues would gradient-based hyperparameter optimization run into? Hint: Re-read about vanishing and exploding gradients in :numref:`sec_numerical_stability`.
     6. *Advanced*: Read :cite:`maclaurin-icml15` for an elegant (yet still somewhat unpractical) approach to gradient-based HPO.
-3. Grid search is another HPO baseline, where we define an equi-spaced grid for each hyperparameter, then iterate over the (combinatorial) Cartesian product in order to suggest configurations.
-    1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :cite:`bergstra2011algorithms`.
+3. Grid search is another HPO baseline, where we define an equispaced grid for each hyperparameter, then iterate over the (combinatorial) Cartesian product in order to suggest configurations.
+    1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :citet:`bergstra-jmlr12a`.
 
 
 :begin_tab:`pytorch`

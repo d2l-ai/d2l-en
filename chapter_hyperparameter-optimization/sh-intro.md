@@ -94,7 +94,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
         self.save_hyperparameters()
         # Compute K, which is later used to determine the number of configurations
         self.K = int(np.log(r_max / r_min) / np.log(eta))
-        # Define the rungs
+        # Define rung levels
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
         if r_max not in self.rung_levels:
             # The final rung should be r_max
