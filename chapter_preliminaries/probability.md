@@ -222,7 +222,7 @@ print("heads, tails: ", [heads, tails])
 More generally, we can simulate multiple draws
 from any variable with a finite number
 of possible outcomes
-(like the toss of a coin or roll of a die)
+(like the toss of a coin or roll of a dice)
 by calling the multinomial function,
 setting the first argument
 to the number of draws
@@ -427,7 +427,7 @@ and call it the *sample space* or *outcome space*.
 Here, each element is a distinct possible *outcome*.
 In the case of rolling a single coin,
 $\mathcal{S} = \{\textrm{heads}, \textrm{tails}\}$.
-For a single die, $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$.
+For a single dice, $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$.
 When flipping two coins, possible outcomes are
 $\{(\textrm{heads}, \textrm{heads}), (\textrm{heads}, \textrm{tails}), (\textrm{tails}, \textrm{heads}),  (\textrm{tails}, \textrm{tails})\}$.
 *Events* are subsets of the sample space.
@@ -435,10 +435,10 @@ For instance, the event "the first coin toss comes up heads"
 corresponds to the set $\{(\textrm{heads}, \textrm{heads}), (\textrm{heads}, \textrm{tails})\}$.
 Whenever the outcome $z$ of a random experiment satisfies
 $z \in \mathcal{A}$, then event $\mathcal{A}$ has occurred.
-For a single roll of a die, we could define the events
+For a single roll of a dice, we could define the events
 "seeing a $5$" ($\mathcal{A} = \{5\}$)
 and "seeing an odd number"  ($\mathcal{B} = \{1, 3, 5\}$).
-In this case, if the die came up $5$,
+In this case, if the dice came up $5$,
 we would say that both $\mathcal{A}$ and $\mathcal{B}$ occurred.
 On the other hand, if $z = 3$,
 then $\mathcal{A}$ did not occur
@@ -474,7 +474,7 @@ have zero probability of occurring.
 
 ## Random Variables
 
-When we spoke about events like the roll of a die
+When we spoke about events like the roll of a dice
 coming up odds or the first coin toss coming up heads,
 we were invoking the idea of a *random variable*.
 Formally, random variables are mappings
@@ -526,7 +526,7 @@ For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq
 
 Note that there is a subtle difference
 between *discrete* random variables,
-like flips of a coin or tosses of a die,
+like flips of a coin or tosses of a dice,
 and *continuous* ones,
 like the weight and the height of a person
 sampled at random from the population.
