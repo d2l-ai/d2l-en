@@ -320,19 +320,19 @@ Let's try to understand *why* this is a useful notion.  Below, we visualize $f^{
 
 First, consider the case that the second derivative $f^{(2)}(x)$ is a positive constant.  This means that the slope of the first derivative is positive.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. This tells us the slope of our original function $f$ and therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum as is shown in :numref:`fig_positive-second`.
 
-![If we assume the second derivative is a positive constant, then the fist derivative in increasing, which implies the function itself has a minimum.](../img/posSecDer.svg)
+![If we assume the second derivative is a positive constant, then the first derivative is increasing, which implies the function itself has a minimum.](../img/posSecDer.svg)
 :label:`fig_positive-second`
 
 
 Second, if the second derivative is a negative constant, that means that the first derivative is decreasing.  This implies the first derivative may start out positive, becomes zero at a point, and then becomes negative. Hence, the function $f$ itself increases, flattens out, then decreases.  In other words, the function $f$ curves down, and has a single maximum as is shown in :numref:`fig_negative-second`.
 
-![If we assume the second derivative is a negative constant, then the fist derivative in decreasing, which implies the function itself has a maximum.](../img/negSecDer.svg)
+![If we assume the second derivative is a negative constant, then the first derivative is decreasing, which implies the function itself has a maximum.](../img/negSecDer.svg)
 :label:`fig_negative-second`
 
 
 Third, if the second derivative is a always zero, then the first derivative will never change---it is constant!  This means that $f$ increases (or decreases) at a fixed rate, and $f$ is itself a straight line  as is shown in :numref:`fig_zero-second`.
 
-![If we assume the second derivative is zero, then the fist derivative is constant, which implies the function itself is a straight line.](../img/zeroSecDer.svg)
+![If we assume the second derivative is zero, then the first derivative is constant, which implies the function itself is a straight line.](../img/zeroSecDer.svg)
 :label:`fig_zero-second`
 
 To summarize, the second derivative can be interpreted as describing the way that the function $f$ curves.  A positive second derivative leads to a upwards curve, while a negative second derivative means that $f$ curves downwards, and a zero second derivative means that $f$ does not curve at all.
