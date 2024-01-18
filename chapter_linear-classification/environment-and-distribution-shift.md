@@ -142,7 +142,7 @@ when we believe that $y$ causes $\mathbf{x}$.
 For example, we may want to predict diagnoses
 given their symptoms (or other manifestations),
 even as the relative prevalence of diagnoses
-are changing over time.
+is changing over time.
 Label shift is the appropriate assumption here
 because diseases cause symptoms.
 In some degenerate cases the label shift
