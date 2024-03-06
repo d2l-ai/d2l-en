@@ -110,7 +110,7 @@ the mean value of the corresponding column**].
 
 ```{.python .input}
 %%tab all
-inputs = inputs.fillna(inputs.mean())
+inputs = inputs.fillna(inputs.select_dtypes(include='number').mean())
 print(inputs)
 ```
 
