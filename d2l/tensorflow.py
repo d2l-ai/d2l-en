@@ -3,6 +3,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 import numpy as np
 import tensorflow as tf
+import platform
 
 nn_Module = tf.keras.Model
 
@@ -479,11 +480,24 @@ def cpu():
 
     Defined in :numref:`sec_use_gpu`"""
     return tf.device('/CPU:0')
+
+def is_apple_silicon():
+    """Check if the code is running on Apple devices
+    with Apple Silicon.
+
+    Return True only if the code is running on Apple Silicon devices"""
+    return 'Mac' in platform.uname().node and 'arm' in platform.uname().machine
+
 def gpu(i=0):
     """Get a GPU device.
 
     Defined in :numref:`sec_use_gpu`"""
-    return tf.device(f'/GPU:{i}')
+    if is_apple_silicon():
+        if num_gpus() == 0:
+            raise RuntimeError('Install TensorFlow-Metal!')
+        return tf.device(f'/physical_device:GPU:{i}')
+    else:
+        return tf.device(f'/GPU:{i}')
 
 def num_gpus():
     """Get the number of available GPUs.
