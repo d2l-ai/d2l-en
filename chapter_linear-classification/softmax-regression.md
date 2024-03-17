@@ -538,7 +538,7 @@ the item with the largest score is the most likely one to be chosen :cite:`Bradl
     1. Extend this to more than two numbers.
 1. The function $g(\mathbf{x}) \stackrel{\textrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
     1. Prove that the function is convex. Hint: to do so, use the fact that the first derivative amounts to the probabilities from the softmax function and show that the second derivative is the variance.
-    1. Show that $g$ is translation invariant, i.e., $g(\mathbf{x} + b) = g(\mathbf{x})$.
+    1. Show that $g$ is translation equivariant, i.e., $g(\mathbf{x} - b) = g(\mathbf{x}) - b$.
     1. What happens if some of the coordinates $x_i$ are very large? What happens if they're all very small?
     1. Show that if we choose $b = \mathrm{max}_i x_i$ we end up with a numerically stable implementation.
 1. Assume that we have some probability distribution $P$. Suppose we pick another distribution $Q$ with $Q(i) \propto P(i)^\alpha$ for $\alpha > 0$.
