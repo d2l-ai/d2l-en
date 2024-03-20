@@ -351,7 +351,7 @@ which is a generalized version of the diamond case in :numref:`fig_projections`.
 In the context of deep learning the main purpose of convex functions is to motivate optimization algorithms and help us understand them in detail. In the following we will see how gradient descent and stochastic gradient descent can be derived accordingly.
 
 
-* Intersections of convex sets are convex. Unions are not.
+* Intersections of convex sets are convex. Unions may not be.
 * The expectation of a convex function is no less than the convex function of an expectation (Jensen's inequality).
 * A twice-differentiable function is convex if and only if its Hessian (a matrix of second derivatives) is positive semidefinite.
 * Convex constraints can be added via the Lagrangian. In practice we may simply add them with a penalty to the objective function.
