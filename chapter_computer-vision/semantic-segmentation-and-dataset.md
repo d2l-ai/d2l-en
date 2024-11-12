@@ -39,7 +39,7 @@ distinguish them from semantic segmentation as follows.
 
 ## The Pascal VOC2012 Semantic Segmentation Dataset
 
-[**On of the most important semantic segmentation dataset
+[**One of the most important semantic segmentation dataset
 is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/).**]
 In the following,
 we will take a look at this dataset.

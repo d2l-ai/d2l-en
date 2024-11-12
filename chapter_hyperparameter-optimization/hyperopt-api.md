@@ -178,7 +178,7 @@ def bookkeeping(self, config: dict, error: float, runtime: float):
 
 We now use our new implementation of random search to optimize the
 *batch size* and *learning rate* of the `LeNet` convolutional neural network
-from :numref:`sec_lenet`. We being by defining the objective function, which
+from :numref:`sec_lenet`. We begin by defining the objective function, which
 will once more be validation error.
 
 ```{.python .input  n=9}
