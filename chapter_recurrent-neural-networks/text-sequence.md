@@ -204,7 +204,7 @@ we [**package everything into the following
 which returns `corpus`, a list of token indices, and `vocab`,
 the vocabulary of *The Time Machine* corpus.
 The modifications we did here are:
-(i) we tokenize text into characters, not words,
+(i) we tokenize text into words, not characters,
 to simplify the training in later sections;
 (ii) `corpus` is a single list, not a list of token lists,
 since each text line in *The Time Machine* dataset
