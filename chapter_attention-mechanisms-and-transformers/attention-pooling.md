@@ -8,7 +8,7 @@ At their core, Nadaraya--Watson estimators rely on some similarity kernel $\alph
 $$\begin{aligned}
 \alpha(\mathbf{q}, \mathbf{k}) & = \exp\left(-\frac{1}{2} \|\mathbf{q} - \mathbf{k}\|^2 \right) && \textrm{Gaussian;} \\
 \alpha(\mathbf{q}, \mathbf{k}) & = 1 \textrm{ if } \|\mathbf{q} - \mathbf{k}\| \leq 1 && \textrm{Boxcar;} \\
-\alpha(\mathbf{q}, \mathbf{k}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right) && \textrm{Epanechikov.}
+\alpha(\mathbf{q}, \mathbf{k}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right) && \textrm{Epanechnikov.}
 \end{aligned}
 $$
 
@@ -77,16 +77,16 @@ def constant(x):
     return 1.0 + 0 * x
  
 if tab.selected('pytorch'):
-    def epanechikov(x):
+    def epanechnikov(x):
         return torch.max(1 - d2l.abs(x), torch.zeros_like(x))
 if tab.selected('mxnet'):
-    def epanechikov(x):
+    def epanechnikov(x):
         return np.maximum(1 - d2l.abs(x), 0)
 if tab.selected('tensorflow'):
-    def epanechikov(x):
+    def epanechnikov(x):
         return tf.maximum(1 - d2l.abs(x), 0)
 if tab.selected('jax'):
-    def epanechikov(x):
+    def epanechnikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
 ```
 
@@ -94,8 +94,8 @@ if tab.selected('jax'):
 %%tab all
 fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
 
-kernels = (gaussian, boxcar, constant, epanechikov)
-names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
+kernels = (gaussian, boxcar, constant, epanechnikov)
+names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechnikov')
 x = d2l.arange(-2.5, 2.5, 0.1)
 for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('pytorch', 'mxnet', 'tensorflow'):
@@ -191,14 +191,14 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 
-The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function. Only the constant kernel that leads to the trivial estimate $f(x) = \frac{1}{n} \sum_i y_i$ produces a rather unrealistic result. Let's inspect the attention weighting a bit more closely:
+The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechnikov) produce fairly workable estimates that are not too far from the true function. Only the constant kernel that leads to the trivial estimate $f(x) = \frac{1}{n} \sum_i y_i$ produces a rather unrealistic result. Let's inspect the attention weighting a bit more closely:
 
 ```{.python .input}
 %%tab all
 plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)
 ```
 
-The visualization clearly shows why the estimates for Gaussian, Boxcar, and Epanechikov are very similar: after all, they are derived from very similar attention weights, despite the different functional form of the kernel. This raises the question as to whether this is always the case. 
+The visualization clearly shows why the estimates for Gaussian, Boxcar, and Epanechnikov are very similar: after all, they are derived from very similar attention weights, despite the different functional form of the kernel. This raises the question as to whether this is always the case. 
 
 ## [**Adapting Attention Pooling**]
 
