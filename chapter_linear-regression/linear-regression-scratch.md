@@ -348,7 +348,7 @@ def prepare_batch(self, batch):
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
-    self.model.train()        
+    self.model.training = True
     for batch in self.train_dataloader:        
         loss = self.model.training_step(self.prepare_batch(batch))
         self.optim.zero_grad()
@@ -360,7 +360,7 @@ def fit_epoch(self):
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
-    self.model.eval()
+    self.model.training = False
     for batch in self.val_dataloader:
         with torch.no_grad():            
             self.model.validation_step(self.prepare_batch(batch))
