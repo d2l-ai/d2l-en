@@ -63,7 +63,7 @@ def save_hyperparameters(self, ignore=[]):
         setattr(self, k, v)
 ```
 
-Progress bar.
+Progress board.
 
 ```{.python .input  n=22}
 %%tab all
