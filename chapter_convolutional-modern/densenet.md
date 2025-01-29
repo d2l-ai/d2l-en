@@ -494,7 +494,7 @@ applying DenseNet may require more memory-efficient implementations that may inc
 ## Exercises
 
 1. Why do we use average pooling rather than max-pooling in the transition layer?
-1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?
+1. One of the advantages mentioned in the DenseNet paper is that its model parameters are fewer than those of ResNet. Why is this the case?
 1. One problem for which DenseNet has been criticized is its high memory consumption.
     1. Is this really the case? Try to change the input shape to $224\times 224$ to compare the actual GPU memory consumption empirically.
     1. Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
