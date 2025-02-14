@@ -463,10 +463,10 @@ import jax
 
 y = lambda x: x * x
 # jax.lax primitives are Python wrappers around XLA operations
-u = jax.lax.stop_gradient(y(x))
-z = lambda x: u * x
-
-grad(lambda x: z(x).sum())(x) == y(x)
+(
+    grad(lambda x: (y(x) * x).sum())(x) == 3 * y(x),
+    grad(lambda x: (jax.lax.stop_gradient(y(x)) * x).sum())(x) == y(x),
+)
 ```
 
 Note that while this procedure
