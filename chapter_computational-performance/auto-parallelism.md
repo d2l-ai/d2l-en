@@ -27,7 +27,7 @@ import torch
 
 ## Parallel Computation on GPUs
 
-Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
+Let's start by defining a reference workload to test: the `run` function below performs 50 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
 
 ```{.python .input}
 #@tab mxnet
