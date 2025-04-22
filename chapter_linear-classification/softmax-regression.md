@@ -245,7 +245,7 @@ Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$
 of $n$ examples with dimensionality (number of inputs) $d$.
 Moreover, assume that we have $q$ categories in the output.
 Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
-and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
+and the bias satisfies $\mathbf{b} \in \mathbb{R}^{n \times q}$.
 
 $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
 :eqlabel:`eq_minibatch_softmax_reg`
