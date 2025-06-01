@@ -642,8 +642,8 @@ While regression models are great
 for addressing *how many?* questions,
 lots of problems do not fit comfortably in this template.
 Consider, for example, a bank that wants
-to develop a check scanning feature for its mobile app.
-Ideally, the customer would simply snap a photo of a check
+to develop a cheque scanning feature for its mobile app.
+Ideally, the customer would simply snap a photo of a cheque
 and the app would automatically recognize the text from the image.
 Assuming that we had some ability
 to segment out image patches
@@ -1615,7 +1615,7 @@ have been deployed since the 1990s.
 This is, after all, the source
 of the famous MNIST dataset
 of handwritten digits.
-The same applies to reading checks for bank deposits and scoring
+The same applies to reading cheques for bank deposits and scoring
 creditworthiness of applicants.
 Financial transactions are checked for fraud automatically.
 This forms the backbone of many e-commerce payment systems,
