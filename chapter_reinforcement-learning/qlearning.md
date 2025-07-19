@@ -1,3 +1,4 @@
+
 ```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(["pytorch"])
@@ -132,9 +133,12 @@ def q_learning(env_info, gamma, num_iters, alpha, epsilon):
             action = e_greedy(env, Q, state, epsilon)
             next_state, reward, done, _ = env.step(action)
 
-            # Q-update:
-            y = reward + gamma * np.max(Q[next_state,:])
-            Q[state, action] = Q[state, action] + alpha * (y - Q[state, action])
+           # Q-learning new update: Q(s,a) ← Q(s,a) + α[r + γ max Q(s',a') − Q(s,a)]
+           #corrected Q -block code 
+            td_target = reward + gamma * np.max(Q[next_state, :])
+            td_error = td_target - Q[state, action]
+            Q[state, action] += alpha * td_error
+
 
             # Move to the next state
             state = next_state
