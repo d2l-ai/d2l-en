@@ -827,7 +827,7 @@ class MTFraEng(d2l.DataModule):
         """Defined in :numref:`sec_machine_translation`"""
         src, tgt = [], []
         for i, line in enumerate(text.split('\n')):
-            if max_examples and i > max_examples: break
+            if max_examples and i >= max_examples: break
             parts = line.split('\t')
             if len(parts) == 2:
                 # Skip empty tokens
@@ -978,6 +978,11 @@ class Seq2Seq(d2l.EncoderDecoder):
     def configure_optimizers(self):
         # Adam optimizer is used here
         return tf.keras.optimizers.Adam(learning_rate=self.lr)
+
+    def loss(self, Y_hat, Y):
+        l = super(Seq2Seq, self).loss(Y_hat, Y, averaged=False)
+        mask = tf.cast(tf.reshape(Y, -1) != self.tgt_pad, tf.float32)
+        return tf.reduce_sum(l * mask) / tf.reduce_sum(mask)
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.

@@ -1028,7 +1028,7 @@ class MTFraEng(d2l.DataModule):
         """Defined in :numref:`sec_machine_translation`"""
         src, tgt = [], []
         for i, line in enumerate(text.split('\n')):
-            if max_examples and i > max_examples: break
+            if max_examples and i >= max_examples: break
             parts = line.split('\t')
             if len(parts) == 2:
                 # Skip empty tokens
@@ -1199,6 +1199,17 @@ class Seq2Seq(d2l.EncoderDecoder):
     def configure_optimizers(self):
         # Adam optimizer is used here
         return optax.adam(learning_rate=self.lr)
+    
+    @partial(jax.jit, static_argnums=(0, 5))
+    def loss(self, params, X, Y, state, averaged=False):
+        Y_hat = state.apply_fn({'params': params}, *X,
+                            rngs={'dropout': state.dropout_rng})
+        Y_hat = Y_hat.reshape((-1, Y_hat.shape[-1]))
+        Y = Y.reshape((-1,))
+        fn = optax.softmax_cross_entropy_with_integer_labels
+        l = fn(Y_hat, Y)
+        mask = (Y.reshape(-1) != self.tgt_pad).astype(jnp.float32)
+        return (l * mask).sum() / mask.sum(), {}
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
