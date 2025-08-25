@@ -60,6 +60,20 @@ $$\mathbb{E}_i \nabla f_i(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\m
 
 This means that, on average, the stochastic gradient is a good estimate of the gradient.
 
+Modern analyses of SGD trace back to the **Robbins–Monro** stochastic approximation framework :cite:`robbins1951stochastic`. In that view, SGD seeks a root of the gradient mapping using a decreasing stepsize sequence that satisfies
+
+$$
+\sum_{t=0}^\infty \eta_t = \infty \quad \text{and} \quad \sum_{t=0}^\infty \eta_t^2 < \infty,
+$$
+
+which ensures convergence under mild regularity conditions. A standard assumption in contemporary proofs is **bounded variance** of the stochastic gradient noise:
+
+$$
+\mathbb{E}\!\left[\|\nabla f_{i_t}(x_t)-\nabla f(x_t)\|^2 \mid x_t\right] \le \sigma^2 .
+$$
+
+together with lower-bounded objectives and smoothness (Lipschitz gradients). Under these, one obtains the classical $\mathcal{O}(1/\sqrt{T})$ rate for convex problems with appropriately decayed $\{\eta_t\}$, and constant-stepsize variants converge to a noise-dominated neighborhood. See :cite:`bottou2018optimization` for a tutorial-style survey.
+
 Now, we will compare it with gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a stochastic gradient descent.
 
 ```{.python .input}
