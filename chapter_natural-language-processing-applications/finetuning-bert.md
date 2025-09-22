@@ -139,7 +139,7 @@ is just a segment of text (text span) from the passage that the question is abou
 To explain,
 consider a passage
 "Some experts report that a mask's efficacy is inconclusive. However, mask makers insist that their products, such as N95 respirator masks, can guard against the virus."
-and a question "Who say that N95 respirator masks can guard against the virus?".
+and a question "Who says that N95 respirator masks can guard against the virus?".
 The answer should be the text span "mask makers" in the passage.
 Thus, the goal in SQuAD v1.1 is to predict the start and end of the text span in the passage given a pair of question and passage.
 
