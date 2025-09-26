@@ -117,7 +117,7 @@ We illustrate this process in the figure below.
 ```{.python .input}
 def rbfkernel(x1, x2, ls=4.):  #@save
     dist = distance_matrix(np.expand_dims(x1, 1), np.expand_dims(x2, 1))
-    return np.exp(-(1. / ls / 2) * (dist ** 2))
+    return np.exp(-(1. / ls**2 / 2) * (dist ** 2))
 
 x_points = np.linspace(0, 5, 50)
 meanvec = np.zeros(len(x_points))
