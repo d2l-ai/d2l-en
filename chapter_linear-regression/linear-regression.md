@@ -568,7 +568,7 @@ is to assume that observations arise from noisy measurements,
 where the noise $\epsilon$ follows the normal distribution 
 $\mathcal{N}(0, \sigma^2)$:
 
-$$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \textrm{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
+$$y = (\mathbf{w}^\*)^\top \mathbf{x} + b^\* + \epsilon \textrm{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
 
 Thus, we can now write out the *likelihood*
 of seeing a particular $y$ for a given $\mathbf{x}$ via
