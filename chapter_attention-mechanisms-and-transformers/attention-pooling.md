@@ -8,7 +8,7 @@ At their core, Nadaraya--Watson estimators rely on some similarity kernel $\alph
 $$\begin{aligned}
 \alpha(\mathbf{q}, \mathbf{k}) & = \exp\left(-\frac{1}{2} \|\mathbf{q} - \mathbf{k}\|^2 \right) && \textrm{Gaussian;} \\
 \alpha(\mathbf{q}, \mathbf{k}) & = 1 \textrm{ if } \|\mathbf{q} - \mathbf{k}\| \leq 1 && \textrm{Boxcar;} \\
-\alpha(\mathbf{q}, \mathbf{k}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right) && \textrm{Epanechikov.}
+\alpha(\mathbf{q}, \mathbf{k}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right) && \textrm{Triangular.}
 \end{aligned}
 $$
 
@@ -77,16 +77,16 @@ def constant(x):
     return 1.0 + 0 * x
  
 if tab.selected('pytorch'):
-    def epanechikov(x):
+    def triangular(x):
         return torch.max(1 - d2l.abs(x), torch.zeros_like(x))
 if tab.selected('mxnet'):
-    def epanechikov(x):
+    def triangular(x):
         return np.maximum(1 - d2l.abs(x), 0)
 if tab.selected('tensorflow'):
-    def epanechikov(x):
+    def triangular(x):
         return tf.maximum(1 - d2l.abs(x), 0)
 if tab.selected('jax'):
-    def epanechikov(x):
+    def triangular(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
 ```
 
@@ -94,8 +94,8 @@ if tab.selected('jax'):
 %%tab all
 fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
 
-kernels = (gaussian, boxcar, constant, epanechikov)
-names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
+kernels = (gaussian, boxcar, constant, triangular)
+names = ('Gaussian', 'Boxcar', 'Constant', 'Triangular')
 x = d2l.arange(-2.5, 2.5, 0.1)
 for kernel, name, ax in zip(kernels, names, axes):
     if tab.selected('pytorch', 'mxnet', 'tensorflow'):
