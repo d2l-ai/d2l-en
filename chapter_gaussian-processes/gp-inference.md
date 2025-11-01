@@ -330,8 +330,8 @@ with torch.no_grad():
     ax.plot(test_x.numpy(), observed_pred.mean.numpy(), linewidth=2.)
     ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.25)
     ax.set_ylim([-1.5, 1.5])
-    ax.legend(['True Function', 'Predictive Mean', 'Observed Data',
-               '95% Credible Set'])
+    ax.legend(['Observed Data', 'True Function', 'Predictive Mean', '95% Credible Set'])
+
 ```
 
 Finally, we plot the fit.
