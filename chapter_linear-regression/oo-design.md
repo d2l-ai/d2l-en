@@ -194,7 +194,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         raise NotImplementedError
 
     def forward(self, X):
-        assert hasattr(self, 'net'), 'Neural network is defined'
+        assert hasattr(self, 'net'), 'Neural network is not defined'
         return self.net(X)
 
     def plot(self, key, value, train):
