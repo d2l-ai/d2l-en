@@ -98,10 +98,10 @@ then execute the following command:
 
 ```bash
 # For macOS and Linux users
-pip install mxnet-cu112==1.9.1
+python -m pip install mxnet-cu112==1.9.1
 
 # For Windows users
-pip install mxnet-cu112==1.9.1 -f https://dist.mxnet.io/python
+python -m pip install mxnet-cu112==1.9.1 -f https://dist.mxnet.io/python
 ```
 
 
@@ -115,7 +115,7 @@ you can install the CPU version
 as follows:
 
 ```bash
-pip install mxnet==1.9.1
+python -m pip install mxnet==1.9.1
 ```
 
 
@@ -127,7 +127,7 @@ pip install mxnet==1.9.1
 You can install PyTorch (the specified versions are tested at the time of writing) with either CPU or GPU support as follows:
 
 ```bash
-pip install torch==2.0.0 torchvision==0.15.1
+python -m pip install torch==2.0.0 torchvision==0.15.1
 ```
 
 
@@ -137,7 +137,7 @@ pip install torch==2.0.0 torchvision==0.15.1
 You can install TensorFlow with either CPU or GPU support as follows:
 
 ```bash
-pip install tensorflow==2.12.0 tensorflow-probability==0.20.0
+python -m pip install tensorflow==2.12.0 tensorflow-probability==0.20.0
 ```
 
 
@@ -148,7 +148,7 @@ You can install JAX and Flax with either CPU or GPU support as follows:
 
 ```bash
 # GPU
-pip install "jax[cuda11_pip]==0.4.13" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html flax==0.7.0
+python -m pip install "jax[cuda11_pip]==0.4.13" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html flax==0.7.0
 ```
 
 
@@ -159,7 +159,7 @@ as follows:
 
 ```bash
 # CPU
-pip install "jax[cpu]==0.4.13" flax==0.7.0
+python -m pip install "jax[cpu]==0.4.13" flax==0.7.0
 ```
 
 
@@ -173,7 +173,7 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l==1.0.3
+python -m pip install d2l==1.0.3
 ```
 
 
