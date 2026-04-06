@@ -84,8 +84,8 @@ from d2l import torch as d2l
 seed = 0  # Random number generator seed
 gamma = 0.95  # Discount factor
 num_iters = 256  # Number of iterations
-alpha   = 0.9  # Learing rate
-epsilon = 0.9  # Epsilon in epsilion gready algorithm
+alpha   = 0.9  # Learning rate
+epsilon = 0.9  # Epsilon in epsilon greedy algorithm
 random.seed(seed)  # Set the random seed
 np.random.seed(seed)
 
