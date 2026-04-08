@@ -55,7 +55,7 @@ loss = gluon.loss.SoftmaxCELoss()
 net = d2l.BERTModel(len(vocab), num_hiddens=128, 
                     ffn_num_hiddens=256, num_heads=2, num_blks=2, dropout=0.2)
 devices = d2l.try_all_gpus()
-loss = nn.CrossEntropyLoss()
+loss = nn.CrossEntropyLoss(reduction='none')
 ```
 
 Before defining the training loop,
@@ -115,7 +115,7 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X,
     mlm_weights_X.reshape(-1, 1)
     mlm_l = mlm_l.sum() / (mlm_weights_X.sum() + 1e-8)
     # Compute next sentence prediction loss
-    nsp_l = loss(nsp_Y_hat, nsp_y)
+    nsp_l = loss(nsp_Y_hat, nsp_y).mean()
     l = mlm_l + nsp_l
     return mlm_l, nsp_l, l
 ```
