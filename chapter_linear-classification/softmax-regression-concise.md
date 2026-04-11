@@ -196,7 +196,9 @@ def loss(self, Y_hat, Y, averaged=True):
         return F.cross_entropy(
             Y_hat, Y, reduction='mean' if averaged else 'none')
     if tab.selected('tensorflow'):
-        fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        fn = tf.keras.losses.SparseCategoricalCrossentropy(
+            from_logits=True,
+            reduction='sum_over_batch_size' if averaged else 'none')
         return fn(Y, Y_hat)
 ```
 
