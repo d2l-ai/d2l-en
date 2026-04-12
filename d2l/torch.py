@@ -2878,7 +2878,7 @@ def show_value_function_progress(env_desc, V, pi):
         # LEFT action: 0, DOWN action: 1
         # RIGHT action: 2, UP action: 3
         action2dxdy = {0:(-.25, 0),1: (0, .25),
-                       2:(0.25, 0),3: (-.25, 0)}
+                       2:(0.25, 0),3: (0, -.25)}
 
         for y in range(4):
             for x in range(4):
@@ -2945,7 +2945,7 @@ def show_Q_function_progress(env_desc, V_all, pi_all):
         # LEFT action: 0, DOWN action: 1
         # RIGHT action: 2, UP action: 3
         action2dxdy = {0:(-.25, 0),1:(0, .25),
-                       2:(0.25, 0),3:(-.25, 0)}
+                       2:(0.25, 0),3:(0, -.25)}
 
         for y in range(4):
             for x in range(4):
