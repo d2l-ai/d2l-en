@@ -296,7 +296,7 @@ class TextCNN(nn.Module):
         self.decoder = nn.Linear(sum(num_channels), 2)
         # The max-over-time pooling layer has no parameters, so this instance
         # can be shared
-        self.pool = nn.AdaptiveAvgPool1d(1)
+        self.pool = nn.AdaptiveMaxPool1d(1)
         self.relu = nn.ReLU()
         # Create multiple one-dimensional convolutional layers
         self.convs = nn.ModuleList()
