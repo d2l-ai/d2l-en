@@ -235,8 +235,8 @@ def _remove_footnote_trailing_space(lines):
 def _add_extra_line_before_endbib(lines):
     for i, l in enumerate(lines):
         if l.startswith('\\end{sphinxthebibliography}'):
-            break
-    lines.insert(i, '')
+            lines.insert(i, '')
+            return
 
 # \index{xx} -> xx
 def _remove_index(lines):
