@@ -59,14 +59,16 @@ def _pagenumbering(lines):
     INTRONUMS = ['\\mainmatter', '\\pagenumbering{arabic}', '\\setcounter{page}{1}']
     CHAPINTRO = '\\chapter{Introduction}'
     chapintro_i = -1
+    frontnums_i = -1
     for i, l in enumerate(lines):
         if l.startswith(BEGINDOC):
             frontnums_i = i + 1
         elif l.startswith(CHAPINTRO):
             chapintro_i = i
             break
-    for i, v in enumerate(FRONTNUMS):
-        lines.insert(frontnums_i + i, v)
+    if frontnums_i >= 0:
+        for i, v in enumerate(FRONTNUMS):
+            lines.insert(frontnums_i + i, v)
     for i, v in enumerate(INTRONUMS):
         if chapintro_i > 0:
             lines.insert(chapintro_i + len(FRONTNUMS) + i, v)
