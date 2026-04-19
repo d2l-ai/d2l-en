@@ -1524,8 +1524,8 @@ def load_data_fashion_mnist(batch_size, resize=None):
     resize_fn = lambda X, y: (
         tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
     return (
-        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
-            batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
+        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).shuffle(
+            len(mnist_train[0])).batch(batch_size).map(resize_fn),
         tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
             batch_size).map(resize_fn))
 
