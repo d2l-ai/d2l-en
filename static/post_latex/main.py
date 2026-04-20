@@ -33,7 +33,7 @@ def _unnumber_chaps_and_secs(lines):
                 lines[i] = l.replace('section{', 'section*{')
 
     # Since we inserted '\n' in some lines[i], re-build the list
-    lines = '\n'.join(lines).split('\n')
+    lines[:] = '\n'.join(lines).split('\n')
 
 
 # If label is of chap*/index.md title, its numref is Chapter X instead of Section X
