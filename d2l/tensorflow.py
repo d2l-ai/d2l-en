@@ -155,9 +155,10 @@ class ProgressBoard(d2l.HyperParameters):
         axes = self.axes if self.axes else d2l.plt.gca()
         if self.xlim: axes.set_xlim(self.xlim)
         if self.ylim: axes.set_ylim(self.ylim)
-        if not self.xlabel: self.xlabel = self.x
-        axes.set_xlabel(self.xlabel)
-        axes.set_ylabel(self.ylabel)
+        if self.xlabel is not None:
+            axes.set_xlabel(self.xlabel)
+        if self.ylabel is not None:
+            axes.set_ylabel(self.ylabel)
         axes.set_xscale(self.xscale)
         axes.set_yscale(self.yscale)
         axes.legend(plt_lines, labels)
