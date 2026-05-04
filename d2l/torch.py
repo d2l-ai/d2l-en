@@ -3388,7 +3388,7 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
         self.reduction='none'
         unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(
             pred.permute(0, 2, 1), label)
-        weighted_loss = (unweighted_loss * weights).mean(dim=1)
+        weighted_loss = (unweighted_loss * weights).sum(dim=1)
         return weighted_loss
 
 def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
@@ -3512,4 +3512,5 @@ reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
 expand_dims = lambda x, *args, **kwargs: x.unsqueeze(*args, **kwargs)
 swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
 repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
+
 
