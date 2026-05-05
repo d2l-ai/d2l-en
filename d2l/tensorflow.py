@@ -1897,7 +1897,7 @@ class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
         label_one_hot = tf.one_hot(label, depth=pred.shape[-1])
         unweighted_loss = tf.keras.losses.CategoricalCrossentropy(
             from_logits=True, reduction='none')(label_one_hot, pred)
-        weighted_loss = tf.reduce_mean((unweighted_loss*weights), axis=1)
+        weighted_loss = tf.reduce_sum((unweighted_loss*weights), axis=1)
         return weighted_loss
 
 def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
