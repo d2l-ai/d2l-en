@@ -95,7 +95,7 @@ sudo fc-cache -f -v
 
 - release d2lbook
 - [optional, only for hardcopy books or partner products]
-    - fix versions of libs in [setup.py](http://setup.py) → requirements and static/build.yml (including d2lbook)
+    - fix versions of libs in [setup.py](./setup.py) → requirements and static/build.yml (including d2lbook)
     - re-evaluate
     - fix d2l version (to appear on pypi below) in installation
 - add docstring for d2l.xxx
@@ -129,7 +129,7 @@ sudo fc-cache -f -v
 - [optional, only for hardcopy books]
     - config.ini: other_file_s3urls
 - [optional, only for hardcopy books or partner products]
-    - restore versions of libs in [setup.py](http://setup.py) → requirements
+    - restore versions of libs in [setup.py](./setup.py) → requirements
  
 ### d2l-zh
 

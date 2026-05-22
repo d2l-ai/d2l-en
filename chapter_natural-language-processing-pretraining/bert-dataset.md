@@ -49,7 +49,7 @@ at the end of this section.
 #@tab all
 #@save
 d2l.DATA_HUB['wikitext-2'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/'
+    'https://raw.githubusercontent.com/LogSSim/deeplearning_d2l_classes/main/class14_BERT/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
 #@save

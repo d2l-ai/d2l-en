@@ -2272,7 +2272,7 @@ class BERTModel(nn.Block):
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 
 d2l.DATA_HUB['wikitext-2'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/'
+    'https://raw.githubusercontent.com/LogSSim/deeplearning_d2l_classes/main/class14_BERT/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
 def _read_wiki(data_dir):
@@ -2285,7 +2285,6 @@ def _read_wiki(data_dir):
                   for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(paragraphs)
     return paragraphs
-
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     """Defined in :numref:`sec_bert-dataset`"""
     if random.random() < 0.5:
