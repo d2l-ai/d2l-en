@@ -172,7 +172,7 @@ class Vocab:  #@save
         return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self, indices):
-        if hasattr(indices, '__len__') and len(indices) > 1:
+        if hasattr(indices, '__len__'):
             return [self.idx_to_token[int(index)] for index in indices]
         return self.idx_to_token[indices]
 
