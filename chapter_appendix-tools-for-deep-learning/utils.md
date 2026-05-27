@@ -108,7 +108,7 @@ def draw(self, x, y, label, every_n=1):
     display.clear_output(wait=True)
 ```
 
-Add FrozenLake enviroment
+Add FrozenLake environment
 ```{.python .input}
 %%tab pytorch
 
@@ -145,7 +145,7 @@ def frozen_lake(seed): #@save
 
 ```
 
-Create enviroment
+Create environment
 ```{.python .input}
 %%tab pytorch
 
