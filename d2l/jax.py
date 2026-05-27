@@ -1028,7 +1028,7 @@ class MTFraEng(d2l.DataModule):
         """Defined in :numref:`sec_machine_translation`"""
         src, tgt = [], []
         for i, line in enumerate(text.split('\n')):
-            if max_examples and i > max_examples: break
+            if max_examples and i >= max_examples: break
             parts = line.split('\t')
             if len(parts) == 2:
                 # Skip empty tokens
