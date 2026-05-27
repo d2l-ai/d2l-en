@@ -36,7 +36,7 @@ trials, i.e., Trial-0 and Trial-3 to the next rung level. This causes idle time 
 Worker-1. Then, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
 which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only
 the best trial, Trial-0, remains which occupies only one worker. To avoid that
-Worker-1 idles during that time, most implementaitons of SH continue already with
+Worker-1 idles during that time, most implementations of SH continue already with
 the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 
 ![Synchronous successive halving with two workers.](../img/sync_sh.svg)

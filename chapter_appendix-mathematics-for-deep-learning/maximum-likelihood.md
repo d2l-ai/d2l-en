@@ -130,7 +130,7 @@ This can be written into code, and freely optimized even for billions of coin fl
 n_H = 8675309
 n_T = 256245
 
-# Initialize our paramteres
+# Initialize our parameters
 theta = np.array(0.5)
 theta.attach_grad()
 
@@ -152,7 +152,7 @@ theta, n_H / (n_H + n_T)
 n_H = 8675309
 n_T = 256245
 
-# Initialize our paramteres
+# Initialize our parameters
 theta = torch.tensor(0.5, requires_grad=True)
 
 # Perform gradient descent
@@ -174,7 +174,7 @@ theta, n_H / (n_H + n_T)
 n_H = 8675309
 n_T = 256245
 
-# Initialize our paramteres
+# Initialize our parameters
 theta = tf.Variable(tf.constant(0.5))
 
 # Perform gradient descent
