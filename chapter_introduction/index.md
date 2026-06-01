@@ -1333,7 +1333,7 @@ is perfectly described by a linear model.
 
 Even in the middle ages, mathematicians
 had a keen intuition of estimates.
-For instance, the geometry book of [Jacob Köbel (1460--1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry)
+For instance, the geometry book of [Jacob Köbel (1460--1533)](https://old.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry)
 illustrates averaging the length of 16 adult men's feet
 to estimate the typical foot length in the population (:numref:`fig_koebel`).
 
