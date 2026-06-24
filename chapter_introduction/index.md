@@ -1027,9 +1027,9 @@ of the peculiar tendency of Germans
 to place the verbs at the end of sentences:
 
 ```text
-German:           Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?
+German:           Haben Sie sich dieses grossartige Lehrwerk schon angeschaut?
 English:          Have you already looked at this excellent textbook?
-Wrong alignment:  Have you yourself already this excellent textbook looked at?
+Wrong alignment:  Have you yourself this excellent textbook already looked at?
 ```
 
 
