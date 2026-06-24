@@ -3,7 +3,7 @@ USE_PYTORCH = False
 USE_TENSORFLOW = False
 
 DATA_HUB = dict()
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+DATA_URL = 'https://d2l-data.s3-accelerate.amazonaws.com/'
 
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
@@ -3123,6 +3123,18 @@ def download(url, folder='../data', sha1_hash=None):
         f.write(r.content)
     return fname
 
+def _safe_tar_extract(tar, path):
+    """Extract tar members, rejecting path traversal entries."""
+    if hasattr(tarfile, 'data_filter'):
+        tar.extractall(path, filter='data')
+        return
+    safe_members = [
+        member for member in tar.getmembers()
+        if not member.name.startswith(('/', '..'))
+        and '..' not in member.name.split('/')
+    ]
+    tar.extractall(path, members=safe_members)
+
 def extract(filename, folder=None):
     """Extract a zip/tar file into folder.
 
@@ -3130,13 +3142,14 @@ def extract(filename, folder=None):
     base_dir = os.path.dirname(filename)
     _, ext = os.path.splitext(filename)
     assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
-    if ext == '.zip':
-        fp = zipfile.ZipFile(filename, 'r')
-    else:
-        fp = tarfile.open(filename, 'r')
     if folder is None:
         folder = base_dir
-    fp.extractall(folder)
+    if ext == '.zip':
+        with zipfile.ZipFile(filename, 'r') as fp:
+            fp.extractall(folder)
+    else:
+        with tarfile.open(filename, 'r') as fp:
+            _safe_tar_extract(fp, folder)
 
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file.
@@ -3146,12 +3159,13 @@ def download_extract(name, folder=None):
     base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
-        fp = zipfile.ZipFile(fname, 'r')
+        with zipfile.ZipFile(fname, 'r') as fp:
+            fp.extractall(base_dir)
     elif ext in ('.tar', '.gz'):
-        fp = tarfile.open(fname, 'r')
+        with tarfile.open(fname, 'r') as fp:
+            _safe_tar_extract(fp, base_dir)
     else:
         assert False, 'Only zip/tar files can be extracted.'
-    fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
 
