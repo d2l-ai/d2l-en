@@ -536,7 +536,7 @@ class ResNeXtBlock(nn.Block):  #@save
         self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
                                strides=1)
         self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1, 
-                               strides=strides, groups=bot_channels//groups)
+                               strides=strides, groups=groups)
         self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
                                strides=1)
         self.bn1 = nn.BatchNorm()
