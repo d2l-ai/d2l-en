@@ -6,7 +6,7 @@
 
 [![Continuous Integration](https://github.com/d2l-ai/d2l-en/actions/workflows/ci.yml/badge.svg)](https://github.com/d2l-ai/d2l-en/actions/workflows/ci.yml)
 
-[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley](http://courses.d2l.ai/berkeley-stat-157/index.html)
+[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley](https://courses.d2l.ai/berkeley-stat-157/index.html)
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
