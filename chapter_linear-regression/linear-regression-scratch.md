@@ -326,8 +326,8 @@ In summary, we will execute the following loop:
  
 Recall that the synthetic regression dataset 
 that we generated in :numref:``sec_synthetic-regression-data`` 
-does not provide a validation dataset. 
-In most cases, however, 
+provided a validation dataset. 
+In most cases, 
 we will want a validation dataset 
 to measure our model quality. 
 Here we pass the validation dataloader 
