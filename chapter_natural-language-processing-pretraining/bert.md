@@ -82,6 +82,8 @@ Combining the best of both worlds,
 BERT (Bidirectional Encoder Representations from Transformers)
 encodes context bidirectionally and requires minimal architecture changes
 for a wide range of natural language processing tasks :cite:`Devlin.Chang.Lee.ea.2018`.
+A section-addressable version of the original BERT paper is also available
+[online](https://webeditions.page/works/bert-pre-training/).
 Using a pretrained Transformer encoder,
 BERT is able to represent any token based on its bidirectional context.
 During supervised learning of downstream tasks,
