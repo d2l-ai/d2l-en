@@ -942,7 +942,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
                 [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
             dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             with autograd.record():
-                Y_hat, _ = net(X, dec_input, X_valid_len)
+                Y_hat = net(X, dec_input, X_valid_len)
                 l = loss(Y_hat, Y, Y_valid_len)
             l.backward()
             d2l.grad_clipping(net, 1)
@@ -1039,7 +1039,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
             bos = torch.tensor([tgt_vocab['<bos>']] * Y.shape[0],
                                device=device).reshape(-1, 1)
             dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
-            Y_hat, _ = net(X, dec_input, X_valid_len)
+            Y_hat = net(X, dec_input, X_valid_len)
             l = loss(Y_hat, Y, Y_valid_len)
             l.sum().backward()  # Make the loss scalar for `backward`
             d2l.grad_clipping(net, 1)
@@ -1138,7 +1138,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
                              shape=(-1, 1))
             dec_input = tf.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             with tf.GradientTape() as tape:
-                Y_hat, _ = net(X, dec_input, X_valid_len, training=True)
+                Y_hat = net(X, dec_input, X_valid_len, training=True)
                 l = MaskedSoftmaxCELoss(Y_valid_len)(Y, Y_hat)
             gradients = tape.gradient(l, net.trainable_variables)
             gradients = d2l.grad_clipping(gradients, 1)

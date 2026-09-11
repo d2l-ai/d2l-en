@@ -3418,7 +3418,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
             bos = torch.tensor([tgt_vocab['<bos>']] * Y.shape[0],
                                device=device).reshape(-1, 1)
             dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
-            Y_hat, _ = net(X, dec_input, X_valid_len)
+            Y_hat = net(X, dec_input, X_valid_len)
             l = loss(Y_hat, Y, Y_valid_len)
             l.sum().backward()  # Make the loss scalar for `backward`
             d2l.grad_clipping(net, 1)
