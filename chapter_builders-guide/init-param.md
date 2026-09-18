@@ -370,7 +370,7 @@ of setting parameters directly.
 :end_tab:
 
 :begin_tab:`jax`
-When initializing parameters in JAX and Flax, the the dictionary of parameters
+When initializing parameters in JAX and Flax, the dictionary of parameters
 returned has a `flax.core.frozen_dict.FrozenDict` type. It is not advisable in
 the Jax ecosystem to directly alter the values of an array, hence the datatypes
 are generally immutable. One might use `params.unfreeze()` to make changes.
