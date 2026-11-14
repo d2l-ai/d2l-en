@@ -3,43 +3,42 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Object-Oriented Design for Implementation
+# Objektinis projektavimas įgyvendinimui
 :label:`sec_oo-design`
 
-In our introduction to linear regression,
-we walked through various components
-including
-the data, the model, the loss function,
-and the optimization algorithm.
-Indeed,
-linear regression is
-one of the simplest machine learning models.
-Training it,
-however, uses many of the same components that other models in this book require.
-Therefore, 
-before diving into the implementation details
-it is worth 
-designing some of the APIs
-that we use throughout. 
-Treating components in deep learning
-as objects,
-we can start by
-defining classes for these objects
-and their interactions.
-This object-oriented design
-for implementation
-will greatly
-streamline the presentation and you might even want to use it in your projects.
+Pristatydami tiesinę regresiją,
+apžvelgėme įvairius komponentus,
+įskaitant
+duomenis, modelį, nuostolių funkciją
+ir optimizavimo algoritmą.
+Iš tiesų
+tiesinė regresija yra
+vienas paprasčiausių mašininio mokymosi modelių.
+Tačiau jai apmokyti naudojama daug tų pačių komponentų, kurių reikia kitiems šios knygos modeliams.
+Todėl
+prieš pasinerdami į įgyvendinimo detales
+verta
+suprojektuoti kai kurias API,
+kurias naudosime visoje knygoje.
+Giliojo mokymosi komponentus traktuodami
+kaip objektus,
+galime pradėti
+apibrėždami šių objektų klases
+ir jų sąveikas.
+Toks objektinis projektavimas
+įgyvendinimui
+labai
+supaprastins pateikimą, ir galbūt net norėsite jį naudoti savo projektuose.
 
 
-Inspired by open-source libraries such as [PyTorch Lightning](https://www.pytorchlightning.ai/),
-at a high level
-we wish to have three classes: 
-(i) `Module` contains models, losses, and optimization methods; 
-(ii) `DataModule` provides data loaders for training and validation; 
-(iii) both classes are combined using the `Trainer` class, which allows us to
-train models on a variety of hardware platforms. 
-Most code in this book adapts `Module` and `DataModule`. We will touch upon the `Trainer` class only when we discuss GPUs, CPUs, parallel training, and optimization algorithms.
+Įkvėpti atvirojo kodo bibliotekų, tokių kaip [PyTorch Lightning](https://www.pytorchlightning.ai/),
+aukštu lygiu
+norime turėti tris klases:
+(i) `Module` talpina modelius, nuostolius ir optimizavimo metodus;
+(ii) `DataModule` teikia duomenų krautuvus apmokymui ir validavimui;
+(iii) abi klasės sujungiamos naudojant klasę `Trainer`, kuri leidžia
+apmokyti modelius įvairiose aparatinės įrangos platformose.
+Didžioji šios knygos kodo dalis pritaiko `Module` ir `DataModule`. Prie klasės `Trainer` sugrįšime tik aptardami GPU, CPU, lygiagretų apmokymą ir optimizavimo algoritmus.
 
 ```{.python .input}
 %%tab mxnet
@@ -79,11 +78,11 @@ import time
 from typing import Any
 ```
 
-## Utilities
+## Pagalbinės priemonės
 :label:`oo-design-utilities`
 
-We need a few utilities to simplify object-oriented programming in Jupyter notebooks. One of the challenges is that class definitions tend to be fairly long blocks of code. Notebook readability demands short code fragments, interspersed with explanations, a requirement incompatible with the style of programming common for Python libraries. The first
-utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we have created instances of the class! It allows us to split the implementation of a class into multiple code blocks.
+Mums reikia keleto pagalbinių priemonių objektiniam programavimui „Jupyter" sąsiuviniuose supaprastinti. Viena iš problemų yra ta, kad klasių apibrėžimai paprastai yra gana ilgi kodo blokai. Sąsiuvinio skaitomumas reikalauja trumpų kodo fragmentų, pertraukiamų paaiškinimais, o tai nesuderinama su Python bibliotekoms įprastu programavimo stiliumi. Pirmoji
+pagalbinė funkcija leidžia užregistruoti funkcijas kaip klasės metodus *po to*, kai klasė jau sukurta. Tiesą sakant, tai galime padaryti *net ir po to*, kai jau sukūrėme klasės egzempliorius! Tai leidžia klasės įgyvendinimą padalyti į kelis kodo blokus.
 
 ```{.python .input}
 %%tab all
@@ -94,7 +93,7 @@ def add_to_class(Class):  #@save
     return wrapper
 ```
 
-Let's have a quick look at how to use it. We plan to implement a class `A` with a method `do`. Instead of having code for both `A` and `do` in the same code block, we can first declare the class `A` and create an instance `a`.
+Pažiūrėkime trumpai, kaip ją naudoti. Planuojame įgyvendinti klasę `A` su metodu `do`. Užuot rašę ir `A`, ir `do` kodą tame pačiame kodo bloke, galime pirmiausia deklaruoti klasę `A` ir sukurti egzempliorių `a`.
 
 ```{.python .input}
 %%tab all
@@ -105,7 +104,7 @@ class A:
 a = A()
 ```
 
-Next we define the method `do` as we normally would, but not in class `A`'s scope. Instead, we decorate this method by `add_to_class` with class `A` as its argument. In doing so, the method is able to access the member variables of `A` just as we would expect had it been included as part of `A`'s definition. Let's see what happens when we invoke it for the instance `a`.
+Toliau apibrėžiame metodą `do` kaip įprasta, bet ne klasės `A` apimtyje. Vietoj to šį metodą dekoruojame `add_to_class`, kurio argumentas yra klasė `A`. Taip darant metodas gali pasiekti `A` narių kintamuosius, lygiai kaip tikėtumėmės, jei jis būtų įtrauktas į `A` apibrėžimą. Pažiūrėkime, kas nutinka iškvietus jį egzemplioriui `a`.
 
 ```{.python .input}
 %%tab all
@@ -116,7 +115,7 @@ def do(self):
 a.do()
 ```
 
-The second one is a utility class that saves all arguments in a class's `__init__` method as class attributes. This allows us to extend constructor call signatures implicitly without additional code.
+Antroji yra pagalbinė klasė, išsaugojanti visus klasės metodo `__init__` argumentus kaip klasės atributus. Tai leidžia netiesiogiai išplėsti konstruktoriaus iškvietimo parašus be papildomo kodo.
 
 ```{.python .input}
 %%tab all
@@ -126,7 +125,7 @@ class HyperParameters:  #@save
         raise NotImplemented
 ```
 
-We defer its implementation into :numref:`sec_utils`. To use it, we define our class that inherits from `HyperParameters` and calls `save_hyperparameters` in the `__init__` method.
+Jos įgyvendinimą atidedame iki :numref:`sec_utils`. Norėdami ją naudoti, apibrėžiame savo klasę, paveldinčią iš `HyperParameters` ir metode `__init__` iškviečiančią `save_hyperparameters`.
 
 ```{.python .input}
 %%tab all
@@ -140,9 +139,9 @@ class B(d2l.HyperParameters):
 b = B(a=1, b=2, c=3)
 ```
 
-The final utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [TensorBoard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
+Paskutinė pagalbinė priemonė leidžia interaktyviai braižyti eksperimento eigą jam vykstant. Pagerbdami kur kas galingesnį (ir sudėtingesnį) [TensorBoard](https://www.tensorflow.org/tensorboard), ją pavadiname `ProgressBoard`. Įgyvendinimas atidedamas iki :numref:`sec_utils`. Kol kas tiesiog pažiūrėkime, kaip ji veikia.
 
-The `draw` method plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
+Metodas `draw` nubraižo tašką `(x, y)` paveiksle, o `label` nurodomas legendoje. Pasirenkamas parametras `every_n` išlygina liniją, paveiksle rodydamas tik $1/n$ taškų. Jų reikšmės suvidurkinamos iš $n$ kaimyninių taškų pradiniame paveiksle.
 
 ```{.python .input}
 %%tab all
@@ -158,7 +157,7 @@ class ProgressBoard(d2l.HyperParameters):  #@save
         raise NotImplemented
 ```
 
-In the following example, we draw `sin` and `cos` with a different smoothness. If you run this code block, you will see the lines grow in animation.
+Toliau pateiktame pavyzdyje braižome `sin` ir `cos` su skirtingu glotnumu. Jei paleisite šį kodo bloką, pamatysite, kaip linijos auga animuotai.
 
 ```{.python .input}
 %%tab all
@@ -168,17 +167,17 @@ for x in np.arange(0, 10, 0.1):
     board.draw(x, np.cos(x), 'cos', every_n=10)
 ```
 
-## Models
+## Modeliai
 :label:`subsec_oo-design-models`
 
-The `Module` class is the base class of all models we will implement. At the very least we need three methods. The first, `__init__`, stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, and finally, `configure_optimizers` returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
-Sometimes we put the code for computing the output into a separate `forward` method to make it more reusable.
+Klasė `Module` yra visų modelių, kuriuos įgyvendinsime, bazinė klasė. Mažiausiai mums reikia trijų metodų. Pirmasis, `__init__`, saugo mokomus parametrus, metodas `training_step` priima duomenų rinkinį ir grąžina nuostolių reikšmę, o galiausiai `configure_optimizers` grąžina optimizavimo metodą arba jų sąrašą, naudojamą mokomiems parametrams atnaujinti. Pasirinktinai galime apibrėžti `validation_step`, kad pateiktume vertinimo matus.
+Kartais išvesties skaičiavimo kodą dedame į atskirą metodą `forward`, kad jį būtų galima naudoti pakartotinai.
 
 :begin_tab:`jax`
-With the introduction of [dataclasses](https://docs.python.org/3/library/dataclasses.html)
-in Python 3.7, classes decorated with `@dataclass` automatically add magic
-methods such as `__init__` and `__repr__`. The member variables are defined
-using type annotations. All Flax modules are Python 3.7 dataclasses.
+Python 3.7 pristačius [duomenų klases](https://docs.python.org/3/library/dataclasses.html),
+klasės, dekoruotos `@dataclass`, automatiškai prideda magiškus
+metodus, tokius kaip `__init__` ir `__repr__`. Narių kintamieji apibrėžiami
+naudojant tipų anotacijas. Visi Flax moduliai yra Python 3.7 duomenų klasės.
 :end_tab:
 
 ```{.python .input}
@@ -323,30 +322,30 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 ```
 
 :begin_tab:`mxnet`
-You may notice that `Module` is a subclass of `nn.Block`, the base class of neural networks in Gluon.
-It provides convenient features for handling neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
+Galbūt pastebėjote, kad `Module` yra `nn.Block` poklasis, t. y. Gluon neuroninių tinklų bazinės klasės.
+Ji suteikia patogių funkcijų neuroniniams tinklams tvarkyti. Pavyzdžiui, jei apibrėžiame metodą `forward`, pvz., `forward(self, X)`, tai egzemplioriui `a` šį metodą galime iškviesti per `a(X)`. Tai veikia, nes įtaisytajame metode `__call__` iškviečiamas metodas `forward`. Daugiau detalių ir pavyzdžių apie `nn.Block` rasite :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`pytorch`
-You may notice that `Module` is a subclass of `nn.Module`, the base class of neural networks in PyTorch.
-It provides convenient features for handling neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this method by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
+Galbūt pastebėjote, kad `Module` yra `nn.Module` poklasis, t. y. PyTorch neuroninių tinklų bazinės klasės.
+Ji suteikia patogių funkcijų neuroniniams tinklams tvarkyti. Pavyzdžiui, jei apibrėžiame metodą `forward`, pvz., `forward(self, X)`, tai egzemplioriui `a` šį metodą galime iškviesti per `a(X)`. Tai veikia, nes įtaisytajame metode `__call__` iškviečiamas metodas `forward`. Daugiau detalių ir pavyzdžių apie `nn.Module` rasite :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
-It provides convenient features for handling neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` method, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
+Galbūt pastebėjote, kad `Module` yra `tf.keras.Model` poklasis, t. y. TensorFlow neuroninių tinklų bazinės klasės.
+Ji suteikia patogių funkcijų neuroniniams tinklams tvarkyti. Pavyzdžiui, ji įtaisytajame metode `__call__` iškviečia metodą `call`. Čia nukreipiame `call` į metodą `forward`, išsaugodami jo argumentus kaip klasės atributą. Tai darome, kad mūsų kodas būtų panašesnis į kitų karkasų įgyvendinimus.
 :end_tab:
 
 :begin_tab:`jax`
-You may notice that `Module` is a subclass of `linen.Module`, the base class of neural networks in Flax.
-It provides convenient features for handling neural networks. For example, it handles the model parameters, provides the `nn.compact` decorator to simplify code, invokes the `__call__` method among other things.
-Here we also redirect `__call__` to the `forward` method. We do this to make our code more similar to other framework implementations.
+Galbūt pastebėjote, kad `Module` yra `linen.Module` poklasis, t. y. Flax neuroninių tinklų bazinės klasės.
+Ji suteikia patogių funkcijų neuroniniams tinklams tvarkyti. Pavyzdžiui, ji tvarko modelio parametrus, pateikia dekoratorių `nn.compact` kodui supaprastinti, be kita ko, iškviečia metodą `__call__`.
+Čia taip pat nukreipiame `__call__` į metodą `forward`. Tai darome, kad mūsų kodas būtų panašesnis į kitų karkasų įgyvendinimus.
 :end_tab:
 
-##  Data
+##  Duomenys
 :label:`oo-design-data`
 
-The `DataModule` class is the base class for data. Quite frequently the `__init__` method is used to prepare the data. This includes downloading and preprocessing if needed. The `train_dataloader` returns the data loader for the training dataset. A data loader is a (Python) generator that yields a data batch each time it is used. This batch is then fed into the `training_step` method of `Module` to compute the loss. There is an optional `val_dataloader` to return the validation dataset loader. It behaves in the same manner, except that it yields data batches for the `validation_step` method in `Module`.
+Klasė `DataModule` yra bazinė duomenų klasė. Gana dažnai metodas `__init__` naudojamas duomenims paruošti. Tai apima atsisiuntimą ir išankstinį apdorojimą, jei reikia. `train_dataloader` grąžina apmokymo duomenų rinkinio duomenų krautuvą. Duomenų krautuvas yra (Python) generatorius, kuris kiekvieną kartą panaudotas pateikia duomenų minirinkinį. Šis minirinkinys tada perduodamas `Module` metodui `training_step` nuostoliams apskaičiuoti. Yra pasirinktinis `val_dataloader`, grąžinantis validavimo duomenų rinkinio krautuvą. Jis elgiasi taip pat, tik pateikia duomenų minirinkinius `Module` metodui `validation_step`.
 
 ```{.python .input}
 %%tab all
@@ -370,15 +369,15 @@ class DataModule(d2l.HyperParameters):  #@save
         return self.get_dataloader(train=False)
 ```
 
-## Training
+## Apmokymas
 :label:`oo-design-training`
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this method to later chapters.
+Klasė `Trainer` apmoko `Module` klasės mokomus parametrus naudodama `DataModule` nurodytus duomenis. Pagrindinis metodas yra `fit`, priimantis du argumentus: `model`, `Module` egzempliorių, ir `data`, `DataModule` egzempliorių. Tada jis `max_epochs` kartų iteruoja per visą duomenų rinkinį modeliui apmokyti. Kaip ir anksčiau, šio metodo įgyvendinimą atidedame vėlesniems skyriams.
 :end_tab:
 
 :begin_tab:`jax`
-The `Trainer` class trains the learnable parameters `params` with data specified in `DataModule`. The key method is `fit`, which accepts three arguments: `model`, an instance of `Module`, `data`, an instance of `DataModule`, and `key`, a JAX `PRNGKeyArray`. We make the `key` argument optional here to simplify the interface, but it is recommended to always pass and initialize the model parameters with a root key in JAX and Flax. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this method to later chapters.
+Klasė `Trainer` apmoko mokomus parametrus `params` naudodama `DataModule` nurodytus duomenis. Pagrindinis metodas yra `fit`, priimantis tris argumentus: `model`, `Module` egzempliorių, `data`, `DataModule` egzempliorių, ir `key`, JAX `PRNGKeyArray`. Argumentą `key` čia padarome pasirinktiniu, kad supaprastintume sąsają, tačiau JAX ir Flax rekomenduojama visada perduoti šakninį raktą ir juo inicializuoti modelio parametrus. Tada jis `max_epochs` kartų iteruoja per visą duomenų rinkinį modeliui apmokyti. Kaip ir anksčiau, šio metodo įgyvendinimą atidedame vėlesniems skyriams.
 :end_tab:
 
 ```{.python .input}
@@ -457,40 +456,40 @@ class Trainer(d2l.HyperParameters):  #@save
         raise NotImplementedError
 ```
 
-## Summary
+## Santrauka
 
-To highlight the object-oriented design
-for our future deep learning implementation,
-the above classes simply show how their objects 
-store data and interact with each other.
-We will keep enriching implementations of these classes,
-such as via `@add_to_class`,
-in the rest of the book.
-Moreover,
-these fully implemented classes
-are saved in the [D2L library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
-a *lightweight toolkit* that makes structured modeling for deep learning easy. 
-In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.;
-this degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. 
+Kad pabrėžtume objektinį projektavimą
+mūsų būsimam giliojo mokymosi įgyvendinimui,
+aukščiau pateiktos klasės tiesiog parodo, kaip jų objektai
+saugo duomenis ir sąveikauja tarpusavyje.
+Šių klasių įgyvendinimus toliau turtinsime,
+pavyzdžiui, per `@add_to_class`,
+likusioje knygos dalyje.
+Be to,
+šios pilnai įgyvendintos klasės
+išsaugotos [D2L bibliotekoje](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
+*lengvame įrankių rinkinyje*, palengvinančiame struktūrizuotą giliojo mokymosi modeliavimą.
+Visų pirma jis leidžia pakartotinai naudoti daugelį komponentų skirtinguose projektuose beveik nieko nekeičiant. Pavyzdžiui, galime pakeisti tik optimizatorių, tik modelį, tik duomenų rinkinį ir pan.;
+šis moduliškumo laipsnis atsiperka visoje knygoje glaustumu ir paprastumu (todėl jį ir pridėjome), ir tą patį jis gali padaryti jūsų projektams.
 
 
-## Exercises
+## Pratimai
 
-1. Locate full implementations of the above classes that are saved in the [D2L library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
-1. Remove the `save_hyperparameters` statement in the `B` class. Can you still print `self.a` and `self.b`? Optional: if you have dived into the full implementation of the `HyperParameters` class, can you explain why?
+1. Suraskite pilnus aukščiau pateiktų klasių įgyvendinimus, išsaugotus [D2L bibliotekoje](https://github.com/d2l-ai/d2l-en/tree/master/d2l). Primygtinai rekomenduojame išsamiai peržiūrėti įgyvendinimą, kai šiek tiek geriau susipažinsite su giliojo mokymosi modeliavimu.
+1. Pašalinkite sakinį `save_hyperparameters` klasėje `B`. Ar vis dar galite atspausdinti `self.a` ir `self.b`? Pasirinktinai: jei esate pasinėrę į pilną klasės `HyperParameters` įgyvendinimą, ar galite paaiškinti, kodėl?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/6645)
+[Diskusijos](https://discuss.d2l.ai/t/6645)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/6646)
+[Diskusijos](https://discuss.d2l.ai/t/6646)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/6647)
+[Diskusijos](https://discuss.d2l.ai/t/6647)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17974)
+[Diskusijos](https://discuss.d2l.ai/t/17974)
 :end_tab:

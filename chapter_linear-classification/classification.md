@@ -3,10 +3,10 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# The Base Classification Model
+# Bazinis klasifikavimo modelis
 :label:`sec_classification`
 
-You may have noticed that the implementations from scratch and the concise implementation using framework functionality were quite similar in the case of regression. The same is true for classification. Since many models in this book deal with classification, it is worth adding functionalities to support this setting specifically. This section provides a base class for classification models to simplify future code.
+Galbūt pastebėjote, kad regresijos atveju įgyvendinimai nuo nulio ir glaustas įgyvendinimas naudojant karkaso funkcionalumą buvo gana panašūs. Tas pats pasakytina apie klasifikavimą. Kadangi daugelis šios knygos modelių nagrinėja klasifikavimą, verta pridėti funkcionalumo, specialiai palaikančio šią aplinką. Šiame skyrelyje pateikiama bazinė klasifikavimo modelių klasė, supaprastinsianti būsimą kodą.
 
 ```{.python .input}
 %%tab mxnet
@@ -36,22 +36,22 @@ import jax
 import optax
 ```
 
-## The `Classifier` Class
+## Klasė `Classifier`
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the final batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+Žemiau apibrėžiame klasę `Classifier`. Metode `validation_step` pateikiame ir nuostolių reikšmę, ir klasifikavimo tikslumą validavimo minirinkinyje. Atnaujinimą braižome kas `num_val_batches` minirinkinių. Tai turi privalumą: gaunami suvidurkinti nuostoliai ir tikslumas visuose validavimo duomenyse. Šie vidurkiai nėra visiškai tikslūs, jei paskutiniame minirinkinyje yra mažiau pavyzdžių, bet šio nedidelio skirtumo nepaisome, kad kodas būtų paprastas.
 :end_tab:
 
 
 :begin_tab:`jax`
-We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+Žemiau apibrėžiame klasę `Classifier`. Metode `validation_step` pateikiame ir nuostolių reikšmę, ir klasifikavimo tikslumą validavimo minirinkinyje. Atnaujinimą braižome kas `num_val_batches` minirinkinių. Tai turi privalumą: gaunami suvidurkinti nuostoliai ir tikslumas visuose validavimo duomenyse. Šie vidurkiai nėra visiškai tikslūs, jei paskutiniame minirinkinyje yra mažiau pavyzdžių, bet šio nedidelio skirtumo nepaisome, kad kodas būtų paprastas.
 
-We also redefine the `training_step` method for JAX since all models that will
-subclass `Classifier` later will have a loss that returns auxiliary data.
-This auxiliary data can be used for models with batch normalization
-(to be explained in :numref:`sec_batch_norm`), while in all other cases
-we will make the loss also return a placeholder (empty dictionary) to
-represent the auxiliary data.
+JAX taip pat iš naujo apibrėžiame metodą `training_step`, nes visi modeliai, kurie
+vėliau paveldės iš `Classifier`, turės nuostolius, grąžinančius pagalbinius duomenis.
+Šie pagalbiniai duomenys gali būti naudojami modeliams su paketine normalizacija
+(bus paaiškinta :numref:`sec_batch_norm`), o visais kitais atvejais
+nuostoliai taip pat grąžins vietos rezervavimo ženklą (tuščią žodyną),
+kad atvaizduotų pagalbinius duomenis.
 :end_tab:
 
 ```{.python .input}
@@ -86,7 +86,7 @@ class Classifier(d2l.Module):  #@save
                   train=False)
 ```
 
-By default we use a stochastic gradient descent optimizer, operating on minibatches, just as we did in the context of linear regression.
+Pagal numatytuosius nustatymus naudojame stochastinio gradientinio nusileidimo optimizatorių, veikiantį minirinkiniuose, kaip ir tiesinės regresijos atveju.
 
 ```{.python .input}
 %%tab mxnet
@@ -119,31 +119,31 @@ def configure_optimizers(self):
     return optax.sgd(self.lr)
 ```
 
-## Accuracy
+## Tikslumas
 
-Given the predicted probability distribution `y_hat`,
-we typically choose the class with the highest predicted probability
-whenever we must output a hard prediction.
-Indeed, many applications require that we make a choice.
-For instance, Gmail must categorize an email into "Primary", "Social", "Updates", "Forums", or "Spam".
-It might estimate probabilities internally,
-but at the end of the day it has to choose one among the classes.
+Turint prognozuotą tikimybių skirstinį `y_hat`,
+paprastai pasirenkame klasę su didžiausia prognozuota tikimybe,
+kai tik turime pateikti griežtą prognozę.
+Iš tiesų daugeliui taikymų reikia, kad atliktume pasirinkimą.
+Pavyzdžiui, „Gmail" turi suskirstyti el. laišką į „Pagrindinis", „Socialiniai", „Naujienos", „Forumai" arba „Šlamštas".
+Jis gali viduje vertinti tikimybes,
+bet galiausiai turi pasirinkti vieną iš klasių.
 
-When predictions are consistent with the label class `y`, they are correct.
-The classification accuracy is the fraction of all predictions that are correct.
-Although it can be difficult to optimize accuracy directly (it is not differentiable),
-it is often the performance measure that we care about the most. It is often *the*
-relevant quantity in benchmarks. As such, we will nearly always report it when training classifiers.
+Kai prognozės atitinka žymens klasę `y`, jos yra teisingos.
+Klasifikavimo tikslumas yra teisingų prognozių dalis tarp visų prognozių.
+Nors tikslumą tiesiogiai optimizuoti gali būti sunku (jis nėra diferencijuojamas),
+dažnai tai yra veikimo matas, kuris mums rūpi labiausiai. Jis dažnai yra *pats*
+svarbiausias dydis lyginamuosiuose rinkiniuose. Todėl jį beveik visada pateiksime apmokydami klasifikatorius.
 
-Accuracy is computed as follows.
-First, if `y_hat` is a matrix,
-we assume that the second dimension stores prediction scores for each class.
-We use `argmax` to obtain the predicted class by the index for the largest entry in each row.
-Then we [**compare the predicted class with the ground truth `y` elementwise.**]
-Since the equality operator `==` is sensitive to data types,
-we convert `y_hat`'s data type to match that of `y`.
-The result is a tensor containing entries of 0 (false) and 1 (true).
-Taking the sum yields the number of correct predictions.
+Tikslumas apskaičiuojamas taip.
+Pirmiausia, jei `y_hat` yra matrica,
+darome prielaidą, kad antrojoje dimensijoje saugomi kiekvienos klasės prognozės balai.
+Naudojame `argmax`, kad gautume prognozuotą klasę pagal didžiausio įrašo kiekvienoje eilutėje indeksą.
+Tada [**palyginame prognozuotą klasę su tikrąja `y` elementas po elemento.**]
+Kadangi lygybės operatorius `==` jautrus duomenų tipams,
+`y_hat` duomenų tipą konvertuojame, kad atitiktų `y` tipą.
+Rezultatas yra tenzorius, kurio įrašai yra 0 (netiesa) ir 1 (tiesa).
+Susumavus gaunamas teisingų prognozių skaičius.
 
 ```{.python .input  n=9}
 %%tab pytorch, mxnet, tensorflow
@@ -192,29 +192,29 @@ def parameters(self):
         params.keys()) else self.get_scratch_params()
 ```
 
-## Summary
+## Santrauka
 
-Classification is a sufficiently common problem that it warrants its own convenience functions. Of central importance in classification is the *accuracy* of the classifier. Note that while we often care primarily about accuracy, we train classifiers to optimize a variety of other objectives for statistical and computational reasons. However, regardless of which loss function was minimized during training, it is useful to have a convenience method for assessing the accuracy of our classifier empirically. 
+Klasifikavimas yra pakankamai dažnas uždavinys, kad nusipelno savo paties patogumo funkcijų. Klasifikavime pagrindinę reikšmę turi klasifikatoriaus *tikslumas*. Atkreipkite dėmesį, kad nors mums dažnai pirmiausia rūpi tikslumas, klasifikatorius apmokome optimizuoti įvairius kitus tikslus dėl statistinių ir skaičiavimo priežasčių. Tačiau nepriklausomai nuo to, kuri nuostolių funkcija buvo minimizuota apmokymo metu, naudinga turėti patogumo metodą mūsų klasifikatoriaus tikslumui empiriškai įvertinti.
 
 
-## Exercises
+## Pratimai
 
-1. Denote by $L_\textrm{v}$ the validation loss, and let $L_\textrm{v}^\textrm{q}$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_\textrm{v}^\textrm{b}$ the loss on the last minibatch. Express $L_\textrm{v}$ in terms of $L_\textrm{v}^\textrm{q}$, $l_\textrm{v}^\textrm{b}$, and the sample and minibatch sizes.
-1. Show that the quick and dirty estimate $L_\textrm{v}^\textrm{q}$ is unbiased. That is, show that $E[L_\textrm{v}] = E[L_\textrm{v}^\textrm{q}]$. Why would you still want to use $L_\textrm{v}$ instead?
-1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y \mid x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y \mid x)$.
+1. Pažymėkime $L_\textrm{v}$ validavimo nuostolius, o $L_\textrm{v}^\textrm{q}$ – jų greitą ir nešvarų įvertį, apskaičiuotą šiame skyrelyje nuostolių vidurkinimu. Galiausiai pažymėkime $l_\textrm{v}^\textrm{b}$ nuostolius paskutiniame minirinkinyje. Išreikškite $L_\textrm{v}$ per $L_\textrm{v}^\textrm{q}$, $l_\textrm{v}^\textrm{b}$ ir imties bei minirinkinio dydžius.
+1. Parodykite, kad greitas ir nešvarus įvertis $L_\textrm{v}^\textrm{q}$ yra nepaslinktas. T. y. parodykite, kad $E[L_\textrm{v}] = E[L_\textrm{v}^\textrm{q}]$. Kodėl vis tiek norėtumėte naudoti $L_\textrm{v}$?
+1. Turint daugiaklasės klasifikacijos nuostolius, kur $l(y,y')$ žymi baudą už įvertį $y'$, kai matome $y$, ir turint tikimybę $p(y \mid x)$, suformuluokite optimalaus $y'$ pasirinkimo taisyklę. Užuomina: išreikškite tikėtinus nuostolius naudodami $l$ ir $p(y \mid x)$.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/6808)
+[Diskusijos](https://discuss.d2l.ai/t/6808)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/6809)
+[Diskusijos](https://discuss.d2l.ai/t/6809)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/6810)
+[Diskusijos](https://discuss.d2l.ai/t/6810)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17981)
+[Diskusijos](https://discuss.d2l.ai/t/17981)
 :end_tab:

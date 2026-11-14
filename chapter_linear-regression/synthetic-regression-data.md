@@ -3,19 +3,19 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Synthetic Regression Data
+# Sintetiniai regresijos duomenys
 :label:`sec_synthetic-regression-data`
 
 
-Machine learning is all about extracting information from data.
-So you might wonder, what could we possibly learn from synthetic data?
-While we might not care intrinsically about the patterns 
-that we ourselves baked into an artificial data generating model,
-such datasets are nevertheless useful for didactic purposes,
-helping us to evaluate the properties of our learning 
-algorithms and to confirm that our implementations work as expected.
-For example, if we create data for which the correct parameters are known *a priori*,
-then we can check that our model can in fact recover them.
+Mašininis mokymasis yra visas apie informacijos išgavimą iš duomenų.
+Todėl galite pagalvoti, ko galėtume išmokti iš sintetinių duomenų?
+Nors mums gali nerūpėti pačios savaime dėsningumai,
+kuriuos patys įdiegėme į dirbtinį duomenis generuojantį modelį,
+tokie duomenų rinkiniai vis tiek naudingi didaktikos tikslais:
+jie padeda įvertinti mūsų mokymosi
+algoritmų savybes ir patvirtinti, kad mūsų įgyvendinimai veikia kaip tikėtasi.
+Pavyzdžiui, jei sukuriame duomenis, kurių teisingi parametrai žinomi *a priori*,
+tada galime patikrinti, ar mūsų modelis iš tikrųjų gali juos atkurti.
 
 ```{.python .input}
 %%tab mxnet
@@ -54,30 +54,29 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 ```
 
-## Generating the Dataset
+## Duomenų rinkinio generavimas
 
-For this example, we will work in low dimension
-for succinctness.
-The following code snippet generates 1000 examples
-with 2-dimensional features drawn 
-from a standard normal distribution.
-The resulting design matrix $\mathbf{X}$
-belongs to $\mathbb{R}^{1000 \times 2}$. 
-We generate each label by applying 
-a *ground truth* linear function, 
-corrupting them via additive noise $\boldsymbol{\epsilon}$, 
-drawn independently and identically for each example:
+Šiame pavyzdyje dėl glaustumo dirbsime mažoje dimensijoje.
+Šis kodo fragmentas sugeneruoja 1000 pavyzdžių
+su 2 dimensijų požymiais, paimtais
+iš standartinio normaliojo skirstinio.
+Gauta požymių matrica $\mathbf{X}$
+priklauso $\mathbb{R}^{1000 \times 2}$.
+Kiekvieną žymenį generuojame taikydami
+*tikrąją* tiesinę funkciją
+ir iškraipydami juos adityviuoju triukšmu $\boldsymbol{\epsilon}$,
+nepriklausomai ir identiškai paimtu kiekvienam pavyzdžiui:
 
 (**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \boldsymbol{\epsilon}.$$**)
 
-For convenience we assume that $\boldsymbol{\epsilon}$ is drawn 
-from a normal distribution with mean $\mu= 0$ 
-and standard deviation $\sigma = 0.01$.
-Note that for object-oriented design
-we add the code to the `__init__` method of a subclass of `d2l.DataModule` (introduced in :numref:`oo-design-data`). 
-It is good practice to allow the setting of any additional hyperparameters. 
-We accomplish this with `save_hyperparameters()`. 
-The `batch_size` will be determined later.
+Patogumo dėlei darome prielaidą, kad $\boldsymbol{\epsilon}$ paimtas
+iš normaliojo skirstinio su vidurkiu $\mu= 0$
+ir standartiniu nuokrypiu $\sigma = 0.01$.
+Atkreipkite dėmesį, kad objektiniam projektavimui
+kodą pridedame prie poklasio `d2l.DataModule` (pristatyto :numref:`oo-design-data`) metodo `__init__`.
+Gera praktika leisti nustatyti bet kokius papildomus hiperparametrus.
+Tai pasiekiame naudodami `save_hyperparameters()`.
+`batch_size` bus nustatytas vėliau.
 
 ```{.python .input}
 %%tab all
@@ -102,36 +101,36 @@ class SyntheticRegressionData(d2l.DataModule):  #@save
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 ```
 
-Below, we set the true parameters to $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$.
-Later, we can check our estimated parameters against these *ground truth* values.
+Toliau nustatome tikruosius parametrus $\mathbf{w} = [2, -3.4]^\top$ ir $b = 4.2$.
+Vėliau galėsime palyginti savo įvertintus parametrus su šiomis *tikrosiomis* reikšmėmis.
 
 ```{.python .input}
 %%tab all
 data = SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 ```
 
-[**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**] Let's have a look at the first entry.
+[**Kiekviena `features` eilutė yra vektorius iš $\mathbb{R}^2$, o kiekviena `labels` eilutė yra skaliaras.**] Pažvelkime į pirmąjį įrašą.
 
 ```{.python .input}
 %%tab all
 print('features:', data.X[0],'\nlabel:', data.y[0])
 ```
 
-## Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-Training machine learning models often requires multiple passes over a dataset, 
-grabbing one minibatch of examples at a time. 
-This data is then used to update the model. 
-To illustrate how this works, we 
-[**implement the `get_dataloader` method,**] 
-registering it in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
-It (**takes a batch size, a matrix of features,
-and a vector of labels, and generates minibatches of size `batch_size`.**)
-As such, each minibatch consists of a tuple of features and labels. 
-Note that we need to be mindful of whether we're in training or validation mode: 
-in the former, we will want to read the data in random order, 
-whereas for the latter, being able to read data in a pre-defined order 
-may be important for debugging purposes.
+Mašininio mokymosi modelių apmokymui dažnai reikia kelis kartus peržiūrėti duomenų rinkinį,
+paimant po vieną pavyzdžių minirinkinį.
+Tada šie duomenys naudojami modeliui atnaujinti.
+Kad parodytume, kaip tai veikia,
+[**įgyvendiname metodą `get_dataloader`**],
+užregistruodami jį klasėje `SyntheticRegressionData` per `add_to_class` (pristatytą :numref:`oo-design-utilities`).
+Jis (**priima minirinkinio dydį, požymių matricą
+ir žymenų vektorių ir sugeneruoja `batch_size` dydžio minirinkinius.**)
+Taigi kiekvienas minirinkinys yra požymių ir žymenų kortežas.
+Atkreipkite dėmesį, kad turime atsižvelgti į tai, ar esame apmokymo, ar validavimo režime:
+pirmuoju atveju norėsime skaityti duomenis atsitiktine tvarka,
+o antruoju atveju galimybė skaityti duomenis iš anksto apibrėžta tvarka
+gali būti svarbi derinimo tikslais.
 
 ```{.python .input}
 %%tab all
@@ -152,9 +151,9 @@ def get_dataloader(self, train):
             yield tf.gather(self.X, j), tf.gather(self.y, j)
 ```
 
-To build some intuition, let's inspect the first minibatch of
-data. Each minibatch of features provides us with both its size and the dimensionality of input features.
-Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
+Kad įgytume šiek tiek intuicijos, apžiūrėkime pirmąjį duomenų
+minirinkinį. Kiekvienas požymių minirinkinys pateikia ir jo dydį, ir įvesties požymių dimensiją.
+Panašiai mūsų žymenų minirinkinys turės atitinkamą formą, nurodytą `batch_size`.
 
 ```{.python .input}
 %%tab all
@@ -162,41 +161,41 @@ X, y = next(iter(data.train_dataloader()))
 print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
-While seemingly innocuous, the invocation 
-of `iter(data.train_dataloader())` 
-illustrates the power of Python's object-oriented design. 
-Note that we added a method to the `SyntheticRegressionData` class
-*after* creating the `data` object. 
-Nonetheless, the object benefits from 
-the *ex post facto* addition of functionality to the class.
+Nors atrodo nekaltas, `iter(data.train_dataloader())`
+iškvietimas
+iliustruoja Python objektinio projektavimo galią.
+Atkreipkite dėmesį, kad pridėjome metodą klasei `SyntheticRegressionData`
+*po to*, kai sukūrėme objektą `data`.
+Vis dėlto objektas gauna naudos iš
+*ex post facto* (vėliau) pridėto klasės funkcionalumo.
 
-Throughout the iteration we obtain distinct minibatches
-until the entire dataset has been exhausted (try this).
-While the iteration implemented above is good for didactic purposes,
-it is inefficient in ways that might get us into trouble with real problems.
-For example, it requires that we load all the data in memory
-and that we perform lots of random memory access.
-The built-in iterators implemented in a deep learning framework
-are considerably more efficient and they can deal
-with sources such as data stored in files, 
-data received via a stream, 
-and data generated or processed on the fly. 
-Next let's try to implement the same method using built-in iterators.
+Iteruojant gauname skirtingus minirinkinius,
+kol išnaudojamas visas duomenų rinkinys (išbandykite tai).
+Nors aukščiau įgyvendinta iteracija tinka didaktikos tikslams,
+ji yra neefektyvi tokiais būdais, kurie gali sukelti problemų su realiais uždaviniais.
+Pavyzdžiui, ji reikalauja, kad visus duomenis įkeltume į atmintį
+ir atliktume daug atsitiktinių atminties prieigų.
+Giliojo mokymosi karkase įgyvendinti įtaisytieji iteratoriai
+yra gerokai efektyvesni ir gali dirbti
+su tokiais šaltiniais kaip failuose saugomi duomenys,
+srautu gaunami duomenys
+ir duomenys, generuojami ar apdorojami skrydžio metu.
+Toliau pabandykime įgyvendinti tą patį metodą naudodami įtaisytuosius iteratorius.
 
-## Concise Implementation of the Data Loader
+## Glaustas duomenų krautuvo įgyvendinimas
 
-Rather than writing our own iterator,
-we can [**call the existing API in a framework to load data.**]
-As before, we need a dataset with features `X` and labels `y`. 
-Beyond that, we set `batch_size` in the built-in data loader 
-and let it take care of shuffling examples  efficiently.
+Užuot rašę savo iteratorių,
+galime [**iškviesti esamą karkaso API duomenims įkelti.**]
+Kaip ir anksčiau, mums reikia duomenų rinkinio su požymiais `X` ir žymenimis `y`.
+Be to, įtaisytajame duomenų krautuve nustatome `batch_size`
+ir leidžiame jam efektyviai pasirūpinti pavyzdžių maišymu.
 
 :begin_tab:`jax`
-JAX is all about NumPy like API with device acceleration and the functional
-transformations, so at least the current version doesn’t include data loading
-methods. With other  libraries we already have great data loaders out there,
-and JAX suggests using them instead. Here we will grab TensorFlow’s data loader,
-and modify it slightly to make it work with JAX.
+JAX yra visas apie į NumPy panašią API su įrenginių spartinimu ir funkcinėmis
+transformacijomis, todėl bent jau dabartinėje versijoje nėra duomenų įkėlimo
+metodų. Su kitomis bibliotekomis jau turime puikių duomenų krautuvų,
+ir JAX siūlo naudoti jas. Čia pasiimsime TensorFlow duomenų krautuvą
+ir šiek tiek jį modifikuosime, kad jis veiktų su JAX.
 :end_tab:
 
 ```{.python .input}
@@ -234,7 +233,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader((self.X, self.y), train, i)
 ```
 
-The new data loader behaves just like the previous one, except that it is more efficient and has some added functionality.
+Naujasis duomenų krautuvas elgiasi lygiai kaip ankstesnis, tik yra efektyvesnis ir turi papildomo funkcionalumo.
 
 ```{.python .input  n=4}
 %%tab all
@@ -242,61 +241,61 @@ X, y = next(iter(data.train_dataloader()))
 print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
-For instance, the data loader provided by the framework API 
-supports the built-in `__len__` method, 
-so we can query its length, 
-i.e., the number of batches.
+Pavyzdžiui, karkaso API pateiktas duomenų krautuvas
+palaiko įtaisytąjį metodą `__len__`,
+todėl galime užklausti jo ilgio,
+t. y. minirinkinių skaičiaus.
 
 ```{.python .input}
 %%tab all
 len(data.train_dataloader())
 ```
 
-## Summary
+## Santrauka
 
-Data loaders are a convenient way of abstracting out 
-the process of loading and manipulating data. 
-This way the same machine learning *algorithm* 
-is capable of processing many different types and sources of data 
-without the need for modification. 
-One of the nice things about data loaders 
-is that they can be composed. 
-For instance, we might be loading images 
-and then have a postprocessing filter 
-that crops them or modifies them in other ways. 
-As such, data loaders can be used 
-to describe an entire data processing pipeline. 
+Duomenų krautuvai yra patogus būdas abstrahuoti
+duomenų įkėlimo ir manipuliavimo jais procesą.
+Taip tas pats mašininio mokymosi *algoritmas*
+gali apdoroti daugelį skirtingų tipų ir šaltinių duomenų,
+jo nekeičiant.
+Vienas gerų duomenų krautuvų dalykų yra tas,
+kad juos galima komponuoti.
+Pavyzdžiui, galime įkelti paveikslėlius
+ir turėti paskesnio apdorojimo filtrą,
+kuris juos apkarpo arba kitaip modifikuoja.
+Taigi duomenų krautuvai gali būti naudojami
+visam duomenų apdorojimo konvejeriui aprašyti.
 
-As for the model itself, the two-dimensional linear model 
-is about the simplest we might encounter. 
-It lets us test out the accuracy of regression models 
-without worrying about having insufficient amounts of data 
-or an underdetermined system of equations. 
-We will put this to good use in the next section.  
+Kalbant apie patį modelį, dvimatis tiesinis modelis
+yra beveik paprasčiausias, su kuriuo galime susidurti.
+Jis leidžia išbandyti regresijos modelių tikslumą,
+nesirūpinant, kad duomenų per mažai
+arba lygčių sistema yra nepakankamai apibrėžta.
+Tai gerai panaudosime kitame skyrelyje.
 
 
-## Exercises
+## Pratimai
 
-1. What will happen if the number of examples cannot be divided by the batch size. How would you change this behavior by specifying a different argument by using the framework's API?
-1. Suppose that we want to generate a huge dataset, where both the size of the parameter vector `w` and the number of examples `num_examples` are large.
-    1. What happens if we cannot hold all data in memory?
-    1. How would you shuffle the data if it is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
-1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
-1. How would you design a random data generator that generates *the same* data each time it is called?
+1. Kas nutiks, jei pavyzdžių skaičiaus negalima padalyti iš minirinkinio dydžio. Kaip pakeistumėte šį elgesį, nurodydami kitą argumentą naudodami karkaso API?
+1. Tarkime, kad norime sugeneruoti milžinišką duomenų rinkinį, kuriame ir parametrų vektoriaus `w` dydis, ir pavyzdžių skaičius `num_examples` yra dideli.
+    1. Kas nutinka, jei negalime visų duomenų laikyti atmintyje?
+    1. Kaip sumaišytumėte duomenis, jei jie laikomi diske? Jūsų užduotis – sukurti *efektyvų* algoritmą, kuriam nereikia per daug atsitiktinių skaitymų ar rašymų. Užuomina: [pseudoatsitiktinių permutacijų generatoriai](https://en.wikipedia.org/wiki/Pseudorandom_permutation) leidžia sukurti permaišymą, aiškiai nesaugant permutacijų lentelės :cite:`Naor.Reingold.1999`.
+1. Įgyvendinkite duomenų generatorių, kuris kuria naujus duomenis skrydžio metu kiekvieną kartą, kai iškviečiamas iteratorius.
+1. Kaip sukurtumėte atsitiktinių duomenų generatorių, kuris kiekvieną kartą iškviestas sugeneruoja *tuos pačius* duomenis?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/6662)
+[Diskusijos](https://discuss.d2l.ai/t/6662)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/6663)
+[Diskusijos](https://discuss.d2l.ai/t/6663)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/6664)
+[Diskusijos](https://discuss.d2l.ai/t/6664)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17975)
+[Diskusijos](https://discuss.d2l.ai/t/17975)
 :end_tab:

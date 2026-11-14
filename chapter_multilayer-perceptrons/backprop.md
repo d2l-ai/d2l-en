@@ -1,180 +1,176 @@
-# Forward Propagation, Backward Propagation, and Computational Graphs
+# Tiesioginis sklidimas, atgalinis sklidimas ir skaičiavimo grafai
 :label:`sec_backprop`
 
-So far, we have trained our models
-with minibatch stochastic gradient descent.
-However, when we implemented the algorithm,
-we only worried about the calculations involved
-in *forward propagation* through the model.
-When it came time to calculate the gradients,
-we just invoked the backpropagation function provided by the deep learning framework.
+Iki šiol savo modelius apmokėme
+minirinkinio stochastiniu gradientiniu nusileidimu.
+Tačiau įgyvendindami algoritmą,
+rūpinomės tik skaičiavimais,
+susijusiais su *tiesioginiu sklidimu* per modelį.
+Kai atėjo laikas apskaičiuoti gradientus,
+tiesiog iškvietėme atgalinio sklidimo funkciją, kurią suteikia giliojo mokymosi karkasas.
 
-The automatic calculation of gradients
-profoundly simplifies
-the implementation of deep learning algorithms.
-Before automatic differentiation,
-even small changes to complicated models required
-recalculating complicated derivatives by hand.
-Surprisingly often, academic papers had to allocate
-numerous pages to deriving update rules.
-While we must continue to rely on automatic differentiation
-so we can focus on the interesting parts,
-you ought to know how these gradients
-are calculated under the hood
-if you want to go beyond a shallow
-understanding of deep learning.
+Automatinis gradientų skaičiavimas
+iš esmės supaprastina
+giliojo mokymosi algoritmų įgyvendinimą.
+Prieš atsirandant automatiniam diferencijavimui,
+net nedideli sudėtingų modelių pakeitimai reikalavo
+rankomis perskaičiuoti sudėtingas išvestines.
+Stebėtinai dažnai moksliniuose straipsniuose tekdavo skirti
+daugybę puslapių atnaujinimo taisyklėms išvesti.
+Nors turime ir toliau remtis automatiniu diferencijavimu,
+kad galėtume susitelkti į įdomiąsias dalis,
+turėtumėte žinoti, kaip šie gradientai
+apskaičiuojami „po gaubtu“,
+jei norite peržengti paviršutinišką
+giliojo mokymosi supratimą.
 
-In this section, we take a deep dive
-into the details of *backward propagation*
-(more commonly called *backpropagation*).
-To convey some insight for both the
-techniques and their implementations,
-we rely on some basic mathematics and computational graphs.
-To start, we focus our exposition on
-a one-hidden-layer MLP
-with weight decay ($\ell_2$ regularization, to be described in subsequent chapters).
+Šiame skyrelyje gilinamės
+į *atgalinio sklidimo*
+(dažniau vadinamo *atgaliniu skleidimu*) detales.
+Kad suteiktume įžvalgų apie
+metodus ir jų įgyvendinimą,
+remiamės elementaria matematika ir skaičiavimo grafais.
+Pradžioje savo pateikimą sutelkiame į
+vieno paslėptojo sluoksnio MLP
+su svorių nykimu ($\ell_2$ reguliarizavimu, kuris bus aprašytas tolesniuose skyriuose).
 
-## Forward Propagation
+## Tiesioginis sklidimas
 
-*Forward propagation* (or *forward pass*) refers to the calculation and storage
-of intermediate variables (including outputs)
-for a neural network in order
-from the input layer to the output layer.
-We now work step-by-step through the mechanics
-of a neural network with one hidden layer.
-This may seem tedious but in the eternal words
-of funk virtuoso James Brown,
-you must "pay the cost to be the boss".
+*Tiesioginis sklidimas* (arba *tiesioginis praėjimas*) reiškia tarpinių kintamųjų
+(įskaitant išvestis) skaičiavimą ir saugojimą
+neuroniniam tinklui iš eilės
+nuo įvesties sluoksnio iki išvesties sluoksnio.
+Dabar žingsnis po žingsnio išnagrinėsime
+neuroninio tinklo su vienu paslėptuoju sluoksniu mechaniką.
+Tai gali pasirodyti nuobodu, bet pagal
+funko virtuozo Jameso Browno amžinuosius žodžius,
+turite „sumokėti kainą, kad taptumėte bosu“.
 
 
-For the sake of simplicity, let's assume
-that the input example is $\mathbf{x}\in \mathbb{R}^d$
-and that our hidden layer does not include a bias term.
-Here the intermediate variable is:
+Paprastumo dėlei tarkime,
+kad įvesties pavyzdys yra $\mathbf{x}\in \mathbb{R}^d$,
+o mūsų paslėptasis sluoksnis neturi poslinkio nario.
+Čia tarpinis kintamasis yra:
 
 $$\mathbf{z}= \mathbf{W}^{(1)} \mathbf{x},$$
 
-where $\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
-is the weight parameter of the hidden layer.
-After running the intermediate variable
-$\mathbf{z}\in \mathbb{R}^h$ through the
-activation function $\phi$
-we obtain our hidden activation vector of length $h$:
+kur $\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
+yra paslėptojo sluoksnio svorių parametras.
+Praleidę tarpinį kintamąjį
+$\mathbf{z}\in \mathbb{R}^h$ per
+aktyvacijos funkciją $\phi$,
+gauname savo paslėptųjų aktyvacijų vektorių, kurio ilgis $h$:
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$
 
-The hidden layer output $\mathbf{h}$
-is also an intermediate variable.
-Assuming that the parameters of the output layer
-possess only a weight of
+Paslėptojo sluoksnio išvestis $\mathbf{h}$
+taip pat yra tarpinis kintamasis.
+Tarkime, kad išvesties sluoksnio parametrai
+turi tik svorį
 $\mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$,
-we can obtain an output layer variable
-with a vector of length $q$:
+tada galime gauti išvesties sluoksnio kintamąjį,
+kuris yra $q$ ilgio vektorius:
 
 $$\mathbf{o}= \mathbf{W}^{(2)} \mathbf{h}.$$
 
-Assuming that the loss function is $l$
-and the example label is $y$,
-we can then calculate the loss term
-for a single data example,
+Tarkime, kad nuostolių funkcija yra $l$,
+o pavyzdžio žymuo yra $y$,
+tada galime apskaičiuoti nuostolių narį
+vienam duomenų pavyzdžiui:
 
 $$L = l(\mathbf{o}, y).$$
 
-As we will see the definition of $\ell_2$ regularization
-to be introduced later,
-given the hyperparameter $\lambda$,
-the regularization term is
+Kaip pamatysime iš vėliau pristatomo $\ell_2$ reguliarizavimo apibrėžimo,
+turint hiperparametrą $\lambda$,
+reguliarizavimo narys yra
 
 $$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_\textrm{F}^2 + \|\mathbf{W}^{(2)}\|_\textrm{F}^2\right),$$
 :eqlabel:`eq_forward-s`
 
-where the Frobenius norm of the matrix
-is simply the $\ell_2$ norm applied
-after flattening the matrix into a vector.
-Finally, the model's regularized loss
-on a given data example is:
+kur matricos Frobenijaus norma
+yra tiesiog $\ell_2$ norma, pritaikyta
+suplokštinus matricą į vektorių.
+Galiausiai modelio reguliarizuoti nuostoliai
+duotam duomenų pavyzdžiui yra:
 
 $$J = L + s.$$
 
-We refer to $J$ as the *objective function*
-in the following discussion.
+Toliau diskusijoje $J$ vadinsime *tikslo funkcija*.
 
 
-## Computational Graph of Forward Propagation
+## Tiesioginio sklidimo skaičiavimo grafas
 
-Plotting *computational graphs* helps us visualize
-the dependencies of operators
-and variables within the calculation.
-:numref:`fig_forward` contains the graph associated
-with the simple network described above,
-where squares denote variables and circles denote operators.
-The lower-left corner signifies the input
-and the upper-right corner is the output.
-Notice that the directions of the arrows
-(which illustrate data flow)
-are primarily rightward and upward.
+*Skaičiavimo grafų* braižymas padeda vizualizuoti
+operatorių ir kintamųjų priklausomybes
+skaičiavimo viduje.
+:numref:`fig_forward` pateiktas grafas, susijęs
+su aukščiau aprašytu paprastu tinklu,
+kuriame kvadratai žymi kintamuosius, o apskritimai – operatorius.
+Apatinis kairysis kampas žymi įvestį,
+o viršutinis dešinysis – išvestį.
+Atkreipkite dėmesį, kad rodyklių kryptys
+(iliustruojančios duomenų srautą)
+daugiausia yra į dešinę ir aukštyn.
 
-![Computational graph of forward propagation.](../img/forward.svg)
+![Tiesioginio sklidimo skaičiavimo grafas.](../img/forward.svg)
 :label:`fig_forward`
 
-## Backpropagation
+## Atgalinis sklidimas
 
-*Backpropagation* refers to the method of calculating
-the gradient of neural network parameters.
-In short, the method traverses the network in reverse order,
-from the output to the input layer,
-according to the *chain rule* from calculus.
-The algorithm stores any intermediate variables
-(partial derivatives)
-required while calculating the gradient
-with respect to some parameters.
-Assume that we have functions
+*Atgalinis sklidimas* reiškia neuroninio tinklo parametrų
+gradiento skaičiavimo metodą.
+Trumpai tariant, metodas apeina tinklą atvirkštine tvarka,
+nuo išvesties iki įvesties sluoksnio,
+pagal *grandinės taisyklę* iš matematinės analizės.
+Algoritmas saugo bet kuriuos tarpinius kintamuosius
+(dalines išvestines),
+reikalingus skaičiuojant gradientą
+kokių nors parametrų atžvilgiu.
+Tarkime, kad turime funkcijas
 $\mathsf{Y}=f(\mathsf{X})$
-and $\mathsf{Z}=g(\mathsf{Y})$,
-in which the input and the output
+ir $\mathsf{Z}=g(\mathsf{Y})$,
+kuriose įvestis ir išvestis
 $\mathsf{X}, \mathsf{Y}, \mathsf{Z}$
-are tensors of arbitrary shapes.
-By using the chain rule,
-we can compute the derivative
-of $\mathsf{Z}$ with respect to $\mathsf{X}$ via
+yra savavališkų formų tenzoriai.
+Naudodami grandinės taisyklę,
+galime apskaičiuoti
+$\mathsf{Z}$ išvestinę $\mathsf{X}$ atžvilgiu pagal
 
 $$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \textrm{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right).$$
 
-Here we use the $\textrm{prod}$ operator
-to multiply its arguments
-after the necessary operations,
-such as transposition and swapping input positions,
-have been carried out.
-For vectors, this is straightforward:
-it is simply matrix--matrix multiplication.
-For higher dimensional tensors,
-we use the appropriate counterpart.
-The operator $\textrm{prod}$ hides all the notational overhead.
+Čia naudojame operatorių $\textrm{prod}$,
+kad sudaugintume jo argumentus
+atlikus reikiamas operacijas,
+tokias kaip transponavimas ir įvesties pozicijų sukeitimas.
+Vektoriams tai paprasta:
+tai tiesiog matricų daugyba.
+Aukštesnių dimensijų tenzoriams
+naudojame atitinkamą analogą.
+Operatorius $\textrm{prod}$ paslepia visą žymėjimo naštą.
 
-Recall that
-the parameters of the simple network with one hidden layer,
-whose computational graph is in :numref:`fig_forward`,
-are $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.
-The objective of backpropagation is to
-calculate the gradients $\partial J/\partial \mathbf{W}^{(1)}$
-and $\partial J/\partial \mathbf{W}^{(2)}$.
-To accomplish this, we apply the chain rule
-and calculate, in turn, the gradient of
-each intermediate variable and parameter.
-The order of calculations are reversed
-relative to those performed in forward propagation,
-since we need to start with the outcome of the computational graph
-and work our way towards the parameters.
-The first step is to calculate the gradients
-of the objective function $J=L+s$
-with respect to the loss term $L$
-and the regularization term $s$:
+Prisiminkite, kad
+paprasto tinklo su vienu paslėptuoju sluoksniu,
+kurio skaičiavimo grafas pateiktas :numref:`fig_forward`,
+parametrai yra $\mathbf{W}^{(1)}$ ir $\mathbf{W}^{(2)}$.
+Atgalinio sklidimo tikslas yra
+apskaičiuoti gradientus $\partial J/\partial \mathbf{W}^{(1)}$
+ir $\partial J/\partial \mathbf{W}^{(2)}$.
+Tam taikome grandinės taisyklę
+ir paeiliui skaičiuojame
+kiekvieno tarpinio kintamojo ir parametro gradientą.
+Skaičiavimų tvarka yra atvirkštinė
+nei atliekama tiesioginio sklidimo metu,
+nes turime pradėti nuo skaičiavimo grafo rezultato
+ir judėti link parametrų.
+Pirmasis žingsnis yra apskaičiuoti
+tikslo funkcijos $J=L+s$ gradientus
+nuostolių nario $L$
+ir reguliarizavimo nario $s$ atžvilgiu:
 
 $$\frac{\partial J}{\partial L} = 1 \; \textrm{and} \; \frac{\partial J}{\partial s} = 1.$$
 
-Next, we compute the gradient of the objective function
-with respect to variable of the output layer $\mathbf{o}$
-according to the chain rule:
+Toliau, pagal grandinės taisyklę, apskaičiuojame tikslo funkcijos
+gradientą išvesties sluoksnio kintamojo $\mathbf{o}$ atžvilgiu:
 
 $$
 \frac{\partial J}{\partial \mathbf{o}}
@@ -183,27 +179,26 @@ $$
 \in \mathbb{R}^q.
 $$
 
-Next, we calculate the gradients
-of the regularization term
-with respect to both parameters:
+Toliau apskaičiuojame reguliarizavimo nario
+gradientus abiejų parametrų atžvilgiu:
 
 $$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)}
 \; \textrm{and} \;
 \frac{\partial s}{\partial \mathbf{W}^{(2)}} = \lambda \mathbf{W}^{(2)}.$$
 
-Now we are able to calculate the gradient
-$\partial J/\partial \mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$
-of the model parameters closest to the output layer.
-Using the chain rule yields:
+Dabar galime apskaičiuoti
+arčiausiai išvesties sluoksnio esančių modelio parametrų
+gradientą $\partial J/\partial \mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$.
+Naudodami grandinės taisyklę gauname:
 
 $$\frac{\partial J}{\partial \mathbf{W}^{(2)}}= \textrm{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{W}^{(2)}}\right) + \textrm{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(2)}}\right)= \frac{\partial J}{\partial \mathbf{o}} \mathbf{h}^\top + \lambda \mathbf{W}^{(2)}.$$
 :eqlabel:`eq_backprop-J-h`
 
-To obtain the gradient with respect to $\mathbf{W}^{(1)}$
-we need to continue backpropagation
-along the output layer to the hidden layer.
-The gradient with respect to the hidden layer output
-$\partial J/\partial \mathbf{h} \in \mathbb{R}^h$ is given by
+Kad gautume gradientą $\mathbf{W}^{(1)}$ atžvilgiu,
+turime tęsti atgalinį sklidimą
+nuo išvesties sluoksnio iki paslėptojo sluoksnio.
+Gradientas paslėptojo sluoksnio išvesties atžvilgiu
+$\partial J/\partial \mathbf{h} \in \mathbb{R}^h$ yra
 
 
 $$
@@ -212,11 +207,11 @@ $$
 = {\mathbf{W}^{(2)}}^\top \frac{\partial J}{\partial \mathbf{o}}.
 $$
 
-Since the activation function $\phi$ applies elementwise,
-calculating the gradient $\partial J/\partial \mathbf{z} \in \mathbb{R}^h$
-of the intermediate variable $\mathbf{z}$
-requires that we use the elementwise multiplication operator,
-which we denote by $\odot$:
+Kadangi aktyvacijos funkcija $\phi$ taikoma elementas po elemento,
+tarpinio kintamojo $\mathbf{z}$ gradiento $\partial J/\partial \mathbf{z} \in \mathbb{R}^h$
+skaičiavimui
+reikia naudoti elementų daugybos operatorių,
+kurį žymime $\odot$:
 
 $$
 \frac{\partial J}{\partial \mathbf{z}}
@@ -224,10 +219,10 @@ $$
 = \frac{\partial J}{\partial \mathbf{h}} \odot \phi'\left(\mathbf{z}\right).
 $$
 
-Finally, we can obtain the gradient
-$\partial J/\partial \mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
-of the model parameters closest to the input layer.
-According to the chain rule, we get
+Galiausiai galime gauti
+arčiausiai įvesties sluoksnio esančių modelio parametrų
+gradientą $\partial J/\partial \mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$.
+Pagal grandinės taisyklę gauname
 
 $$
 \frac{\partial J}{\partial \mathbf{W}^{(1)}}
@@ -237,62 +232,62 @@ $$
 
 
 
-## Training Neural Networks
+## Neuroninių tinklų apmokymas
 
-When training neural networks,
-forward and backward propagation depend on each other.
-In particular, for forward propagation,
-we traverse the computational graph in the direction of dependencies
-and compute all the variables on its path.
-These are then used for backpropagation
-where the compute order on the graph is reversed.
+Apmokant neuroninius tinklus,
+tiesioginis ir atgalinis sklidimai priklauso vienas nuo kito.
+Visų pirma, tiesioginio sklidimo metu
+apeiname skaičiavimo grafą priklausomybių kryptimi
+ir apskaičiuojame visus kintamuosius jo kelyje.
+Jie vėliau naudojami atgaliniam sklidimui,
+kai skaičiavimo tvarka grafe apverčiama.
 
-Take the aforementioned simple network as an illustrative example.
-On the one hand,
-computing the regularization term :eqref:`eq_forward-s`
-during forward propagation
-depends on the current values of model parameters $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.
-They are given by the optimization algorithm according to backpropagation in the most recent iteration.
-On the other hand,
-the gradient calculation for the parameter
-:eqref:`eq_backprop-J-h` during backpropagation
-depends on the current value of the hidden layer output $\mathbf{h}$,
-which is given by forward propagation.
-
-
-Therefore when training neural networks, once model parameters are initialized,
-we alternate forward propagation with backpropagation,
-updating model parameters using gradients given by backpropagation.
-Note that backpropagation reuses the stored intermediate values from forward propagation to avoid duplicate calculations.
-One of the consequences is that we need to retain
-the intermediate values until backpropagation is complete.
-This is also one of the reasons why training
-requires significantly more memory than plain prediction.
-Besides, the size of such intermediate values is roughly
-proportional to the number of network layers and the batch size.
-Thus,
-training deeper networks using larger batch sizes
-more easily leads to *out-of-memory* errors.
+Kaip iliustracinį pavyzdį paimkime minėtą paprastą tinklą.
+Viena vertus,
+reguliarizavimo nario :eqref:`eq_forward-s` skaičiavimas
+tiesioginio sklidimo metu
+priklauso nuo dabartinių modelio parametrų $\mathbf{W}^{(1)}$ ir $\mathbf{W}^{(2)}$ reikšmių.
+Jas pateikia optimizavimo algoritmas pagal atgalinį sklidimą paskutinėje iteracijoje.
+Kita vertus,
+parametro gradiento skaičiavimas
+:eqref:`eq_backprop-J-h` atgalinio sklidimo metu
+priklauso nuo dabartinės paslėptojo sluoksnio išvesties $\mathbf{h}$ reikšmės,
+kurią pateikia tiesioginis sklidimas.
 
 
-## Summary
+Todėl apmokant neuroninius tinklus, kai tik modelio parametrai inicializuoti,
+kaitaliojame tiesioginį sklidimą su atgaliniu sklidimu,
+atnaujindami modelio parametrus naudodami gradientus, gautus atgalinio sklidimo metu.
+Atkreipkite dėmesį, kad atgalinis sklidimas pakartotinai naudoja išsaugotas tarpines reikšmes iš tiesioginio sklidimo, kad išvengtų dubliuotų skaičiavimų.
+Viena iš pasekmių yra ta, kad turime išlaikyti
+tarpines reikšmes, kol atgalinis sklidimas bus baigtas.
+Tai taip pat viena iš priežasčių, kodėl apmokymui
+reikia gerokai daugiau atminties nei paprastai prognozei.
+Be to, tokių tarpinių reikšmių dydis yra maždaug
+proporcingas tinklo sluoksnių skaičiui ir paketo dydžiui.
+Todėl
+apmokant gilesnius tinklus su didesniais paketų dydžiais
+lengviau susiduriama su *atminties trūkumo* klaidomis.
 
-Forward propagation sequentially calculates and stores intermediate variables within the computational graph defined by the neural network. It proceeds from the input to the output layer.
-Backpropagation sequentially calculates and stores the gradients of intermediate variables and parameters within the neural network in the reversed order.
-When training deep learning models, forward propagation and backpropagation are interdependent,
-and training requires significantly more memory than prediction.
+
+## Santrauka
+
+Tiesioginis sklidimas nuosekliai apskaičiuoja ir saugo tarpinius kintamuosius neuroninio tinklo apibrėžtame skaičiavimo grafe. Jis vyksta nuo įvesties iki išvesties sluoksnio.
+Atgalinis sklidimas nuosekliai apskaičiuoja ir saugo tarpinių kintamųjų ir parametrų gradientus neuroniniame tinkle atvirkštine tvarka.
+Apmokant giliojo mokymosi modelius, tiesioginis ir atgalinis sklidimai yra tarpusavyje priklausomi,
+o apmokymui reikia gerokai daugiau atminties nei prognozei.
 
 
-## Exercises
+## Pratimai
 
-1. Assume that the inputs $\mathbf{X}$ to some scalar function $f$ are $n \times m$ matrices. What is the dimensionality of the gradient of $f$ with respect to $\mathbf{X}$?
-1. Add a bias to the hidden layer of the model described in this section (you do not need to include bias in the regularization term).
-    1. Draw the corresponding computational graph.
-    1. Derive the forward and backward propagation equations.
-1. Compute the memory footprint for training and prediction in the model described in this section.
-1. Assume that you want to compute second derivatives. What happens to the computational graph? How long do you expect the calculation to take?
-1. Assume that the computational graph is too large for your GPU.
-    1. Can you partition it over more than one GPU?
-    1. What are the advantages and disadvantages over training on a smaller minibatch?
+1. Tarkime, kad kokios nors skaliarinės funkcijos $f$ įvestys $\mathbf{X}$ yra $n \times m$ matricos. Kokia yra $f$ gradiento $\mathbf{X}$ atžvilgiu dimensija?
+1. Pridėkite poslinkį prie šiame skyrelyje aprašyto modelio paslėptojo sluoksnio (poslinkio į reguliarizavimo narį įtraukti nereikia).
+    1. Nubraižykite atitinkamą skaičiavimo grafą.
+    1. Išveskite tiesioginio ir atgalinio sklidimo lygtis.
+1. Apskaičiuokite atminties apimtį apmokymui ir prognozei šiame skyrelyje aprašytame modelyje.
+1. Tarkime, kad norite apskaičiuoti antrąsias išvestines. Kas nutinka skaičiavimo grafui? Kiek laiko tikitės, kad užtruks skaičiavimas?
+1. Tarkime, kad skaičiavimo grafas per didelis jūsų GPU.
+    1. Ar galite jį išskaidyti per daugiau nei vieną GPU?
+    1. Kokie pranašumai ir trūkumai, palyginti su apmokymu mažesniu minirinkiniu?
 
-[Discussions](https://discuss.d2l.ai/t/102)
+[Diskusijos](https://discuss.d2l.ai/t/102)

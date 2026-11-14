@@ -1,358 +1,358 @@
-# Environment and Distribution Shift
+# Aplinka ir skirstinio poslinkis
 :label:`sec_environment-and-distribution-shift`
 
-In the previous sections, we worked through
-a number of hands-on applications of machine learning,
-fitting models to a variety of datasets.
-And yet, we never stopped to contemplate
-either where data came from in the first place
-or what we ultimately plan to do
-with the outputs from our models.
-Too often, machine learning developers
-in possession of data rush to develop models
-without pausing to consider these fundamental issues.
+Ankstesniuose skyreliuose išnagrinėjome
+keletą praktinių mašininio mokymosi taikymų,
+pritaikydami modelius įvairiems duomenų rinkiniams.
+Ir vis dėlto niekada nesustojome pamąstyti,
+nei iš kur iš pradžių atsirado duomenys,
+nei ką galiausiai planuojame daryti
+su savo modelių išvestimis.
+Per dažnai mašininio mokymosi kūrėjai,
+turėdami duomenų, skuba kurti modelius,
+nesustodami apsvarstyti šių fundamentalių klausimų.
 
-Many failed machine learning deployments
-can be traced back to this failure.
-Sometimes models appear to perform marvelously
-as measured by test set accuracy
-but fail catastrophically in deployment
-when the distribution of data suddenly shifts.
-More insidiously, sometimes the very deployment of a model
-can be the catalyst that perturbs the data distribution.
-Say, for example, that we trained a model
-to predict who will repay rather than default on a loan,
-finding that an applicant's choice of footwear
-was associated with the risk of default
-(Oxfords indicate repayment, sneakers indicate default).
-We might be inclined 
-thereafter to grant a loan
-to any applicant wearing Oxfords
-and to deny all applicants wearing sneakers.
+Daugelio nesėkmingų mašininio mokymosi diegimų priežastis
+galima atsekti iki šios klaidos.
+Kartais modeliai atrodo veikiantys puikiai,
+vertinant pagal testavimo aibės tikslumą,
+bet katastrofiškai suklysta diegimo metu,
+kai duomenų skirstinys staiga pasikeičia.
+Klastingiau, kartais pats modelio diegimas
+gali būti katalizatorius, sutrikdantis duomenų skirstinį.
+Tarkime, pavyzdžiui, kad apmokėme modelį
+prognozuoti, kas grąžins paskolą, o kas nevykdys įsipareigojimų,
+ir nustatėme, kad kreditą prašančiojo avalynės pasirinkimas
+susijęs su nemokumo rizika
+(oksfordai rodo grąžinimą, sportbačiai – nemokumą).
+Po to galėtume būti linkę
+suteikti paskolą
+kiekvienam oksfordus avinčiam pareiškėjui
+ir atmesti visus sportbačius avinčius pareiškėjus.
 
-In this case, our ill-considered leap from
-pattern recognition to decision-making
-and our failure to critically consider the environment
-might have disastrous consequences.
-For starters, as soon as we began
-making decisions based on footwear,
-customers would catch on and change their behavior.
-Before long, all applicants would be wearing Oxfords,
-without any coincident improvement in credit-worthiness.
-Take a minute to digest this because similar issues abound
-in many applications of machine learning:
-by introducing our model-based decisions to the environment,
-we might break the model.
+Tokiu atveju mūsų nepagrįstas šuolis
+nuo dėsningumų atpažinimo prie sprendimų priėmimo
+ir mūsų nesugebėjimas kritiškai apsvarstyti aplinkos
+gali turėti pražūtingų pasekmių.
+Pirmiausia, vos pradėjus
+priimti sprendimus pagal avalynę,
+klientai tai supras ir pakeis savo elgesį.
+Netrukus visi pareiškėjai avės oksfordus,
+nesant jokio kartu vykstančio kreditingumo pagerėjimo.
+Skirkite minutę tam suvokti, nes panašių problemų
+yra daugelyje mašininio mokymosi taikymų:
+įvesdami savo modeliu pagrįstus sprendimus į aplinką,
+galime sugadinti modelį.
 
-While we cannot possibly give these topics
-a complete treatment in one section,
-we aim here to expose some common concerns,
-and to stimulate the critical thinking
-required to detect such situations early,
-mitigate damage, and use machine learning responsibly.
-Some of the solutions are simple
-(ask for the "right" data),
-some are technically difficult
-(implement a reinforcement learning system),
-and others require that we step outside the realm of
-statistical prediction altogether and
-grapple with difficult philosophical questions
-concerning the ethical application of algorithms.
+Nors negalime išsamiai nagrinėti šių temų
+viename skyrelyje,
+čia siekiame atskleisti kai kuriuos dažnus rūpesčius
+ir paskatinti kritinį mąstymą,
+reikalingą tokioms situacijoms laiku aptikti,
+žalai sumažinti ir mašininiam mokymuisi naudoti atsakingai.
+Kai kurie sprendimai paprasti
+(paprašyti „tinkamų" duomenų),
+kai kurie techniškai sudėtingi
+(įgyvendinti skatinamojo mokymo sistemą),
+o kiti reikalauja, kad išeitume už
+statistinės prognozės srities ribų
+ir imtumės sudėtingų filosofinių klausimų,
+susijusių su etišku algoritmų taikymu.
 
-## Types of Distribution Shift
+## Skirstinio poslinkio tipai
 
-To begin, we stick with the passive prediction setting
-considering the various ways that data distributions might shift
-and what might be done to salvage model performance.
-In one classic setup, we assume that our training data
-was sampled from some distribution $p_S(\mathbf{x},y)$
-but that our test data will consist
-of unlabeled examples drawn from
-some different distribution $p_T(\mathbf{x},y)$.
-Already, we must confront a sobering reality.
-Absent any assumptions on how $p_S$
-and $p_T$ relate to each other,
-learning a robust classifier is impossible.
+Pradėkime pasilikdami pasyvios prognozės aplinkoje,
+nagrinėdami įvairius būdus, kuriais gali pasikeisti duomenų skirstiniai,
+ir ką galima padaryti, kad išgelbėtume modelio veikimą.
+Vienoje klasikinėje sąrankoje darome prielaidą, kad mūsų apmokymo duomenys
+paimti iš kokio nors skirstinio $p_S(\mathbf{x},y)$,
+bet mūsų testavimo duomenis sudarys
+nepažymėti pavyzdžiai, paimti iš
+kokio nors kito skirstinio $p_T(\mathbf{x},y)$.
+Jau dabar turime susidurti su blaivinančia tikrove.
+Neturint jokių prielaidų apie tai, kaip $p_S$
+ir $p_T$ susiję tarpusavyje,
+išmokti patikimą klasifikatorių neįmanoma.
 
-Consider a binary classification problem,
-where we wish to distinguish between dogs and cats.
-If the distribution can shift in arbitrary ways,
-then our setup permits the pathological case
-in which the distribution over inputs remains
-constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$,
-but the labels are all flipped:
+Panagrinėkime dvejetainio klasifikavimo uždavinį,
+kuriame norime atskirti šunis ir kates.
+Jei skirstinys gali kisti savavališkais būdais,
+tuomet mūsų sąranka leidžia patologinį atvejį,
+kai įvesčių skirstinys išlieka
+pastovus: $p_S(\mathbf{x}) = p_T(\mathbf{x})$,
+bet visi žymenys yra apversti:
 $p_S(y \mid \mathbf{x}) = 1 - p_T(y \mid \mathbf{x})$.
-In other words, if God can suddenly decide
-that in the future all "cats" are now dogs
-and what we previously called "dogs" are now cats---without
-any change in the distribution of inputs $p(\mathbf{x})$,
-then we cannot possibly distinguish this setting
-from one in which the distribution did not change at all.
+Kitaip tariant, jei Dievas gali staiga nuspręsti,
+kad ateityje visos „katės" yra šunys,
+o tai, ką anksčiau vadinome „šunimis", dabar yra katės – be
+jokio įvesčių skirstinio $p(\mathbf{x})$ pasikeitimo,
+tuomet jokiu būdu negalime atskirti šios situacijos
+nuo tos, kurioje skirstinys visai nepasikeitė.
 
-Fortunately, under some restricted assumptions
-on the ways our data might change in the future,
-principled algorithms can detect shift
-and sometimes even adapt on the fly,
-improving on the accuracy of the original classifier.
+Laimei, esant tam tikroms ribojančioms prielaidoms
+apie tai, kaip mūsų duomenys gali keistis ateityje,
+principingi algoritmai gali aptikti poslinkį
+ir kartais net prisitaikyti skrydžio metu,
+pagerindami pradinio klasifikatoriaus tikslumą.
 
-### Covariate Shift
+### Kovariantų poslinkis
 
-Among categories of distribution shift,
-covariate shift may be the most widely studied.
-Here, we assume that while the distribution of inputs
-may change over time, the labeling function,
-i.e., the conditional distribution
-$P(y \mid \mathbf{x})$ does not change.
-Statisticians call this *covariate shift*
-because the problem arises due to a
-shift in the distribution of the covariates (features).
-While we can sometimes reason about distribution shift
-without invoking causality, we note that covariate shift
-is the natural assumption to invoke in settings
-where we believe that $\mathbf{x}$ causes $y$.
+Tarp skirstinio poslinkio kategorijų
+kovariantų poslinkis galbūt yra plačiausiai tyrinėjamas.
+Čia darome prielaidą, kad nors įvesčių skirstinys
+gali kisti laikui bėgant, žymėjimo funkcija,
+t. y. sąlyginis skirstinys
+$P(y \mid \mathbf{x})$, nesikeičia.
+Statistikai tai vadina *kovariantų poslinkiu*,
+nes problema kyla dėl
+kovariantų (požymių) skirstinio poslinkio.
+Nors kartais galime samprotauti apie skirstinio poslinkį
+nesiremdami priežastingumu, pažymime, kad kovariantų poslinkis
+yra natūrali prielaida aplinkoje,
+kur tikime, kad $\mathbf{x}$ sukelia $y$.
 
-Consider the challenge of distinguishing cats and dogs.
-Our training data might consist of images of the kind in :numref:`fig_cat-dog-train`.
+Panagrinėkime iššūkį atskirti kates ir šunis.
+Mūsų apmokymo duomenis gali sudaryti tokie vaizdai, kaip :numref:`fig_cat-dog-train`.
 
-![Training data for distinguishing cats and dogs (illustrations: Lafeez Hossain / 500px / Getty Images; ilkermetinkursova / iStock / Getty Images Plus; GlobalP / iStock / Getty Images Plus; Musthafa Aboobakuru / 500px / Getty Images).](../img/cat-dog-train.png)
+![Apmokymo duomenys katėms ir šunims atskirti (iliustracijos: Lafeez Hossain / 500px / Getty Images; ilkermetinkursova / iStock / Getty Images Plus; GlobalP / iStock / Getty Images Plus; Musthafa Aboobakuru / 500px / Getty Images).](../img/cat-dog-train.png)
 :label:`fig_cat-dog-train`
 
 
-At test time we are asked to classify the images in :numref:`fig_cat-dog-test`.
+Testavimo metu mūsų prašoma klasifikuoti vaizdus :numref:`fig_cat-dog-test`.
 
-![Test data for distinguishing cats and dogs (illustrations: SIBAS_minich / iStock / Getty Images Plus; Ghrzuzudu / iStock / Getty Images Plus; id-work / DigitalVision Vectors / Getty Images; Yime / iStock / Getty Images Plus).](../img/cat-dog-test.png)
+![Testavimo duomenys katėms ir šunims atskirti (iliustracijos: SIBAS_minich / iStock / Getty Images Plus; Ghrzuzudu / iStock / Getty Images Plus; id-work / DigitalVision Vectors / Getty Images; Yime / iStock / Getty Images Plus).](../img/cat-dog-test.png)
 :label:`fig_cat-dog-test`
 
-The training set consists of photos,
-while the test set contains only cartoons.
-Training on a dataset with substantially different
-characteristics from the test set
-can spell trouble absent a coherent plan
-for how to adapt to the new domain.
+Apmokymo aibę sudaro nuotraukos,
+o testavimo aibėje yra tik karikatūros.
+Apmokymas duomenų rinkinyje, kurio charakteristikos
+gerokai skiriasi nuo testavimo aibės,
+gali sukelti bėdų, jei nėra nuoseklaus plano,
+kaip prisitaikyti prie naujos srities.
 
-### Label Shift
+### Žymenų poslinkis
 
-*Label shift* describes the converse problem.
-Here, we assume that the label marginal $P(y)$
-can change
-but the class-conditional distribution
-$P(\mathbf{x} \mid y)$ remains fixed across domains.
-Label shift is a reasonable assumption to make
-when we believe that $y$ causes $\mathbf{x}$.
-For example, we may want to predict diagnoses
-given their symptoms (or other manifestations),
-even as the relative prevalence of diagnoses
-are changing over time.
-Label shift is the appropriate assumption here
-because diseases cause symptoms.
-In some degenerate cases the label shift
-and covariate shift assumptions can hold simultaneously.
-For example, when the label is deterministic,
-the covariate shift assumption will be satisfied,
-even when $y$ causes $\mathbf{x}$.
-Interestingly, in these cases,
-it is often advantageous to work with methods
-that flow from the label shift assumption.
-That is because these methods tend
-to involve manipulating objects that look like labels (often low-dimensional),
-as opposed to objects that look like inputs,
-which tend to be high-dimensional in deep learning.
+*Žymenų poslinkis* aprašo atvirkštinę problemą.
+Čia darome prielaidą, kad žymenų marginalusis skirstinys $P(y)$
+gali kisti,
+bet klasės sąlyginis skirstinys
+$P(\mathbf{x} \mid y)$ išlieka fiksuotas skirtingose srityse.
+Žymenų poslinkis yra pagrįsta prielaida,
+kai tikime, kad $y$ sukelia $\mathbf{x}$.
+Pavyzdžiui, galime norėti prognozuoti diagnozes
+pagal jų simptomus (ar kitas apraiškas),
+net kai santykinis diagnozių paplitimas
+laikui bėgant keičiasi.
+Žymenų poslinkis čia yra tinkama prielaida,
+nes ligos sukelia simptomus.
+Kai kuriais išsigimusiais atvejais žymenų poslinkio
+ir kovariantų poslinkio prielaidos gali galioti vienu metu.
+Pavyzdžiui, kai žymuo yra deterministinis,
+kovariantų poslinkio prielaida bus patenkinta,
+net kai $y$ sukelia $\mathbf{x}$.
+Įdomu tai, kad šiais atvejais
+dažnai naudinga dirbti su metodais,
+kylančiais iš žymenų poslinkio prielaidos.
+Taip yra todėl, kad šie metodai paprastai
+apima manipuliavimą objektais, panašiais į žymenis (dažnai mažos dimensijos),
+o ne objektais, panašiais į įvestis,
+kurie giliajame mokyme paprastai yra didelės dimensijos.
 
-### Concept Shift
+### Sąvokų poslinkis
 
-We may also encounter the related problem of *concept shift*,
-which arises when the very definitions of labels can change.
-This sounds weird---a *cat* is a *cat*, no?
-However, other categories are subject to changes in usage over time.
-Diagnostic criteria for mental illness,
-what passes for fashionable, and job titles,
-are all subject to considerable
-amounts of concept shift.
-It turns out that if we navigate around the United States,
-shifting the source of our data by geography,
-we will find considerable concept shift regarding
-the distribution of names for *soft drinks*
-as shown in :numref:`fig_popvssoda`.
+Taip pat galime susidurti su susijusia *sąvokų poslinkio* problema,
+kuri kyla, kai gali keistis pats žymenų apibrėžimas.
+Tai skamba keistai – *katė* yra *katė*, ar ne?
+Tačiau kitų kategorijų vartojimas laikui bėgant kinta.
+Psichikos ligų diagnostiniai kriterijai,
+tai, kas laikoma madinga, ir darbo pareigybių pavadinimai
+patiria nemažai
+sąvokų poslinkio.
+Pasirodo, kad jei keliautume po Jungtines Valstijas,
+keisdami savo duomenų šaltinį pagal geografiją,
+rastume didelį sąvokų poslinkį dėl
+*gaiviųjų gėrimų* pavadinimų skirstinio,
+kaip parodyta :numref:`fig_popvssoda`.
 
-![Concept shift for soft drink names in the United States (CC-BY: Alan McConchie, PopVsSoda.com).](../img/popvssoda.png)
+![Gaiviųjų gėrimų pavadinimų sąvokų poslinkis Jungtinėse Valstijose (CC-BY: Alan McConchie, PopVsSoda.com).](../img/popvssoda.png)
 :width:`400px`
 :label:`fig_popvssoda`
 
-If we were to build a machine translation system,
-the distribution $P(y \mid \mathbf{x})$ might be different
-depending on our location.
-This problem can be tricky to spot.
-We might hope to exploit knowledge
-that shift only takes place gradually
-either in a temporal or geographic sense.
+Jei kurtume mašininio vertimo sistemą,
+skirstinys $P(y \mid \mathbf{x})$ galėtų skirtis
+priklausomai nuo mūsų buvimo vietos.
+Šią problemą gali būti sunku pastebėti.
+Galime tikėtis pasinaudoti žiniomis,
+kad poslinkis vyksta tik laipsniškai,
+tiek laiko, tiek geografine prasme.
 
-## Examples of Distribution Shift
+## Skirstinio poslinkio pavyzdžiai
 
-Before delving into formalism and algorithms,
-we can discuss some concrete situations
-where covariate or concept shift might not be obvious.
-
-
-### Medical Diagnostics
-
-Imagine that you want to design an algorithm to detect cancer.
-You collect data from healthy and sick people
-and you train your algorithm.
-It works fine, giving you high accuracy
-and you conclude that you are ready
-for a successful career in medical diagnostics.
-*Not so fast.*
-
-The distributions that gave rise to the training data
-and those you will encounter in the wild might differ considerably.
-This happened to an unfortunate startup
-that some of we authors worked with years ago.
-They were developing a blood test for a disease
-that predominantly affects older men
-and hoped to study it using blood samples
-that they had collected from patients.
-However, it is considerably more difficult
-to obtain blood samples from healthy men
-than from sick patients already in the system.
-To compensate, the startup solicited
-blood donations from students on a university campus
-to serve as healthy controls in developing their test.
-Then they asked whether we could help them
-to build a classifier for detecting the disease.
-
-As we explained to them,
-it would indeed be easy to distinguish
-between the healthy and sick cohorts
-with near-perfect accuracy.
-However, that is because the test subjects
-differed in age, hormone levels,
-physical activity, diet, alcohol consumption,
-and many more factors unrelated to the disease.
-This was unlikely to be the case with real patients.
-Due to their sampling procedure,
-we could expect to encounter extreme covariate shift.
-Moreover, this case was unlikely to be
-correctable via conventional methods.
-In short, they wasted a significant sum of money.
+Prieš gilindamiesi į formalizmą ir algoritmus,
+galime aptarti kelias konkrečias situacijas,
+kuriose kovariantų ar sąvokų poslinkis gali būti neakivaizdus.
 
 
+### Medicininė diagnostika
 
-### Self-Driving Cars
+Įsivaizduokite, kad norite sukurti algoritmą vėžiui aptikti.
+Surenkate duomenis iš sveikų ir sergančių žmonių
+ir apmokote savo algoritmą.
+Jis veikia gerai, suteikia jums aukštą tikslumą,
+ir darote išvadą, kad esate pasirengę
+sėkmingai medicininės diagnostikos karjerai.
+*Ne taip greitai.*
 
-Say a company wanted to leverage machine learning
-for developing self-driving cars.
-One key component here is a roadside detector.
-Since real annotated data is expensive to get,
-they had the (smart and questionable) idea
-to use synthetic data from a game rendering engine
-as additional training data.
-This worked really well on "test data"
-drawn from the rendering engine.
-Alas, inside a real car it was a disaster.
-As it turned out, the roadside had been rendered
-with a very simplistic texture.
-More importantly, *all* the roadside had been rendered
-with the *same* texture and the roadside detector
-learned about this "feature" very quickly.
+Skirstiniai, sukūrę apmokymo duomenis,
+ir tie, su kuriais susidursite realiame pasaulyje, gali gerokai skirtis.
+Taip nutiko nelaimingam startuoliui,
+su kuriuo prieš keletą metų dirbo kai kurie iš mūsų, autorių.
+Jie kūrė kraujo tyrimą ligai,
+kuri daugiausia veikia vyresnio amžiaus vyrus,
+ir tikėjosi ją ištirti naudodami kraujo mėginius,
+kuriuos surinko iš pacientų.
+Tačiau gerokai sunkiau
+gauti kraujo mėginius iš sveikų vyrų
+nei iš jau sistemoje esančių sergančių pacientų.
+Kad tai kompensuotų, startuolis paprašė
+universiteto miestelio studentų aukoti kraują,
+kad jie būtų sveikų žmonių kontrolė kuriant jų tyrimą.
+Tada jie paklausė, ar galėtume padėti jiems
+sukurti klasifikatorių ligai aptikti.
 
-A similar thing happened to the US Army
-when they first tried to detect tanks in the forest.
-They took aerial photographs of the forest without tanks,
-then drove the tanks into the forest
-and took another set of pictures.
-The classifier appeared to work *perfectly*.
-Unfortunately, it had merely learned
-how to distinguish trees with shadows
-from trees without shadows---the first set
-of pictures was taken in the early morning,
-the second set at noon.
-
-### Nonstationary Distributions
-
-A much more subtle situation arises
-when the distribution changes slowly
-(also known as *nonstationary distribution*)
-and the model is not updated adequately.
-Below are some typical cases.
-
-* We train a computational advertising model and then fail to update it frequently (e.g., we forget to incorporate that an obscure new device called an iPad was just launched).
-* We build a spam filter. It works well at detecting all spam that we have seen so far. But then the spammers wise up and craft new messages that look unlike anything we have seen before.
-* We build a product recommendation system. It works throughout the winter but then continues to recommend Santa hats long after Christmas.
-
-### More Anecdotes
-
-* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
-* We build a web search engine for the US market and want to deploy it in the UK.
-* We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
+Kaip paaiškinome jiems,
+iš tiesų būtų lengva atskirti
+sveikų ir sergančių žmonių grupes
+beveik tobulu tikslumu.
+Tačiau taip yra todėl, kad tiriamieji
+skyrėsi amžiumi, hormonų lygiu,
+fiziniu aktyvumu, mityba, alkoholio vartojimu
+ir daugeliu kitų veiksnių, nesusijusių su liga.
+Realių pacientų atveju taip vargu ar būtų.
+Dėl jų imčių ėmimo procedūros
+galėjome tikėtis susidurti su kraštutiniu kovariantų poslinkiu.
+Be to, šio atvejo vargu ar buvo galima
+ištaisyti įprastais metodais.
+Trumpai tariant, jie iššvaistė nemažą pinigų sumą.
 
 
+
+### Savaeigiai automobiliai
+
+Tarkime, kad bendrovė norėjo pasinaudoti mašininiu mokymusi
+savaeigiams automobiliams kurti.
+Vienas pagrindinių komponentų čia yra kelkraščio detektorius.
+Kadangi tikrus anotuotus duomenis gauti brangu,
+jie sugalvojo (gudrią ir abejotiną) idėją
+kaip papildomus apmokymo duomenis naudoti
+sintetinius duomenis iš žaidimų atvaizdavimo variklio.
+Tai labai gerai veikė su „testavimo duomenimis",
+paimtais iš atvaizdavimo variklio.
+Deja, tikrame automobilyje tai buvo katastrofa.
+Pasirodo, kelkraštis buvo atvaizduotas
+labai primityvia tekstūra.
+Dar svarbiau, *visas* kelkraštis buvo atvaizduotas
+su *ta pačia* tekstūra, o kelkraščio detektorius
+labai greitai išmoko šį „požymį".
+
+Panašiai nutiko JAV armijai,
+kai ji pirmą kartą bandė aptikti tankus miške.
+Jie padarė miško aerofotonuotraukas be tankų,
+tada įvarė tankus į mišką
+ir padarė dar vieną nuotraukų rinkinį.
+Atrodė, kad klasifikatorius veikia *tobulai*.
+Deja, jis tiesiog išmoko
+atskirti medžius su šešėliais
+nuo medžių be šešėlių – pirmasis nuotraukų rinkinys
+buvo padarytas anksti ryte,
+antrasis – vidurdienį.
+
+### Nestacionarūs skirstiniai
+
+Kur kas subtilesnė situacija atsiranda,
+kai skirstinys kinta lėtai
+(dar vadinamas *nestacionariu skirstiniu*),
+o modelis nėra tinkamai atnaujinamas.
+Žemiau pateikiami keli tipiški atvejai.
+
+* Apmokome skaičiuojamosios reklamos modelį, o paskui nesugebame jo dažnai atnaujinti (pvz., pamirštame įtraukti, kad ką tik buvo išleistas mažai žinomas naujas įrenginys, vadinamas iPad).
+* Sukuriame šlamšto filtrą. Jis gerai aptinka visą iki šiol matytą šlamštą. Tačiau tada šlamšto siuntėjai pasidaro gudresni ir sukuria naujus laiškus, kurie nepanašūs į nieką, ką esame matę anksčiau.
+* Sukuriame produktų rekomendavimo sistemą. Ji veikia visą žiemą, bet paskui ir toliau rekomenduoja Kalėdų Senelio kepures ilgai po Kalėdų.
+
+### Daugiau anekdotų
+
+* Sukuriame veido detektorių. Jis gerai veikia visuose lyginamuosiuose rinkiniuose. Deja, jis nepavyksta su testavimo duomenimis – kenkiantys pavyzdžiai yra stambūs planai, kuriuose veidas užpildo visą vaizdą (tokių duomenų apmokymo aibėje nebuvo).
+* Sukuriame interneto paieškos sistemą JAV rinkai ir norime ją įdiegti Jungtinėje Karalystėje.
+* Apmokome vaizdų klasifikatorių, sudarydami didelį duomenų rinkinį, kuriame kiekviena iš didelio klasių rinkinio yra vienodai atstovaujama, tarkime, 1000 kategorijų, kiekviena atstovaujama 1000 vaizdų. Tada diegiame sistemą realiame pasaulyje, kur tikrasis nuotraukų žymenų skirstinys yra aiškiai nevienodas.
 
 
 
 
-## Correction of Distribution Shift
 
-As we have discussed, there are many cases
-where training and test distributions
-$P(\mathbf{x}, y)$ are different.
-In some cases, we get lucky and the models work
-despite covariate, label, or concept shift.
-In other cases, we can do better by employing
-principled strategies to cope with the shift.
-The remainder of this section grows considerably more technical.
-The impatient reader could continue on to the next section
-as this material is not prerequisite to subsequent concepts.
 
-### Empirical Risk and  Risk
+## Skirstinio poslinkio korekcija
+
+Kaip aptarėme, yra daug atvejų,
+kai apmokymo ir testavimo skirstiniai
+$P(\mathbf{x}, y)$ skiriasi.
+Kai kuriais atvejais mums pasiseka ir modeliai veikia
+nepaisant kovariantų, žymenų ar sąvokų poslinkio.
+Kitais atvejais galime pasiekti geriau, taikydami
+principingas strategijas poslinkiui įveikti.
+Likusi šio skyrelio dalis tampa gerokai techniškesnė.
+Nekantrus skaitytojas gali pereiti prie kito skyrelio,
+nes ši medžiaga nėra būtina vėlesnėms sąvokoms suprasti.
+
+### Empirinė rizika ir rizika
 :label:`subsec_empirical-risk-and-risk`
 
-Let's first reflect on what exactly
-is happening during model training:
-we iterate over features and associated labels
-of training data
+Pirmiausia pamąstykime, kas tiksliai
+vyksta modelio apmokymo metu:
+iteruojame per apmokymo duomenų
+požymius ir susijusius žymenis
 $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
-and update the parameters of a model $f$ after every minibatch.
-For simplicity we do not consider regularization,
-so we largely minimize the loss on the training:
+ir po kiekvieno minirinkinio atnaujiname modelio $f$ parametrus.
+Dėl paprastumo nenagrinėjame reguliarizavimo,
+todėl iš esmės minimizuojame nuostolius apmokymo duomenyse:
 
 $$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i),$$
 :eqlabel:`eq_empirical-risk-min`
 
-where $l$ is the loss function
-measuring "how bad" the prediction $f(\mathbf{x}_i)$ is given the associated label $y_i$.
-Statisticians call the term in :eqref:`eq_empirical-risk-min` *empirical risk*.
-The *empirical risk* is an average loss over the training data
-for approximating the *risk*,
-which is the
-expectation of the loss over the entire population of data drawn from their true distribution
+kur $l$ yra nuostolių funkcija,
+matuojanti, „kiek bloga" yra prognozė $f(\mathbf{x}_i)$ esant susijusiam žymeniui $y_i$.
+Statistikai narį :eqref:`eq_empirical-risk-min` vadina *empirine rizika*.
+*Empirinė rizika* yra vidutiniai nuostoliai apmokymo duomenyse,
+skirti aproksimuoti *riziką*,
+kuri yra
+nuostolių vidurkis visoje duomenų populiacijoje, paimtoje iš tikrojo jos skirstinio
 $p(\mathbf{x},y)$:
 
 $$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\mathbf{x}, y) \;d\mathbf{x}dy.$$
 :eqlabel:`eq_true-risk`
 
-However, in practice we typically cannot obtain the entire population of data.
-Thus, *empirical risk minimization*,
-which is minimizing the empirical risk in :eqref:`eq_empirical-risk-min`,
-is a practical strategy for machine learning,
-with the hope of approximately
-minimizing the risk.
+Tačiau praktikoje paprastai negalime gauti visos duomenų populiacijos.
+Todėl *empirinės rizikos minimizavimas*,
+t. y. empirinės rizikos minimizavimas :eqref:`eq_empirical-risk-min`,
+yra praktinė mašininio mokymosi strategija,
+tikintis apytiksliai
+minimizuoti riziką.
 
 
 
-### Covariate Shift Correction
+### Kovariantų poslinkio korekcija
 :label:`subsec_covariate-shift-correction`
 
-Assume that we want to estimate
-some dependency $P(y \mid \mathbf{x})$
-for which we have labeled data $(\mathbf{x}_i, y_i)$.
-Unfortunately, the observations $\mathbf{x}_i$ are drawn
-from some *source distribution* $q(\mathbf{x})$
-rather than the *target distribution* $p(\mathbf{x})$.
-Fortunately,
-the dependency assumption means
-that the conditional distribution does not change: $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
-If the source distribution $q(\mathbf{x})$ is "wrong",
-we can correct for that by using the following simple identity in the risk:
+Tarkime, kad norime įvertinti
+kokią nors priklausomybę $P(y \mid \mathbf{x})$,
+kuriai turime pažymėtus duomenis $(\mathbf{x}_i, y_i)$.
+Deja, stebiniai $\mathbf{x}_i$ paimti
+iš kokio nors *šaltinio skirstinio* $q(\mathbf{x})$,
+o ne iš *tikslinio skirstinio* $p(\mathbf{x})$.
+Laimei,
+priklausomybės prielaida reiškia,
+kad sąlyginis skirstinys nesikeičia: $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
+Jei šaltinio skirstinys $q(\mathbf{x})$ yra „neteisingas",
+galime tai pataisyti naudodami šią paprastą tapatybę rizikoje:
 
 $$
 \begin{aligned}
@@ -361,119 +361,119 @@ $$
 \end{aligned}
 $$
 
-In other words, we need to reweigh each data example
-by the ratio of the
-probability
-that it would have been drawn from the correct distribution to that from the wrong one:
+Kitaip tariant, turime perskaičiuoti kiekvieno duomenų pavyzdžio svorį
+pagal santykį
+tikimybės,
+kad jis būtų paimtas iš teisingo skirstinio, su tikimybe iš neteisingo:
 
 $$\beta_i \stackrel{\textrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
-Plugging in the weight $\beta_i$ for
-each data example $(\mathbf{x}_i, y_i)$
-we can train our model using
-*weighted empirical risk minimization*:
+Įstatę svorį $\beta_i$
+kiekvienam duomenų pavyzdžiui $(\mathbf{x}_i, y_i)$,
+galime apmokyti savo modelį naudodami
+*svertinį empirinės rizikos minimizavimą*:
 
 $$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n \beta_i l(f(\mathbf{x}_i), y_i).$$
 :eqlabel:`eq_weighted-empirical-risk-min`
 
 
 
-Alas, we do not know that ratio,
-so before we can do anything useful we need to estimate it.
-Many methods are available,
-including some fancy operator-theoretic approaches
-that attempt to recalibrate the expectation operator directly
-using a minimum-norm or a maximum entropy principle.
-Note that for any such approach, we need samples
-drawn from both distributions---the "true" $p$, e.g.,
-by access to test data, and the one used
-for generating the training set $q$ (the latter is trivially available).
-Note however, that we only need features $\mathbf{x} \sim p(\mathbf{x})$;
-we do not need to access labels $y \sim p(y)$.
+Deja, to santykio nežinome,
+todėl prieš darydami ką nors naudingo, turime jį įvertinti.
+Yra daug metodų,
+įskaitant kai kuriuos įmantrius operatorių teorijos metodus,
+kurie bando tiesiogiai perkalibruoti vidurkio operatorių,
+naudodami minimalios normos ar didžiausios entropijos principą.
+Atkreipkite dėmesį, kad bet kuriam tokiam metodui mums reikia imčių,
+paimtų iš abiejų skirstinių – „tikrojo" $p$, pvz.,
+turint prieigą prie testavimo duomenų, ir to, kuris naudojamas
+apmokymo aibei generuoti, $q$ (pastarasis lengvai prieinamas).
+Tačiau atkreipkite dėmesį, kad mums reikia tik požymių $\mathbf{x} \sim p(\mathbf{x})$;
+mums nereikia prieigos prie žymenų $y \sim p(y)$.
 
-In this case, there exists a very effective approach
-that will give almost as good results as the original: namely, logistic regression,
-which is a special case of softmax regression (see :numref:`sec_softmax`)
-for binary classification.
-This is all that is needed to compute estimated probability ratios.
-We learn a classifier to distinguish
-between data drawn from $p(\mathbf{x})$
-and data drawn from $q(\mathbf{x})$.
-If it is impossible to distinguish
-between the two distributions
-then it means that the associated instances
-are equally likely to come from
-either one of those two distributions.
-On the other hand, any instances
-that can be well discriminated
-should be significantly overweighted
-or underweighted accordingly.
+Šiuo atveju egzistuoja labai efektyvus metodas,
+kuris duos beveik tokius pat gerus rezultatus kaip pradinis: būtent logistinė regresija,
+kuri yra atskiras softmax regresijos atvejis (žr. :numref:`sec_softmax`)
+dvejetainiam klasifikavimui.
+Tai viskas, ko reikia apytikslėms tikimybių santykių reikšmėms apskaičiuoti.
+Išmokstame klasifikatorių, atskiriantį
+duomenis, paimtus iš $p(\mathbf{x})$,
+nuo duomenų, paimtų iš $q(\mathbf{x})$.
+Jei neįmanoma atskirti
+šių dviejų skirstinių,
+tai reiškia, kad atitinkami egzemplioriai
+vienodai tikėtinai kyla iš
+bet kurio iš šių dviejų skirstinių.
+Kita vertus, bet kurie egzemplioriai,
+kuriuos galima gerai atskirti,
+turėtų būti atitinkamai gerokai per daug arba
+per mažai svertiniai.
 
-For simplicity's sake assume that we have
-an equal number of instances from both distributions
+Dėl paprastumo tarkime, kad turime
+vienodą egzempliorių skaičių iš abiejų skirstinių
 $p(\mathbf{x})$
-and $q(\mathbf{x})$, respectively.
-Now denote by $z$ labels that are $1$
-for data drawn from $p$ and $-1$ for data drawn from $q$.
-Then the probability in a mixed dataset is given by
+ir $q(\mathbf{x})$.
+Dabar pažymėkime $z$ žymenis, kurie yra $1$
+duomenims, paimtiems iš $p$, ir $-1$ duomenims, paimtiems iš $q$.
+Tada tikimybė mišriame duomenų rinkinyje yra
 
 $$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \textrm{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
-Thus, if we use a logistic regression approach,
-where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parametrized function),
-it follows that
+Taigi, jei naudojame logistinės regresijos metodą,
+kur $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ yra parametrizuota funkcija),
+iš to išplaukia, kad
 
 $$
 \beta_i = \frac{1/(1 + \exp(-h(\mathbf{x}_i)))}{\exp(-h(\mathbf{x}_i))/(1 + \exp(-h(\mathbf{x}_i)))} = \exp(h(\mathbf{x}_i)).
 $$
 
-As a result, we need to solve two problems:
-the first, to distinguish between
-data drawn from both distributions,
-and then a weighted empirical risk minimization problem
-in :eqref:`eq_weighted-empirical-risk-min`
-where we weigh terms by $\beta_i$.
+Todėl turime išspręsti dvi problemas:
+pirma, atskirti
+duomenis, paimtus iš abiejų skirstinių,
+ir tada svertinio empirinės rizikos minimizavimo problemą
+:eqref:`eq_weighted-empirical-risk-min`,
+kur narius sveriame $\beta_i$.
 
-Now we are ready to describe a correction algorithm.
-Suppose that we have a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ and an unlabeled test set $\{\mathbf{u}_1, \ldots, \mathbf{u}_m\}$.
-For covariate shift,
-we assume that $\mathbf{x}_i$ for all $1 \leq i \leq n$ are drawn from some source distribution
-and $\mathbf{u}_i$ for all $1 \leq i \leq m$
-are drawn from the target distribution.
-Here is a prototypical algorithm
-for correcting covariate shift:
+Dabar esame pasirengę aprašyti korekcijos algoritmą.
+Tarkime, kad turime apmokymo aibę $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ ir nepažymėtą testavimo aibę $\{\mathbf{u}_1, \ldots, \mathbf{u}_m\}$.
+Kovariantų poslinkio atveju
+darome prielaidą, kad $\mathbf{x}_i$ visiems $1 \leq i \leq n$ paimti iš kokio nors šaltinio skirstinio,
+o $\mathbf{u}_i$ visiems $1 \leq i \leq m$
+paimti iš tikslinio skirstinio.
+Štai prototipinis algoritmas
+kovariantų poslinkiui ištaisyti:
 
-1. Create a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
-1. Train a binary classifier using logistic regression to get the function $h$.
-1. Weigh training data using $\beta_i = \exp(h(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ for some constant $c$.
-1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
+1. Sukurkite dvejetainio klasifikavimo apmokymo aibę: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
+1. Apmokykite dvejetainį klasifikatorių naudodami logistinę regresiją, kad gautumėte funkciją $h$.
+1. Sverkite apmokymo duomenis naudodami $\beta_i = \exp(h(\mathbf{x}_i))$ arba geriau $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ su kokia nors konstanta $c$.
+1. Naudokite svorius $\beta_i$ apmokymui su $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ :eqref:`eq_weighted-empirical-risk-min`.
 
-Note that the above algorithm relies on a crucial assumption.
-For this scheme to work, we need that each data example
-in the target (e.g., test time) distribution
-had nonzero probability of occurring at training time.
-If we find a point where $p(\mathbf{x}) > 0$ but $q(\mathbf{x}) = 0$,
-then the corresponding importance weight should be infinity.
-
-
+Atkreipkite dėmesį, kad aukščiau pateiktas algoritmas remiasi esmine prielaida.
+Kad ši schema veiktų, reikia, kad kiekvienas duomenų pavyzdys
+tiksliniame (pvz., testavimo metu) skirstinyje
+turėtų nenulinę atsiradimo tikimybę apmokymo metu.
+Jei randame tašką, kuriame $p(\mathbf{x}) > 0$, bet $q(\mathbf{x}) = 0$,
+tada atitinkamas svarbos svoris turėtų būti begalinis.
 
 
 
 
-### Label Shift Correction
 
-Assume that we are dealing with a
-classification task with $k$ categories.
-Using the same notation in :numref:`subsec_covariate-shift-correction`,
-$q$ and $p$ are the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
-Assume that the distribution of labels shifts over time:
-$q(y) \neq p(y)$, but the class-conditional distribution
-stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
-If the source distribution $q(y)$ is "wrong",
-we can correct for that
-according to
-the following identity in the risk
-as defined in
+
+### Žymenų poslinkio korekcija
+
+Tarkime, kad sprendžiame
+klasifikavimo užduotį su $k$ kategorijų.
+Naudodami tą patį žymėjimą kaip :numref:`subsec_covariate-shift-correction`,
+$q$ ir $p$ yra atitinkamai šaltinio skirstinys (pvz., apmokymo metu) ir tikslinis skirstinys (pvz., testavimo metu).
+Tarkime, kad žymenų skirstinys laikui bėgant keičiasi:
+$q(y) \neq p(y)$, bet klasės sąlyginis skirstinys
+išlieka tas pats: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
+Jei šaltinio skirstinys $q(y)$ yra „neteisingas",
+galime tai pataisyti
+pagal
+šią tapatybę rizikoje,
+apibrėžtoje
 :eqref:`eq_true-risk`:
 
 $$
@@ -485,205 +485,205 @@ $$
 
 
 
-Here, our importance weights will correspond to the
-label likelihood ratios:
+Čia mūsų svarbos svoriai atitiks
+žymenų tikėtinumo santykius:
 
 $$\beta_i \stackrel{\textrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
-One nice thing about label shift is that
-if we have a reasonably good model
-on the source distribution,
-then we can get consistent estimates of these weights
-without ever having to deal with the ambient dimension.
-In deep learning, the inputs tend
-to be high-dimensional objects like images,
-while the labels are often simpler objects like categories.
+Viena gera žymenų poslinkio savybė yra ta,
+kad jei turime pakankamai gerą modelį
+šaltinio skirstiniui,
+tuomet galime gauti nuoseklius šių svorių įverčius,
+niekada nesusidurdami su aplinkine dimensija.
+Giliajame mokyme įvestys paprastai
+yra didelės dimensijos objektai, pvz., vaizdai,
+o žymenys dažnai yra paprastesni objektai, pvz., kategorijos.
 
-To estimate the target label distribution,
-we first take our reasonably good off-the-shelf classifier
-(typically trained on the training data)
-and compute its "confusion" matrix using the validation set
-(also from the training distribution).
-The *confusion matrix*, $\mathbf{C}$, is simply a $k \times k$ matrix,
-where each column corresponds to the label category (ground truth)
-and each row corresponds to our model's predicted category.
-Each cell's value $c_{ij}$ is the fraction of total predictions on the validation set
-where the true label was $j$ and our model predicted $i$.
+Kad įvertintume tikslinį žymenų skirstinį,
+pirmiausia imame savo pakankamai gerą paruoštą klasifikatorių
+(paprastai apmokytą apmokymo duomenimis)
+ir apskaičiuojame jo „painiavos" matricą, naudodami validavimo aibę
+(taip pat iš apmokymo skirstinio).
+*Painiavos matrica* $\mathbf{C}$ yra tiesiog $k \times k$ matrica,
+kurios kiekvienas stulpelis atitinka žymens kategoriją (tikrąją reikšmę),
+o kiekviena eilutė – mūsų modelio prognozuotą kategoriją.
+Kiekvienos ląstelės reikšmė $c_{ij}$ yra validavimo aibės prognozių dalis,
+kai tikrasis žymuo buvo $j$, o mūsų modelis prognozavo $i$.
 
-Now, we cannot calculate the confusion matrix
-on the target data directly
-because we do not get to see the labels for the examples
-that we see in the wild,
-unless we invest in a complex real-time annotation pipeline.
-What we can do, however, is average all of our model's predictions
-at test time together, yielding the mean model outputs $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
-where the $i^\textrm{th}$ element $\mu(\hat{y}_i)$
-is the fraction of the total predictions on the test set
-where our model predicted $i$.
+Dabar negalime apskaičiuoti painiavos matricos
+tiksliniuose duomenyse tiesiogiai,
+nes nematome žymenų pavyzdžiams,
+kuriuos matome realiame pasaulyje,
+nebent investuotume į sudėtingą realaus laiko anotavimo konvejerį.
+Tačiau galime suvidurkinti visas savo modelio prognozes
+testavimo metu, gaudami vidutines modelio išvestis $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
+kur $i$-asis elementas $\mu(\hat{y}_i)$
+yra testavimo aibės prognozių dalis,
+kai mūsų modelis prognozavo $i$.
 
-It turns out that under some mild conditions---if
-our classifier was reasonably accurate in the first place,
-and if the target data contains only categories
-that we have seen before,
-and if the label shift assumption holds in the first place
-(the strongest assumption here)---we can estimate the test set label distribution
-by solving a simple linear system
+Pasirodo, kad esant kai kurioms švelnioms sąlygoms – jei
+mūsų klasifikatorius iš pradžių buvo pakankamai tikslus,
+jei tiksliniai duomenys turi tik kategorijas,
+kurias esame matę anksčiau,
+ir jei žymenų poslinkio prielaida iš pradžių galioja
+(stipriausia čia prielaida) – galime įvertinti testavimo aibės žymenų skirstinį,
+išspręsdami paprastą tiesinę sistemą
 
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
 
-because as an estimate $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ holds for all $1 \leq i \leq k$,
-where $p(y_j)$ is the $j^\textrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
-If our classifier is sufficiently accurate to begin with,
-then the confusion matrix $\mathbf{C}$ will be invertible,
-and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
+nes kaip įvertis $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ galioja visiems $1 \leq i \leq k$,
+kur $p(y_j)$ yra $j$-asis $k$ dimensijų žymenų skirstinio vektoriaus $p(\mathbf{y})$ elementas.
+Jei mūsų klasifikatorius iš pradžių yra pakankamai tikslus,
+tada painiavos matrica $\mathbf{C}$ bus apverčiama,
+ir gausime sprendinį $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
-Because we observe the labels on the source data,
-it is easy to estimate the distribution $q(y)$.
-Then, for any training example $i$ with label $y_i$,
-we can take the ratio of our estimated $p(y_i)/q(y_i)$
-to calculate the weight $\beta_i$,
-and plug this into weighted empirical risk minimization
-in :eqref:`eq_weighted-empirical-risk-min`.
-
-
-### Concept Shift Correction
-
-Concept shift is much harder to fix in a principled manner.
-For instance, in a situation where suddenly the problem changes
-from distinguishing cats from dogs to one of
-distinguishing white from black animals,
-it will be unreasonable to assume
-that we can do much better than just collecting new labels
-and training from scratch.
-Fortunately, in practice, such extreme shifts are rare.
-Instead, what usually happens is that the task keeps on changing slowly.
-To make things more concrete, here are some examples:
-
-* In computational advertising, new products are launched,
-old products become less popular. This means that the distribution over ads and their popularity changes gradually and any click-through rate predictor needs to change gradually with it.
-* Traffic camera lenses degrade gradually due to environmental wear, affecting image quality progressively.
-* News content changes gradually (i.e., most of the news remains unchanged but new stories appear).
-
-In such cases, we can use the same approach that we used for training networks to make them adapt to the change in the data. In other words, we use the existing network weights and simply perform a few update steps with the new data rather than training from scratch.
+Kadangi šaltinio duomenyse stebime žymenis,
+lengva įvertinti skirstinį $q(y)$.
+Tada bet kuriam apmokymo pavyzdžiui $i$ su žymeniu $y_i$
+galime paimti mūsų įvertinto $p(y_i)/q(y_i)$ santykį,
+kad apskaičiuotume svorį $\beta_i$,
+ir įstatyti jį į svertinį empirinės rizikos minimizavimą
+:eqref:`eq_weighted-empirical-risk-min`.
 
 
-## A Taxonomy of Learning Problems
+### Sąvokų poslinkio korekcija
 
-Armed with knowledge about how to deal with changes in distributions, we can now consider some other aspects of machine learning problem formulation.
+Sąvokų poslinkį kur kas sunkiau ištaisyti principingu būdu.
+Pavyzdžiui, situacijoje, kai problema staiga pasikeičia
+iš kačių ir šunų atskyrimo į
+baltų ir juodų gyvūnų atskyrimą,
+būtų nepagrįsta manyti,
+kad galime padaryti daug daugiau nei tiesiog surinkti naujus žymenis
+ir apmokyti iš naujo.
+Laimei, praktikoje tokie kraštutiniai poslinkiai yra reti.
+Vietoj to paprastai nutinka, kad užduotis keičiasi lėtai.
+Kad viskas būtų konkretesnė, štai keli pavyzdžiai:
+
+* Skaičiuojamojoje reklamoje išleidžiami nauji produktai,
+seni produktai tampa mažiau populiarūs. Tai reiškia, kad reklamų ir jų populiarumo skirstinys keičiasi laipsniškai, ir bet kuris paspaudimų dažnio prognozuotojas turi laipsniškai keistis kartu.
+* Eismo kamerų lęšiai laipsniškai blogėja dėl aplinkos dėvėjimosi, palaipsniui veikdami vaizdo kokybę.
+* Naujienų turinys keičiasi laipsniškai (t. y. dauguma naujienų išlieka tos pačios, bet atsiranda naujų istorijų).
+
+Tokiais atvejais galime naudoti tą patį metodą, kurį naudojome tinklams apmokyti, kad jie prisitaikytų prie duomenų pokyčių. Kitaip tariant, naudojame esamus tinklo svorius ir tiesiog atliekame kelis atnaujinimo žingsnius su naujais duomenimis, užuot apmokę iš naujo.
 
 
-### Batch Learning
+## Mokymosi uždavinių taksonomija
 
-In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we have trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
+Apsiginklavę žiniomis, kaip tvarkytis su skirstinių pokyčiais, dabar galime apsvarstyti kai kuriuos kitus mašininio mokymosi uždavinio formulavimo aspektus.
 
 
-### Online Learning
+### Paketinis mokymasis
 
-Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$. Only once we have done this do we observe $y_i$ and so receive a reward or incur a loss, given our decision.
-Many real problems fall into this category. For example, we need to predict tomorrow's stock price, which allows us to trade based on that estimate and at the end of the day we find out whether our estimate made us a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations:
+*Paketiniame mokymesi* turime prieigą prie apmokymo požymių ir žymenų $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, kuriuos naudojame modeliui $f(\mathbf{x})$ apmokyti. Vėliau diegiame šį modelį naujiems duomenims $(\mathbf{x}, y)$, paimtiems iš to paties skirstinio, įvertinti. Tai numatytoji prielaida bet kuriam čia aptariamam uždaviniui. Pavyzdžiui, galime apmokyti kačių detektorių pagal daugybę kačių ir šunų nuotraukų. Kai jį apmokome, pristatome jį kaip išmaniosios katėms skirtos durų kompiuterinio matymo sistemos dalį, kuri įleidžia tik kates. Tada tai įrengiama kliento namuose ir daugiau niekada neatnaujinama (nebent esant kraštutinėms aplinkybėms).
+
+
+### Nuolatinis mokymasis
+
+Dabar įsivaizduokite, kad duomenys $(\mathbf{x}_i, y_i)$ ateina po vieną imtį. Tiksliau, tarkime, kad pirmiausia stebime $\mathbf{x}_i$, tada turime pateikti įvertį $f(\mathbf{x}_i)$. Tik tai padarę stebime $y_i$ ir taip gauname atlygį ar patiriame nuostolių, atsižvelgiant į mūsų sprendimą.
+Daugelis realių uždavinių patenka į šią kategoriją. Pavyzdžiui, turime prognozuoti rytojaus akcijų kainą, kuri leidžia mums prekiauti pagal šį įvertį, o dienos pabaigoje sužinome, ar mūsų įvertis atnešė pelną. Kitaip tariant, *nuolatiniame mokymesi* turime tokį ciklą, kuriame nuolat tobulename modelį, gaudami naujų stebinių:
 
 $$\begin{aligned}&\textrm{model } f_t \longrightarrow \textrm{data }  \mathbf{x}_t \longrightarrow \textrm{estimate } f_t(\mathbf{x}_t) \longrightarrow\\ \textrm{obs}&\textrm{ervation } y_t \longrightarrow \textrm{loss } l(y_t, f_t(\mathbf{x}_t)) \longrightarrow \textrm{model } f_{t+1}\end{aligned}$$
 
-### Bandits
+### Banditai
 
-*Bandits* are a special case of the problem above. While in most learning problems we have a continuously parametrized function $f$ where we want to learn its parameters (e.g., a deep network), in a *bandit* problem we only have a finite number of arms that we can pull, i.e., a finite number of actions that we can take. It is not very surprising that for this simpler problem stronger theoretical guarantees in terms of optimality can be obtained. We list it mainly since this problem is often (confusingly) treated as if it were a distinct learning setting.
-
-
-### Control
-
-In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. For instance, a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional-integral-derivative) controller algorithms are a popular choice there.
-Likewise, a user's behavior on a news site will depend on what we showed them previously (e.g., they will read most news only once). Many such algorithms form a model of the environment in which they act so as to make their decisions appear less random.
-Recently,
-control theory (e.g., PID variants) has also been used
-to automatically tune hyperparameters
-to achieve better disentangling and reconstruction quality,
-and improve the diversity of generated text and the reconstruction quality of generated images :cite:`Shao.Yao.Sun.ea.2020`.
+*Banditai* yra atskiras aukščiau aprašytos problemos atvejis. Nors daugumoje mokymosi uždavinių turime tolydžiai parametrizuotą funkciją $f$, kurios parametrus norime išmokti (pvz., gilusis tinklas), *banditų* uždavinyje turime tik baigtinį skaičių svirčių, kurias galime traukti, t. y. baigtinį veiksmų, kuriuos galime atlikti, skaičių. Nėra labai stebėtina, kad šiam paprastesniam uždaviniui galima gauti stipresnes teorines garantijas optimalumo požiūriu. Jį išvardijame daugiausia todėl, kad šis uždavinys dažnai (klaidinančiai) traktuojamas taip, tarsi tai būtų atskira mokymosi aplinka.
 
 
+### Valdymas
 
-
-### Reinforcement Learning
-
-In the more general case of an environment with memory, we may encounter situations where the environment is trying to cooperate with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to win. Chess, Go, Backgammon, or StarCraft are some of the cases in *reinforcement learning*. Likewise, we might want to build a good controller for autonomous cars. Other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, or trying to cooperate with it.
-
-### Considering the Environment
-
-One key distinction between the different situations above is that a strategy that might have worked throughout in the case of a stationary environment, might not work throughout in an environment that can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once it is exploited. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist in dealing with concept shift, i.e., when the problem that is being solved can change over time.
+Daugeliu atvejų aplinka prisimena, ką darėme. Nebūtinai priešiškai, bet ji tiesiog prisimins, ir atsakas priklausys nuo to, kas įvyko anksčiau. Pavyzdžiui, kavos virimo katilo valdiklis stebės skirtingas temperatūras, priklausomai nuo to, ar anksčiau jis šildė katilą. PID (proporcinio-integralinio-diferencialinio) valdiklio algoritmai yra populiarus pasirinkimas.
+Panašiai naudotojo elgesys naujienų svetainėje priklausys nuo to, ką jam anksčiau parodėme (pvz., daugumą naujienų jis perskaitys tik vieną kartą). Daugelis tokių algoritmų sudaro aplinkos, kurioje veikia, modelį, kad jų sprendimai atrodytų mažiau atsitiktiniai.
+Neseniai
+valdymo teorija (pvz., PID variantai) taip pat buvo naudojama
+hiperparametrams automatiškai derinti,
+siekiant geresnio atskyrimo ir rekonstrukcijos kokybės
+ir sugeneruoto teksto įvairovės bei sugeneruotų vaizdų rekonstrukcijos kokybės pagerinimo :cite:`Shao.Yao.Sun.ea.2020`.
 
 
 
 
-## Fairness, Accountability, and Transparency in Machine Learning
+### Skatinamasis mokymas
 
-Finally, it is important to remember
-that when you deploy machine learning systems
-you are not merely optimizing a predictive model---you
-are typically providing a tool that will
-be used to (partially or fully) automate decisions.
-These technical systems can impact the lives
-of individuals who are subject to the resulting decisions.
-The leap from considering predictions to making decisions
-raises not only new technical questions,
-but also a slew of ethical questions
-that must be carefully considered.
-If we are deploying a medical diagnostic system,
-we need to know for which populations
-it may work and for which it may not.
-Overlooking foreseeable risks to the welfare of
-a subpopulation could cause us to administer inferior care.
-Moreover, once we contemplate decision-making systems,
-we must step back and reconsider how we evaluate our technology.
-Among other consequences of this change of scope,
-we will find that *accuracy* is seldom the right measure.
-For instance, when translating predictions into actions,
-we will often want to take into account
-the potential cost sensitivity of erring in various ways.
-If one way of misclassifying an image
-could be perceived as a racial sleight of hand,
-while misclassification to a different category
-would be harmless, then we might want to adjust
-our thresholds accordingly, accounting for societal values
-in designing the decision-making protocol.
-We also want to be careful about
-how prediction systems can lead to feedback loops.
-For example, consider predictive policing systems,
-which allocate patrol officers
-to areas with high forecasted crime.
-It is easy to see how a worrying pattern can emerge:
+Bendresniu atveju aplinkoje su atmintimi galime susidurti su situacijomis, kai aplinka bando bendradarbiauti su mumis (kooperaciniai žaidimai, ypač nenulinės sumos žaidimai), arba kitomis, kai aplinka bandys laimėti. Šachmatai, Go, Backgammon ar StarCraft yra keli *skatinamojo mokymo* atvejai. Panašiai galime norėti sukurti gerą valdiklį savaeigiams automobiliams. Kiti automobiliai greičiausiai reaguos į savaeigio automobilio vairavimo stilių netrivialiais būdais, pvz., bandydami jo išvengti, bandydami sukelti avariją arba bandydami su juo bendradarbiauti.
 
- 1. Neighborhoods with more crime get more patrols.
- 1. Consequently, more crimes are discovered in these neighborhoods, entering the training data available for future iterations.
- 1. Exposed to more positives, the model predicts yet more crime in these neighborhoods.
- 1. In the next iteration, the updated model targets the same neighborhood even more heavily leading to yet more crimes discovered, etc.
+### Aplinkos svarstymas
 
-Often, the various mechanisms by which
-a model's predictions become coupled to its training data
-are unaccounted for in the modeling process.
-This can lead to what researchers call *runaway feedback loops*.
-Additionally, we want to be careful about
-whether we are addressing the right problem in the first place.
-Predictive algorithms now play an outsize role
-in mediating the dissemination of information.
-Should the news that an individual encounters
-be determined by the set of Facebook pages they have *Liked*?
-These are just a few among the many pressing ethical dilemmas
-that you might encounter in a career in machine learning.
+Vienas esminis skirtumas tarp aukščiau aprašytų situacijų yra tas, kad strategija, kuri galėjo veikti visą laiką stacionarioje aplinkoje, gali neveikti visą laiką aplinkoje, galinčioje prisitaikyti. Pavyzdžiui, prekiautojo atrasta arbitražo galimybė greičiausiai išnyks, kai tik bus išnaudota. Greitis ir būdas, kuriuo keičiasi aplinka, didele dalimi nulemia algoritmų, kuriuos galime pritaikyti, tipą. Pavyzdžiui, jei žinome, kad viskas gali keistis tik lėtai, galime priversti ir bet kokį įvertį keistis tik lėtai. Jei žinome, kad aplinka gali pasikeisti akimirksniu, bet tik labai retai, galime tam numatyti išimtis. Tokios žinios yra esminės siekiančiam tapti duomenų mokslininku, tvarkantis su sąvokų poslinkiu, t. y. kai sprendžiama problema gali keistis laikui bėgant.
 
 
-## Summary
-
-In many cases training and test sets do not come from the same distribution. This is called distribution shift.
-The risk is the expectation of the loss over the entire population of data drawn from their true distribution. However, this entire population is usually unavailable. Empirical risk is an average loss over the training data to approximate the risk. In practice, we perform empirical risk minimization.
-
-Under the corresponding assumptions, covariate and label shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
-In some cases, the environment may remember automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
-
-## Exercises
-
-1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
-1. Implement a covariate shift detector. Hint: build a classifier.
-1. Implement a covariate shift corrector.
-1. Besides distribution shift, what else could affect how the empirical risk approximates the risk?
 
 
-[Discussions](https://discuss.d2l.ai/t/105)
+## Sąžiningumas, atskaitomybė ir skaidrumas mašininiame mokyme
+
+Galiausiai svarbu prisiminti,
+kad diegdami mašininio mokymosi sistemas
+jūs ne tik optimizuojate prognozavimo modelį – jūs
+paprastai teikiate įrankį, kuris
+bus naudojamas (iš dalies ar visiškai) sprendimams automatizuoti.
+Šios techninės sistemos gali paveikti
+asmenų, kuriems taikomi gauti sprendimai, gyvenimus.
+Šuolis nuo prognozių svarstymo prie sprendimų priėmimo
+kelia ne tik naujų techninių klausimų,
+bet ir daugybę etinių klausimų,
+kuriuos reikia atidžiai apsvarstyti.
+Jei diegiame medicininės diagnostikos sistemą,
+turime žinoti, kurioms populiacijoms
+ji gali veikti, o kurioms – ne.
+Pamiršę numatomą riziką subpopuliacijos gerovei,
+galime teikti prastesnę priežiūrą.
+Be to, kai tik pradedame svarstyti sprendimų priėmimo sistemas,
+turime žengti žingsnį atgal ir iš naujo apsvarstyti, kaip vertiname savo technologiją.
+Tarp kitų šio taikymo srities pokyčio pasekmių
+paaiškės, kad *tikslumas* retai kada yra tinkamas matas.
+Pavyzdžiui, versdami prognozes į veiksmus,
+dažnai norėsime atsižvelgti
+į galimą jautrumą išlaidoms klystant įvairiais būdais.
+Jei vienas vaizdo neteisingo klasifikavimo būdas
+galėtų būti suvoktas kaip rasinis pasityčiojimas,
+o neteisingas klasifikavimas į kitą kategoriją
+būtų nekenksmingas, tuomet galbūt norėsime pakoreguoti
+savo slenksčius, atsižvelgdami į visuomenės vertybes
+projektuojant sprendimų priėmimo protokolą.
+Taip pat norime būti atsargūs dėl to,
+kaip prognozavimo sistemos gali sukelti grįžtamojo ryšio kilpas.
+Pavyzdžiui, panagrinėkime prognozuojamosios policijos sistemas,
+kurios paskirsto patruliuojančius pareigūnus
+į vietas su dideliu prognozuojamu nusikalstamumu.
+Nesunku suprasti, kaip gali atsirasti nerimą keliantis dėsningumas:
+
+ 1. Kvartalai su didesniu nusikalstamumu gauna daugiau patrulių.
+ 1. Todėl šiuose kvartaluose aptinkama daugiau nusikaltimų, kurie patenka į apmokymo duomenis, prieinamus būsimoms iteracijoms.
+ 1. Susidūręs su daugiau teigiamų atvejų, modelis prognozuoja dar daugiau nusikaltimų šiuose kvartaluose.
+ 1. Kitoje iteracijoje atnaujintas modelis dar stipriau taikosi į tą patį kvartalą, todėl aptinkama dar daugiau nusikaltimų ir t. t.
+
+Dažnai įvairūs mechanizmai, kuriais
+modelio prognozės susiejamos su jo apmokymo duomenimis,
+nėra įvertinami modeliavimo procese.
+Tai gali sukelti tai, ką tyrėjai vadina *pabėgančiomis grįžtamojo ryšio kilpomis*.
+Be to, norime būti atsargūs,
+ar apskritai sprendžiame tinkamą problemą.
+Prognozavimo algoritmai dabar atlieka neproporcingai didelį vaidmenį
+tarpininkaujant informacijos sklaidoje.
+Ar naujienos, su kuriomis susiduria asmuo,
+turėtų būti nulemtos „Facebook" puslapių, kuriuos jis *pamėgo*, rinkinio?
+Tai tik keletas iš daugelio neatidėliotinų etinių dilemų,
+su kuriomis galite susidurti mašininio mokymosi karjeroje.
+
+
+## Santrauka
+
+Daugeliu atvejų apmokymo ir testavimo aibės nėra iš to paties skirstinio. Tai vadinama skirstinio poslinkiu.
+Rizika yra nuostolių vidurkis visoje duomenų populiacijoje, paimtoje iš tikrojo jos skirstinio. Tačiau ši visa populiacija paprastai nėra prieinama. Empirinė rizika yra vidutiniai nuostoliai apmokymo duomenyse, skirti rizikai aproksimuoti. Praktikoje atliekame empirinės rizikos minimizavimą.
+
+Esant atitinkamoms prielaidoms, kovariantų ir žymenų poslinkį galima aptikti ir ištaisyti testavimo metu. Nesugebėjimas atsižvelgti į šį paslinkimą gali tapti problema testavimo metu.
+Kai kuriais atvejais aplinka gali prisiminti automatizuotus veiksmus ir reaguoti stebinančiais būdais. Turime atsižvelgti į šią galimybę kurdami modelius ir toliau stebėti veikiančias sistemas, būdami atviri galimybei, kad mūsų modeliai ir aplinka susipins nenumatytais būdais.
+
+## Pratimai
+
+1. Kas gali nutikti, kai pakeičiame paieškos sistemos elgesį? Ką gali daryti naudotojai? O reklamuotojai?
+1. Įgyvendinkite kovariantų poslinkio detektorių. Užuomina: sukurkite klasifikatorių.
+1. Įgyvendinkite kovariantų poslinkio korektorių.
+1. Be skirstinio poslinkio, kas dar galėtų paveikti, kaip empirinė rizika aproksimuoja riziką?
+
+
+[Diskusijos](https://discuss.d2l.ai/t/105)

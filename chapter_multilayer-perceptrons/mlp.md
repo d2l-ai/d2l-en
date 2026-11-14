@@ -3,25 +3,25 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Multilayer Perceptrons
+# Daugiasluoksniai perceptronai
 :label:`sec_mlp`
 
-In :numref:`sec_softmax`, we introduced
-softmax regression,
-implementing the algorithm from scratch
-(:numref:`sec_softmax_scratch`) and using high-level APIs
-(:numref:`sec_softmax_concise`). This allowed us to
-train classifiers capable of recognizing
-10 categories of clothing from low-resolution images.
-Along the way, we learned how to wrangle data,
-coerce our outputs into a valid probability distribution,
-apply an appropriate loss function,
-and minimize it with respect to our model's parameters.
-Now that we have mastered these mechanics
-in the context of simple linear models,
-we can launch our exploration of deep neural networks,
-the comparatively rich class of models
-with which this book is primarily concerned.
+:numref:`sec_softmax` pristatėme
+softmax regresiją,
+įgyvendindami algoritmą nuo nulio
+(:numref:`sec_softmax_scratch`) ir naudodami aukšto lygio API
+(:numref:`sec_softmax_concise`). Tai leido mums
+apmokyti klasifikatorius, gebančius atpažinti
+10 drabužių kategorijų iš mažos skyros vaizdų.
+Šio proceso metu išmokome tvarkyti duomenis,
+versti savo išvestis į tinkamą tikimybių skirstinį,
+taikyti tinkamą nuostolių funkciją
+ir minimizuoti ją pagal savo modelio parametrus.
+Dabar, kai įvaldėme šią mechaniką
+paprastų tiesinių modelių kontekste,
+galime pradėti giliųjų neuroninių tinklų tyrinėjimą –
+palyginti turtingos modelių klasės,
+kuriai ir skirta ši knyga.
 
 ```{.python .input}
 %%tab mxnet
@@ -54,146 +54,144 @@ from jax import numpy as jnp
 from jax import grad, vmap
 ```
 
-## Hidden Layers
+## Paslėptieji sluoksniai
 
-We described affine transformations in
-:numref:`subsec_linear_model` as
-linear transformations with added bias.
-To begin, recall the model architecture
-corresponding to our softmax regression example,
-illustrated in  :numref:`fig_softmaxreg`.
-This model maps inputs directly to outputs
-via a single affine transformation,
-followed by a softmax operation.
-If our labels truly were related
-to the input data by a simple affine transformation,
-then this approach would be sufficient.
-However, linearity (in affine transformations) is a *strong* assumption.
+Afinines transformacijas
+:numref:`subsec_linear_model` aprašėme kaip
+tiesines transformacijas su pridėtu poslinkiu.
+Pradėkime prisimindami modelio architektūrą,
+atitinkančią mūsų softmax regresijos pavyzdį,
+pavaizduotą :numref:`fig_softmaxreg`.
+Šis modelis atvaizduoja įvestis tiesiogiai į išvestis
+per vieną afininę transformaciją,
+po kurios seka softmax operacija.
+Jei mūsų žymenys iš tiesų būtų susiję
+su įvesties duomenimis paprasta afinine transformacija,
+tada šio metodo pakaktų.
+Tačiau tiesiškumas (afininėse transformacijose) yra *stipri* prielaida.
 
-### Limitations of Linear Models
+### Tiesinių modelių apribojimai
 
-For example, linearity implies the *weaker*
-assumption of *monotonicity*, i.e.,
-that any increase in our feature must
-either always cause an increase in our model's output
-(if the corresponding weight is positive),
-or always cause a decrease in our model's output
-(if the corresponding weight is negative).
-Sometimes that makes sense.
-For example, if we were trying to predict
-whether an individual will repay a loan,
-we might reasonably assume that all other things being equal,
-an applicant with a higher income
-would always be more likely to repay
-than one with a lower income.
-While monotonic, this relationship likely
-is not linearly associated with the probability of
-repayment. An increase in income from \$0 to \$50,000
-likely corresponds to a bigger increase
-in likelihood of repayment
-than an increase from \$1 million to \$1.05 million.
-One way to handle this might be to postprocess our outcome
-such that linearity becomes more plausible,
-by using the logistic map (and thus the logarithm of the probability of outcome).
+Pavyzdžiui, tiesiškumas reiškia *silpnesnę*
+*monotoniškumo* prielaidą, t. y.
+kad bet koks mūsų požymio padidėjimas turi
+arba visada sukelti modelio išvesties padidėjimą
+(jei atitinkamas svoris teigiamas),
+arba visada sukelti modelio išvesties sumažėjimą
+(jei atitinkamas svoris neigiamas).
+Kartais tai prasminga.
+Pavyzdžiui, jei bandytume prognozuoti,
+ar asmuo grąžins paskolą,
+galėtume pagrįstai manyti, kad kitiems dalykams esant vienodiems,
+didesnes pajamas gaunantis pareiškėjas
+visada labiau tikėtinai grąžins,
+nei gaunantis mažesnes pajamas.
+Nors tai monotoniška, šis ryšys greičiausiai
+nėra tiesiškai susijęs su grąžinimo
+tikimybe. Pajamų padidėjimas nuo \$0 iki \$50 000
+greičiausiai atitinka didesnį grąžinimo
+tikimybės padidėjimą
+nei padidėjimas nuo \$1 milijono iki \$1,05 milijono.
+Vienas būdas tai išspręsti galėtų būti rezultato paskesnis apdorojimas,
+kad tiesiškumas taptų labiau tikėtinas,
+naudojant logistinį atvaizdį (taigi ir rezultato tikimybės logaritmą).
 
-Note that we can easily come up with examples
-that violate monotonicity.
-Say for example that we want to predict health as a function
-of body temperature.
-For individuals with a normal body temperature
-above 37°C (98.6°F),
-higher temperatures indicate greater risk.
-However, if the body temperatures drops
-below 37°C, lower temperatures indicate greater risk!
-Again, we might resolve the problem
-with some clever preprocessing, such as using the distance from 37°C
-as a feature.
+Atkreipkite dėmesį, kad lengvai galime sugalvoti pavyzdžių,
+pažeidžiančių monotoniškumą.
+Tarkime, pavyzdžiui, kad norime prognozuoti sveikatą kaip
+kūno temperatūros funkciją.
+Asmenims, kurių normali kūno temperatūra
+yra aukščiau 37 °C (98,6 °F),
+aukštesnė temperatūra rodo didesnę riziką.
+Tačiau jei kūno temperatūra nukrenta
+žemiau 37 °C, žemesnė temperatūra rodo didesnę riziką!
+Vėlgi, problemą galėtume išspręsti
+kokiu nors gudriu išankstiniu apdorojimu, pavyzdžiui, naudodami atstumą nuo 37 °C
+kaip požymį.
 
 
-But what about classifying images of cats and dogs?
-Should increasing the intensity
-of the pixel at location (13, 17)
-always increase (or always decrease)
-the likelihood that the image depicts a dog?
-Reliance on a linear model corresponds to the implicit
-assumption that the only requirement
-for differentiating cats and dogs is to assess
-the brightness of individual pixels.
-This approach is doomed to fail in a world
-where inverting an image preserves the category.
+O kaip klasifikuoti kačių ir šunų vaizdus?
+Ar pikselio vietoje (13, 17) intensyvumo didinimas
+visada turėtų didinti (arba visada mažinti)
+tikimybę, kad vaizde pavaizduotas šuo?
+Pasikliovimas tiesiniu modeliu atitinka numanomą
+prielaidą, kad vienintelis reikalavimas
+katėms ir šunims atskirti yra įvertinti
+atskirų pikselių ryškumą.
+Šis metodas pasmerktas nesėkmei pasaulyje,
+kuriame vaizdo invertavimas išsaugo kategoriją.
 
-And yet despite the apparent absurdity of linearity here,
-as compared with our previous examples,
-it is less obvious that we could address the problem
-with a simple preprocessing fix.
-That is, because the significance of any pixel
-depends in complex ways on its context
-(the values of the surrounding pixels).
-While there might exist a representation of our data
-that would take into account
-the relevant interactions among our features,
-on top of which a linear model would be suitable,
-we simply do not know how to calculate it by hand.
-With deep neural networks, we used observational data
-to jointly learn both a representation via hidden layers
-and a linear predictor that acts upon that representation.
+Ir vis dėlto, nepaisant akivaizdaus tiesiškumo absurdiškumo čia,
+palyginti su ankstesniais pavyzdžiais,
+mažiau akivaizdu, ar galėtume spręsti problemą
+paprastu išankstinio apdorojimo pataisymu.
+Taip yra todėl, kad bet kurio pikselio reikšmingumas
+sudėtingais būdais priklauso nuo jo konteksto
+(aplinkinių pikselių reikšmių).
+Nors gali egzistuoti mūsų duomenų atvaizdas,
+kuris atsižvelgtų į
+svarbias sąveikas tarp mūsų požymių
+ir kuriame tiesinis modelis būtų tinkamas,
+mes tiesiog nežinome, kaip jį apskaičiuoti rankomis.
+Su giliaisiais neuroniniais tinklais naudojome stebėjimo duomenis,
+kad kartu išmoktume ir atvaizdą per paslėptuosius sluoksnius,
+ir tiesinį prognozuotoją, veikiantį pagal tą atvaizdą.
 
-This problem of nonlinearity has been studied for at least a
-century :cite:`Fisher.1928`. For instance, decision trees
-in their most basic form use a sequence of binary decisions to
-decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel
-methods have been used for many decades to model nonlinear dependencies
-:cite:`Aronszajn.1950`. This has found its way into
-nonparametric spline models :cite:`Wahba.1990` and kernel methods
-:cite:`Scholkopf.Smola.2002`. It is also something that the brain solves
-quite naturally. After all, neurons feed into other neurons which,
-in turn, feed into other neurons again :cite:`Cajal.Azoulay.1894`.
-Consequently we have a sequence of relatively simple transformations.
+Ši netiesiškumo problema nagrinėjama bent jau
+šimtmetį :cite:`Fisher.1928`. Pavyzdžiui, sprendimų medžiai
+pačia paprasčiausia forma naudoja dvejetainių sprendimų seką,
+kad nuspręstų dėl priklausymo klasei :cite:`quinlan2014c4`. Panašiai branduolių
+metodai jau daugelį dešimtmečių naudojami netiesinėms priklausomybėms modeliuoti
+:cite:`Aronszajn.1950`. Tai rado kelią į
+neparametrinius splainų modelius :cite:`Wahba.1990` ir branduolių metodus
+:cite:`Scholkopf.Smola.2002`. Tai taip pat yra tai, ką smegenys sprendžia
+visiškai natūraliai. Juk neuronai maitina kitus neuronus, kurie,
+savo ruožtu, vėl maitina kitus neuronus :cite:`Cajal.Azoulay.1894`.
+Todėl turime santykinai paprastų transformacijų seką.
 
-### Incorporating Hidden Layers
+### Paslėptųjų sluoksnių įtraukimas
 
-We can overcome the limitations of linear models
-by incorporating one or more hidden layers.
-The easiest way to do this is to stack
-many fully connected layers on top of one another.
-Each layer feeds into the layer above it,
-until we generate outputs.
-We can think of the first $L-1$ layers
-as our representation and the final layer
-as our linear predictor.
-This architecture is commonly called
-a *multilayer perceptron*,
-often abbreviated as *MLP* (:numref:`fig_mlp`).
+Tiesinių modelių apribojimus galime įveikti
+įtraukdami vieną ar kelis paslėptuosius sluoksnius.
+Lengviausias būdas tai padaryti yra sukrauti
+daug pilnai sujungtų sluoksnių vieną ant kito.
+Kiekvienas sluoksnis maitina aukščiau esantį sluoksnį,
+kol sugeneruojame išvestis.
+Pirmuosius $L-1$ sluoksnius galime laikyti
+savo atvaizdu, o paskutinį sluoksnį –
+savo tiesiniu prognozuotoju.
+Ši architektūra paprastai vadinama
+*daugiasluoksniu perceptronu*,
+dažnai sutrumpintai *MLP* (:numref:`fig_mlp`).
 
-![An MLP with a hidden layer of five hidden units.](../img/mlp.svg)
+![MLP su paslėptuoju sluoksniu iš penkių paslėptųjų vienetų.](../img/mlp.svg)
 :label:`fig_mlp`
 
-This MLP has four inputs, three outputs,
-and its hidden layer contains five hidden units.
-Since the input layer does not involve any calculations,
-producing outputs with this network
-requires implementing the computations
-for both the hidden and output layers;
-thus, the number of layers in this MLP is two.
-Note that both layers are fully connected.
-Every input influences every neuron in the hidden layer,
-and each of these in turn influences
-every neuron in the output layer. Alas, we are not quite
-done yet.
+Šis MLP turi keturias įvestis, tris išvestis,
+o jo paslėptajame sluoksnyje yra penki paslėptieji vienetai.
+Kadangi įvesties sluoksnis neatlieka jokių skaičiavimų,
+išvestims šiuo tinklu gauti
+reikia įgyvendinti skaičiavimus
+ir paslėptajam, ir išvesties sluoksniams;
+todėl šio MLP sluoksnių skaičius yra du.
+Atkreipkite dėmesį, kad abu sluoksniai yra pilnai sujungti.
+Kiekviena įvestis veikia kiekvieną paslėptojo sluoksnio neuroną,
+o kiekvienas iš jų, savo ruožtu, veikia
+kiekvieną išvesties sluoksnio neuroną. Deja, dar nesame
+visai baigę.
 
-### From Linear to Nonlinear
+### Nuo tiesinio iki netiesinio
 
-As before, we denote by the matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$
-a minibatch of $n$ examples where each example has $d$ inputs (features).
-For a one-hidden-layer MLP whose hidden layer has $h$ hidden units,
-we denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
-the outputs of the hidden layer, which are
-*hidden representations*.
-Since the hidden and output layers are both fully connected,
-we have hidden-layer weights $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
-and output-layer weights $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.
-This allows us to calculate the outputs $\mathbf{O} \in \mathbb{R}^{n \times q}$
-of the one-hidden-layer MLP as follows:
+Kaip ir anksčiau, matrica $\mathbf{X} \in \mathbb{R}^{n \times d}$ žymime
+$n$ pavyzdžių minirinkinį, kur kiekvienas pavyzdys turi $d$ įvesčių (požymių).
+Vieno paslėptojo sluoksnio MLP, kurio paslėptasis sluoksnis turi $h$ paslėptųjų vienetų,
+paslėptojo sluoksnio išvestis žymime $\mathbf{H} \in \mathbb{R}^{n \times h}$,
+kurios yra *paslėptieji atvaizdai*.
+Kadangi paslėptasis ir išvesties sluoksniai yra pilnai sujungti,
+turime paslėptojo sluoksnio svorius $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ ir poslinkius $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
+bei išvesties sluoksnio svorius $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ ir poslinkius $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.
+Tai leidžia mums apskaičiuoti vieno paslėptojo sluoksnio MLP išvestis $\mathbf{O} \in \mathbb{R}^{n \times q}$
+taip:
 
 $$
 \begin{aligned}
@@ -202,42 +200,42 @@ $$
 \end{aligned}
 $$
 
-Note that after adding the hidden layer,
-our model now requires us to track and update
-additional sets of parameters.
-So what have we gained in exchange?
-You might be surprised to find out
-that---in the model defined above---*we
-gain nothing for our troubles*!
-The reason is plain.
-The hidden units above are given by
-an affine function of the inputs,
-and the outputs (pre-softmax) are just
-an affine function of the hidden units.
-An affine function of an affine function
-is itself an affine function.
-Moreover, our linear model was already
-capable of representing any affine function.
+Atkreipkite dėmesį, kad pridėjus paslėptąjį sluoksnį,
+mūsų modeliui dabar reikia sekti ir atnaujinti
+papildomas parametrų aibes.
+Taigi ką gavome mainais?
+Galbūt nustebsite sužinoję,
+kad – aukščiau apibrėžtame modelyje – *nieko
+negavome už savo vargus*!
+Priežastis aiški.
+Aukščiau esantys paslėptieji vienetai gaunami
+afinine įvesčių funkcija,
+o išvestys (prieš softmax) yra tiesiog
+afininė paslėptųjų vienetų funkcija.
+Afininė afininės funkcijos funkcija
+pati yra afininė funkcija.
+Be to, mūsų tiesinis modelis jau galėjo
+atvaizduoti bet kurią afininę funkciją.
 
-To see this formally we can just collapse out the hidden layer in the above definition,
-yielding an equivalent single-layer model with parameters
-$\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ and $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
+Kad tai pamatytume formaliai, galime tiesiog suskleisti paslėptąjį sluoksnį aukščiau pateiktame apibrėžime,
+gaudami ekvivalentų vieno sluoksnio modelį su parametrais
+$\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ ir $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
 
 $$
 \mathbf{O} = (\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})\mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W}^{(1)}\mathbf{W}^{(2)} + \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W} + \mathbf{b}.
 $$
 
-In order to realize the potential of multilayer architectures,
-we need one more key ingredient: a
-nonlinear *activation function* $\sigma$
-to be applied to each hidden unit
-following the affine transformation. For instance, a popular
-choice is the ReLU (rectified linear unit) activation function :cite:`Nair.Hinton.2010`
-$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments elementwise.
-The outputs of activation functions $\sigma(\cdot)$
-are called *activations*.
-In general, with activation functions in place,
-it is no longer possible to collapse our MLP into a linear model:
+Kad realizuotume daugiasluoksnių architektūrų potencialą,
+mums reikia dar vieno esminio ingrediento:
+netiesinės *aktyvacijos funkcijos* $\sigma$,
+taikomos kiekvienam paslėptajam vienetui
+po afininės transformacijos. Pavyzdžiui, populiarus
+pasirinkimas yra ReLU (angl. *rectified linear unit*, tiesinis lygintuvas) aktyvacijos funkcija :cite:`Nair.Hinton.2010`
+$\sigma(x) = \mathrm{max}(0, x)$, veikianti savo argumentus elementas po elemento.
+Aktyvacijos funkcijų $\sigma(\cdot)$ išvestys
+vadinamos *aktyvacijomis*.
+Apskritai, esant aktyvacijos funkcijoms,
+nebegalima suskleisti mūsų MLP į tiesinį modelį:
 
 $$
 \begin{aligned}
@@ -246,81 +244,81 @@ $$
 \end{aligned}
 $$
 
-Since each row in $\mathbf{X}$ corresponds to an example in the minibatch,
-with some abuse of notation, we define the nonlinearity
-$\sigma$ to apply to its inputs in a rowwise fashion,
-i.e., one example at a time.
-Note that we used the same notation for softmax
-when we denoted a rowwise operation in :numref:`subsec_softmax_vectorization`.
-Quite frequently the activation functions we use apply not merely rowwise but
-elementwise. That means that after computing the linear portion of the layer,
-we can calculate each activation
-without looking at the values taken by the other hidden units.
+Kadangi kiekviena $\mathbf{X}$ eilutė atitinka minirinkinio pavyzdį,
+šiek tiek laisvai vartodami žymėjimą, apibrėžiame netiesiškumą
+$\sigma$ taip, kad jis būtų taikomas savo įvestims eilutėmis,
+t. y. po vieną pavyzdį vienu metu.
+Atkreipkite dėmesį, kad tą patį žymėjimą naudojome softmax,
+kai žymėjome eilutėmis atliekamą operaciją :numref:`subsec_softmax_vectorization`.
+Gana dažnai mūsų naudojamos aktyvacijos funkcijos taikomos ne tik
+eilutėmis, bet ir elementas po elemento. Tai reiškia, kad apskaičiavę tiesinę sluoksnio dalį,
+galime apskaičiuoti kiekvieną aktyvaciją,
+nežiūrėdami į kitų paslėptųjų vienetų įgyjamas reikšmes.
 
-To build more general MLPs, we can continue stacking
-such hidden layers,
-e.g., $\mathbf{H}^{(1)} = \sigma_1(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})$
-and $\mathbf{H}^{(2)} = \sigma_2(\mathbf{H}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)})$,
-one atop another, yielding ever more expressive models.
+Kad sukurtume bendresnius MLP, galime toliau krauti
+tokius paslėptuosius sluoksnius,
+pvz., $\mathbf{H}^{(1)} = \sigma_1(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})$
+ir $\mathbf{H}^{(2)} = \sigma_2(\mathbf{H}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)})$,
+vieną ant kito, gaudami vis raiškesnius modelius.
 
-### Universal Approximators
+### Universalieji aproksimatoriai
 
-We know that the brain is capable of very sophisticated statistical analysis. As such,
-it is worth asking, just *how powerful* a deep network could be. This question
-has been answered multiple times, e.g., in :citet:`Cybenko.1989` in the context
-of MLPs, and in :citet:`micchelli1984interpolation` in the context of reproducing kernel
-Hilbert spaces in a way that could be seen as radial basis function (RBF) networks with a single hidden layer.
-These (and related results) suggest that even with a single-hidden-layer network,
-given enough nodes (possibly absurdly many),
-and the right set of weights,
-we can model any function.
-Actually learning that function is the hard part, though.
-You might think of your neural network
-as being a bit like the C programming language.
-The language, like any other modern language,
-is capable of expressing any computable program.
-But actually coming up with a program
-that meets your specifications is the hard part.
+Žinome, kad smegenys geba atlikti labai sudėtingą statistinę analizę. Todėl
+verta paklausti, *kokio galingumo* gali būti gilusis tinklas. Į šį klausimą
+buvo atsakyta ne kartą, pvz., :citet:`Cybenko.1989` MLP kontekste
+ir :citet:`micchelli1984interpolation` atkuriančiojo branduolio
+Hilberto erdvių kontekste, kurį galima laikyti radialinių bazinių funkcijų (RBF) tinklais su vienu paslėptuoju sluoksniu.
+Šie (ir susiję) rezultatai rodo, kad net su vieno paslėptojo sluoksnio tinklu,
+turint pakankamai mazgų (galbūt absurdiškai daug)
+ir tinkamą svorių rinkinį,
+galime modeliuoti bet kurią funkciją.
+Tačiau iš tiesų išmokti tą funkciją yra sunkioji dalis.
+Savo neuroninį tinklą galite įsivaizduoti
+šiek tiek kaip programavimo kalbą C.
+Ši kalba, kaip ir bet kuri kita šiuolaikinė kalba,
+geba išreikšti bet kurią apskaičiuojamą programą.
+Bet iš tiesų sugalvoti programą,
+atitinkančią jūsų specifikacijas, yra sunkioji dalis.
 
-Moreover, just because a single-hidden-layer network
-*can* learn any function
-does not mean that you should try
-to solve all of your problems
-with one. In fact, in this case kernel methods
-are way more effective, since they are capable of solving the problem
-*exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`.
-In fact, we can approximate many functions
-much more compactly by using deeper (rather than wider) networks :cite:`Simonyan.Zisserman.2014`.
-We will touch upon more rigorous arguments in subsequent chapters.
+Be to, tai, kad vieno paslėptojo sluoksnio tinklas
+*gali* išmokti bet kurią funkciją,
+nereiškia, kad turėtumėte bandyti
+išspręsti visas savo problemas
+su tokiu tinklu. Tiesą sakant, šiuo atveju branduolių metodai
+yra gerokai efektyvesni, nes jie geba išspręsti problemą
+*tiksliai* net begalinės dimensijos erdvėse :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`.
+Iš tikrųjų daugelį funkcijų galime aproksimuoti
+daug kompaktiškiau naudodami gilesnius (o ne platesnius) tinklus :cite:`Simonyan.Zisserman.2014`.
+Prie griežtesnių argumentų grįšime tolesniuose skyriuose.
 
 
-## Activation Functions
+## Aktyvacijos funkcijos
 :label:`subsec_activation-functions`
 
-Activation functions decide whether a neuron should be activated or not by
-calculating the weighted sum and further adding bias to it.
-They are differentiable operators for transforming input signals to outputs,
-while most of them add nonlinearity.
-Because activation functions are fundamental to deep learning,
-(**let's briefly survey some common ones**).
+Aktyvacijos funkcijos nusprendžia, ar neuronas turėtų būti aktyvuotas, ar ne,
+apskaičiuodamos svertinę sumą ir prie jos pridėdamos poslinkį.
+Tai diferencijuojami operatoriai, transformuojantys įvesties signalus į išvestis,
+o dauguma jų prideda netiesiškumo.
+Kadangi aktyvacijos funkcijos yra fundamentalios giliajam mokymuisi,
+(**trumpai apžvelkime kai kurias dažniausias**).
 
-### ReLU Function
+### ReLU funkcija
 
-The most popular choice,
-due to both simplicity of implementation and
-its good performance on a variety of predictive tasks,
-is the *rectified linear unit* (*ReLU*) :cite:`Nair.Hinton.2010`.
-[**ReLU provides a very simple nonlinear transformation**].
-Given an element $x$, the function is defined
-as the maximum of that element and $0$:
+Populiariausias pasirinkimas,
+dėl įgyvendinimo paprastumo ir
+gero veikimo įvairiose prognozavimo užduotyse,
+yra *tiesinis lygintuvas* (angl. *rectified linear unit*, *ReLU*) :cite:`Nair.Hinton.2010`.
+[**ReLU suteikia labai paprastą netiesinę transformaciją**].
+Turint elementą $x$, funkcija apibrėžiama
+kaip to elemento ir $0$ maksimumas:
 
 $$\operatorname{ReLU}(x) = \max(x, 0).$$
 
-Informally, the ReLU function retains only positive
-elements and discards all negative elements
-by setting the corresponding activations to 0.
-To gain some intuition, we can plot the function.
-As you can see, the activation function is piecewise linear.
+Neformaliai ReLU funkcija išsaugo tik teigiamus
+elementus ir atmeta visus neigiamus elementus,
+nustatydama atitinkamas aktyvacijas lygias 0.
+Kad įgytume šiek tiek intuicijos, galime nubraižyti funkciją.
+Kaip matote, aktyvacijos funkcija yra dalimis tiesinė.
 
 ```{.python .input}
 %%tab mxnet
@@ -352,22 +350,22 @@ y = jax.nn.relu(x)
 d2l.plot(x, y, 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
-When the input is negative,
-the derivative of the ReLU function is 0,
-and when the input is positive,
-the derivative of the ReLU function is 1.
-Note that the ReLU function is not differentiable
-when the input takes value precisely equal to 0.
-In these cases, we default to the left-hand-side
-derivative and say that the derivative is 0 when the input is 0.
-We can get away with this because
-the input may never actually be zero (mathematicians would
-say that it is nondifferentiable on a set of measure zero).
-There is an old adage that if subtle boundary conditions matter,
-we are probably doing (*real*) mathematics, not engineering.
-That conventional wisdom may apply here, or at least, the fact that
-we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`.
-We plot the derivative of the ReLU function below.
+Kai įvestis neigiama,
+ReLU funkcijos išvestinė yra 0,
+o kai įvestis teigiama,
+ReLU funkcijos išvestinė yra 1.
+Atkreipkite dėmesį, kad ReLU funkcija nėra diferencijuojama,
+kai įvestis įgyja reikšmę tiksliai lygią 0.
+Tokiais atvejais numatytuoju laikome kairiąją
+išvestinę ir sakome, kad išvestinė yra 0, kai įvestis yra 0.
+Tai galime padaryti, nes
+įvestis gali niekada nebūti lygi nuliui (matematikai
+sakytų, kad ji nediferencijuojama nulinio mato aibėje).
+Yra sena patarlė, kad jei svarbios subtilios ribinės sąlygos,
+tikriausiai užsiimame (*tikrąja*) matematika, o ne inžinerija.
+Ši įprasta išmintis gali būti taikoma čia, arba bent jau tai, kad
+neatliekame apribotojo optimizavimo :cite:`Mangasarian.1965,Rockafellar.1970`.
+Žemiau nubraižome ReLU funkcijos išvestinę.
 
 ```{.python .input}
 %%tab mxnet
@@ -395,67 +393,67 @@ grad_relu = vmap(grad(jax.nn.relu))
 d2l.plot(x, grad_relu(x), 'x', 'grad of relu', figsize=(5, 2.5))
 ```
 
-The reason for using ReLU is that
-its derivatives are particularly well behaved:
-either they vanish or they just let the argument through.
-This makes optimization better behaved
-and it mitigated the well-documented problem
-of vanishing gradients that plagued
-previous versions of neural networks (more on this later).
+ReLU naudojimo priežastis yra ta,
+kad jos išvestinės yra ypač gerai elgiasi:
+jos arba išnyksta, arba tiesiog praleidžia argumentą.
+Dėl to optimizavimas elgiasi geriau,
+ir tai sušvelnino gerai dokumentuotą
+nykstančių gradientų problemą, kuri kamavo
+ankstesnes neuroninių tinklų versijas (apie tai vėliau).
 
-Note that there are many variants to the ReLU function,
-including the *parametrized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
-This variation adds a linear term to ReLU,
-so some information still gets through,
-even when the argument is negative:
+Atkreipkite dėmesį, kad yra daug ReLU funkcijos variantų,
+įskaitant *parametrizuotą ReLU* (*pReLU*) funkciją :cite:`He.Zhang.Ren.ea.2015`.
+Šis variantas prideda tiesinį narį prie ReLU,
+todėl šiek tiek informacijos vis tiek praeina,
+net kai argumentas neigiamas:
 
 $$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
 
-### Sigmoid Function
+### Sigmoidinė funkcija
 
-[**The *sigmoid function* transforms those inputs**]
-whose values lie in the domain $\mathbb{R}$,
-(**to outputs that lie on the interval (0, 1).**)
-For that reason, the sigmoid is
-often called a *squashing function*:
-it squashes any input in the range (-inf, inf)
-to some value in the range (0, 1):
+[**Sigmoidinė funkcija transformuoja tas įvestis**],
+kurių reikšmės yra srityje $\mathbb{R}$,
+(**į išvestis, esančias intervale (0, 1).**)
+Dėl šios priežasties sigmoidinė funkcija
+dažnai vadinama *spaudimo funkcija*:
+ji suspaudžia bet kurią įvestį diapazone (-inf, inf)
+į kokią nors reikšmę diapazone (0, 1):
 
 $$\operatorname{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
-In the earliest neural networks, scientists
-were interested in modeling biological neurons
-that either *fire* or *do not fire*.
-Thus the pioneers of this field,
-going all the way back to McCulloch and Pitts,
-the inventors of the artificial neuron,
-focused on thresholding units :cite:`McCulloch.Pitts.1943`.
-A thresholding activation takes value 0
-when its input is below some threshold
-and value 1 when the input exceeds the threshold.
+Ankstyviausiuose neuroniniuose tinkluose mokslininkai
+domėjosi biologinių neuronų, kurie arba *šauna*, arba *nešauna*,
+modeliavimu.
+Todėl šios srities pradininkai,
+siekiantys net McCullocho ir Pittso,
+dirbtinio neurono išradėjų,
+sutelkė dėmesį į slenkstinius vienetus :cite:`McCulloch.Pitts.1943`.
+Slenkstinė aktyvacija įgyja reikšmę 0,
+kai jos įvestis yra žemiau tam tikro slenksčio,
+ir reikšmę 1, kai įvestis viršija slenkstį.
 
-When attention shifted to gradient-based learning,
-the sigmoid function was a natural choice
-because it is a smooth, differentiable
-approximation to a thresholding unit.
-Sigmoids are still widely used as
-activation functions on the output units
-when we want to interpret the outputs as probabilities
-for binary classification problems: you can think of the sigmoid as a special case of the softmax.
-However, the sigmoid has largely been replaced
-by the simpler and more easily trainable ReLU
-for most use in hidden layers. Much of this has to do
-with the fact that the sigmoid poses challenges for optimization
-:cite:`LeCun.Bottou.Orr.ea.1998` since its gradient vanishes for large positive *and* negative arguments.
-This can lead to plateaus that are difficult to escape from.
-Nonetheless sigmoids are important. In later chapters (e.g., :numref:`sec_lstm`) on recurrent neural networks,
-we will describe architectures that leverage sigmoid units
-to control the flow of information across time.
+Kai dėmesys persikėlė į gradientinį mokymąsi,
+sigmoidinė funkcija buvo natūralus pasirinkimas,
+nes ji yra glotni, diferencijuojama
+slenkstinio vieneto aproksimacija.
+Sigmoidinės funkcijos vis dar plačiai naudojamos kaip
+aktyvacijos funkcijos išvesties vienetuose,
+kai norime interpretuoti išvestis kaip tikimybes
+dvejetainio klasifikavimo uždaviniuose: sigmoidinę funkciją galite laikyti atskiru softmax atveju.
+Tačiau sigmoidinę funkciją daugiausia pakeitė
+paprastesnė ir lengviau apmokoma ReLU,
+daugumai naudojimų paslėptuosiuose sluoksniuose. Tai daugiausia susiję
+su tuo, kad sigmoidinė funkcija kelia iššūkių optimizavimui
+:cite:`LeCun.Bottou.Orr.ea.1998`, nes jos gradientas išnyksta didelėms teigiamoms *ir* neigiamoms argumentų reikšmėms.
+Tai gali sukelti plynaukštes, iš kurių sunku išsivaduoti.
+Vis dėlto sigmoidinės funkcijos yra svarbios. Vėlesniuose skyriuose (pvz., :numref:`sec_lstm`) apie rekurentinius neuroninius tinklus
+aprašysime architektūras, naudojančias sigmoidinius vienetus
+informacijos srautui per laiką valdyti.
 
-Below, we plot the sigmoid function.
-Note that when the input is close to 0,
-the sigmoid function approaches
-a linear transformation.
+Žemiau nubraižome sigmoidinę funkciją.
+Atkreipkite dėmesį, kad kai įvestis artima 0,
+sigmoidinė funkcija artėja prie
+tiesinės transformacijos.
 
 ```{.python .input}
 %%tab mxnet
@@ -482,17 +480,17 @@ y = jax.nn.sigmoid(x)
 d2l.plot(x, y, 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
-The derivative of the sigmoid function is given by the following equation:
+Sigmoidinės funkcijos išvestinė duodama šia lygtimi:
 
 $$\frac{d}{dx} \operatorname{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \operatorname{sigmoid}(x)\left(1-\operatorname{sigmoid}(x)\right).$$
 
 
-The derivative of the sigmoid function is plotted below.
-Note that when the input is 0,
-the derivative of the sigmoid function
-reaches a maximum of 0.25.
-As the input diverges from 0 in either direction,
-the derivative approaches 0.
+Sigmoidinės funkcijos išvestinė nubraižyta žemiau.
+Atkreipkite dėmesį, kad kai įvestis yra 0,
+sigmoidinės funkcijos išvestinė
+pasiekia didžiausią reikšmę 0,25.
+Kai įvestis tolsta nuo 0 bet kuria kryptimi,
+išvestinė artėja prie 0.
 
 ```{.python .input}
 %%tab mxnet
@@ -522,16 +520,16 @@ grad_sigmoid = vmap(grad(jax.nn.sigmoid))
 d2l.plot(x, grad_sigmoid(x), 'x', 'grad of sigmoid', figsize=(5, 2.5))
 ```
 
-### Tanh Function
+### Tanh funkcija
 :label:`subsec_tanh`
 
-Like the sigmoid function, [**the tanh (hyperbolic tangent)
-function also squashes its inputs**],
-transforming them into elements on the interval (**between $-1$ and $1$**):
+Kaip ir sigmoidinė funkcija, [**tanh (hiperbolinio tangento)
+funkcija taip pat suspaudžia savo įvestis**],
+paversdama jas elementais intervale (**tarp $-1$ ir $1$**):
 
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
-We plot the tanh function below. Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
+Žemiau nubraižome tanh funkciją. Atkreipkite dėmesį, kad kai įvestis artėja prie 0, tanh funkcija artėja prie tiesinės transformacijos. Nors funkcijos forma panaši į sigmoidinės funkcijos, tanh funkcija pasižymi taškine simetrija koordinačių sistemos pradžios atžvilgiu :cite:`Kalman.Kwasny.1992`.
 
 ```{.python .input}
 %%tab mxnet
@@ -558,16 +556,16 @@ y = jax.nn.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
-The derivative of the tanh function is:
+Tanh funkcijos išvestinė yra:
 
 $$\frac{d}{dx} \operatorname{tanh}(x) = 1 - \operatorname{tanh}^2(x).$$
 
-It is plotted below.
-As the input nears 0,
-the derivative of the tanh function approaches a maximum of 1.
-And as we saw with the sigmoid function,
-as input moves away from 0 in either direction,
-the derivative of the tanh function approaches 0.
+Ji nubraižyta žemiau.
+Kai įvestis artėja prie 0,
+tanh funkcijos išvestinė artėja prie didžiausios reikšmės 1.
+Ir kaip matėme su sigmoidine funkcija,
+kai įvestis tolsta nuo 0 bet kuria kryptimi,
+tanh funkcijos išvestinė artėja prie 0.
 
 ```{.python .input}
 %%tab mxnet
@@ -597,63 +595,62 @@ grad_tanh = vmap(grad(jax.nn.tanh))
 d2l.plot(x, grad_tanh(x), 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-We now know how to incorporate nonlinearities
-to build expressive multilayer neural network architectures.
-As a side note, your knowledge already
-puts you in command of a similar toolkit
-to a practitioner circa 1990.
-In some ways, you have an advantage
-over anyone working back then,
-because you can leverage powerful
-open-source deep learning frameworks
-to build models rapidly, using only a few lines of code.
-Previously, training these networks
-required researchers to code up layers and derivatives
-explicitly in C, Fortran, or even Lisp (in the case of LeNet).
+Dabar žinome, kaip įtraukti netiesiškumus,
+kad sukurtume raiškias daugiasluoksnes neuroninių tinklų architektūras.
+Pastebėsime, kad jūsų žinios jau
+suteikia jums panašų įrankių rinkinį
+kaip specialistui apie 1990 m.
+Tam tikrais atžvilgiais turite pranašumą
+prieš bet ką, dirbusį tada,
+nes galite pasinaudoti galingais
+atvirojo kodo giliojo mokymosi karkasais,
+kad greitai kurtumėte modelius naudodami vos kelias kodo eilutes.
+Anksčiau šiems tinklams apmokyti
+tyrėjai turėdavo aiškiai užkoduoti sluoksnius ir išvestines
+C, Fortran ar net Lisp kalbomis (LeNet atveju).
 
-A secondary benefit is that ReLU is significantly more amenable to
-optimization than the sigmoid or the tanh function. One could argue
-that this was one of the key innovations that helped the resurgence
-of deep learning over the past decade. Note, though, that research in
-activation functions has not stopped.
-For instance, 
-the GELU (Gaussian error linear unit)
-activation function $x \Phi(x)$ by :citet:`Hendrycks.Gimpel.2016` ($\Phi(x)$
-is the standard Gaussian cumulative distribution function) 
-and
-the Swish activation
-function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in :citet:`Ramachandran.Zoph.Le.2017` can yield better accuracy
-in many cases.
+Antrinė nauda yra ta, kad ReLU yra gerokai geriau pritaikyta
+optimizavimui nei sigmoidinė ar tanh funkcija. Galima teigti,
+kad tai buvo viena pagrindinių naujovių, padėjusių giliojo mokymosi
+atgimimui per pastarąjį dešimtmetį. Tačiau atkreipkite dėmesį, kad aktyvacijos funkcijų
+tyrimai nesustojo.
+Pavyzdžiui,
+GELU (angl. *Gaussian error linear unit*, Gauso paklaidos tiesinis vienetas)
+aktyvacijos funkcija $x \Phi(x)$, kurią pasiūlė :citet:`Hendrycks.Gimpel.2016` ($\Phi(x)$
+yra standartinė Gauso kaupiamojo skirstinio funkcija),
+ir
+Swish aktyvacijos
+funkcija $\sigma(x) = x \operatorname{sigmoid}(\beta x)$, pasiūlyta :citet:`Ramachandran.Zoph.Le.2017`, daugeliu atvejų gali duoti geresnį tikslumą.
 
-## Exercises
+## Pratimai
 
-1. Show that adding layers to a *linear* deep network, i.e., a network without
-   nonlinearity $\sigma$ can never increase the expressive power of the network.
-   Give an example where it actively reduces it.
-1. Compute the derivative of the pReLU activation function.
-1. Compute the derivative of the Swish activation function $x \operatorname{sigmoid}(\beta x)$.
-1. Show that an MLP using only ReLU (or pReLU) constructs a
-   continuous piecewise linear function.
-1. Sigmoid and tanh are very similar.
-    1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
-    1. Prove that the function classes parametrized by both nonlinearities are identical. Hint: affine layers have bias terms, too.
-1. Assume that we have a nonlinearity that applies to one minibatch at a time, such as the batch normalization :cite:`Ioffe.Szegedy.2015`. What kinds of problems do you expect this to cause?
-1. Provide an example where the gradients vanish for the sigmoid activation function.
+1. Parodykite, kad sluoksnių pridėjimas prie *tiesinio* gilaus tinklo, t. y. tinklo be
+   netiesiškumo $\sigma$, niekada negali padidinti tinklo raiškos galios.
+   Pateikite pavyzdį, kai jis aktyviai ją sumažina.
+1. Apskaičiuokite pReLU aktyvacijos funkcijos išvestinę.
+1. Apskaičiuokite Swish aktyvacijos funkcijos $x \operatorname{sigmoid}(\beta x)$ išvestinę.
+1. Parodykite, kad MLP, naudojantis tik ReLU (arba pReLU), sukonstruoja
+   tolydžią dalimis tiesinę funkciją.
+1. Sigmoidinė ir tanh funkcijos yra labai panašios.
+    1. Parodykite, kad $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
+    1. Įrodykite, kad abiejų netiesiškumų parametrizuotos funkcijų klasės yra identiškos. Užuomina: afininiai sluoksniai taip pat turi poslinkio narius.
+1. Tarkime, kad turime netiesiškumą, kuris taikomas vienam minirinkiniui vienu metu, pvz., paketinė normalizacija :cite:`Ioffe.Szegedy.2015`. Kokių problemų tikitės dėl to?
+1. Pateikite pavyzdį, kai sigmoidinės aktyvacijos funkcijos gradientai išnyksta.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/90)
+[Diskusijos](https://discuss.d2l.ai/t/90)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/91)
+[Diskusijos](https://discuss.d2l.ai/t/91)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/226)
+[Diskusijos](https://discuss.d2l.ai/t/226)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17984)
+[Diskusijos](https://discuss.d2l.ai/t/17984)
 :end_tab:

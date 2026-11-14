@@ -3,15 +3,15 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Concise Implementation of Softmax Regression
+# Glaustas softmax regresijos įgyvendinimas
 :label:`sec_softmax_concise`
 
 
 
-Just as high-level deep learning frameworks
-made it easier to implement linear regression
-(see :numref:`sec_linear_concise`),
-they are similarly convenient here.
+Kaip aukšto lygio giliojo mokymosi karkasai
+palengvino tiesinės regresijos įgyvendinimą
+(žr. :numref:`sec_linear_concise`),
+taip pat patogūs jie ir čia.
 
 ```{.python .input}
 %%tab mxnet
@@ -45,38 +45,38 @@ from jax import numpy as jnp
 import optax
 ```
 
-## Defining the Model
+## Modelio apibrėžimas
 
-As in :numref:`sec_linear_concise`, 
-we construct our fully connected layer 
-using the built-in layer. 
-The built-in `__call__` method then invokes `forward` 
-whenever we need to apply the network to some input.
+Kaip ir :numref:`sec_linear_concise`,
+savo pilnai sujungtą sluoksnį sukonstruojame
+naudodami įtaisytąjį sluoksnį.
+Tada įtaisytasis metodas `__call__` iškviečia `forward`,
+kai tik reikia taikyti tinklą kokiai nors įvesčiai.
 
 :begin_tab:`mxnet`
-Even though the input `X` is a fourth-order tensor, 
-the built-in `Dense` layer 
-will automatically convert `X` into a second-order tensor 
-by keeping the dimensionality along the first axis unchanged.
+Nors įvestis `X` yra ketvirtos eilės tenzorius,
+įtaisytasis sluoksnis `Dense`
+automatiškai konvertuos `X` į antros eilės tenzorių,
+nekeisdamas dimensijos pagal pirmąją ašį.
 :end_tab:
 
 :begin_tab:`pytorch`
-We use a `Flatten` layer to convert the fourth-order tensor `X` to second order 
-by keeping the dimensionality along the first axis unchanged.
+Naudojame sluoksnį `Flatten`, kad ketvirtos eilės tenzorių `X` konvertuotume į antros eilės,
+nekeisdami dimensijos pagal pirmąją ašį.
 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We use a `Flatten` layer to convert the fourth-order tensor `X` 
-by keeping the dimension along the first axis unchanged.
+Naudojame sluoksnį `Flatten`, kad ketvirtos eilės tenzorių `X` konvertuotume,
+nekeisdami dimensijos pagal pirmąją ašį.
 :end_tab:
 
 :begin_tab:`jax`
-Flax allows users to write the network class in a more compact way
-using `@nn.compact` dectorator. With `@nn.compact`, one
-can simply write all network logic inside a single “forward pass”
-method, without needing to define the standard `setup` method in
-the dataclass.
+Flax leidžia naudotojams tinklo klasę rašyti glaustesniu būdu,
+naudojant dekoratorių `@nn.compact`. Su `@nn.compact`
+galima tiesiog užrašyti visą tinklo logiką viename „tiesioginio sklidimo"
+metode, nereikia apibrėžti standartinio metodo `setup`
+duomenų klasėje.
 :end_tab:
 
 ```{.python .input}
@@ -125,25 +125,25 @@ class SoftmaxRegression(d2l.Classifier):  #@save
         return X
 ```
 
-## Softmax Revisited
+## Dar kartą apie softmax
 :label:`subsec_softmax-implementation-revisited`
 
-In :numref:`sec_softmax_scratch` we calculated our model's output
-and applied the cross-entropy loss. While this is perfectly
-reasonable mathematically, it is risky computationally, because of
-numerical underflow and overflow in the exponentiation.
+:numref:`sec_softmax_scratch` apskaičiavome savo modelio išvestį
+ir pritaikėme kryžminės entropijos nuostolius. Nors tai visiškai
+pagrįsta matematiškai, skaičiavimo požiūriu tai rizikinga dėl
+skaitinio nepakankamumo ir perpildymo kėlimo eksponente metu.
 
-Recall that the softmax function computes probabilities via
+Prisiminkite, kad softmax funkcija apskaičiuoja tikimybes pagal
 $\hat y_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$.
-If some of the $o_k$ are very large, i.e., very positive,
-then $\exp(o_k)$ might be larger than the largest number
-we can have for certain data types. This is called *overflow*. Likewise,
-if every argument is a very large negative number, we will get *underflow*.
-For instance, single precision floating point numbers approximately
-cover the range of $10^{-38}$ to $10^{38}$. As such, if the largest term in $\mathbf{o}$
-lies outside the interval $[-90, 90]$, the result will not be stable.
-A way round this problem is to subtract $\bar{o} \stackrel{\textrm{def}}{=} \max_k o_k$ from
-all entries:
+Jei kai kurie $o_k$ yra labai dideli, t. y. labai teigiami,
+tada $\exp(o_k)$ gali būti didesnis už didžiausią skaičių,
+kurį galima turėti tam tikriems duomenų tipams. Tai vadinama *perpildymu*. Panašiai,
+jei kiekvienas argumentas yra labai didelis neigiamas skaičius, gausime *nepakankamumą*.
+Pavyzdžiui, vienguba tikslumo slankiojo kablelio skaičiai maždaug
+apima diapazoną nuo $10^{-38}$ iki $10^{38}$. Todėl jei didžiausias $\mathbf{o}$ narys
+yra už intervalo $[-90, 90]$ ribų, rezultatas nebus stabilus.
+Būdas apeiti šią problemą yra atimti $\bar{o} \stackrel{\textrm{def}}{=} \max_k o_k$ iš
+visų įrašų:
 
 $$
 \hat y_j = \frac{\exp o_j}{\sum_k \exp o_k} =
@@ -151,21 +151,21 @@ $$
 \frac{\exp(o_j - \bar{o})}{\sum_k \exp (o_k - \bar{o})}.
 $$
 
-By construction we know that $o_j - \bar{o} \leq 0$ for all $j$. As such, for a $q$-class
-classification problem, the denominator is contained in the interval $[1, q]$. Moreover, the
-numerator never exceeds $1$, thus preventing numerical overflow. Numerical underflow only
-occurs when $\exp(o_j - \bar{o})$ numerically evaluates as $0$. Nonetheless, a few steps down
-the road we might find ourselves in trouble when we want to compute $\log \hat{y}_j$ as $\log 0$.
-In particular, in backpropagation,
-we might find ourselves faced with a screenful
-of the dreaded `NaN` (Not a Number) results.
+Pagal konstrukciją žinome, kad $o_j - \bar{o} \leq 0$ visiems $j$. Todėl $q$ klasių
+klasifikavimo uždaviniui vardiklis yra intervale $[1, q]$. Be to,
+skaitiklis niekada neviršija $1$, taip išvengiant skaitinio perpildymo. Skaitinis nepakankamumas
+atsiranda tik tada, kai $\exp(o_j - \bar{o})$ skaitiškai įvertinamas kaip $0$. Vis dėlto po kelių žingsnių
+galime patekti į bėdą, kai norėsime apskaičiuoti $\log \hat{y}_j$ kaip $\log 0$.
+Visų pirma atgaliniame sklidime
+galime susidurti su ekranu
+baisių `NaN` (Not a Number, ne skaičius) rezultatų.
 
-Fortunately, we are saved by the fact that
-even though we are computing exponential functions,
-we ultimately intend to take their log
-(when calculating the cross-entropy loss).
-By combining softmax and cross-entropy,
-we can escape the numerical stability issues altogether. We have:
+Laimei, mus išgelbsti tai, kad
+nors skaičiuojame eksponentines funkcijas,
+galiausiai ketiname imti jų logaritmą
+(skaičiuodami kryžminės entropijos nuostolius).
+Sujungę softmax ir kryžminę entropiją,
+galime visiškai išvengti skaitinio stabilumo problemų. Turime:
 
 $$
 \log \hat{y}_j =
@@ -173,14 +173,14 @@ $$
 o_j - \bar{o} - \log \sum_k \exp (o_k - \bar{o}).
 $$
 
-This avoids both overflow and underflow.
-We will want to keep the conventional softmax function handy
-in case we ever want to evaluate the output probabilities by our model.
-But instead of passing softmax probabilities into our new loss function,
-we just
-[**pass the logits and compute the softmax and its log
-all at once inside the cross-entropy loss function,**]
-which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
+Taip išvengiama ir perpildymo, ir nepakankamumo.
+Norėsime po ranka turėti įprastą softmax funkciją,
+jei kada nors norėtume įvertinti mūsų modelio išvesties tikimybes.
+Bet užuot perdavę softmax tikimybes į naują nuostolių funkciją,
+tiesiog
+[**perduodame logitus ir apskaičiuojame softmax bei jo logaritmą
+visa tai iš karto kryžminės entropijos nuostolių funkcijos viduje,**]
+kuri daro protingus dalykus, pavyzdžiui, [„LogSumExp triuką"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -216,9 +216,9 @@ def loss(self, params, X, Y, state, averaged=True):
     return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 ```
 
-## Training
+## Apmokymas
 
-Next we train our model. We use Fashion-MNIST images, flattened to 784-dimensional feature vectors.
+Toliau apmokome savo modelį. Naudojame Fashion-MNIST vaizdus, išlygintus į 784 dimensijų požymių vektorius.
 
 ```{.python .input}
 %%tab all
@@ -228,39 +228,38 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-As before, this algorithm converges to a solution
-that is reasonably accurate,
-albeit this time with fewer lines of code than before.
+Kaip ir anksčiau, šis algoritmas konverguoja į sprendinį,
+kuris yra pakankamai tikslus,
+nors šį kartą naudojant mažiau kodo eilučių nei anksčiau.
 
 
-## Summary
+## Santrauka
 
-High-level APIs are very convenient at hiding from their user potentially dangerous aspects, such as numerical stability. Moreover, they allow users to design models concisely with very few lines of code. This is both a blessing and a curse. The obvious benefit is that it makes things highly accessible, even to engineers who never took a single class of statistics in their life (in fact, they are part of the target audience of the book). But hiding the sharp edges also comes with a price: a disincentive to add new and different components on your own, since there is little muscle memory for doing it. Moreover, it makes it more difficult to *fix* things whenever the protective padding of
-a framework fails to cover all the corner cases entirely. Again, this is due to lack of familiarity.
+Aukšto lygio API labai patogiai slepia nuo naudotojo potencialiai pavojingus aspektus, tokius kaip skaitinis stabilumas. Be to, jos leidžia naudotojams glaustai projektuoti modelius naudojant labai mažai kodo eilučių. Tai ir palaima, ir prakeiksmas. Akivaizdi nauda yra ta, kad viskas tampa labai prieinama, net inžinieriams, kurie gyvenime nėra lankę nė vienos statistikos paskaitos (iš tiesų jie yra dalis šios knygos tikslinės auditorijos). Tačiau aštrių kampų slėpimas turi ir kainą: nenorą patiems pridėti naujų ir skirtingų komponentų, nes mažai turima įpročio tai daryti. Be to, tai apsunkina dalykų *taisymą*, kai karkaso apsauginis sluoksnis nepadengia visų kraštutinių atvejų. Vėlgi, tai kyla dėl nepakankamo susipažinimo.
 
-As such, we strongly urge you to review *both* the bare bones and the elegant versions of many of the implementations that follow. While we emphasize ease of understanding, the implementations are nonetheless usually quite performant (convolutions are the big exception here). It is our intention to allow you to build on these when you invent something new that no framework can give you.
+Todėl primygtinai raginame peržiūrėti *abi* – ir paprastąją, ir elegantiškąją – daugelio tolesnių įgyvendinimų versijas. Nors pabrėžiame supratimo paprastumą, įgyvendinimai vis dėlto paprastai yra gana našūs (konvoliucijos čia yra didelė išimtis). Mūsų ketinimas – leisti jums remtis jais, kai išrasite ką nors naujo, ko joks karkasas negali suteikti.
 
 
-## Exercises
+## Pratimai
 
-1. Deep learning uses many different number formats, including FP64 double precision (used extremely rarely),
-FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (very unstable), TF32 (a new format from NVIDIA), and INT8. Compute the smallest and largest argument of the exponential function for which the result does not lead to numerical underflow or overflow.
-1. INT8 is a very limited format consisting of nonzero numbers from $1$ to $255$. How could you extend its dynamic range without using more bits? Do standard multiplication and addition still work?
-1. Increase the number of epochs for training. Why might the validation accuracy decrease after a while? How could we fix this?
-1. What happens as you increase the learning rate? Compare the loss curves for several learning rates. Which one works better? When?
+1. Giliajame mokyme naudojama daug skirtingų skaičių formatų, įskaitant FP64 dvigubą tikslumą (naudojamas itin retai),
+FP32 vienguba tikslumu, BFLOAT16 (tinka suspaustiems atvaizdams), FP16 (labai nestabilus), TF32 (naujas NVIDIA formatas) ir INT8. Apskaičiuokite mažiausią ir didžiausią eksponentinės funkcijos argumentą, kuriam rezultatas nesukelia skaitinio nepakankamumo ar perpildymo.
+1. INT8 yra labai ribotas formatas, sudarytas iš nenulinių skaičių nuo $1$ iki $255$. Kaip galėtumėte išplėsti jo dinaminį diapazoną nenaudodami daugiau bitų? Ar standartinė daugyba ir sudėtis vis dar veikia?
+1. Padidinkite apmokymo epochų skaičių. Kodėl validavimo tikslumas po kurio laiko gali sumažėti? Kaip tai galėtume ištaisyti?
+1. Kas nutinka didinant mokymosi spartą? Palyginkite nuostolių kreives esant kelioms mokymosi spartoms. Kuri veikia geriau? Kada?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/52)
+[Diskusijos](https://discuss.d2l.ai/t/52)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/53)
+[Diskusijos](https://discuss.d2l.ai/t/53)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/260)
+[Diskusijos](https://discuss.d2l.ai/t/260)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17983)
+[Diskusijos](https://discuss.d2l.ai/t/17983)
 :end_tab:

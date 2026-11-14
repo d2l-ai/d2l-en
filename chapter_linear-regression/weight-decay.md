@@ -3,48 +3,48 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Weight Decay
+# Svorių nykimas
 :label:`sec_weight_decay`
 
-Now that we have characterized the problem of overfitting,
-we can introduce our first *regularization* technique.
-Recall that we can always mitigate overfitting
-by collecting more training data.
-However, that can be costly, time consuming,
-or entirely out of our control,
-making it impossible in the short run.
-For now, we can assume that we already have
-as much high-quality data as our resources permit
-and focus the tools at our disposal
-when the dataset is taken as a given.
+Kai jau apibūdinome persimokymo problemą,
+galime pristatyti pirmąjį savo *reguliarizavimo* metodą.
+Prisiminkite, kad persimokymą visada galime sumažinti
+surinkdami daugiau apmokymo duomenų.
+Tačiau tai gali būti brangu, imti daug laiko
+arba visiškai nuo mūsų nepriklausyti,
+todėl trumpuoju laikotarpiu tai neįmanoma.
+Kol kas galime laikyti, kad jau turime
+tiek aukštos kokybės duomenų, kiek leidžia mūsų ištekliai,
+ir sutelkti dėmesį į turimas priemones,
+kai duomenų rinkinys laikomas duotu.
 
-Recall that in our polynomial regression example
+Prisiminkite, kad savo polinominės regresijos pavyzdyje
 (:numref:`subsec_polynomial-curve-fitting`)
-we could limit our model's capacity
-by tweaking the degree
-of the fitted polynomial.
-Indeed, limiting the number of features
-is a popular technique for mitigating overfitting.
-However, simply tossing aside features
-can be too blunt an instrument.
-Sticking with the polynomial regression
-example, consider what might happen
-with high-dimensional input.
-The natural extensions of polynomials
-to multivariate data are called *monomials*,
-which are simply products of powers of variables.
-The degree of a monomial is the sum of the powers.
-For example, $x_1^2 x_2$, and $x_3 x_5^2$
-are both monomials of degree 3.
+galėjome apriboti savo modelio talpą,
+keisdami pritaikomo polinomo
+laipsnį.
+Iš tiesų požymių skaičiaus ribojimas
+yra populiarus persimokymo mažinimo būdas.
+Tačiau paprastas požymių atmetimas
+gali būti pernelyg grubi priemonė.
+Pasilikę prie polinominės regresijos
+pavyzdžio, panagrinėkime, kas gali nutikti
+su didelės dimensijos įvestimi.
+Natūralūs polinomų apibendrinimai
+daugiamačiams duomenims vadinami *monomais*,
+kurie yra tiesiog kintamųjų laipsnių sandaugos.
+Monomo laipsnis yra laipsnių suma.
+Pavyzdžiui, $x_1^2 x_2$ ir $x_3 x_5^2$
+yra abu 3 laipsnio monomai.
 
-Note that the number of terms with degree $d$
-blows up rapidly as $d$ grows larger.
-Given $k$ variables, the number of monomials
-of degree $d$ is ${k - 1 + d} \choose {k - 1}$.
-Even small changes in degree, say from $2$ to $3$,
-dramatically increase the complexity of our model.
-Thus we often need a more fine-grained tool
-for adjusting function complexity.
+Atkreipkite dėmesį, kad $d$ laipsnio narių skaičius
+sparčiai didėja, augant $d$.
+Turint $k$ kintamųjų, $d$ laipsnio monomų
+skaičius yra ${k - 1 + d} \choose {k - 1}$.
+Net nedideli laipsnio pokyčiai, tarkime, nuo $2$ iki $3$,
+dramatiškai padidina mūsų modelio sudėtingumą.
+Todėl dažnai mums reikia smulkesnės priemonės
+funkcijos sudėtingumui reguliuoti.
 
 ```{.python .input}
 %%tab mxnet
@@ -79,163 +79,162 @@ from jax import numpy as jnp
 import optax
 ```
 
-## Norms and Weight Decay
+## Normos ir svorių nykimas
 
-(**Rather than directly manipulating the number of parameters,
-*weight decay*, operates by restricting the values 
-that the parameters can take.**)
-More commonly called $\ell_2$ regularization
-outside of deep learning circles
-when optimized by minibatch stochastic gradient descent,
-weight decay might be the most widely used technique
-for regularizing parametric machine learning models.
-The technique is motivated by the basic intuition
-that among all functions $f$,
-the function $f = 0$
-(assigning the value $0$ to all inputs)
-is in some sense the *simplest*,
-and that we can measure the complexity
-of a function by the distance of its parameters from zero.
-But how precisely should we measure
-the distance between a function and zero?
-There is no single right answer.
-In fact, entire branches of mathematics,
-including parts of functional analysis
-and the theory of Banach spaces,
-are devoted to addressing such issues.
+(**Užuot tiesiogiai keitęs parametrų skaičių,
+*svorių nykimas* veikia apribodamas reikšmes,
+kurias gali įgyti parametrai.**)
+Už giliojo mokymosi ssluoksnių ribų dažniau vadinamas
+$\ell_2$ reguliarizavimu,
+kai optimizuojamas minirinkinio stochastiniu gradientiniu nusileidimu,
+svorių nykimas galbūt yra plačiausiai naudojamas metodas
+parametriniams mašininio mokymosi modeliams reguliarizuoti.
+Šio metodo pagrindas yra pagrindinė intuicija,
+kad tarp visų funkcijų $f$
+funkcija $f = 0$
+(priskirianti reikšmę $0$ visoms įvestims)
+tam tikra prasme yra *paprasčiausia*,
+ir kad funkcijos sudėtingumą galime išmatuoti
+jos parametrų atstumu nuo nulio.
+Bet kaip tiksliai turėtume matuoti
+atstumą tarp funkcijos ir nulio?
+Vienintelio teisingo atsakymo nėra.
+Tiesą sakant, ištisos matematikos šakos,
+įskaitant funkcinės analizės dalis
+ir Banacho erdvių teoriją,
+skirtos tokiems klausimams spręsti.
 
-One simple interpretation might be
-to measure the complexity of a linear function
-$f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
-by some norm of its weight vector, e.g., $\| \mathbf{w} \|^2$.
-Recall that we introduced the $\ell_2$ norm and $\ell_1$ norm,
-which are special cases of the more general $\ell_p$ norm,
-in :numref:`subsec_lin-algebra-norms`.
-The most common method for ensuring a small weight vector
-is to add its norm as a penalty term
-to the problem of minimizing the loss.
-Thus we replace our original objective,
-*minimizing the prediction loss on the training labels*,
-with new objective,
-*minimizing the sum of the prediction loss and the penalty term*.
-Now, if our weight vector grows too large,
-our learning algorithm might focus
-on minimizing the weight norm $\| \mathbf{w} \|^2$
-rather than minimizing the training error.
-That is exactly what we want.
-To illustrate things in code,
-we revive our previous example
-from :numref:`sec_linear_regression` for linear regression.
-There, our loss was given by
+Viena paprasta interpretacija galėtų būti
+matuoti tiesinės funkcijos
+$f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$ sudėtingumą
+kokia nors jos svorių vektoriaus norma, pvz., $\| \mathbf{w} \|^2$.
+Prisiminkite, kad $\ell_2$ ir $\ell_1$ normas,
+kurios yra bendresnės $\ell_p$ normos atskiri atvejai,
+pristatėme :numref:`subsec_lin-algebra-norms`.
+Dažniausias būdas užtikrinti mažą svorių vektorių
+yra pridėti jo normą kaip baudos narį
+prie nuostolių minimizavimo uždavinio.
+Taigi savo pradinį tikslą,
+*minimizuoti prognozės nuostolius apmokymo žymenyse*,
+pakeičiame nauju tikslu,
+*minimizuoti prognozės nuostolių ir baudos nario sumą*.
+Dabar, jei mūsų svorių vektorius pernelyg išauga,
+mūsų mokymosi algoritmas gali sutelkti dėmesį
+į svorių normos $\| \mathbf{w} \|^2$ minimizavimą,
+o ne į apmokymo paklaidos minimizavimą.
+Būtent to ir norime.
+Kad viską parodytume kode,
+atgaivinsime savo ankstesnį pavyzdį
+iš :numref:`sec_linear_regression` apie tiesinę regresiją.
+Ten mūsų nuostoliai buvo
 
 $$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-Recall that $\mathbf{x}^{(i)}$ are the features,
-$y^{(i)}$ is the label for any data example $i$, and $(\mathbf{w}, b)$
-are the weight and bias parameters, respectively.
-To penalize the size of the weight vector,
-we must somehow add $\| \mathbf{w} \|^2$ to the loss function,
-but how should the model trade off the
-standard loss for this new additive penalty?
-In practice, we characterize this trade-off
-via the *regularization constant* $\lambda$,
-a nonnegative hyperparameter
-that we fit using validation data:
+Prisiminkite, kad $\mathbf{x}^{(i)}$ yra požymiai,
+$y^{(i)}$ yra bet kurio duomenų pavyzdžio $i$ žymuo, o $(\mathbf{w}, b)$
+yra atitinkamai svorių ir poslinkio parametrai.
+Kad nubaustume svorių vektoriaus dydį,
+turime kaip nors pridėti $\| \mathbf{w} \|^2$ prie nuostolių funkcijos,
+bet kaip modelis turėtų kompromisiškai suderinti
+standartinius nuostolius su šia nauja adityviąja bauda?
+Praktikoje šį kompromisą apibūdiname
+*reguliarizavimo konstanta* $\lambda$,
+neneigiamu hiperparametru,
+kurį parenkame naudodami validavimo duomenis:
 
 $$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
 
 
-For $\lambda = 0$, we recover our original loss function.
-For $\lambda > 0$, we restrict the size of $\| \mathbf{w} \|$.
-We divide by $2$ by convention:
-when we take the derivative of a quadratic function,
-the $2$ and $1/2$ cancel out, ensuring that the expression
-for the update looks nice and simple.
-The astute reader might wonder why we work with the squared
-norm and not the standard norm (i.e., the Euclidean distance).
-We do this for computational convenience.
-By squaring the $\ell_2$ norm, we remove the square root,
-leaving the sum of squares of
-each component of the weight vector.
-This makes the derivative of the penalty easy to compute: 
-the sum of derivatives equals the derivative of the sum.
+Kai $\lambda = 0$, atkuriame savo pradinę nuostolių funkciją.
+Kai $\lambda > 0$, apribojame $\| \mathbf{w} \|$ dydį.
+Dalijame iš $2$ pagal susitarimą:
+kai imame kvadratinės funkcijos išvestinę,
+$2$ ir $1/2$ susiprastina, užtikrindami, kad atnaujinimo
+išraiška atrodytų gražiai ir paprastai.
+Atidus skaitytojas galėtų susimąstyti, kodėl dirbame su kvadratine
+norma, o ne su standartine norma (t. y. Euklido atstumu).
+Taip darome dėl skaičiavimo patogumo.
+Pakėlę $\ell_2$ normą kvadratu, atsikratome kvadratinės šaknies,
+ir lieka kiekvienos svorių vektoriaus komponentės kvadratų suma.
+Dėl to baudos išvestinę lengva apskaičiuoti:
+išvestinių suma lygi sumos išvestinei.
 
 
-Moreover, you might ask why we work with the $\ell_2$ norm
-in the first place and not, say, the $\ell_1$ norm.
-In fact, other choices are valid and
-popular throughout statistics.
-While $\ell_2$-regularized linear models constitute
-the classic *ridge regression* algorithm,
-$\ell_1$-regularized linear regression
-is a similarly fundamental method in statistics, 
-popularly known as *lasso regression*.
-One reason to work with the $\ell_2$ norm
-is that it places an outsize penalty
-on large components of the weight vector.
-This biases our learning algorithm
-towards models that distribute weight evenly
-across a larger number of features.
-In practice, this might make them more robust
-to measurement error in a single variable.
-By contrast, $\ell_1$ penalties lead to models
-that concentrate weights on a small set of features
-by clearing the other weights to zero.
-This gives us an effective method for *feature selection*,
-which may be desirable for other reasons.
-For example, if our model only relies on a few features,
-then we may not need to collect, store, or transmit data
-for the other (dropped) features. 
+Be to, galite paklausti, kodėl apskritai dirbame su $\ell_2$ norma,
+o ne, tarkime, su $\ell_1$ norma.
+Iš tiesų kiti pasirinkimai yra tinkami ir
+populiarūs visoje statistikoje.
+Nors $\ell_2$ reguliarizuoti tiesiniai modeliai sudaro
+klasikinį *kalnagūbrio regresijos* (angl. *ridge regression*) algoritmą,
+$\ell_1$ reguliarizuota tiesinė regresija
+yra panašiai fundamentalus statistikos metodas,
+populiariai žinomas kaip *Lasso regresija*.
+Viena priežasčių dirbti su $\ell_2$ norma yra ta,
+kad ji skiria neproporcingai didelę baudą
+dideliems svorių vektoriaus komponentams.
+Tai paslenka mūsų mokymosi algoritmą
+link modelių, kurie svorį paskirsto tolygiai
+tarp didesnio požymių skaičiaus.
+Praktikoje tai gali padaryti juos atsparesnius
+vieno kintamojo matavimo paklaidai.
+Priešingai, $\ell_1$ baudos veda prie modelių,
+kurie sutelkia svorius nedidelėje požymių aibėje,
+kitus svorius nustatydami lygius nuliui.
+Tai suteikia mums efektyvų *požymių atrankos* metodą,
+kuris gali būti pageidautinas dėl kitų priežasčių.
+Pavyzdžiui, jei mūsų modelis remiasi tik keliais požymiais,
+tada mums gali nereikėti rinkti, saugoti ar perduoti duomenų
+apie kitus (atmestus) požymius.
 
-Using the same notation in :eqref:`eq_linreg_batch_update`,
-minibatch stochastic gradient descent updates
-for $\ell_2$-regularized regression as follows:
+Naudodami tą patį žymėjimą kaip :eqref:`eq_linreg_batch_update`,
+minirinkinio stochastinis gradientinis nusileidimas
+$\ell_2$ reguliarizuotai regresijai atnaujina taip:
 
 $$\begin{aligned}
 \mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
 \end{aligned}$$
 
-As before, we update $\mathbf{w}$ based on the amount
-by which our estimate differs from the observation.
-However, we also shrink the size of $\mathbf{w}$ towards zero.
-That is why the method is sometimes called "weight decay":
-given the penalty term alone,
-our optimization algorithm *decays*
-the weight at each step of training.
-In contrast to feature selection,
-weight decay offers us a mechanism for continuously adjusting the complexity of a function.
-Smaller values of $\lambda$ correspond
-to less constrained $\mathbf{w}$,
-whereas larger values of $\lambda$
-constrain $\mathbf{w}$ more considerably.
-Whether we include a corresponding bias penalty $b^2$ 
-can vary across implementations, 
-and may vary across layers of a neural network.
-Often, we do not regularize the bias term.
-Besides,
-although $\ell_2$ regularization may not be equivalent to weight decay for other optimization algorithms,
-the idea of regularization through
-shrinking the size of weights
-still holds true.
+Kaip ir anksčiau, atnaujiname $\mathbf{w}$ pagal dydį,
+kuriuo mūsų įvertis skiriasi nuo stebinio.
+Tačiau taip pat mažiname $\mathbf{w}$ dydį link nulio.
+Todėl metodas kartais vadinamas „svorių nykimu":
+turint tik baudos narį,
+mūsų optimizavimo algoritmas kiekviename apmokymo žingsnyje
+*sumažina* svorį.
+Skirtingai nuo požymių atrankos,
+svorių nykimas suteikia mums mechanizmą nuolat reguliuoti funkcijos sudėtingumą.
+Mažesnės $\lambda$ reikšmės atitinka
+mažiau suvaržytą $\mathbf{w}$,
+o didesnės $\lambda$ reikšmės
+$\mathbf{w}$ varžo žymiai stipriau.
+Ar įtraukiame atitinkamą poslinkio baudą $b^2$,
+gali skirtis skirtinguose įgyvendinimuose
+ir gali skirtis skirtinguose neuroninio tinklo sluoksniuose.
+Dažnai poslinkio nario nereguliarizuojame.
+Be to,
+nors $\ell_2$ reguliarizavimas gali būti neekvivalentus svorių nykimui kitiems optimizavimo algoritmams,
+reguliarizavimo idėja
+mažinant svorių dydį
+vis tiek išlieka teisinga.
 
-## High-Dimensional Linear Regression
+## Didelės dimensijos tiesinė regresija
 
-We can illustrate the benefits of weight decay 
-through a simple synthetic example.
+Svorių nykimo teikiamą naudą galime iliustruoti
+paprastu sintetiniu pavyzdžiu.
 
-First, we [**generate some data as before**]:
+Pirmiausia [**sugeneruojame duomenis kaip anksčiau**]:
 
 (**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \textrm{ where }
 \epsilon \sim \mathcal{N}(0, 0.01^2).$$**)
 
-In this synthetic dataset, our label is given 
-by an underlying linear function of our inputs,
-corrupted by Gaussian noise 
-with zero mean and standard deviation 0.01.
-For illustrative purposes, 
-we can make the effects of overfitting pronounced,
-by increasing the dimensionality of our problem to $d = 200$
-and working with a small training set with only 20 examples.
+Šiame sintetiniame duomenų rinkinyje mūsų žymuo gaunamas
+iš pagrindinės tiesinės įvesčių funkcijos,
+iškraipytos Gauso triukšmu
+su nuliniu vidurkiu ir standartiniu nuokrypiu 0,01.
+Iliustracijos tikslais
+galime išryškinti persimokymo poveikį,
+padidindami savo uždavinio dimensiją iki $d = 200$
+ir dirbdami su nedidele apmokymo aibe, turinčia tik 20 pavyzdžių.
 
 ```{.python .input}
 %%tab all
@@ -260,18 +259,18 @@ class Data(d2l.DataModule):
         return self.get_tensorloader([self.X, self.y], train, i)
 ```
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-Now, let's try implementing weight decay from scratch.
-Since minibatch stochastic gradient descent
-is our optimizer,
-we just need to add the squared $\ell_2$ penalty
-to the original loss function.
+Dabar pabandykime įgyvendinti svorių nykimą nuo nulio.
+Kadangi mūsų optimizatorius yra
+minirinkinio stochastinis gradientinis nusileidimas,
+tereikia pridėti kvadratinę $\ell_2$ baudą
+prie pradinės nuostolių funkcijos.
 
-### (**Defining $\ell_2$ Norm Penalty**)
+### (**$\ell_2$ normos baudos apibrėžimas**)
 
-Perhaps the most convenient way of implementing this penalty
-is to square all terms in place and sum them.
+Galbūt patogiausias būdas įgyvendinti šią baudą
+yra pakelti visus narius kvadratu vietoje ir juos susumuoti.
 
 ```{.python .input}
 %%tab all
@@ -279,11 +278,11 @@ def l2_penalty(w):
     return d2l.reduce_sum(w**2) / 2
 ```
 
-### Defining the Model
+### Modelio apibrėžimas
 
-In the final model,
-the linear regression and the squared loss have not changed since :numref:`sec_linear_scratch`,
-so we will just define a subclass of `d2l.LinearRegressionScratch`. The only change here is that our loss now includes the penalty term.
+Galutiniame modelyje
+tiesinė regresija ir kvadratiniai nuostoliai nepasikeitė nuo :numref:`sec_linear_scratch`,
+todėl tiesiog apibrėšime klasės `d2l.LinearRegressionScratch` poklasį. Vienintelis pakeitimas čia yra tas, kad mūsų nuostoliai dabar apima baudos narį.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -307,7 +306,7 @@ class WeightDecayScratch(d2l.LinearRegressionScratch):
                 self.lambd * l2_penalty(params['w']))
 ```
 
-The following code fits our model on the training set with 20 examples and evaluates it on the validation set with 100 examples.
+Toliau pateiktas kodas pritaiko mūsų modelį apmokymo aibėje su 20 pavyzdžių ir įvertina jį validavimo aibėje su 100 pavyzdžių.
 
 ```{.python .input}
 %%tab all
@@ -325,76 +324,76 @@ def train_scratch(lambd):
               float(l2_penalty(trainer.state.params['w'])))
 ```
 
-### [**Training without Regularization**]
+### [**Apmokymas be reguliarizavimo**]
 
-We now run this code with `lambd = 0`,
-disabling weight decay.
-Note that we overfit badly,
-decreasing the training error but not the
-validation error---a textbook case of overfitting.
+Dabar paleidžiame šį kodą su `lambd = 0`,
+išjungdami svorių nykimą.
+Atkreipkite dėmesį, kad smarkiai persimokome:
+apmokymo paklaida mažėja, bet validavimo paklaida nemažėja –
+vadovėlinis persimokymo atvejis.
 
 ```{.python .input}
 %%tab all
 train_scratch(0)
 ```
 
-### [**Using Weight Decay**]
+### [**Svorių nykimo naudojimas**]
 
-Below, we run with substantial weight decay.
-Note that the training error increases
-but the validation error decreases.
-This is precisely the effect
-we expect from regularization.
+Žemiau paleidžiame su dideliu svorių nykimu.
+Atkreipkite dėmesį, kad apmokymo paklaida didėja,
+bet validavimo paklaida mažėja.
+Būtent šio poveikio
+ir tikimės iš reguliarizavimo.
 
 ```{.python .input}
 %%tab all
 train_scratch(3)
 ```
 
-## [**Concise Implementation**]
+## [**Glaustas įgyvendinimas**]
 
-Because weight decay is ubiquitous
-in neural network optimization,
-the deep learning framework makes it especially convenient,
-integrating weight decay into the optimization algorithm itself
-for easy use in combination with any loss function.
-Moreover, this integration serves a computational benefit,
-allowing implementation tricks to add weight decay to the algorithm,
-without any additional computational overhead.
-Since the weight decay portion of the update
-depends only on the current value of each parameter,
-the optimizer must touch each parameter once anyway.
+Kadangi svorių nykimas yra visur paplitęs
+neuroninių tinklų optimizavime,
+giliojo mokymosi karkasas padaro jį ypač patogų,
+integruodamas svorių nykimą į patį optimizavimo algoritmą,
+kad būtų lengva naudoti kartu su bet kuria nuostolių funkcija.
+Be to, ši integracija turi skaičiavimo naudą:
+ji leidžia pasitelkti įgyvendinimo gudrybes svorių nykimui pridėti prie algoritmo
+be jokių papildomų skaičiavimo sąnaudų.
+Kadangi atnaujinimo svorių nykimo dalis
+priklauso tik nuo dabartinės kiekvieno parametro reikšmės,
+optimizatorius vis tiek turi vieną kartą paliesti kiekvieną parametrą.
 
 :begin_tab:`mxnet`
-Below, we specify
-the weight decay hyperparameter directly
-through `wd` when instantiating our `Trainer`.
-By default, Gluon decays both
-weights and biases simultaneously.
-Note that the hyperparameter `wd`
-will be multiplied by `wd_mult`
-when updating model parameters.
-Thus, if we set `wd_mult` to zero,
-the bias parameter $b$ will not decay.
+Žemiau nurodome
+svorių nykimo hiperparametrą tiesiogiai
+per `wd`, kurdami savo `Trainer`.
+Pagal numatytuosius nustatymus Gluon sumažina ir
+svorius, ir poslinkius vienu metu.
+Atkreipkite dėmesį, kad hiperparametras `wd`
+bus padaugintas iš `wd_mult`,
+atnaujinant modelio parametrus.
+Taigi, jei `wd_mult` nustatysime lygų nuliui,
+poslinkio parametras $b$ nenyks.
 :end_tab:
 
 :begin_tab:`pytorch`
-Below, we specify
-the weight decay hyperparameter directly
-through `weight_decay` when instantiating our optimizer.
-By default, PyTorch decays both
-weights and biases simultaneously, but
-we can configure the optimizer to handle different parameters
-according to different policies.
-Here, we only set `weight_decay` for
-the weights (the `net.weight` parameters), hence the 
-bias (the `net.bias` parameter) will not decay.
+Žemiau nurodome
+svorių nykimo hiperparametrą tiesiogiai
+per `weight_decay`, kurdami savo optimizatorių.
+Pagal numatytuosius nustatymus PyTorch sumažina ir
+svorius, ir poslinkius vienu metu, bet
+galime sukonfigūruoti optimizatorių skirtingus parametrus tvarkyti
+pagal skirtingas politikas.
+Čia `weight_decay` nustatome tik
+svoriams (parametrams `net.weight`), todėl
+poslinkis (parametras `net.bias`) nenyks.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Below, we create an $\ell_2$ regularizer with
-the weight decay hyperparameter `wd` and apply it to the layer's weights
-through the `kernel_regularizer` argument.
+Žemiau sukuriame $\ell_2$ reguliarizatorių su
+svorių nykimo hiperparametru `wd` ir pritaikome jį sluoksnio svoriams
+per argumentą `kernel_regularizer`.
 :end_tab:
 
 ```{.python .input}
@@ -453,13 +452,13 @@ class WeightDecay(d2l.LinearRegression):
                            optax.sgd(self.lr))
 ```
 
-[**The plot looks similar to that when
-we implemented weight decay from scratch**].
-However, this version runs faster
-and is easier to implement,
-benefits that will become more
-pronounced as you address larger problems
-and this work becomes more routine.
+[**Grafikas atrodo panašiai kaip tada,
+kai svorių nykimą įgyvendinome nuo nulio**].
+Tačiau ši versija veikia greičiau
+ir ją lengviau įgyvendinti,
+o šie privalumai taps ryškesni,
+kai spręsite didesnius uždavinius
+ir šis darbas taps rutina.
 
 ```{.python .input}
 %%tab all
@@ -473,47 +472,48 @@ if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
-So far, we have touched upon one notion of
-what constitutes a simple linear function.
-However, even for simple nonlinear functions, the situation can be much more complex. To see this, the concept of [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
-allows one to apply tools introduced
-for linear functions in a nonlinear context.
-Unfortunately, RKHS-based algorithms
-tend to scale poorly to large, high-dimensional data.
-In this book we will often adopt the common heuristic
-whereby weight decay is applied
-to all layers of a deep network.
+Kol kas palietėme vieną sampratą apie tai,
+kas sudaro paprastą tiesinę funkciją.
+Tačiau net paprastoms netiesinėms funkcijoms situacija gali būti gerokai sudėtingesnė. Tam parodyti
+[atkuriančiojo branduolio Hilberto erdvės (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space) sąvoka
+leidžia taikyti tiesinėms funkcijoms
+pristatytus įrankius netiesiniame kontekste.
+Deja, RKHS pagrįsti algoritmai
+dažniausiai prastai skalėja dideliems, didelės dimensijos duomenims.
+Šioje knygoje dažnai taikysime įprastą euristiką,
+pagal kurią svorių nykimas taikomas
+visiems gilaus tinklo sluoksniams.
 
-## Summary
+## Santrauka
 
-Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
-One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
-In practice, the weight decay functionality is provided in optimizers from deep learning frameworks.
-Different sets of parameters can have different update behaviors within the same training loop.
+Reguliarizavimas yra įprastas persimokymo sprendimo būdas. Klasikiniai reguliarizavimo metodai prideda baudos narį prie nuostolių funkcijos (apmokymo metu), kad sumažintų išmokto modelio sudėtingumą.
+Vienas konkretus pasirinkimas modeliui išlaikyti paprastą yra $\ell_2$ bauda. Tai veda prie svorių nykimo minirinkinio stochastinio gradientinio nusileidimo algoritmo atnaujinimo žingsniuose.
+Praktikoje svorių nykimo funkcionalumas pateikiamas giliojo mokymosi karkasų optimizatoriuose.
+Skirtingos parametrų aibės tame pačiame apmokymo cikle gali turėti skirtingą atnaujinimo elgesį.
 
 
 
-## Exercises
+## Pratimai
 
-1. Experiment with the value of $\lambda$ in the estimation problem in this section. Plot training and validation accuracy as a function of $\lambda$. What do you observe?
-1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
-1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice ($\ell_1$ regularization)?
-1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (see the Frobenius norm in :numref:`subsec_lin-algebra-norms`)?
-1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways might help us deal with overfitting?
-1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
+1. Eksperimentuokite su $\lambda$ reikšme šiame skyrelyje nagrinėjamame vertinimo uždavinyje. Nubraižykite apmokymo ir validavimo tikslumą kaip $\lambda$ funkciją. Ką pastebite?
+1. Naudodami validavimo aibę raskite optimalią $\lambda$ reikšmę. Ar tikrai tai optimali reikšmė? Ar tai svarbu?
+1. Kaip atrodytų atnaujinimo lygtys, jei vietoj $\|\mathbf{w}\|^2$ kaip baudą pasirinktume $\sum_i |w_i|$ ($\ell_1$ reguliarizavimas)?
+1. Žinome, kad $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Ar galite rasti panašią lygtį matricoms (žr. Frobenijaus normą :numref:`subsec_lin-algebra-norms`)?
+1. Peržiūrėkite ryšį tarp apmokymo paklaidos ir apibendrinimo paklaidos. Be svorių nykimo, didesnio apmokymo ir tinkamo sudėtingumo modelio naudojimo, kokie dar būdai galėtų padėti spręsti persimokymo problemą?
+1. Bajeso statistikoje naudojame apriorinės tikimybės ir tikėtinumo sandaugą aposteriorinei gauti per $P(w \mid x) \propto P(x \mid w) P(w)$. Kaip galite susieti $P(w)$ su reguliarizavimu?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/98)
+[Diskusijos](https://discuss.d2l.ai/t/98)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/99)
+[Diskusijos](https://discuss.d2l.ai/t/99)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/236)
+[Diskusijos](https://discuss.d2l.ai/t/236)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17979)
+[Diskusijos](https://discuss.d2l.ai/t/17979)
 :end_tab:

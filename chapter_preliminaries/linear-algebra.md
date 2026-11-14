@@ -3,18 +3,18 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Linear Algebra
+# Tiesinė algebra
 :label:`sec_linear-algebra`
 
-By now, we can load datasets into tensors
-and manipulate these tensors
-with basic mathematical operations.
-To start building sophisticated models,
-we will also need a few tools from linear algebra.
-This section offers a gentle introduction
-to the most essential concepts,
-starting from scalar arithmetic
-and ramping up to matrix multiplication.
+Dabar jau galime įkelti duomenų rinkinius į tenzorius
+ir apdoroti šiuos tenzorius
+pagrindinėmis matematinėmis operacijomis.
+Norint pradėti kurti sudėtingus modelius,
+mums prireiks ir keleto tiesinės algebros įrankių.
+Šiame skyrelyje švelniai supažindiname
+su svarbiausiomis sąvokomis,
+pradedant skaliarine aritmetika
+ir pereinant prie matricų daugybos.
 
 ```{.python .input}
 %%tab mxnet
@@ -37,43 +37,43 @@ import tensorflow as tf
 from jax import numpy as jnp
 ```
 
-## Scalars
+## Skaliarai
 
 
-Most everyday mathematics
-consists of manipulating
-numbers one at a time.
-Formally, we call these values *scalars*.
-For example, the temperature in Palo Alto
-is a balmy $72$ degrees Fahrenheit.
-If you wanted to convert the temperature to Celsius
-you would evaluate the expression
-$c = \frac{5}{9}(f - 32)$, setting $f$ to $72$.
-In this equation, the values
-$5$, $9$, and $32$ are constant scalars.
-The variables $c$ and $f$
-in general represent unknown scalars.
+Dauguma kasdienės matematikos
+susideda iš skaičių apdorojimo
+po vieną.
+Formaliai šias reikšmes vadiname *skaliarais*.
+Pavyzdžiui, temperatūra Palo Alto
+yra malonūs $72$ Farenheito laipsniai.
+Jei norėtumėte konvertuoti temperatūrą į Celsijaus laipsnius,
+įvertintumėte išraišką
+$c = \frac{5}{9}(f - 32)$, kai $f$ lygus $72$.
+Šioje lygtyje reikšmės
+$5$, $9$ ir $32$ yra pastovūs skaliarai.
+Kintamieji $c$ ir $f$
+paprastai žymi nežinomus skaliarus.
 
-We denote scalars
-by ordinary lower-cased letters
-(e.g., $x$, $y$, and $z$)
-and the space of all (continuous)
-*real-valued* scalars by $\mathbb{R}$.
-For expedience, we will skip past
-rigorous definitions of *spaces*:
-just remember that the expression $x \in \mathbb{R}$
-is a formal way to say that $x$ is a real-valued scalar.
-The symbol $\in$ (pronounced "in")
-denotes membership in a set.
-For example, $x, y \in \{0, 1\}$
-indicates that $x$ and $y$ are variables
-that can only take values $0$ or $1$.
+Skaliarus žymime
+paprastomis mažosiomis raidėmis
+(pvz., $x$, $y$ ir $z$),
+o visų (tolydžiųjų)
+*realiąsias reikšmes įgyjančių* skaliarų erdvę – $\mathbb{R}$.
+Patogumo dėlei praleisime
+griežtas *erdvių* apibrėžtis:
+tiesiog prisiminkite, kad išraiška $x \in \mathbb{R}$
+yra formalus būdas pasakyti, kad $x$ yra realiąją reikšmę įgyjantis skaliaras.
+Simbolis $\in$ (tariamas „priklauso")
+žymi priklausymą aibei.
+Pavyzdžiui, $x, y \in \{0, 1\}$
+rodo, kad $x$ ir $y$ yra kintamieji,
+galintys įgyti tik reikšmes $0$ arba $1$.
 
-(**Scalars are implemented as tensors
-that contain only one element.**)
-Below, we assign two scalars
-and perform the familiar addition, multiplication,
-division, and exponentiation operations.
+(**Skaliarai įgyvendinami kaip tenzoriai,
+turintys tik vieną elementą.**)
+Toliau priskiriame du skaliarus
+ir atliekame gerai žinomas sudėties, daugybos,
+dalybos ir kėlimo laipsniu operacijas.
 
 ```{.python .input}
 %%tab mxnet
@@ -107,31 +107,31 @@ y = jnp.array(2.0)
 x + y, x * y, x / y, x**y
 ```
 
-## Vectors
+## Vektoriai
 
-For current purposes, [**you can think of a vector as a fixed-length array of scalars.**]
-As with their code counterparts,
-we call these scalars the *elements* of the vector
-(synonyms include *entries* and *components*).
-When vectors represent examples from real-world datasets,
-their values hold some real-world significance.
-For example, if we were training a model to predict
-the risk of a loan defaulting,
-we might associate each applicant with a vector
-whose components correspond to quantities
-like their income, length of employment,
-or number of previous defaults.
-If we were studying the risk of heart attack,
-each vector might represent a patient
-and its components might correspond to
-their most recent vital signs, cholesterol levels,
-minutes of exercise per day, etc.
-We denote vectors by bold lowercase letters,
-(e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$).
+Šiuo metu [**vektorių galite įsivaizduoti kaip fiksuoto ilgio skaliarų masyvą.**]
+Kaip ir jų atitikmenis kode,
+šiuos skaliarus vadiname vektoriaus *elementais*
+(sinonimai: *įrašai* ir *komponentės*).
+Kai vektoriai vaizduoja realių duomenų rinkinių pavyzdžius,
+jų reikšmės turi tam tikrą realią reikšmę.
+Pavyzdžiui, jei apmokytume modelį prognozuoti
+paskolos neišmokėjimo riziką,
+galėtume kiekvieną pareiškėją susieti su vektoriumi,
+kurio komponentės atitinka dydžius,
+tokius kaip jų pajamos, darbo stažas
+ar ankstesnių neįvykdymų skaičius.
+Jei tirtume infarkto riziką,
+kiekvienas vektorius galėtų vaizduoti pacientą,
+o jo komponentės galėtų atitikti
+naujausius gyvybinius požymius, cholesterolio lygį,
+kasdienio fizinio krūvio minutes ir kt.
+Vektorius žymime pastorintomis mažosiomis raidėmis
+(pvz., $\mathbf{x}$, $\mathbf{y}$ ir $\mathbf{z}$).
 
-Vectors are implemented as $1^{\textrm{st}}$-order tensors.
-In general, such tensors can have arbitrary lengths,
-subject to memory limitations. Caution: in Python, as in most programming languages, vector indices start at $0$, also known as *zero-based indexing*, whereas in linear algebra subscripts begin at $1$ (one-based indexing).
+Vektoriai įgyvendinami kaip $1$-osios eilės tenzoriai.
+Paprastai tokie tenzoriai gali būti savavališko ilgio,
+priklausomai nuo atminties apribojimų. Dėmesio: Python, kaip ir daugumoje programavimo kalbų, vektorių indeksai prasideda nuo $0$ (angl. *zero-based indexing*, indeksavimas nuo nulio), o tiesinėje algebroje apatiniai indeksai prasideda nuo $1$ (indeksavimas nuo vieneto).
 
 ```{.python .input}
 %%tab mxnet
@@ -157,82 +157,82 @@ x = jnp.arange(3)
 x
 ```
 
-We can refer to an element of a vector by using a subscript.
-For example, $x_2$ denotes the second element of $\mathbf{x}$.
-Since $x_2$ is a scalar, we do not bold it.
-By default, we visualize vectors
-by stacking their elements vertically:
+Vektoriaus elementą galime nurodyti naudodami apatinį indeksą.
+Pavyzdžiui, $x_2$ žymi antrąjį $\mathbf{x}$ elementą.
+Kadangi $x_2$ yra skaliaras, jo nepastoriname.
+Pagal numatytuosius nustatymus vektorius vizualizuojame
+sudėdami jo elementus vertikaliai:
 
 $$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix}.$$
 :eqlabel:`eq_vec_def`
 
-Here $x_1, \ldots, x_n$ are elements of the vector.
-Later on, we will distinguish between such *column vectors*
-and *row vectors* whose elements are stacked horizontally.
-Recall that [**we access a tensor's elements via indexing.**]
+Čia $x_1, \ldots, x_n$ yra vektoriaus elementai.
+Vėliau atskirsime tokius *stulpelio vektorius*
+ir *eilutės vektorius*, kurių elementai sudėti horizontaliai.
+Prisiminkite, kad [**tenzoriaus elementus pasiekiame indeksavimu.**]
 
 ```{.python .input}
 %%tab all
 x[2]
 ```
 
-To indicate that a vector contains $n$ elements,
-we write $\mathbf{x} \in \mathbb{R}^n$.
-Formally, we call $n$ the *dimensionality* of the vector.
-[**In code, this corresponds to the tensor's length**],
-accessible via Python's built-in `len` function.
+Norėdami nurodyti, kad vektorių sudaro $n$ elementų,
+rašome $\mathbf{x} \in \mathbb{R}^n$.
+Formaliai $n$ vadiname vektoriaus *dimensija*.
+[**Kode tai atitinka tenzoriaus ilgį**],
+pasiekiamą Python integruota funkcija `len`.
 
 ```{.python .input}
 %%tab all
 len(x)
 ```
 
-We can also access the length via the `shape` attribute.
-The shape is a tuple that indicates a tensor's length along each axis.
-(**Tensors with just one axis have shapes with just one element.**)
+Ilgį taip pat galime pasiekti per atributą `shape`.
+Forma yra kortežas, nurodantis tenzoriaus ilgį kiekviena ašimi.
+(**Tenzorių, turinčių tik vieną ašį, formos turi tik vieną elementą.**)
 
 ```{.python .input}
 %%tab all
 x.shape
 ```
 
-Oftentimes, the word "dimension" gets overloaded
-to mean both the number of axes
-and the length along a particular axis.
-To avoid this confusion,
-we use *order* to refer to the number of axes
-and *dimensionality* exclusively to refer
-to the number of components.
+Dažnai žodis „dimensija" vartojamas dviprasmiškai:
+tiek ašių skaičiui,
+tiek ilgiui tam tikra ašimi žymėti.
+Kad išvengtume šios painiavos,
+ašių skaičiui žymėti vartojame terminą *eilė*,
+o *dimensija* – tik
+komponenčių skaičiui žymėti.
 
 
-## Matrices
+## Matricos
 
-Just as scalars are $0^{\textrm{th}}$-order tensors
-and vectors are $1^{\textrm{st}}$-order tensors,
-matrices are $2^{\textrm{nd}}$-order tensors.
-We denote matrices by bold capital letters
-(e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
-and represent them in code by tensors with two axes.
-The expression $\mathbf{A} \in \mathbb{R}^{m \times n}$
-indicates that a matrix $\mathbf{A}$
-contains $m \times n$ real-valued scalars,
-arranged as $m$ rows and $n$ columns.
-When $m = n$, we say that a matrix is *square*.
-Visually, we can illustrate any matrix as a table.
-To refer to an individual element,
-we subscript both the row and column indices, e.g.,
-$a_{ij}$ is the value that belongs to $\mathbf{A}$'s
-$i^{\textrm{th}}$ row and $j^{\textrm{th}}$ column:
+Kaip skaliarai yra $0$-osios eilės tenzoriai,
+o vektoriai – $1$-osios eilės tenzoriai,
+taip matricos yra $2$-osios eilės tenzoriai.
+Matricas žymime pastorintomis didžiosiomis raidėmis
+(pvz., $\mathbf{X}$, $\mathbf{Y}$ ir $\mathbf{Z}$)
+ir kode vaizduojame tenzoriais su dviem ašimis.
+Išraiška $\mathbf{A} \in \mathbb{R}^{m \times n}$
+rodo, kad matricą $\mathbf{A}$
+sudaro $m \times n$ realiąsias reikšmes įgyjančių skaliarų,
+išdėstytų $m$ eilučių ir $n$ stulpelių.
+Kai $m = n$, sakome, kad matrica yra *kvadratinė*.
+Vizualiai bet kurią matricą galime pavaizduoti kaip lentelę.
+Kad nurodytume atskirą elementą,
+pridedame apatinius eilutės ir stulpelio indeksus, pvz.,
+$a_{ij}$ yra reikšmė, priklausanti $\mathbf{A}$
+$i$-ajai eilutei ir $j$-ajam stulpeliui:
 
 $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \\ \end{bmatrix}.$$
 :eqlabel:`eq_matrix_def`
 
 
-In code, we represent a matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
-by a $2^{\textrm{nd}}$-order tensor with shape ($m$, $n$).
-[**We can convert any appropriately sized $m \times n$ tensor
-into an $m \times n$ matrix**]
-by passing the desired shape to `reshape`:
+Kode matricą $\mathbf{A} \in \mathbb{R}^{m \times n}$
+vaizduojame $2$-osios eilės tenzoriumi, kurio forma ($m$, $n$).
+[**Bet kurį tinkamo dydžio $m \times n$ tenzorių galime paversti
+$m \times n$ matrica,**]
+nurodę norimą formą funkcijai `reshape`:
 
 ```{.python .input}
 %%tab mxnet
@@ -258,14 +258,14 @@ A = jnp.arange(6).reshape(3, 2)
 A
 ```
 
-Sometimes we want to flip the axes.
-When we exchange a matrix's rows and columns,
-the result is called its *transpose*.
-Formally, we signify a matrix $\mathbf{A}$'s transpose
-by $\mathbf{A}^\top$ and if $\mathbf{B} = \mathbf{A}^\top$,
-then $b_{ij} = a_{ji}$ for all $i$ and $j$.
-Thus, the transpose of an $m \times n$ matrix
-is an $n \times m$ matrix:
+Kartais norime apversti ašis.
+Kai sukeičiame matricos eilutes ir stulpelius,
+rezultatas vadinamas jos *transponuota matrica*.
+Formaliai matricos $\mathbf{A}$ transponuotą matricą
+žymime $\mathbf{A}^\top$, ir jei $\mathbf{B} = \mathbf{A}^\top$,
+tai $b_{ij} = a_{ji}$ visiems $i$ ir $j$.
+Taigi $m \times n$ matricos transponuota matrica
+yra $n \times m$ matrica:
 
 $$
 \mathbf{A}^\top =
@@ -277,7 +277,7 @@ $$
 \end{bmatrix}.
 $$
 
-In code, we can access any (**matrix's transpose**) as follows:
+Kode bet kurios (**matricos transponuotą matricą**) galime gauti taip:
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -289,10 +289,10 @@ A.T
 tf.transpose(A)
 ```
 
-[**Symmetric matrices are the subset of square matrices
-that are equal to their own transposes:
+[**Simetrinės matricos yra kvadratinių matricų poaibis,
+lygių savo pačių transponuotoms matricoms:
 $\mathbf{A} = \mathbf{A}^\top$.**]
-The following matrix is symmetric:
+Ši matrica yra simetrinė:
 
 ```{.python .input}
 %%tab mxnet
@@ -318,46 +318,46 @@ A = jnp.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == A.T
 ```
 
-Matrices are useful for representing datasets.
-Typically, rows correspond to individual records
-and columns correspond to distinct attributes.
+Matricos naudingos duomenų rinkiniams vaizduoti.
+Paprastai eilutės atitinka atskirus įrašus,
+o stulpeliai – skirtingus atributus.
 
 
 
-## Tensors
+## Tenzoriai
 
-While you can go far in your machine learning journey
-with only scalars, vectors, and matrices,
-eventually you may need to work with
-higher-order [**tensors**].
-Tensors (**give us a generic way of describing
-extensions to $n^{\textrm{th}}$-order arrays.**)
-We call software objects of the *tensor class* "tensors"
-precisely because they too can have arbitrary numbers of axes.
-While it may be confusing to use the word
-*tensor* for both the mathematical object
-and its realization in code,
-our meaning should usually be clear from context.
-We denote general tensors by capital letters
-with a special font face
-(e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
-and their indexing mechanism
-(e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$)
-follows naturally from that of matrices.
+Nors su vien skaliarais, vektoriais ir matricomis
+galite nueiti toli savo mašininio mokymosi kelyje,
+galiausiai gali prireikti dirbti su
+aukštesnės eilės [**tenzoriais**].
+Tenzoriai (**suteikia mums bendrą būdą aprašyti
+$n$-osios eilės masyvų plėtinius.**)
+Programinius *tenzoriaus klasės* objektus vadiname „tenzoriais"
+būtent todėl, kad jie taip pat gali turėti savavališką ašių skaičių.
+Nors gali būti painu vartoti žodį
+*tenzorius* ir matematiniam objektui,
+ir jo įgyvendinimui kode,
+mūsų reikšmė paprastai turėtų būti aiški iš konteksto.
+Bendruosius tenzorius žymime didžiosiomis raidėmis
+specialiu šriftu
+(pvz., $\mathsf{X}$, $\mathsf{Y}$ ir $\mathsf{Z}$),
+o jų indeksavimo mechanizmas
+(pvz., $x_{ijk}$ ir $[\mathsf{X}]_{1, 2i-1, 3}$)
+natūraliai išplaukia iš matricų indeksavimo.
 
-Tensors will become more important
-when we start working with images.
-Each image arrives as a $3^{\textrm{rd}}$-order tensor
-with axes corresponding to the height, width, and *channel*.
-At each spatial location, the intensities
-of each color (red, green, and blue)
-are stacked along the channel.
-Furthermore, a collection of images is represented
-in code by a $4^{\textrm{th}}$-order tensor,
-where distinct images are indexed
-along the first axis.
-Higher-order tensors are constructed, as were vectors and matrices,
-by growing the number of shape components.
+Tenzoriai taps svarbesni,
+kai pradėsime dirbti su vaizdais.
+Kiekvienas vaizdas pateikiamas kaip $3$-iosios eilės tenzorius,
+kurio ašys atitinka aukštį, plotį ir *kanalą*.
+Kiekvienoje erdvinėje vietoje kiekvienos spalvos
+(raudonos, žalios ir mėlynos) intensyvumai
+sudedami kanalo ašimi.
+Be to, vaizdų rinkinys
+kode vaizduojamas $4$-osios eilės tenzoriumi,
+kurio skirtingi vaizdai indeksuojami
+pirmąja ašimi.
+Aukštesnės eilės tenzoriai konstruojami, kaip ir vektoriai bei matricos,
+didinant formos komponenčių skaičių.
 
 ```{.python .input}
 %%tab mxnet
@@ -379,14 +379,14 @@ tf.reshape(tf.range(24), (2, 3, 4))
 jnp.arange(24).reshape(2, 3, 4)
 ```
 
-## Basic Properties of Tensor Arithmetic
+## Pagrindinės tenzorių aritmetikos savybės
 
-Scalars, vectors, matrices,
-and higher-order tensors
-all have some handy properties.
-For example, elementwise operations
-produce outputs that have the
-same shape as their operands.
+Skaliarai, vektoriai, matricos
+ir aukštesnės eilės tenzoriai
+turi keletą patogių savybių.
+Pavyzdžiui, poelementės operacijos
+sukuria išvestis, kurių forma
+tokia pati kaip operandų.
 
 ```{.python .input}
 %%tab mxnet
@@ -416,11 +416,11 @@ B = A
 A, A + B
 ```
 
-The [**elementwise product of two matrices
-is called their *Hadamard product***] (denoted $\odot$).
-We can spell out the entries
-of the Hadamard product of two matrices
-$\mathbf{A}, \mathbf{B} \in \mathbb{R}^{m \times n}$:
+[**Dviejų matricų poelementė sandauga
+vadinama jų *Adamaro sandauga***] (žymima $\odot$).
+Dviejų matricų
+$\mathbf{A}, \mathbf{B} \in \mathbb{R}^{m \times n}$ Adamaro sandaugos įrašus
+galime išrašyti:
 
 
 
@@ -439,9 +439,9 @@ $$
 A * B
 ```
 
-[**Adding or multiplying a scalar and a tensor**] produces a result
-with the same shape as the original tensor.
-Here, each element of the tensor is added to (or multiplied by) the scalar.
+[**Pridėjus skaliarą prie tenzoriaus arba padauginus skaliarą ir tenzorių**], gaunamas rezultatas,
+kurio forma tokia pati kaip pradinio tenzoriaus.
+Čia prie kiekvieno tenzoriaus elemento pridedamas skaliaras (arba jis dauginamas iš skaliaro).
 
 ```{.python .input}
 %%tab mxnet
@@ -471,12 +471,12 @@ X = jnp.arange(24).reshape(2, 3, 4)
 a + X, (a * X).shape
 ```
 
-## Reduction
+## Redukavimas
 :label:`subsec_lin-alg-reduction`
 
-Often, we wish to calculate [**the sum of a tensor's elements.**]
-To express the sum of the elements in a vector $\mathbf{x}$ of length $n$,
-we write $\sum_{i=1}^n x_i$. There is a simple function for it:
+Dažnai norime apskaičiuoti [**tenzoriaus elementų sumą.**]
+Vektoriaus $\mathbf{x}$, kurio ilgis $n$, elementų sumai išreikšti
+rašome $\sum_{i=1}^n x_i$. Tam yra paprasta funkcija:
 
 ```{.python .input}
 %%tab mxnet
@@ -502,11 +502,10 @@ x = jnp.arange(3, dtype=jnp.float32)
 x, x.sum()
 ```
 
-To express [**sums over the elements of tensors of arbitrary shape**],
-we simply sum over all its axes.
-For example, the sum of the elements
-of an $m \times n$ matrix $\mathbf{A}$
-could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
+Kad išreikštume [**savavališkos formos tenzorių elementų sumas**],
+tiesiog sumuojame pagal visas jo ašis.
+Pavyzdžiui, $m \times n$ matricos $\mathbf{A}$ elementų suma
+galėtų būti užrašyta $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -518,16 +517,16 @@ A.shape, A.sum()
 A.shape, tf.reduce_sum(A)
 ```
 
-By default, invoking the sum function
-*reduces* a tensor along all of its axes,
-eventually producing a scalar.
-Our libraries also allow us to [**specify the axes
-along which the tensor should be reduced.**]
-To sum over all elements along the rows (axis 0),
-we specify `axis=0` in `sum`.
-Since the input matrix reduces along axis 0
-to generate the output vector,
-this axis is missing from the shape of the output.
+Pagal numatytuosius nustatymus iškvietus sumos funkciją
+tenzorius *redukuojamas* visomis ašimis,
+galiausiai gaunamas skaliaras.
+Mūsų bibliotekos taip pat leidžia [**nurodyti ašis,
+kuriomis tenzorius turi būti redukuojamas.**]
+Norėdami susumuoti visus elementus eilutėmis (0 ašis),
+funkcijoje `sum` nurodome `axis=0`.
+Kadangi įvesties matrica redukuojama 0 ašimi,
+kad gautume išvesties vektorių,
+šios ašies išvesties formoje nėra.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -539,7 +538,7 @@ A.shape, A.sum(axis=0).shape
 A.shape, tf.reduce_sum(A, axis=0).shape
 ```
 
-Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
+Nurodžius `axis=1`, bus redukuojamas stulpelių matmuo (1 ašis), susumuojant visų stulpelių elementus.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -551,8 +550,8 @@ A.shape, A.sum(axis=1).shape
 A.shape, tf.reduce_sum(A, axis=1).shape
 ```
 
-Reducing a matrix along both rows and columns via summation
-is equivalent to summing up all the elements of the matrix.
+Matricos redukavimas sumuojant ir eilutėmis, ir stulpeliais
+yra ekvivalentus visų matricos elementų susumavimui.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -564,12 +563,12 @@ A.sum(axis=[0, 1]) == A.sum()  # Same as A.sum()
 tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A)  # Same as tf.reduce_sum(A)
 ```
 
-[**A related quantity is the *mean*, also called the *average*.**]
-We calculate the mean by dividing the sum
-by the total number of elements.
-Because computing the mean is so common,
-it gets a dedicated library function
-that works analogously to `sum`.
+[**Susijęs dydis yra *vidurkis*, dar vadinamas *aritmetiniu vidurkiu*.**]
+Vidurkį skaičiuojame dalydami sumą
+iš bendro elementų skaičiaus.
+Kadangi vidurkio skaičiavimas toks dažnas,
+jam skirta atskira bibliotekos funkcija,
+veikianti analogiškai kaip `sum`.
 
 ```{.python .input}
 %%tab mxnet, jax
@@ -586,8 +585,8 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
-Likewise, the function for calculating the mean
-can also reduce a tensor along specific axes.
+Panašiai vidurkio skaičiavimo funkcija
+taip pat gali redukuoti tenzorių konkrečiomis ašimis.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -599,12 +598,12 @@ A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
-## Non-Reduction Sum
+## Suma be redukavimo
 :label:`subsec_lin-alg-non-reduction`
 
-Sometimes it can be useful to [**keep the number of axes unchanged**]
-when invoking the function for calculating the sum or mean.
-This matters when we want to use the broadcast mechanism.
+Kartais gali būti naudinga [**išlaikyti nepakeistą ašių skaičių**],
+kviečiant sumos ar vidurkio skaičiavimo funkciją.
+Tai svarbu, kai norime naudoti transliavimo mechanizmą.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -618,18 +617,18 @@ sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
 sum_A, sum_A.shape
 ```
 
-For instance, since `sum_A` keeps its two axes after summing each row,
-we can (**divide `A` by `sum_A` with broadcasting**)
-to create a matrix where each row sums up to $1$.
+Pavyzdžiui, kadangi `sum_A` po kiekvienos eilutės susumavimo išlaiko abi ašis,
+galime (**padalyti `A` iš `sum_A` naudodami transliavimą**),
+kad sukurtume matricą, kurios kiekvienos eilutės suma lygi $1$.
 
 ```{.python .input}
 %%tab all
 A / sum_A
 ```
 
-If we want to calculate [**the cumulative sum of elements of `A` along some axis**],
-say `axis=0` (row by row), we can call the `cumsum` function.
-By design, this function does not reduce the input tensor along any axis.
+Jei norime apskaičiuoti [**`A` elementų kaupiamąją sumą tam tikra ašimi**],
+tarkime, `axis=0` (eilutė po eilutės), galime iškviesti funkciją `cumsum`.
+Pagal paskirtį ši funkcija neredukuoja įvesties tenzoriaus jokia ašimi.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -641,19 +640,19 @@ A.cumsum(axis=0)
 tf.cumsum(A, axis=0)
 ```
 
-## Dot Products
+## Skaliarinės sandaugos
 
-So far, we have only performed elementwise operations, sums, and averages.
-And if this was all we could do, linear algebra
-would not deserve its own section.
-Fortunately, this is where things get more interesting.
-One of the most fundamental operations is the dot product.
-Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$,
-their *dot product* $\mathbf{x}^\top \mathbf{y}$ (also known as *inner product*, $\langle \mathbf{x}, \mathbf{y}  \rangle$)
-is a sum over the products of the elements at the same position:
+Iki šiol atlikome tik poelementes operacijas, sumas ir vidurkius.
+Ir jei tai būtų viskas, ką galime daryti, tiesinė algebra
+nenusipelnytų atskiro skyrelio.
+Laimei, čia viskas tampa įdomiau.
+Viena pagrindinių operacijų yra skaliarinė sandauga.
+Kai duoti du vektoriai $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$,
+jų *skaliarinė sandauga* $\mathbf{x}^\top \mathbf{y}$ (dar žinoma kaip *vidinė sandauga*, $\langle \mathbf{x}, \mathbf{y}  \rangle$)
+yra tos pačios padėties elementų sandaugų suma:
 $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 
-[~~The *dot product* of two vectors is a sum over the products of the elements at the same position~~]
+[~~Dviejų vektorių *skaliarinė sandauga* yra tos pačios padėties elementų sandaugų suma~~]
 
 ```{.python .input}
 %%tab mxnet
@@ -679,8 +678,8 @@ y = jnp.ones(3, dtype = jnp.float32)
 x, y, jnp.dot(x, y)
 ```
 
-Equivalently, (**we can calculate the dot product of two vectors
-by performing an elementwise multiplication followed by a sum:**)
+Ekvivalenčiai, (**dviejų vektorių skaliarinę sandaugą galime apskaičiuoti
+atlikdami poelementę daugybą, o po jos – sumavimą:**)
 
 ```{.python .input}
 %%tab mxnet
@@ -702,29 +701,29 @@ tf.reduce_sum(x * y)
 jnp.sum(x * y)
 ```
 
-Dot products are useful in a wide range of contexts.
-For example, given some set of values,
-denoted by a vector $\mathbf{x}  \in \mathbb{R}^n$,
-and a set of weights, denoted by $\mathbf{w} \in \mathbb{R}^n$,
-the weighted sum of the values in $\mathbf{x}$
-according to the weights $\mathbf{w}$
-could be expressed as the dot product $\mathbf{x}^\top \mathbf{w}$.
-When the weights are nonnegative
-and sum to $1$, i.e., $\left(\sum_{i=1}^{n} {w_i} = 1\right)$,
-the dot product expresses a *weighted average*.
-After normalizing two vectors to have unit length,
-the dot products express the cosine of the angle between them.
-Later in this section, we will formally introduce this notion of *length*.
+Skaliarinės sandaugos naudingos įvairiuose kontekstuose.
+Pavyzdžiui, kai duotas reikšmių rinkinys,
+žymimas vektoriumi $\mathbf{x}  \in \mathbb{R}^n$,
+ir svorių (angl. *weights*) rinkinys, žymimas $\mathbf{w} \in \mathbb{R}^n$,
+reikšmių $\mathbf{x}$ svertinė suma
+pagal svorius $\mathbf{w}$
+gali būti išreikšta skaliarine sandauga $\mathbf{x}^\top \mathbf{w}$.
+Kai svoriai neneigiami
+ir sudaro sumą $1$, t. y. $\left(\sum_{i=1}^{n} {w_i} = 1\right)$,
+skaliarinė sandauga išreiškia *svertinį vidurkį*.
+Normalizavus du vektorius iki vienetinio ilgio,
+skaliarinės sandaugos išreiškia kampo tarp jų kosinusą.
+Vėliau šiame skyrelyje formaliai pristatysime šią *ilgio* sąvoką.
 
 
-## Matrix--Vector Products
+## Matricos ir vektoriaus sandaugos
 
-Now that we know how to calculate dot products,
-we can begin to understand the *product*
-between an $m \times n$ matrix $\mathbf{A}$
-and an $n$-dimensional vector $\mathbf{x}$.
-To start off, we visualize our matrix
-in terms of its row vectors
+Dabar, kai žinome, kaip skaičiuoti skaliarines sandaugas,
+galime pradėti suprasti *sandaugą*
+tarp $m \times n$ matricos $\mathbf{A}$
+ir $n$-mačio vektoriaus $\mathbf{x}$.
+Pradžioje savo matricą
+pavaizduojame jos eilučių vektoriais
 
 $$\mathbf{A}=
 \begin{bmatrix}
@@ -734,13 +733,12 @@ $$\mathbf{A}=
 \mathbf{a}^\top_m \\
 \end{bmatrix},$$
 
-where each $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
-is a row vector representing the $i^\textrm{th}$ row
-of the matrix $\mathbf{A}$.
+kur kiekvienas $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
+yra eilutės vektorius, vaizduojantis matricos $\mathbf{A}$ $i$-ąją eilutę.
 
-[**The matrix--vector product $\mathbf{A}\mathbf{x}$
-is simply a column vector of length $m$,
-whose $i^\textrm{th}$ element is the dot product
+[**Matricos ir vektoriaus sandauga $\mathbf{A}\mathbf{x}$
+yra tiesiog $m$ ilgio stulpelio vektorius,
+kurio $i$-asis elementas yra skaliarinė sandauga
 $\mathbf{a}^\top_i \mathbf{x}$:**]
 
 $$
@@ -759,47 +757,47 @@ $$
 \end{bmatrix}.
 $$
 
-We can think of multiplication with a matrix
+Daugybą iš matricos
 $\mathbf{A}\in \mathbb{R}^{m \times n}$
-as a transformation that projects vectors
-from $\mathbb{R}^{n}$ to $\mathbb{R}^{m}$.
-These transformations are remarkably useful.
-For example, we can represent rotations
-as multiplications by certain square matrices.
-Matrix--vector products also describe
-the key calculation involved in computing
-the outputs of each layer in a neural network
-given the outputs from the previous layer.
+galime laikyti transformacija, projektuojančia vektorius
+iš $\mathbb{R}^{n}$ į $\mathbb{R}^{m}$.
+Šios transformacijos nepaprastai naudingos.
+Pavyzdžiui, posūkius galime pavaizduoti
+kaip daugybą iš tam tikrų kvadratinių matricų.
+Matricos ir vektoriaus sandaugos taip pat aprašo
+pagrindinį skaičiavimą, naudojamą apskaičiuojant
+kiekvieno neuroninio tinklo sluoksnio išvestis,
+kai duotos ankstesnio sluoksnio išvestys.
 
 :begin_tab:`mxnet`
-To express a matrix--vector product in code,
-we use the same `dot` function.
-The operation is inferred
-based on the type of the arguments.
-Note that the column dimension of `A`
-(its length along axis 1)
-must be the same as the dimension of `x` (its length).
+Matricos ir vektoriaus sandaugai kode išreikšti
+naudojame tą pačią funkciją `dot`.
+Operacija nustatoma
+pagal argumentų tipą.
+Atkreipkite dėmesį, kad `A` stulpelių dimensija
+(jos ilgis 1 ašimi)
+turi sutapti su `x` dimensija (jo ilgiu).
 :end_tab:
 
 :begin_tab:`pytorch`
-To express a matrix--vector product in code,
-we use the `mv` function.
-Note that the column dimension of `A`
-(its length along axis 1)
-must be the same as the dimension of `x` (its length).
-Python has a convenience operator `@`
-that can execute both matrix--vector
-and matrix--matrix products
-(depending on its arguments).
-Thus we can write `A@x`.
+Matricos ir vektoriaus sandaugai kode išreikšti
+naudojame funkciją `mv`.
+Atkreipkite dėmesį, kad `A` stulpelių dimensija
+(jos ilgis 1 ašimi)
+turi sutapti su `x` dimensija (jo ilgiu).
+Python turi patogų operatorių `@`,
+galintį vykdyti ir matricos–vektoriaus,
+ir matricos–matricos sandaugas
+(priklausomai nuo argumentų).
+Taigi galime rašyti `A@x`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-To express a matrix--vector product in code,
-we use the `matvec` function.
-Note that the column dimension of `A`
-(its length along axis 1)
-must be the same as the dimension of `x` (its length).
+Matricos ir vektoriaus sandaugai kode išreikšti
+naudojame funkciją `matvec`.
+Atkreipkite dėmesį, kad `A` stulpelių dimensija
+(jos ilgis 1 ašimi)
+turi sutapti su `x` dimensija (jo ilgiu).
 :end_tab:
 
 ```{.python .input}
@@ -822,14 +820,14 @@ A.shape, x.shape, tf.linalg.matvec(A, x)
 A.shape, x.shape, jnp.matmul(A, x)
 ```
 
-## Matrix--Matrix Multiplication
+## Matricų daugyba
 
-Once you have gotten the hang of dot products and matrix--vector products,
-then *matrix--matrix multiplication* should be straightforward.
+Kai perprasite skaliarines sandaugas ir matricos ir vektoriaus sandaugas,
+*matricų daugyba* turėtų būti paprasta.
 
-Say that we have two matrices
+Tarkime, turime dvi matricas
 $\mathbf{A} \in \mathbb{R}^{n \times k}$
-and $\mathbf{B} \in \mathbb{R}^{k \times m}$:
+ir $\mathbf{B} \in \mathbb{R}^{k \times m}$:
 
 $$\mathbf{A}=\begin{bmatrix}
  a_{11} & a_{12} & \cdots & a_{1k} \\
@@ -845,12 +843,10 @@ $$\mathbf{A}=\begin{bmatrix}
 \end{bmatrix}.$$
 
 
-Let $\mathbf{a}^\top_{i} \in \mathbb{R}^k$ denote
-the row vector representing the $i^\textrm{th}$ row
-of the matrix $\mathbf{A}$
-and let $\mathbf{b}_{j} \in \mathbb{R}^k$ denote
-the column vector from the $j^\textrm{th}$ column
-of the matrix $\mathbf{B}$:
+Tegul $\mathbf{a}^\top_{i} \in \mathbb{R}^k$ žymi
+eilutės vektorių, vaizduojantį matricos $\mathbf{A}$ $i$-ąją eilutę,
+o $\mathbf{b}_{j} \in \mathbb{R}^k$ – stulpelio vektorių
+iš matricos $\mathbf{B}$ $j$-ojo stulpelio:
 
 $$\mathbf{A}=
 \begin{bmatrix}
@@ -865,12 +861,12 @@ $$\mathbf{A}=
 $$
 
 
-To form the matrix product $\mathbf{C} \in \mathbb{R}^{n \times m}$,
-we simply compute each element $c_{ij}$
-as the dot product between
-the $i^{\textrm{th}}$ row of $\mathbf{A}$
-and the $j^{\textrm{th}}$ column of $\mathbf{B}$,
-i.e., $\mathbf{a}^\top_i \mathbf{b}_j$:
+Kad sudarytume matricų sandaugą $\mathbf{C} \in \mathbb{R}^{n \times m}$,
+tiesiog apskaičiuojame kiekvieną elementą $c_{ij}$
+kaip skaliarinę sandaugą tarp
+$\mathbf{A}$ $i$-osios eilutės
+ir $\mathbf{B}$ $j$-ojo stulpelio,
+t. y. $\mathbf{a}^\top_i \mathbf{b}_j$:
 
 $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 \mathbf{a}^\top_{1} \\
@@ -889,16 +885,16 @@ $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 \end{bmatrix}.
 $$
 
-[**We can think of the matrix--matrix multiplication $\mathbf{AB}$
-as performing $m$ matrix--vector products
-or $m \times n$ dot products
-and stitching the results together
-to form an $n \times m$ matrix.**]
-In the following snippet,
-we perform matrix multiplication on `A` and `B`.
-Here, `A` is a matrix with two rows and three columns,
-and `B` is a matrix with three rows and four columns.
-After multiplication, we obtain a matrix with two rows and four columns.
+[**Matricų daugybą $\mathbf{AB}$ galime laikyti
+$m$ matricos ir vektoriaus sandaugų
+arba $m \times n$ skaliarinių sandaugų atlikimu
+ir rezultatų sujungimu į
+$n \times m$ matricą.**]
+Šiame fragmente
+atliekame matricų `A` ir `B` daugybą.
+Čia `A` yra matrica su dviem eilutėmis ir trimis stulpeliais,
+o `B` – matrica su trimis eilutėmis ir keturiais stulpeliais.
+Po daugybos gauname matricą su dviem eilutėmis ir keturiais stulpeliais.
 
 ```{.python .input}
 %%tab mxnet
@@ -924,43 +920,43 @@ B = jnp.ones((3, 4))
 jnp.matmul(A, B)
 ```
 
-The term *matrix--matrix multiplication* is
-often simplified to *matrix multiplication*,
-and should not be confused with the Hadamard product.
+Terminas *matricų daugyba* (angl. *matrix–matrix multiplication*)
+dažnai supaprastinamas iki *matricų daugybos*
+ir neturėtų būti painiojamas su Adamaro sandauga.
 
 
-## Norms
+## Normos
 :label:`subsec_lin-algebra-norms`
 
-Some of the most useful operators in linear algebra are *norms*.
-Informally, the norm of a vector tells us how *big* it is.
-For instance, the $\ell_2$ norm measures
-the (Euclidean) length of a vector.
-Here, we are employing a notion of *size* that concerns the magnitude of a vector's components
-(not its dimensionality).
+Vieni naudingiausių tiesinės algebros operatorių yra *normos*.
+Neformaliai vektoriaus norma parodo, kiek jis yra *didelis*.
+Pavyzdžiui, $\ell_2$ norma matuoja
+vektoriaus (Euklido) ilgį.
+Čia vartojame *dydžio* sąvoką, susijusią su vektoriaus komponenčių didumu
+(o ne jo dimensija).
 
-A norm is a function $\| \cdot \|$ that maps a vector
-to a scalar and satisfies the following three properties:
+Norma yra funkcija $\| \cdot \|$, kuri atvaizduoja vektorių
+į skaliarą ir tenkina šias tris savybes:
 
-1. Given any vector $\mathbf{x}$, if we scale (all elements of) the vector
-   by a scalar $\alpha \in \mathbb{R}$, its norm scales accordingly:
+1. Kai duotas bet kuris vektorius $\mathbf{x}$, jei vektorių (visus jo elementus)
+   padauginame iš skaliaro $\alpha \in \mathbb{R}$, jo norma atitinkamai keičiasi:
    $$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|.$$
-2. For any vectors $\mathbf{x}$ and $\mathbf{y}$:
-   norms satisfy the triangle inequality:
+2. Bet kuriems vektoriams $\mathbf{x}$ ir $\mathbf{y}$
+   normos tenkina trikampio nelygybę:
    $$\|\mathbf{x} + \mathbf{y}\| \leq \|\mathbf{x}\| + \|\mathbf{y}\|.$$
-3. The norm of a vector is nonnegative and it only vanishes if the vector is zero:
+3. Vektoriaus norma yra neneigiama ir lygi nuliui tik tada, kai vektorius nulinis:
    $$\|\mathbf{x}\| > 0 \textrm{ for all } \mathbf{x} \neq 0.$$
 
-Many functions are valid norms and different norms
-encode different notions of size.
-The Euclidean norm that we all learned in elementary school geometry
-when calculating the hypotenuse of a right triangle
-is the square root of the sum of squares of a vector's elements.
-Formally, this is called [**the $\ell_2$ *norm***] and expressed as
+Daug funkcijų yra tinkamos normos, ir skirtingos normos
+koduoja skirtingas dydžio sąvokas.
+Euklido norma, kurią visi išmokome pradinės mokyklos geometrijoje
+skaičiuodami statiojo trikampio įžambinę,
+yra vektoriaus elementų kvadratų sumos kvadratinė šaknis.
+Formaliai tai vadinama [**$\ell_2$ *norma***] ir išreiškiama
 
 (**$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$**)
 
-The method `norm` calculates the $\ell_2$ norm.
+Metodas `norm` apskaičiuoja $\ell_2$ normą.
 
 ```{.python .input}
 %%tab mxnet
@@ -986,17 +982,17 @@ u = jnp.array([3.0, -4.0])
 jnp.linalg.norm(u)
 ```
 
-[**The $\ell_1$ norm**] is also common
-and the associated measure is called the Manhattan distance.
-By definition, the $\ell_1$ norm sums
-the absolute values of a vector's elements:
+[**$\ell_1$ norma**] taip pat dažna,
+o susijęs matas vadinamas Manheteno atstumu.
+Pagal apibrėžtį $\ell_1$ norma susumuoja
+vektoriaus elementų absoliutines reikšmes:
 
 (**$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$**)
 
-Compared to the $\ell_2$ norm, it is less sensitive to outliers.
-To compute the $\ell_1$ norm,
-we compose the absolute value
-with the sum operation.
+Palyginti su $\ell_2$ norma, ji mažiau jautri išskirtims.
+Kad apskaičiuotume $\ell_1$ normą,
+absoliutinės reikšmės operaciją
+sukomponuojame su sumavimo operacija.
 
 ```{.python .input}
 %%tab mxnet
@@ -1018,29 +1014,29 @@ tf.reduce_sum(tf.abs(u))
 jnp.linalg.norm(u, ord=1) # same as jnp.abs(u).sum()
 ```
 
-Both the $\ell_2$ and $\ell_1$ norms are special cases
-of the more general $\ell_p$ *norms*:
+Ir $\ell_2$, ir $\ell_1$ normos yra bendresnių $\ell_p$ *normų*
+atskiri atvejai:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
-In the case of matrices, matters are more complicated.
-After all, matrices can be viewed both as collections of individual entries
-*and* as objects that operate on vectors and transform them into other vectors.
-For instance, we can ask by how much longer
-the matrix--vector product $\mathbf{X} \mathbf{v}$
-could be relative to $\mathbf{v}$.
-This line of thought leads to what is called the *spectral* norm.
-For now, we introduce [**the *Frobenius norm*,
-which is much easier to compute**] and defined as
-the square root of the sum of the squares
-of a matrix's elements:
+Matricų atveju reikalai sudėtingesni.
+Juk matricas galima vertinti ir kaip atskirų įrašų rinkinius,
+*ir* kaip objektus, veikiančius vektorius ir paverčiančius juos kitais vektoriais.
+Pavyzdžiui, galime klausti, kiek ilgesnė
+gali būti matricos ir vektoriaus sandauga $\mathbf{X} \mathbf{v}$
+palyginti su $\mathbf{v}$.
+Ši mąstymo linija veda prie vadinamosios *spektrinės* normos.
+Kol kas pristatome [**kur kas lengviau apskaičiuojamą *Frobenijaus normą***],
+apibrėžiamą kaip
+matricos elementų kvadratų sumos
+kvadratinė šaknis:
 
 [**$$\|\mathbf{X}\|_\textrm{F} = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
-The Frobenius norm behaves as if it were
-an $\ell_2$ norm of a matrix-shaped vector.
-Invoking the following function will calculate
-the Frobenius norm of a matrix.
+Frobenijaus norma elgiasi taip, tarsi
+būtų matricos formos vektoriaus $\ell_2$ norma.
+Iškvietus šią funkciją, bus apskaičiuota
+matricos Frobenijaus norma.
 
 ```{.python .input}
 %%tab mxnet
@@ -1062,98 +1058,98 @@ tf.norm(tf.ones((4, 9)))
 jnp.linalg.norm(jnp.ones((4, 9)))
 ```
 
-While we do not want to get too far ahead of ourselves,
-we already can plant some intuition about why these concepts are useful.
-In deep learning, we are often trying to solve optimization problems:
-*maximize* the probability assigned to observed data;
-*maximize* the revenue associated with a recommender model;
-*minimize* the distance between predictions
-and the ground truth observations;
-*minimize* the distance between representations
-of photos of the same person
-while *maximizing* the distance between representations
-of photos of different people.
-These distances, which constitute
-the objectives of deep learning algorithms,
-are often expressed as norms.
+Nors nenorime per daug skubėti,
+jau galime sudaryti intuiciją, kodėl šios sąvokos naudingos.
+Giliajame mokyme dažnai bandome spręsti optimizavimo uždavinius:
+*maksimizuoti* stebimiems duomenims priskirtą tikimybę;
+*maksimizuoti* su rekomendacijų modeliu susijusias pajamas;
+*minimizuoti* atstumą tarp prognozių
+ir etaloninių stebėjimų;
+*minimizuoti* atstumą tarp to paties asmens nuotraukų
+reprezentacijų,
+kartu *maksimizuojant* atstumą tarp skirtingų asmenų
+nuotraukų reprezentacijų.
+Šie atstumai, sudarantys
+giliojo mokymosi algoritmų tikslus,
+dažnai išreiškiami normomis.
 
 
-## Discussion
+## Diskusija
 
-In this section, we have reviewed all the linear algebra
-that you will need to understand
-a significant chunk of modern deep learning.
-There is a lot more to linear algebra, though,
-and much of it is useful for machine learning.
-For example, matrices can be decomposed into factors,
-and these decompositions can reveal
-low-dimensional structure in real-world datasets.
-There are entire subfields of machine learning
-that focus on using matrix decompositions
-and their generalizations to high-order tensors
-to discover structure in datasets
-and solve prediction problems.
-But this book focuses on deep learning.
-And we believe you will be more inclined
-to learn more mathematics
-once you have gotten your hands dirty
-applying machine learning to real datasets.
-So while we reserve the right
-to introduce more mathematics later on,
-we wrap up this section here.
+Šiame skyrelyje apžvelgėme visą tiesinę algebrą,
+kurios jums prireiks, kad suprastumėte
+didelę šiuolaikinio giliojo mokymosi dalį.
+Tiesinė algebra turi daug daugiau,
+ir didelė jos dalis naudinga mašininiam mokymuisi.
+Pavyzdžiui, matricas galima skaidyti į daugiklius,
+o šie skaidiniai gali atskleisti
+žemos dimensijos struktūrą realiuose duomenų rinkiniuose.
+Yra ištisų mašininio mokymosi porūšių,
+kurie sutelkia dėmesį į matricų skaidinių
+ir jų apibendrinimų aukštesnės eilės tenzoriams naudojimą,
+kad atskleistų duomenų rinkinių struktūrą
+ir spręstų prognozavimo uždavinius.
+Tačiau ši knyga sutelkia dėmesį į gilųjį mokymąsi.
+Ir manome, kad jums labiau norėsis
+išmokti daugiau matematikos,
+kai praktiškai išbandysite
+mašininį mokymąsi su realiais duomenų rinkiniais.
+Taigi, nors pasiliekame teisę
+vėliau pristatyti daugiau matematikos,
+čia šį skyrelį baigiame.
 
-If you are eager to learn more linear algebra,
-there are many excellent books and online resources.
-For a more advanced crash course, consider checking out
-:citet:`Strang.1993`, :citet:`Kolter.2008`, and :citet:`Petersen.Pedersen.ea.2008`.
+Jei norite sužinoti daugiau tiesinės algebros,
+yra daug puikių knygų ir šaltinių internete.
+Pažangesniam greitajam kursui apsvarstykite
+:citet:`Strang.1993`, :citet:`Kolter.2008` ir :citet:`Petersen.Pedersen.ea.2008`.
 
-To recap:
+Apibendrinant:
 
-* Scalars, vectors, matrices, and tensors are
-  the basic mathematical objects used in linear algebra
-  and have zero, one, two, and an arbitrary number of axes, respectively.
-* Tensors can be sliced or reduced along specified axes
-  via indexing, or operations such as `sum` and `mean`, respectively.
-* Elementwise products are called Hadamard products.
-  By contrast, dot products, matrix--vector products, and matrix--matrix products
-  are not elementwise operations and in general return objects
-  having shapes that are different from the the operands.
-* Compared to Hadamard products, matrix--matrix products
-  take considerably longer to compute (cubic rather than quadratic time).
-* Norms capture various notions of the magnitude of a vector (or matrix),
-  and are commonly applied to the difference of two vectors
-  to measure their distance apart.
-* Common vector norms include the $\ell_1$ and $\ell_2$ norms,
-   and common matrix norms include the *spectral* and *Frobenius* norms.
+* Skaliarai, vektoriai, matricos ir tenzoriai yra
+  pagrindiniai matematiniai objektai, naudojami tiesinėje algebroje,
+  ir turi atitinkamai nulį, vieną, dvi ir savavališką skaičių ašių.
+* Tenzorius galima atpjauti arba redukuoti nurodytomis ašimis
+  atitinkamai indeksavimu arba operacijomis, tokiomis kaip `sum` ir `mean`.
+* Poelementės sandaugos vadinamos Adamaro sandaugomis.
+  Priešingai, skaliarinės sandaugos, matricos ir vektoriaus sandaugos bei matricų sandaugos
+  nėra poelementės operacijos ir paprastai grąžina objektus,
+  kurių formos skiriasi nuo operandų.
+* Palyginti su Adamaro sandaugomis, matricų sandaugos
+  skaičiuojamos gerokai ilgiau (kubiniu, o ne kvadratiniu laiku).
+* Normos atspindi įvairias vektoriaus (ar matricos) didumo sąvokas
+  ir dažnai taikomos dviejų vektorių skirtumui,
+  kad būtų išmatuotas jų atstumas.
+* Įprastos vektorių normos yra $\ell_1$ ir $\ell_2$ normos,
+   o įprastos matricų normos – *spektrinė* ir *Frobenijaus* normos.
 
 
-## Exercises
+## Pratimai
 
-1. Prove that the transpose of the transpose of a matrix is the matrix itself: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
-1. Given two matrices $\mathbf{A}$ and $\mathbf{B}$, show that sum and transposition commute: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
-1. Given any square matrix $\mathbf{A}$, is $\mathbf{A} + \mathbf{A}^\top$ always symmetric? Can you prove the result by using only the results of the previous two exercises?
-1. We defined the tensor `X` of shape (2, 3, 4) in this section. What is the output of `len(X)`? Write your answer without implementing any code, then check your answer using code.
-1. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
-1. Run `A / A.sum(axis=1)` and see what happens. Can you analyze the results?
-1. When traveling between two points in downtown Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
-1. Consider a tensor of shape (2, 3, 4). What are the shapes of the summation outputs along axes 0, 1, and 2?
-1. Feed a tensor with three or more axes to the `linalg.norm` function and observe its output. What does this function compute for tensors of arbitrary shape?
-1. Consider three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{14}}$, initialized with Gaussian random variables. You want to compute the product $\mathbf{A} \mathbf{B} \mathbf{C}$. Is there any difference in memory footprint and speed, depending on whether you compute $(\mathbf{A} \mathbf{B}) \mathbf{C}$ or $\mathbf{A} (\mathbf{B} \mathbf{C})$? Why?
-1. Consider three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{16}}$. Is there any difference in speed depending on whether you compute $\mathbf{A} \mathbf{B}$ or $\mathbf{A} \mathbf{C}^\top$? Why? What changes if you initialize $\mathbf{C} = \mathbf{B}^\top$ without cloning memory? Why?
-1. Consider three matrices, say $\mathbf{A}, \mathbf{B}, \mathbf{C} \in \mathbb{R}^{100 \times 200}$. Construct a tensor with three axes by stacking $[\mathbf{A}, \mathbf{B}, \mathbf{C}]$. What is the dimensionality? Slice out the second coordinate of the third axis to recover $\mathbf{B}$. Check that your answer is correct.
+1. Įrodykite, kad matricos transponuotos matricos transponuota matrica yra pati matrica: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
+1. Kai duotos dvi matricos $\mathbf{A}$ ir $\mathbf{B}$, parodykite, kad sudėtis ir transponavimas komutuoja: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
+1. Ar bet kurios kvadratinės matricos $\mathbf{A}$ atveju $\mathbf{A} + \mathbf{A}^\top$ visada yra simetrinė? Ar galite įrodyti rezultatą naudodami tik ankstesnių dviejų pratimų rezultatus?
+1. Šiame skyrelyje apibrėžėme tenzorių `X`, kurio forma (2, 3, 4). Kokia yra `len(X)` išvestis? Parašykite savo atsakymą nerašydami jokio kodo, tada patikrinkite atsakymą kodu.
+1. Ar savavališkos formos tenzoriui `X` `len(X)` visada atitinka tam tikros `X` ašies ilgį? Kokia tai ašis?
+1. Paleiskite `A / A.sum(axis=1)` ir pažiūrėkite, kas nutinka. Ar galite išanalizuoti rezultatus?
+1. Keliaujant tarp dviejų taškų Manheteno centre, kokį atstumą reikia įveikti koordinačių požiūriu, t. y. prospektais ir gatvėmis? Ar galima keliauti įstrižai?
+1. Panagrinėkite tenzorių, kurio forma (2, 3, 4). Kokios yra sumavimo išvesčių formos 0, 1 ir 2 ašimis?
+1. Pateikite tenzorių su trimis ar daugiau ašių funkcijai `linalg.norm` ir stebėkite jos išvestį. Ką ši funkcija apskaičiuoja savavališkos formos tenzoriams?
+1. Panagrinėkite tris dideles matricas, tarkime, $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ ir $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{14}}$, inicializuotas Gauso atsitiktiniais dydžiais. Norite apskaičiuoti sandaugą $\mathbf{A} \mathbf{B} \mathbf{C}$. Ar yra skirtumas atminties pėdsake ir greityje, priklausomai nuo to, ar skaičiuojate $(\mathbf{A} \mathbf{B}) \mathbf{C}$, ar $\mathbf{A} (\mathbf{B} \mathbf{C})$? Kodėl?
+1. Panagrinėkite tris dideles matricas, tarkime, $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ ir $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{16}}$. Ar yra skirtumas greityje, priklausomai nuo to, ar skaičiuojate $\mathbf{A} \mathbf{B}$, ar $\mathbf{A} \mathbf{C}^\top$? Kodėl? Kas pasikeičia, jei inicializuojate $\mathbf{C} = \mathbf{B}^\top$ nekopijuodami atminties? Kodėl?
+1. Panagrinėkite tris matricas, tarkime, $\mathbf{A}, \mathbf{B}, \mathbf{C} \in \mathbb{R}^{100 \times 200}$. Sukonstruokite tenzorių su trimis ašimis, sudėję $[\mathbf{A}, \mathbf{B}, \mathbf{C}]$. Kokia yra dimensija? Atpjaukite antrąją trečiosios ašies koordinatę, kad atkurtumėte $\mathbf{B}$. Patikrinkite, ar jūsų atsakymas teisingas.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/30)
+[Diskusijos](https://discuss.d2l.ai/t/30)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/31)
+[Diskusijos](https://discuss.d2l.ai/t/31)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/196)
+[Diskusijos](https://discuss.d2l.ai/t/196)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17968)
+[Diskusijos](https://discuss.d2l.ai/t/17968)
 :end_tab:

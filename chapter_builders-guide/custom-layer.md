@@ -3,22 +3,21 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Custom Layers
+# Pasirinktiniai sluoksniai
 
-One factor behind deep learning's success
-is the availability of a wide range of layers
-that can be composed in creative ways
-to design architectures suitable
-for a wide variety of tasks.
-For instance, researchers have invented layers
-specifically for handling images, text,
-looping over sequential data,
-and
-performing dynamic programming.
-Sooner or later, you will need
-a layer that does not exist yet in the deep learning framework.
-In these cases, you must build a custom layer.
-In this section, we show you how.
+Vienas iš giliojo mokymosi sėkmės veiksnių
+yra platus sluoksnių, kuriuos galima kūrybiškai derinti,
+spektras, leidžiantis projektuoti architektūras,
+tinkamas labai įvairioms užduotims.
+Pavyzdžiui, tyrėjai išrado sluoksnius,
+skirtus būtent vaizdams, tekstui,
+ciklams per sekų duomenis
+ir
+dinaminiam programavimui atlikti.
+Anksčiau ar vėliau jums prireiks
+sluoksnio, kurio dar nėra giliojo mokymosi karkase.
+Tokiais atvejais turite sukurti pasirinktinį sluoksnį.
+Šiame skyrelyje parodome, kaip tai padaryti.
 
 ```{.python .input}
 %%tab mxnet
@@ -50,16 +49,16 @@ import jax
 from jax import numpy as jnp
 ```
 
-## (**Layers without Parameters**)
+## (**Sluoksniai be parametrų**)
 
-To start, we construct a custom layer
-that does not have any parameters of its own.
-This should look familiar if you recall our
-introduction to modules in :numref:`sec_model_construction`.
-The following `CenteredLayer` class simply
-subtracts the mean from its input.
-To build it, we simply need to inherit
-from the base layer class and implement the forward propagation function.
+Pradžioje sukonstruojame pasirinktinį sluoksnį,
+kuris neturi savų parametrų.
+Tai turėtų atrodyti pažįstama, jei prisimenate mūsų
+modulių pristatymą :numref:`sec_model_construction`.
+Ši klasė `CenteredLayer` tiesiog
+atima vidurkį iš savo įvesties.
+Kad ją sukurtume, tereikia paveldėti
+iš bazinės sluoksnio klasės ir įgyvendinti tiesioginio sklidimo funkciją.
 
 ```{.python .input}
 %%tab mxnet
@@ -98,7 +97,7 @@ class CenteredLayer(nn.Module):
         return X - X.mean()
 ```
 
-Let's verify that our layer works as intended by feeding some data through it.
+Patikrinkime, ar mūsų sluoksnis veikia, kaip numatyta, paduodami jam šiek tiek duomenų.
 
 ```{.python .input}
 %%tab all
@@ -106,8 +105,8 @@ layer = CenteredLayer()
 layer(d2l.tensor([1.0, 2, 3, 4, 5]))
 ```
 
-We can now [**incorporate our layer as a component
-in constructing more complex models.**]
+Dabar galime [**įtraukti savo sluoksnį kaip komponentą
+konstruodami sudėtingesnius modelius.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -131,16 +130,16 @@ net = tf.keras.Sequential([tf.keras.layers.Dense(128), CenteredLayer()])
 net = nn.Sequential([nn.Dense(128), CenteredLayer()])
 ```
 
-As an extra sanity check, we can send random data
-through the network and check that the mean is in fact 0.
-Because we are dealing with floating point numbers,
-we may still see a very small nonzero number
-due to quantization.
+Kaip papildomą sveiko proto patikrą, galime paduoti atsitiktinius duomenis
+per tinklą ir patikrinti, ar vidurkis iš tiesų yra 0.
+Kadangi dirbame su slankiojo kablelio skaičiais,
+vis tiek galime pamatyti labai mažą nenulinį skaičių
+dėl kvantavimo.
 
 :begin_tab:`jax`
-Here we utilize the `init_with_output` method which returns both the output of
-the network as well as the parameters. In this case we only focus on the
-output.
+Čia naudojame metodą `init_with_output`, kuris grąžina ir tinklo išvestį,
+ir parametrus. Šiuo atveju daugiausia dėmesio skiriame
+išvesčiai.
 :end_tab:
 
 ```{.python .input}
@@ -162,24 +161,24 @@ Y, _ = net.init_with_output(d2l.get_key(), jax.random.uniform(d2l.get_key(),
 Y.mean()
 ```
 
-## [**Layers with Parameters**]
+## [**Sluoksniai su parametrais**]
 
-Now that we know how to define simple layers,
-let's move on to defining layers with parameters
-that can be adjusted through training.
-We can use built-in functions to create parameters, which
-provide some basic housekeeping functionality.
-In particular, they govern access, initialization,
-sharing, saving, and loading model parameters.
-This way, among other benefits, we will not need to write
-custom serialization routines for every custom layer.
+Dabar, kai žinome, kaip apibrėžti paprastus sluoksnius,
+pereikime prie sluoksnių su parametrais,
+kuriuos galima koreguoti apmokymo metu, apibrėžimo.
+Parametrams kurti galime naudoti įtaisytąsias funkcijas, kurios
+suteikia šiek tiek pagrindinių buities darbų funkcionalumo.
+Visų pirma jos tvarko modelio parametrų pasiekimą, inicializavimą,
+bendrinimą, išsaugojimą ir įkėlimą.
+Tokiu būdu, be kitų privalumų, mums nereikės rašyti
+pasirinktinių serializavimo rutinų kiekvienam pasirinktiniam sluoksniui.
 
-Now let's implement our own version of the  fully connected layer.
-Recall that this layer requires two parameters,
-one to represent the weight and the other for the bias.
-In this implementation, we bake in the ReLU activation as a default.
-This layer requires two input arguments: `in_units` and `units`, which
-denote the number of inputs and outputs, respectively.
+Dabar įgyvendinkime savo pilnai sujungto sluoksnio versiją.
+Prisiminkite, kad šiam sluoksniui reikia dviejų parametrų:
+vieno svoriui atvaizduoti, kito – poslinkiui.
+Šiame įgyvendinime ReLU aktyvaciją įdedame kaip numatytąją.
+Šiam sluoksniui reikia dviejų įvesties argumentų: `in_units` ir `units`, kurie
+žymi atitinkamai įvesčių ir išvesčių skaičių.
 
 ```{.python .input}
 %%tab mxnet
@@ -245,13 +244,13 @@ class MyDense(nn.Module):
 ```
 
 :begin_tab:`mxnet, tensorflow, jax`
-Next, we instantiate the `MyDense` class
-and access its model parameters.
+Toliau sukuriame klasės `MyDense` egzempliorių
+ir pasiekiame jo modelio parametrus.
 :end_tab:
 
 :begin_tab:`pytorch`
-Next, we instantiate the `MyLinear` class
-and access its model parameters.
+Toliau sukuriame klasės `MyLinear` egzempliorių
+ir pasiekiame jo modelio parametrus.
 :end_tab:
 
 ```{.python .input}
@@ -280,7 +279,7 @@ params = dense.init(d2l.get_key(), jnp.zeros((3, 5)))
 params
 ```
 
-We can [**directly carry out forward propagation calculations using custom layers.**]
+Galime [**tiesiogiai atlikti tiesioginio sklidimo skaičiavimus naudodami pasirinktinius sluoksnius.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -304,8 +303,8 @@ dense.apply(params, jax.random.uniform(d2l.get_key(),
                                        (2, 5)))
 ```
 
-We can also (**construct models using custom layers.**)
-Once we have that we can use it just like the built-in fully connected layer.
+Taip pat galime (**konstruoti modelius naudodami pasirinktinius sluoksnius.**)
+Kai tai turime, galime jį naudoti lygiai taip pat kaip įtaisytąjį pilnai sujungtą sluoksnį.
 
 ```{.python .input}
 %%tab mxnet
@@ -336,31 +335,31 @@ Y, _ = net.init_with_output(d2l.get_key(), jax.random.uniform(d2l.get_key(),
 Y
 ```
 
-## Summary
+## Santrauka
 
-We can design custom layers via the basic layer class. This allows us to define flexible new layers that behave differently from any existing layers in the library.
-Once defined, custom layers can be invoked in arbitrary contexts and architectures.
-Layers can have local parameters, which can be created through built-in functions.
+Pasirinktinius sluoksnius galime projektuoti per bazinę sluoksnio klasę. Tai leidžia apibrėžti lanksčius naujus sluoksnius, kurie elgiasi kitaip nei bet kurie bibliotekoje esantys sluoksniai.
+Apibrėžti pasirinktiniai sluoksniai gali būti kviečiami savavališkuose kontekstuose ir architektūrose.
+Sluoksniai gali turėti vietinių parametrų, kuriuos galima sukurti įtaisytosiomis funkcijomis.
 
 
-## Exercises
+## Pratimai
 
-1. Design a layer that takes an input and computes a tensor reduction,
-   i.e., it returns $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
-1. Design a layer that returns the leading half of the Fourier coefficients of the data.
+1. Suprojektuokite sluoksnį, kuris priima įvestį ir apskaičiuoja tenzoriaus redukciją,
+   t. y. grąžina $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
+1. Suprojektuokite sluoksnį, kuris grąžina pirmąją duomenų Furjė koeficientų pusę.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/58)
+[Diskusijos](https://discuss.d2l.ai/t/58)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/59)
+[Diskusijos](https://discuss.d2l.ai/t/59)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/279)
+[Diskusijos](https://discuss.d2l.ai/t/279)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17993)
+[Diskusijos](https://discuss.d2l.ai/t/17993)
 :end_tab:

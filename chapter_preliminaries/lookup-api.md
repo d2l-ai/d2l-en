@@ -3,30 +3,30 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Documentation
+# Dokumentacija
 :begin_tab:`mxnet`
-While we cannot possibly introduce every single MXNet function and class 
-(and the information might become outdated quickly), 
-the [API documentation](https://mxnet.apache.org/versions/1.8.0/api) 
-and additional [tutorials](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) and examples 
-provide such documentation. 
-This section provides some guidance for how to explore the MXNet API.
+Nors negalime pristatyti kiekvienos MXNet funkcijos ir klasės
+(o informacija gali greitai pasenti),
+[API dokumentacija](https://mxnet.apache.org/versions/1.8.0/api)
+ir papildomi [vadovai](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) bei pavyzdžiai
+suteikia tokią dokumentaciją.
+Šiame skyrelyje pateikiame šiek tiek patarimų, kaip tyrinėti MXNet API.
 :end_tab:
 
 :begin_tab:`pytorch`
-While we cannot possibly introduce every single PyTorch function and class 
-(and the information might become outdated quickly), 
-the [API documentation](https://pytorch.org/docs/stable/index.html) and additional [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) and examples 
-provide such documentation.
-This section provides some guidance for how to explore the PyTorch API.
+Nors negalime pristatyti kiekvienos PyTorch funkcijos ir klasės
+(o informacija gali greitai pasenti),
+[API dokumentacija](https://pytorch.org/docs/stable/index.html) ir papildomi [vadovai](https://pytorch.org/tutorials/beginner/basics/intro.html) bei pavyzdžiai
+suteikia tokią dokumentaciją.
+Šiame skyrelyje pateikiame šiek tiek patarimų, kaip tyrinėti PyTorch API.
 :end_tab:
 
 :begin_tab:`tensorflow`
-While we cannot possibly introduce every single TensorFlow function and class 
-(and the information might become outdated quickly), 
-the [API documentation](https://www.tensorflow.org/api_docs) and additional [tutorials](https://www.tensorflow.org/tutorials) and examples 
-provide such documentation. 
-This section provides some guidance for how to explore the TensorFlow API.
+Nors negalime pristatyti kiekvienos TensorFlow funkcijos ir klasės
+(o informacija gali greitai pasenti),
+[API dokumentacija](https://www.tensorflow.org/api_docs) ir papildomi [vadovai](https://www.tensorflow.org/tutorials) bei pavyzdžiai
+suteikia tokią dokumentaciją.
+Šiame skyrelyje pateikiame šiek tiek patarimų, kaip tyrinėti TensorFlow API.
 :end_tab:
 
 ```{.python .input}
@@ -49,11 +49,11 @@ import tensorflow as tf
 import jax
 ```
 
-## Functions and Classes in a Module
+## Modulio funkcijos ir klasės
 
-To know which functions and classes can be called in a module,
-we invoke the `dir` function. For instance, we can
-(**query all properties in the module for generating random numbers**):
+Norėdami sužinoti, kurias funkcijas ir klases galima kviesti modulyje,
+iškviečiame funkciją `dir`. Pavyzdžiui, galime
+(**užklausti visų atsitiktinių skaičių generavimo modulio savybių**):
 
 ```{.python .input  n=1}
 %%tab mxnet
@@ -75,19 +75,19 @@ print(dir(tf.random))
 print(dir(jax.random))
 ```
 
-Generally, we can ignore functions that start and end with `__` (special objects in Python) 
-or functions that start with a single `_`(usually internal functions). 
-Based on the remaining function or attribute names, 
-we might hazard a guess that this module offers 
-various methods for generating random numbers, 
-including sampling from the uniform distribution (`uniform`), 
-normal distribution (`normal`), and multinomial distribution (`multinomial`).
+Paprastai galime nepaisyti funkcijų, prasidedančių ir pasibaigiančių `__` (specialūs Python objektai),
+arba funkcijų, prasidedančių vienu `_` (paprastai vidinės funkcijos).
+Pagal likusius funkcijų ar atributų pavadinimus
+galime drįsti spėti, kad šis modulis siūlo
+įvairius atsitiktinių skaičių generavimo metodus,
+įskaitant atranką iš tolygiojo skirstinio (`uniform`),
+normaliojo skirstinio (`normal`) ir daugianario skirstinio (`multinomial`).
 
-## Specific Functions and Classes
+## Konkrečios funkcijos ir klasės
 
-For specific instructions on how to use a given function or class,
-we can invoke the  `help` function. As an example, let's
-[**explore the usage instructions for tensors' `ones` function**].
+Konkrečių nurodymų, kaip naudoti tam tikrą funkciją ar klasę,
+galime gauti iškviesdami funkciją `help`. Pavyzdžiui,
+[**panagrinėkime tenzorių funkcijos `ones` naudojimo instrukcijas**].
 
 ```{.python .input}
 %%tab mxnet
@@ -109,11 +109,11 @@ help(tf.ones)
 help(jax.numpy.ones)
 ```
 
-From the documentation, we can see that the `ones` function 
-creates a new tensor with the specified shape 
-and sets all the elements to the value of 1. 
-Whenever possible, you should (**run a quick test**) 
-to confirm your interpretation:
+Iš dokumentacijos matome, kad funkcija `ones`
+sukuria naują tenzorių su nurodyta forma
+ir visus elementus nustato lygius 1.
+Kai tik įmanoma, turėtumėte (**atlikti greitą bandymą**),
+kad patvirtintumėte savo interpretaciją:
 
 ```{.python .input}
 %%tab mxnet
@@ -135,34 +135,34 @@ tf.ones(4)
 jax.numpy.ones(4)
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another
-window. For example, `list?` will create content
-that is almost identical to `help(list)`,
-displaying it in a new browser window.
-In addition, if we use two question marks, such as `list??`,
-the Python code implementing the function will also be displayed.
+„Jupyter" sąsiuvinyje galime naudoti `?` dokumentui parodyti kitame
+lange. Pavyzdžiui, `list?` sukurs turinį,
+beveik identišką `help(list)`,
+ir parodys jį naujame naršyklės lange.
+Be to, jei naudojame du klaustukus, pvz., `list??`,
+bus parodytas ir funkciją įgyvendinantis Python kodas.
 
-The official documentation provides plenty of descriptions and examples that are beyond this book. 
-We emphasize important use cases 
-that will get you started quickly with practical problems, 
-rather than completeness of coverage. 
-We also encourage you to study the source code of the libraries 
-to see examples of high-quality implementations of production code. 
-By doing this you will become a better engineer 
-in addition to becoming a better scientist.
+Oficiali dokumentacija pateikia daug aprašymų ir pavyzdžių, kurie yra už šios knygos ribų.
+Pabrėžiame svarbius naudojimo atvejus,
+kurie leis jums greitai pradėti spręsti praktinius uždavinius,
+o ne aprėpties išsamumą.
+Taip pat skatiname studijuoti bibliotekų šaltinio kodą,
+kad pamatytumėte aukštos kokybės gamybinio kodo įgyvendinimo pavyzdžių.
+Tai darydami taptumėte geresniu inžinieriumi
+ir kartu geresniu mokslininku.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/38)
+[Diskusijos](https://discuss.d2l.ai/t/38)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/39)
+[Diskusijos](https://discuss.d2l.ai/t/39)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/199)
+[Diskusijos](https://discuss.d2l.ai/t/199)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17972)
+[Diskusijos](https://discuss.d2l.ai/t/17972)
 :end_tab:

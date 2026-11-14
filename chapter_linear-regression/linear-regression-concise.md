@@ -3,39 +3,39 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Concise Implementation of Linear Regression
+# Glaustas tiesinės regresijos įgyvendinimas
 :label:`sec_linear_concise`
 
-Deep learning has witnessed a sort of Cambrian explosion
-over the past decade.
-The sheer number of techniques, applications and algorithms by far surpasses the
-progress of previous decades. 
-This is due to a fortuitous combination of multiple factors,
-one of which is the powerful free tools
-offered by a number of open-source deep learning frameworks.
+Pastarąjį dešimtmetį giliojo mokymosi srityje įvyko tarsi
+Kambro sprogimas.
+Metodų, taikymų ir algoritmų gausa gerokai pranoksta
+ankstesnių dešimtmečių pažangą.
+Tai lėmė laimingas kelių veiksnių derinys,
+vienas iš kurių yra galingi nemokami įrankiai,
+kuriuos siūlo keli atvirojo kodo giliojo mokymosi karkasai.
 Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010`,
-DistBelief :cite:`Dean.Corrado.Monga.ea.2012`,
-and Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014`
-arguably represent the
-first generation of such models 
-that found widespread adoption.
-In contrast to earlier (seminal) works like
+DistBelief :cite:`Dean.Corrado.Monga.ea.2012`
+ir Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014`
+galima laikyti
+pirmąja tokių karkasų karta,
+sulaukusia plataus pritaikymo.
+Skirtingai nuo ankstesnių (pamatinių) darbų, tokių kaip
 SN2 (Simulateur Neuristique) :cite:`Bottou.Le-Cun.1988`,
-which provided a Lisp-like programming experience,
-modern frameworks offer automatic differentiation
-and the convenience of Python.
-These frameworks allow us to automate and modularize
-the repetitive work of implementing gradient-based learning algorithms.
+kuris teikė į Lisp panašią programavimo patirtį,
+šiuolaikiniai karkasai siūlo automatinį diferencijavimą
+ir Python patogumą.
+Šie karkasai leidžia mums automatizuoti ir moduliarizuoti
+pasikartojantį gradientiniu mokymusi pagrįstų algoritmų įgyvendinimo darbą.
 
-In :numref:`sec_linear_scratch`, we relied only on
-(i) tensors for data storage and linear algebra;
-and (ii) automatic differentiation for calculating gradients.
-In practice, because data iterators, loss functions, optimizers,
-and neural network layers
-are so common, modern libraries implement these components for us as well.
-In this section, (**we will show you how to implement
-the linear regression model**) from :numref:`sec_linear_scratch`
-(**concisely by using high-level APIs**) of deep learning frameworks.
+:numref:`sec_linear_scratch` rėmėmės tik
+(i) tenzoriais duomenims saugoti ir tiesinei algebrai;
+ir (ii) automatiniu diferencijavimu gradientams skaičiuoti.
+Praktikoje, kadangi duomenų iteratoriai, nuostolių funkcijos, optimizatoriai
+ir neuroninių tinklų sluoksniai
+yra tokie dažni, šiuolaikinės bibliotekos įgyvendina ir šiuos komponentus už mus.
+Šiame skyrelyje (**parodysime, kaip įgyvendinti
+tiesinės regresijos modelį**) iš :numref:`sec_linear_scratch`
+(**glaustai naudojant aukšto lygio giliojo mokymosi karkasų API**).
 
 ```{.python .input}
 %%tab mxnet
@@ -69,78 +69,77 @@ from jax import numpy as jnp
 import optax
 ```
 
-## Defining the Model
+## Modelio apibrėžimas
 
-When we implemented linear regression from scratch
-in :numref:`sec_linear_scratch`,
-we defined our model parameters explicitly
-and coded up the calculations to produce output
-using basic linear algebra operations.
-You *should* know how to do this.
-But once your models get more complex,
-and once you have to do this nearly every day,
-you will be glad of the assistance.
-The situation is similar to coding up your own blog from scratch.
-Doing it once or twice is rewarding and instructive,
-but you would be a lousy web developer
-if you spent a month reinventing the wheel.
+Kai :numref:`sec_linear_scratch` įgyvendinome tiesinę regresiją
+nuo nulio,
+aiškiai apibrėžėme savo modelio parametrus
+ir užkodavome skaičiavimus išvesčiai gauti
+naudodami pagrindines tiesinės algebros operacijas.
+Jūs *turėtumėte* mokėti tai daryti.
+Bet kai jūsų modeliai taps sudėtingesni
+ir kai tai reikės daryti beveik kasdien,
+džiaugsitės pagalba.
+Situacija panaši į savo tinklaraščio kūrimą nuo nulio.
+Padaryti tai vieną ar du kartus yra naudinga ir pamokoma,
+bet būtumėte prastas interneto kūrėjas,
+jei mėnesį praleistumėte išradinėdami dviratį.
 
-For standard operations,
-we can [**use a framework's predefined layers,**]
-which allow us to focus
-on the layers used to construct the model
-rather than worrying about their implementation.
-Recall the architecture of a single-layer network
-as described in :numref:`fig_single_neuron`.
-The layer is called *fully connected*,
-since each of its inputs is connected
-to each of its outputs
-by means of a matrix--vector multiplication.
+Standartinėms operacijoms
+galime [**naudoti karkaso iš anksto apibrėžtus sluoksnius,**]
+kurie leidžia mums sutelkti dėmesį
+į modeliui sudaryti naudojamus sluoksnius,
+o ne rūpintis jų įgyvendinimu.
+Prisiminkite vieno sluoksnio tinklo architektūrą,
+aprašytą :numref:`fig_single_neuron`.
+Sluoksnis vadinamas *pilnai sujungtu*,
+nes kiekviena jo įvestis sujungta
+su kiekviena jo išvestimi
+per matricos ir vektoriaus daugybą.
 
 :begin_tab:`mxnet`
-In Gluon, the fully connected layer is defined in the `Dense` class.
-Since we only want to generate a single scalar output,
-we set that number to 1.
-It is worth noting that, for convenience,
-Gluon does not require us to specify
-the input shape for each layer.
-Hence we do not need to tell Gluon
-how many inputs go into this linear layer.
-When we first pass data through our model,
-e.g., when we execute `net(X)` later,
-Gluon will automatically infer the number of inputs to each layer and
-thus instantiate the correct model.
-We will describe how this works in more detail later.
+Gluon pilnai sujungtas sluoksnis apibrėžiamas klasėje `Dense`.
+Kadangi norime sugeneruoti tik vieną skaliarinę išvestį,
+tą skaičių nustatome lygų 1.
+Verta pažymėti, kad dėl patogumo
+Gluon nereikalauja, kad nurodytume
+kiekvieno sluoksnio įvesties formą.
+Todėl mums nereikia pasakyti Gluon,
+kiek įvesčių patenka į šį tiesinį sluoksnį.
+Kai pirmą kartą perduodame duomenis per savo modelį,
+pvz., kai vėliau vykdome `net(X)`,
+Gluon automatiškai nustatys kiekvieno sluoksnio įvesčių skaičių ir
+taip sukurs teisingą modelį.
+Kaip tai veikia, aprašysime išsamiau vėliau.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` classes (available since version 1.8.0). 
-The latter
-allows users to specify *merely*
-the output dimension,
-while the former
-additionally asks for
-how many inputs go into this layer.
-Specifying input shapes is inconvenient and may require nontrivial calculations
-(such as in convolutional layers).
-Thus, for simplicity, we will use such "lazy" layers
-whenever we can. 
+PyTorch pilnai sujungtas sluoksnis apibrėžiamas klasėse `Linear` ir `LazyLinear` (prieinamose nuo versijos 1.8.0).
+Pastaroji
+leidžia vartotojams nurodyti *tik*
+išvesties dimensiją,
+o pirmoji
+papildomai klausia,
+kiek įvesčių patenka į šį sluoksnį.
+Įvesties formų nurodymas yra nepatogus ir gali reikalauti netrivialių skaičiavimų
+(pvz., konvoliuciniuose sluoksniuose).
+Todėl dėl paprastumo, kai tik galėsime, naudosime tokius „tingius" sluoksnius.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In Keras, the fully connected layer is defined in the `Dense` class.
-Since we only want to generate a single scalar output,
-we set that number to 1.
-It is worth noting that, for convenience,
-Keras does not require us to specify
-the input shape for each layer.
-We do not need to tell Keras
-how many inputs go into this linear layer.
-When we first try to pass data through our model,
-e.g., when we execute `net(X)` later,
-Keras will automatically infer
-the number of inputs to each layer.
-We will describe how this works in more detail later.
+Keras pilnai sujungtas sluoksnis apibrėžiamas klasėje `Dense`.
+Kadangi norime sugeneruoti tik vieną skaliarinę išvestį,
+tą skaičių nustatome lygų 1.
+Verta pažymėti, kad dėl patogumo
+Keras nereikalauja, kad nurodytume
+kiekvieno sluoksnio įvesties formą.
+Mums nereikia pasakyti Keras,
+kiek įvesčių patenka į šį tiesinį sluoksnį.
+Kai pirmą kartą bandome perduoti duomenis per savo modelį,
+pvz., kai vėliau vykdome `net(X)`,
+Keras automatiškai nustatys
+kiekvieno sluoksnio įvesčių skaičių.
+Kaip tai veikia, aprašysime išsamiau vėliau.
 :end_tab:
 
 ```{.python .input}
@@ -172,7 +171,7 @@ class LinearRegression(d2l.Module):  #@save
         self.net = nn.Dense(1, kernel_init=nn.initializers.normal(0.01))
 ```
 
-In the `forward` method we just invoke the built-in `__call__` method of the predefined layers to compute the outputs.
+Metode `forward` tiesiog iškviečiame iš anksto apibrėžtų sluoksnių įtaisytąjį metodą `__call__`, kad apskaičiuotume išvestis.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -188,26 +187,26 @@ def forward(self, X):
     return self.net(X)
 ```
 
-## Defining the Loss Function
+## Nuostolių funkcijos apibrėžimas
 
 :begin_tab:`mxnet`
-The `loss` module defines many useful loss functions.
-For speed and convenience, we forgo implementing our own
-and choose the built-in `loss.L2Loss` instead.
-Because the `loss` that it returns is
-the squared error for each example,
-we use `mean`to average the loss across over the minibatch.
+Modulis `loss` apibrėžia daug naudingų nuostolių funkcijų.
+Dėl spartos ir patogumo atsisakome įgyvendinti savo
+ir vietoj to pasirenkame įtaisytąją `loss.L2Loss`.
+Kadangi jos grąžinami `loss` yra
+kiekvieno pavyzdžio kvadratinė paklaida,
+naudojame `mean`, kad suvidurkintume nuostolius per minirinkinį.
 :end_tab:
 
 :begin_tab:`pytorch`
-[**The `MSELoss` class computes the mean squared error (without the $1/2$ factor in :eqref:`eq_mse`).**]
-By default, `MSELoss` returns the average loss over examples.
-It is faster (and easier to use) than implementing our own.
+[**Klasė `MSELoss` apskaičiuoja vidutinę kvadratinę paklaidą (be $1/2$ daugiklio :eqref:`eq_mse`).**]
+Pagal numatytuosius nustatymus `MSELoss` grąžina vidutinius nuostolius per pavyzdžius.
+Tai greičiau (ir lengviau naudoti) nei įgyvendinti savo.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The `MeanSquaredError` class computes the mean squared error (without the $1/2$ factor in :eqref:`eq_mse`).
-By default, it returns the average loss over examples.
+Klasė `MeanSquaredError` apskaičiuoja vidutinę kvadratinę paklaidą (be $1/2$ daugiklio :eqref:`eq_mse`).
+Pagal numatytuosius nustatymus ji grąžina vidutinius nuostolius per pavyzdžius.
 :end_tab:
 
 ```{.python .input}
@@ -233,44 +232,44 @@ def loss(self, params, X, y, state):
     return d2l.reduce_mean(optax.l2_loss(y_hat, y))
 ```
 
-## Defining the Optimization Algorithm
+## Optimizavimo algoritmo apibrėžimas
 
 :begin_tab:`mxnet`
-Minibatch SGD is a standard tool
-for optimizing neural networks
-and thus Gluon supports it alongside a number of
-variations on this algorithm through its `Trainer` class.
-Note that Gluon's `Trainer` class stands
-for the optimization algorithm,
-while the `Trainer` class we created in :numref:`sec_oo-design`
-contains the training method,
-i.e., repeatedly call the optimizer
-to update the model parameters.
-When we instantiate `Trainer`,
-we specify the parameters to optimize over,
-obtainable from our model `net` via `net.collect_params()`,
-the optimization algorithm we wish to use (`sgd`),
-and a dictionary of hyperparameters
-required by our optimization algorithm.
+Minirinkinio SGD yra standartinė priemonė
+neuroniniams tinklams optimizuoti,
+todėl Gluon jį palaiko kartu su keliomis
+šio algoritmo variacijomis per savo klasę `Trainer`.
+Atkreipkite dėmesį, kad Gluon klasė `Trainer` reiškia
+optimizavimo algoritmą,
+o :numref:`sec_oo-design` sukurta klasė `Trainer`
+talpina apmokymo metodą,
+t. y. pakartotinai kviečia optimizatorių
+modelio parametrams atnaujinti.
+Kai kuriame `Trainer` egzempliorių,
+nurodome parametrus, kuriuos optimizuosime,
+gaunamus iš mūsų modelio `net` per `net.collect_params()`,
+optimizavimo algoritmą, kurį norime naudoti (`sgd`),
+ir hiperparametrų žodyną,
+reikalingą mūsų optimizavimo algoritmui.
 :end_tab:
 
 :begin_tab:`pytorch`
-Minibatch SGD is a standard tool
-for optimizing neural networks
-and thus PyTorch supports it alongside a number of
-variations on this algorithm in the `optim` module.
-When we (**instantiate an `SGD` instance,**)
-we specify the parameters to optimize over,
-obtainable from our model via `self.parameters()`,
-and the learning rate (`self.lr`)
-required by our optimization algorithm.
+Minirinkinio SGD yra standartinė priemonė
+neuroniniams tinklams optimizuoti,
+todėl PyTorch jį palaiko kartu su keliomis
+šio algoritmo variacijomis modulyje `optim`.
+Kai (**kuriame `SGD` egzempliorių,**)
+nurodome parametrus, kuriuos optimizuosime,
+gaunamus iš mūsų modelio per `self.parameters()`,
+ir mokymosi spartą (`self.lr`),
+reikalingą mūsų optimizavimo algoritmui.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Minibatch SGD is a standard tool
-for optimizing neural networks
-and thus Keras supports it alongside a number of
-variations on this algorithm in the `optimizers` module.
+Minirinkinio SGD yra standartinė priemonė
+neuroniniams tinklams optimizuoti,
+todėl Keras jį palaiko kartu su keliomis
+šio algoritmo variacijomis modulyje `optimizers`.
 :end_tab:
 
 ```{.python .input}
@@ -288,23 +287,23 @@ def configure_optimizers(self):
         return optax.sgd(self.lr)
 ```
 
-## Training
+## Apmokymas
 
-You might have noticed that expressing our model through
-high-level APIs of a deep learning framework
-requires fewer lines of code.
-We did not have to allocate parameters individually,
-define our loss function, or implement minibatch SGD.
-Once we start working with much more complex models,
-the advantages of the high-level API will grow considerably.
+Galbūt pastebėjote, kad modelio išreiškimas per
+giliojo mokymosi karkaso aukšto lygio API
+reikalauja mažiau kodo eilučių.
+Mums nereikėjo atskirai skirstyti parametrų,
+apibrėžti nuostolių funkcijos ar įgyvendinti minirinkinio SGD.
+Kai pradėsime dirbti su gerokai sudėtingesniais modeliais,
+aukšto lygio API pranašumai gerokai išaugs.
 
-Now that we have all the basic pieces in place,
-[**the training loop itself is the same
-as the one we implemented from scratch.**]
-So we just call the `fit` method (introduced in :numref:`oo-design-training`),
-which relies on the implementation of the `fit_epoch` method
-in :numref:`sec_linear_scratch`,
-to train our model.
+Dabar, kai turime visas pagrindines dalis,
+[**pats apmokymo ciklas yra toks pat,
+kaip ir įgyvendintasis nuo nulio.**]
+Todėl tiesiog iškviečiame metodą `fit` (pristatytą :numref:`oo-design-training`),
+kuris remiasi metodo `fit_epoch` įgyvendinimu
+:numref:`sec_linear_scratch`,
+kad apmokytume savo modelį.
 
 ```{.python .input}
 %%tab all
@@ -314,17 +313,17 @@ trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
 ```
 
-Below, we
-[**compare the model parameters learned
-by training on finite data
-and the actual parameters**]
-that generated our dataset.
-To access parameters,
-we access the weights and bias
-of the layer that we need.
-As in our implementation from scratch,
-note that our estimated parameters
-are close to their true counterparts.
+Žemiau
+[**palyginame modelio parametrus, išmoktus
+apmokant baigtiniuose duomenyse,
+su tikraisiais parametrais**],
+sugeneravusiais mūsų duomenų rinkinį.
+Parametrams pasiekti
+kreipiamės į reikiamo sluoksnio
+svorius ir poslinkį.
+Kaip ir įgyvendinime nuo nulio,
+atkreipkite dėmesį, kad mūsų įvertinti parametrai
+artimi tikriesiems.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -355,89 +354,88 @@ print(f'error in estimating w: {data.w - d2l.reshape(w, data.w.shape)}')
 print(f'error in estimating b: {data.b - b}')
 ```
 
-## Summary
+## Santrauka
 
-This section contains the first
-implementation of a deep network (in this book)
-to tap into the conveniences afforded
-by modern deep learning frameworks,
-such as MXNet :cite:`Chen.Li.Li.ea.2015`, 
-JAX :cite:`Frostig.Johnson.Leary.2018`, 
-PyTorch :cite:`Paszke.Gross.Massa.ea.2019`, 
-and Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
-We used framework defaults for loading data, defining a layer,
-a loss function, an optimizer and a training loop.
-Whenever the framework provides all necessary features,
-it is generally a good idea to use them,
-since the library implementations of these components
-tend to be heavily optimized for performance
-and properly tested for reliability.
-At the same time, try not to forget
-that these modules *can* be implemented directly.
-This is especially important for aspiring researchers
-who wish to live on the leading edge of model development,
-where you will be inventing new components
-that cannot possibly exist in any current library.
+Šiame skyrelyje yra pirmasis (šioje knygoje)
+gilaus tinklo įgyvendinimas, pasinaudojantis patogumais,
+kuriuos suteikia šiuolaikiniai giliojo mokymosi karkasai,
+tokie kaip MXNet :cite:`Chen.Li.Li.ea.2015`,
+JAX :cite:`Frostig.Johnson.Leary.2018`,
+PyTorch :cite:`Paszke.Gross.Massa.ea.2019`
+ir Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
+Duomenims įkelti, sluoksniui, nuostolių funkcijai, optimizatoriui ir apmokymo ciklui apibrėžti
+naudojome karkaso numatytuosius nustatymus.
+Kai tik karkasas pateikia visas reikalingas funkcijas,
+paprastai gera mintis jas naudoti,
+nes bibliotekų šių komponentų įgyvendinimai
+paprastai būna labai optimizuoti spartai
+ir tinkamai išbandyti patikimumui.
+Kartu stenkitės nepamiršti,
+kad šiuos modulius *galima* įgyvendinti tiesiogiai.
+Tai ypač svarbu siekiantiems tapti tyrėjais,
+norintiems būti modelių kūrimo priešakyje,
+kur išrasite naujų komponentų,
+kurių negali būti jokioje dabartinėje bibliotekoje.
 
 :begin_tab:`mxnet`
-In Gluon, the `data` module provides tools for data processing,
-the `nn` module defines a large number of neural network layers,
-and the `loss` module defines many common loss functions.
-Moreover, the `initializer` gives access
-to many choices for parameter initialization.
-Conveniently for the user,
-dimensionality and storage are automatically inferred.
-A consequence of this lazy initialization is that
-you must not attempt to access parameters
-before they have been instantiated (and initialized).
+Gluon modulis `data` teikia duomenų apdorojimo įrankius,
+modulis `nn` apibrėžia daugybę neuroninių tinklų sluoksnių,
+o modulis `loss` apibrėžia daug įprastų nuostolių funkcijų.
+Be to, `initializer` suteikia prieigą
+prie daugelio parametrų inicializavimo pasirinkimų.
+Vartotojui patogiai
+dimensija ir saugojimas nustatomi automatiškai.
+Šios tingios inicializacijos pasekmė yra ta,
+kad negalima bandyti pasiekti parametrų,
+kol jie nesukurti (ir neinicializuoti).
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the `data` module provides tools for data processing,
-the `nn` module defines a large number of neural network layers and common loss functions.
-We can initialize the parameters by replacing their values
-with methods ending with `_`.
-Note that we need to specify the input dimensions of the network.
-While this is trivial for now, it can have significant knock-on effects
-when we want to design complex networks with many layers.
-Careful considerations of how to parametrize these networks
-is needed to allow portability.
+PyTorch modulis `data` teikia duomenų apdorojimo įrankius,
+modulis `nn` apibrėžia daugybę neuroninių tinklų sluoksnių ir įprastų nuostolių funkcijų.
+Parametrus galime inicializuoti pakeisdami jų reikšmes
+metodais, kurių pavadinimas baigiasi `_`.
+Atkreipkite dėmesį, kad turime nurodyti tinklo įvesties dimensijas.
+Nors kol kas tai nesudėtinga, tai gali turėti reikšmingų grandininių pasekmių,
+kai norime suprojektuoti sudėtingus tinklus su daug sluoksnių.
+Norint užtikrinti perkeliamumą, reikia kruopščiai apsvarstyti,
+kaip parametrizuoti šiuos tinklus.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In TensorFlow, the `data` module provides tools for data processing,
-the `keras` module defines a large number of neural network layers and common loss functions.
-Moreover, the `initializers` module provides various methods for model parameter initialization.
-Dimensionality and storage for networks are automatically inferred
-(but be careful not to attempt to access parameters before they have been initialized).
+TensorFlow modulis `data` teikia duomenų apdorojimo įrankius,
+modulis `keras` apibrėžia daugybę neuroninių tinklų sluoksnių ir įprastų nuostolių funkcijų.
+Be to, modulis `initializers` teikia įvairius modelio parametrų inicializavimo metodus.
+Tinklų dimensija ir saugojimas nustatomi automatiškai
+(bet būkite atsargūs ir nebandykite pasiekti parametrų, kol jie neinicializuoti).
 :end_tab:
 
-## Exercises
+## Pratimai
 
-1. How would you need to change the learning rate if you replace the aggregate loss over the minibatch
-   with an average over the loss on the minibatch?
-1. Review the framework documentation to see which loss functions are provided. In particular,
-   replace the squared loss with Huber's robust loss function. That is, use the loss function
+1. Kaip reikėtų pakeisti mokymosi spartą, jei suminius nuostolius per minirinkinį
+   pakeistumėte nuostolių vidurkiu per minirinkinį?
+1. Peržiūrėkite karkaso dokumentaciją ir pažiūrėkite, kokios nuostolių funkcijos pateikiamos. Visų pirma
+   pakeiskite kvadratinius nuostolius Huberio robastine nuostolių funkcija. Tai yra, naudokite nuostolių funkciją
    $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \textrm{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \textrm{ otherwise}\end{cases}$$
-1. How do you access the gradient of the weights of the model?
-1. What is the effect on the solution if you change the learning rate and the number of epochs? Does it keep on improving?
-1. How does the solution change as you vary the amount of data generated?
-    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e., 5, 10, 20, 50, ..., 10,000 rather than 1000, 2000, ..., 10,000.
-    2. Why is the suggestion in the hint appropriate?
+1. Kaip pasiekti modelio svorių gradientą?
+1. Kokį poveikį sprendiniui turi mokymosi spartos ir epochų skaičiaus keitimas? Ar jis ir toliau gerėja?
+1. Kaip keičiasi sprendinys, keičiant sugeneruotų duomenų kiekį?
+    1. Nubraižykite įvertinimo paklaidą $\hat{\mathbf{w}} - \mathbf{w}$ ir $\hat{b} - b$ kaip duomenų kiekio funkciją. Užuomina: didinkite duomenų kiekį logaritmiškai, o ne tiesiškai, t. y. 5, 10, 20, 50, ..., 10 000, o ne 1000, 2000, ..., 10 000.
+    2. Kodėl užuominoje pateiktas patarimas yra tinkamas?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/44)
+[Diskusijos](https://discuss.d2l.ai/t/44)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/45)
+[Diskusijos](https://discuss.d2l.ai/t/45)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/204)
+[Diskusijos](https://discuss.d2l.ai/t/204)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17977)
+[Diskusijos](https://discuss.d2l.ai/t/17977)
 :end_tab:

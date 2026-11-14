@@ -3,30 +3,30 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Predicting House Prices on Kaggle
+# Namų kainų prognozavimas Kaggle platformoje
 :label:`sec_kaggle_house`
 
-Now that we have introduced some basic tools
-for building and training deep networks
-and regularizing them with techniques including
-weight decay and dropout,
-we are ready to put all this knowledge into practice
-by participating in a Kaggle competition.
-The house price prediction competition
-is a great place to start.
-The data is fairly generic and do not exhibit exotic structure
-that might require specialized models (as audio or video might).
-This dataset, collected by :citet:`De-Cock.2011`,
-covers house prices in Ames, Iowa from the period 2006--2010.
-It is considerably larger than the famous [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
-boasting both more examples and more features.
+Dabar, kai pristatėme keletą pagrindinių įrankių
+giliesiems tinklams kurti ir apmokyti
+bei reguliarizuoti juos tokiomis technikomis kaip
+svorių nykimas ir dropout,
+esame pasirengę visas šias žinias pritaikyti praktikoje,
+dalyvaudami Kaggle konkurse.
+Namų kainų prognozavimo konkursas
+yra puiki vieta pradėti.
+Duomenys gana bendri ir neturi egzotiškos struktūros,
+kuriai galėtų prireikti specializuotų modelių (kaip garso ar vaizdo įrašams).
+Šis duomenų rinkinys, surinktas :citet:`De-Cock.2011`,
+apima namų kainas Eimse, Ajovoje, 2006–2010 m. laikotarpiu.
+Jis yra gerokai didesnis nei garsusis Harrisono ir Rubinfeldo (1978) [Bostono būsto duomenų rinkinys](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names),
+turintis ir daugiau pavyzdžių, ir daugiau požymių.
 
 
-In this section, we will walk you through details of
-data preprocessing, model design, and hyperparameter selection.
-We hope that through a hands-on approach,
-you will gain some intuitions that will guide you
-in your career as a data scientist.
+Šiame skyrelyje išsamiai apžvelgsime
+duomenų išankstinį apdorojimą, modelio projektavimą ir hiperparametrų parinkimą.
+Tikimės, kad praktiniu metodu
+įgysite šiek tiek intuicijos, kuri padės jums
+duomenų mokslininko karjeroje.
 
 ```{.python .input}
 %%tab mxnet
@@ -66,14 +66,13 @@ import numpy as np
 import pandas as pd
 ```
 
-## Downloading Data
+## Duomenų atsisiuntimas
 
-Throughout the book, we will train and test models
-on various downloaded datasets.
-Here, we (**implement two utility functions**)
-for downloading and extracting zip or tar files.
-Again, we skip implementation details of
-such utility functions.
+Visoje knygoje apmokysime ir testuosime modelius
+su įvairiais atsisiųstais duomenų rinkiniais.
+Čia (**įgyvendiname dvi pagalbines funkcijas**)
+zip ar tar failams atsisiųsti ir išskleisti.
+Vėlgi, tokių pagalbinių funkcijų įgyvendinimo detales praleidžiame.
 
 ```{.python .input  n=2}
 %%tab all
@@ -86,72 +85,72 @@ def extract(filename, folder):
 
 ## Kaggle
 
-[Kaggle](https://www.kaggle.com) is a popular platform
-that hosts machine learning competitions.
-Each competition centers on a dataset and many
-are sponsored by stakeholders who offer prizes
-to the winning solutions.
-The platform helps users to interact
-via forums and shared code,
-fostering both collaboration and competition.
-While leaderboard chasing often spirals out of control,
-with researchers focusing myopically on preprocessing steps
-rather than asking fundamental questions,
-there is also tremendous value in the objectivity of a platform
-that facilitates direct quantitative comparisons
-among competing approaches as well as code sharing
-so that everyone can learn what did and did not work.
-If you want to participate in a Kaggle competition,
-you will first need to register for an account
-(see :numref:`fig_kaggle`).
+[Kaggle](https://www.kaggle.com) yra populiari platforma,
+kurioje vyksta mašininio mokymosi konkursai.
+Kiekvienas konkursas sukasi apie duomenų rinkinį, o daugelį
+remia suinteresuotosios šalys, siūlančios prizus
+laimėjusiems sprendimams.
+Platforma padeda naudotojams bendrauti
+per forumus ir bendrinamą kodą,
+skatindama ir bendradarbiavimą, ir konkurenciją.
+Nors lyderių lentelės vaikymasis dažnai nesuvaldomai išsiplečia,
+tyrėjams trumparegiškai susitelkus į išankstinio apdorojimo žingsnius,
+užuot kėlus esminius klausimus,
+taip pat yra didžiulė vertė platformos objektyvume,
+leidžiančiame tiesiogiai kiekybiškai palyginti
+konkuruojančius metodus ir dalytis kodu,
+kad kiekvienas galėtų išmokti, kas veikė ir kas neveikė.
+Jei norite dalyvauti Kaggle konkurse,
+pirmiausia turėsite užsiregistruoti ir susikurti paskyrą
+(žr. :numref:`fig_kaggle`).
 
-![The Kaggle website.](../img/kaggle.png)
+![Kaggle svetainė.](../img/kaggle.png)
 :width:`400px`
 :label:`fig_kaggle`
 
-On the house price prediction competition page, as illustrated
-in :numref:`fig_house_pricing`,
-you can find the dataset (under the "Data" tab),
-submit predictions, and see your ranking,
-The URL is right here:
+Namų kainų prognozavimo konkurso puslapyje, kaip parodyta
+:numref:`fig_house_pricing`,
+galite rasti duomenų rinkinį (skirtuke „Data“),
+pateikti prognozes ir pamatyti savo reitingą.
+URL yra čia:
 
 > https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 
-![The house price prediction competition page.](../img/house-pricing.png)
+![Namų kainų prognozavimo konkurso puslapis.](../img/house-pricing.png)
 :width:`400px`
 :label:`fig_house_pricing`
 
-## Accessing and Reading the Dataset
+## Duomenų rinkinio pasiekimas ir skaitymas
 
-Note that the competition data is separated
-into training and test sets.
-Each record includes the property value of the house
-and attributes such as street type, year of construction,
-roof type, basement condition, etc.
-The features consist of various data types.
-For example, the year of construction
-is represented by an integer,
-the roof type by discrete categorical assignments,
-and other features by floating point numbers.
-And here is where reality complicates things:
-for some examples, some data is altogether missing
-with the missing value marked simply as "na".
-The price of each house is included
-for the training set only
-(it is a competition after all).
-We will want to partition the training set
-to create a validation set,
-but we only get to evaluate our models on the official test set
-after uploading predictions to Kaggle.
-The "Data" tab on the competition tab
-in :numref:`fig_house_pricing`
-has links for downloading the data.
+Atkreipkite dėmesį, kad konkurso duomenys yra padalyti
+į apmokymo ir testavimo aibes.
+Kiekvienas įrašas apima namo nekilnojamojo turto vertę
+ir tokius atributus kaip gatvės tipas, statybos metai,
+stogo tipas, rūsio būklė ir kt.
+Požymiai sudaryti iš įvairių duomenų tipų.
+Pavyzdžiui, statybos metai
+pavaizduoti sveikuoju skaičiumi,
+stogo tipas – diskrečiais kategoriniais priskyrimais,
+o kiti požymiai – slankiojo kablelio skaičiais.
+Ir čia tikrovė viską sukomplikuoja:
+kai kuriems pavyzdžiams kai kurių duomenų visai trūksta,
+o trūkstama reikšmė tiesiog pažymėta „na“.
+Kiekvieno namo kaina pateikta
+tik apmokymo aibei
+(juk tai konkursas).
+Norėsime padalyti apmokymo aibę,
+kad sukurtume validavimo aibę,
+bet savo modelius oficialioje testavimo aibėje galime įvertinti tik
+įkėlę prognozes į Kaggle.
+Konkurso skirtuke „Data“,
+:numref:`fig_house_pricing`,
+yra nuorodos duomenims atsisiųsti.
 
-To get started, we will [**read in and process the data
-using `pandas`**], which we introduced in :numref:`sec_pandas`.
-For convenience, we can download and cache
-the Kaggle housing dataset.
-If a file corresponding to this dataset already exists in the cache directory and its SHA-1 matches `sha1_hash`, our code will use the cached file to avoid clogging up your Internet with redundant downloads.
+Pradėdami, [**nuskaitysime ir apdorosime duomenis
+naudodami `pandas`**], kurį pristatėme :numref:`sec_pandas`.
+Patogumo dėlei galime atsisiųsti ir išsaugoti talpykloje
+Kaggle būsto duomenų rinkinį.
+Jei failas, atitinkantis šį duomenų rinkinį, jau egzistuoja talpyklos kataloge ir jo SHA-1 atitinka `sha1_hash`, mūsų kodas naudos talpykloje esantį failą, kad neužkimštų jūsų interneto nereikalingais atsisiuntimais.
 
 ```{.python .input  n=30}
 %%tab all
@@ -168,9 +167,9 @@ class KaggleHouse(d2l.DataModule):
                 sha1_hash='fa19780a7b011d9b009e8bff8e99922a8ee2eb90'))
 ```
 
-The training dataset includes 1460 examples,
-80 features, and one label, while the validation data
-contains 1459 examples and 80 features.
+Apmokymo duomenų rinkinyje yra 1460 pavyzdžių,
+80 požymių ir vienas žymuo, o validavimo duomenyse
+yra 1459 pavyzdžiai ir 80 požymių.
 
 ```{.python .input  n=31}
 %%tab all
@@ -179,62 +178,62 @@ print(data.raw_train.shape)
 print(data.raw_val.shape)
 ```
 
-## Data Preprocessing
+## Duomenų išankstinis apdorojimas
 
-Let's [**take a look at the first four and final two features
-as well as the label (SalePrice)**] from the first four examples.
+Pažvelkime į [**pirmus keturis ir paskutinius du požymius
+bei žymenį (SalePrice)**] iš pirmųjų keturių pavyzdžių.
 
 ```{.python .input  n=10}
 %%tab all
 print(data.raw_train.iloc[:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
-We can see that in each example, the first feature is the identifier.
-This helps the model determine each training example.
-While this is convenient, it does not carry
-any information for prediction purposes.
-Hence, we will remove it from the dataset
-before feeding the data into the model.
-Furthermore, given a wide variety of data types,
-we will need to preprocess the data before we can start modeling.
+Matome, kad kiekviename pavyzdyje pirmasis požymis yra identifikatorius.
+Tai padeda modeliui atpažinti kiekvieną apmokymo pavyzdį.
+Nors tai patogu, prognozavimo tikslais
+jis neneša jokios informacijos.
+Todėl pašalinsime jį iš duomenų rinkinio
+prieš paduodami duomenis į modelį.
+Be to, turint daugybę duomenų tipų,
+turėsime apdoroti duomenis prieš pradėdami modeliuoti.
 
 
-Let's start with the numerical features.
-First, we apply a heuristic,
-[**replacing all missing values
-by the corresponding feature's mean.**]
-Then, to put all features on a common scale,
-we (***standardize* the data by
-rescaling features to zero mean and unit variance**):
+Pradėkime nuo skaitinių požymių.
+Pirmiausia taikome euristiką,
+[**pakeisdami visas trūkstamas reikšmes
+atitinkamo požymio vidurkiu.**]
+Tada, kad visus požymius suvestume į bendrą mastelį,
+(***standartizuojame* duomenis,
+perskalindami požymius iki nulinio vidurkio ir vienetinės dispersijos**):
 
 $$x \leftarrow \frac{x - \mu}{\sigma},$$
 
-where $\mu$ and $\sigma$ denote mean and standard deviation, respectively.
-To verify that this indeed transforms
-our feature (variable) such that it has zero mean and unit variance,
-note that $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
-and that $E[(x-\mu)^2] = (\sigma^2 + \mu^2) - 2\mu^2+\mu^2 = \sigma^2$.
-Intuitively, we standardize the data
-for two reasons.
-First, it proves convenient for optimization.
-Second, because we do not know *a priori*
-which features will be relevant,
-we do not want to penalize coefficients
-assigned to one feature more than any other.
+kur $\mu$ ir $\sigma$ atitinkamai žymi vidurkį ir standartinį nuokrypį.
+Kad patikrintume, jog tai iš tiesų transformuoja
+mūsų požymį (kintamąjį) taip, kad jis turėtų nulinį vidurkį ir vienetinę dispersiją,
+pastebėkime, kad $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
+ir kad $E[(x-\mu)^2] = (\sigma^2 + \mu^2) - 2\mu^2+\mu^2 = \sigma^2$.
+Intuityviai duomenis standartizuojame
+dėl dviejų priežasčių.
+Pirma, tai patogu optimizavimui.
+Antra, kadangi iš anksto nežinome,
+kurie požymiai bus svarbūs,
+nenorime labiau bausti koeficientų,
+priskirtų vienam požymiui, nei bet kuriam kitam.
 
-[**Next we deal with discrete values.**]
-These include features such as "MSZoning".
-(**We replace them by a one-hot encoding**)
-in the same way that we earlier transformed
-multiclass labels into vectors (see :numref:`subsec_classification-problem`).
-For instance, "MSZoning" assumes the values "RL" and "RM".
-Dropping the "MSZoning" feature,
-two new indicator features
-"MSZoning_RL" and "MSZoning_RM" are created with values being either 0 or 1.
-According to one-hot encoding,
-if the original value of "MSZoning" is "RL",
-then "MSZoning_RL" is 1 and "MSZoning_RM" is 0.
-The `pandas` package does this automatically for us.
+[**Toliau tvarkomės su diskrečiomis reikšmėmis.**]
+Tai apima tokius požymius kaip „MSZoning“.
+(**Pakeičiame jas vieno karšto kodavimu (angl. *one-hot*)**)
+taip pat, kaip anksčiau transformavome
+daugiaklasius žymenis į vektorius (žr. :numref:`subsec_classification-problem`).
+Pavyzdžiui, „MSZoning“ įgyja reikšmes „RL“ ir „RM“.
+Pašalinus požymį „MSZoning“,
+sukuriami du nauji indikatoriniai požymiai
+„MSZoning_RL“ ir „MSZoning_RM“ su reikšmėmis 0 arba 1.
+Pagal vieno karšto kodavimą,
+jei pradinė „MSZoning“ reikšmė yra „RL“,
+tada „MSZoning_RL“ yra 1, o „MSZoning_RM“ yra 0.
+Paketas `pandas` tai atlieka automatiškai.
 
 ```{.python .input  n=32}
 %%tab all
@@ -259,8 +258,8 @@ def preprocess(self):
     self.val = features[self.raw_train.shape[0]:].copy()
 ```
 
-You can see that this conversion increases
-the number of features from 79 to 331 (excluding ID and label columns).
+Matote, kad ši konversija padidina
+požymių skaičių nuo 79 iki 331 (neįskaitant ID ir žymens stulpelių).
 
 ```{.python .input  n=33}
 %%tab all
@@ -268,32 +267,32 @@ data.preprocess()
 data.train.shape
 ```
 
-## Error Measure
+## Paklaidos matas
 
-To get started we will train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it does provide a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
+Pradžiai apmokysime tiesinį modelį su kvadratiniais nuostoliais. Nenuostabu, kad mūsų tiesinis modelis nepaskatins konkursą laimėsiančio pateikimo, bet jis suteikia sveiko proto patikrą, ar duomenyse yra prasmingos informacijos. Jei čia negalime pasiekti geresnio rezultato nei atsitiktinis spėliojimas, tuomet gali būti didelė tikimybė, kad turime duomenų apdorojimo klaidą. O jei viskas veikia, tiesinis modelis bus atskaitos taškas, suteikiantis šiek tiek intuicijos, kaip arti geriausių pateiktų modelių priartėja paprastas modelis, ir leisiantis suprasti, kokio laimėjimo galime tikėtis iš įmantresnių modelių.
 
-With house prices, as with stock prices,
-we care about relative quantities
-more than absolute quantities.
-Thus [**we tend to care more about
-the relative error $\frac{y - \hat{y}}{y}$**]
-than about the absolute error $y - \hat{y}$.
-For instance, if our prediction is off by \$100,000
-when estimating the price of a house in rural Ohio,
-where the value of a typical house is \$125,000,
-then we are probably doing a horrible job.
-On the other hand, if we err by this amount
-in Los Altos Hills, California,
-this might represent a stunningly accurate prediction
-(there, the median house price exceeds \$4 million).
+Su namų kainomis, kaip ir su akcijų kainomis,
+labiau rūpi santykiniai dydžiai
+nei absoliutūs dydžiai.
+Taigi [**mums labiau rūpi
+santykinė paklaida $\frac{y - \hat{y}}{y}$**]
+nei absoliutinė paklaida $y - \hat{y}$.
+Pavyzdžiui, jei mūsų prognozė klysta \$100 000,
+įvertinant namo kainą kaimiškame Ohajuje,
+kur tipinio namo vertė yra \$125 000,
+tai greičiausiai dirbame siaubingai.
+Kita vertus, jei tokiu dydžiu suklystume
+Los Altos Hilse, Kalifornijoje,
+tai galėtų reikšti stulbinamai tikslią prognozę
+(ten medianinė namo kaina viršija \$4 milijonus).
 
-(**One way to address this problem is to
-measure the discrepancy in the logarithm of the price estimates.**)
-In fact, this is also the official error measure
-used by the competition to evaluate the quality of submissions.
-After all, a small value $\delta$ for $|\log y - \log \hat{y}| \leq \delta$
-translates into $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
-This leads to the following root-mean-squared-error between the logarithm of the predicted price and the logarithm of the label price:
+(**Vienas būdas spręsti šią problemą yra
+matuoti neatitikimą kainų įverčių logaritme.**)
+Iš tiesų tai taip pat yra oficialus paklaidos matas,
+kurį konkursas naudoja pateikimų kokybei vertinti.
+Juk maža reikšmė $\delta$, kai $|\log y - \log \hat{y}| \leq \delta$,
+virsta $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
+Tai veda prie tokios šaknies iš vidutinės kvadratinės paklaidos tarp prognozuojamos kainos logaritmo ir žymens kainos logaritmo:
 
 $$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
@@ -312,23 +311,23 @@ def get_dataloader(self, train):
     return self.get_tensorloader(tensors, train)
 ```
 
-## $K$-Fold Cross-Validation
+## $K$ dalių kryžminis validavimas
 
-You might recall that we introduced [**cross-validation**]
-in :numref:`subsec_generalization-model-selection`, where we discussed how to deal
-with model selection.
-We will put this to good use to select the model design
-and to adjust the hyperparameters.
-We first need a function that returns
-the $i^\textrm{th}$ fold of the data
-in a $K$-fold cross-validation procedure.
-It proceeds by slicing out the $i^\textrm{th}$ segment
-as validation data and returning the rest as training data.
-Note that this is not the most efficient way of handling data
-and we would definitely do something much smarter
-if our dataset was considerably larger.
-But this added complexity might obfuscate our code unnecessarily
-so we can safely omit it here owing to the simplicity of our problem.
+Galbūt prisimenate, kad [**kryžminį validavimą**] pristatėme
+:numref:`subsec_generalization-model-selection`, kur aptarėme, kaip spręsti
+modelio parinkimo klausimus.
+Tai gerai panaudosime modelio dizainui parinkti
+ir hiperparametrams reguliuoti.
+Pirmiausia mums reikia funkcijos, kuri grąžina
+$i$-ąją duomenų dalį
+$K$ dalių kryžminio validavimo procedūroje.
+Ji veikia išpjaudama $i$-ąjį segmentą
+kaip validavimo duomenis, o likusius grąžindama kaip apmokymo duomenis.
+Atkreipkite dėmesį, kad tai nėra efektyviausias būdas tvarkyti duomenis,
+ir tikrai darytume ką nors daug gudresnio,
+jei mūsų duomenų rinkinys būtų gerokai didesnis.
+Bet šis papildomas sudėtingumas galėtų be reikalo užgožti mūsų kodą,
+todėl dėl mūsų problemos paprastumo čia galime saugiai jo atsisakyti.
 
 ```{.python .input}
 %%tab all
@@ -342,8 +341,8 @@ def k_fold_data(data, k):
     return rets
 ```
 
-[**The average validation error is returned**]
-when we train $K$ times in the $K$-fold cross-validation.
+[**Vidutinė validavimo paklaida grąžinama**],
+kai apmokome $K$ kartų $K$ dalių kryžminiame validavime.
 
 ```{.python .input}
 %%tab all
@@ -360,19 +359,19 @@ def k_fold(trainer, data, k, lr):
     return models
 ```
 
-## [**Model Selection**]
+## [**Modelio parinkimas**]
 
-In this example, we pick an untuned set of hyperparameters
-and leave it up to the reader to improve the model.
-Finding a good choice can take time,
-depending on how many variables one optimizes over.
-With a large enough dataset,
-and the normal sorts of hyperparameters,
-$K$-fold cross-validation tends to be
-reasonably resilient against multiple testing.
-However, if we try an unreasonably large number of options
-we might find that our validation
-performance is no longer representative of the true error.
+Šiame pavyzdyje pasirenkame nesuderintą hiperparametrų rinkinį
+ir paliekame skaitytojui patobulinti modelį.
+Rasti gerą pasirinkimą gali užtrukti,
+priklausomai nuo to, per kiek kintamųjų optimizuojama.
+Turint pakankamai didelį duomenų rinkinį
+ir įprastų tipų hiperparametrus,
+$K$ dalių kryžminis validavimas paprastai yra
+pakankamai atsparus daugkartiniam testavimui.
+Tačiau jei išbandytume nepagrįstai didelį variantų skaičių,
+galime pamatyti, kad mūsų validavimo
+našumas nebeatspindi tikrosios paklaidos.
 
 ```{.python .input}
 %%tab all
@@ -380,26 +379,26 @@ trainer = d2l.Trainer(max_epochs=10)
 models = k_fold(trainer, data, k=5, lr=0.01)
 ```
 
-Notice that sometimes the number of training errors
-for a set of hyperparameters can be very low,
-even as the number of errors on $K$-fold cross-validation
-grows considerably higher.
-This indicates that we are overfitting.
-Throughout training you will want to monitor both numbers.
-Less overfitting might indicate that our data can support a more powerful model.
-Massive overfitting might suggest that we can gain
-by incorporating regularization techniques.
+Atkreipkite dėmesį, kad kartais apmokymo paklaidų skaičius
+tam tikram hiperparametrų rinkiniui gali būti labai mažas,
+net kai $K$ dalių kryžminio validavimo klaidų skaičius
+auga gerokai didesnis.
+Tai rodo, kad persimokome.
+Viso apmokymo metu norėsite stebėti abu skaičius.
+Mažesnis persimokymas gali rodyti, kad mūsų duomenys gali palaikyti galingesnį modelį.
+Didžiulis persimokymas gali rodyti, kad galime laimėti,
+įtraukdami reguliarizavimo technikas.
 
-##  [**Submitting Predictions on Kaggle**]
+##  [**Prognozių pateikimas Kaggle platformoje**]
 
-Now that we know what a good choice of hyperparameters should be,
-we might 
-calculate the average predictions 
-on the test set
-by all the $K$ models.
-Saving the predictions in a csv file
-will simplify uploading the results to Kaggle.
-The following code will generate a file called `submission.csv`.
+Dabar, kai žinome, koks turėtų būti geras hiperparametrų pasirinkimas,
+galime
+apskaičiuoti vidutines prognozes
+testavimo aibėje
+iš visų $K$ modelių.
+Prognozių išsaugojimas csv faile
+supaprastins rezultatų įkėlimą į Kaggle.
+Šis kodas sugeneruos failą, vadinamą `submission.csv`.
 
 ```{.python .input}
 %%tab all
@@ -417,55 +416,55 @@ submission = pd.DataFrame({'Id':data.raw_val.Id,
 submission.to_csv('submission.csv', index=False)
 ```
 
-Next, as demonstrated in :numref:`fig_kaggle_submit2`,
-we can submit our predictions on Kaggle
-and see how they compare with the actual house prices (labels)
-on the test set.
-The steps are quite simple:
+Toliau, kaip parodyta :numref:`fig_kaggle_submit2`,
+galime pateikti savo prognozes Kaggle
+ir pamatyti, kaip jos palyginamos su tikrosiomis namų kainomis (žymenimis)
+testavimo aibėje.
+Žingsniai gana paprasti:
 
-* Log in to the Kaggle website and visit the house price prediction competition page.
-* Click the “Submit Predictions” or “Late Submission” button.
-* Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.
-* Click the “Make Submission” button at the bottom of the page to view your results.
+* Prisijunkite prie Kaggle svetainės ir apsilankykite namų kainų prognozavimo konkurso puslapyje.
+* Spustelėkite mygtuką „Submit Predictions“ arba „Late Submission“.
+* Spustelėkite mygtuką „Upload Submission File“ punktyriniame langelyje puslapio apačioje ir pasirinkite prognozių failą, kurį norite įkelti.
+* Spustelėkite mygtuką „Make Submission“ puslapio apačioje, kad pamatytumėte savo rezultatus.
 
-![Submitting data to Kaggle.](../img/kaggle-submit2.png)
+![Duomenų pateikimas Kaggle.](../img/kaggle-submit2.png)
 :width:`400px`
 :label:`fig_kaggle_submit2`
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-Real data often contains a mix of different data types and needs to be preprocessed.
-Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
-Furthermore, transforming categorical features into indicator features allows us to treat them like one-hot vectors.
-When we tend to care more about
-the relative error than about the absolute error,
-we can 
-measure the discrepancy in the logarithm of the prediction.
-To select the model and adjust the hyperparameters,
-we can use $K$-fold cross-validation .
+Tikri duomenys dažnai turi įvairių duomenų tipų mišinį ir juos reikia apdoroti iš anksto.
+Realiųjų verčių duomenų perskalinimas iki nulinio vidurkio ir vienetinės dispersijos yra geras numatytasis sprendimas. Kaip ir trūkstamų reikšmių pakeitimas jų vidurkiu.
+Be to, kategorinių požymių transformavimas į indikatorinius požymius leidžia traktuoti juos kaip vieno karšto vektorius.
+Kai labiau rūpi
+santykinė, o ne absoliutinė paklaida,
+galime
+matuoti neatitikimą prognozės logaritme.
+Modeliui parinkti ir hiperparametrams reguliuoti
+galime naudoti $K$ dalių kryžminį validavimą.
 
 
 
-## Exercises
+## Pratimai
 
-1. Submit your predictions for this section to Kaggle. How good are they?
-1. Is it always a good idea to replace missing values by a mean? Hint: can you construct a situation where the values are not missing at random?
-1. Improve the score by tuning the hyperparameters through $K$-fold cross-validation.
-1. Improve the score by improving the model (e.g., layers, weight decay, and dropout).
-1. What happens if we do not standardize the continuous numerical features as we have done in this section?
+1. Pateikite šio skyrelio prognozes Kaggle platformai. Kokios jos geros?
+1. Ar visada gera idėja pakeisti trūkstamas reikšmes vidurkiu? Užuomina: ar galite sukonstruoti situaciją, kai reikšmės trūksta ne atsitiktinai?
+1. Pagerinkite rezultatą suderindami hiperparametrus per $K$ dalių kryžminį validavimą.
+1. Pagerinkite rezultatą tobulindami modelį (pvz., sluoksnius, svorių nykimą ir dropout).
+1. Kas nutinka, jei nestandartizuojame tolydžiųjų skaitinių požymių, kaip tai darėme šiame skyrelyje?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/106)
+[Diskusijos](https://discuss.d2l.ai/t/106)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/107)
+[Diskusijos](https://discuss.d2l.ai/t/107)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/237)
+[Diskusijos](https://discuss.d2l.ai/t/237)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17988)
+[Diskusijos](https://discuss.d2l.ai/t/17988)
 :end_tab:

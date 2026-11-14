@@ -3,84 +3,84 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# GPUs
+# GPU
 :label:`sec_use_gpu`
 
-In :numref:`tab_intro_decade`, we illustrated the rapid growth
-of computation over the past two decades.
-In a nutshell, GPU performance has increased
-by a factor of 1000 every decade since 2000.
-This offers great opportunities but it also suggests
-that there was significant demand for such performance.
+:numref:`tab_intro_decade` iliustravome spartų skaičiavimų augimą
+per pastaruosius du dešimtmečius.
+Trumpai tariant, GPU našumas nuo 2000 m. išaugo
+1000 kartų kas dešimtmetį.
+Tai suteikia puikių galimybių, bet taip pat rodo,
+kad tokio našumo poreikis buvo didelis.
 
 
-In this section, we begin to discuss how to harness
-this computational performance for your research.
-First by using a single GPU and at a later point,
-how to use multiple GPUs and multiple servers (with multiple GPUs).
+Šiame skyrelyje pradedame aptarti, kaip pasinaudoti
+šiuo skaičiavimo našumu savo tyrimams.
+Pirmiausia naudojant vieną GPU, o vėliau –
+kaip naudoti kelis GPU ir kelis serverius (su keliais GPU).
 
-Specifically, we will discuss how
-to use a single NVIDIA GPU for calculations.
-First, make sure you have at least one NVIDIA GPU installed.
-Then, download the [NVIDIA driver and CUDA](https://developer.nvidia.com/cuda-downloads)
-and follow the prompts to set the appropriate path.
-Once these preparations are complete,
-the `nvidia-smi` command can be used
-to (**view the graphics card information**).
+Konkrečiai, aptarsime, kaip
+skaičiavimams naudoti vieną NVIDIA GPU.
+Pirmiausia įsitikinkite, kad turite įdiegtą bent vieną NVIDIA GPU.
+Tada atsisiųskite [NVIDIA tvarkyklę ir CUDA](https://developer.nvidia.com/cuda-downloads)
+ir vykdykite nurodymus, kad nustatytumėte tinkamą kelią.
+Kai šie pasiruošimai baigti,
+komandą `nvidia-smi` galima naudoti
+(**vaizdo plokštės informacijai peržiūrėti**).
 
 :begin_tab:`mxnet`
-You might have noticed that a MXNet tensor
-looks almost identical to a NumPy `ndarray`.
-But there are a few crucial differences.
-One of the key features that distinguishes MXNet
-from NumPy is its support for diverse hardware devices.
+Galbūt pastebėjote, kad MXNet tenzorius
+atrodo beveik identiškai kaip NumPy `ndarray`.
+Bet yra keletas esminių skirtumų.
+Viena pagrindinių savybių, išskiriančių MXNet
+iš NumPy, yra jo palaikymas įvairiems aparatinės įrangos įrenginiams.
 
-In MXNet, every array has a context.
-So far, by default, all variables
-and associated computation
-have been assigned to the CPU.
-Typically, other contexts might be various GPUs.
-Things can get even hairier when
-we deploy jobs across multiple servers.
-By assigning arrays to contexts intelligently,
-we can minimize the time spent
-transferring data between devices.
-For example, when training neural networks on a server with a GPU,
-we typically prefer for the model's parameters to live on the GPU.
+MXNet kiekvienas masyvas turi kontekstą.
+Iki šiol pagal numatytuosius nustatymus visi kintamieji
+ir su jais susiję skaičiavimai
+buvo priskirti CPU.
+Paprastai kiti kontekstai gali būti įvairūs GPU.
+Dalykai gali tapti dar sudėtingesni, kai
+užduotis diegiame keliuose serveriuose.
+Protingai priskirdami masyvus kontekstams,
+galime sumažinti laiką, praleidžiamą
+perduodant duomenis tarp įrenginių.
+Pavyzdžiui, apmokant neuroninius tinklus serveryje su GPU,
+paprastai norime, kad modelio parametrai būtų GPU.
 
-Next, we need to confirm that
-the GPU version of MXNet is installed.
-If a CPU version of MXNet is already installed,
-we need to uninstall it first.
-For example, use the `pip uninstall mxnet` command,
-then install the corresponding MXNet version
-according to your CUDA version.
-Assuming you have CUDA 10.0 installed,
-you can install the MXNet version
-that supports CUDA 10.0 via `pip install mxnet-cu100`.
+Toliau turime patvirtinti, kad
+įdiegta GPU MXNet versija.
+Jei jau įdiegta CPU MXNet versija,
+pirmiausia turime ją pašalinti.
+Pavyzdžiui, naudokite komandą `pip uninstall mxnet`,
+tada įdiekite atitinkamą MXNet versiją
+pagal savo CUDA versiją.
+Tarkime, kad turite įdiegtą CUDA 10.0,
+galite įdiegti MXNet versiją,
+palaikančią CUDA 10.0, per `pip install mxnet-cu100`.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, every array has a device; we often refer it as a *context*.
-So far, by default, all variables
-and associated computation
-have been assigned to the CPU.
-Typically, other contexts might be various GPUs.
-Things can get even hairier when
-we deploy jobs across multiple servers.
-By assigning arrays to contexts intelligently,
-we can minimize the time spent
-transferring data between devices.
-For example, when training neural networks on a server with a GPU,
-we typically prefer for the model's parameters to live on the GPU.
+PyTorch kiekvienas masyvas turi įrenginį; dažnai vadiname jį *kontekstu*.
+Iki šiol pagal numatytuosius nustatymus visi kintamieji
+ir su jais susiję skaičiavimai
+buvo priskirti CPU.
+Paprastai kiti kontekstai gali būti įvairūs GPU.
+Dalykai gali tapti dar sudėtingesni, kai
+užduotis diegiame keliuose serveriuose.
+Protingai priskirdami masyvus kontekstams,
+galime sumažinti laiką, praleidžiamą
+perduodant duomenis tarp įrenginių.
+Pavyzdžiui, apmokant neuroninius tinklus serveryje su GPU,
+paprastai norime, kad modelio parametrai būtų GPU.
 :end_tab:
 
-To run the programs in this section,
-you need at least two GPUs.
-Note that this might be extravagant for most desktop computers
-but it is easily available in the cloud, e.g.,
-by using the AWS EC2 multi-GPU instances.
-Almost all other sections do *not* require multiple GPUs, but here we simply wish to illustrate data flow between different devices.
+Kad paleistumėte šiame skyrelyje pateiktas programas,
+jums reikia bent dviejų GPU.
+Atkreipkite dėmesį, kad daugumai stalinių kompiuterių tai gali būti ištaiginga,
+bet debesyje tai lengvai prieinama, pvz.,
+naudojant AWS EC2 kelių GPU egzempliorius.
+Beveik visiems kitiems skyreliams kelių GPU *nereikia*, bet čia tiesiog norime iliustruoti duomenų srautą tarp skirtingų įrenginių.
 
 ```{.python .input}
 %%tab mxnet
@@ -111,38 +111,38 @@ import jax
 from jax import numpy as jnp
 ```
 
-## [**Computing Devices**]
+## [**Skaičiavimo įrenginiai**]
 
-We can specify devices, such as CPUs and GPUs,
-for storage and calculation.
-By default, tensors are created in the main memory
-and then the CPU is used for calculations.
+Saugojimui ir skaičiavimui galime nurodyti įrenginius,
+tokius kaip CPU ir GPU.
+Pagal numatytuosius nustatymus tenzoriai sukuriami pagrindinėje atmintyje,
+o skaičiavimams naudojamas CPU.
 
 :begin_tab:`mxnet`
-In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`.
-It should be noted that `cpu()`
-(or any integer in the parentheses)
-means all physical CPUs and memory.
-This means that MXNet's calculations
-will try to use all CPU cores.
-However, `gpu()` only represents one card
-and the corresponding memory.
-If there are multiple GPUs, we use `gpu(i)`
-to represent the $i^\textrm{th}$ GPU ($i$ starts from 0).
-Also, `gpu(0)` and `gpu()` are equivalent.
+MXNet CPU ir GPU galima nurodyti per `cpu()` ir `gpu()`.
+Reikia pažymėti, kad `cpu()`
+(ar bet koks sveikasis skaičius skliausteliuose)
+reiškia visus fizinius CPU ir atmintį.
+Tai reiškia, kad MXNet skaičiavimai
+bandys naudoti visus CPU branduolius.
+Tačiau `gpu()` atstovauja tik vieną plokštę
+ir atitinkamą atmintį.
+Jei yra keli GPU, naudojame `gpu(i)`
+$i$-ajam GPU atvaizduoti ($i$ prasideda nuo 0).
+Taip pat `gpu(0)` ir `gpu()` yra ekvivalentūs.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the CPU and GPU can be indicated by `torch.device('cpu')` and `torch.device('cuda')`.
-It should be noted that the `cpu` device
-means all physical CPUs and memory.
-This means that PyTorch's calculations
-will try to use all CPU cores.
-However, a `gpu` device only represents one card
-and the corresponding memory.
-If there are multiple GPUs, we use `torch.device(f'cuda:{i}')`
-to represent the $i^\textrm{th}$ GPU ($i$ starts at 0).
-Also, `gpu:0` and `gpu` are equivalent.
+PyTorch CPU ir GPU galima nurodyti per `torch.device('cpu')` ir `torch.device('cuda')`.
+Reikia pažymėti, kad `cpu` įrenginys
+reiškia visus fizinius CPU ir atmintį.
+Tai reiškia, kad PyTorch skaičiavimai
+bandys naudoti visus CPU branduolius.
+Tačiau `gpu` įrenginys atstovauja tik vieną plokštę
+ir atitinkamą atmintį.
+Jei yra keli GPU, naudojame `torch.device(f'cuda:{i}')`
+$i$-ajam GPU atvaizduoti ($i$ prasideda nuo 0).
+Taip pat `gpu:0` ir `gpu` yra ekvivalentūs.
 :end_tab:
 
 ```{.python .input}
@@ -181,7 +181,7 @@ def gpu(i=0):  #@save
 cpu(), gpu(), gpu(1)
 ```
 
-We can (**query the number of available GPUs.**)
+Galime (**užklausti turimų GPU skaičiaus.**)
 
 ```{.python .input}
 %%tab pytorch
@@ -209,8 +209,8 @@ def num_gpus():  #@save
 num_gpus()
 ```
 
-Now we [**define two convenient functions that allow us
-to run code even if the requested GPUs do not exist.**]
+Dabar [**apibrėžiame dvi patogias funkcijas, leidžiančias
+vykdyti kodą net jei prašomų GPU nėra.**]
 
 ```{.python .input}
 %%tab all
@@ -227,22 +227,22 @@ def try_all_gpus():  #@save
 try_gpu(), try_gpu(10), try_all_gpus()
 ```
 
-## Tensors and GPUs
+## Tenzoriai ir GPU
 
 :begin_tab:`pytorch`
-By default, tensors are created on the CPU.
-We can [**query the device where the tensor is located.**]
+Pagal numatytuosius nustatymus tenzoriai sukuriami CPU.
+Galime [**užklausti įrenginio, kuriame yra tenzorius.**]
 :end_tab:
 
 :begin_tab:`mxnet`
-By default, tensors are created on the CPU.
-We can [**query the device where the tensor is located.**]
+Pagal numatytuosius nustatymus tenzoriai sukuriami CPU.
+Galime [**užklausti įrenginio, kuriame yra tenzorius.**]
 :end_tab:
 
 :begin_tab:`tensorflow, jax`
-By default, tensors are created on the GPU/TPU if they are available,
-else CPU is used if not available.
-We can [**query the device where the tensor is located.**]
+Pagal numatytuosius nustatymus tenzoriai sukuriami GPU/TPU, jei jie yra,
+o jei jų nėra, naudojamas CPU.
+Galime [**užklausti įrenginio, kuriame yra tenzorius.**]
 :end_tab:
 
 ```{.python .input}
@@ -269,23 +269,23 @@ x = jnp.array([1, 2, 3])
 x.device()
 ```
 
-It is important to note that whenever we want
-to operate on multiple terms,
-they need to be on the same device.
-For instance, if we sum two tensors,
-we need to make sure that both arguments
-live on the same device---otherwise the framework
-would not know where to store the result
-or even how to decide where to perform the computation.
+Svarbu atkreipti dėmesį, kad kai tik norime
+operuoti keliais nariais,
+jie turi būti tame pačiame įrenginyje.
+Pavyzdžiui, jei sudedame du tenzorius,
+turime užtikrinti, kad abu argumentai
+yra tame pačiame įrenginyje – priešingu atveju karkasas
+nežinotų, kur saugoti rezultatą
+ar net kaip nuspręsti, kur atlikti skaičiavimą.
 
-### Storage on the GPU
+### Saugojimas GPU
 
-There are several ways to [**store a tensor on the GPU.**]
-For example, we can specify a storage device when creating a tensor.
-Next, we create the tensor variable `X` on the first `gpu`.
-The tensor created on a GPU only consumes the memory of this GPU.
-We can use the `nvidia-smi` command to view GPU memory usage.
-In general, we need to make sure that we do not create data that exceeds the GPU memory limit.
+Yra keli būdai [**saugoti tenzorių GPU.**]
+Pavyzdžiui, kurdami tenzorių galime nurodyti saugojimo įrenginį.
+Toliau sukuriame tenzoriaus kintamąjį `X` pirmajame `gpu`.
+GPU sukurtas tenzorius sunaudoja tik šio GPU atmintį.
+Komandą `nvidia-smi` galime naudoti GPU atminties naudojimui peržiūrėti.
+Apskritai turime užtikrinti, kad nesukurtume duomenų, viršijančių GPU atminties ribą.
 
 ```{.python .input}
 %%tab mxnet
@@ -313,7 +313,7 @@ X = jax.device_put(jnp.ones((2, 3)), try_gpu())
 X
 ```
 
-Assuming that you have at least two GPUs, the following code will (**create a random tensor, `Y`, on the second GPU.**)
+Tarkime, kad turite bent du GPU, šis kodas (**sukurs atsitiktinį tenzorių `Y` antrajame GPU.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -341,21 +341,21 @@ Y = jax.device_put(jax.random.uniform(jax.random.PRNGKey(0), (2, 3)),
 Y
 ```
 
-### Copying
+### Kopijavimas
 
-[**If we want to compute `X + Y`,
-we need to decide where to perform this operation.**]
-For instance, as shown in :numref:`fig_copyto`,
-we can transfer `X` to the second GPU
-and perform the operation there.
-*Do not* simply add `X` and `Y`,
-since this will result in an exception.
-The runtime engine would not know what to do:
-it cannot find data on the same device and it fails.
-Since `Y` lives on the second GPU,
-we need to move `X` there before we can add the two.
+[**Jei norime apskaičiuoti `X + Y`,
+turime nuspręsti, kur atlikti šią operaciją.**]
+Pavyzdžiui, kaip parodyta :numref:`fig_copyto`,
+galime perkelti `X` į antrąjį GPU
+ir atlikti operaciją ten.
+*Nesudėkite* tiesiog `X` ir `Y`,
+nes tai sukels išimtį.
+Vykdymo variklis nežinotų, ką daryti:
+jis negali rasti duomenų tame pačiame įrenginyje ir nepavyksta.
+Kadangi `Y` yra antrajame GPU,
+turime perkelti `X` ten, kad galėtume juos sudėti.
 
-![Copy data to perform an operation on the same device.](../img/copyto.svg)
+![Nukopijuokite duomenis, kad atliktumėte operaciją tame pačiame įrenginyje.](../img/copyto.svg)
 :label:`fig_copyto`
 
 ```{.python .input}
@@ -387,7 +387,7 @@ print(X)
 print(Z)
 ```
 
-Now that [**the data (both `Z` and `Y`) are on the same GPU), we can add them up.**]
+Dabar, kai [**duomenys (ir `Z`, ir `Y`) yra tame pačiame GPU), galime juos sudėti.**]
 
 ```{.python .input}
 %%tab all
@@ -395,37 +395,37 @@ Y + Z
 ```
 
 :begin_tab:`mxnet`
-Imagine that your variable `Z` already lives on your second GPU.
-What happens if we still call  `Z.copyto(gpu(1))`?
-It will make a copy and allocate new memory,
-even though that variable already lives on the desired device.
-There are times where, depending on the environment our code is running in,
-two variables may already live on the same device.
-So we want to make a copy only if the variables
-currently live in different devices.
-In these cases, we can call `as_in_ctx`.
-If the variable already live in the specified device
-then this is a no-op.
-Unless you specifically want to make a copy,
-`as_in_ctx` is the method of choice.
+Įsivaizduokite, kad jūsų kintamasis `Z` jau yra antrajame GPU.
+Kas nutinka, jei vis tiek kviečiame `Z.copyto(gpu(1))`?
+Jis padarys kopiją ir paskirs naują atmintį,
+nors tas kintamasis jau yra norimame įrenginyje.
+Būna atvejų, kai, priklausomai nuo aplinkos, kurioje vykdomas mūsų kodas,
+du kintamieji jau gali būti tame pačiame įrenginyje.
+Todėl norime daryti kopiją tik tada, kai kintamieji
+šiuo metu yra skirtinguose įrenginiuose.
+Tokiais atvejais galime kviesti `as_in_ctx`.
+Jei kintamasis jau yra nurodytame įrenginyje,
+tai nieko nedaro.
+Nebent konkrečiai norite padaryti kopiją,
+`as_in_ctx` yra pasirenkamas metodas.
 :end_tab:
 
 :begin_tab:`pytorch`
-But what if your variable `Z` already lived on your second GPU?
-What happens if we still call `Z.cuda(1)`?
-It will return `Z` instead of making a copy and allocating new memory.
+Bet kas, jei jūsų kintamasis `Z` jau buvo antrajame GPU?
+Kas nutinka, jei vis tiek kviečiame `Z.cuda(1)`?
+Jis grąžins `Z`, užuot daręs kopiją ir paskyręs naują atmintį.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Imagine that your variable `Z` already lives on your second GPU.
-What happens if we still call `Z2 = Z` under the same device scope?
-It will return `Z` instead of making a copy and allocating new memory.
+Įsivaizduokite, kad jūsų kintamasis `Z` jau yra antrajame GPU.
+Kas nutinka, jei vis tiek kviečiame `Z2 = Z` to paties įrenginio srityje?
+Jis grąžins `Z`, užuot daręs kopiją ir paskyręs naują atmintį.
 :end_tab:
 
 :begin_tab:`jax`
-Imagine that your variable `Z` already lives on your second GPU.
-What happens if we still call `Z2 = Z` under the same device scope?
-It will return `Z` instead of making a copy and allocating new memory.
+Įsivaizduokite, kad jūsų kintamasis `Z` jau yra antrajame GPU.
+Kas nutinka, jei vis tiek kviečiame `Z2 = Z` to paties įrenginio srityje?
+Jis grąžins `Z`, užuot daręs kopiją ir paskyręs naują atmintį.
 :end_tab:
 
 ```{.python .input}
@@ -451,44 +451,44 @@ Z2 = jax.device_put(Z, try_gpu(1))
 Z2 is Z
 ```
 
-### Side Notes
+### Papildomos pastabos
 
-People use GPUs to do machine learning
-because they expect them to be fast.
-But transferring variables between devices is slow: much slower than computation.
-So we want you to be 100% certain
-that you want to do something slow before we let you do it.
-If the deep learning framework just did the copy automatically
-without crashing then you might not realize
-that you had written some slow code.
+Žmonės naudoja GPU mašininiam mokymuisi,
+nes tikisi, kad jie bus greiti.
+Bet kintamųjų perkėlimas tarp įrenginių yra lėtas: daug lėtesnis nei skaičiavimas.
+Todėl norime, kad būtumėte 100 % tikri,
+jog norite daryti kažką lėto, prieš tai leisdami tai daryti.
+Jei giliojo mokymosi karkasas tiesiog automatiškai atliktų kopijavimą
+nesugriūdamas, galbūt nepastebėtumėte,
+kad parašėte lėto kodo.
 
-Transferring data is not only slow, it also makes parallelization a lot more difficult,
-since we have to wait for data to be sent (or rather to be received)
-before we can proceed with more operations.
-This is why copy operations should be taken with great care.
-As a rule of thumb, many small operations
-are much worse than one big operation.
-Moreover, several operations at a time
-are much better than many single operations interspersed in the code
-unless you know what you are doing.
-This is the case since such operations can block if one device
-has to wait for the other before it can do something else.
-It is a bit like ordering your coffee in a queue
-rather than pre-ordering it by phone
-and finding out that it is ready when you are.
+Duomenų perkėlimas ne tik lėtas, bet ir gerokai apsunkina lygiagretinimą,
+nes turime laukti, kol duomenys bus išsiųsti (ar tiksliau – gauti),
+kad galėtume tęsti tolesnes operacijas.
+Todėl su kopijavimo operacijomis reikia elgtis labai atsargiai.
+Nykščio taisyklė: daug mažų operacijų
+yra daug blogiau nei viena didelė operacija.
+Be to, kelios operacijos vienu metu
+yra daug geriau nei daug pavienių operacijų, išbarstytų po kodą,
+nebent žinote, ką darote.
+Taip yra todėl, kad tokios operacijos gali blokuotis, jei vienas įrenginys
+turi laukti kito, kol galės daryti ką nors kita.
+Tai šiek tiek primena kavos užsakymą eilėje,
+užuot užsisakius ją iš anksto telefonu
+ir sužinojus, kad ji paruošta, kai jūs atvykstate.
 
-Last, when we print tensors or convert tensors to the NumPy format,
-if the data is not in the main memory,
-the framework will copy it to the main memory first,
-resulting in additional transmission overhead.
-Even worse, it is now subject to the dreaded global interpreter lock
-that makes everything wait for Python to complete.
+Galiausiai, kai spausdiname tenzorius arba konvertuojame tenzorius į NumPy formatą,
+jei duomenų nėra pagrindinėje atmintyje,
+karkasas pirmiausia nukopijuos juos į pagrindinę atmintį,
+dėl ko atsiranda papildomos perdavimo sąnaudos.
+Dar blogiau, dabar tai priklauso nuo baisiojo globaliojo interpretatoriaus užrakto,
+dėl kurio viskas laukia, kol Python baigs darbą.
 
 
-## [**Neural Networks and GPUs**]
+## [**Neuroniniai tinklai ir GPU**]
 
-Similarly, a neural network model can specify devices.
-The following code puts the model parameters on the GPU.
+Panašiai neuroninio tinklo modelis gali nurodyti įrenginius.
+Šis kodas modelio parametrus patalpina GPU.
 
 ```{.python .input}
 %%tab mxnet
@@ -520,11 +520,11 @@ x = jax.random.normal(key1, (10,))  # Dummy input
 params = net.init(key2, x)  # Initialization call
 ```
 
-We will see many more examples of
-how to run models on GPUs in the following chapters,
-simply because the models will become somewhat more computationally intensive.
+Daug daugiau pavyzdžių, kaip vykdyti modelius GPU, pamatysime
+tolesniuose skyriuose,
+tiesiog todėl, kad modeliai taps šiek tiek imlesni skaičiavimams.
 
-For example, when the input is a tensor on the GPU, the model will calculate the result on the same GPU.
+Pavyzdžiui, kai įvestis yra tenzorius GPU, modelis apskaičiuos rezultatą tame pačiame GPU.
 
 ```{.python .input}
 %%tab mxnet, pytorch, tensorflow
@@ -536,7 +536,7 @@ net(X)
 net.apply(params, x)
 ```
 
-Let's (**confirm that the model parameters are stored on the same GPU.**)
+Patvirtinkime, kad (**modelio parametrai saugomi tame pačiame GPU.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -558,7 +558,7 @@ net.layers[0].weights[0].device, net.layers[0].weights[1].device
 print(jax.tree_util.tree_map(lambda x: x.device(), params))
 ```
 
-Let the trainer support GPU.
+Leiskime apmokytojui palaikyti GPU.
 
 ```{.python .input}
 %%tab mxnet
@@ -617,49 +617,49 @@ def prepare_batch(self, batch):
     return batch
 ```
 
-In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following chapters we will see several such examples.
+Trumpai tariant, kol visi duomenys ir parametrai yra tame pačiame įrenginyje, galime efektyviai mokyti modelius. Tolesniuose skyriuose pamatysime keletą tokių pavyzdžių.
 
-## Summary
+## Santrauka
 
-We can specify devices for storage and calculation, such as the CPU or GPU.
-  By default, data is created in the main memory
-  and then uses the CPU for calculations.
-The deep learning framework requires all input data for calculation
-  to be on the same device,
-  be it CPU or the same GPU.
-You can lose significant performance by moving data without care.
-  A typical mistake is as follows: computing the loss
-  for every minibatch on the GPU and reporting it back
-  to the user on the command line (or logging it in a NumPy `ndarray`)
-  will trigger a global interpreter lock which stalls all GPUs.
-  It is much better to allocate memory
-  for logging inside the GPU and only move larger logs.
+Saugojimui ir skaičiavimui galime nurodyti įrenginius, tokius kaip CPU ar GPU.
+  Pagal numatytuosius nustatymus duomenys sukuriami pagrindinėje atmintyje,
+  o skaičiavimams naudojamas CPU.
+Giliojo mokymosi karkasas reikalauja, kad visi skaičiavimo įvesties duomenys
+  būtų tame pačiame įrenginyje,
+  nesvarbu, ar tai CPU, ar tas pats GPU.
+Neatsargiai perkeldami duomenis galite prarasti daug našumo.
+  Tipinė klaida yra tokia: apskaičiuoti nuostolius
+  kiekvienam minirinkiniui GPU ir pranešti juos
+  naudotojui komandų eilutėje (arba įrašyti juos į NumPy `ndarray`)
+  sukels globalųjį interpretatoriaus užraktą, kuris sustabdys visus GPU.
+  Daug geriau paskirti atmintį
+  žurnalui GPU viduje ir perkelti tik didesnius žurnalus.
 
-## Exercises
+## Pratimai
 
-1. Try a larger computation task, such as the multiplication of large matrices,
-   and see the difference in speed between the CPU and GPU.
-   What about a task with a small number of calculations?
-1. How should we read and write model parameters on the GPU?
-1. Measure the time it takes to compute 1000
-   matrix--matrix multiplications of $100 \times 100$ matrices
-   and log the Frobenius norm of the output matrix one result at a time. Compare it with keeping a log on the GPU and transferring only the final result.
-1. Measure how much time it takes to perform two matrix--matrix multiplications
-   on two GPUs at the same time. Compare it with computing in in sequence
-   on one GPU. Hint: you should see almost linear scaling.
+1. Išbandykite didesnę skaičiavimo užduotį, pavyzdžiui, didelių matricų daugybą,
+   ir pažiūrėkite skirtumą tarp CPU ir GPU greičio.
+   O kaip su užduotimi, turinčia nedaug skaičiavimų?
+1. Kaip turėtume skaityti ir rašyti modelio parametrus GPU?
+1. Išmatuokite laiką, per kurį apskaičiuojama 1000
+   $100 \times 100$ matricų daugybų
+   ir po vieną rezultatą žurnale užfiksuokite išvesties matricos Frobenijaus normą. Palyginkite su žurnalo laikymu GPU ir perkeliant tik galutinį rezultatą.
+1. Išmatuokite, kiek laiko užtrunka atlikti dvi matricų daugybas
+   dviejuose GPU vienu metu. Palyginkite su skaičiavimu paeiliui
+   viename GPU. Užuomina: turėtumėte matyti beveik tiesinį mastelio kitimą.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/62)
+[Diskusijos](https://discuss.d2l.ai/t/62)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/63)
+[Diskusijos](https://discuss.d2l.ai/t/63)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/270)
+[Diskusijos](https://discuss.d2l.ai/t/270)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17995)
+[Diskusijos](https://discuss.d2l.ai/t/17995)
 :end_tab:

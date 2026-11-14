@@ -1,478 +1,471 @@
-# Generalization
+# Apibendrinimas
 :label:`sec_generalization_basics`
 
-Consider two college students diligently
-preparing for their final exam.
-Commonly, this preparation will consist
-of practicing and testing their abilities
-by taking exams administered in previous years.
-Nonetheless, doing well on past exams is no guarantee
-that they will excel when it matters.
-For instance, imagine a student, Extraordinary Ellie,
-whose preparation consisted entirely
-of memorizing the answers
-to previous years' exam questions.
-Even if Ellie were endowed
-with an extraordinary memory,
-and thus could perfectly recall the answer
-to any *previously seen* question,
-she might nevertheless freeze
-when faced with a new (*previously unseen*) question.
-By comparison, imagine another student,
-Inductive Irene, with comparably poor
-memorization skills,
-but a knack for picking up patterns.
-Note that if the exam truly consisted of
-recycled questions from a previous year,
-Ellie would handily outperform Irene.
-Even if Irene's inferred patterns
-yielded 90% accurate predictions,
-they could never compete with
-Ellie's 100% recall.
-However, even if the exam consisted
-entirely of fresh questions,
-Irene might maintain her 90% average.
+Įsivaizduokite du kolegijos studentus, stropiai
+besirengiančius baigiamajam egzaminui.
+Paprastai toks pasirengimas susideda
+iš įgūdžių lavinimo ir tikrinimosi
+sprendžiant ankstesnių metų egzaminus.
+Vis dėlto gerai išlaikyti praėjusių metų egzaminai negarantuoja,
+kad jie pasirodys puikiai, kai tai bus svarbu.
+Pavyzdžiui, įsivaizduokite studentę Nepaprastąją Eliją,
+kurios pasirengimas visiškai susidėjo
+iš ankstesnių metų egzamino klausimų
+atsakymų įsiminimo.
+Net jei Elija turėtų
+nepaprastą atmintį
+ir todėl galėtų tobulai prisiminti atsakymą
+į bet kurį *anksčiau matytą* klausimą,
+ji vis tiek gali sustingti,
+susidūrusi su nauju (*anksčiau nematytu*) klausimu.
+Palyginimui įsivaizduokite kitą studentę,
+Indukcinę Irenę, kurios įsiminimo įgūdžiai palyginti prasti,
+bet kuri turi gabumų pastebėti dėsningumus.
+Atkreipkite dėmesį, kad jei egzaminas tikrai susidėtų
+iš pernai metų klausimų,
+Elija lengvai pranoktų Irenę.
+Net jei Irenės išvesti dėsningumai
+duotų 90 % tikslumo prognozes,
+jie niekada negalėtų konkuruoti su
+Elijos 100 % prisiminimu.
+Tačiau net jei egzaminas susidėtų
+vien iš naujų klausimų,
+Irenė galėtų išlaikyti savo 90 % vidurkį.
 
-As machine learning scientists,
-our goal is to discover *patterns*.
-But how can we be sure that we have
-truly discovered a *general* pattern
-and not simply memorized our data?
-Most of the time, our predictions are only useful
-if our model discovers such a pattern.
-We do not want to predict yesterday's stock prices, but tomorrow's.
-We do not need to recognize
-already diagnosed diseases
-for previously seen patients,
-but rather previously undiagnosed
-ailments in previously unseen patients.
-This problem---how to discover patterns that *generalize*---is
-the fundamental problem of machine learning,
-and arguably of all of statistics.
-We might cast this problem as just one slice
-of a far grander question
-that engulfs all of science:
-when are we ever justified
-in making the leap from particular observations
-to more general statements?
+Kaip mašininio mokymosi mokslininkų,
+mūsų tikslas yra atrasti *dėsningumus*.
+Bet kaip galime būti tikri, kad iš tiesų
+atradome *bendrą* dėsningumą,
+o ne tiesiog įsiminėme savo duomenis?
+Daugeliu atvejų mūsų prognozės naudingos tik tada,
+jei mūsų modelis atranda tokį dėsningumą.
+Mes nenorime prognozuoti vakarykščių akcijų kainų, o tik rytojaus.
+Mums nereikia atpažinti
+jau diagnozuotų ligų
+anksčiau matytiems pacientams,
+o veikiau anksčiau nediagnozuotus
+negalavimus anksčiau nematytiems pacientams.
+Ši problema – kaip atrasti dėsningumus, kurie *apibendrinami* –
+yra pagrindinė mašininio mokymosi problema
+ir, tikriausiai, visos statistikos.
+Šią problemą galėtume laikyti tik viena dalimi
+daug didesnio klausimo,
+apimančio visą mokslą:
+kada mes apskritai turime pagrindą
+peršokti nuo konkrečių stebinių
+prie bendresnių teiginių?
 
 
-In real life, we must fit our models
-using a finite collection of data.
-The typical scales of that data
-vary wildly across domains.
-For many important medical problems,
-we can only access a few thousand data points.
-When studying rare diseases,
-we might be lucky to access hundreds.
-By contrast, the largest public datasets
-consisting of labeled photographs,
-e.g., ImageNet :cite:`Deng.Dong.Socher.ea.2009`,
-contain millions of images.
-And some unlabeled image collections
-such as the Flickr YFC100M dataset
-can be even larger, containing
-over 100 million images :cite:`thomee2016yfcc100m`.
-However, even at this extreme scale,
-the number of available data points
-remains infinitesimally small
-compared to the space of all possible images
-at a megapixel resolution.
-Whenever we work with finite samples,
-we must keep in mind the risk
-that we might fit our training data,
-only to discover that we failed
-to discover a generalizable pattern.
+Realiame gyvenime savo modelius turime pritaikyti
+naudodami baigtinį duomenų rinkinį.
+Tipiniai tų duomenų mastai
+labai skiriasi įvairiose srityse.
+Daugeliui svarbių medicininių problemų
+galime pasiekti tik kelis tūkstančius duomenų taškų.
+Tyrinėjant retas ligas,
+gali pasisekti, jei pavyks gauti šimtus.
+Priešingai, didžiausi vieši duomenų rinkiniai,
+sudaryti iš pažymėtų nuotraukų,
+pvz., ImageNet :cite:`Deng.Dong.Socher.ea.2009`,
+turi milijonus vaizdų.
+O kai kurie nepažymėtų vaizdų rinkiniai,
+tokie kaip Flickr YFC100M duomenų rinkinys,
+gali būti dar didesni, turintys
+daugiau nei 100 milijonų vaizdų :cite:`thomee2016yfcc100m`.
+Tačiau net ir esant tokiam ekstremaliam mastui,
+turimų duomenų taškų skaičius
+išlieka be galo mažas,
+palyginti su visų galimų
+megapikselio skyros vaizdų erdve.
+Kai tik dirbame su baigtinėmis imtimis,
+turime nepamiršti rizikos,
+kad galime pritaikyti savo apmokymo duomenis
+ir tik tada pamatyti, kad nepavyko
+atrasti apibendrinamo dėsningumo.
 
-The phenomenon of fitting closer to our training data
-than to the underlying distribution is called *overfitting*,
-and techniques for combatting overfitting
-are often called *regularization* methods.
-While it is no substitute for a proper introduction
-to statistical learning theory (see :citet:`Vapnik98,boucheron2005theory`),
-we will give you just enough intuition to get going.
-We will revisit generalization in many chapters
-throughout the book,
-exploring both what is known about
-the principles underlying generalization
-in various models,
-and also heuristic techniques
-that have been found (empirically)
-to yield improved generalization
-on tasks of practical interest.
+Reiškinys, kai modelis pritaikomas artimiau mūsų apmokymo duomenims,
+nei pagrindiniam skirstiniui, vadinamas *persimokymu*,
+o persimokymo prevencijos metodai
+dažnai vadinami *reguliarizavimo* metodais.
+Nors tai nepakeičia tinkamo įvado
+į statistinio mokymosi teoriją (žr. :citet:`Vapnik98,boucheron2005theory`),
+suteiksime pakankamai intuicijos, kad galėtumėte pradėti.
+Prie apibendrinimo sugrįšime daugelyje knygos skyrių,
+nagrinėdami tiek tai, kas žinoma apie
+apibendrinimo pagrindinius principus
+įvairiuose modeliuose,
+tiek euristinius metodus,
+kurie (empiriškai) padeda
+pagerinti apibendrinimą
+praktiškai svarbiose užduotyse.
 
 
 
-## Training Error and Generalization Error
+## Apmokymo paklaida ir apibendrinimo paklaida
 
 
-In the standard supervised learning setting,
-we assume that the training data and the test data
-are drawn *independently* from *identical* distributions.
-This is commonly called the *IID assumption*.
-While this assumption is strong,
-it is worth noting that, absent any such assumption,
-we would be dead in the water.
-Why should we believe that training data
-sampled from distribution $P(X,Y)$
-should tell us how to make predictions on
-test data generated by a *different distribution* $Q(X,Y)$?
-Making such leaps turns out to require
-strong assumptions about how $P$ and $Q$ are related.
-Later on we will discuss some assumptions
-that allow for shifts in distribution
-but first we need to understand the IID case,
-where $P(\cdot) = Q(\cdot)$.
+Standartinėje prižiūrimo mokymo aplinkoje
+darome prielaidą, kad apmokymo duomenys ir testavimo duomenys
+paimti *nepriklausomai* iš *identiškų* skirstinių.
+Tai paprastai vadinama *IID prielaida* (nepriklausomi ir vienodai pasiskirstę).
+Nors ši prielaida stipri,
+verta pažymėti, kad be jokios tokios prielaidos
+būtume bejėgiai.
+Kodėl turėtume tikėti, kad apmokymo duomenys,
+paimti iš skirstinio $P(X,Y)$,
+gali mums pasakyti, kaip daryti prognozes
+testavimo duomenims, sugeneruotiems *kito skirstinio* $Q(X,Y)$?
+Pasirodo, tokiems šuoliams reikia
+stiprių prielaidų apie tai, kaip susiję $P$ ir $Q$.
+Vėliau aptarsime kai kurias prielaidas,
+leidžiančias skirstinio pokyčius,
+bet pirmiausia turime suprasti IID atvejį,
+kai $P(\cdot) = Q(\cdot)$.
 
-To begin with, we need to differentiate between
-the *training error* $R_\textrm{emp}$,
-which is a *statistic*
-calculated on the training dataset,
-and the *generalization error* $R$,
-which is an *expectation* taken
-with respect to the underlying distribution.
-You can think of the generalization error as
-what you would see  if you applied your model
-to an infinite stream of additional data examples
-drawn from the same underlying data distribution.
-Formally the training error is expressed as a *sum* (with the same notation as :numref:`sec_linear_regression`):
+Pirmiausia turime atskirti
+*apmokymo paklaidą* $R_\textrm{emp}$,
+kuri yra *statistika*,
+apskaičiuota apmokymo duomenų rinkinyje,
+ir *apibendrinimo paklaidą* $R$,
+kuri yra *vidurkis*, paimtas
+pagal pagrindinį skirstinį.
+Apibendrinimo paklaidą galite įsivaizduoti kaip
+tai, ką pamatytumėte, jei pritaikytumėte savo modelį
+begaliniam papildomų duomenų pavyzdžių srautui,
+paimtam iš to paties pagrindinio duomenų skirstinio.
+Formaliai apmokymo paklaida išreiškiama *suma* (tuo pačiu žymėjimu kaip :numref:`sec_linear_regression`):
 
 $$R_\textrm{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$
 
 
-while the generalization error is expressed as an integral:
+o apibendrinimo paklaida išreiškiama integralu:
 
 $$R[p, f] = E_{(\mathbf{x}, y) \sim P} [l(\mathbf{x}, y, f(\mathbf{x}))] =
 \int \int l(\mathbf{x}, y, f(\mathbf{x})) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
 
-Problematically, we can never calculate
-the generalization error $R$ exactly.
-Nobody ever tells us the precise form
-of the density function $p(\mathbf{x}, y)$.
-Moreover, we cannot sample an infinite stream of data points.
-Thus, in practice, we must *estimate* the generalization error
-by applying our model to an independent test set
-constituted of a random selection of examples
-$\mathbf{X}'$ and labels $\mathbf{y}'$
-that were withheld from our training set.
-This consists of applying the same formula
-that was used for calculating the empirical training error
-but to a test set $\mathbf{X}', \mathbf{y}'$.
+Problema ta, kad apibendrinimo paklaidos $R$ niekada negalime apskaičiuoti tiksliai.
+Niekas niekada nepasako mums tikslios
+tankio funkcijos $p(\mathbf{x}, y)$ formos.
+Be to, negalime paimti begalinio duomenų taškų srauto.
+Todėl praktikoje apibendrinimo paklaidą turime *įvertinti*,
+taikydami savo modelį nepriklausomai testavimo aibei,
+sudarytai iš atsitiktinai parinktų pavyzdžių
+$\mathbf{X}'$ ir žymenų $\mathbf{y}'$,
+kurie buvo atskirti nuo mūsų apmokymo aibės.
+Tai reiškia tos pačios formulės,
+kuri naudojama empirinei apmokymo paklaidai skaičiuoti,
+taikymą testavimo aibei $\mathbf{X}', \mathbf{y}'$.
 
 
-Crucially, when we evaluate our classifier on the test set,
-we are working with a *fixed* classifier
-(it does not depend on the sample of the test set),
-and thus estimating its error
-is simply the problem of mean estimation.
-However the same cannot be said
-for the training set.
-Note that the model we wind up with
-depends explicitly on the selection of the training set
-and thus the training error will in general
-be a biased estimate of the true error
-on the underlying population.
-The central question of generalization
-is then when should we expect our training error
-to be close to the population error
-(and thus the generalization error).
+Esminis dalykas: kai vertiname savo klasifikatorių testavimo aibėje,
+dirbame su *fiksuotu* klasifikatoriumi
+(jis nepriklauso nuo testavimo aibės imties),
+todėl jo paklaidos įvertinimas
+yra tiesiog vidurkio vertinimo uždavinys.
+Tačiau to paties negalima pasakyti
+apie apmokymo aibę.
+Atkreipkite dėmesį, kad galutinis modelis
+aiškiai priklauso nuo apmokymo aibės pasirinkimo,
+todėl apmokymo paklaida apskritai
+bus paslinktas tikrosios paklaidos pagrindinėje populiacijoje įvertis.
+Centrinis apibendrinimo klausimas yra,
+kada turėtume tikėtis, kad mūsų apmokymo paklaida
+bus artima populiacijos paklaidai
+(taigi ir apibendrinimo paklaidai).
 
-### Model Complexity
+### Modelio sudėtingumas
 
-In classical theory, when we have
-simple models and abundant data,
-the training and generalization errors tend to be close.
-However, when we work with
-more complex models and/or fewer examples,
-we expect the training error to go down
-but the generalization gap to grow.
-This should not be surprising.
-Imagine a model class so expressive that
-for any dataset of $n$ examples,
-we can find a set of parameters
-that can perfectly fit arbitrary labels,
-even if randomly assigned.
-In this case, even if we fit our training data perfectly,
-how can we conclude anything about the generalization error?
-For all we know, our generalization error
-might be no better than random guessing.
+Klasikinėje teorijoje, kai turime
+paprastus modelius ir gausybę duomenų,
+apmokymo ir apibendrinimo paklaidos paprastai būna artimos.
+Tačiau kai dirbame su
+sudėtingesniais modeliais ir (arba) mažiau pavyzdžių,
+tikimės, kad apmokymo paklaida sumažės,
+bet apibendrinimo atotrūkis padidės.
+Tai neturėtų stebinti.
+Įsivaizduokite modelių klasę, tokią raiškią, kad
+bet kuriam $n$ pavyzdžių duomenų rinkiniui
+galime rasti parametrų rinkinį,
+kuris gali tobulai pritaikyti savavališkus žymenis,
+net jei jie priskirti atsitiktinai.
+Tokiu atveju, net jei tobulai pritaikome savo apmokymo duomenis,
+kaip galime ką nors spręsti apie apibendrinimo paklaidą?
+Kiek mes žinome, mūsų apibendrinimo paklaida
+gali būti ne geresnė nei atsitiktinis spėliojimas.
 
-In general, absent any restriction on our model class,
-we cannot conclude, based on fitting the training data alone,
-that our model has discovered any generalizable pattern :cite:`vapnik1994measuring`.
-On the other hand, if our model class
-was not capable of fitting arbitrary labels,
-then it must have discovered a pattern.
-Learning-theoretic ideas about model complexity
-derived some inspiration from the ideas
-of Karl Popper, an influential philosopher of science,
-who formalized the criterion of falsifiability.
-According to Popper, a theory
-that can explain any and all observations
-is not a scientific theory at all!
-After all, what has it told us about the world
-if it has not ruled out any possibility?
-In short, what we want is a hypothesis
-that *could not* explain any observations
-we might conceivably make
-and yet nevertheless happens to be compatible
-with those observations that we *in fact* make.
+Apskritai, neturint jokių apribojimų mūsų modelių klasei,
+negalime daryti išvados vien iš apmokymo duomenų pritaikymo,
+kad mūsų modelis atrado kokį nors apibendrinamą dėsningumą :cite:`vapnik1994measuring`.
+Kita vertus, jei mūsų modelių klasė
+negalėjo pritaikyti savavališkų žymenų,
+tai jis turėjo atrasti dėsningumą.
+Mokymosi teorijos idėjos apie modelio sudėtingumą
+tam tikro įkvėpimo sėmėsi iš
+Karlo Popperio, įtakingo mokslo filosofo, idėjų,
+kuris formalizavo falsifikuojamumo kriterijų.
+Pasak Popperio, teorija,
+kuri gali paaiškinti bet kokius ir visus stebinius,
+iš viso nėra mokslinė teorija!
+Juk ką ji mums pasakė apie pasaulį,
+jei neatmetė jokios galimybės?
+Trumpai tariant, to, ko mes norime, yra hipotezė,
+kuri *negalėtų* paaiškinti jokių stebinių,
+kuriuos galime įsivaizduoti,
+ir vis dėlto pasitaiko, kad ji suderinama
+su tais stebiniais, kuriuos *iš tikrųjų* atliekame.
 
-Now what precisely constitutes an appropriate
-notion of model complexity is a complex matter.
-Often, models with more parameters
-are able to fit a greater number
-of arbitrarily assigned labels.
-However, this is not necessarily true.
-For instance, kernel methods operate in spaces
-with infinite numbers of parameters,
-yet their complexity is controlled
-by other means :cite:`Scholkopf.Smola.2002`.
-One notion of complexity that often proves useful
-is the range of values that the parameters can take.
-Here, a model whose parameters are permitted
-to take arbitrary values
-would be more complex.
-We will revisit this idea in the next section,
-when we introduce *weight decay*,
-your first practical regularization technique.
-Notably, it can be difficult to compare
-complexity among members of substantially different model classes
-(say, decision trees vs. neural networks).
+Kas tiksliai sudaro tinkamą
+modelio sudėtingumo sampratą, yra sudėtingas klausimas.
+Dažnai modeliai su daugiau parametrų
+gali pritaikyti didesnį skaičių
+savavališkai priskirtų žymenų.
+Tačiau tai nebūtinai tiesa.
+Pavyzdžiui, branduolių metodai veikia erdvėse
+su begaliniu parametrų skaičiumi,
+tačiau jų sudėtingumas valdomas
+kitais būdais :cite:`Scholkopf.Smola.2002`.
+Viena sudėtingumo samprata, kuri dažnai pasirodo naudinga,
+yra reikšmių, kurias gali įgyti parametrai, diapazonas.
+Čia modelis, kurio parametrams leidžiama
+įgyti savavališkas reikšmes,
+būtų sudėtingesnis.
+Prie šios idėjos sugrįšime kitame skyrelyje,
+kai pristatysime *svorių nykimą*,
+jūsų pirmąjį praktinį reguliarizavimo metodą.
+Pažymėtina, kad gali būti sunku palyginti
+sudėtingumą tarp iš esmės skirtingų modelių klasių narių
+(tarkime, sprendimų medžių ir neuroninių tinklų).
 
 
-At this point, we must stress another important point
-that we will revisit when introducing deep neural networks.
-When a model is capable of fitting arbitrary labels,
-low training error does not necessarily
-imply low generalization error.
-*However, it does not necessarily
-imply high generalization error either!*
-All we can say with confidence is that
-low training error alone is not enough
-to certify low generalization error.
-Deep neural networks turn out to be just such models:
-while they generalize well in practice,
-they are too powerful to allow us to conclude
-much on the basis of training error alone.
-In these cases we must rely more heavily
-on our holdout data to certify generalization
-after the fact.
-Error on the holdout data, i.e., validation set,
-is called the *validation error*.
+Šioje vietoje turime pabrėžti dar vieną svarbų dalyką,
+prie kurio sugrįšime pristatydami gilius neuroninius tinklus.
+Kai modelis gali pritaikyti savavališkus žymenis,
+maža apmokymo paklaida nebūtinai
+reiškia mažą apibendrinimo paklaidą.
+*Tačiau ji nebūtinai reiškia ir didelę apibendrinimo paklaidą!*
+Vienintelis dalykas, kurį galime pasakyti užtikrintai, yra tas,
+kad vien maža apmokymo paklaida nepakanka
+mažai apibendrinimo paklaidai patvirtinti.
+Giliesiems neuroniniams tinklams būtent tokie modeliai ir yra:
+nors praktikoje jie gerai apibendrina,
+jie per galingi, kad galėtume daug ką spręsti
+vien pagal apmokymo paklaidą.
+Šiais atvejais turime labiau pasikliauti
+atskirtais duomenimis, kad patvirtintume apibendrinimą
+po fakto.
+Paklaida atskirtuose duomenyse, t. y. validavimo aibėje,
+vadinama *validavimo paklaida*.
 
-## Underfitting or Overfitting?
+## Nepakankamas mokymasis ar persimokymas?
 
-When we compare the training and validation errors,
-we want to be mindful of two common situations.
-First, we want to watch out for cases
-when our training error and validation error are both substantial
-but there is a little gap between them.
-If the model is unable to reduce the training error,
-that could mean that our model is too simple
-(i.e., insufficiently expressive)
-to capture the pattern that we are trying to model.
-Moreover, since the *generalization gap* ($R_\textrm{emp} - R$)
-between our training and generalization errors is small,
-we have reason to believe that we could get away with a more complex model.
-This phenomenon is known as *underfitting*.
+Lygindami apmokymo ir validavimo paklaidas,
+turime atkreipti dėmesį į dvi dažnas situacijas.
+Pirma, turime stebėti atvejus,
+kai ir apmokymo, ir validavimo paklaidos yra didelės,
+bet tarp jų yra nedidelis atotrūkis.
+Jei modelis negali sumažinti apmokymo paklaidos,
+tai gali reikšti, kad mūsų modelis yra per paprastas
+(t. y. nepakankamai raiškus),
+kad užfiksuotų dėsningumą, kurį bandome modeliuoti.
+Be to, kadangi *apibendrinimo atotrūkis* ($R_\textrm{emp} - R$)
+tarp mūsų apmokymo ir apibendrinimo paklaidų yra mažas,
+turime pagrindo manyti, kad galėtume apsieiti su sudėtingesniu modeliu.
+Šis reiškinys žinomas kaip *nepakankamas mokymasis* (angl. *underfitting*).
 
-On the other hand, as we discussed above,
-we want to watch out for the cases
-when our training error is significantly lower
-than our validation error, indicating severe *overfitting*.
-Note that overfitting is not always a bad thing.
-In deep learning especially,
-the best predictive models often perform
-far better on training data than on holdout data.
-Ultimately, we usually care about
-driving the generalization error lower,
-and only care about the gap insofar
-as it becomes an obstacle to that end.
-Note that if the training error is zero,
-then the generalization gap is precisely equal to the generalization error
-and we can make progress only by reducing the gap.
+Kita vertus, kaip aptarėme aukščiau,
+turime stebėti atvejus,
+kai mūsų apmokymo paklaida yra gerokai mažesnė
+nei validavimo paklaida, o tai rodo didelį *persimokymą*.
+Atkreipkite dėmesį, kad persimokymas ne visada yra blogas dalykas.
+Ypač giliajame mokyme
+geriausi prognozavimo modeliai dažnai veikia
+gerokai geriau apmokymo duomenyse nei atskirtuose duomenyse.
+Galiausiai paprastai mums rūpi
+sumažinti apibendrinimo paklaidą,
+o atotrūkis rūpi tik tiek,
+kiek jis tampa kliūtimi šiam tikslui.
+Atkreipkite dėmesį, kad jei apmokymo paklaida lygi nuliui,
+apibendrinimo atotrūkis tiksliai lygus apibendrinimo paklaidai,
+ir pažangos galime pasiekti tik mažindami atotrūkį.
 
-### Polynomial Curve Fitting
+### Polinomo kreivės pritaikymas
 :label:`subsec_polynomial-curve-fitting`
 
-To illustrate some classical intuition
-about overfitting and model complexity,
-consider the following:
-given training data consisting of a single feature $x$
-and a corresponding real-valued label $y$,
-we try to find the polynomial of degree $d$
+Kad iliustruotume klasikinę intuiciją
+apie persimokymą ir modelio sudėtingumą,
+panagrinėkime tokį pavyzdį:
+turint apmokymo duomenis, sudarytus iš vieno požymio $x$
+ir atitinkamo realiojo žymens $y$,
+bandome rasti $d$ laipsnio polinomą
 
 $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
-for estimating the label $y$.
-This is just a linear regression problem
-where our features are given by the powers of $x$,
-the model's weights are given by $w_i$,
-and the bias is given by $w_0$ since $x^0 = 1$ for all $x$.
-Since this is just a linear regression problem,
-we can use the squared error as our loss function.
+žymeniui $y$ įvertinti.
+Tai tiesiog tiesinės regresijos uždavinys,
+kuriame mūsų požymiai yra $x$ laipsniai,
+modelio svoriai yra $w_i$,
+o poslinkis yra $w_0$, nes $x^0 = 1$ visiems $x$.
+Kadangi tai tiesiog tiesinės regresijos uždavinys,
+kaip nuostolių funkciją galime naudoti kvadratinę paklaidą.
 
 
-A higher-order polynomial function is more complex
-than a lower-order polynomial function,
-since the higher-order polynomial has more parameters
-and the model function's selection range is wider.
-Fixing the training dataset,
-higher-order polynomial functions should always
-achieve lower (at worst, equal) training error
-relative to lower-degree polynomials.
-In fact, whenever each data example
-has a distinct value of $x$,
-a polynomial function with degree
-equal to the number of data examples
-can fit the training set perfectly.
-We compare the relationship between polynomial degree (model complexity)
-and both underfitting and overfitting in :numref:`fig_capacity_vs_error`.
+Aukštesnės eilės polinominė funkcija yra sudėtingesnė
+nei žemesnės eilės polinominė funkcija,
+nes aukštesnės eilės polinomas turi daugiau parametrų
+ir modelio funkcijos pasirinkimo diapazonas platesnis.
+Fiksavus apmokymo duomenų rinkinį,
+aukštesnės eilės polinominės funkcijos visada turėtų
+pasiekti mažesnę (blogiausiu atveju lygią) apmokymo paklaidą,
+palyginti su žemesnio laipsnio polinomais.
+Tiesą sakant, kai kiekvienas duomenų pavyzdys
+turi skirtingą $x$ reikšmę,
+polinominė funkcija, kurios laipsnis
+lygus duomenų pavyzdžių skaičiui,
+gali tobulai pritaikyti apmokymo aibę.
+Polinomo laipsnio (modelio sudėtingumo) ryšį
+su nepakankamu mokymusi ir persimokymu palyginame :numref:`fig_capacity_vs_error`.
 
-![Influence of model complexity on underfitting and overfitting.](../img/capacity-vs-error.svg)
+![Modelio sudėtingumo įtaka nepakankamam mokymuisi ir persimokymui.](../img/capacity-vs-error.svg)
 :label:`fig_capacity_vs_error`
 
 
-### Dataset Size
+### Duomenų rinkinio dydis
 
-As the above bound already indicates,
-another big consideration
-to bear in mind is dataset size.
-Fixing our model, the fewer samples
-we have in the training dataset,
-the more likely (and more severely)
-we are to encounter overfitting.
-As we increase the amount of training data,
-the generalization error typically decreases.
-Moreover, in general, more data never hurts.
-For a fixed task and data distribution,
-model complexity should not increase
-more rapidly than the amount of data.
-Given more data, we might  attempt
-to fit a more complex model.
-Absent sufficient data, simpler models
-may be more difficult to beat.
-For many tasks, deep learning
-only outperforms linear models
-when many thousands of training examples are available.
-In part, the current success of deep learning
-owes considerably to the abundance of massive datasets
-arising from Internet companies, cheap storage,
-connected devices, and the broad digitization of the economy.
+Kaip jau rodo aukščiau pateikta riba,
+dar vienas svarbus aspektas, kurį reikia turėti galvoje,
+yra duomenų rinkinio dydis.
+Fiksavus savo modelį, kuo mažiau imčių
+turime apmokymo duomenų rinkinyje,
+tuo labiau tikėtina (ir tuo sunkesnis),
+kad susidursime su persimokymu.
+Didinant apmokymo duomenų kiekį,
+apibendrinimo paklaida paprastai mažėja.
+Be to, apskritai daugiau duomenų niekada nepakenkia.
+Fiksuotai užduočiai ir duomenų skirstiniui
+modelio sudėtingumas neturėtų didėti
+sparčiau nei duomenų kiekis.
+Turint daugiau duomenų, galime bandyti
+pritaikyti sudėtingesnį modelį.
+Nesant pakankamai duomenų, paprastesnių modelių
+gali būti sunkiau pranokti.
+Daugeliui užduočių giliasis mokymasis
+pranoksta tiesinius modelius tik tada,
+kai prieinama daug tūkstančių apmokymo pavyzdžių.
+Iš dalies dabartinė giliojo mokymosi sėkmė
+daug kuo yra skolinga didžiulių duomenų rinkinių gausai,
+atsiradusiai dėl interneto bendrovių, pigaus duomenų saugojimo,
+sujungtų įrenginių ir plačios ekonomikos skaitmenizacijos.
 
-## Model Selection
+## Modelio parinkimas
 :label:`subsec_generalization-model-selection`
 
-Typically, we select our final model
-only after evaluating multiple models
-that differ in various ways
-(different architectures, training objectives,
-selected features, data preprocessing,
-learning rates, etc.).
-Choosing among many models is aptly
-called *model selection*.
+Paprastai galutinį modelį pasirenkame
+tik įvertinę kelis modelius,
+kurie skiriasi įvairiais aspektais
+(skirtingos architektūros, apmokymo tikslai,
+parinkti požymiai, duomenų išankstinis apdorojimas,
+mokymosi spartos ir t. t.).
+Pasirinkimas tarp daugelio modelių taikliai
+vadinamas *modelio parinkimu*.
 
-In principle, we should not touch our test set
-until after we have chosen all our hyperparameters.
-Were we to use the test data in the model selection process,
-there is a risk that we might overfit the test data.
-Then we would be in serious trouble.
-If we overfit our training data,
-there is always the evaluation on test data to keep us honest.
-But if we overfit the test data, how would we ever know?
-See :citet:`ong2005learning` for an example of how
-this can lead to absurd results even for models where the complexity
-can be tightly controlled.
+Iš principo neturėtume liesti savo testavimo aibės,
+kol nepasirinksime visų savo hiperparametrų.
+Jei testavimo duomenis naudotume modelio parinkimo procese,
+kyla rizika, kad galime persimokyti testavimo duomenis.
+Tada turėtume rimtų problemų.
+Jei persimokome apmokymo duomenis,
+visada yra vertinimas testavimo duomenyse, kuris išlaiko mus sąžiningus.
+Bet jei persimokytume testavimo duomenis, kaip kada nors tai sužinotume?
+Pavyzdžio, kaip tai gali sukelti absurdiškus rezultatus net modeliams, kurių sudėtingumas
+gali būti griežtai kontroliuojamas, žr. :citet:`ong2005learning`.
 
-Thus, we should never rely on the test data for model selection.
-And yet we cannot rely solely on the training data
-for model selection either because
-we cannot estimate the generalization error
-on the very data that we use to train the model.
+Taigi niekada neturėtume remtis testavimo duomenimis modelio parinkimui.
+Ir vis dėlto negalime pasikliauti vien apmokymo duomenimis
+modelio parinkimui, nes
+negalime įvertinti apibendrinimo paklaidos
+tuose pačiuose duomenyse, kuriuos naudojame modeliui apmokyti.
 
 
-In practical applications, the picture gets muddier.
-While ideally we would only touch the test data once,
-to assess the very best model or to compare
-a small number of models with each other,
-real-world test data is seldom discarded after just one use.
-We can seldom afford a new test set for each round of experiments.
-In fact, recycling benchmark data for decades
-can have a significant impact on the
-development of algorithms,
-e.g., for [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
-and [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
+Praktiniuose taikymuose vaizdas darosi miglotesnis.
+Nors idealiu atveju testavimo duomenų liestume tik vieną kartą,
+kad įvertintume pačią geriausią modelį arba palygintume
+nedidelį skaičių modelių tarpusavyje,
+realaus pasaulio testavimo duomenys retai išmetami po vieno panaudojimo.
+Retai galime sau leisti naują testavimo aibę kiekvienam eksperimentų ciklui.
+Tiesą sakant, dešimtmečius pakartotinai naudojami lyginamieji duomenys
+gali turėti didelį poveikį
+algoritmų kūrimui,
+pvz., [vaizdų klasifikavimui](https://paperswithcode.com/sota/image-classification-on-imagenet)
+ir [optiniam simbolių atpažinimui](https://paperswithcode.com/sota/image-classification-on-mnist).
 
-The common practice for addressing the problem of *training on the test set*
-is to split our data three ways,
-incorporating a *validation set*
-in addition to the training and test datasets.
-The result is a murky business where the boundaries
-between validation and test data are worryingly ambiguous.
-Unless explicitly stated otherwise, in the experiments in this book
-we are really working with what should rightly be called
-training data and validation data, with no true test sets.
-Therefore, the accuracy reported in each experiment of the book is really
-the validation accuracy and not a true test set accuracy.
+Įprasta praktika sprendžiant *apmokymo testavimo aibėje* problemą
+yra skaidyti duomenis į tris dalis,
+be apmokymo ir testavimo duomenų rinkinių, įtraukiant *validavimo aibę*.
+Rezultatas yra miglotas reikalas, kuriame ribos
+tarp validavimo ir testavimo duomenų neramiai neaiškios.
+Jei aiškiai nenurodyta kitaip, šios knygos eksperimentuose
+iš tikrųjų dirbame su tuo, kas teisingai turėtų būti vadinama
+apmokymo duomenimis ir validavimo duomenimis, be tikrų testavimo aibių.
+Todėl kiekviename knygos eksperimente pateikiamas tikslumas iš tikrųjų yra
+validavimo tikslumas, o ne tikras testavimo aibės tikslumas.
 
-### Cross-Validation
+### Kryžminis validavimas
 
-When training data is scarce,
-we might not even be able to afford to hold out
-enough data to constitute a proper validation set.
-One popular solution to this problem is to employ
-$K$*-fold cross-validation*.
-Here, the original training data is split into $K$ non-overlapping subsets.
-Then model training and validation are executed $K$ times,
-each time training on $K-1$ subsets and validating
-on a different subset (the one not used for training in that round).
-Finally, the training and validation errors are estimated
-by averaging over the results from the $K$ experiments.
+Kai apmokymo duomenų trūksta,
+galime net negalėti sau leisti atskirti
+pakankamai duomenų tinkamai validavimo aibei sudaryti.
+Vienas populiarus šios problemos sprendimas yra naudoti
+$K$ *dalių kryžminį validavimą*.
+Čia pradiniai apmokymo duomenys padalijami į $K$ nesikertančių poaibių.
+Tada modelio apmokymas ir validavimas vykdomi $K$ kartų,
+kiekvieną kartą apmokant su $K-1$ poaibiais ir validuojant
+su skirtingu poaibiu (tuo, kuris tame etape nebuvo naudojamas apmokymui).
+Galiausiai apmokymo ir validavimo paklaidos įvertinamos
+suvidurkinant $K$ eksperimentų rezultatus.
 
 
 
-## Summary
+## Santrauka
 
-This section explored some of the  underpinnings
-of generalization in  machine learning.
-Some of these ideas become complicated
-and counterintuitive when we get to deeper models; here, models are capable of overfitting data badly,
-and the relevant notions of complexity
-can be both implicit and counterintuitive
-(e.g., larger architectures with more parameters
-generalizing better).
-We leave you with a few rules of thumb:
+Šiame skyrelyje nagrinėjome kai kuriuos
+apibendrinimo mašininiame mokyme pagrindus.
+Kai kurios iš šių idėjų tampa sudėtingos
+ir prieštaraujančios intuicijai, kai pereiname prie gilesnių modelių; čia modeliai gali smarkiai persimokyti duomenis,
+o susijusios sudėtingumo sampratos
+gali būti ir neišreikštos, ir prieštaraujančios intuicijai
+(pvz., didesnės architektūros su daugiau parametrų
+geriau apibendrina).
+Paliekame jums kelias praktines taisykles:
 
-1. Use validation sets (or $K$*-fold cross-validation*) for model selection;
-1. More complex models often require more data;
-1. Relevant notions of complexity include both the number of parameters and the range of values that they are allowed to take;
-1. Keeping all else equal, more data almost always leads to better generalization;
-1. This entire talk of generalization is all predicated on the IID assumption. If we relax this assumption, allowing for distributions to shift between the train and testing periods, then we cannot say anything about generalization absent a further (perhaps milder) assumption.
+1. Modelio parinkimui naudokite validavimo aibes (arba $K$ dalių kryžminį validavimą);
+1. Sudėtingesniems modeliams dažnai reikia daugiau duomenų;
+1. Svarbios sudėtingumo sampratos apima ir parametrų skaičių, ir reikšmių, kurias jiems leidžiama įgyti, diapazoną;
+1. Visiems kitiems dalykams esant vienodiems, daugiau duomenų beveik visada veda prie geresnio apibendrinimo;
+1. Visas šis pokalbis apie apibendrinimą grindžiamas IID prielaida. Jei atsisakome šios prielaidos, leisdami skirstiniams pasikeisti tarp apmokymo ir testavimo laikotarpių, tada negalime nieko pasakyti apie apibendrinimą be tolesnės (galbūt švelnesnės) prielaidos.
 
 
-## Exercises
+## Pratimai
 
-1. When can you solve the problem of polynomial regression exactly?
-1. Give at least five examples where dependent random variables make treating the problem as IID data inadvisable.
-1. Can you ever expect to see zero training error? Under which circumstances would you see zero generalization error?
-1. Why is $K$-fold cross-validation very expensive to compute?
-1. Why is the $K$-fold cross-validation error estimate biased?
-1. The VC dimension is defined as the maximum number of points that can be classified with arbitrary labels $\{\pm 1\}$ by a function of a class of functions. Why might this not be a good idea for measuring how complex the class of functions is? Hint: consider the magnitude of the functions.
-1. Your manager gives you a difficult dataset on which your current algorithm does not perform so well. How would you justify to him that you need more data? Hint: you cannot increase the data but you can decrease it.
+1. Kada galite tiksliai išspręsti polinominės regresijos uždavinį?
+1. Pateikite bent penkis pavyzdžius, kai priklausomi atsitiktiniai dydžiai daro netinkamą nagrinėti uždavinį kaip IID duomenis.
+1. Ar kada nors galite tikėtis matyti nulinę apmokymo paklaidą? Kokiomis aplinkybėmis pamatytumėte nulinę apibendrinimo paklaidą?
+1. Kodėl $K$ dalių kryžminį validavimą labai brangu apskaičiuoti?
+1. Kodėl $K$ dalių kryžminio validavimo paklaidos įvertis yra paslinktas?
+1. VC dimensija apibrėžiama kaip didžiausias taškų skaičius, kuriuos funkcijų klasės funkcija gali klasifikuoti su savavališkais žymenimis $\{\pm 1\}$. Kodėl tai gali nebūti gera mintis matuojant, kiek sudėtinga funkcijų klasė? Užuomina: apsvarstykite funkcijų didumą.
+1. Jūsų vadovas duoda jums sunkų duomenų rinkinį, kuriame jūsų dabartinis algoritmas veikia nelabai gerai. Kaip jam pagrįstumėte, kad jums reikia daugiau duomenų? Užuomina: duomenų padidinti negalite, bet galite sumažinti.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/96)
+[Diskusijos](https://discuss.d2l.ai/t/96)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/97)
+[Diskusijos](https://discuss.d2l.ai/t/97)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/234)
+[Diskusijos](https://discuss.d2l.ai/t/234)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17978)
+[Diskusijos](https://discuss.d2l.ai/t/17978)
 :end_tab:

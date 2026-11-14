@@ -3,15 +3,15 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Parameter Initialization
+# Parametrų inicializavimas
 
-Now that we know how to access the parameters,
-let's look at how to initialize them properly.
-We discussed the need for proper initialization in :numref:`sec_numerical_stability`.
-The deep learning framework provides default random initializations to its layers.
-However, we often want to initialize our weights
-according to various other protocols. The framework provides most commonly
-used protocols, and also allows to create a custom initializer.
+Dabar, kai žinome, kaip pasiekti parametrus,
+pažiūrėkime, kaip juos tinkamai inicializuoti.
+Tinkamo inicializavimo būtinybę aptarėme :numref:`sec_numerical_stability`.
+Giliojo mokymosi karkasas savo sluoksniams numato atsitiktinius inicializavimus.
+Tačiau dažnai norime inicializuoti savo svorius
+pagal įvairius kitus protokolus. Karkasas suteikia dažniausiai
+naudojamus protokolus ir taip pat leidžia sukurti pasirinktinį inicializatorių.
 
 ```{.python .input}
 %%tab mxnet
@@ -40,32 +40,32 @@ from jax import numpy as jnp
 ```
 
 :begin_tab:`mxnet`
-By default, MXNet initializes weight parameters by randomly drawing from a uniform distribution $U(-0.07, 0.07)$,
-clearing bias parameters to zero.
-MXNet's `init` module provides a variety
-of preset initialization methods.
+Pagal numatytuosius nustatymus MXNet inicializuoja svorių parametrus atsitiktinai semdamas iš tolygiojo skirstinio $U(-0.07, 0.07)$,
+o poslinkio parametrus nustato lygius nuliui.
+MXNet modulis `init` suteikia įvairių
+iš anksto nustatytų inicializavimo metodų.
 :end_tab:
 
 :begin_tab:`pytorch`
-By default, PyTorch initializes weight and bias matrices
-uniformly by drawing from a range that is computed according to the input and output dimension.
-PyTorch's `nn.init` module provides a variety
-of preset initialization methods.
+Pagal numatytuosius nustatymus PyTorch inicializuoja svorių ir poslinkių matricas
+tolygiai semdamas iš intervalo, kuris apskaičiuojamas pagal įvesties ir išvesties dimensiją.
+PyTorch modulis `nn.init` suteikia įvairių
+iš anksto nustatytų inicializavimo metodų.
 :end_tab:
 
 :begin_tab:`tensorflow`
-By default, Keras initializes weight matrices uniformly by drawing from a range that is computed according to the input and output dimension, and the bias parameters are all set to zero.
-TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module.
+Pagal numatytuosius nustatymus Keras inicializuoja svorių matricas tolygiai semdamas iš intervalo, kuris apskaičiuojamas pagal įvesties ir išvesties dimensiją, o poslinkio parametrai visi nustatomi lygūs nuliui.
+TensorFlow suteikia įvairių inicializavimo metodų ir šakniniame modulyje, ir modulyje `keras.initializers`.
 :end_tab:
 
 :begin_tab:`jax`
-By default, Flax initializes weights using `jax.nn.initializers.lecun_normal`,
-i.e., by drawing samples from a truncated normal distribution centered on 0 with
-the standard deviation set as the squared root of $1 / \textrm{fan}_{\textrm{in}}$
-where `fan_in` is the number of input units in the weight tensor. The bias
-parameters are all set to zero.
-Jax's `nn.initializers` module provides a variety
-of preset initialization methods.
+Pagal numatytuosius nustatymus Flax inicializuoja svorius naudodamas `jax.nn.initializers.lecun_normal`,
+t. y. semdamas imtis iš sutrumpinto normaliojo skirstinio, centruoto ties 0, kurio
+standartinis nuokrypis nustatytas kaip kvadratinė šaknis iš $1 / \textrm{fan}_{\textrm{in}}$,
+kur `fan_in` yra svorių tenzoriaus įvesties vienetų skaičius. Poslinkio
+parametrai visi nustatomi lygūs nuliui.
+Jax modulis `nn.initializers` suteikia įvairių
+iš anksto nustatytų inicializavimo metodų.
 :end_tab:
 
 ```{.python .input}
@@ -106,12 +106,12 @@ params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
-## [**Built-in Initialization**]
+## [**Įtaisytasis inicializavimas**]
 
-Let's begin by calling on built-in initializers.
-The code below initializes all weight parameters
-as Gaussian random variables
-with standard deviation 0.01, while bias parameters are cleared to zero.
+Pradėkime kviesdami įtaisytuosius inicializatorius.
+Žemiau pateiktas kodas inicializuoja visus svorių parametrus
+kaip Gauso atsitiktinius dydžius
+su standartiniu nuokrypiu 0,01, o poslinkio parametrus nustato lygius nuliui.
 
 ```{.python .input}
 %%tab mxnet
@@ -160,8 +160,8 @@ layer_0 = params['params']['layers_0']
 layer_0['kernel'][:, 0], layer_0['bias'][0]
 ```
 
-We can also initialize all the parameters
-to a given constant value (say, 1).
+Taip pat galime inicializuoti visus parametrus
+tam tikra pastovia reikšme (tarkime, 1).
 
 ```{.python .input}
 %%tab mxnet
@@ -208,11 +208,11 @@ layer_0 = params['params']['layers_0']
 layer_0['kernel'][:, 0], layer_0['bias'][0]
 ```
 
-[**We can also apply different initializers for certain blocks.**]
-For example, below we initialize the first layer
-with the Xavier initializer
-and initialize the second layer
-to a constant value of 42.
+[**Taip pat galime taikyti skirtingus inicializatorius tam tikriems blokams.**]
+Pavyzdžiui, žemiau inicializuojame pirmąjį sluoksnį
+Xavier inicializatoriumi,
+o antrąjį sluoksnį –
+pastovia reikšme 42.
 
 ```{.python .input}
 %%tab mxnet
@@ -267,12 +267,12 @@ params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
 params['params']['layers_0']['kernel'][:, 0], params['params']['layers_2']['kernel']
 ```
 
-### [**Custom Initialization**]
+### [**Pasirinktinis inicializavimas**]
 
-Sometimes, the initialization methods we need
-are not provided by the deep learning framework.
-In the example below, we define an initializer
-for any weight parameter $w$ using the following strange distribution:
+Kartais mums reikalingų inicializavimo metodų
+giliojo mokymosi karkasas nesuteikia.
+Žemiau pateiktame pavyzdyje apibrėžiame inicializatorių
+bet kuriam svorio parametrui $w$, naudodami šį keistą skirstinį:
 
 $$
 \begin{aligned}
@@ -285,25 +285,25 @@ $$
 $$
 
 :begin_tab:`mxnet`
-Here we define a subclass of the `Initializer` class.
-Usually, we only need to implement the `_init_weight` function
-which takes a tensor argument (`data`)
-and assigns to it the desired initialized values.
+Čia apibrėžiame klasės `Initializer` poklasę.
+Paprastai mums tereikia įgyvendinti funkciją `_init_weight`,
+kuri priima tenzoriaus argumentą (`data`)
+ir priskiria jam norimas inicializuotas reikšmes.
 :end_tab:
 
 :begin_tab:`pytorch`
-Again, we implement a `my_init` function to apply to `net`.
+Vėlgi, įgyvendiname funkciją `my_init`, kad pritaikytume ją `net`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Here we define a subclass of `Initializer` and implement the `__call__`
-function that return a desired tensor given the shape and data type.
+Čia apibrėžiame `Initializer` poklasę ir įgyvendiname funkciją `__call__`,
+kuri grąžina norimą tenzorių, turint formą ir duomenų tipą.
 :end_tab:
 
 :begin_tab:`jax`
-Jax initialization functions take as arguments the `PRNGKey`, `shape` and
-`dtype`. Here we implement the function `my_init` that returns a desired
-tensor given the shape and data type.
+Jax inicializavimo funkcijos kaip argumentus priima `PRNGKey`, `shape` ir
+`dtype`. Čia įgyvendiname funkciją `my_init`, kuri grąžina norimą
+tenzorių, turint formą ir duomenų tipą.
 :end_tab:
 
 ```{.python .input}
@@ -365,15 +365,15 @@ print(params['params']['layers_0']['kernel'][:, :2])
 ```
 
 :begin_tab:`mxnet, pytorch, tensorflow`
-Note that we always have the option
-of setting parameters directly.
+Atkreipkite dėmesį, kad visada turime galimybę
+parametrus nustatyti tiesiogiai.
 :end_tab:
 
 :begin_tab:`jax`
-When initializing parameters in JAX and Flax, the the dictionary of parameters
-returned has a `flax.core.frozen_dict.FrozenDict` type. It is not advisable in
-the Jax ecosystem to directly alter the values of an array, hence the datatypes
-are generally immutable. One might use `params.unfreeze()` to make changes.
+Inicializuojant parametrus JAX ir Flax, grąžinamas parametrų žodynas
+yra tipo `flax.core.frozen_dict.FrozenDict`. JAX ekosistemoje nerekomenduojama
+tiesiogiai keisti masyvo reikšmių, todėl duomenų tipai
+paprastai yra nekeičiami. Pakeitimams atlikti galima naudoti `params.unfreeze()`.
 :end_tab:
 
 ```{.python .input}
@@ -397,26 +397,26 @@ net.layers[1].weights[0][0, 0].assign(42)
 net.layers[1].weights[0]
 ```
 
-## Summary
+## Santrauka
 
-We can initialize parameters using built-in and custom initializers.
+Parametrus galime inicializuoti naudodami įtaisytuosius ir pasirinktinius inicializatorius.
 
-## Exercises
+## Pratimai
 
-Look up the online documentation for more built-in initializers.
+Susiraskite internetinę dokumentaciją, kad rastumėte daugiau įtaisytųjų inicializatorių.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/8089)
+[Diskusijos](https://discuss.d2l.ai/t/8089)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/8090)
+[Diskusijos](https://discuss.d2l.ai/t/8090)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/8091)
+[Diskusijos](https://discuss.d2l.ai/t/8091)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17991)
+[Diskusijos](https://discuss.d2l.ai/t/17991)
 :end_tab:

@@ -3,11 +3,11 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Implementation of Multilayer Perceptrons
+# Daugiasluoksnių perceptronų įgyvendinimas
 :label:`sec_mlp-implementation`
 
-Multilayer perceptrons (MLPs) are not much more complex to implement than simple linear models. The key conceptual
-difference is that we now concatenate multiple layers.
+Daugiasluoksnius perceptronus (MLP) įgyvendinti nėra daug sudėtingiau nei paprastus tiesinius modelius. Pagrindinis konceptualus
+skirtumas yra tas, kad dabar sujungiame kelis sluoksnius.
 
 ```{.python .input}
 %%tab mxnet
@@ -38,52 +38,52 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-Let's begin again by implementing such a network from scratch.
+Vėl pradėkime įgyvendindami tokį tinklą nuo nulio.
 
-### Initializing Model Parameters
+### Modelio parametrų inicializavimas
 
-Recall that Fashion-MNIST contains 10 classes,
-and that each image consists of a $28 \times 28 = 784$
-grid of grayscale pixel values.
-As before we will disregard the spatial structure
-among the pixels for now,
-so we can think of this as a classification dataset
-with 784 input features and 10 classes.
-To begin, we will [**implement an MLP
-with one hidden layer and 256 hidden units.**]
-Both the number of layers and their width are adjustable
-(they are considered hyperparameters).
-Typically, we choose the layer widths to be divisible by larger powers of 2.
-This is computationally efficient due to the way
-memory is allocated and addressed in hardware.
+Prisiminkite, kad Fashion-MNIST turi 10 klasių,
+o kiekvienas vaizdas sudarytas iš $28 \times 28 = 784$
+pilkumo atspalvių pikselių reikšmių tinklelio.
+Kaip ir anksčiau, kol kas nepaisysime erdvinės struktūros
+tarp pikselių,
+todėl tai galime laikyti klasifikavimo duomenų rinkiniu
+su 784 įvesties požymiais ir 10 klasių.
+Pradžioje [**įgyvendinsime MLP
+su vienu paslėptuoju sluoksniu ir 256 paslėptaisiais vienetais.**]
+Ir sluoksnių skaičius, ir jų plotis yra reguliuojami
+(jie laikomi hiperparametrais).
+Paprastai sluoksnių pločius renkamės dalius iš didesnių 2 laipsnių.
+Tai skaičiavimo požiūriu efektyvu dėl to, kaip
+aparatinėje įrangoje paskirstoma ir adresuojama atmintis.
 
-Again, we will represent our parameters with several tensors.
-Note that *for every layer*, we must keep track of
-one weight matrix and one bias vector.
-As always, we allocate memory
-for the gradients of the loss with respect to these parameters.
+Vėlgi, savo parametrus atvaizduosime keliais tenzoriais.
+Atkreipkite dėmesį, kad *kiekvienam sluoksniui* turime sekti
+vieną svorių matricą ir vieną poslinkių vektorių.
+Kaip visada, skiriame atmintį
+nuostolių gradientams šių parametrų atžvilgiu.
 
 :begin_tab:`mxnet`
-In the code below, we first define and initialize the parameters
-and then enable gradient tracking.
+Žemiau pateiktame kode pirmiausia apibrėžiame ir inicializuojame parametrus,
+o tada įjungiame gradientų sekimą.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the code below we use `nn.Parameter`
-to automatically register
-a class attribute as a parameter to be tracked by `autograd` (:numref:`sec_autograd`).
+Žemiau pateiktame kode naudojame `nn.Parameter`,
+kad automatiškai užregistruotume
+klasės atributą kaip parametrą, kurį seks `autograd` (:numref:`sec_autograd`).
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the code below we use `tf.Variable`
-to define the model parameter.
+Žemiau pateiktame kode naudojame `tf.Variable`
+modelio parametrui apibrėžti.
 :end_tab:
 
 :begin_tab:`jax`
-In the code below we use `flax.linen.Module.param`
-to define the model parameter.
+Žemiau pateiktame kode naudojame `flax.linen.Module.param`
+modelio parametrui apibrėžti.
 :end_tab:
 
 ```{.python .input}
@@ -144,11 +144,11 @@ class MLPScratch(d2l.Classifier):
         self.b2 = self.param('b2', nn.initializers.zeros, self.num_outputs)
 ```
 
-### Model
+### Modelis
 
-To make sure we know how everything works,
-we will [**implement the ReLU activation**] ourselves
-rather than invoking the built-in `relu` function directly.
+Kad įsitikintume, jog suprantame, kaip viskas veikia,
+ReLU aktyvaciją [**įgyvendinsime patys**],
+užuot tiesiogiai kvietę įtaisytąją funkciją `relu`.
 
 ```{.python .input}
 %%tab mxnet
@@ -175,11 +175,11 @@ def relu(X):
     return jnp.maximum(X, 0)
 ```
 
-Since we are disregarding spatial structure,
-we `reshape` each two-dimensional image into
-a flat vector of length  `num_inputs`.
-Finally, we (**implement our model**)
-with just a few lines of code. Since we use the framework built-in autograd this is all that it takes.
+Kadangi nepaisome erdvinės struktūros,
+kiekvieną dvimatį vaizdą pertvarkome (`reshape`) į
+plokščią vektorių, kurio ilgis `num_inputs`.
+Galiausiai (**įgyvendiname savo modelį**)
+vos keliomis kodo eilutėmis. Kadangi naudojame karkaso įtaisytąjį autograd, to pakanka.
 
 ```{.python .input}
 %%tab all
@@ -190,10 +190,10 @@ def forward(self, X):
     return d2l.matmul(H, self.W2) + self.b2
 ```
 
-### Training
+### Apmokymas
 
-Fortunately, [**the training loop for MLPs
-is exactly the same as for softmax regression.**] We define the model, data, and trainer, then finally invoke the `fit` method on model and data.
+Laimei, [**MLP apmokymo ciklas
+yra lygiai toks pat kaip softmax regresijos.**] Apibrėžiame modelį, duomenis ir apmokytoją, o tada kviečiame modelio ir duomenų metodą `fit`.
 
 ```{.python .input}
 %%tab all
@@ -203,19 +203,18 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-## Concise Implementation
+## Glaustas įgyvendinimas
 
-As you might expect, by relying on the high-level APIs, we can implement MLPs even more concisely.
+Kaip galite tikėtis, pasitelkę aukšto lygio API, MLP galime įgyvendinti dar glausčiau.
 
-### Model
+### Modelis
 
-Compared with our concise implementation
-of softmax regression implementation
+Palyginti su glaustu softmax regresijos įgyvendinimu
 (:numref:`sec_softmax_concise`),
-the only difference is that we add
-*two* fully connected layers where we previously added only *one*.
-The first is [**the hidden layer**],
-the second is the output layer.
+vienintelis skirtumas yra tas, kad pridedame
+*du* pilnai sujungtus sluoksnius ten, kur anksčiau pridėjome tik *vieną*.
+Pirmasis yra [**paslėptasis sluoksnis**],
+antrasis – išvesties sluoksnis.
 
 ```{.python .input}
 %%tab mxnet
@@ -267,31 +266,31 @@ class MLP(d2l.Classifier):
         return X
 ```
 
-Previously, we defined `forward` methods for models to transform input using the model parameters.
-These operations are essentially a pipeline:
-you take an input and
-apply a transformation (e.g.,
-matrix multiplication with weights followed by bias addition),
-then repetitively use the output of the current transformation as
-input to the next transformation.
-However, you may have noticed that 
-no `forward` method is defined here.
-In fact, `MLP` inherits the `forward` method from the `Module` class (:numref:`subsec_oo-design-models`) to 
-simply invoke `self.net(X)` (`X` is input),
-which is now defined as a sequence of transformations
-via the `Sequential` class.
-The `Sequential` class abstracts the forward process
-enabling us to focus on the transformations.
-We will further discuss how the `Sequential` class works in :numref:`subsec_model-construction-sequential`.
+Anksčiau modeliams apibrėžėme `forward` metodus, kad transformuotume įvestį naudodami modelio parametrus.
+Šios operacijos iš esmės yra konvejeris:
+paimate įvestį ir
+pritaikote transformaciją (pvz.,
+matricos daugyba iš svorių, po kurios pridedamas poslinkis),
+tada pakartotinai naudojate dabartinės transformacijos išvestį kaip
+kitos transformacijos įvestį.
+Tačiau galbūt pastebėjote, kad
+čia `forward` metodas neapibrėžtas.
+Iš tikrųjų `MLP` paveldi `forward` metodą iš klasės `Module` (:numref:`subsec_oo-design-models`), kad
+tiesiog iškviestų `self.net(X)` (`X` yra įvestis),
+kuris dabar apibrėžtas kaip transformacijų seka
+per klasę `Sequential`.
+Klasė `Sequential` abstrahuoja tiesioginį procesą,
+leisdama mums susitelkti į transformacijas.
+Plačiau aptarsime, kaip veikia klasė `Sequential`, :numref:`subsec_model-construction-sequential`.
 
 
-### Training
+### Apmokymas
 
-[**The training loop**] is exactly the same
-as when we implemented softmax regression.
-This modularity enables us to separate
-matters concerning the model architecture
-from orthogonal considerations.
+[**Apmokymo ciklas**] yra lygiai toks pat,
+kaip įgyvendinant softmax regresiją.
+Šis moduliškumas leidžia atskirti
+klausimus, susijusius su modelio architektūra,
+nuo ortogonalių svarstymų.
 
 ```{.python .input}
 %%tab all
@@ -299,42 +298,42 @@ model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
 trainer.fit(model, data)
 ```
 
-## Summary
+## Santrauka
 
-Now that we have more practice in designing deep networks, the step from a single to multiple layers of deep networks does not pose such a significant challenge any longer. In particular, we can reuse the training algorithm and data loader. Note, though, that implementing MLPs from scratch is nonetheless messy: naming and keeping track of the model parameters makes it difficult to extend models. For instance, imagine wanting to insert another layer between layers 42 and 43. This might now be layer 42b, unless we are willing to perform sequential renaming. Moreover, if we implement the network from scratch, it is much more difficult for the framework to perform meaningful performance optimizations.
+Dabar, kai turime daugiau praktikos projektuojant giliuosius tinklus, žingsnis nuo vieno iki kelių giliųjų tinklų sluoksnių nebekelia tokio didelio iššūkio. Visų pirma, galime pakartotinai naudoti apmokymo algoritmą ir duomenų įkroviklį. Vis dėlto atkreipkite dėmesį, kad MLP įgyvendinimas nuo nulio yra netvarkingas: modelio parametrų pavadinimai ir jų sekimas apsunkina modelių plėtimą. Pavyzdžiui, įsivaizduokite, kad norite įterpti dar vieną sluoksnį tarp 42 ir 43 sluoksnių. Tai dabar galėtų būti 42b sluoksnis, nebent norėtume atlikti nuoseklų pervadinimą. Be to, jei tinklą įgyvendiname nuo nulio, karkasui gerokai sunkiau atlikti prasmingas našumo optimizacijas.
 
-Nonetheless, you have now reached the state of the art of the late 1980s when fully connected deep networks were the method of choice for neural network modeling. Our next conceptual step will be to consider images. Before we do so, we need to review a number of statistical basics and details on how to compute models efficiently.
+Vis dėlto dabar pasiekėte 9-ojo dešimtmečio pabaigos technikos lygį, kai pilnai sujungti gilieji tinklai buvo pasirenkamas neuroninių tinklų modeliavimo metodas. Kitas mūsų konceptualus žingsnis bus vaizdų nagrinėjimas. Prieš tai turime apžvelgti keletą statistikos pagrindų ir išsamiau aptarti, kaip efektyviai skaičiuoti modelius.
 
 
-## Exercises
+## Pratimai
 
-1. Change the number of hidden units `num_hiddens` and plot how its number affects the accuracy of the model. What is the best value of this hyperparameter?
-1. Try adding a hidden layer to see how it affects the results.
-1. Why is it a bad idea to insert a hidden layer with a single neuron? What could go wrong?
-1. How does changing the learning rate alter your results? With all other parameters fixed, which learning rate gives you the best results? How does this relate to the number of epochs?
-1. Let's optimize over all hyperparameters jointly, i.e., learning rate, number of epochs, number of hidden layers, and number of hidden units per layer.
-    1. What is the best result you can get by optimizing over all of them?
-    1. Why it is much more challenging to deal with multiple hyperparameters?
-    1. Describe an efficient strategy for optimizing over multiple parameters jointly.
-1. Compare the speed of the framework and the from-scratch implementation for a challenging problem. How does it change with the complexity of the network?
-1. Measure the speed of tensor--matrix multiplications for well-aligned and misaligned matrices. For instance, test for matrices with dimension 1024, 1025, 1026, 1028, and 1032.
-    1. How does this change between GPUs and CPUs?
-    1. Determine the memory bus width of your CPU and GPU.
-1. Try out different activation functions. Which one works best?
-1. Is there a difference between weight initializations of the network? Does it matter?
+1. Pakeiskite paslėptųjų vienetų skaičių `num_hiddens` ir nubraižykite, kaip jų skaičius veikia modelio tikslumą. Kokia geriausia šio hiperparametro reikšmė?
+1. Pabandykite pridėti paslėptąjį sluoksnį ir pažiūrėkite, kaip tai veikia rezultatus.
+1. Kodėl blogas sumanymas įterpti paslėptąjį sluoksnį su vienu neuronu? Kas gali nepavykti?
+1. Kaip mokymosi sparto keitimas pakeičia jūsų rezultatus? Kai visi kiti parametrai fiksuoti, kuris mokymosi sparta duoda geriausius rezultatus? Kaip tai susiję su epochų skaičiumi?
+1. Optimizuokime visus hiperparametrus kartu, t. y. mokymosi spartą, epochų skaičių, paslėptųjų sluoksnių skaičių ir paslėptųjų vienetų skaičių viename sluoksnyje.
+    1. Koks geriausias rezultatas, kurį galite gauti optimizuodami visus juos?
+    1. Kodėl gerokai sunkiau tvarkytis su keliais hiperparametrais?
+    1. Aprašykite efektyvią strategiją keliems parametrams optimizuoti kartu.
+1. Palyginkite karkaso ir įgyvendinimo nuo nulio greitį sudėtingai problemai. Kaip jis kinta didėjant tinklo sudėtingumui?
+1. Išmatuokite tenzorių ir matricų daugybos greitį gerai sulygiuotoms ir nesulygiuotoms matricoms. Pavyzdžiui, išbandykite matricas, kurių dimensijos 1024, 1025, 1026, 1028 ir 1032.
+    1. Kaip tai skiriasi tarp GPU ir CPU?
+    1. Nustatykite savo CPU ir GPU atminties magistralės plotį.
+1. Išbandykite skirtingas aktyvacijos funkcijas. Kuri veikia geriausiai?
+1. Ar yra skirtumas tarp tinklo svorių inicializavimų? Ar tai svarbu?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/92)
+[Diskusijos](https://discuss.d2l.ai/t/92)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/93)
+[Diskusijos](https://discuss.d2l.ai/t/93)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/227)
+[Diskusijos](https://discuss.d2l.ai/t/227)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17985)
+[Diskusijos](https://discuss.d2l.ai/t/17985)
 :end_tab:

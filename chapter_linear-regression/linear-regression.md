@@ -3,32 +3,32 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Linear Regression
+# Tiesinė regresija
 :label:`sec_linear_regression`
 
-*Regression* problems pop up whenever we want to predict a numerical value.
-Common examples include predicting prices (of homes, stocks, etc.),
-predicting the length of stay (for patients in the hospital),
-forecasting demand (for retail sales), among numerous others.
-Not every prediction problem is one of classical regression.
-Later on, we will introduce classification problems,
-where the goal is to predict membership among a set of categories.
+*Regresijos* uždaviniai iškyla, kai tik norime prognozuoti skaitinę reikšmę.
+Įprasti pavyzdžiai: kainų (namų, akcijų ir pan.) prognozė,
+gydymo trukmės (ligoninėje besigydančių pacientų) prognozė,
+paklausos (mažmeninėje prekyboje) prognozavimas ir daugelis kitų.
+Ne kiekvienas prognozavimo uždavinys yra klasikinė regresija.
+Vėliau pristatysime klasifikavimo uždavinius,
+kuriuose tikslas yra prognozuoti priklausymą kategorijų aibei.
 
-As a running example, suppose that we wish
-to estimate the prices of houses (in dollars)
-based on their area (in square feet) and age (in years).
-To develop a model for predicting house prices,
-we need to get our hands on data,
-including the sales price, area, and age for each home.
-In the terminology of machine learning,
-the dataset is called a *training dataset* or *training set*,
-and each row (containing the data corresponding to one sale)
-is called an *example* (or *data point*, *instance*, *sample*).
-The thing we are trying to predict (price)
-is called a *label* (or *target*).
-The variables (age and area)
-upon which the predictions are based
-are called *features* (or *covariates*).
+Kaip bėgamąjį pavyzdį tarkime, kad norime
+įvertinti namų kainas (doleriais)
+pagal jų plotą (kvadratiniais pėdais) ir amžių (metais).
+Norėdami sukurti namų kainų prognozavimo modelį,
+turime gauti duomenų,
+įskaitant kiekvieno namo pardavimo kainą, plotą ir amžių.
+Mašininio mokymosi terminologijoje
+duomenų rinkinys vadinamas *apmokymo duomenų rinkiniu* arba *apmokymo aibe*,
+o kiekviena eilutė (kurioje yra vieno pardavimo duomenys)
+vadinama *pavyzdžiu* (arba *duomenų tašku*, *egzemplioriumi*, *imtimi*).
+Tai, ką bandome prognozuoti (kaina),
+vadinama *žymeniu* (arba *tikslu*).
+Kintamieji (amžius ir plotas),
+kuriais remiasi prognozės,
+vadinami *požymiais* (arba *kovariantėmis*).
 
 ```{.python .input}
 %%tab mxnet
@@ -68,190 +68,189 @@ import math
 import time
 ```
 
-## Basics
+## Pagrindai
 
-*Linear regression* is both the simplest
-and most popular among the standard tools
-for tackling regression problems.
-Dating back to the dawn of the 19th century :cite:`Legendre.1805,Gauss.1809`,
-linear regression flows from a few simple assumptions.
-First, we assume that the relationship
-between features $\mathbf{x}$ and target $y$
-is approximately linear,
-i.e., that the conditional mean $E[Y \mid X=\mathbf{x}]$
-can be expressed as a weighted sum
-of the features $\mathbf{x}$.
-This setup allows that the target value
-may still deviate from its expected value
-on account of observation noise.
-Next, we can impose the assumption that any such noise
-is well behaved, following a Gaussian distribution.
-Typically, we will use $n$ to denote
-the number of examples in our dataset.
-We use superscripts to enumerate samples and targets,
-and subscripts to index coordinates.
-More concretely,
-$\mathbf{x}^{(i)}$ denotes the $i^{\textrm{th}}$ sample
-and $x_j^{(i)}$ denotes its $j^{\textrm{th}}$ coordinate.
+*Tiesinė regresija* yra ir paprasčiausia,
+ir populiariausia iš standartinių priemonių
+regresijos uždaviniams spręsti.
+Ji siekia XIX amžiaus aušrą :cite:`Legendre.1805,Gauss.1809`,
+o tiesinė regresija išplaukia iš kelių paprastų prielaidų.
+Pirma, darome prielaidą, kad ryšys
+tarp požymių $\mathbf{x}$ ir tikslo $y$
+yra apytiksliai tiesinis,
+t. y. kad sąlyginis vidurkis $E[Y \mid X=\mathbf{x}]$
+gali būti išreikštas kaip požymių $\mathbf{x}$
+svertinė suma.
+Tokia sąranka leidžia, kad tikslinė reikšmė
+vis dar gali nukrypti nuo savo tikėtinos reikšmės
+dėl stebėjimo triukšmo.
+Toliau galime numatyti prielaidą, kad bet koks toks triukšmas
+yra tvarkingas ir pasiskirstęs pagal Gauso skirstinį.
+Paprastai $n$ žymėsime
+pavyzdžių skaičių mūsų duomenų rinkinyje.
+Viršutinius indeksus naudojame imtims ir tikslams numeruoti,
+o apatinius – koordinatėms indeksuoti.
+Konkrečiau,
+$\mathbf{x}^{(i)}$ žymi $i$-ąją imtį,
+o $x_j^{(i)}$ – jos $j$-ąją koordinatę.
 
-### Model
+### Modelis
 :label:`subsec_linear_model`
 
-At the heart of every solution is a model
-that describes how features can be transformed
-into an estimate of the target.
-The assumption of linearity means that
-the expected value of the target (price) can be expressed
-as a weighted sum of the features (area and age):
+Kiekvieno sprendimo širdyje yra modelis,
+aprašantis, kaip požymiai gali būti paversti
+tikslo įverčiu.
+Tiesiškumo prielaida reiškia, kad
+tikėtina tikslo (kainos) reikšmė gali būti išreikšta
+kaip požymių (ploto ir amžiaus) svertinė suma:
 
 $$\textrm{price} = w_{\textrm{area}} \cdot \textrm{area} + w_{\textrm{age}} \cdot \textrm{age} + b.$$
 :eqlabel:`eq_price-area`
 
-Here $w_{\textrm{area}}$ and $w_{\textrm{age}}$
-are called *weights*, and $b$ is called a *bias*
-(or *offset* or *intercept*).
-The weights determine the influence of each feature on our prediction.
-The bias determines the value of the estimate when all features are zero.
-Even though we will never see any newly-built homes with precisely zero area,
-we still need the bias because it allows us
-to express all linear functions of our features
-(rather than restricting us to lines that pass through the origin).
-Strictly speaking, :eqref:`eq_price-area` is an *affine transformation* of input features, which is characterized by a *linear transformation* of features via a weighted sum, combined with a *translation* via the added bias.
-Given a dataset, our goal is to choose
-the weights $\mathbf{w}$ and the bias $b$
-that, on average, make our model's predictions
-fit the true prices observed in the data as closely as possible.
+Čia $w_{\textrm{area}}$ ir $w_{\textrm{age}}$
+vadinami *svoriais*, o $b$ – *poslinkiu*
+(arba *postūmiu*, *laisvuoju nariu*).
+Svoriai nulemia kiekvieno požymio įtaką mūsų prognozei.
+Poslinkis nulemia įverčio reikšmę, kai visi požymiai lygūs nuliui.
+Nors niekada nepamatysime naujai pastatytų namų su tiksliai nuliniu plotu,
+poslinkio vis tiek reikia, nes jis leidžia mums
+išreikšti visas tiesines požymių funkcijas
+(užuot mus apribojęs tiesėmis, einančiomis per koordinačių pradžią).
+Griežtai kalbant, :eqref:`eq_price-area` yra įvesties požymių *afininė transformacija*, kuriai būdinga požymių *tiesinė transformacija* per svertinę sumą, kartu su *postūmiu* per pridėtą poslinkį.
+Turėdami duomenų rinkinį, siekiame pasirinkti
+svorius $\mathbf{w}$ ir poslinkį $b$,
+kad vidutiniškai mūsų modelio prognozės
+kuo tiksliau atitiktų duomenyse stebėtas tikras kainas.
 
 
-In disciplines where it is common to focus
-on datasets with just a few features,
-explicitly expressing models long-form,
-as in :eqref:`eq_price-area`, is common.
-In machine learning, we usually work
-with high-dimensional datasets,
-where it is more convenient to employ
-compact linear algebra notation.
-When our inputs consist of $d$ features,
-we can assign each an index (between $1$ and $d$)
-and express our prediction $\hat{y}$
-(in general the "hat" symbol denotes an estimate) as
+Disciplinose, kuriose įprasta sutelkti dėmesį
+į duomenų rinkinius su vos keliais požymiais,
+dažnai modeliai išreiškiami išplėstine forma,
+kaip :eqref:`eq_price-area`.
+Mašininiame mokyme paprastai dirbame
+su didelės dimensijos duomenų rinkiniais,
+kuriems patogiau naudoti
+glaustą tiesinės algebros žymėjimą.
+Kai mūsų įvestis sudaro $d$ požymių,
+galime kiekvienam priskirti indeksą (nuo $1$ iki $d$)
+ir išreikšti savo prognozę $\hat{y}$
+(apskritai „kepurėlės" simbolis žymi įvertį) taip:
 
 $$\hat{y} = w_1  x_1 + \cdots + w_d  x_d + b.$$
 
-Collecting all features into a vector $\mathbf{x} \in \mathbb{R}^d$
-and all weights into a vector $\mathbf{w} \in \mathbb{R}^d$,
-we can express our model compactly via the dot product
-between $\mathbf{w}$ and $\mathbf{x}$:
+Surinkę visus požymius į vektorių $\mathbf{x} \in \mathbb{R}^d$,
+o visus svorius – į vektorių $\mathbf{w} \in \mathbb{R}^d$,
+galime glaustai išreikšti savo modelį per skaliarinę sandaugą
+tarp $\mathbf{w}$ ir $\mathbf{x}$:
 
 $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 :eqlabel:`eq_linreg-y`
 
-In :eqref:`eq_linreg-y`, the vector $\mathbf{x}$
-corresponds to the features of a single example.
-We will often find it convenient
-to refer to features of our entire dataset of $n$ examples
-via the *design matrix* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
-Here, $\mathbf{X}$ contains one row for every example
-and one column for every feature.
-For a collection of features $\mathbf{X}$,
-the predictions $\hat{\mathbf{y}} \in \mathbb{R}^n$
-can be expressed via the matrix--vector product:
+:eqref:`eq_linreg-y` vektorius $\mathbf{x}$
+atitinka vieno pavyzdžio požymius.
+Dažnai bus patogu
+kalbėti apie viso $n$ pavyzdžių duomenų rinkinio požymius
+per *požymių matricą* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
+Čia $\mathbf{X}$ turi po vieną eilutę kiekvienam pavyzdžiui
+ir po vieną stulpelį kiekvienam požymiui.
+Požymių rinkiniui $\mathbf{X}$
+prognozės $\hat{\mathbf{y}} \in \mathbb{R}^n$
+gali būti išreikštos matricos ir vektoriaus sandauga:
 
 $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
 :eqlabel:`eq_linreg-y-vec`
 
-where broadcasting (:numref:`subsec_broadcasting`) is applied during the summation.
-Given features of a training dataset $\mathbf{X}$
-and corresponding (known) labels $\mathbf{y}$,
-the goal of linear regression is to find
-the weight vector $\mathbf{w}$ and the bias term $b$
-such that, given features of a new data example
-sampled from the same distribution as $\mathbf{X}$,
-the new example's label will (in expectation)
-be predicted with the smallest error.
+kur sumuojant taikomas transliavimas (:numref:`subsec_broadcasting`).
+Turint apmokymo duomenų rinkinio požymius $\mathbf{X}$
+ir atitinkamus (žinomus) žymenis $\mathbf{y}$,
+tiesinės regresijos tikslas yra rasti
+svorių vektorių $\mathbf{w}$ ir poslinkio narį $b$
+taip, kad turint naujo duomenų pavyzdžio požymius,
+paimtus iš to paties skirstinio kaip $\mathbf{X}$,
+naujo pavyzdžio žymuo (vidutiniškai)
+būtų prognozuojamas su mažiausia paklaida.
 
-Even if we believe that the best model for
-predicting $y$ given $\mathbf{x}$ is linear,
-we would not expect to find a real-world dataset of $n$ examples where
-$y^{(i)}$ exactly equals $\mathbf{w}^\top \mathbf{x}^{(i)}+b$
-for all $1 \leq i \leq n$.
-For example, whatever instruments we use to observe
-the features $\mathbf{X}$ and labels $\mathbf{y}$, there might be a small amount of measurement error.
-Thus, even when we are confident
-that the underlying relationship is linear,
-we will incorporate a noise term to account for such errors.
+Net jei manome, kad geriausias modelis
+$y$ prognozuoti pagal $\mathbf{x}$ yra tiesinis,
+nesitikėtume rasti realaus pasaulio duomenų rinkinio su $n$ pavyzdžių, kuriame
+$y^{(i)}$ tiksliai lygus $\mathbf{w}^\top \mathbf{x}^{(i)}+b$
+visiems $1 \leq i \leq n$.
+Pavyzdžiui, kad ir kokius prietaisus naudotume
+požymiams $\mathbf{X}$ ir žymenims $\mathbf{y}$ stebėti, gali būti nedidelė matavimo paklaida.
+Todėl net kai esame įsitikinę,
+kad pagrindinis ryšys yra tiesinis,
+įtrauksime triukšmo narį tokioms paklaidoms paaiškinti.
 
-Before we can go about searching for the best *parameters*
-(or *model parameters*) $\mathbf{w}$ and $b$,
-we will need two more things:
-(i) a measure of the quality of some given model;
-and (ii) a procedure for updating the model to improve its quality.
+Prieš pradėdami ieškoti geriausių *parametrų*
+(arba *modelio parametrų*) $\mathbf{w}$ ir $b$,
+mums reikės dar dviejų dalykų:
+(i) tam tikro duoto modelio kokybės matas;
+ir (ii) modelio atnaujinimo, siekiant pagerinti jo kokybę, procedūra.
 
-### Loss Function
+### Nuostolių funkcija
 :label:`subsec_linear-regression-loss-function`
 
-Naturally, fitting our model to the data requires
-that we agree on some measure of *fitness*
-(or, equivalently, of *unfitness*).
-*Loss functions* quantify the distance
-between the *real* and *predicted* values of the target.
-The loss will usually be a nonnegative number
-where smaller values are better
-and perfect predictions incur a loss of 0.
-For regression problems, the most common loss function is the squared error.
-When our prediction for an example $i$ is $\hat{y}^{(i)}$
-and the corresponding true label is $y^{(i)}$,
-the *squared error* is given by:
+Natūralu, kad modelio pritaikymui duomenims reikia
+susitarti dėl kokio nors *tinkamumo* mato
+(arba, atitinkamai, *netinkamumo* matas).
+*Nuostolių funkcijos* kiekybiškai išreiškia atstumą
+tarp *tikrųjų* ir *prognozuotų* tikslo reikšmių.
+Nuostoliai paprastai yra neneigiamas skaičius,
+kur mažesnės reikšmės geresnės,
+o tobulos prognozės turi nulinius nuostolius.
+Regresijos uždaviniams įprasčiausia nuostolių funkcija yra kvadratinė paklaida.
+Kai mūsų prognozė pavyzdžiui $i$ yra $\hat{y}^{(i)}$,
+o atitinkamas tikrasis žymuo yra $y^{(i)}$,
+*kvadratinė paklaida* yra:
 
 $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$
 :eqlabel:`eq_mse`
 
-The constant $\frac{1}{2}$ makes no real difference
-but proves to be notationally convenient,
-since it cancels out when we take the derivative of the loss.
-Because the training dataset is given to us,
-and thus is out of our control,
-the empirical error is only a function of the model parameters.
-In :numref:`fig_fit_linreg`, we visualize the fit of a linear regression model
-in a problem with one-dimensional inputs.
+Konstanta $\frac{1}{2}$ realaus skirtumo nesukuria,
+bet pasirodo patogi žymėjimo požiūriu,
+nes ji suprastėja, kai imame nuostolių išvestinę.
+Kadangi apmokymo duomenų rinkinys mums duotas
+ir todėl nuo mūsų nepriklauso,
+empirinė paklaida yra tik modelio parametrų funkcija.
+:numref:`fig_fit_linreg` pavaizduojame tiesinės regresijos modelio pritaikymą
+uždaviniui su vienmatėmis įvestimis.
 
-![Fitting a linear regression model to one-dimensional data.](../img/fit-linreg.svg)
+![Tiesinės regresijos modelio pritaikymas vienmačiams duomenims.](../img/fit-linreg.svg)
 :label:`fig_fit_linreg`
 
-Note that large differences between
-estimates $\hat{y}^{(i)}$ and targets $y^{(i)}$
-lead to even larger contributions to the loss,
-due to its quadratic form
-(this quadraticity can be a double-edge sword; while it encourages the model to avoid large errors
-it can also lead to excessive sensitivity to anomalous data).
-To measure the quality of a model on the entire dataset of $n$ examples,
-we simply average (or equivalently, sum)
-the losses on the training set:
+Atkreipkite dėmesį, kad dideli skirtumai tarp
+įverčių $\hat{y}^{(i)}$ ir tikslų $y^{(i)}$
+duoda dar didesnį indėlį į nuostolius
+dėl kvadratinės jų formos
+(šis kvadratiškumas gali būti dviašmenis kardas: nors jis skatina modelį vengti didelių paklaidų,
+jis taip pat gali sukelti pernelyg didelį jautrumą anomaliems duomenims).
+Kad įvertintume modelio kokybę visame $n$ pavyzdžių duomenų rinkinyje,
+tiesiog suvidurkiname (arba, ekvivalentiškai, susumuojame)
+nuostolius apmokymo aibėje:
 
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-When training the model, we seek parameters ($\mathbf{w}^*, b^*$)
-that minimize the total loss across all training examples:
+Apmokydami modelį ieškome parametrų ($\mathbf{w}^*, b^*$),
+kurie minimizuoja bendrus nuostolius visuose apmokymo pavyzdžiuose:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
-### Analytic Solution
+### Analizinis sprendinys
 
-Unlike most of the models that we will cover,
-linear regression presents us with
-a surprisingly easy optimization problem.
-In particular, we can find the optimal parameters
-(as assessed on the training data)
-analytically by applying a simple formula as follows.
-First, we can subsume the bias $b$ into the parameter $\mathbf{w}$
-by appending a column to the design matrix consisting of all 1s.
-Then our prediction problem is to minimize $\|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2$.
-As long as the design matrix $\mathbf{X}$ has full rank
-(no feature is linearly dependent on the others),
-then there will be just one critical point on the loss surface
-and it corresponds to the minimum of the loss over the entire domain.
-Taking the derivative of the loss with respect to $\mathbf{w}$
-and setting it equal to zero yields:
+Skirtingai nuo daugumos modelių, kuriuos nagrinėsime,
+tiesinė regresija pateikia stebėtinai lengvą optimizavimo uždavinį.
+Visų pirma, optimalius parametrus
+(vertinamus pagal apmokymo duomenis)
+galime rasti analiziškai, taikydami paprastą formulę.
+Pirmiausia galime poslinkį $b$ įtraukti į parametrą $\mathbf{w}$,
+pridėdami prie požymių matricos stulpelį, sudarytą iš vienetų.
+Tada mūsų prognozavimo uždavinys yra minimizuoti $\|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2$.
+Kol požymių matrica $\mathbf{X}$ turi pilnąjį rangą
+(nė vienas požymis nėra tiesiškai priklausomas nuo kitų),
+nuostolių paviršiuje bus tik vienas kritinis taškas,
+atitinkantis nuostolių minimumą visoje srityje.
+Paėmę nuostolių išvestinę $\mathbf{w}$ atžvilgiu
+ir prilyginę ją nuliui, gauname:
 
 $$\begin{aligned}
     \partial_{\mathbf{w}} \|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2 =
@@ -260,174 +259,173 @@ $$\begin{aligned}
     \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}.
 \end{aligned}$$
 
-Solving for $\mathbf{w}$ provides us with the optimal solution
-for the optimization problem.
-Note that this solution 
+Išsprendę $\mathbf{w}$, gauname optimalų
+optimizavimo uždavinio sprendinį.
+Atkreipkite dėmesį, kad šis sprendinys
 
 $$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}$$
 
-will only be unique
-when the matrix $\mathbf X^\top \mathbf X$ is invertible,
-i.e., when the columns of the design matrix
-are linearly independent :cite:`Golub.Van-Loan.1996`.
+bus vienintelis tik tada,
+kai matrica $\mathbf X^\top \mathbf X$ yra apverčiama,
+t. y. kai požymių matricos stulpeliai
+yra tiesiškai nepriklausomi :cite:`Golub.Van-Loan.1996`.
 
 
 
-While simple problems like linear regression
-may admit analytic solutions,
-you should not get used to such good fortune.
-Although analytic solutions allow for nice mathematical analysis,
-the requirement of an analytic solution is so restrictive
-that it would exclude almost all exciting aspects of deep learning.
+Nors paprasti uždaviniai, tokie kaip tiesinė regresija,
+gali turėti analizinius sprendinius,
+neturėtumėte priprasti prie tokio sėkmės.
+Nors analiziniai sprendiniai leidžia atlikti gražią matematinę analizę,
+reikalavimas turėti analizinį sprendinį yra toks ribojantis,
+kad atmestų beveik visus įdomiausius giliojo mokymosi aspektus.
 
-### Minibatch Stochastic Gradient Descent
+### Minirinkinio stochastinis gradientinis nusileidimas
 
-Fortunately, even in cases where we cannot solve the models analytically,
-we can still often train models effectively in practice.
-Moreover, for many tasks, those hard-to-optimize models
-turn out to be so much better that figuring out how to train them
-ends up being well worth the trouble.
+Laimei, net tais atvejais, kai negalime modelių išspręsti analiziškai,
+praktikoje vis tiek dažnai galime juos efektyviai apmokyti.
+Be to, daugelyje užduočių tie sunkiai optimizuojami modeliai
+pasirodo tokie daug geresni, kad išsiaiškinti, kaip juos apmokyti,
+galiausiai yra visiškai verta vargo.
 
-The key technique for optimizing nearly every deep learning model,
-and which we will call upon throughout this book,
-consists of iteratively reducing the error
-by updating the parameters in the direction
-that incrementally lowers the loss function.
-This algorithm is called *gradient descent*.
+Pagrindinė technika, skirta optimizuoti beveik kiekvieną giliojo mokymosi modelį
+ir kurią naudosime visoje šioje knygoje,
+yra iteratyvus paklaidos mažinimas,
+atnaujinant parametrus kryptimi,
+kuri laipsniškai mažina nuostolių funkciją.
+Šis algoritmas vadinamas *gradientiniu nusileidimu*.
 
-The most naive application of gradient descent
-consists of taking the derivative of the loss function,
-which is an average of the losses computed
-on every single example in the dataset.
-In practice, this can be extremely slow:
-we must pass over the entire dataset before making a single update,
-even if the update steps might be very powerful :cite:`Liu.Nocedal.1989`.
-Even worse, if there is a lot of redundancy in the training data,
-the benefit of a full update is limited.
+Naiviausias gradientinio nusileidimo taikymas
+yra nuostolių funkcijos išvestinės ėmimas,
+kuri yra nuostolių vidurkis, apskaičiuotas
+kiekvienam duomenų rinkinio pavyzdžiui.
+Praktikoje tai gali būti nepaprastai lėta:
+turime peržvelgti visą duomenų rinkinį prieš atlikdami vieną atnaujinimą,
+net jei atnaujinimo žingsniai gali būti labai galingi :cite:`Liu.Nocedal.1989`.
+Dar blogiau, jei apmokymo duomenyse daug pertekliaus,
+viso atnaujinimo nauda yra ribota.
 
-The other extreme is to consider only a single example at a time and to take
-update steps based on one observation at a time.
-The resulting algorithm, *stochastic gradient descent* (SGD)
-can be an effective strategy :cite:`Bottou.2010`, even for large datasets.
-Unfortunately, SGD has drawbacks, both computational and statistical.
-One problem arises from the fact that processors are a lot faster
-multiplying and adding numbers than they are
-at moving data from main memory to processor cache.
-It is up to an order of magnitude more efficient to
-perform a matrix--vector multiplication
-than a corresponding number of vector--vector operations.
-This means that it can take a lot longer to process
-one sample at a time compared to a full batch.
-A second problem is that some of the layers,
-such as batch normalization (to be described in :numref:`sec_batch_norm`),
-only work well when we have access
-to more than one observation at a time.
+Kita kraštutinė yra nagrinėti tik vieną pavyzdį vienu metu ir atlikti
+atnaujinimo žingsnius pagal vieną stebinį.
+Gautas algoritmas, *stochastinis gradientinis nusileidimas* (SGD),
+gali būti efektyvi strategija :cite:`Bottou.2010`, net dideliems duomenų rinkiniams.
+Deja, SGD turi trūkumų, tiek skaičiavimo, tiek statistinių.
+Viena problema kyla dėl to, kad procesoriai daug greičiau
+daugina ir sudeda skaičius, nei
+perkelia duomenis iš pagrindinės atminties į procesoriaus podėlį.
+Matricos ir vektoriaus daugyba yra net iki dydžio eilės efektyvesnė
+nei atitinkamas skaičius vektorių tarpusavio operacijų.
+Tai reiškia, kad vieno pavyzdžio apdorojimas vienu metu
+gali užtrukti daug ilgiau, palyginti su visu rinkiniu.
+Antra problema yra ta, kad kai kurie sluoksniai,
+pavyzdžiui, paketinė normalizacija (aprašyta :numref:`sec_batch_norm`),
+gerai veikia tik tada, kai turime prieigą
+daugiau nei prie vieno stebinio vienu metu.
 
-The solution to both problems is to pick an intermediate strategy:
-rather than taking a full batch or only a single sample at a time,
-we take a *minibatch* of observations :cite:`Li.Zhang.Chen.ea.2014`.
-The specific choice of the size of the said minibatch depends on many factors,
-such as the amount of memory, the number of accelerators,
-the choice of layers, and the total dataset size.
-Despite all that, a number between 32 and 256,
-preferably a multiple of a large power of $2$, is a good start.
-This leads us to *minibatch stochastic gradient descent*.
+Abiejų problemų sprendimas yra pasirinkti tarpinę strategiją:
+užuot ėmę visą rinkinį ar tik vieną imtį vienu metu,
+imame stebinių *minirinkinį* :cite:`Li.Zhang.Chen.ea.2014`.
+Konkretus minėto minirinkinio dydžio pasirinkimas priklauso nuo daugelio veiksnių,
+tokių kaip atminties kiekis, spartintuvų skaičius,
+sluoksnių pasirinkimas ir bendras duomenų rinkinio dydis.
+Nepaisant to, skaičius tarp 32 ir 256,
+pageidautina didelio dvejeto laipsnio kartotinis, yra geras pradinis taškas.
+Tai veda prie *minirinkinio stochastinio gradientinio nusileidimo*.
 
-In its most basic form, in each iteration $t$,
-we first randomly sample a minibatch $\mathcal{B}_t$
-consisting of a fixed number $|\mathcal{B}|$ of training examples.
-We then compute the derivative (gradient) of the average loss
-on the minibatch with respect to the model parameters.
-Finally, we multiply the gradient
-by a predetermined small positive value $\eta$,
-called the *learning rate*,
-and subtract the resulting term from the current parameter values.
-We can express the update as follows:
+Pačia paprasčiausia forma kiekvienoje iteracijoje $t$
+pirmiausia atsitiktinai atrenkame minirinkinį $\mathcal{B}_t$,
+sudarytą iš fiksuoto skaičiaus $|\mathcal{B}|$ apmokymo pavyzdžių.
+Tada apskaičiuojame vidutinių nuostolių minirinkinyje
+išvestinę (gradientą) modelio parametrų atžvilgiu.
+Galiausiai gradientą padauginame
+iš iš anksto nustatytos mažos teigiamos reikšmės $\eta$,
+vadinamos *mokymosi sparta*,
+ir gautą narį atimame iš dabartinių parametrų reikšmių.
+Atnaujinimą galime išreikšti taip:
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b).$$
 
-In summary, minibatch SGD proceeds as follows:
-(i) initialize the values of the model parameters, typically at random;
-(ii) iteratively sample random minibatches from the data,
-updating the parameters in the direction of the negative gradient.
-For quadratic losses and affine transformations,
-this has a closed-form expansion:
+Apibendrinant, minirinkinio SGD vyksta taip:
+(i) inicializuojamos modelio parametrų reikšmės, paprastai atsitiktinai;
+(ii) iteratyviai atrenkami atsitiktiniai minirinkiniai iš duomenų,
+atnaujinant parametrus neigiamo gradiento kryptimi.
+Kvadratiniams nuostoliams ir afininėms transformacijoms
+tai turi uždarą išraišką:
 
 $$\begin{aligned} \mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_b l^{(i)}(\mathbf{w}, b) &&  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
 :eqlabel:`eq_linreg_batch_update`
 
-Since we pick a minibatch $\mathcal{B}$
-we need to normalize by its size $|\mathcal{B}|$.
-Frequently minibatch size and learning rate are user-defined.
-Such tunable parameters that are not updated
-in the training loop are called *hyperparameters*.
-They can be tuned automatically by a number of techniques, such as Bayesian optimization
-:cite:`Frazier.2018`. In the end, the quality of the solution is
-typically assessed on a separate *validation dataset* (or *validation set*).
+Kadangi pasirenkame minirinkinį $\mathcal{B}$,
+turime normalizuoti pagal jo dydį $|\mathcal{B}|$.
+Dažnai minirinkinio dydį ir mokymosi spartą nustato vartotojas.
+Tokie derinami parametrai, kurie
+apmokymo cikle neatnaujinami, vadinami *hiperparametrais*.
+Juos galima derinti automatiškai keliais metodais, pvz., Bajeso optimizavimu
+:cite:`Frazier.2018`. Galiausiai sprendinio kokybė
+paprastai vertinama atskirame *validavimo duomenų rinkinyje* (arba *validavimo aibėje*).
 
-After training for some predetermined number of iterations
-(or until some other stopping criterion is met),
-we record the estimated model parameters,
-denoted $\hat{\mathbf{w}}, \hat{b}$.
-Note that even if our function is truly linear and noiseless,
-these parameters will not be the exact minimizers of the loss, nor even deterministic.
-Although the algorithm converges slowly towards the minimizers
-it typically will not find them exactly in a finite number of steps.
-Moreover, the minibatches $\mathcal{B}$
-used for updating the parameters are chosen at random.
-This breaks determinism.
+Apmokę iš anksto nustatytą iteracijų skaičių
+(arba kol įvykdomas kitas sustojimo kriterijus),
+užfiksuojame įvertintus modelio parametrus,
+žymimus $\hat{\mathbf{w}}, \hat{b}$.
+Atkreipkite dėmesį, kad net jei mūsų funkcija iš tiesų tiesinė ir be triukšmo,
+šie parametrai nebus tikslūs nuostolių minimizatoriai ir net nebus deterministiniai.
+Nors algoritmas lėtai konverguoja link minimizatorių,
+paprastai jis jų tiksliai nesuras per baigtinį žingsnių skaičių.
+Be to, minirinkiniai $\mathcal{B}$,
+naudojami parametrams atnaujinti, parenkami atsitiktinai.
+Tai sulaužo determinizmą.
 
-Linear regression happens to be a learning problem
-with a global minimum
-(whenever $\mathbf{X}$ is full rank, or equivalently,
-whenever $\mathbf{X}^\top \mathbf{X}$ is invertible).
-However, the loss surfaces for deep networks contain many saddle points and minima.
-Fortunately, we typically do not care about finding
-an exact set of parameters but merely any set of parameters
-that leads to accurate predictions (and thus low loss).
-In practice, deep learning practitioners
-seldom struggle to find parameters
-that minimize the loss *on training sets*
+Tiesinė regresija yra mokymosi uždavinys
+su globaliuoju minimumu
+(kai tik $\mathbf{X}$ turi pilnąjį rangą arba, ekvivalentiškai,
+kai tik $\mathbf{X}^\top \mathbf{X}$ yra apverčiama).
+Tačiau giliųjų tinklų nuostolių paviršiuose yra daug balno taškų ir minimumų.
+Laimei, paprastai mums nerūpi rasti
+tikslų parametrų rinkinį, o tik bet kokį parametrų rinkinį,
+kuris veda prie tikslių prognozių (taigi ir mažų nuostolių).
+Praktikoje giliojo mokymosi specialistams
+retai kyla sunkumų ieškant parametrų,
+kurie minimizuoja nuostolius *apmokymo aibėse*
 :cite:`Izmailov.Podoprikhin.Garipov.ea.2018,Frankle.Carbin.2018`.
-The more formidable task is to find parameters
-that lead to accurate predictions on previously unseen data,
-a challenge called *generalization*.
-We return to these topics throughout the book.
+Sunkesnė užduotis yra rasti parametrus,
+kurie veda prie tikslių prognozių anksčiau nematytiems duomenims,
+o šis iššūkis vadinamas *apibendrinimu*.
+Prie šių temų sugrįšime visoje knygoje.
 
-### Predictions
+### Prognozės
 
-Given the model $\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
-we can now make *predictions* for a new example,
-e.g., predicting the sales price of a previously unseen house
-given its area $x_1$ and age $x_2$.
-Deep learning practitioners have taken to calling the prediction phase *inference*
-but this is a bit of a misnomer---*inference* refers broadly
-to any conclusion reached on the basis of evidence,
-including both the values of the parameters
-and the likely label for an unseen instance.
-If anything, in the statistics literature
-*inference* more often denotes parameter inference
-and this overloading of terminology creates unnecessary confusion
-when deep learning practitioners talk to statisticians.
-In the following we will stick to *prediction* whenever possible.
+Turėdami modelį $\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
+dabar galime daryti naujo pavyzdžio *prognozes*,
+pvz., prognozuoti anksčiau nematyto namo pardavimo kainą
+pagal jo plotą $x_1$ ir amžių $x_2$.
+Giliojo mokymosi specialistai įprato prognozavimo etapą vadinti *inferencija*,
+bet tai yra šiek tiek klaidingas pavadinimas – *inferencija* apskritai reiškia
+bet kokią išvadą, padarytą remiantis įrodymais,
+įskaitant ir parametrų reikšmes,
+ir tikėtiną anksčiau nematyto egzemplioriaus žymenį.
+Statistikos literatūroje
+*inferencija* dažniau reiškia parametrų inferenciją,
+ir šis terminijos perkrovimas sukuria nereikalingą painiavą,
+kai giliojo mokymosi specialistai kalbasi su statistikais.
+Toliau, kai tik įmanoma, laikysimės termino *prognozė*.
 
 
 
-## Vectorization for Speed
+## Vektorizacija spartai
 
-When training our models, we typically want to process
-whole minibatches of examples simultaneously.
-Doing this efficiently requires that (**we**) (~~should~~)
-(**vectorize the calculations and leverage
-fast linear algebra libraries
-rather than writing costly for-loops in Python.**)
+Apmokydami modelius dažniausiai norime apdoroti
+visus pavyzdžių minirinkinius vienu metu.
+Kad tai būtų daroma efektyviai, (**turime**) (~~should~~)
+(**vektorizuoti skaičiavimus ir pasinaudoti
+greitomis tiesinės algebros bibliotekomis,
+užuot rašę brangius ciklus „for" Python kalba.**)
 
-To see why this matters so much,
-let's (**consider two methods for adding vectors.**)
-To start, we instantiate two 10,000-dimensional vectors
-containing all 1s.
-In the first method, we loop over the vectors with a Python for-loop.
-In the second, we rely on a single call to `+`.
+Kad suprastume, kodėl tai taip svarbu,
+(**panagrinėkime du vektorių sudėjimo metodus.**)
+Pradžioje sukuriame du 10 000 dimensijų vektorius,
+sudarytus vien iš vienetų.
+Pirmuoju metodu einame per vektorius Python ciklu „for".
+Antruoju remiamės vienu operatoriaus `+` iškvietimu.
 
 ```{.python .input}
 %%tab all
@@ -436,9 +434,9 @@ a = d2l.ones(n)
 b = d2l.ones(n)
 ```
 
-Now we can benchmark the workloads.
-First, [**we add them, one coordinate at a time,
-using a for-loop.**]
+Dabar galime išmatuoti darbo krūvių spartą.
+Pirmiausia [**sudedame juos po vieną koordinatę,
+naudodami ciklą „for".**]
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -470,7 +468,7 @@ for i in range(n):
 f'{time.time() - t:.5f} sec'
 ```
 
-(**Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum.**)
+(**Arba remiamės perkrautu operatoriumi `+`, kad apskaičiuotume elementinę sumą.**)
 
 ```{.python .input}
 %%tab all
@@ -479,42 +477,42 @@ d = a + b
 f'{time.time() - t:.5f} sec'
 ```
 
-The second method is dramatically faster than the first.
-Vectorizing code often yields order-of-magnitude speedups.
-Moreover, we push more of the mathematics to the library
-so we do not have to write as many calculations ourselves,
-reducing the potential for errors and increasing portability of the code.
+Antrasis metodas yra stebėtinai greitesnis už pirmąjį.
+Vektorizavimas dažnai suteikia dydžio eilės pagreitį.
+Be to, daugiau matematikos perkeliame bibliotekai,
+todėl mums nereikia patiems rašyti tiek skaičiavimų,
+o tai mažina klaidų galimybę ir didina kodo perkeliamumą.
 
 
-## The Normal Distribution and Squared Loss
+## Normalusis skirstinys ir kvadratiniai nuostoliai
 :label:`subsec_normal_distribution_and_squared_loss`
 
-So far we have given a fairly functional motivation
-of the squared loss objective:
-the optimal parameters return the conditional expectation $E[Y\mid X]$
-whenever the underlying pattern is truly linear,
-and the loss assigns large penalties for outliers.
-We can also provide a more formal motivation
-for the squared loss objective
-by making probabilistic assumptions
-about the distribution of noise.
+Iki šiol kvadratinių nuostolių tikslui pateikėme gana funkcinį
+pagrindimą:
+optimalūs parametrai grąžina sąlyginį vidurkį $E[Y\mid X]$,
+kai tik pagrindinis dėsningumas yra tikrai tiesinis,
+o nuostoliai skiria dideles baudas už nuokrypius.
+Taip pat galime pateikti formalesnį
+kvadratinių nuostolių tikslo pagrindimą,
+darydami tikimybines prielaidas
+apie triukšmo skirstinį.
 
-Linear regression was invented at the turn of the 19th century.
-While it has long been debated whether Gauss or Legendre
-first thought up the idea,
-it was Gauss who also discovered the normal distribution
-(also called the *Gaussian*).
-It turns out that the normal distribution
-and linear regression with squared loss
-share a deeper connection than common parentage.
+Tiesinė regresija buvo išrasta XIX amžiaus sandūroje.
+Nors ilgai buvo diskutuojama, ar Gaussas, ar Legendre'as
+pirmasis sugalvojo šią idėją,
+būtent Gaussas taip pat atrado normalųjį skirstinį
+(vadinamą ir *Gauso skirstiniu*).
+Pasirodo, kad normalusis skirstinys
+ir tiesinė regresija su kvadratiniais nuostoliais
+turi gilesnį ryšį nei bendra kilmė.
 
-To begin, recall that a normal distribution
-with mean $\mu$ and variance $\sigma^2$ (standard deviation $\sigma$)
-is given as
+Pirmiausia prisiminkite, kad normalusis skirstinys
+su vidurkiu $\mu$ ir dispersija $\sigma^2$ (standartiniu nuokrypiu $\sigma$)
+duodamas taip:
 
 $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \mu)^2\right).$$
 
-Below [**we define a function to compute the normal distribution**].
+Žemiau [**apibrėžiame funkciją normaliajam skirstiniui apskaičiuoti**].
 
 ```{.python .input}
 %%tab all
@@ -526,7 +524,7 @@ def normal(x, mu, sigma):
         return p * np.exp(-0.5 * (x - mu)**2 / sigma**2)
 ```
 
-We can now (**visualize the normal distributions**).
+Dabar galime (**vizualizuoti normaliuosius skirstinius**).
 
 ```{.python .input}
 %%tab mxnet
@@ -557,204 +555,203 @@ d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
          legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
 ```
 
-Note that changing the mean corresponds
-to a shift along the $x$-axis,
-and increasing the variance
-spreads the distribution out,
-lowering its peak.
+Atkreipkite dėmesį, kad vidurkio keitimas atitinka
+postūmį išilgai $x$ ašies,
+o dispersijos didinimas
+išplečia skirstinį,
+sumažindamas jo viršūnę.
 
-One way to motivate linear regression with squared loss
-is to assume that observations arise from noisy measurements,
-where the noise $\epsilon$ follows the normal distribution 
+Vienas būdas pagrįsti tiesinę regresiją su kvadratiniais nuostoliais
+yra daryti prielaidą, kad stebiniai atsiranda iš triukšmingų matavimų,
+kur triukšmas $\epsilon$ pasiskirstęs pagal normalųjį skirstinį
 $\mathcal{N}(0, \sigma^2)$:
 
 $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \textrm{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
 
-Thus, we can now write out the *likelihood*
-of seeing a particular $y$ for a given $\mathbf{x}$ via
+Taigi dabar galime užrašyti *tikėtinumą*
+pamatyti konkretų $y$ esant duotam $\mathbf{x}$:
 
 $$P(y \mid \mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$
 
-As such, the likelihood factorizes.
-According to *the principle of maximum likelihood*,
-the best values of parameters $\mathbf{w}$ and $b$ are those
-that maximize the *likelihood* of the entire dataset:
+Taigi tikėtinumas faktorizuojasi.
+Pagal *didžiausio tikėtinumo principą*
+geriausios parametrų $\mathbf{w}$ ir $b$ reikšmės yra tos,
+kurios maksimizuoja viso duomenų rinkinio *tikėtinumą*:
 
 $$P(\mathbf y \mid \mathbf X) = \prod_{i=1}^{n} p(y^{(i)} \mid \mathbf{x}^{(i)}).$$
 
-The equality follows since all pairs $(\mathbf{x}^{(i)}, y^{(i)})$
-were drawn independently of each other.
-Estimators chosen according to the principle of maximum likelihood
-are called *maximum likelihood estimators*.
-While, maximizing the product of many exponential functions,
-might look difficult,
-we can simplify things significantly, without changing the objective,
-by maximizing the logarithm of the likelihood instead.
-For historical reasons, optimizations are more often expressed
-as minimization rather than maximization.
-So, without changing anything,
-we can *minimize* the *negative log-likelihood*,
-which we can express as follows:
+Lygybė išplaukia, nes visos poros $(\mathbf{x}^{(i)}, y^{(i)})$
+buvo paimtos nepriklausomai viena nuo kitos.
+Įvertiniai, parinkti pagal didžiausio tikėtinumo principą,
+vadinami *didžiausio tikėtinumo įvertiniais*.
+Nors daugelio eksponentinių funkcijų sandaugos maksimizavimas
+gali atrodyti sudėtingas,
+galime žymiai viską supaprastinti, nekeisdami tikslo,
+vietoj to maksimizuodami tikėtinumo logaritmą.
+Dėl istorinių priežasčių optimizavimas dažniau išreiškiamas
+kaip minimizavimas, o ne maksimizavimas.
+Taigi, nieko nekeisdami,
+galime *minimizuoti* *neigiamą logaritminį tikėtinumą*,
+kurį galime išreikšti taip:
 
 $$-\log P(\mathbf y \mid \mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$
 
-If we assume that $\sigma$ is fixed,
-we can ignore the first term,
-because it does not depend on $\mathbf{w}$ or $b$.
-The second term is identical
-to the squared error loss introduced earlier,
-except for the multiplicative constant $\frac{1}{\sigma^2}$.
-Fortunately, the solution does not depend on $\sigma$ either.
-It follows that minimizing the mean squared error
-is equivalent to the maximum likelihood estimation
-of a linear model under the assumption of additive Gaussian noise.
+Jei darome prielaidą, kad $\sigma$ yra fiksuotas,
+pirmąjį narį galime ignoruoti,
+nes jis nepriklauso nuo $\mathbf{w}$ ar $b$.
+Antrasis narys yra identiškas
+anksčiau pristatytiems kvadratinės paklaidos nuostoliams,
+išskyrus daugiklį $\frac{1}{\sigma^2}$.
+Laimei, sprendinys taip pat nepriklauso nuo $\sigma$.
+Iš to išplaukia, kad vidutinės kvadratinės paklaidos minimizavimas
+yra ekvivalentus tiesinio modelio didžiausio tikėtinumo vertinimui
+darant adityvaus Gauso triukšmo prielaidą.
 
 
-## Linear Regression as a Neural Network
+## Tiesinė regresija kaip neuroninis tinklas
 
-While linear models are not sufficiently rich
-to express the many complicated networks
-that we will introduce in this book,
-(artificial) neural networks are rich enough
-to subsume linear models as networks
-in which every feature is represented by an input neuron,
-all of which are connected directly to the output.
+Nors tiesiniai modeliai nėra pakankamai turtingi
+išreikšti daugeliui sudėtingų tinklų,
+kuriuos pristatysime šioje knygoje,
+(dirbtiniai) neuroniniai tinklai yra pakankamai turtingi,
+kad apimtų tiesinius modelius kaip tinklus,
+kuriuose kiekvienas požymis atvaizduojamas įvesties neuronu,
+ir visi jie sujungti tiesiogiai su išvestimi.
 
-:numref:`fig_single_neuron` depicts
-linear regression as a neural network.
-The diagram highlights the connectivity pattern,
-such as how each input is connected to the output,
-but not the specific values taken by the weights or biases.
+:numref:`fig_single_neuron` pavaizduota
+tiesinė regresija kaip neuroninis tinklas.
+Diagrama pabrėžia jungčių struktūrą,
+pavyzdžiui, kaip kiekviena įvestis sujungta su išvestimi,
+bet ne konkrečias svorių ar poslinkių reikšmes.
 
-![Linear regression is a single-layer neural network.](../img/singleneuron.svg)
+![Tiesinė regresija yra vieno sluoksnio neuroninis tinklas.](../img/singleneuron.svg)
 :label:`fig_single_neuron`
 
-The inputs are $x_1, \ldots, x_d$.
-We refer to $d$ as the *number of inputs*
-or the *feature dimensionality* in the input layer.
-The output of the network is $o_1$.
-Because we are just trying to predict
-a single numerical value,
-we have only one output neuron.
-Note that the input values are all *given*.
-There is just a single *computed* neuron.
-In summary, we can think of linear regression
-as a single-layer fully connected neural network.
-We will encounter networks
-with far more layers
-in later chapters.
+Įvestys yra $x_1, \ldots, x_d$.
+$d$ vadiname *įvesčių skaičiumi*
+arba įvesties sluoksnio *požymių dimensija*.
+Tinklo išvestis yra $o_1$.
+Kadangi bandome prognozuoti tik
+vieną skaitinę reikšmę,
+turime tik vieną išvesties neuroną.
+Atkreipkite dėmesį, kad visos įvesties reikšmės yra *duotos*.
+Yra tik vienas *apskaičiuojamas* neuronas.
+Apibendrinant, tiesinę regresiją galime laikyti
+vieno sluoksnio pilnai sujungtu neuroniniu tinklu.
+Vėlesniuose skyriuose susidursime su tinklais,
+turinčiais gerokai daugiau sluoksnių.
 
-### Biology
+### Biologija
 
-Because linear regression predates computational neuroscience,
-it might seem anachronistic to describe
-linear regression in terms of neural networks.
-Nonetheless, they were a natural place to start
-when the cyberneticists and neurophysiologists
-Warren McCulloch and Walter Pitts began to develop
-models of artificial neurons.
-Consider the cartoonish picture
-of a biological neuron in :numref:`fig_Neuron`,
-consisting of *dendrites* (input terminals),
-the *nucleus* (CPU), the *axon* (output wire),
-and the *axon terminals* (output terminals),
-enabling connections to other neurons via *synapses*.
+Kadangi tiesinė regresija atsirado anksčiau nei skaičiuojamoji neurologija,
+tiesinę regresiją aprašyti neuroninių tinklų terminais
+gali pasirodyti anachronizmas.
+Vis dėlto tai buvo natūrali pradžia,
+kai kibernetikai ir neurofiziologai
+Warrenas McCullochas ir Walteris Pittsas pradėjo kurti
+dirbtinių neuronų modelius.
+Panagrinėkime schematinį
+biologinio neurono paveikslėlį :numref:`fig_Neuron`,
+sudarytą iš *dendritų* (įvesties gnybtų),
+*branduolio* (CPU), *aksono* (išvesties laido)
+ir *aksono galūnių* (išvesties gnybtų),
+leidžiančių jungtis su kitais neuronais per *sinapses*.
 
-![The real neuron (source: "Anatomy and Physiology" by the US National Cancer Institute's Surveillance, Epidemiology and End Results (SEER) Program).](../img/neuron.svg)
+![Tikrasis neuronas (šaltinis: „Anatomija ir fiziologija", JAV Nacionalinio vėžio instituto Stebėsenos, epidemiologijos ir galutinių rezultatų (SEER) programa).](../img/neuron.svg)
 :label:`fig_Neuron`
 
-Information $x_i$ arriving from other neurons
-(or environmental sensors) is received in the dendrites.
-In particular, that information is weighted
-by *synaptic weights* $w_i$,
-determining the effect of the inputs,
-e.g., activation or inhibition via the product $x_i w_i$.
-The weighted inputs arriving from multiple sources
-are aggregated in the nucleus
-as a weighted sum $y = \sum_i x_i w_i + b$,
-possibly subject to some nonlinear postprocessing via a function $\sigma(y)$.
-This information is then sent via the axon to the axon terminals,
-where it reaches its destination
-(e.g., an actuator such as a muscle)
-or it is fed into another neuron via its dendrites.
+Informacija $x_i$, atkeliaujanti iš kitų neuronų
+(arba aplinkos jutiklių), priimama dendrituose.
+Visų pirma ši informacija sveriama
+*sinapsiniais svoriais* $w_i$,
+nulemiančiais įvesčių poveikį,
+pvz., aktyvavimą ar slopinimą per sandaugą $x_i w_i$.
+Svertinės įvestys, ateinančios iš kelių šaltinių,
+branduolyje agreguojamos
+kaip svertinė suma $y = \sum_i x_i w_i + b$,
+galbūt papildomai netiesiškai apdorojama funkcija $\sigma(y)$.
+Tada ši informacija aksonu siunčiama į aksono galūnes,
+kur ji pasiekia paskirties vietą
+(pvz., vykdiklį, tokį kaip raumuo)
+arba perduodama kitam neuronui per jo dendritus.
 
-Certainly, the high-level idea that many such units
-could be combined, provided they have the correct connectivity and learning algorithm,
-to produce far more interesting and complex behavior
-than any one neuron alone could express
-arises from our study of real biological neural systems.
-At the same time, most research in deep learning today
-draws inspiration from a much wider source.
-We invoke :citet:`Russell.Norvig.2016`
-who pointed out that although airplanes might have been *inspired* by birds,
-ornithology has not been the primary driver
-of aeronautics innovation for some centuries.
-Likewise, inspiration in deep learning these days
-comes in equal or greater measure
-from mathematics, linguistics, psychology,
-statistics, computer science, and many other fields.
+Be abejo, aukšto lygio idėja, kad daug tokių vienetų
+galėtų būti sujungti, jei jie turi teisingą jungčių struktūrą ir mokymosi algoritmą,
+sukurti daug įdomesnį ir sudėtingesnį elgesį,
+nei galėtų išreikšti vienas neuronas,
+kyla iš tikrųjų biologinių nervų sistemų tyrimo.
+Tuo pat metu dauguma šiandienos giliojo mokymosi tyrimų
+įkvėpimo semiasi iš kur kas platesnio šaltinio.
+Remiamės :citet:`Russell.Norvig.2016`,
+kurie pažymėjo, kad nors lėktuvus galbūt *įkvėpė* paukščiai,
+ornitologija jau kelis šimtmečius nėra
+pagrindinė aeronautikos naujovių varomoji jėga.
+Panašiai šiais laikais giliojo mokymosi įkvėpimas
+vienodai ar net labiau kyla
+iš matematikos, kalbotyros, psichologijos,
+statistikos, informatikos ir daugelio kitų sričių.
 
-## Summary
+## Santrauka
 
-In this section, we introduced
-traditional linear regression,
-where the parameters of a linear function
-are chosen to minimize squared loss on the training set.
-We also motivated this choice of objective
-both via some practical considerations
-and through an interpretation
-of linear regression as maximimum likelihood estimation
-under an assumption of linearity and Gaussian noise.
-After discussing both computational considerations
-and connections to statistics,
-we showed how such linear models could be expressed
-as simple neural networks where the inputs
-are directly wired to the output(s).
-While we will soon move past linear models altogether,
-they are sufficient to introduce most of the components
-that all of our models require:
-parametric forms, differentiable objectives,
-optimization via minibatch stochastic gradient descent,
-and ultimately, evaluation on previously unseen data.
+Šiame skyrelyje pristatėme
+tradicinę tiesinę regresiją,
+kurioje tiesinės funkcijos parametrai
+parenkami taip, kad minimizuotų kvadratinius nuostolius apmokymo aibėje.
+Šį tikslo pasirinkimą taip pat pagrindėme
+ir praktiniais sumetimais,
+ir tiesinės regresijos interpretacija
+kaip didžiausio tikėtinumo vertinimu
+darant tiesiškumo ir Gauso triukšmo prielaidą.
+Aptarę ir skaičiavimo aspektus,
+ir ryšius su statistika,
+parodėme, kaip tokius tiesinius modelius galima išreikšti
+kaip paprastus neuroninius tinklus, kuriuose įvestys
+tiesiogiai sujungtos su išvestimi (-mis).
+Nors netrukus apskritai pereisime prie netiesinių modelių,
+jie yra pakankami pristatyti daugumą komponentų,
+kurių reikia visiems mūsų modeliams:
+parametrinėms formoms, diferencijuojamiems tikslams,
+optimizavimui minirinkinio stochastiniu gradientiniu nusileidimu
+ir galiausiai vertinimui anksčiau nematytuose duomenyse.
 
 
 
-## Exercises
+## Pratimai
 
-1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
-    1. Find an analytic solution for the optimal value of $b$.
-    1. How does this problem and its solution relate to the normal distribution?
-    1. What if we change the loss from $\sum_i (x_i - b)^2$ to $\sum_i |x_i-b|$? Can you find the optimal solution for $b$?
-1. Prove that the affine functions that can be expressed by $\mathbf{x}^\top \mathbf{w} + b$ are equivalent to linear functions on $(\mathbf{x}, 1)$.
-1. Assume that you want to find quadratic functions of $\mathbf{x}$, i.e., $f(\mathbf{x}) = b + \sum_i w_i x_i + \sum_{j \leq i} w_{ij} x_{i} x_{j}$. How would you formulate this in a deep network?
-1. Recall that one of the conditions for the linear regression problem to be solvable was that the design matrix $\mathbf{X}^\top \mathbf{X}$ has full rank.
-    1. What happens if this is not the case?
-    1. How could you fix it? What happens if you add a small amount of coordinate-wise independent Gaussian noise to all entries of $\mathbf{X}$?
-    1. What is the expected value of the design matrix $\mathbf{X}^\top \mathbf{X}$ in this case?
-    1. What happens with stochastic gradient descent when $\mathbf{X}^\top \mathbf{X}$ does not have full rank?
-1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
-    1. Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
-    1. Can you find a closed form solution?
-    1. Suggest a minibatch stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
-1. Assume that we want to design a neural network with two layers by composing two linear layers. That is, the output of the first layer becomes the input of the second layer. Why would such a naive composition not work?
-1. What happens if you want to use regression for realistic price estimation of houses or stock prices?
-    1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
-    1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \textrm{price}$?
-    1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock? For more information review the celebrated Black--Scholes model for option pricing :cite:`Black.Scholes.1973`.
-1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
-    1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.
-    1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k \mid \lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.
-    1. Design a loss function associated with the Poisson distribution.
-    1. Design a loss function for estimating $\log \lambda$ instead.
+1. Tarkime, turime duomenis $x_1, \ldots, x_n \in \mathbb{R}$. Mūsų tikslas yra rasti konstantą $b$, kuri minimizuotų $\sum_i (x_i - b)^2$.
+    1. Raskite analizinį optimalios $b$ reikšmės sprendinį.
+    1. Kaip šis uždavinys ir jo sprendinys susiję su normaliuoju skirstiniu?
+    1. Kas bus, jei nuostolius pakeisime iš $\sum_i (x_i - b)^2$ į $\sum_i |x_i-b|$? Ar galite rasti optimalų $b$ sprendinį?
+1. Įrodykite, kad afininės funkcijos, išreiškiamos $\mathbf{x}^\top \mathbf{w} + b$, yra ekvivalenčios tiesinėms funkcijoms nuo $(\mathbf{x}, 1)$.
+1. Tarkime, norite rasti kvadratines $\mathbf{x}$ funkcijas, t. y. $f(\mathbf{x}) = b + \sum_i w_i x_i + \sum_{j \leq i} w_{ij} x_{i} x_{j}$. Kaip tai suformuluotumėte giliajame tinkle?
+1. Prisiminkite, kad viena iš tiesinės regresijos uždavinio išsprendžiamumo sąlygų buvo, kad požymių matrica $\mathbf{X}^\top \mathbf{X}$ turi pilnąjį rangą.
+    1. Kas nutinka, jei taip nėra?
+    1. Kaip tai galėtumėte ištaisyti? Kas nutinka, jei prie visų $\mathbf{X}$ įrašų pridedate nedidelį kiekį koordinatėmis nepriklausomo Gauso triukšmo?
+    1. Kokia yra požymių matricos $\mathbf{X}^\top \mathbf{X}$ tikėtina reikšmė šiuo atveju?
+    1. Kas nutinka su stochastiniu gradientiniu nusileidimu, kai $\mathbf{X}^\top \mathbf{X}$ neturi pilnojo rango?
+1. Tarkime, kad adityvųjį triukšmą $\epsilon$ valdantis triukšmo modelis yra eksponentinis skirstinys. T. y. $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
+    1. Užrašykite duomenų neigiamą logaritminį tikėtinumą pagal modelį $-\log P(\mathbf y \mid \mathbf X)$.
+    1. Ar galite rasti uždaros formos sprendinį?
+    1. Pasiūlykite minirinkinio stochastinio gradientinio nusileidimo algoritmą šiam uždaviniui spręsti. Kas galėtų nepavykti (užuomina: kas nutinka šalia stacionaraus taško, toliau atnaujinant parametrus)? Ar galite tai ištaisyti?
+1. Tarkime, norime sukurti dviejų sluoksnių neuroninį tinklą, sukomponuodami du tiesinius sluoksnius. T. y. pirmojo sluoksnio išvestis tampa antrojo sluoksnio įvestimi. Kodėl tokia naivi kompozicija neveiktų?
+1. Kas nutinka, jei norite naudoti regresiją realistiškam namų kainų ar akcijų kainų vertinimui?
+    1. Parodykite, kad adityvaus Gauso triukšmo prielaida netinkama. Užuomina: ar gali būti neigiamų kainų? O svyravimai?
+    1. Kodėl regresija kainos logaritmui būtų daug geresnė, t. y. $y = \log \textrm{price}$?
+    1. Dėl ko reikia sunerimti dirbant su centų akcijomis, t. y. labai žemos kainos akcijomis? Užuomina: ar galite prekiauti visomis galimomis kainomis? Kodėl tai didesnė problema pigioms akcijoms? Daugiau informacijos rasite perskaitę garsųjį Blacko ir Scholeso modelį opcionų kainodarai :cite:`Black.Scholes.1973`.
+1. Tarkime, norime naudoti regresiją, kad įvertintume parduotuvėje parduotų obuolių *skaičių*.
+    1. Kokios yra Gauso adityvaus triukšmo modelio problemos? Užuomina: jūs parduodate obuolius, o ne naftą.
+    1. [Puasono skirstinys](https://en.wikipedia.org/wiki/Poisson_distribution) aprašo skaičių skirstinius. Jis duodamas $p(k \mid \lambda) = \lambda^k e^{-\lambda}/k!$. Čia $\lambda$ yra intensyvumo funkcija, o $k$ – matomų įvykių skaičius. Įrodykite, kad $\lambda$ yra skaičiaus $k$ tikėtina reikšmė.
+    1. Sukurkite nuostolių funkciją, susijusią su Puasono skirstiniu.
+    1. Sukurkite nuostolių funkciją, skirtą vietoj to įvertinti $\log \lambda$.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/40)
+[Diskusijos](https://discuss.d2l.ai/t/40)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/258)
+[Diskusijos](https://discuss.d2l.ai/t/258)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/259)
+[Diskusijos](https://discuss.d2l.ai/t/259)
 :end_tab:

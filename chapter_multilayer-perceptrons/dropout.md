@@ -7,91 +7,90 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 :label:`sec_dropout`
 
 
-Let's think briefly about what we
-expect from a good predictive model.
-We want it to peform well on unseen data.
-Classical generalization theory
-suggests that to close the gap between
-train and test performance,
-we should aim for a simple model.
-Simplicity can come in the form
-of a small number of dimensions.
-We explored this when discussing the
-monomial basis functions of linear models
-in :numref:`sec_generalization_basics`.
-Additionally, as we saw when discussing weight decay
-($\ell_2$ regularization) in :numref:`sec_weight_decay`,
-the (inverse) norm of the parameters also
-represents a useful measure of simplicity.
-Another useful notion of simplicity is smoothness,
-i.e., that the function should not be sensitive
-to small changes to its inputs.
-For instance, when we classify images,
-we would expect that adding some random noise
-to the pixels should be mostly harmless.
+Trumpai pamąstykime, ko tikimės iš gero prognozavimo modelio.
+Norime, kad jis gerai veiktų su nematytais duomenimis.
+Klasikinė apibendrinimo teorija
+teigia, kad norint sumažinti atotrūkį tarp
+apmokymo ir testavimo našumo,
+turėtume siekti paprasto modelio.
+Paprastumas gali reikštis
+nedideliu dimensijų skaičiumi.
+Tai nagrinėjome aptardami
+tiesinių modelių monominius bazines funkcijas
+:numref:`sec_generalization_basics`.
+Be to, kaip matėme aptardami svorių nykimą
+($\ell_2$ reguliarizavimą) :numref:`sec_weight_decay`,
+parametrų (atvirkštinė) norma taip pat
+yra naudingas paprastumo matas.
+Kita naudinga paprastumo samprata yra glotnumas,
+t. y. kad funkcija neturėtų būti jautri
+nedideliems jos įvesčių pokyčiams.
+Pavyzdžiui, klasifikuodami vaizdus,
+tikėtumės, kad šiek tiek atsitiktinio triukšmo
+pridėjimas prie pikselių daugiausia turėtų būti nekenksmingas.
 
-:citet:`Bishop.1995` formalized
-this idea when he proved that training with input noise
-is equivalent to Tikhonov regularization.
-This work drew a clear mathematical connection
-between the requirement that a function be smooth (and thus simple),
-and the requirement that it be resilient
-to perturbations in the input.
+:citet:`Bishop.1995` suformalizavo
+šią idėją, įrodydamas, kad apmokymas su įvesties triukšmu
+yra ekvivalentus Tichonovo reguliarizavimui.
+Šis darbas nubrėžė aiškų matematinį ryšį
+tarp reikalavimo, kad funkcija būtų glotni (taigi ir paprasta),
+ir reikalavimo, kad ji būtų atspari
+įvesties trikdžiams.
 
-Then, :citet:`Srivastava.Hinton.Krizhevsky.ea.2014`
-developed a clever idea for how to apply Bishop's idea
-to the internal layers of a network, too.
-Their idea, called *dropout*, involves
-injecting noise while computing
-each internal layer during forward propagation,
-and it has become a standard technique
-for training neural networks.
-The method is called *dropout* because we literally
-*drop out* some neurons during training.
-Throughout training, on each iteration,
-standard dropout consists of zeroing out
-some fraction of the nodes in each layer
-before calculating the subsequent layer.
+Vėliau :citet:`Srivastava.Hinton.Krizhevsky.ea.2014`
+sukūrė gudrią idėją, kaip taikyti Bishopo idėją
+ir vidiniams tinklo sluoksniams.
+Jų idėja, vadinama *dropout*, apima
+triukšmo injektavimą skaičiuojant
+kiekvieną vidinį sluoksnį tiesioginio sklidimo metu,
+ir ji tapo standartine neuroninių tinklų
+apmokymo technika.
+Metodas vadinamas *dropout* (angl. „iškritimas“), nes apmokymo metu mes pažodžiui
+*išmetame* kai kuriuos neuronus.
+Viso apmokymo metu, kiekvienoje iteracijoje,
+standartinis dropout susideda iš tam tikros
+kiekvieno sluoksnio mazgų dalies nuliavimo
+prieš skaičiuojant kitą sluoksnį.
 
-To be clear, we are imposing
-our own narrative with the link to Bishop.
-The original paper on dropout
-offers intuition through a surprising
-analogy to sexual reproduction.
-The authors argue that neural network overfitting
-is characterized by a state in which
-each layer relies on a specific
-pattern of activations in the previous layer,
-calling this condition *co-adaptation*.
-Dropout, they claim, breaks up co-adaptation
-just as sexual reproduction is argued to
-break up co-adapted genes.
-While such an justification of this theory is certainly up for debate,
-the dropout technique itself has proved enduring,
-and various forms of dropout are implemented
-in most deep learning libraries. 
+Kad būtų aišku, ryšiu su Bishopu mes
+primetame savo pasakojimą.
+Originalus straipsnis apie dropout
+pateikia intuiciją per stebinančią
+analogiją su lytiniu dauginimusi.
+Autoriai teigia, kad neuroninio tinklo persimokymą
+apibūdina būsena, kai
+kiekvienas sluoksnis remiasi tam tikru
+ankstesnio sluoksnio aktyvacijų dėsningumu,
+šią būseną pavadindami *bendra adaptacija*.
+Jų teigimu, dropout sutraukia bendrą adaptaciją
+taip, kaip, manoma, lytinis dauginimasis
+sutraukia kartu prisitaikiusius genus.
+Nors tokio šios teorijos pagrindimo tikrai galima diskutuoti,
+pati dropout technika pasirodė esanti ilgaamžė,
+ir įvairios dropout formos yra įgyvendintos
+daugumoje giliojo mokymosi bibliotekų.
 
 
-The key challenge is how to inject this noise.
-One idea is to inject it in an *unbiased* manner
-so that the expected value of each layer---while fixing
-the others---equals the value it would have taken absent noise.
-In Bishop's work, he added Gaussian noise
-to the inputs to a linear model.
-At each training iteration, he added noise
-sampled from a distribution with mean zero
-$\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$,
-yielding a perturbed point $\mathbf{x}' = \mathbf{x} + \epsilon$.
-In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
+Pagrindinis iššūkis yra, kaip injektuoti šį triukšmą.
+Viena idėja yra injektuoti jį *nešališku* būdu,
+kad kiekvieno sluoksnio laukiamoji reikšmė – fiksavus
+kitus – lygiavertų reikšmei, kurią jis būtų įgijęs be triukšmo.
+Bishopo darbe jis pridėjo Gauso triukšmą
+prie tiesinio modelio įvesčių.
+Kiekvienoje apmokymo iteracijoje jis pridėdavo triukšmą,
+paimtą iš skirstinio su nuliniu vidurkiu
+$\epsilon \sim \mathcal{N}(0,\sigma^2)$, prie įvesties $\mathbf{x}$,
+gaudamas sutrikdytą tašką $\mathbf{x}' = \mathbf{x} + \epsilon$.
+Laukiamoji reikšmė $E[\mathbf{x}'] = \mathbf{x}$.
 
-In standard dropout regularization,
-one zeros out some fraction of the nodes in each layer
-and then *debiases* each layer by normalizing
-by the fraction of nodes that were retained (not dropped out).
-In other words,
-with *dropout probability* $p$,
-each intermediate activation $h$ is replaced by
-a random variable $h'$ as follows:
+Standartiniame dropout reguliarizavime
+nuliuojama tam tikra kiekvieno sluoksnio mazgų dalis,
+o tada kiekvienas sluoksnis *pašalinamas iš šališkumo*, normalizuojant
+pagal išlaikytų (neišmestų) mazgų dalį.
+Kitaip tariant,
+su *dropout tikimybe* $p$
+kiekviena tarpinė aktyvacija $h$ pakeičiama
+atsitiktiniu dydžiu $h'$ taip:
 
 $$
 \begin{aligned}
@@ -103,7 +102,7 @@ h' =
 \end{aligned}
 $$
 
-By design, the expectation remains unchanged, i.e., $E[h'] = h$.
+Pagal konstrukciją laukiamoji reikšmė lieka nepakitusi, t. y. $E[h'] = h$.
 
 ```{.python .input}
 %%tab mxnet
@@ -136,54 +135,54 @@ from jax import numpy as jnp
 import optax
 ```
 
-## Dropout in Practice
+## Dropout praktikoje
 
-Recall the MLP with a hidden layer and five hidden units
-from :numref:`fig_mlp`.
-When we apply dropout to a hidden layer,
-zeroing out each hidden unit with probability $p$,
-the result can be viewed as a network
-containing only a subset of the original neurons.
-In :numref:`fig_dropout2`, $h_2$ and $h_5$ are removed.
-Consequently, the calculation of the outputs
-no longer depends on $h_2$ or $h_5$
-and their respective gradient also vanishes
-when performing backpropagation.
-In this way, the calculation of the output layer
-cannot be overly dependent on any
-one element of $h_1, \ldots, h_5$.
+Prisiminkite MLP su paslėptuoju sluoksniu ir penkiais paslėptaisiais vienetais
+iš :numref:`fig_mlp`.
+Kai taikome dropout paslėptajam sluoksniui,
+nuliuodami kiekvieną paslėptąjį vienetą su tikimybe $p$,
+rezultatą galima vertinti kaip tinklą,
+kuriame yra tik pradinių neuronų poaibis.
+:numref:`fig_dropout2` pašalinti $h_2$ ir $h_5$.
+Todėl išvesčių skaičiavimas
+nebepriklauso nuo $h_2$ ar $h_5$,
+ir jų atitinkamas gradientas taip pat išnyksta
+atliekant atgalinį sklidimą.
+Tokiu būdu išvesties sluoksnio skaičiavimas
+negali pernelyg priklausyti nuo
+nė vieno iš $h_1, \ldots, h_5$ elementų.
 
-![MLP before and after dropout.](../img/dropout2.svg)
+![MLP prieš dropout ir po jo.](../img/dropout2.svg)
 :label:`fig_dropout2`
 
-Typically, we disable dropout at test time.
-Given a trained model and a new example,
-we do not drop out any nodes
-and thus do not need to normalize.
-However, there are some exceptions:
-some researchers use dropout at test time as a heuristic
-for estimating the *uncertainty* of neural network predictions:
-if the predictions agree across many different dropout outputs,
-then we might say that the network is more confident.
+Paprastai testavimo metu dropout išjungiame.
+Turint apmokytą modelį ir naują pavyzdį,
+neišmetame jokių mazgų,
+todėl normalizuoti nereikia.
+Tačiau yra keletas išimčių:
+kai kurie tyrėjai naudoja dropout testavimo metu kaip euristiką
+neuroninio tinklo prognozių *netikrumui* įvertinti:
+jei prognozės sutampa per daugelį skirtingų dropout išvesčių,
+galime sakyti, kad tinklas yra labiau pasitikintis.
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-To implement the dropout function for a single layer,
-we must draw as many samples
-from a Bernoulli (binary) random variable
-as our layer has dimensions,
-where the random variable takes value $1$ (keep)
-with probability $1-p$ and $0$ (drop) with probability $p$.
-One easy way to implement this is to first draw samples
-from the uniform distribution $U[0, 1]$.
-Then we can keep those nodes for which the corresponding
-sample is greater than $p$, dropping the rest.
+Kad įgyvendintume dropout funkciją vienam sluoksniui,
+turime paimti tiek imčių
+iš Bernulio (dvejetainio) atsitiktinio dydžio,
+kiek mūsų sluoksnis turi dimensijų,
+kur atsitiktinis dydis įgyja reikšmę $1$ (palikti)
+su tikimybe $1-p$ ir $0$ (išmesti) su tikimybe $p$.
+Vienas lengvas būdas tai įgyvendinti yra pirmiausia paimti imtis
+iš tolygiojo skirstinio $U[0, 1]$.
+Tada galime palikti tuos mazgus, kurių atitinkama
+imtis yra didesnė nei $p$, o likusius išmesti.
 
-In the following code, we (**implement a `dropout_layer` function
-that drops out the elements in the tensor input `X`
-with probability `dropout`**),
-rescaling the remainder as described above:
-dividing the survivors by `1.0-dropout`.
+Šiame kode (**įgyvendiname funkciją `dropout_layer`,
+kuri išmeta tenzoriaus įvesties `X` elementus
+su tikimybe `dropout`**),
+likusius perskalindami, kaip aprašyta aukščiau:
+išlikusius dalydami iš `1.0-dropout`.
 
 ```{.python .input}
 %%tab mxnet
@@ -222,10 +221,10 @@ def dropout_layer(X, dropout, key=d2l.get_key()):
     return jnp.asarray(mask, dtype=jnp.float32) * X / (1.0 - dropout)
 ```
 
-We can [**test out the `dropout_layer` function on a few examples**].
-In the following lines of code,
-we pass our input `X` through the dropout operation,
-with probabilities 0, 0.5, and 1, respectively.
+Galime [**išbandyti funkciją `dropout_layer` keliais pavyzdžiais**].
+Šiose kodo eilutėse
+perduodame savo įvestį `X` per dropout operaciją
+su tikimybėmis atitinkamai 0, 0,5 ir 1.
 
 ```{.python .input}
 %%tab all
@@ -242,14 +241,14 @@ print('dropout_p = 0.5:', dropout_layer(X, 0.5))
 print('dropout_p = 1:', dropout_layer(X, 1))
 ```
 
-### Defining the Model
+### Modelio apibrėžimas
 
-The model below applies dropout to the output
-of each hidden layer (following the activation function).
-We can set dropout probabilities for each layer separately.
-A common choice is to set
-a lower dropout probability closer to the input layer.
-We ensure that dropout is only active during training.
+Žemiau pateiktas modelis taiko dropout
+kiekvieno paslėptojo sluoksnio išvesčiai (po aktyvacijos funkcijos).
+Kiekvienam sluoksniui dropout tikimybes galime nustatyti atskirai.
+Įprastas pasirinkimas yra
+nustatyti mažesnę dropout tikimybę arčiau įvesties sluoksnio.
+Užtikriname, kad dropout būtų aktyvus tik apmokymo metu.
 
 ```{.python .input}
 %%tab mxnet
@@ -343,9 +342,9 @@ class DropoutMLPScratch(d2l.Classifier):
         return self.lin3(H2)
 ```
 
-### [**Training**]
+### [**Apmokymas**]
 
-The following is similar to the training of MLPs described previously.
+Toliau pateikta panašu į anksčiau aprašytą MLP apmokymą.
 
 ```{.python .input}
 %%tab all
@@ -357,18 +356,18 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-## [**Concise Implementation**]
+## [**Glaustas įgyvendinimas**]
 
-With high-level APIs, all we need to do is add a `Dropout` layer
-after each fully connected layer,
-passing in the dropout probability
-as the only argument to its constructor.
-During training, the `Dropout` layer will randomly
-drop out outputs of the previous layer
-(or equivalently, the inputs to the subsequent layer)
-according to the specified dropout probability.
-When not in training mode,
-the `Dropout` layer simply passes the data through during testing.
+Su aukšto lygio API viskas, ko mums reikia, yra pridėti `Dropout` sluoksnį
+po kiekvieno pilnai sujungto sluoksnio,
+perduodant dropout tikimybę
+kaip vienintelį jo konstruktoriaus argumentą.
+Apmokymo metu `Dropout` sluoksnis atsitiktinai
+išmes ankstesnio sluoksnio išvestis
+(arba, lygiavertiškai, kito sluoksnio įvestis)
+pagal nurodytą dropout tikimybę.
+Kai ne apmokymo režimu,
+`Dropout` sluoksnis testavimo metu tiesiog praleidžia duomenis.
 
 ```{.python .input}
 %%tab mxnet
@@ -436,18 +435,18 @@ class DropoutMLP(d2l.Classifier):
 ```
 
 :begin_tab:`jax`
-Note that we need to redefine the loss function since a network
-with a dropout layer needs a PRNGKey when using `Module.apply()`,
-and this RNG seed should be explicitly named `dropout`. This key is
-used by the `dropout` layer in Flax to generate the random dropout
-mask internally. It is important to use a unique `dropout_rng` key
-with every epoch in the training loop, otherwise the generated dropout
-mask will not be stochastic and different between the epoch runs.
-This `dropout_rng` can be stored in the
-`TrainState` object (in the `d2l.Trainer` class defined in
-:numref:`oo-design-training`) as an attribute and with every epoch
-it is replaced with a new `dropout_rng`. We already handled this with the
-`fit_epoch` method defined in :numref:`sec_linear_scratch`.
+Atkreipkite dėmesį, kad turime iš naujo apibrėžti nuostolių funkciją, nes tinklui
+su dropout sluoksniu, naudojant `Module.apply()`, reikia PRNGKey,
+o šis ATS sėklos raktas turi būti aiškiai pavadintas `dropout`. Šį raktą
+`dropout` sluoksnis Flax naudoja atsitiktinei dropout
+kaukei viduje generuoti. Svarbu kiekvienai apmokymo ciklo epochai naudoti unikalų `dropout_rng` raktą,
+kitaip sugeneruota dropout
+kaukė nebus stochastinė ir skirtingų epochų paleidimuose bus ta pati.
+Šį `dropout_rng` galima saugoti
+`TrainState` objekte (klasėje `d2l.Trainer`, apibrėžtoje
+:numref:`oo-design-training`) kaip atributą, o kiekvienoje epochoje
+jis pakeičiamas nauju `dropout_rng`. Tai jau sutvarkėme
+metodu `fit_epoch`, apibrėžtu :numref:`sec_linear_scratch`.
 :end_tab:
 
 ```{.python .input}
@@ -466,7 +465,7 @@ def loss(self, params, X, Y, state, averaged=True):
     return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 ```
 
-Next, we [**train the model**].
+Toliau [**apmokome modelį**].
 
 ```{.python .input}
 %%tab all
@@ -474,36 +473,36 @@ model = DropoutMLP(**hparams)
 trainer.fit(model, data)
 ```
 
-## Summary
+## Santrauka
 
-Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool for avoiding overfitting. Often tools are used jointly.
-Note that dropout is
-used only during training:
-it replaces an activation $h$ with a random variable with expected value $h$.
+Be dimensijų skaičiaus ir svorių vektoriaus dydžio kontroliavimo, dropout yra dar vienas įrankis persimokymui išvengti. Dažnai įrankiai naudojami kartu.
+Atkreipkite dėmesį, kad dropout
+naudojamas tik apmokymo metu:
+jis pakeičia aktyvaciją $h$ atsitiktiniu dydžiu, kurio laukiamoji reikšmė yra $h$.
 
 
-## Exercises
+## Pratimai
 
-1. What happens if you change the dropout probabilities for the first and second layers? In particular, what happens if you switch the ones for both layers? Design an experiment to answer these questions, describe your results quantitatively, and summarize the qualitative takeaways.
-1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
-1. What is the variance of the activations in each hidden layer when dropout is and is not applied? Draw a plot to show how this quantity evolves over time for both models.
-1. Why is dropout not typically used at test time?
-1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive? Are there diminished returns (or worse)? Do they cancel each other out?
-1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
-1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the Fashion-MNIST dataset (for a fixed architecture)?
+1. Kas nutinka, jei pakeičiate pirmojo ir antrojo sluoksnių dropout tikimybes? Visų pirma, kas nutinka, jei sukeičiate abiejų sluoksnių tikimybes? Suplanuokite eksperimentą šiems klausimams atsakyti, aprašykite savo rezultatus kiekybiškai ir apibendrinkite kokybines išvadas.
+1. Padidinkite epochų skaičių ir palyginkite rezultatus, gautus naudojant dropout, su gautais jo nenaudojant.
+1. Kokia yra aktyvacijų dispersija kiekviename paslėptajame sluoksnyje, kai dropout taikomas ir netaikomas? Nubraižykite grafiką, rodantį, kaip šis dydis kinta laikui bėgant abiem modeliams.
+1. Kodėl dropout paprastai nenaudojamas testavimo metu?
+1. Naudodami šiame skyrelyje pateiktą modelį kaip pavyzdį, palyginkite dropout ir svorių nykimo poveikį. Kas nutinka, kai dropout ir svorių nykimas naudojami vienu metu? Ar rezultatai adityvūs? Ar yra mažėjanti grąža (ar dar blogiau)? Ar jie vienas kitą panaikina?
+1. Kas nutinka, jei dropout taikome atskiriems svorių matricos svoriams, o ne aktyvacijoms?
+1. Išrasti kitą atsitiktinio triukšmo injektavimo kiekviename sluoksnyje techniką, besiskiriančią nuo standartinės dropout technikos. Ar galite sukurti metodą, kuris pralenktų dropout su Fashion-MNIST duomenų rinkiniu (fiksuotai architektūrai)?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/100)
+[Diskusijos](https://discuss.d2l.ai/t/100)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/101)
+[Diskusijos](https://discuss.d2l.ai/t/101)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/261)
+[Diskusijos](https://discuss.d2l.ai/t/261)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17987)
+[Diskusijos](https://discuss.d2l.ai/t/17987)
 :end_tab:

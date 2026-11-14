@@ -1,587 +1,582 @@
-# Generalization in Classification
+# Apibendrinimas klasifikavime
 
 :label:`chap_classification_generalization`
 
 
 
-So far, we have focused on how to tackle multiclass classification problems
-by training (linear) neural networks with multiple outputs and softmax functions.
-Interpreting our model's outputs as probabilistic predictions,
-we motivated and derived the cross-entropy loss function,
-which calculates the negative log likelihood
-that our model (for a fixed set of parameters)
-assigns to the actual labels.
-And finally, we put these tools into practice
-by fitting our model to the training set.
-However, as always, our goal is to learn *general patterns*,
-as assessed empirically on previously unseen data (the test set).
-High accuracy on the training set means nothing.
-Whenever each of our inputs is unique
-(and indeed this is true for most high-dimensional datasets),
-we can attain perfect accuracy on the training set
-by just memorizing the dataset on the first training epoch,
-and subsequently looking up the label whenever we see a new image.
-And yet, memorizing the exact labels
-associated with the exact training examples
-does not tell us how to classify new examples.
-Absent further guidance, we might have to fall back
-on random guessing whenever we encounter new examples.
+Iki šiol sutelkėme dėmesį į tai, kaip spręsti daugiaklasius klasifikavimo uždavinius,
+apmokant (tiesinius) neuroninius tinklus su keliomis išvestimis ir softmax funkcijomis.
+Interpretuodami savo modelio išvestis kaip tikimybines prognozes,
+pagrindėme ir išvedėme kryžminės entropijos nuostolių funkciją,
+kuri apskaičiuoja neigiamą logaritminį tikėtinumą,
+kurį mūsų modelis (su fiksuotu parametrų rinkiniu)
+priskiria tikriesiems žymenims.
+Ir galiausiai pritaikėme šias priemones praktikoje,
+pritaikydami savo modelį apmokymo aibei.
+Tačiau, kaip visada, mūsų tikslas yra išmokti *bendrus dėsningumus*,
+empiriškai įvertinamus anksčiau nematytuose duomenyse (testavimo aibėje).
+Aukštas tikslumas apmokymo aibėje nieko nereiškia.
+Kai tik kiekviena mūsų įvestis yra unikali
+(ir iš tiesų taip yra daugumoje didelės dimensijos duomenų rinkinių),
+galime pasiekti tobulą tikslumą apmokymo aibėje,
+tiesiog įsimindami duomenų rinkinį pirmojoje apmokymo epochoje
+ir vėliau ieškodami žymens, kai tik pamatome naują vaizdą.
+Ir vis dėlto tikslių žymenų,
+susietų su tiksliais apmokymo pavyzdžiais, įsiminimas
+nepasako, kaip klasifikuoti naujus pavyzdžius.
+Be tolesnių nurodymų, galime būti priversti grįžti
+prie atsitiktinio spėliojimo, kai tik susiduriame su naujais pavyzdžiais.
 
-A number of burning questions demand immediate attention:
+Keletas degančių klausimų reikalauja neatidėliotino dėmesio:
 
-1. How many test examples do we need to give a good estimate of the accuracy of our classifiers on the underlying population?
-1. What happens if we keep evaluating models on the same test repeatedly?
-1. Why should we expect that fitting our linear models to the training set
-   should fare any better than our naive memorization scheme?
+1. Kiek testavimo pavyzdžių mums reikia, kad gerai įvertintume savo klasifikatorių tikslumą pagrindinėje populiacijoje?
+1. Kas nutinka, jei toliau vertiname modelius tuo pačiu testavimo rinkiniu pakartotinai?
+1. Kodėl turėtume tikėtis, kad mūsų tiesinių modelių pritaikymas apmokymo aibei
+   veiks geriau nei mūsų naivi įsiminimo schema?
 
 
-Whereas :numref:`sec_generalization_basics` introduced
-the basics of overfitting and generalization
-in the context of linear regression,
-this chapter will go a little deeper,
-introducing some of the foundational ideas
-of statistical learning theory.
-It turns out that we often can guarantee generalization *a priori*:
-for many models,
-and for any desired upper bound
-on the generalization gap $\epsilon$,
-we can often determine some required number of samples $n$
-such that if our training set contains at least $n$
-samples, our empirical error will lie
-within $\epsilon$ of the true error,
-*for any data generating distribution*.
-Unfortunately, it also turns out
-that while these sorts of guarantees provide
-a profound set of intellectual building blocks,
-they are of limited practical utility
-to the deep learning practitioner.
-In short, these guarantees suggest
-that ensuring generalization
-of deep neural networks *a priori*
-requires an absurd number of examples
-(perhaps trillions or more),
-even when we find that, on the tasks we care about,
-deep neural networks typically generalize
-remarkably well with far fewer examples (thousands).
-Thus deep learning practitioners often forgo
-*a priori* guarantees altogether,
-instead employing methods
-that have generalized well
-on similar problems in the past,
-and certifying generalization *post hoc*
-through empirical evaluations.
-When we get to :numref:`chap_perceptrons`,
-we will revisit generalization
-and provide a light introduction
-to the vast scientific literature
-that has sprung in attempts
-to explain why deep neural networks generalize in practice.
+Kol :numref:`sec_generalization_basics` pristatė
+persimokymo ir apibendrinimo pagrindus
+tiesinės regresijos kontekste,
+šis skyrius eis šiek tiek giliau,
+pristatydamas kai kurias fundamentalias
+statistinio mokymosi teorijos idėjas.
+Pasirodo, kad dažnai galime garantuoti apibendrinimą *a priori*:
+daugeliui modelių
+ir bet kuriai norimai
+apibendrinimo atotrūkio ribai $\epsilon$
+dažnai galime nustatyti tam tikrą reikiamą imčių skaičių $n$,
+kad jei mūsų apmokymo aibėje yra bent $n$
+imčių, mūsų empirinė paklaida bus
+$\epsilon$ ribose nuo tikrosios paklaidos,
+*bet kuriam duomenis generuojančiam skirstiniui*.
+Deja, taip pat paaiškėja,
+kad nors tokios garantijos suteikia
+gilų intelektualinių statybinių blokų rinkinį,
+jos turi ribotą praktinę naudą
+giliojo mokymosi specialistui.
+Trumpai tariant, šios garantijos rodo,
+kad užtikrinti giliųjų neuroninių tinklų apibendrinimą
+*a priori*
+reikia absurdiško skaičiaus pavyzdžių
+(galbūt trilijonų ar daugiau),
+net kai matome, kad mums rūpimose užduotyse
+giliesiems neuroniniams tinklams paprastai
+nepaprastai gerai sekasi apibendrinti su kur kas mažiau pavyzdžių (tūkstančiais).
+Todėl giliojo mokymosi specialistai dažnai apskritai atsisako
+*a priori* garantijų,
+vietoj to naudodami metodus,
+kurie gerai apibendrino
+panašiuose uždaviniuose praeityje,
+ir apibendrinimą patvirtindami *post hoc*
+empiriniais vertinimais.
+Kai pasieksime :numref:`chap_perceptrons`,
+vėl grįšime prie apibendrinimo
+ir pateiksime lengvą įvadą
+į plačią mokslinę literatūrą,
+kuri atsirado bandant
+paaiškinti, kodėl giliesiems neuroniniams tinklams praktikoje pavyksta apibendrinti.
 
-## The Test Set
+## Testavimo aibė
 
-Since we have already begun to rely on test sets
-as the gold standard method
-for assessing generalization error,
-let's get started by discussing
-the properties of such error estimates.
-Let's focus on a fixed classifier $f$,
-without worrying about how it was obtained.
-Moreover suppose that we possess
-a *fresh* dataset of examples $\mathcal{D} = {(\mathbf{x}^{(i)},y^{(i)})}_{i=1}^n$
-that were not used to train the classifier $f$.
-The *empirical error* of our classifier $f$ on $\mathcal{D}$
-is simply the fraction of instances
-for which the prediction $f(\mathbf{x}^{(i)})$
-disagrees with the true label $y^{(i)}$,
-and is given by the following expression:
+Kadangi jau pradėjome remtis testavimo aibėmis
+kaip aukso standarto metodu
+apibendrinimo paklaidai vertinti,
+pradėkime aptardami
+tokių paklaidos įverčių savybes.
+Sutelkime dėmesį į fiksuotą klasifikatorių $f$,
+nesirūpindami, kaip jis gautas.
+Be to, tarkime, kad turime
+*naują* pavyzdžių duomenų rinkinį $\mathcal{D} = {(\mathbf{x}^{(i)},y^{(i)})}_{i=1}^n$,
+kuris nebuvo naudotas klasifikatoriui $f$ apmokyti.
+Mūsų klasifikatoriaus $f$ *empirinė paklaida* rinkinyje $\mathcal{D}$
+yra tiesiog egzempliorių dalis,
+kuriems prognozė $f(\mathbf{x}^{(i)})$
+nesutampa su tikruoju žymeniu $y^{(i)}$,
+ir ji išreiškiama šia išraiška:
 
 $$\epsilon_\mathcal{D}(f) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(f(\mathbf{x}^{(i)}) \neq y^{(i)}).$$
 
-By contrast, the *population error*
-is the *expected* fraction
-of examples in the underlying population
-(some distribution $P(X,Y)$  characterized
-by probability density function $p(\mathbf{x},y)$)
-for which our classifier disagrees
-with the true label:
+Priešingai, *populiacijos paklaida*
+yra *tikėtina* pavyzdžių dalis
+pagrindinėje populiacijoje
+(tam tikras skirstinys $P(X,Y)$, apibūdinamas
+tikimybės tankio funkcija $p(\mathbf{x},y)$),
+kuriai mūsų klasifikatorius nesutampa
+su tikruoju žymeniu:
 
 $$\epsilon(f) =  E_{(\mathbf{x}, y) \sim P} \mathbf{1}(f(\mathbf{x}) \neq y) =
 \int\int \mathbf{1}(f(\mathbf{x}) \neq y) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
 
-While $\epsilon(f)$ is the quantity that we actually care about,
-we cannot observe it directly,
-just as we cannot directly
-observe the average height in a large population
-without measuring every single person.
-We can only estimate this quantity based on samples.
-Because our test set $\mathcal{D}$
-is statistically representative
-of the underlying population,
-we can view $\epsilon_\mathcal{D}(f)$ as a statistical
-estimator of the population error $\epsilon(f)$.
-Moreover, because our quantity of interest $\epsilon(f)$
-is an expectation (of the random variable $\mathbf{1}(f(X) \neq Y)$)
-and the corresponding estimator $\epsilon_\mathcal{D}(f)$
-is the sample average,
-estimating the population error
-is simply the classic problem of mean estimation,
-which you may recall from :numref:`sec_prob`.
+Nors $\epsilon(f)$ yra dydis, kuris mums iš tikrųjų rūpi,
+negalime jo stebėti tiesiogiai,
+kaip negalime tiesiogiai
+stebėti vidutinio ūgio didelėje populiacijoje,
+neišmatavę kiekvieno žmogaus.
+Šį dydį galime tik įvertinti pagal imtis.
+Kadangi mūsų testavimo aibė $\mathcal{D}$
+statistiškai atspindi
+pagrindinę populiaciją,
+galime žiūrėti į $\epsilon_\mathcal{D}(f)$ kaip į statistinį
+populiacijos paklaidos $\epsilon(f)$ įvertinį.
+Be to, kadangi mus dominantis dydis $\epsilon(f)$
+yra vidurkis (atsitiktinio dydžio $\mathbf{1}(f(X) \neq Y)$),
+o atitinkamas įvertinys $\epsilon_\mathcal{D}(f)$
+yra imties vidurkis,
+populiacijos paklaidos įvertinimas
+yra tiesiog klasikinis vidurkio vertinimo uždavinys,
+kurį galbūt prisimenate iš :numref:`sec_prob`.
 
-An important classical result from probability theory
-called the *central limit theorem* guarantees
-that whenever we possess $n$ random samples $a_1, ..., a_n$
-drawn from any distribution with mean $\mu$ and standard deviation $\sigma$,
-then, as the number of samples $n$ approaches infinity,
-the sample average $\hat{\mu}$ approximately
-tends towards a normal distribution centered
-at the true mean and with standard deviation $\sigma/\sqrt{n}$.
-Already, this tells us something important:
-as the number of examples grows large,
-our test error $\epsilon_\mathcal{D}(f)$
-should approach the true error $\epsilon(f)$
-at a rate of $\mathcal{O}(1/\sqrt{n})$.
-Thus, to estimate our test error twice as precisely,
-we must collect four times as large a test set.
-To reduce our test error by a factor of one hundred,
-we must collect ten thousand times as large a test set.
-In general, such a rate of $\mathcal{O}(1/\sqrt{n})$
-is often the best we can hope for in statistics.
+Svarbus klasikinis tikimybių teorijos rezultatas,
+vadinamas *centrine ribine teorema*, garantuoja,
+kad kai tik turime $n$ atsitiktinių imčių $a_1, ..., a_n$,
+paimtų iš bet kurio skirstinio su vidurkiu $\mu$ ir standartiniu nuokrypiu $\sigma$,
+tada, imčių skaičiui $n$ artėjant prie begalybės,
+imties vidurkis $\hat{\mu}$ apytiksliai
+linksta į normalųjį skirstinį, kurio centras
+yra tikrasis vidurkis, o standartinis nuokrypis – $\sigma/\sqrt{n}$.
+Jau tai mums pasako ką nors svarbaus:
+didėjant pavyzdžių skaičiui,
+mūsų testavimo paklaida $\epsilon_\mathcal{D}(f)$
+turėtų artėti prie tikrosios paklaidos $\epsilon(f)$
+sparta $\mathcal{O}(1/\sqrt{n})$.
+Taigi, kad įvertintume savo testavimo paklaidą dvigubai tiksliau,
+turime surinkti keturis kartus didesnę testavimo aibę.
+Kad sumažintume savo testavimo paklaidą šimtą kartų,
+turime surinkti dešimt tūkstančių kartų didesnę testavimo aibę.
+Apskritai tokia sparta $\mathcal{O}(1/\sqrt{n})$
+dažnai yra geriausia, ko galime tikėtis statistikoje.
 
-Now that we know something about the asymptotic rate
-at which our test error $\epsilon_\mathcal{D}(f)$ converges to the true error $\epsilon(f)$,
-we can zoom in on some important details.
-Recall that the random variable of interest
+Dabar, kai žinome ką nors apie asimptotinę spartą,
+kuria mūsų testavimo paklaida $\epsilon_\mathcal{D}(f)$ konverguoja į tikrąją paklaidą $\epsilon(f)$,
+galime pasigilinti į kai kurias svarbias detales.
+Prisiminkite, kad dominantis atsitiktinis dydis
 $\mathbf{1}(f(X) \neq Y)$
-can only take values $0$ and $1$
-and thus is a Bernoulli random variable,
-characterized by a parameter
-indicating the probability that it takes value $1$.
-Here, $1$ means that our classifier made an error,
-so the parameter of our random variable
-is actually the true error rate $\epsilon(f)$.
-The variance $\sigma^2$ of a Bernoulli
-depends on its parameter (here, $\epsilon(f)$)
-according to the expression $\epsilon(f)(1-\epsilon(f))$.
-While $\epsilon(f)$ is initially unknown,
-we know that it cannot be greater than $1$.
-A little investigation of this function
-reveals that our variance is highest
-when the true error rate is close to $0.5$
-and can be far lower when it is
-close to $0$ or close to $1$.
-This tells us that the asymptotic standard deviation
-of our estimate $\epsilon_\mathcal{D}(f)$ of the error $\epsilon(f)$
-(over the choice of the $n$ test samples)
-cannot be any greater than $\sqrt{0.25/n}$.
+gali įgyti tik reikšmes $0$ ir $1$,
+todėl yra Bernulio atsitiktinis dydis,
+apibūdinamas parametru,
+nurodančiu tikimybę, kad jis įgis reikšmę $1$.
+Čia $1$ reiškia, kad mūsų klasifikatorius padarė klaidą,
+todėl mūsų atsitiktinio dydžio parametras
+iš tikrųjų yra tikrasis klaidų dažnis $\epsilon(f)$.
+Bernulio dispersija $\sigma^2$
+priklauso nuo jo parametro (čia $\epsilon(f)$)
+pagal išraišką $\epsilon(f)(1-\epsilon(f))$.
+Nors $\epsilon(f)$ iš pradžių nežinomas,
+žinome, kad jis negali būti didesnis nei $1$.
+Šiek tiek patyrinėjus šią funkciją,
+paaiškėja, kad mūsų dispersija yra didžiausia,
+kai tikrasis klaidų dažnis yra artimas $0.5$,
+ir gali būti gerokai mažesnė, kai jis
+artimas $0$ ar artimas $1$.
+Tai mums sako, kad asimptotinis standartinis nuokrypis
+mūsų įverčio $\epsilon_\mathcal{D}(f)$ paklaidai $\epsilon(f)$
+(per $n$ testavimo imčių pasirinkimą)
+negali būti didesnis nei $\sqrt{0.25/n}$.
 
-If we ignore the fact that this rate characterizes
-behavior as the test set size approaches infinity
-rather than when we possess finite samples,
-this tells us that if we want our test error $\epsilon_\mathcal{D}(f)$
-to approximate the population error $\epsilon(f)$
-such that one standard deviation corresponds
-to an interval of $\pm 0.01$,
-then we should collect roughly 2500 samples.
-If we want to fit two standard deviations
-in that range and thus be 95% confident
-that $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$,
-then we will need 10,000 samples!
+Jei nepaisysime fakto, kad ši sparta apibūdina
+elgesį, kai testavimo aibės dydis artėja prie begalybės,
+o ne kai turime baigtines imtis,
+tai mums sako, kad jei norime, kad mūsų testavimo paklaida $\epsilon_\mathcal{D}(f)$
+aproksimuotų populiacijos paklaidą $\epsilon(f)$
+taip, kad vienas standartinis nuokrypis atitiktų
+$\pm 0.01$ intervalą,
+tuomet turėtume surinkti maždaug 2500 imčių.
+Jei norime, kad du standartiniai nuokrypiai tilptų
+tame diapazone ir taip būtume 95 % tikri,
+kad $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$,
+tuomet mums reikės 10 000 imčių!
 
-This turns out to be the size of the test sets
-for many popular benchmarks in machine learning.
-You might be surprised to find out that thousands
-of applied deep learning papers get published every year
-making a big deal out of error rate improvements of $0.01$ or less.
-Of course, when the error rates are much closer to $0$,
-then an improvement of $0.01$ can indeed be a big deal.
+Pasirodo, tai yra daugelio populiarių mašininio mokymosi lyginamųjų rinkinių
+testavimo aibių dydis.
+Galbūt nustebsite sužinoję, kad kasmet skelbiama tūkstančiai
+taikomojo giliojo mokymosi straipsnių,
+kuriuose didelis dėmesys skiriamas klaidų dažnio pagerėjimui $0.01$ ar mažiau.
+Žinoma, kai klaidų dažniai yra daug artimesni $0$,
+pagerėjimas $0.01$ iš tiesų gali būti labai svarbus.
 
 
-One pesky feature of our analysis thus far
-is that it really only tells us about asymptotics,
-i.e., how the relationship between $\epsilon_\mathcal{D}$ and $\epsilon$
-evolves as our sample size goes to infinity.
-Fortunately, because our random variable is bounded,
-we can obtain valid finite sample bounds
-by applying an inequality due to Hoeffding (1963):
+Viena erzinanti mūsų iki šiol atliktos analizės savybė yra ta,
+kad ji iš tikrųjų pasako tik apie asimptotiką,
+t. y. kaip ryšys tarp $\epsilon_\mathcal{D}$ ir $\epsilon$
+kinta, kai mūsų imties dydis artėja prie begalybės.
+Laimei, kadangi mūsų atsitiktinis dydis yra aprėžtas,
+galime gauti galiojančias baigtinės imties ribas,
+pritaikę Hoeffdingo (1963) nelygybę:
 
 $$P(\epsilon_\mathcal{D}(f) - \epsilon(f) \geq t) < \exp\left( - 2n t^2 \right).$$
 
-Solving for the smallest dataset size
-that would allow us to conclude
-with 95% confidence that the distance $t$
-between our estimate $\epsilon_\mathcal{D}(f)$
-and the true error rate $\epsilon(f)$
-does not exceed $0.01$,
-you will find that roughly 15,000 examples are required
-as compared to the 10,000 examples suggested
-by the asymptotic analysis above.
-If you go deeper into statistics
-you will find that this trend holds generally.
-Guarantees that hold even in finite samples
-are typically slightly more conservative.
-Note that in the scheme of things,
-these numbers are not so far apart,
-reflecting the general usefulness
-of asymptotic analysis for giving
-us ballpark figures even if they are not
-guarantees we can take to court.
+Išsprendę mažiausią duomenų rinkinio dydį,
+kuris leistų mums padaryti išvadą
+su 95 % pasitikėjimu, kad atstumas $t$
+tarp mūsų įverčio $\epsilon_\mathcal{D}(f)$
+ir tikrojo klaidų dažnio $\epsilon(f)$
+neviršija $0.01$,
+rasite, kad reikia maždaug 15 000 pavyzdžių,
+palyginti su 10 000 pavyzdžių, kuriuos siūlo
+aukščiau pateikta asimptotinė analizė.
+Jei gilinsitės į statistiką,
+pamatysite, kad ši tendencija galioja apskritai.
+Garantijos, galiojančios net baigtinėse imtyse,
+paprastai yra šiek tiek konservatyvesnės.
+Atkreipkite dėmesį, kad bendrame kontekste
+šie skaičiai nėra labai nutolę,
+o tai atspindi bendrą asimptotinės analizės naudingumą,
+suteikiant mums apytikslius skaičius, net jei jie nėra
+garantijos, su kuriomis galėtume eiti į teismą.
 
-## Test Set Reuse
+## Testavimo aibės pakartotinis naudojimas
 
-In some sense, you are now set up to succeed
-at conducting empirical machine learning research.
-Nearly all practical models are developed
-and validated based on test set performance
-and you are now a master of the test set.
-For any fixed classifier $f$,
-you know how to evaluate its test error $\epsilon_\mathcal{D}(f)$,
-and know precisely what can (and cannot)
-be said about its population error $\epsilon(f)$.
+Tam tikra prasme dabar esate pasirengę sėkmingai
+atlikti empirinius mašininio mokymosi tyrimus.
+Beveik visi praktiniai modeliai kuriami
+ir validuojami pagal veikimą testavimo aibėje,
+o jūs dabar esate testavimo aibės meistras.
+Bet kuriam fiksuotam klasifikatoriui $f$
+žinote, kaip įvertinti jo testavimo paklaidą $\epsilon_\mathcal{D}(f)$,
+ir tiksliai žinote, ką galima (ir ko negalima)
+pasakyti apie jo populiacijos paklaidą $\epsilon(f)$.
 
-So let's say that you take this knowledge
-and prepare to train your first model $f_1$.
-Knowing just how confident you need to be
-in the performance of your classifier's error rate
-you apply our analysis above to determine
-an appropriate number of examples
-to set aside for the test set.
-Moreover, let's assume that you took the lessons from
-:numref:`sec_generalization_basics` to heart
-and made sure to preserve the sanctity of the test set
-by conducting all of your preliminary analysis,
-hyperparameter tuning, and even selection
-among multiple competing model architectures
-on a validation set.
-Finally you evaluate your model $f_1$
-on the test set and report an unbiased
-estimate of the population error
-with an associated confidence interval.
+Taigi tarkime, kad pasitelkiate šias žinias
+ir ruošiatės apmokyti savo pirmąjį modelį $f_1$.
+Žinodami, kokio pasitikėjimo reikia
+jūsų klasifikatoriaus klaidų dažnio veikimu,
+taikote aukščiau pateiktą analizę, kad nustatytumėte
+tinkamą pavyzdžių skaičių,
+kurį skirsite testavimo aibei.
+Be to, tarkime, kad rimtai priėmėte pamokas iš
+:numref:`sec_generalization_basics`
+ir pasirūpinote išsaugoti testavimo aibės neliečiamumą,
+atlikdami visą išankstinę analizę,
+hiperparametrų derinimą ir net parinkimą
+tarp kelių konkuruojančių modelių architektūrų
+validavimo aibėje.
+Galiausiai įvertinate savo modelį $f_1$
+testavimo aibėje ir pateikiate nepaslinktą
+populiacijos paklaidos įvertį
+su susijusiu pasikliautinuoju intervalu.
 
-So far everything seems to be going well.
-However, that night you wake up at 3am
-with a brilliant idea for a new modeling approach.
-The next day, you code up your new model,
-tune its hyperparameters on the validation set
-and not only are you getting your new model $f_2$ to work
-but its error rate appears to be much lower than $f_1$'s.
-However, the thrill of discovery suddenly fades
-as you prepare for the final evaluation.
-You do not have a test set!
+Kol kas viskas atrodo gerai.
+Tačiau tą naktį pabundate 3 val. ryto
+su puikia nauja modeliavimo metodo idėja.
+Kitą dieną užkoduojate savo naują modelį,
+suderinate jo hiperparametrus validavimo aibėje,
+ir ne tik jūsų naujas modelis $f_2$ veikia,
+bet ir jo klaidų dažnis atrodo gerokai mažesnis nei $f_1$.
+Tačiau atradimo džiaugsmas staiga išblėsta,
+kai ruošiatės galutiniam vertinimui.
+Jūs neturite testavimo aibės!
 
-Even though the original test set $\mathcal{D}$
-is still sitting on your server,
-you now face two formidable problems.
-First, when you collected your test set,
-you determined the required level of precision
-under the assumption that you were evaluating
-a single classifier $f$.
-However, if you get into the business
-of evaluating multiple classifiers $f_1, ..., f_k$
-on the same test set,
-you must consider the problem of false discovery.
-Before, you might have been 95% sure
-that $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$
-for a single classifier $f$
-and thus the probability of a misleading result
-was a mere 5%.
-With $k$ classifiers in the mix,
-it can be hard to guarantee
-that there is not even one among them
-whose test set performance is misleading.
-With 20 classifiers under consideration,
-you might have no power at all
-to rule out the possibility
-that at least one among them
-received a misleading score.
-This problem relates to multiple hypothesis testing,
-which despite a vast literature in statistics,
-remains a persistent problem plaguing scientific research.
+Nors pradinė testavimo aibė $\mathcal{D}$
+vis dar guli jūsų serveryje,
+dabar susiduriate su dviem didžiulėmis problemomis.
+Pirma, kai rinkote savo testavimo aibę,
+reikiamą tikslumo lygį nustatėte
+darydami prielaidą, kad vertinate
+vieną klasifikatorių $f$.
+Tačiau jei imatės vertinti kelis klasifikatorius $f_1, ..., f_k$
+toje pačioje testavimo aibėje,
+turite apsvarstyti klaidingo atradimo problemą.
+Anksčiau galėjote būti 95 % tikri,
+kad $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$
+vienam klasifikatoriui $f$,
+todėl klaidinančio rezultato tikimybė
+buvo vos 5 %.
+Su $k$ klasifikatorių rinkiniu
+sunku garantuoti,
+kad nėra nė vieno iš jų,
+kurio testavimo aibės rezultatas klaidinantis.
+Nagrinėjant 20 klasifikatorių,
+galite apskritai neturėti galios
+atmesti galimybės,
+kad bent vienas iš jų
+gavo klaidinantį įvertį.
+Ši problema susijusi su daugkartiniu hipotezių tikrinimu,
+kuris, nepaisant plačios statistikos literatūros,
+išlieka nuolatine mokslinius tyrimus kamuojančia problema.
 
 
-If that is not enough to worry you,
-there is a special reason to distrust
-the results that you get on subsequent evaluations.
-Recall that our analysis of test set performance
-rested on the assumption that the classifier
-was chosen absent any contact with the test set
-and thus we could view the test set
-as drawn randomly from the underlying population.
-Here, not only are you testing multiple functions,
-the subsequent function $f_2$ was chosen
-after you observed the test set performance of $f_1$.
-Once information from the test set has leaked to the modeler,
-it can never be a true test set again in the strictest sense.
-This problem is called *adaptive overfitting* and has recently emerged
-as a topic of intense interest to learning theorists and statisticians
+Jei to nepakanka jums sunerimti,
+yra ypatinga priežastis nepasitikėti
+rezultatais, gaunamais vėlesniuose vertinimuose.
+Prisiminkite, kad mūsų testavimo aibės veikimo analizė
+rėmėsi prielaida, kad klasifikatorius
+buvo parinktas be jokio kontakto su testavimo aibe,
+todėl galėjome žiūrėti į testavimo aibę
+kaip atsitiktinai paimtą iš pagrindinės populiacijos.
+Čia jūs ne tik testuojate kelias funkcijas,
+vėlesnė funkcija $f_2$ buvo pasirinkta
+po to, kai pamatėte $f_1$ veikimą testavimo aibėje.
+Kai tik informacija iš testavimo aibės nutekėjo modeliuotojui,
+ji niekada nebegali būti tikra testavimo aibe griežčiausia prasme.
+Ši problema vadinama *adaptyviuoju persimokymu* ir neseniai iškilo
+kaip mokymosi teoretikų ir statistikų didelio susidomėjimo tema
 :cite:`dwork2015preserving`.
-Fortunately, while it is possible
-to leak all information out of a holdout set,
-and the theoretical worst case scenarios are bleak,
-these analyses may be too conservative.
-In practice, take care to create real test sets,
-to consult them as infrequently as possible,
-to account for multiple hypothesis testing
-when reporting confidence intervals,
-and to dial up your vigilance more aggressively
-when the stakes are high and your dataset size is small.
-When running a series of benchmark challenges,
-it is often good practice to maintain
-several test sets so that after each round,
-the old test set can be demoted to a validation set.
+Laimei, nors įmanoma
+nutekinti visą informaciją iš atskirtos aibės,
+o teoriniai blogiausi scenarijai yra niūrūs,
+šios analizės gali būti pernelyg konservatyvios.
+Praktikoje pasirūpinkite sukurti tikras testavimo aibes,
+konsultuokitės su jomis kuo rečiau,
+atsižvelkite į daugkartinį hipotezių tikrinimą,
+pateikdami pasikliautinuosius intervalus,
+ir agresyviau didinkite budrumą,
+kai statymai dideli, o jūsų duomenų rinkinio dydis mažas.
+Vykdydami lyginamųjų užduočių seriją,
+dažnai gera praktika yra turėti
+kelias testavimo aibes, kad po kiekvieno rato
+senąją testavimo aibę būtų galima paversti validavimo aibe.
 
 
 
 
 
-## Statistical Learning Theory
+## Statistinio mokymosi teorija
 
-Put simply, *test sets are all that we really have*,
-and yet this fact seems strangely unsatisfying.
-First, we seldom possess a *true test set*---unless
-we are the ones creating the dataset,
-someone else has probably already evaluated
-their own classifier on our ostensible "test set".
-And even when we have first dibs,
-we soon find ourselves frustrated, wishing we could
-evaluate our subsequent modeling attempts
-without the gnawing feeling
-that we cannot trust our numbers.
-Moreover, even a true test set can only tell us *post hoc*
-whether a classifier has in fact generalized to the population,
-not whether we have any reason to expect *a priori*
-that it should generalize.
+Paprastai tariant, *testavimo aibės yra viskas, ką iš tikrųjų turime*,
+ir vis dėlto šis faktas atrodo keistai nepatenkinamas.
+Pirma, retai turime *tikrą testavimo aibę* – nebent
+patys kuriame duomenų rinkinį,
+kažkas kitas tikriausiai jau įvertino
+savo klasifikatorių mūsų tariamoje „testavimo aibėje".
+Ir net kai turime pirmumo teisę,
+netrukus pajuntame nusivylimą, norėdami
+įvertinti savo vėlesnius modeliavimo bandymus
+be graužiančio jausmo,
+kad negalime pasitikėti savo skaičiais.
+Be to, net tikra testavimo aibė gali pasakyti tik *post hoc*,
+ar klasifikatorius iš tikrųjų apibendrino populiacijai,
+o ne ar turime pagrindo tikėtis *a priori*,
+kad jis turėtų apibendrinti.
 
-With these misgivings in mind,
-you might now be sufficiently primed
-to see the appeal of *statistical learning theory*,
-the mathematical subfield of machine learning
-whose practitioners aim to elucidate the
-fundamental principles that explain
-why/when models trained on empirical data
-can/will generalize to unseen data.
-One of the primary aims
-of statistical learning researchers
-has been to bound the generalization gap,
-relating the properties of the model class
-to the number of samples in the dataset.
+Turėdami omenyje šiuos abejojimus,
+galbūt dabar esate pakankamai paruošti
+pamatyti *statistinio mokymosi teorijos* patrauklumą –
+matematinės mašininio mokymosi šakos,
+kurios specialistai siekia išaiškinti
+fundamentalius principus, paaiškinančius,
+kodėl / kada modeliai, apmokyti empiriniais duomenimis,
+gali / gebės apibendrinti nematytus duomenis.
+Vienas pagrindinių statistinio mokymosi tyrėjų tikslų
+buvo apriboti apibendrinimo atotrūkį,
+susiejant modelių klasės savybes
+su imčių skaičiumi duomenų rinkinyje.
 
-Learning theorists aim to bound the difference
-between the *empirical error* $\epsilon_\mathcal{S}(f_\mathcal{S})$
-of a learned classifier $f_\mathcal{S}$,
-both trained and evaluated
-on the training set $\mathcal{S}$,
-and the true error $\epsilon(f_\mathcal{S})$
-of that same classifier on the underlying population.
-This might look similar to the evaluation problem
-that we just addressed but there is a major difference.
-Earlier, the classifier $f$ was fixed
-and we only needed a dataset
-for evaluative purposes.
-And indeed, any fixed classifier does generalize:
-its error on a (previously unseen) dataset
-is an unbiased estimate of the population error.
-But what can we say when a classifier
-is trained and evaluated on the same dataset?
-Can we ever be confident that the training error
-will be close to the testing error?
+Mokymosi teoretikai siekia apriboti skirtumą
+tarp *empirinės paklaidos* $\epsilon_\mathcal{S}(f_\mathcal{S})$
+išmokto klasifikatoriaus $f_\mathcal{S}$,
+apmokyto ir įvertinto
+apmokymo aibėje $\mathcal{S}$,
+ir tikrosios paklaidos $\epsilon(f_\mathcal{S})$
+to paties klasifikatoriaus pagrindinėje populiacijoje.
+Tai gali atrodyti panašu į vertinimo problemą,
+kurią ką tik sprendėme, bet yra esminis skirtumas.
+Anksčiau klasifikatorius $f$ buvo fiksuotas,
+ir duomenų rinkinio mums reikėjo
+tik vertinimo tikslais.
+Ir iš tiesų bet kuris fiksuotas klasifikatorius apibendrina:
+jo paklaida (anksčiau nematytame) duomenų rinkinyje
+yra nepaslinktas populiacijos paklaidos įvertis.
+Bet ką galime pasakyti, kai klasifikatorius
+apmokomas ir vertinamas tame pačiame duomenų rinkinyje?
+Ar kada nors galime būti tikri, kad apmokymo paklaida
+bus artima testavimo paklaidai?
 
 
-Suppose that our learned classifier $f_\mathcal{S}$ must be chosen
-from some pre-specified set of functions $\mathcal{F}$.
-Recall from our discussion of test sets
-that while it is easy to estimate
-the error of a single classifier,
-things get hairy when we begin
-to consider collections of classifiers.
-Even if the empirical error
-of any one (fixed) classifier
-will be close to its true error
-with high probability,
-once we consider a collection of classifiers,
-we need to worry about the possibility
-that *just one* of them
-will receive a badly estimated error.
-The worry is that we might pick such a classifier
-and thereby grossly underestimate
-the population error.
-Moreover, even for linear models,
-because their parameters are continuously valued,
-we are typically choosing from
-an infinite class of functions ($|\mathcal{F}| = \infty$).
+Tarkime, kad mūsų išmoktas klasifikatorius $f_\mathcal{S}$ turi būti parinktas
+iš tam tikros iš anksto nurodytos funkcijų aibės $\mathcal{F}$.
+Prisiminkite iš mūsų testavimo aibių aptarimo,
+kad nors lengva įvertinti
+vieno klasifikatoriaus paklaidą,
+viskas tampa sudėtinga, kai pradedame
+nagrinėti klasifikatorių rinkinius.
+Net jei bet kurio vieno (fiksuoto) klasifikatoriaus
+empirinė paklaida
+su didele tikimybe bus artima jo tikrajai paklaidai,
+kai nagrinėjame klasifikatorių rinkinį,
+turime nerimauti dėl galimybės,
+kad *vienam vieninteliam* iš jų
+paklaida bus įvertinta blogai.
+Nerimas tas, kad galime pasirinkti tokį klasifikatorių
+ir taip rimtai nuvertinti
+populiacijos paklaidą.
+Be to, net tiesiniams modeliams,
+kadangi jų parametrai įgyja tolydžias reikšmes,
+paprastai renkamės iš
+begalinės funkcijų klasės ($|\mathcal{F}| = \infty$).
 
-One ambitious solution to the problem
-is to develop analytic tools
-for proving uniform convergence, i.e.,
-that with high probability,
-the empirical error rate for every classifier in the class $f\in\mathcal{F}$
-will *simultaneously* converge to its true error rate.
-In other words, we seek a theoretical principle
-that would allow us to state that
-with probability at least $1-\delta$
-(for some small $\delta$)
-no classifier's error rate $\epsilon(f)$
-(among all classifiers in the class $\mathcal{F}$)
-will be misestimated by more
-than some  small amount $\alpha$.
-Clearly, we cannot make such statements
-for all model classes $\mathcal{F}$.
-Recall the class of memorization machines
-that always achieve empirical error $0$
-but never outperform random guessing
-on the underlying population.
+Vienas ambicingas problemos sprendimas
+yra sukurti analizės įrankius
+tolygiajam konvergavimui įrodyti, t. y.
+kad su didele tikimybe
+kiekvieno klasės klasifikatoriaus $f\in\mathcal{F}$ empirinis klaidų dažnis
+*vienu metu* konverguos į savo tikrąjį klaidų dažnį.
+Kitaip tariant, ieškome teorinio principo,
+kuris leistų teigti, kad
+su tikimybe bent $1-\delta$
+(kuriai nors mažai $\delta$)
+jokio klasifikatoriaus klaidų dažnis $\epsilon(f)$
+(tarp visų klasės $\mathcal{F}$ klasifikatorių)
+nebus neteisingai įvertintas
+daugiau nei kokia nors maža reikšmė $\alpha$.
+Aišku, kad tokių teiginių negalime padaryti
+visoms modelių klasėms $\mathcal{F}$.
+Prisiminkite įsiminimo mašinų klasę,
+kuri visada pasiekia empirinę paklaidą $0$,
+bet niekada nepranoksta atsitiktinio spėliojimo
+pagrindinėje populiacijoje.
 
-In a sense the class of memorizers is too flexible.
-No such a uniform convergence result could possibly hold.
-On the other hand, a fixed classifier is useless---it
-generalizes perfectly, but fits neither
-the training data nor the test data.
-The central question of learning
-has thus historically been framed as a trade-off
-between more flexible (higher variance) model classes
-that better fit the training data but risk overfitting,
-versus more rigid (higher bias) model classes
-that generalize well but risk underfitting.
-A central question in learning theory
-has been to develop the appropriate
-mathematical analysis to quantify
-where a model sits along this spectrum,
-and to provide the associated guarantees.
+Tam tikra prasme įsiminėjų klasė yra per daug lanksti.
+Joks toks tolygiojo konvergavimo rezultatas negalėtų galioti.
+Kita vertus, fiksuotas klasifikatorius yra nenaudingas – jis
+apibendrina tobulai, bet netinka nei
+apmokymo, nei testavimo duomenims.
+Todėl centrinis mokymosi klausimas
+istoriškai buvo formuluojamas kaip kompromisas
+tarp lankstesnių (didesnės dispersijos) modelių klasių,
+kurios geriau pritaiko apmokymo duomenis, bet rizikuoja persimokymu,
+ir standesnių (didesnio poslinkio) modelių klasių,
+kurios gerai apibendrina, bet rizikuoja nepakankamu mokymusi.
+Pagrindinis mokymosi teorijos klausimas
+buvo sukurti tinkamą
+matematinę analizę, kuri kiekybiškai nustatytų,
+kur modelis yra šiame spektre,
+ir pateiktų susijusias garantijas.
 
-In a series of seminal papers,
-Vapnik and Chervonenkis extended
-the theory on the convergence
-of relative frequencies
-to more general classes of functions
+Serijoje pamatinių darbų
+Vapnikas ir Chervonenkis išplėtė
+santykinių dažnių
+konvergavimo teoriją
+bendresnėms funkcijų klasėms
 :cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
-One of the key contributions of this line of work
-is the Vapnik--Chervonenkis (VC) dimension,
-which measures (one notion of)
-the complexity (flexibility) of a model class.
-Moreover, one of their key results bounds
-the difference between the empirical error
-and the population error as a function
-of the VC dimension and the number of samples:
+Vienas pagrindinių šios krypties darbų indėlių
+yra Vapniko ir Chervonenkio (VC) dimensija,
+kuri matuoja (vieną) modelių klasės
+sudėtingumo (lankstumo) sampratą.
+Be to, vienas jų pagrindinių rezultatų apriboja
+skirtumą tarp empirinės paklaidos
+ir populiacijos paklaidos kaip funkciją
+nuo VC dimensijos ir imčių skaičiaus:
 
 $$P\left(R[p, f] - R_\textrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \alpha\right) \geq 1-\delta
 \ \textrm{ for }\ \alpha \geq c \sqrt{(\textrm{VC} - \log \delta)/n}.$$
 
-Here $\delta > 0$ is the probability that the bound is violated,
-$\alpha$ is the upper bound on the generalization gap,
-and $n$ is the dataset size.
-Lastly, $c > 0$ is a constant that depends
-only on the scale of the loss that can be incurred.
-One use of the bound might be to plug in desired
-values of $\delta$ and $\alpha$
-to determine how many samples to collect.
-The VC dimension quantifies the largest
-number of data points for which we can assign
-any arbitrary (binary) labeling
-and for each find some model $f$ in the class
-that agrees with that labeling.
-For example, linear models on $d$-dimensional inputs
-have VC dimension $d+1$.
-It is easy to see that a line can assign
-any possible labeling to three points in two dimensions,
-but not to four.
-Unfortunately, the theory tends to be
-overly pessimistic for more complex models
-and obtaining this guarantee typically requires
-far more examples than are actually needed
-to achieve the desired error rate.
-Note also that fixing the model class and $\delta$,
-our error rate again decays
-with the usual $\mathcal{O}(1/\sqrt{n})$ rate.
-It seems unlikely that we could do better in terms of $n$.
-However, as we vary the model class,
-VC dimension can present
-a pessimistic picture
-of the generalization gap.
+Čia $\delta > 0$ yra tikimybė, kad riba pažeidžiama,
+$\alpha$ yra viršutinė apibendrinimo atotrūkio riba,
+o $n$ yra duomenų rinkinio dydis.
+Galiausiai $c > 0$ yra konstanta, priklausanti
+tik nuo galimų nuostolių masto.
+Vienas ribos panaudojimas galėtų būti įstatyti norimas
+$\delta$ ir $\alpha$ reikšmes,
+kad nustatytume, kiek imčių surinkti.
+VC dimensija kiekybiškai nusako didžiausią
+duomenų taškų skaičių, kuriems galime priskirti
+bet kokį savavališką (dvejetainį) žymėjimą
+ir kiekvienam rasti klasėje tokį modelį $f$,
+kuris sutampa su tuo žymėjimu.
+Pavyzdžiui, tiesiniai modeliai $d$ dimensijų įvestims
+turi VC dimensiją $d+1$.
+Nesunku suprasti, kad tiesė gali priskirti
+bet kokį galimą žymėjimą trims taškams dvimatėje erdvėje,
+bet ne keturiems.
+Deja, teorija linkusi būti
+pernelyg pesimistiška sudėtingesniems modeliams,
+ir šiai garantijai gauti paprastai reikia
+gerokai daugiau pavyzdžių, nei iš tikrųjų reikia
+norimam klaidų dažniui pasiekti.
+Atkreipkite dėmesį ir tai, kad fiksavus modelių klasę ir $\delta$,
+mūsų klaidų dažnis vėl mažėja
+įprasta sparta $\mathcal{O}(1/\sqrt{n})$.
+Atrodo mažai tikėtina, kad galėtume pasiekti geriau pagal $n$.
+Tačiau keičiant modelių klasę,
+VC dimensija gali pateikti
+pesimistinį apibendrinimo atotrūkio
+vaizdą.
 
 
 
 
 
-## Summary
+## Santrauka
 
-The most straightforward way to evaluate a model
-is to consult a test set comprised of previously unseen data.
-Test set evaluations provide an unbiased estimate of the true error
-and converge at the desired $\mathcal{O}(1/\sqrt{n})$ rate as the test set grows.
-We can provide approximate confidence intervals
-based on exact asymptotic distributions
-or valid finite sample confidence intervals
-based on (more conservative) finite sample guarantees.
-Indeed test set evaluation is the bedrock
-of modern machine learning research.
-However, test sets are seldom true test sets
-(used by multiple researchers again and again).
-Once the same test set is used
-to evaluate multiple models,
-controlling for false discovery can be difficult.
-This can cause huge problems in theory.
-In practice, the significance of the problem
-depends on the size of the holdout sets in question
-and whether they are merely being used to choose hyperparameters
-or if they are leaking information more directly.
-Nevertheless, it is good practice to curate real test sets (or multiple)
-and to be as conservative as possible about how often they are used.
+Paprasčiausias būdas įvertinti modelį
+yra pasinaudoti testavimo aibe, sudaryta iš anksčiau nematytų duomenų.
+Testavimo aibės vertinimai suteikia nepaslinktą tikrosios paklaidos įvertį
+ir konverguoja norima sparta $\mathcal{O}(1/\sqrt{n})$, didėjant testavimo aibei.
+Galime pateikti apytikslius pasikliautinuosius intervalus,
+pagrįstus tiksliais asimptotiniais skirstiniais,
+arba galiojančius baigtinės imties pasikliautinuosius intervalus,
+pagrįstus (konservatyvesnėmis) baigtinės imties garantijomis.
+Iš tiesų testavimo aibės vertinimas yra
+šiuolaikinių mašininio mokymosi tyrimų pagrindas.
+Tačiau testavimo aibės retai kada būna tikros testavimo aibės
+(kurias daug kartų naudoja keli tyrėjai).
+Kai tik ta pati testavimo aibė naudojama
+keliems modeliams įvertinti,
+klaidingo atradimo kontrolė gali būti sudėtinga.
+Teoriškai tai gali sukelti milžiniškų problemų.
+Praktikoje problemos svarba
+priklauso nuo nagrinėjamų atskirtų aibių dydžio
+ir nuo to, ar jos tik naudojamos hiperparametrams rinktis,
+ar iš jų tiesiogiau nuteka informacija.
+Vis dėlto gera praktika yra kurti tikras testavimo aibes (ar kelias)
+ir būti kuo konservatyvesniems dėl to, kaip dažnai jos naudojamos.
 
 
-Hoping to provide a more satisfying solution,
-statistical learning theorists have developed methods
-for guaranteeing uniform convergence over a model class.
-If indeed every model's empirical error simultaneously
-converges to its true error,
-then we are free to choose the model that performs
-best, minimizing the training error,
-knowing that it too will perform similarly well
-on the holdout data.
-Crucially, any one of such results must depend
-on some property of the model class.
-Vladimir Vapnik and Alexey Chernovenkis
-introduced the VC dimension,
-presenting uniform convergence results
-that hold for all models in a VC class.
-The training errors for all models in the class
-are (simultaneously) guaranteed
-to be close to their true errors,
-and guaranteed to grow even closer
-at $\mathcal{O}(1/\sqrt{n})$ rates.
-Following the revolutionary discovery of VC dimension,
-numerous alternative complexity measures have been proposed,
-each facilitating an analogous generalization guarantee.
-See :citet:`boucheron2005theory` for a detailed discussion
-of several advanced ways of measuring function complexity.
-Unfortunately, while these complexity measures
-have become broadly useful tools in statistical theory,
-they turn out to be powerless
-(as straightforwardly applied)
-for explaining why deep neural networks generalize.
-Deep neural networks often have millions of parameters (or more),
-and can easily assign random labels to large collections of points.
-Nevertheless, they generalize well on practical problems
-and, surprisingly, they often generalize better,
-when they are larger and deeper,
-despite incurring higher VC dimensions.
-In the next chapter, we will revisit generalization
-in the context of deep learning.
+Tikėdamiesi pateikti patenkinamesnį sprendimą,
+statistinio mokymosi teoretikai sukūrė metodus
+tolygiajam konvergavimui modelių klasėje garantuoti.
+Jei iš tiesų kiekvieno modelio empirinė paklaida vienu metu
+konverguoja į jo tikrąją paklaidą,
+tada galime laisvai rinktis modelį, kuris veikia
+geriausiai, minimizuodamas apmokymo paklaidą,
+žinodami, kad jis taip pat panašiai gerai veiks
+atskirtuose duomenyse.
+Esminis dalykas: bet kuris toks rezultatas turi priklausyti
+nuo kokios nors modelių klasės savybės.
+Vladimiras Vapnikas ir Aleksejus Chervonenkis
+pristatė VC dimensiją,
+pateikdami tolygiojo konvergavimo rezultatus,
+galiojančius visiems VC klasės modeliams.
+Visų klasės modelių apmokymo paklaidos
+(vienu metu) garantuotai
+yra artimos jų tikrosioms paklaidoms
+ir garantuotai dar labiau artėja
+sparta $\mathcal{O}(1/\sqrt{n})$.
+Po revoliucinio VC dimensijos atradimo
+pasiūlyta daugybė alternatyvių sudėtingumo matų,
+kurių kiekvienas palengvina analogišką apibendrinimo garantiją.
+Išsamų kelių pažangių funkcijų sudėtingumo matavimo būdų aptarimą žr. :citet:`boucheron2005theory`.
+Deja, nors šie sudėtingumo matai
+tapo plačiai naudingomis statistinės teorijos priemonėmis,
+paaiškėja, kad jie yra bejėgiai
+(tiesiogiai taikomi),
+paaiškinti, kodėl giliesiems neuroniniams tinklams pavyksta apibendrinti.
+Giliesiems neuroniniams tinklams dažnai tenka milijonai parametrų (ar daugiau),
+ir jie lengvai gali priskirti atsitiktinius žymenis dideliems taškų rinkiniams.
+Nepaisant to, jie gerai apibendrina praktiniuose uždaviniuose
+ir, stebėtina, dažnai apibendrina geriau,
+kai yra didesni ir gilesni,
+nepaisant didesnių VC dimensijų.
+Kitame skyriuje vėl grįšime prie apibendrinimo
+giliojo mokymosi kontekste.
 
-## Exercises
+## Pratimai
 
-1. If we wish to estimate the error of a fixed model $f$
-   to within $0.0001$ with probability greater than 99.9%,
-   how many samples do we need?
-1. Suppose that somebody else possesses a labeled test set
-   $\mathcal{D}$ and only makes available the unlabeled inputs (features).
-   Now suppose that you can only access the test set labels
-   by running a model $f$ (with no restrictions placed on the model class)
-   on each of the unlabeled inputs
-   and receiving the corresponding error $\epsilon_\mathcal{D}(f)$.
-   How many models would you need to evaluate
-   before you leak the entire test set
-   and thus could appear to have error $0$,
-   regardless of your true error?
-1. What is the VC dimension of the class of fifth-order polynomials?
-1. What is the VC dimension of axis-aligned rectangles on two-dimensional data?
+1. Jei norime įvertinti fiksuoto modelio $f$ paklaidą
+   $0.0001$ tikslumu su didesne nei 99,9 % tikimybe,
+   kiek imčių mums reikia?
+1. Tarkime, kad kažkas kitas turi pažymėtą testavimo aibę
+   $\mathcal{D}$ ir pateikia tik nepažymėtas įvestis (požymius).
+   Dabar tarkime, kad prie testavimo aibės žymenų galite prieiti tik
+   paleisdami modelį $f$ (be apribojimų modelių klasei)
+   kiekvienai nepažymėtai įvesčiai
+   ir gaudami atitinkamą paklaidą $\epsilon_\mathcal{D}(f)$.
+   Kiek modelių jums reikėtų įvertinti,
+   kol nutekintumėte visą testavimo aibę
+   ir taip galėtumėte atrodyti, kad turite paklaidą $0$,
+   nepriklausomai nuo tikrosios paklaidos?
+1. Kokia yra penktos eilės polinomų klasės VC dimensija?
+1. Kokia yra ašims lygiagrečių stačiakampių VC dimensija dvimačiams duomenims?
 
-[Discussions](https://discuss.d2l.ai/t/6829)
+[Diskusijos](https://discuss.d2l.ai/t/6829)

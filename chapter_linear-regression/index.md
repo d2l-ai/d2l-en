@@ -1,25 +1,25 @@
-# Linear Neural Networks for Regression
+# Tiesiniai neuroniniai tinklai regresijai
 :label:`chap_regression`
 
-Before we worry about making our neural networks deep,
-it will be helpful to implement some shallow ones,
-for which the inputs connect directly to the outputs.
-This will prove important for a few reasons.
-First, rather than getting distracted by complicated architectures,
-we can focus on the basics of neural network training,
-including parametrizing the output layer, handling data,
-specifying a loss function, and training the model.
-Second, this class of shallow networks happens
-to comprise the set of linear models,
-which subsumes many classical methods of statistical prediction,
-including linear and softmax regression.
-Understanding these classical tools is pivotal
-because they are widely used in many contexts
-and we will often need to use them as baselines
-when justifying the use of fancier architectures.
-This chapter will focus narrowly on linear regression
-and the next one will extend our modeling repertoire
-by developing linear neural networks for classification.
+Prieš rūpindamiesi, kad mūsų neuroniniai tinklai taptų gilūs,
+naudinga įgyvendinti keletą sekliųjų,
+kuriuose įvestys jungiasi tiesiogiai su išvestimis.
+Tai pasirodys svarbu dėl kelių priežasčių.
+Pirma, užuot blaškęsi dėl sudėtingų architektūrų,
+galime sutelkti dėmesį į neuroninių tinklų apmokymo pagrindus,
+įskaitant išvesties sluoksnio parametrizavimą, duomenų tvarkymą,
+nuostolių funkcijos nurodymą ir modelio apmokymą.
+Antra, ši seklių tinklų klasė
+sudaro tiesinių modelių aibę,
+apimančią daugelį klasikinių statistinės prognozės metodų,
+įskaitant tiesinę ir softmax regresiją.
+Suprasti šias klasikines priemones labai svarbu,
+nes jos plačiai naudojamos daugelyje kontekstų
+ir dažnai reikės jas naudoti kaip bazines linijas,
+pagrindžiant sudėtingesnių architektūrų naudojimą.
+Šiame skyriuje apsiribosime tiesine regresija,
+o kitame skyriuje išplėsime savo modeliavimo repertuarą,
+sukurdami tiesinius neuroninius tinklus klasifikavimui.
 
 ```toc
 :maxdepth: 2
@@ -32,4 +32,3 @@ linear-regression-concise
 generalization
 weight-decay
 ```
-

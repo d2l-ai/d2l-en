@@ -1,18 +1,18 @@
-# Linear Neural Networks for Classification
+# Tiesiniai neuroniniai tinklai klasifikavimui
 :label:`chap_classification`
 
-Now that you have worked through all of the mechanics
-you are ready to apply the skills you have learned to broader kinds of tasks.
-Even as we pivot towards classification,
-most of the plumbing remains the same:
-loading the data, passing it through the model,
-generating output, calculating the loss,
-taking gradients with respect to weights,
-and updating the model.
-However, the precise form of the targets,
-the parametrization of the output layer,
-and the choice of loss function will adapt
-to suit the *classification* setting.
+Kai jau įveikėte visą mechaniką,
+esate pasirengę pritaikyti išmoktus įgūdžius platesnėms užduotims.
+Net pereinant prie klasifikavimo,
+didžioji dalis „santechnikos" išlieka ta pati:
+duomenų įkėlimas, perdavimas per modelį,
+išvesties generavimas, nuostolių apskaičiavimas,
+gradientų svorių atžvilgiu ėmimas
+ir modelio atnaujinimas.
+Tačiau tikslus tikslinių dydžių pavidalas,
+išvesties sluoksnio parametrizavimas
+ir nuostolių funkcijos pasirinkimas bus pritaikyti
+*klasifikavimo* aplinkai.
 
 ```toc
 :maxdepth: 2
@@ -25,4 +25,3 @@ softmax-regression-concise
 generalization-classification
 environment-and-distribution-shift
 ```
-

@@ -3,36 +3,36 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Parameter Management
+# Parametrų valdymas
 
-Once we have chosen an architecture
-and set our hyperparameters,
-we proceed to the training loop,
-where our goal is to find parameter values
-that minimize our loss function.
-After training, we will need these parameters
-in order to make future predictions.
-Additionally, we will sometimes wish
-to extract the parameters
-perhaps to reuse them in some other context,
-to save our model to disk so that
-it may be executed in other software,
-or for examination in the hope of
-gaining scientific understanding.
+Kai pasirenkame architektūrą
+ir nustatome hiperparametrus,
+pereiname prie apmokymo ciklo,
+kuriame mūsų tikslas yra rasti parametrų reikšmes,
+minimizuojančias mūsų nuostolių funkciją.
+Po apmokymo šių parametrų mums prireiks
+ateities prognozėms daryti.
+Be to, kartais norėsime
+išgauti parametrus,
+galbūt norėdami pakartotinai juos panaudoti kitame kontekste,
+išsaugoti savo modelį diske, kad
+jį būtų galima vykdyti kitoje programinėje įrangoje,
+arba ištirti jų, tikėdamiesi
+įgyti mokslinį supratimą.
 
-Most of the time, we will be able
-to ignore the nitty-gritty details
-of how parameters are declared
-and manipulated, relying on deep learning frameworks
-to do the heavy lifting.
-However, when we move away from
-stacked architectures with standard layers,
-we will sometimes need to get into the weeds
-of declaring and manipulating parameters.
-In this section, we cover the following:
+Daugeliu atvejų galėsime
+nepaisyti smulkių detalių,
+kaip parametrai deklaruojami
+ir manipuliuojami, pasikliaudami giliojo mokymosi karkasais,
+kad jie atliktų sunkiąją dalį.
+Tačiau kai tolstame nuo
+sukrautų architektūrų su standartiniais sluoksniais,
+kartais reikės gilintis į
+parametrų deklaravimo ir manipuliavimo niuansus.
+Šiame skyrelyje aptariame:
 
-* Accessing parameters for debugging, diagnostics, and visualizations.
-* Sharing parameters across different model components.
+* Parametrų pasiekimą derinimui, diagnostikai ir vizualizacijoms.
+* Parametrų bendrinimą tarp skirtingų modelio komponentų.
 
 ```{.python .input}
 %%tab mxnet
@@ -60,7 +60,7 @@ import jax
 from jax import numpy as jnp
 ```
 
-(**We start by focusing on an MLP with one hidden layer.**)
+(**Pradėkime susitelkdami į MLP su vienu paslėptuoju sluoksniu.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -104,30 +104,30 @@ params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
-## [**Parameter Access**]
+## [**Parametrų pasiekimas**]
 :label:`subsec_param-access`
 
-Let's start with how to access parameters
-from the models that you already know.
+Pradėkime nuo to, kaip pasiekti parametrus
+iš jums jau pažįstamų modelių.
 
 :begin_tab:`mxnet, pytorch, tensorflow`
-When a model is defined via the `Sequential` class,
-we can first access any layer by indexing
-into the model as though it were a list.
-Each layer's parameters are conveniently
-located in its attribute.
+Kai modelis apibrėžiamas per klasę `Sequential`,
+pirmiausia galime pasiekti bet kurį sluoksnį, indeksuodami
+modelį taip, tarsi jis būtų sąrašas.
+Kiekvieno sluoksnio parametrai patogiai
+yra jo atribute.
 :end_tab:
 
 :begin_tab:`jax`
-Flax and JAX decouple the model and the parameters as you
-might have observed in the models defined previously.
-When a model is defined via the `Sequential` class,
-we first need to initialize the network to generate
-the parameters dictionary. We can access
-any layer's parameters through the keys of this dictionary.
+Flax ir JAX atskiria modelį ir parametrus, kaip
+galbūt pastebėjote anksčiau apibrėžtuose modeliuose.
+Kai modelis apibrėžiamas per klasę `Sequential`,
+pirmiausia turime inicializuoti tinklą, kad sugeneruotume
+parametrų žodyną. Bet kurio sluoksnio parametrus galime pasiekti
+per šio žodyno raktus.
 :end_tab:
 
-We can inspect the parameters of the second fully connected layer as follows.
+Antrojo pilnai sujungto sluoksnio parametrus galime patikrinti taip.
 
 ```{.python .input}
 %%tab mxnet
@@ -149,23 +149,23 @@ net.layers[2].weights
 params['params']['layers_2']
 ```
 
-We can see that this fully connected layer
-contains two parameters,
-corresponding to that layer's
-weights and biases, respectively.
+Matome, kad šis pilnai sujungtas sluoksnis
+turi du parametrus,
+atitinkamai atitinkančius to sluoksnio
+svorius ir poslinkius.
 
 
-### [**Targeted Parameters**]
+### [**Tikslinių parametrų pasiekimas**]
 
-Note that each parameter is represented
-as an instance of the parameter class.
-To do anything useful with the parameters,
-we first need to access the underlying numerical values.
-There are several ways to do this.
-Some are simpler while others are more general.
-The following code extracts the bias
-from the second neural network layer, which returns a parameter class instance, and
-further accesses that parameter's value.
+Atkreipkite dėmesį, kad kiekvienas parametras atvaizduojamas
+kaip parametro klasės egzempliorius.
+Kad su parametrais padarytume ką nors naudinga,
+pirmiausia turime pasiekti pagrindines skaitines reikšmes.
+Tai galima padaryti keliais būdais.
+Kai kurie paprastesni, o kiti bendresni.
+Šis kodas išgauna poslinkį
+iš antrojo neuroninio tinklo sluoksnio, kuris grąžina parametro klasės egzempliorių, ir
+toliau pasiekia to parametro reikšmę.
 
 ```{.python .input}
 %%tab mxnet
@@ -189,19 +189,19 @@ type(bias), bias
 ```
 
 :begin_tab:`mxnet,pytorch`
-Parameters are complex objects,
-containing values, gradients,
-and additional information.
-That is why we need to request the value explicitly.
+Parametrai yra sudėtingi objektai,
+kuriuose yra reikšmės, gradientai
+ir papildoma informacija.
+Todėl reikšmės turime prašyti aiškiai.
 
-In addition to the value, each parameter also allows us to access the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
+Be reikšmės, kiekvienas parametras taip pat leidžia pasiekti gradientą. Kadangi šiam tinklui dar nekvietėme atgalinio sklidimo, jis yra pradinės būsenos.
 :end_tab:
 
 :begin_tab:`jax`
-Unlike the other frameworks, JAX does not keep a track of the gradients over the
-neural network parameters, instead the parameters and the network are decoupled.
-It allows the user to express their computation as a
-Python function, and use the `grad` transformation for the same purpose.
+Skirtingai nei kiti karkasai, JAX nesaugo neuroninio tinklo parametrų
+gradientų – vietoj to parametrai ir tinklas yra atskirti.
+Tai leidžia naudotojui išreikšti savo skaičiavimą kaip
+Python funkciją ir tam pačiam tikslui naudoti transformaciją `grad`.
 :end_tab:
 
 ```{.python .input}
@@ -214,15 +214,15 @@ net[1].weight.grad()
 net[2].weight.grad == None
 ```
 
-### [**All Parameters at Once**]
+### [**Visi parametrai iš karto**]
 
-When we need to perform operations on all parameters,
-accessing them one-by-one can grow tedious.
-The situation can grow especially unwieldy
-when we work with more complex, e.g., nested, modules,
-since we would need to recurse
-through the entire tree to extract
-each sub-module's parameters. Below we demonstrate accessing the parameters of all layers.
+Kai reikia atlikti operacijas su visais parametrais,
+pasiekti juos po vieną gali tapti varginanti.
+Situacija gali tapti ypač nepatogi,
+kai dirbame su sudėtingesniais, pvz., įdėtaisiais, moduliais,
+nes turėtume rekursyviai
+apeiti visą medį, kad išgautume
+kiekvieno submodulio parametrus. Žemiau pademonstruojame visų sluoksnių parametrų pasiekimą.
 
 ```{.python .input}
 %%tab mxnet
@@ -244,15 +244,15 @@ net.get_weights()
 jax.tree_util.tree_map(lambda x: x.shape, params)
 ```
 
-## [**Tied Parameters**]
+## [**Susieti parametrai**]
 
-Often, we want to share parameters across multiple layers.
-Let's see how to do this elegantly.
-In the following we allocate a fully connected layer
-and then use its parameters specifically
-to set those of another layer.
-Here we need to run the forward propagation
-`net(X)` before accessing the parameters.
+Dažnai norime bendrinti parametrus tarp kelių sluoksnių.
+Pažiūrėkime, kaip tai padaryti elegantiškai.
+Toliau paskiriame pilnai sujungtą sluoksnį
+ir tada naudojame jo parametrus būtent
+kito sluoksnio parametrams nustatyti.
+Čia turime paleisti tiesioginį sklidimą
+`net(X)` prieš pasiekdami parametrus.
 
 ```{.python .input}
 %%tab mxnet
@@ -329,47 +329,45 @@ params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
 print(len(params['params']) == 3)
 ```
 
-This example shows that the parameters
-of the second and third layer are tied.
-They are not just equal, they are
-represented by the same exact tensor.
-Thus, if we change one of the parameters,
-the other one changes, too.
+Šis pavyzdys rodo, kad antrojo ir trečiojo sluoksnių parametrai
+yra susieti.
+Jie ne tik lygūs, bet ir
+atvaizduojami tuo pačiu tenzoriumi.
+Taigi, jei pakeisime vieną iš parametrų,
+pasikeis ir kitas.
 
 :begin_tab:`mxnet, pytorch, tensorflow`
-You might wonder,
-when parameters are tied
-what happens to the gradients?
-Since the model parameters contain gradients,
-the gradients of the second hidden layer
-and the third hidden layer are added together
-during backpropagation.
+Galbūt stebitės,
+kas nutinka gradientams, kai parametrai yra susieti.
+Kadangi modelio parametrai turi gradientus,
+antrojo ir trečiojo paslėptųjų sluoksnių gradientai
+atgalinio sklidimo metu sudedami.
 :end_tab:
 
 
-## Summary
+## Santrauka
 
-We have several ways of accessing and tying model parameters.
+Turime kelis būdus pasiekti ir susieti modelio parametrus.
 
 
-## Exercises
+## Pratimai
 
-1. Use the `NestMLP` model defined in :numref:`sec_model_construction` and access the parameters of the various layers.
-1. Construct an MLP containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
-1. Why is sharing parameters a good idea?
+1. Naudokite modelį `NestMLP`, apibrėžtą :numref:`sec_model_construction`, ir pasiekite įvairių sluoksnių parametrus.
+1. Sukonstruokite MLP, kuriame yra bendrinamų parametrų sluoksnis, ir apmokykite jį. Apmokymo proceso metu stebėkite kiekvieno sluoksnio modelio parametrus ir gradientus.
+1. Kodėl parametrų bendrinimas yra gera idėja?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/56)
+[Diskusijos](https://discuss.d2l.ai/t/56)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/57)
+[Diskusijos](https://discuss.d2l.ai/t/57)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/269)
+[Diskusijos](https://discuss.d2l.ai/t/269)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17990)
+[Diskusijos](https://discuss.d2l.ai/t/17990)
 :end_tab:

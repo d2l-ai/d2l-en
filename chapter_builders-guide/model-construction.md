@@ -3,96 +3,96 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Layers and Modules
+# Sluoksniai ir moduliai
 :label:`sec_model_construction`
 
-When we first introduced neural networks,
-we focused on linear models with a single output.
-Here, the entire model consists of just a single neuron.
-Note that a single neuron
-(i) takes some set of inputs;
-(ii) generates a corresponding scalar output;
-and (iii) has a set of associated parameters that can be updated
-to optimize some objective function of interest.
-Then, once we started thinking about networks with multiple outputs,
-we leveraged vectorized arithmetic
-to characterize an entire layer of neurons.
-Just like individual neurons,
-layers (i) take a set of inputs,
-(ii) generate corresponding outputs,
-and (iii) are described by a set of tunable parameters.
-When we worked through softmax regression,
-a single layer was itself the model.
-However, even when we subsequently
-introduced MLPs,
-we could still think of the model as
-retaining this same basic structure.
+Kai pirmą kartą pristatėme neuroninius tinklus,
+susitelkėme į tiesinius modelius su viena išvestimi.
+Čia visą modelį sudaro tik vienas neuronas.
+Atkreipkite dėmesį, kad vienas neuronas
+(i) priima tam tikrą įvesčių aibę;
+(ii) generuoja atitinkamą skaliarinę išvestį;
+ir (iii) turi susijusių parametrų aibę, kurią galima atnaujinti
+siekiant optimizuoti kokią nors dominančią tikslo funkciją.
+Tada, kai pradėjome galvoti apie tinklus su keliomis išvestimis,
+pasitelkėme vektorizuotą aritmetiką,
+kad apibūdintume visą neuronų sluoksnį.
+Lygiai kaip atskiri neuronai,
+sluoksniai (i) priima įvesčių aibę,
+(ii) generuoja atitinkamas išvestis
+ir (iii) yra aprašomi derinamų parametrų aibe.
+Kai nagrinėjome softmax regresiją,
+vienas sluoksnis pats buvo modelis.
+Tačiau net kai vėliau
+pristatėme MLP,
+vis tiek galėjome laikyti, kad modelis
+išlaiko tą pačią pagrindinę struktūrą.
 
-Interestingly, for MLPs,
-both the entire model and its constituent layers
-share this structure.
-The entire model takes in raw inputs (the features),
-generates outputs (the predictions),
-and possesses parameters
-(the combined parameters from all constituent layers).
-Likewise, each individual layer ingests inputs
-(supplied by the previous layer)
-generates outputs (the inputs to the subsequent layer),
-and possesses a set of tunable parameters that are updated
-according to the signal that flows backwards
-from the subsequent layer.
+Įdomu, kad MLP atveju
+ir visas modelis, ir jo sudedamieji sluoksniai
+turi šią struktūrą.
+Visas modelis priima neapdorotas įvestis (požymius),
+generuoja išvestis (prognozes)
+ir turi parametrus
+(visų sudedamųjų sluoksnių parametrų visumą).
+Lygiai taip pat kiekvienas atskiras sluoksnis priima įvestis
+(kurias pateikia ankstesnis sluoksnis),
+generuoja išvestis (kito sluoksnio įvestis)
+ir turi derinamų parametrų aibę, kuri atnaujinama
+pagal signalą, tekantį atgal
+iš kito sluoksnio.
 
 
-While you might think that neurons, layers, and models
-give us enough abstractions to go about our business,
-it turns out that we often find it convenient
-to speak about components that are
-larger than an individual layer
-but smaller than the entire model.
-For example, the ResNet-152 architecture,
-which is wildly popular in computer vision,
-possesses hundreds of layers.
-These layers consist of repeating patterns of *groups of layers*. Implementing such a network one layer at a time can grow tedious.
-This concern is not just hypothetical---such
-design patterns are common in practice.
-The ResNet architecture mentioned above
-won the 2015 ImageNet and COCO computer vision competitions
-for both recognition and detection :cite:`He.Zhang.Ren.ea.2016`
-and remains a go-to architecture for many vision tasks.
-Similar architectures in which layers are arranged
-in various repeating patterns
-are now ubiquitous in other domains,
-including natural language processing and speech.
+Nors galite manyti, kad neuronai, sluoksniai ir modeliai
+suteikia mums pakankamai abstrakcijų savo darbui,
+paaiškėja, kad dažnai patogu
+kalbėti apie komponentus, kurie yra
+didesni nei atskiras sluoksnis,
+bet mažesni nei visas modelis.
+Pavyzdžiui, ResNet-152 architektūra,
+kuri be galo populiari kompiuteriniame matyme,
+turi šimtus sluoksnių.
+Šiuos sluoksnius sudaro pasikartojantys *sluoksnių grupių* dėsningumai. Įgyvendinti tokį tinklą po vieną sluoksnį gali tapti varginantis.
+Šis rūpestis nėra vien hipotetinis – tokie
+projektavimo šablonai praktikoje yra įprasti.
+Minėtoji ResNet architektūra
+laimėjo 2015 m. ImageNet ir COCO kompiuterinio matymo konkursus
+tiek atpažinimo, tiek aptikimo kategorijose :cite:`He.Zhang.Ren.ea.2016`
+ir tebėra pagrindinė architektūra daugeliui matymo užduočių.
+Panašios architektūros, kuriose sluoksniai išdėstyti
+įvairiais pasikartojančiais dėsningumais,
+dabar yra visur kitose srityse,
+įskaitant natūraliosios kalbos apdorojimą ir kalbą.
 
-To implement these complex networks,
-we introduce the concept of a neural network *module*.
-A module could describe a single layer,
-a component consisting of multiple layers,
-or the entire model itself!
-One benefit of working with the module abstraction
-is that they can be combined into larger artifacts,
-often recursively. This is illustrated in :numref:`fig_blocks`. By defining code to generate modules
-of arbitrary complexity on demand,
-we can write surprisingly compact code
-and still implement complex neural networks.
+Kad įgyvendintume šiuos sudėtingus tinklus,
+pristatome neuroninio tinklo *modulio* sąvoką.
+Modulis gali aprašyti atskirą sluoksnį,
+kelių sluoksnių komponentą
+arba patį visą modelį!
+Viena darbo su modulio abstrakcija nauda
+yra ta, kad juos galima jungti į didesnius darinius,
+dažnai rekursyviai. Tai iliustruota :numref:`fig_blocks`. Apibrėždami kodą, generuojantį savavališko sudėtingumo
+modulius pagal poreikį,
+galime parašyti stebėtinai kompaktišką kodą
+ir vis tiek įgyvendinti sudėtingus neuroninius tinklus.
 
-![Multiple layers are combined into modules, forming repeating patterns of larger models.](../img/blocks.svg)
+![Keli sluoksniai sujungiami į modulius, sudarydami didesnių modelių pasikartojančius dėsningumus.](../img/blocks.svg)
 :label:`fig_blocks`
 
 
-From a programming standpoint, a module is represented by a *class*.
-Any subclass of it must define a forward propagation method
-that transforms its input into output
-and must store any necessary parameters.
-Note that some modules do not require any parameters at all.
-Finally a module must possess a backpropagation method,
-for purposes of calculating gradients.
-Fortunately, due to some behind-the-scenes magic
-supplied by the auto differentiation
-(introduced in :numref:`sec_autograd`)
-when defining our own module,
-we only need to worry about parameters
-and the forward propagation method.
+Programavimo požiūriu modulis atvaizduojamas *klase*.
+Bet kuri jos poklasė turi apibrėžti tiesioginio sklidimo metodą,
+kuris transformuoja jos įvestį į išvestį,
+ir turi saugoti visus reikalingus parametrus.
+Atkreipkite dėmesį, kad kai kuriems moduliams parametrų visai nereikia.
+Galiausiai modulis turi turėti atgalinio sklidimo metodą
+gradientams apskaičiuoti.
+Laimei, dėl užkulisinės magijos,
+kurią suteikia automatinis diferencijavimas
+(pristatytas :numref:`sec_autograd`),
+apibrėždami savo modulį,
+turime rūpintis tik parametrais
+ir tiesioginio sklidimo metodu.
 
 ```{.python .input}
 %%tab mxnet
@@ -122,14 +122,14 @@ import jax
 from jax import numpy as jnp
 ```
 
-[**To begin, we revisit the code
-that we used to implement MLPs**]
+[**Pradžioje peržiūrime kodą,
+kurį naudojome MLP įgyvendinti**]
 (:numref:`sec_mlp`).
-The following code generates a network
-with one fully connected hidden layer
-with 256 units and ReLU activation,
-followed by a fully connected output layer
-with ten units (no activation function).
+Šis kodas sugeneruoja tinklą
+su vienu pilnai sujungtu paslėptuoju sluoksniu,
+turinčiu 256 vienetus ir ReLU aktyvaciją,
+po kurio eina pilnai sujungtas išvesties sluoksnis
+su dešimčia vienetų (be aktyvacijos funkcijos).
 
 ```{.python .input}
 %%tab mxnet
@@ -172,91 +172,91 @@ net.apply(params, X).shape
 ```
 
 :begin_tab:`mxnet`
-In this example, we constructed
-our model by instantiating an `nn.Sequential`,
-assigning the returned object to the `net` variable.
-Next, we repeatedly call its `add` method,
-appending layers in the order
-that they should be executed.
-In short, `nn.Sequential` defines a special kind of `Block`,
-the class that presents a *module* in Gluon.
-It maintains an ordered list of constituent `Block`s.
-The `add` method simply facilitates
-the addition of each successive `Block` to the list.
-Note that each layer is an instance of the `Dense` class
-which is itself a subclass of `Block`.
-The forward propagation (`forward`) method is also remarkably simple:
-it chains each `Block` in the list together,
-passing the output of each as input to the next.
-Note that until now, we have been invoking our models
-via the construction `net(X)` to obtain their outputs.
-This is actually just shorthand for `net.forward(X)`,
-a slick Python trick achieved via
-the `Block` class's `__call__` method.
+Šiame pavyzdyje sukonstravome
+savo modelį, sukurdami `nn.Sequential` egzempliorių
+ir priskirdami grąžintą objektą kintamajam `net`.
+Toliau pakartotinai kviečiame jo metodą `add`,
+pridėdami sluoksnius ta tvarka,
+kuria jie turėtų būti vykdomi.
+Trumpai tariant, `nn.Sequential` apibrėžia ypatingą `Block` rūšį –
+klasę, kuri Gluon atvaizduoja *modulį*.
+Ji palaiko sutvarkytą sudedamųjų `Block` sąrašą.
+Metodas `add` tiesiog palengvina
+kiekvieno paskesnio `Block` pridėjimą prie sąrašo.
+Atkreipkite dėmesį, kad kiekvienas sluoksnis yra klasės `Dense` egzempliorius,
+kuris pats yra `Block` poklasė.
+Tiesioginio sklidimo (`forward`) metodas taip pat nepaprastai paprastas:
+jis sujungia kiekvieną sąrašo `Block` į grandinę,
+perduodamas kiekvieno išvestį kaip įvestį kitam.
+Atkreipkite dėmesį, kad iki šiol savo modelius kvietėme
+konstrukcija `net(X)`, kad gautume jų išvestis.
+Tai iš tikrųjų tėra santrumpa `net.forward(X)` –
+graži Python gudrybė, pasiekiama
+per klasės `Block` metodą `__call__`.
 :end_tab:
 
 :begin_tab:`pytorch`
-In this example, we constructed
-our model by instantiating an `nn.Sequential`, with layers in the order
-that they should be executed passed as arguments.
-In short, (**`nn.Sequential` defines a special kind of `Module`**),
-the class that presents a module in PyTorch.
-It maintains an ordered list of constituent `Module`s.
-Note that each of the two fully connected layers is an instance of the `Linear` class
-which is itself a subclass of `Module`.
-The forward propagation (`forward`) method is also remarkably simple:
-it chains each module in the list together,
-passing the output of each as input to the next.
-Note that until now, we have been invoking our models
-via the construction `net(X)` to obtain their outputs.
-This is actually just shorthand for `net.__call__(X)`.
+Šiame pavyzdyje sukonstravome
+savo modelį, sukurdami `nn.Sequential` egzempliorių, perduodami sluoksnius kaip argumentus ta tvarka,
+kuria jie turėtų būti vykdomi.
+Trumpai tariant, (**`nn.Sequential` apibrėžia ypatingą `Module` rūšį**) –
+klasę, kuri PyTorch atvaizduoja modulį.
+Ji palaiko sutvarkytą sudedamųjų `Module` sąrašą.
+Atkreipkite dėmesį, kad kiekvienas iš dviejų pilnai sujungtų sluoksnių yra klasės `Linear` egzempliorius,
+kuris pats yra `Module` poklasė.
+Tiesioginio sklidimo (`forward`) metodas taip pat nepaprastai paprastas:
+jis sujungia kiekvieną sąrašo modulį į grandinę,
+perduodamas kiekvieno išvestį kaip įvestį kitam.
+Atkreipkite dėmesį, kad iki šiol savo modelius kvietėme
+konstrukcija `net(X)`, kad gautume jų išvestis.
+Tai iš tikrųjų tėra santrumpa `net.__call__(X)`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In this example, we constructed
-our model by instantiating an `keras.models.Sequential`, with layers in the order
-that they should be executed passed as arguments.
-In short, `Sequential` defines a special kind of `keras.Model`,
-the class that presents a module in Keras.
-It maintains an ordered list of constituent `Model`s.
-Note that each of the two fully connected layers is an instance of the `Dense` class
-which is itself a subclass of `Model`.
-The forward propagation (`call`) method is also remarkably simple:
-it chains each module in the list together,
-passing the output of each as input to the next.
-Note that until now, we have been invoking our models
-via the construction `net(X)` to obtain their outputs.
-This is actually just shorthand for `net.call(X)`,
-a slick Python trick achieved via
-the module class's `__call__` method.
+Šiame pavyzdyje sukonstravome
+savo modelį, sukurdami `keras.models.Sequential` egzempliorių, perduodami sluoksnius kaip argumentus ta tvarka,
+kuria jie turėtų būti vykdomi.
+Trumpai tariant, `Sequential` apibrėžia ypatingą `keras.Model` rūšį –
+klasę, kuri Keras atvaizduoja modulį.
+Ji palaiko sutvarkytą sudedamųjų `Model` sąrašą.
+Atkreipkite dėmesį, kad kiekvienas iš dviejų pilnai sujungtų sluoksnių yra klasės `Dense` egzempliorius,
+kuris pats yra `Model` poklasė.
+Tiesioginio sklidimo (`call`) metodas taip pat nepaprastai paprastas:
+jis sujungia kiekvieną sąrašo modulį į grandinę,
+perduodamas kiekvieno išvestį kaip įvestį kitam.
+Atkreipkite dėmesį, kad iki šiol savo modelius kvietėme
+konstrukcija `net(X)`, kad gautume jų išvestis.
+Tai iš tikrųjų tėra santrumpa `net.call(X)` –
+graži Python gudrybė, pasiekiama
+per modulio klasės metodą `__call__`.
 :end_tab:
 
-## [**A Custom Module**]
+## [**Pasirinktinis modulis**]
 
-Perhaps the easiest way to develop intuition
-about how a module works
-is to implement one ourselves.
-Before we do that,
-we briefly summarize the basic functionality
-that each module must provide:
-
-
-1. Ingest input data as arguments to its forward propagation method.
-1. Generate an output by having the forward propagation method return a value. Note that the output may have a different shape from the input. For example, the first fully connected layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256.
-1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation method. Typically this happens automatically.
-1. Store and provide access to those parameters necessary
-   for executing the forward propagation computation.
-1. Initialize model parameters as needed.
+Galbūt lengviausias būdas išsiugdyti intuiciją
+apie tai, kaip veikia modulis,
+yra patiems jį įgyvendinti.
+Prieš tai
+trumpai apibendriname pagrindines funkcijas,
+kurias turi teikti kiekvienas modulis:
 
 
-In the following snippet,
-we code up a module from scratch
-corresponding to an MLP
-with one hidden layer with 256 hidden units,
-and a 10-dimensional output layer.
-Note that the `MLP` class below inherits the class that represents a module.
-We will heavily rely on the parent class's methods,
-supplying only our own constructor (the `__init__` method in Python) and the forward propagation method.
+1. Priimti įvesties duomenis kaip savo tiesioginio sklidimo metodo argumentus.
+1. Generuoti išvestį, kad tiesioginio sklidimo metodas grąžintų reikšmę. Atkreipkite dėmesį, kad išvestis gali turėti kitą formą nei įvestis. Pavyzdžiui, pirmasis pilnai sujungtas sluoksnis mūsų aukščiau pateiktame modelyje priima savavališkos dimensijos įvestį, bet grąžina 256 dimensijos išvestį.
+1. Apskaičiuoti savo išvesties gradientą įvesties atžvilgiu, kurį galima pasiekti per jo atgalinio sklidimo metodą. Paprastai tai vyksta automatiškai.
+1. Saugoti ir suteikti prieigą prie tų parametrų, kurie reikalingi
+   tiesioginio sklidimo skaičiavimui atlikti.
+1. Prireikus inicializuoti modelio parametrus.
+
+
+Šiame fragmente
+užkoduojame nuo nulio modulį,
+atitinkantį MLP
+su vienu paslėptuoju sluoksniu su 256 paslėptaisiais vienetais
+ir 10 dimensijų išvesties sluoksniu.
+Atkreipkite dėmesį, kad žemiau pateikta klasė `MLP` paveldi klasę, atvaizduojančią modulį.
+Labai pasikliausime tėvinės klasės metodais,
+pateikdami tik savo konstruktorių (Python metodą `__init__`) ir tiesioginio sklidimo metodą.
 
 ```{.python .input}
 %%tab mxnet
@@ -320,36 +320,35 @@ class MLP(nn.Module):
         return self.out(nn.relu(self.hidden(X)))
 ```
 
-Let's first focus on the forward propagation method.
-Note that it takes `X` as input,
-calculates the hidden representation
-with the activation function applied,
-and outputs its logits.
-In this `MLP` implementation,
-both layers are instance variables.
-To see why this is reasonable, imagine
-instantiating two MLPs, `net1` and `net2`,
-and training them on different data.
-Naturally, we would expect them
-to represent two different learned models.
+Pirmiausia susitelkime į tiesioginio sklidimo metodą.
+Atkreipkite dėmesį, kad jis priima `X` kaip įvestį,
+apskaičiuoja paslėptąjį atvaizdą
+su pritaikyta aktyvacijos funkcija
+ir išveda savo logitus.
+Šiame `MLP` įgyvendinime
+abu sluoksniai yra egzemplioriaus kintamieji.
+Kad suprastume, kodėl tai pagrįsta, įsivaizduokite
+sukuriant du MLP, `net1` ir `net2`,
+ir apmokant juos su skirtingais duomenimis.
+Natūralu, kad tikėtumėmės, jog jie
+atvaizduos du skirtingus išmoktus modelius.
 
-We [**instantiate the MLP's layers**]
-in the constructor
-(**and subsequently invoke these layers**)
-on each call to the forward propagation method.
-Note a few key details.
-First, our customized `__init__` method
-invokes the parent class's `__init__` method
-via `super().__init__()`
-sparing us the pain of restating
-boilerplate code applicable to most modules.
-We then instantiate our two fully connected layers,
-assigning them to `self.hidden` and `self.out`.
-Note that unless we implement a new layer,
-we need not worry about the backpropagation method
-or parameter initialization.
-The system will generate these methods automatically.
-Let's try this out.
+Konstruktoriuje [**sukuriame MLP sluoksnius**]
+(**ir vėliau kviečiame šiuos sluoksnius**)
+kiekvieną kartą kviečiant tiesioginio sklidimo metodą.
+Atkreipkite dėmesį į keletą esminių detalių.
+Pirma, mūsų pritaikytas metodas `__init__`
+kviečia tėvinės klasės metodą `__init__`
+per `super().__init__()`,
+taip pasaugodamas mus nuo pasikartojančio
+šablonistinio kodo, taikomo daugumai modulių, kartojimo.
+Tada sukuriame du savo pilnai sujungtus sluoksnius,
+priskirdami juos `self.hidden` ir `self.out`.
+Atkreipkite dėmesį, kad jei neįgyvendiname naujo sluoksnio,
+nereikia rūpintis nei atgalinio sklidimo metodu,
+nei parametrų inicializavimu.
+Sistema šiuos metodus sugeneruos automatiškai.
+Išbandykime tai.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -366,32 +365,32 @@ params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
-A key virtue of the module abstraction is its versatility.
-We can subclass a module to create layers
-(such as the fully connected layer class),
-entire models (such as the `MLP` class above),
-or various components of intermediate complexity.
-We exploit this versatility
-throughout the coming chapters,
-such as when addressing
-convolutional neural networks.
+Pagrindinė modulio abstrakcijos dorybė yra jos universalumas.
+Galime sukurti modulio poklasę, kad sukurtume sluoksnius
+(pavyzdžiui, pilnai sujungto sluoksnio klasę),
+visus modelius (pavyzdžiui, aukščiau pateiktą klasę `MLP`)
+arba įvairius vidutinio sudėtingumo komponentus.
+Šį universalumą išnaudosime
+visuose būsimuose skyriuose,
+pavyzdžiui, nagrinėdami
+konvoliucinius neuroninius tinklus.
 
 
-## [**The Sequential Module**]
+## [**Nuoseklusis modulis**]
 :label:`subsec_model-construction-sequential`
 
-We can now take a closer look
-at how the `Sequential` class works.
-Recall that `Sequential` was designed
-to daisy-chain other modules together.
-To build our own simplified `MySequential`,
-we just need to define two key methods:
+Dabar galime atidžiau pažvelgti,
+kaip veikia klasė `Sequential`.
+Prisiminkite, kad `Sequential` buvo sukurta
+kitiems moduliams sujungti į grandinę.
+Kad sukurtume savo supaprastintą `MySequential`,
+tereikia apibrėžti du pagrindinius metodus:
 
-1. A method for appending modules one by one to a list.
-1. A forward propagation method for passing an input through the chain of modules, in the same order as they were appended.
+1. Metodą, skirtą po vieną pridėti modulius į sąrašą.
+1. Tiesioginio sklidimo metodą, skirtą perduoti įvestį per modulių grandinę ta pačia tvarka, kuria jie buvo pridėti.
 
-The following `MySequential` class delivers the same
-functionality of the default `Sequential` class.
+Tą patį funkcionalumą, kurį teikia numatytoji klasė `Sequential`,
+pateikia ir žemiau pateikta klasė `MySequential`.
 
 ```{.python .input}
 %%tab mxnet
@@ -451,31 +450,31 @@ class MySequential(nn.Module):
 ```
 
 :begin_tab:`mxnet`
-The `add` method adds a single block
-to the ordered dictionary `_children`.
-You might wonder why every Gluon `Block`
-possesses a `_children` attribute
-and why we used it rather than just
-define a Python list ourselves.
-In short the chief advantage of `_children`
-is that during our block's parameter initialization,
-Gluon knows to look inside the `_children`
-dictionary to find sub-blocks whose
-parameters also need to be initialized.
+Metodas `add` prideda vieną bloką
+į sutvarkytą žodyną `_children`.
+Galbūt stebitės, kodėl kiekvienas Gluon `Block`
+turi atributą `_children`
+ir kodėl jį naudojome, užuot tiesiog
+patys apibrėžę Python sąrašą.
+Trumpai tariant, pagrindinis `_children` pranašumas yra tas,
+kad mūsų bloko parametrų inicializavimo metu
+Gluon žino, kad reikia pažvelgti į `_children`
+žodyną, norint rasti pogrupius blokus, kurių
+parametrus taip pat reikia inicializuoti.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the `__init__` method, we add every module
-by calling the `add_modules` method. These modules can be accessed by the `children` method at a later date.
-In this way the system knows the added modules,
-and it will properly initialize each module's parameters.
+Metode `__init__` pridedame kiekvieną modulį
+kviesdami metodą `add_modules`. Šiuos modulius vėliau galima pasiekti metodu `children`.
+Tokiu būdu sistema žino pridėtus modulius
+ir tinkamai inicializuos kiekvieno modulio parametrus.
 :end_tab:
 
-When our `MySequential`'s forward propagation method is invoked,
-each added module is executed
-in the order in which they were added.
-We can now reimplement an MLP
-using our `MySequential` class.
+Kai iškviečiamas mūsų `MySequential` tiesioginio sklidimo metodas,
+kiekvienas pridėtas modulis vykdomas
+ta tvarka, kuria jie buvo pridėti.
+Dabar galime iš naujo įgyvendinti MLP
+naudodami savo klasę `MySequential`.
 
 ```{.python .input}
 %%tab mxnet
@@ -507,42 +506,42 @@ params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
-Note that this use of `MySequential`
-is identical to the code we previously wrote
-for the `Sequential` class
-(as described in :numref:`sec_mlp`).
+Atkreipkite dėmesį, kad šis `MySequential` naudojimas
+yra identiškas kodui, kurį anksčiau parašėme
+klasei `Sequential`
+(kaip aprašyta :numref:`sec_mlp`).
 
 
-## [**Executing Code in the Forward Propagation Method**]
+## [**Kodo vykdymas tiesioginio sklidimo metode**]
 
-The `Sequential` class makes model construction easy,
-allowing us to assemble new architectures
-without having to define our own class.
-However, not all architectures are simple daisy chains.
-When greater flexibility is required,
-we will want to define our own blocks.
-For example, we might want to execute
-Python's control flow within the forward propagation method.
-Moreover, we might want to perform
-arbitrary mathematical operations,
-not simply relying on predefined neural network layers.
+Klasė `Sequential` palengvina modelio konstravimą,
+leisdama mums surinkti naujas architektūras
+neapibrėžiant savo klasės.
+Tačiau ne visos architektūros yra paprastos grandinės.
+Kai reikia didesnio lankstumo,
+norėsime apibrėžti savo blokus.
+Pavyzdžiui, galime norėti vykdyti
+Python valdymo srautą tiesioginio sklidimo metode.
+Be to, galime norėti atlikti
+savavališkas matematines operacijas,
+nepasikliaudami vien iš anksto apibrėžtais neuroninių tinklų sluoksniais.
 
-You may have noticed that until now,
-all of the operations in our networks
-have acted upon our network's activations
-and its parameters.
-Sometimes, however, we might want to
-incorporate terms
-that are neither the result of previous layers
-nor updatable parameters.
-We call these *constant parameters*.
-Say for example that we want a layer
-that calculates the function
+Galbūt pastebėjote, kad iki šiol
+visos mūsų tinklų operacijos
+veikė mūsų tinklo aktyvacijas
+ir jo parametrus.
+Tačiau kartais galime norėti
+įtraukti narius,
+kurie nėra nei ankstesnių sluoksnių rezultatas,
+nei atnaujinami parametrai.
+Juos vadiname *pastoviaisiais parametrais*.
+Tarkime, pavyzdžiui, kad norime sluoksnio,
+kuris apskaičiuoja funkciją
 $f(\mathbf{x},\mathbf{w}) = c \cdot \mathbf{w}^\top \mathbf{x}$,
-where $\mathbf{x}$ is the input, $\mathbf{w}$ is our parameter,
-and $c$ is some specified constant
-that is not updated during optimization.
-So we implement a `FixedHiddenMLP` class as follows.
+kur $\mathbf{x}$ yra įvestis, $\mathbf{w}$ yra mūsų parametras,
+o $c$ yra kokia nors nurodyta konstanta,
+kuri optimizavimo metu neatnaujinama.
+Taigi įgyvendiname klasę `FixedHiddenMLP` taip.
 
 ```{.python .input}
 %%tab mxnet
@@ -638,29 +637,29 @@ class FixedHiddenMLP(nn.Module):
         return X.sum()
 ```
 
-In this model,
-we implement a hidden layer whose weights
-(`self.rand_weight`) are initialized randomly
-at instantiation and are thereafter constant.
-This weight is not a model parameter
-and thus it is never updated by backpropagation.
-The network then passes the output of this "fixed" layer
-through a fully connected layer.
+Šiame modelyje
+įgyvendiname paslėptąjį sluoksnį, kurio svoriai
+(`self.rand_weight`) inicializuojami atsitiktinai
+sukuriant egzempliorių ir vėliau yra pastovūs.
+Šis svoris nėra modelio parametras,
+todėl jis niekada neatnaujinamas atgaliniu sklidimu.
+Tada tinklas perduoda šio „fiksuoto“ sluoksnio išvestį
+per pilnai sujungtą sluoksnį.
 
-Note that before returning the output,
-our model did something unusual.
-We ran a while-loop, testing
-on the condition its $\ell_1$ norm is larger than $1$,
-and dividing our output vector by $2$
-until it satisfied the condition.
-Finally, we returned the sum of the entries in `X`.
-To our knowledge, no standard neural network
-performs this operation.
-Note that this particular operation may not be useful
-in any real-world task.
-Our point is only to show you how to integrate
-arbitrary code into the flow of your
-neural network computations.
+Atkreipkite dėmesį, kad prieš grąžindamas išvestį,
+mūsų modelis padarė kai ką neįprasto.
+Paleidome ciklą while, tikrindami
+sąlygą, ar jo $\ell_1$ norma didesnė už $1$,
+ir dalijome savo išvesties vektorių iš $2$,
+kol jis tenkino sąlygą.
+Galiausiai grąžinome `X` elementų sumą.
+Kiek mums žinoma, joks standartinis neuroninis tinklas
+neatlieka šios operacijos.
+Atkreipkite dėmesį, kad ši konkreti operacija gali būti nenaudinga
+jokioje realaus pasaulio užduotyje.
+Mūsų tikslas yra tik parodyti, kaip integruoti
+savavališką kodą į savo
+neuroninio tinklo skaičiavimų srautą.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -677,10 +676,10 @@ params = net.init(d2l.get_key(), X)
 net.apply(params, X)
 ```
 
-We can [**mix and match various
-ways of assembling modules together.**]
-In the following example, we nest modules
-in some creative ways.
+Galime [**maišyti ir derinti įvairius
+modulių sujungimo būdus.**]
+Šiame pavyzdyje modulius įdedame vieną į kitą
+kai kuriais kūrybiškais būdais.
 
 ```{.python .input}
 %%tab mxnet
@@ -754,35 +753,35 @@ params = chimera.init(d2l.get_key(), X)
 chimera.apply(params, X)
 ```
 
-## Summary
+## Santrauka
 
-Individual layers can be modules.
-Many layers can comprise a module.
-Many modules can comprise a module.
+Atskiri sluoksniai gali būti moduliai.
+Daug sluoksnių gali sudaryti modulį.
+Daug modulių gali sudaryti modulį.
 
-A module can contain code.
-Modules take care of lots of housekeeping, including parameter initialization and backpropagation.
-Sequential concatenations of layers and modules are handled by the `Sequential` module.
+Modulis gali turėti kodo.
+Moduliai pasirūpina daugybe buities darbų, įskaitant parametrų inicializavimą ir atgalinį sklidimą.
+Nuoseklius sluoksnių ir modulių sujungimus tvarko modulis `Sequential`.
 
 
-## Exercises
+## Pratimai
 
-1. What kinds of problems will occur if you change `MySequential` to store modules in a Python list?
-1. Implement a module that takes two modules as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward propagation. This is also called a *parallel module*.
-1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same module and build a larger network from it.
+1. Kokių problemų kils, jei pakeisite `MySequential`, kad moduliai būtų saugomi Python sąraše?
+1. Įgyvendinkite modulį, kuris kaip argumentus priima du modulius, tarkime, `net1` ir `net2`, ir tiesioginio sklidimo metu grąžina abiejų tinklų sujungtą išvestį. Tai taip pat vadinama *lygiagrečiuoju moduliu*.
+1. Tarkime, kad norite sujungti kelis to paties tinklo egzempliorius. Įgyvendinkite gamyklos funkciją, kuri sugeneruoja kelis to paties modulio egzempliorius, ir iš jų sukurkite didesnį tinklą.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/54)
+[Diskusijos](https://discuss.d2l.ai/t/54)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/55)
+[Diskusijos](https://discuss.d2l.ai/t/55)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/264)
+[Diskusijos](https://discuss.d2l.ai/t/264)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17989)
+[Diskusijos](https://discuss.d2l.ai/t/17989)
 :end_tab:

@@ -3,35 +3,34 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Data Preprocessing
+# Duomenų išankstinis apdorojimas
 :label:`sec_pandas`
 
-So far, we have been working with synthetic data
-that arrived in ready-made tensors.
-However, to apply deep learning in the wild
-we must extract messy data 
-stored in arbitrary formats,
-and preprocess it to suit our needs.
-Fortunately, the *pandas* [library](https://pandas.pydata.org/) 
-can do much of the heavy lifting.
-This section, while no substitute 
-for a proper *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
-will give you a crash course
-on some of the most common routines.
+Iki šiol dirbome su sintetiniais duomenimis,
+kurie buvo pateikti jau paruoštuose tenzoriuose.
+Tačiau norint taikyti gilųjį mokymąsi realiame pasaulyje,
+turime išgauti netvarkingus duomenis,
+saugomus savavališkais formatais,
+ir juos iš anksto apdoroti pagal savo poreikius.
+Laimei, *pandas* [biblioteka](https://pandas.pydata.org/)
+gali atlikti didžiąją dalį sunkaus darbo.
+Šis skyrelis, nors ir neatstoja tinkamo *pandas* [vadovo](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
+suteiks jums greitąjį kursą
+apie kai kurias dažniausias procedūras.
 
-## Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-Comma-separated values (CSV) files are ubiquitous 
-for the storing of tabular (spreadsheet-like) data.
-In them, each line corresponds to one record
-and consists of several (comma-separated) fields, e.g.,
-"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,field of gravitational physics".
-To demonstrate how to load CSV files with `pandas`, 
-we (**create a CSV file below**) `../data/house_tiny.csv`. 
-This file represents a dataset of homes,
-where each row corresponds to a distinct home
-and the columns correspond to the number of rooms (`NumRooms`),
-the roof type (`RoofType`), and the price (`Price`).
+Kableliais atskirtų reikšmių (angl. *comma-separated values*, CSV) failai yra plačiai paplitę
+lentelinių (skaičiuoklės tipo) duomenų saugojimui.
+Juose kiekviena eilutė atitinka vieną įrašą
+ir susideda iš kelių (kableliais atskirtų) laukų, pvz.,
+„Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,field of gravitational physics".
+Norėdami pademonstruoti, kaip įkelti CSV failus naudojant `pandas`,
+(**toliau sukuriame CSV failą**) `../data/house_tiny.csv`.
+Šis failas vaizduoja namų duomenų rinkinį,
+kuriame kiekviena eilutė atitinka atskirą namą,
+o stulpeliai – kambarių skaičių (`NumRooms`),
+stogo tipą (`RoofType`) ir kainą (`Price`).
 
 ```{.python .input}
 %%tab all
@@ -47,7 +46,7 @@ NA,NA,127500
 NA,NA,140000''')
 ```
 
-Now let's import `pandas` and load the dataset with `read_csv`.
+Dabar importuokime `pandas` ir įkelkime duomenų rinkinį naudodami `read_csv`.
 
 ```{.python .input}
 %%tab all
@@ -57,44 +56,44 @@ data = pd.read_csv(data_file)
 print(data)
 ```
 
-## Data Preparation
+## Duomenų paruošimas
 
-In supervised learning, we train models
-to predict a designated *target* value,
-given some set of *input* values. 
-Our first step in processing the dataset
-is to separate out columns corresponding
-to input versus target values. 
-We can select columns either by name or
-via integer-location based indexing (`iloc`).
+Prižiūrimame mokyme apmokome modelius
+prognozuoti nurodytą *tikslinę* reikšmę,
+kai duotas tam tikras *įvesties* reikšmių rinkinys.
+Pirmasis mūsų žingsnis apdorojant duomenų rinkinį
+yra atskirti stulpelius, atitinkančius
+įvesties ir tikslines reikšmes.
+Stulpelius galime pasirinkti pagal pavadinimą arba
+naudodami indeksavimą pagal sveikąją padėtį (`iloc`).
 
-You might have noticed that `pandas` replaced
-all CSV entries with value `NA`
-with a special `NaN` (*not a number*) value. 
-This can also happen whenever an entry is empty,
-e.g., "3,,,270000".
-These are called *missing values* 
-and they are the "bed bugs" of data science,
-a persistent menace that you will confront
-throughout your career. 
-Depending upon the context, 
-missing values might be handled
-either via *imputation* or *deletion*.
-Imputation replaces missing values 
-with estimates of their values
-while deletion simply discards 
-either those rows or those columns
-that contain missing values. 
+Galbūt pastebėjote, kad `pandas` pakeitė
+visus CSV įrašus su reikšme `NA`
+speciale `NaN` (angl. *not a number*, „ne skaičius") reikšme.
+Tai taip pat gali nutikti, kai įrašas tuščias,
+pvz., „3,,,270000".
+Jos vadinamos *trūkstamomis reikšmėmis*
+ir yra duomenų mokslo „blakės" –
+nuolatinė grėsmė, su kuria susidursite
+visos savo karjeros metu.
+Priklausomai nuo konteksto,
+trūkstamos reikšmės gali būti tvarkomos
+arba *imputavimu*, arba *šalinimu*.
+Imputavimas pakeičia trūkstamas reikšmes
+jų reikšmių įverčiais,
+o šalinimas tiesiog atmeta
+tas eilutes arba tuos stulpelius,
+kuriuose yra trūkstamų reikšmių.
 
-Here are some common imputation heuristics.
-[**For categorical input fields, 
-we can treat `NaN` as a category.**]
-Since the `RoofType` column takes values `Slate` and `NaN`,
-`pandas` can convert this column 
-into two columns `RoofType_Slate` and `RoofType_nan`.
-A row whose roof type is `Slate` will set values 
-of `RoofType_Slate` and `RoofType_nan` to 1 and 0, respectively.
-The converse holds for a row with a missing `RoofType` value.
+Štai keletas dažnų imputavimo euristikų.
+[**Kategoriniams įvesties laukams
+`NaN` galime traktuoti kaip kategoriją.**]
+Kadangi stulpelis `RoofType` įgyja reikšmes `Slate` ir `NaN`,
+`pandas` gali konvertuoti šį stulpelį
+į du stulpelius `RoofType_Slate` ir `RoofType_nan`.
+Eilutėje, kurios stogo tipas yra `Slate`,
+`RoofType_Slate` ir `RoofType_nan` reikšmės bus atitinkamai 1 ir 0.
+Priešingai yra eilutei, kurios `RoofType` reikšmė trūksta.
 
 ```{.python .input}
 %%tab all
@@ -103,10 +102,10 @@ inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
 ```
 
-For missing numerical values, 
-one common heuristic is to 
-[**replace the `NaN` entries with 
-the mean value of the corresponding column**].
+Trūkstamoms skaitinėms reikšmėms
+viena dažna euristika yra
+[**pakeisti `NaN` įrašus
+atitinkamo stulpelio vidutine reikšme**].
 
 ```{.python .input}
 %%tab all
@@ -114,10 +113,10 @@ inputs = inputs.fillna(inputs.mean())
 print(inputs)
 ```
 
-## Conversion to the Tensor Format
+## Konvertavimas į tenzoriaus formatą
 
-Now that [**all the entries in `inputs` and `targets` are numerical,
-we can load them into a tensor**] (recall :numref:`sec_ndarray`).
+Dabar, kai [**visi `inputs` ir `targets` įrašai yra skaitiniai,
+galime juos įkelti į tenzorių**] (prisiminkite :numref:`sec_ndarray`).
 
 ```{.python .input}
 %%tab mxnet
@@ -154,62 +153,62 @@ y = jnp.array(targets.to_numpy(dtype=float))
 X, y
 ```
 
-## Discussion
+## Diskusija
 
-You now know how to partition data columns, 
-impute missing variables, 
-and load `pandas` data into tensors. 
-In :numref:`sec_kaggle_house`, you will
-pick up some more data processing skills. 
-While this crash course kept things simple,
-data processing can get hairy.
-For example, rather than arriving in a single CSV file,
-our dataset might be spread across multiple files
-extracted from a relational database.
-For instance, in an e-commerce application,
-customer addresses might live in one table
-and purchase data in another.
-Moreover, practitioners face myriad data types
-beyond categorical and numeric, for example,
-text strings, images,
-audio data, and point clouds. 
-Oftentimes, advanced tools and efficient algorithms 
-are required in order to prevent data processing from becoming
-the biggest bottleneck in the machine learning pipeline. 
-These problems will arise when we get to 
-computer vision and natural language processing. 
-Finally, we must pay attention to data quality.
-Real-world datasets are often plagued 
-by outliers, faulty measurements from sensors, and recording errors, 
-which must be addressed before 
-feeding the data into any model. 
-Data visualization tools such as [seaborn](https://seaborn.pydata.org/), 
-[Bokeh](https://docs.bokeh.org/), or [matplotlib](https://matplotlib.org/)
-can help you to manually inspect the data 
-and develop intuitions about 
-the type of problems you may need to address.
+Dabar žinote, kaip padalyti duomenų stulpelius,
+imputuoti trūkstamus kintamuosius
+ir įkelti `pandas` duomenis į tenzorius.
+:numref:`sec_kaggle_house` įgysite
+dar keletą duomenų apdorojimo įgūdžių.
+Nors šiame greitajame kurse viską supaprastinome,
+duomenų apdorojimas gali tapti sudėtingas.
+Pavyzdžiui, užuot buvę viename CSV faile,
+mūsų duomenys gali būti išsklaidyti po kelis failus,
+išgautus iš reliacinės duomenų bazės.
+Pavyzdžiui, elektroninės prekybos taikyme
+klientų adresai gali būti vienoje lentelėje,
+o pirkimų duomenys – kitoje.
+Be to, praktikai susiduria su daugybe duomenų tipų,
+be kategorinių ir skaitinių, pavyzdžiui,
+teksto eilutėmis, vaizdais,
+garso duomenimis ir taškų debesimis.
+Dažnai reikia pažangių įrankių ir efektyvių algoritmų,
+kad duomenų apdorojimas netaptų
+didžiausiu mašininio mokymosi proceso kliuviniu.
+Šios problemos iškils, kai pereisime prie
+kompiuterinės regos ir natūraliosios kalbos apdorojimo.
+Galiausiai turime atkreipti dėmesį į duomenų kokybę.
+Realaus pasaulio duomenų rinkiniuose dažnai pasitaiko
+išskirčių, klaidingų jutiklių matavimų ir registravimo klaidų,
+kurias reikia pašalinti prieš
+pateikiant duomenis bet kuriam modeliui.
+Duomenų vizualizavimo įrankiai, tokie kaip [seaborn](https://seaborn.pydata.org/),
+[Bokeh](https://docs.bokeh.org/) ar [matplotlib](https://matplotlib.org/),
+gali padėti jums rankiniu būdu peržiūrėti duomenis
+ir susidaryti intuiciją apie
+problemų, kurias gali tekti spręsti, tipą.
 
 
-## Exercises
+## Pratimai
 
-1. Try loading datasets, e.g., Abalone from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets) and inspect their properties. What fraction of them has missing values? What fraction of the variables is numerical, categorical, or text?
-1. Try indexing and selecting data columns by name rather than by column number. The pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
-1. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, and memory footprint. Try this out on your laptop. What happens if you try it out on a server? 
-1. How would you deal with data that has a very large number of categories? What if the category labels are all unique? Should you include the latter?
-1. What alternatives to pandas can you think of? How about [loading NumPy tensors from a file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Check out [Pillow](https://python-pillow.org/), the Python Imaging Library. 
+1. Pabandykite įkelti duomenų rinkinius, pvz., Abalone iš [UCI mašininio mokymosi saugyklos](https://archive.ics.uci.edu/ml/datasets), ir ištirkite jų savybes. Kokia jų dalis turi trūkstamų reikšmių? Kokia kintamųjų dalis yra skaitiniai, kategoriniai ar tekstiniai?
+1. Pabandykite indeksuoti ir pasirinkti duomenų stulpelius pagal pavadinimą, o ne pagal stulpelio numerį. Pandas dokumentacija apie [indeksavimą](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) pateikia daugiau informacijos, kaip tai padaryti.
+1. Kokio dydžio duomenų rinkinį, jūsų manymu, galėtumėte taip įkelti? Kokie gali būti apribojimai? Užuomina: apsvarstykite duomenų skaitymo laiką, vaizdavimą, apdorojimą ir atminties pėdsaką. Išbandykite tai savo nešiojamajame kompiuteryje. Kas nutinka, jei tai išbandote serveryje?
+1. Kaip elgtumėtės su duomenimis, turinčiais labai daug kategorijų? O jei visos kategorijų žymės unikalios? Ar pastarąsias reikėtų įtraukti?
+1. Kokių pandas alternatyvų galite sugalvoti? O kaip [NumPy tenzorių įkėlimas iš failo](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Susipažinkite su [Pillow](https://python-pillow.org/), Python vaizdų biblioteka.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/28)
+[Diskusijos](https://discuss.d2l.ai/t/28)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/29)
+[Diskusijos](https://discuss.d2l.ai/t/29)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/195)
+[Diskusijos](https://discuss.d2l.ai/t/195)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17967)
+[Diskusijos](https://discuss.d2l.ai/t/17967)
 :end_tab:

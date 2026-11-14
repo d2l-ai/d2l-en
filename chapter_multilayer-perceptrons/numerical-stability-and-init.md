@@ -3,30 +3,31 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Numerical Stability and Initialization
+# Skaitinis stabilumas ir inicializavimas
 :label:`sec_numerical_stability`
 
 
-Thus far, every model that we have implemented
-required that we initialize its parameters
-according to some pre-specified distribution.
-Until now, we took the initialization scheme for granted,
-glossing over the details of how these choices are made.
-You might have even gotten the impression that these choices
-are not especially important.
-On the contrary, the choice of initialization scheme
-plays a significant role in neural network learning,
-and it can be crucial for maintaining numerical stability.
-Moreover, these choices can be tied up in interesting ways
-with the choice of the nonlinear activation function.
-Which function we choose and how we initialize parameters
-can determine how quickly our optimization algorithm converges.
-Poor choices here can cause us to encounter
-exploding or vanishing gradients while training.
-In this section, we delve into these topics in greater detail
-and discuss some useful heuristics
-that you will find useful
-throughout your career in deep learning.
+Iki šiol kiekvienam mūsų įgyvendintam modeliui
+reikėjo inicializuoti jo parametrus
+pagal tam tikrą iš anksto nurodytą skirstinį.
+Iki šiol inicializavimo schemą laikėme savaime suprantama,
+praleisdami detales, kaip šie pasirinkimai daromi.
+Galbūt net susidarėte įspūdį,
+kad šie pasirinkimai nėra ypač svarbūs.
+Priešingai, inicializavimo schemos pasirinkimas
+vaidina svarbų vaidmenį neuroninių tinklų mokymesi,
+ir jis gali būti lemiamas išlaikant skaitinį stabilumą.
+Be to, šie pasirinkimai gali būti įdomiais būdais susiję
+su netiesinės aktyvacijos funkcijos pasirinkimu.
+Kokią funkciją pasirenkame ir kaip inicializuojame parametrus,
+gali nulemti, kaip greitai konverguoja mūsų optimizavimo algoritmas.
+Prasti pasirinkimai čia gali lemti,
+kad apmokymo metu susidursime su
+sprogstančiais arba nykstančiais gradientais.
+Šiame skyrelyje išsamiau nagrinėjame šias temas
+ir aptariame keletą naudingų euristikų,
+kurios jums praverstų
+visoje jūsų giliojo mokymosi karjeroje.
 
 ```{.python .input}
 %%tab mxnet
@@ -59,66 +60,66 @@ from jax import numpy as jnp
 from jax import grad, vmap
 ```
 
-## Vanishing and Exploding Gradients
+## Nykstantys ir sprogstantys gradientai
 
-Consider a deep network with $L$ layers,
-input $\mathbf{x}$ and output $\mathbf{o}$.
-With each layer $l$ defined by a transformation $f_l$
-parametrized by weights $\mathbf{W}^{(l)}$,
-whose hidden layer output is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
-our network can be expressed as:
+Panagrinėkime gilųjį tinklą su $L$ sluoksnių,
+įvestimi $\mathbf{x}$ ir išvestimi $\mathbf{o}$.
+Kiekvieną sluoksnį $l$ apibrėžia transformacija $f_l$,
+parametrizuota svoriais $\mathbf{W}^{(l)}$,
+kurio paslėptojo sluoksnio išvestis yra $\mathbf{h}^{(l)}$ (tegul $\mathbf{h}^{(0)} = \mathbf{x}$),
+tada mūsų tinklą galima išreikšti taip:
 
 $$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \textrm{ and thus } \mathbf{o} = f_L \circ \cdots \circ f_1(\mathbf{x}).$$
 
-If all the hidden layer output and the input are vectors,
-we can write the gradient of $\mathbf{o}$ with respect to
-any set of parameters $\mathbf{W}^{(l)}$ as follows:
+Jei visos paslėptojo sluoksnio išvestys ir įvestis yra vektoriai,
+$\mathbf{o}$ gradientą bet kurios parametrų aibės $\mathbf{W}^{(l)}$ atžvilgiu
+galime užrašyti taip:
 
 $$\partial_{\mathbf{W}^{(l)}} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{(L-1)}} \mathbf{h}^{(L)}}_{ \mathbf{M}^{(L)} \stackrel{\textrm{def}}{=}} \cdots \underbrace{\partial_{\mathbf{h}^{(l)}} \mathbf{h}^{(l+1)}}_{ \mathbf{M}^{(l+1)} \stackrel{\textrm{def}}{=}} \underbrace{\partial_{\mathbf{W}^{(l)}} \mathbf{h}^{(l)}}_{ \mathbf{v}^{(l)} \stackrel{\textrm{def}}{=}}.$$
 
-In other words, this gradient is
-the product of $L-l$ matrices
+Kitaip tariant, šis gradientas yra
+$L-l$ matricų
 $\mathbf{M}^{(L)} \cdots \mathbf{M}^{(l+1)}$
-and the gradient vector $\mathbf{v}^{(l)}$.
-Thus we are susceptible to the same
-problems of numerical underflow that often crop up
-when multiplying together too many probabilities.
-When dealing with probabilities, a common trick is to
-switch into log-space, i.e., shifting
-pressure from the mantissa to the exponent
-of the numerical representation.
-Unfortunately, our problem above is more serious:
-initially the matrices $\mathbf{M}^{(l)}$ may have a wide variety of eigenvalues.
-They might be small or large, and
-their product might be *very large* or *very small*.
+ir gradiento vektoriaus $\mathbf{v}^{(l)}$ sandauga.
+Todėl esame jautrūs toms pačioms
+skaitinio nuopildymo (angl. *underflow*) problemoms, kurios dažnai iškyla
+dauginant per daug tikimybių.
+Dirbant su tikimybėmis, įprastas triukas yra
+pereiti į logaritminę erdvę, t. y. perkelti
+apkrovą nuo mantisės prie skaitinio vaizdavimo
+eksponentės.
+Deja, mūsų aukščiau minėta problema rimtesnė:
+iš pradžių matricos $\mathbf{M}^{(l)}$ gali turėti labai įvairias tikrines reikšmes.
+Jos gali būti mažos arba didelės, ir
+jų sandauga gali būti *labai didelė* arba *labai maža*.
 
-The risks posed by unstable gradients
-go beyond numerical representation.
-Gradients of unpredictable magnitude
-also threaten the stability of our optimization algorithms.
-We may be facing parameter updates that are either
-(i) excessively large, destroying our model
-(the *exploding gradient* problem);
-or (ii) excessively small
-(the *vanishing gradient* problem),
-rendering learning impossible as parameters
-hardly move on each update.
+Nestabilių gradientų keliama rizika
+neapsiriboja skaitiniu vaizdavimu.
+Nenuspėjamo dydžio gradientai
+taip pat kelia grėsmę mūsų optimizavimo algoritmų stabilumui.
+Galime susidurti su parametrų atnaujinimais, kurie yra arba
+(i) pernelyg dideli, sugadinantys mūsų modelį
+(*sprogstančių gradientų* problema);
+arba (ii) pernelyg maži
+(*nykstančių gradientų* problema),
+dėl ko mokymasis tampa neįmanomas, nes parametrai
+vos juda per kiekvieną atnaujinimą.
 
 
-### (**Vanishing Gradients**)
+### (**Nykstantys gradientai**)
 
-One frequent culprit causing the vanishing gradient problem
-is the choice of the activation function $\sigma$
-that is appended following each layer's linear operations.
-Historically, the sigmoid function
-$1/(1 + \exp(-x))$ (introduced in :numref:`sec_mlp`)
-was popular because it resembles a thresholding function.
-Since early artificial neural networks were inspired
-by biological neural networks,
-the idea of neurons that fire either *fully* or *not at all*
-(like biological neurons) seemed appealing.
-Let's take a closer look at the sigmoid
-to see why it can cause vanishing gradients.
+Vienas dažnas nykstančių gradientų problemos kaltininkas
+yra aktyvacijos funkcijos $\sigma$ pasirinkimas,
+kuri pridedama po kiekvieno sluoksnio tiesinių operacijų.
+Istoriškai sigmoidinė funkcija
+$1/(1 + \exp(-x))$ (pristatyta :numref:`sec_mlp`)
+buvo populiari, nes primena slenkstinę funkciją.
+Kadangi ankstyvieji dirbtiniai neuroniniai tinklai buvo įkvėpti
+biologinių neuroninių tinklų,
+idėja apie neuronus, kurie šauna arba *visiškai*, arba *visai nešauna*
+(kaip biologiniai neuronai), atrodė patraukli.
+Pažvelkime į sigmoidinę funkciją atidžiau,
+kad pamatytume, kodėl ji gali sukelti nykstančius gradientus.
 
 ```{.python .input}
 %%tab mxnet
@@ -159,34 +160,34 @@ d2l.plot(x, [y, grad_sigmoid(x)],
          legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
-As you can see, (**the sigmoid's gradient vanishes
-both when its inputs are large and when they are small**).
-Moreover, when backpropagating through many layers,
-unless we are in the Goldilocks zone, where
-the inputs to many of the sigmoids are close to zero,
-the gradients of the overall product may vanish.
-When our network boasts many layers,
-unless we are careful, the gradient
-will likely be cut off at some layer.
-Indeed, this problem used to plague deep network training.
-Consequently, ReLUs, which are more stable
-(but less neurally plausible),
-have emerged as the default choice for practitioners.
+Kaip matote, (**sigmoidinės funkcijos gradientas išnyksta,
+kai jos įvestys yra ir didelės, ir mažos**).
+Be to, atgalinio sklidimo per daugelį sluoksnių metu,
+nebent būtume „Auksaplaukės zonoje“, kurioje
+daugelio sigmoidinių funkcijų įvestys artimos nuliui,
+bendros sandaugos gradientai gali išnykti.
+Kai mūsų tinklas turi daug sluoksnių,
+jei nebūsime atsargūs, gradientas
+greičiausiai bus nutrauktas kuriame nors sluoksnyje.
+Iš tiesų ši problema anksčiau kamavo giliųjų tinklų apmokymą.
+Todėl ReLU, kurios stabilesnės
+(bet mažiau neuroniškai įtikimos),
+tapo numatytuoju specialistų pasirinkimu.
 
 
-### [**Exploding Gradients**]
+### [**Sprogstantys gradientai**]
 
-The opposite problem, when gradients explode,
-can be similarly vexing.
-To illustrate this a bit better,
-we draw 100 Gaussian random matrices
-and multiply them with some initial matrix.
-For the scale that we picked
-(the choice of the variance $\sigma^2=1$),
-the matrix product explodes.
-When this happens because of the initialization
-of a deep network, we have no chance of getting
-a gradient descent optimizer to converge.
+Priešinga problema, kai gradientai sprogsta,
+gali būti lygiai taip pat erzinanti.
+Kad tai šiek tiek geriau iliustruotume,
+generuojame 100 Gauso atsitiktinių matricų
+ir dauginame jas iš kokios nors pradinės matricos.
+Mūsų pasirinktam mastelio dydžiui
+(dispersijos pasirinkimas $\sigma^2=1$)
+matricų sandauga sprogsta.
+Kai taip nutinka dėl gilaus tinklo
+inicializavimo, neturime jokių šansų priversti
+gradientinio nusileidimo optimizatoriaus konverguoti.
 
 ```{.python .input}
 %%tab mxnet
@@ -225,98 +226,98 @@ for i in range(100):
 print('after multiplying 100 matrices\n', M)
 ```
 
-### Breaking the Symmetry
+### Simetrijos laužymas
 
-Another problem in neural network design
-is the symmetry inherent in their parametrization.
-Assume that we have a simple MLP
-with one hidden layer and two units.
-In this case, we could permute the weights $\mathbf{W}^{(1)}$
-of the first layer and likewise permute
-the weights of the output layer
-to obtain the same function.
-There is nothing special differentiating
-the first and second hidden units.
-In other words, we have permutation symmetry
-among the hidden units of each layer.
+Kita neuroninių tinklų projektavimo problema
+yra jų parametrizavimui būdinga simetrija.
+Tarkime, kad turime paprastą MLP
+su vienu paslėptuoju sluoksniu ir dviem vienetais.
+Šiuo atveju galėtume sukeisti vietomis pirmojo sluoksnio svorius $\mathbf{W}^{(1)}$
+ir taip pat sukeisti
+išvesties sluoksnio svorius,
+kad gautume tą pačią funkciją.
+Nėra nieko ypatingo, kas skirtų
+pirmąjį ir antrąjį paslėptuosius vienetus.
+Kitaip tariant, turime keitinių simetriją
+tarp kiekvieno sluoksnio paslėptųjų vienetų.
 
-This is more than just a theoretical nuisance.
-Consider the aforementioned one-hidden-layer MLP
-with two hidden units.
-For illustration,
-suppose that the output layer transforms the two hidden units into only one output unit.
-Imagine what would happen if we initialized
-all the parameters of the hidden layer
-as $\mathbf{W}^{(1)} = c$ for some constant $c$.
-In this case, during forward propagation
-either hidden unit takes the same inputs and parameters
-producing the same activation
-which is fed to the output unit.
-During backpropagation,
-differentiating the output unit with respect to parameters $\mathbf{W}^{(1)}$ gives a gradient all of whose elements take the same value.
-Thus, after gradient-based iteration (e.g., minibatch stochastic gradient descent),
-all the elements of $\mathbf{W}^{(1)}$ still take the same value.
-Such iterations would
-never *break the symmetry* on their own
-and we might never be able to realize
-the network's expressive power.
-The hidden layer would behave
-as if it had only a single unit.
-Note that while minibatch stochastic gradient descent would not break this symmetry,
-dropout regularization (to be introduced later) would!
-
-
-## Parameter Initialization
-
-One way of addressing---or at least mitigating---the
-issues raised above is through careful initialization.
-As we will see later,
-additional care during optimization
-and suitable regularization can further enhance stability.
+Tai daugiau nei tik teorinis nepatogumas.
+Panagrinėkime minėtą vieno paslėptojo sluoksnio MLP
+su dviem paslėptaisiais vienetais.
+Iliustracijai
+tarkime, kad išvesties sluoksnis du paslėptuosius vienetus transformuoja tik į vieną išvesties vienetą.
+Įsivaizduokite, kas nutiktų, jei inicializuotume
+visus paslėptojo sluoksnio parametrus
+kaip $\mathbf{W}^{(1)} = c$ su kokia nors konstanta $c$.
+Šiuo atveju tiesioginio sklidimo metu
+abu paslėptieji vienetai gauna tas pačias įvestis ir parametrus,
+sukurdami tą pačią aktyvaciją,
+kuri paduodama išvesties vienetui.
+Atgalinio sklidimo metu
+diferencijavus išvesties vienetą parametrų $\mathbf{W}^{(1)}$ atžvilgiu, gaunamas gradientas, kurio visi elementai įgyja tą pačią reikšmę.
+Taigi po gradientinės iteracijos (pvz., minirinkinio stochastinio gradientinio nusileidimo)
+visi $\mathbf{W}^{(1)}$ elementai vis dar įgyja tą pačią reikšmę.
+Tokios iteracijos
+niekada savaime nesulaužytų *simetrijos*
+ir galbūt niekada nesugebėtume realizuoti
+tinklo raiškos galios.
+Paslėptasis sluoksnis elgtųsi
+taip, tarsi turėtų tik vieną vienetą.
+Atkreipkite dėmesį, kad nors minirinkinio stochastinis gradientinis nusileidimas šios simetrijos nesulaužytų,
+dropout reguliarizavimas (pristatytas vėliau) ją sulaužytų!
 
 
-### Default Initialization
+## Parametrų inicializavimas
 
-In the previous sections, e.g., in :numref:`sec_linear_concise`,
-we used a normal distribution
-to initialize the values of our weights.
-If we do not specify the initialization method, the framework will
-use a default random initialization method, which often works well in practice
-for moderate problem sizes.
+Vienas būdas spręsti – ar bent sušvelninti –
+aukščiau iškeltas problemas yra atsargus inicializavimas.
+Kaip pamatysime vėliau,
+papildomas atsargumas optimizavimo metu
+ir tinkamas reguliarizavimas gali dar labiau pagerinti stabilumą.
 
 
+### Numatytasis inicializavimas
+
+Ankstesniuose skyreliuose, pvz., :numref:`sec_linear_concise`,
+naudojome normalųjį skirstinį
+savo svorių reikšmėms inicializuoti.
+Jei nenurodome inicializavimo metodo, karkasas
+naudos numatytąjį atsitiktinio inicializavimo metodą, kuris praktikoje dažnai gerai veikia
+vidutinio dydžio problemoms.
 
 
 
 
-### Xavier Initialization
+
+
+### Xavier inicializavimas
 :label:`subsec_xavier`
 
-Let's look at the scale distribution of
-an output $o_{i}$ for some fully connected layer
-*without nonlinearities*.
-With $n_\textrm{in}$ inputs $x_j$
-and their associated weights $w_{ij}$ for this layer,
-an output is given by
+Pažvelkime į išvesties $o_{i}$ mastelio skirstinį
+kokiame nors pilnai sujungtame sluoksnyje
+*be netiesiškumų*.
+Turint $n_\textrm{in}$ įvesčių $x_j$
+ir su jomis susijusius svorius $w_{ij}$ šiam sluoksniui,
+išvestis duodama
 
 $$o_{i} = \sum_{j=1}^{n_\textrm{in}} w_{ij} x_j.$$
 
-The weights $w_{ij}$ are all drawn
-independently from the same distribution.
-Furthermore, let's assume that this distribution
-has zero mean and variance $\sigma^2$.
-Note that this does not mean that the distribution has to be Gaussian,
-just that the mean and variance need to exist.
-For now, let's assume that the inputs to the layer $x_j$
-also have zero mean and variance $\gamma^2$
-and that they are independent of $w_{ij}$ and independent of each other.
-In this case, we can compute the mean of $o_i$:
+Svoriai $w_{ij}$ visi traukiami
+nepriklausomai iš to paties skirstinio.
+Be to, tarkime, kad šis skirstinys
+turi nulinį vidurkį ir dispersiją $\sigma^2$.
+Atkreipkite dėmesį, kad tai nereiškia, jog skirstinys turi būti Gauso,
+tik kad vidurkis ir dispersija turi egzistuoti.
+Kol kas tarkime, kad sluoksnio įvestys $x_j$
+taip pat turi nulinį vidurkį ir dispersiją $\gamma^2$
+ir kad jos yra nepriklausomos nuo $w_{ij}$ bei viena nuo kitos.
+Šiuo atveju galime apskaičiuoti $o_i$ vidurkį:
 
 $$
 \begin{aligned}
     E[o_i] & = \sum_{j=1}^{n_\textrm{in}} E[w_{ij} x_j] \\&= \sum_{j=1}^{n_\textrm{in}} E[w_{ij}] E[x_j] \\&= 0, \end{aligned}$$
 
-and the variance:
+ir dispersiją:
 
 $$
 \begin{aligned}
@@ -327,18 +328,18 @@ $$
 \end{aligned}
 $$
 
-One way to keep the variance fixed
-is to set $n_\textrm{in} \sigma^2 = 1$.
-Now consider backpropagation.
-There we face a similar problem,
-albeit with gradients being propagated from the layers closer to the output.
-Using the same reasoning as for forward propagation,
-we see that the gradients' variance can blow up
-unless $n_\textrm{out} \sigma^2 = 1$,
-where $n_\textrm{out}$ is the number of outputs of this layer.
-This leaves us in a dilemma:
-we cannot possibly satisfy both conditions simultaneously.
-Instead, we simply try to satisfy:
+Vienas būdas išlaikyti dispersiją fiksuotą
+yra nustatyti $n_\textrm{in} \sigma^2 = 1$.
+Dabar panagrinėkime atgalinį sklidimą.
+Ten susiduriame su panašia problema,
+nors gradientai sklinda iš sluoksnių, esančių arčiau išvesties.
+Naudodami tą patį samprotavimą kaip tiesioginiam sklidimui,
+matome, kad gradientų dispersija gali sprogti,
+nebent $n_\textrm{out} \sigma^2 = 1$,
+kur $n_\textrm{out}$ yra šio sluoksnio išvesčių skaičius.
+Tai palieka mus dilemoje:
+negalime vienu metu patenkinti abiejų sąlygų.
+Vietoj to tiesiog stengiamės patenkinti:
 
 $$
 \begin{aligned}
@@ -347,80 +348,80 @@ $$
 \end{aligned}
 $$
 
-This is the reasoning underlying the now-standard
-and practically beneficial *Xavier initialization*,
-named after the first author of its creators :cite:`Glorot.Bengio.2010`.
-Typically, the Xavier initialization
-samples weights from a Gaussian distribution
-with zero mean and variance
+Tai yra samprotavimas, kuriuo grindžiamas dabar jau standartinis
+ir praktiškai naudingas *Xavier inicializavimas*,
+pavadintas pirmojo jo kūrėjų autoriaus vardu :cite:`Glorot.Bengio.2010`.
+Paprastai Xavier inicializavimas
+semia svorius iš Gauso skirstinio
+su nuliniu vidurkiu ir dispersija
 $\sigma^2 = \frac{2}{n_\textrm{in} + n_\textrm{out}}$.
-We can also adapt this to
-choose the variance when sampling weights
-from a uniform distribution.
-Note that the uniform distribution $U(-a, a)$ has variance $\frac{a^2}{3}$.
-Plugging $\frac{a^2}{3}$ into our condition on $\sigma^2$
-prompts us to initialize according to
+Taip pat galime tai pritaikyti
+dispersijai pasirinkti, kai svoriai semiami
+iš tolygiojo skirstinio.
+Atkreipkite dėmesį, kad tolygusis skirstinys $U(-a, a)$ turi dispersiją $\frac{a^2}{3}$.
+Įstatę $\frac{a^2}{3}$ į savo sąlygą $\sigma^2$,
+gauname, kad turėtume inicializuoti pagal
 
 $$U\left(-\sqrt{\frac{6}{n_\textrm{in} + n_\textrm{out}}}, \sqrt{\frac{6}{n_\textrm{in} + n_\textrm{out}}}\right).$$
 
-Though the assumption for nonexistence of nonlinearities
-in the above mathematical reasoning
-can be easily violated in neural networks,
-the Xavier initialization method
-turns out to work well in practice.
+Nors prielaida apie netiesiškumų nebuvimą
+aukščiau pateiktame matematiniame samprotavime
+neuroniniuose tinkluose gali būti lengvai pažeista,
+Xavier inicializavimo metodas
+praktikoje veikia gerai.
 
 
-### Beyond
+### Daugiau
 
-The reasoning above barely scratches the surface
-of modern approaches to parameter initialization.
-A deep learning framework often implements over a dozen different heuristics.
-Moreover, parameter initialization continues to be
-a hot area of fundamental research in deep learning.
-Among these are heuristics specialized for
-tied (shared) parameters, super-resolution,
-sequence models, and other situations.
-For instance,
-:citet:`Xiao.Bahri.Sohl-Dickstein.ea.2018` demonstrated the possibility of training
-10,000-layer neural networks without architectural tricks
-by using a carefully-designed initialization method.
+Aukščiau pateiktas samprotavimas vos paliečia
+šiuolaikinių parametrų inicializavimo metodų paviršių.
+Giliojo mokymosi karkasas dažnai įgyvendina daugiau nei tuziną skirtingų euristikų.
+Be to, parametrų inicializavimas ir toliau yra
+karšta fundamentinių giliojo mokymosi tyrimų sritis.
+Tarp jų yra euristikos, specializuotos
+susietiems (bendriems) parametrams, superrezoliucijai,
+sekų modeliams ir kitoms situacijoms.
+Pavyzdžiui,
+:citet:`Xiao.Bahri.Sohl-Dickstein.ea.2018` parodė galimybę apmokyti
+10 000 sluoksnių neuroninius tinklus be architektūrinių gudrybių,
+naudojant kruopščiai suprojektuotą inicializavimo metodą.
 
-If the topic interests you we suggest
-a deep dive into this module's offerings,
-reading the papers that proposed and analyzed each heuristic,
-and then exploring the latest publications on the topic.
-Perhaps you will stumble across or even invent
-a clever idea and contribute an implementation to deep learning frameworks.
+Jei ši tema jus domina, siūlome
+pasigilinti į šio modulio siūlomas galimybes,
+perskaityti straipsnius, pasiūliusius ir išanalizavusius kiekvieną euristiką,
+o tada panagrinėti naujausias publikacijas šia tema.
+Galbūt užtiksite ar net išrasite
+gudrią idėją ir prisidėsite įgyvendinimu prie giliojo mokymosi karkasų.
 
 
-## Summary
+## Santrauka
 
-Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
-Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
-Random initialization is key to ensuring that symmetry is broken before optimization.
-Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
-ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
+Nykstantys ir sprogstantys gradientai yra dažnos problemos giliuosiuose tinkluose. Reikia didelio atidumo inicializuojant parametrus, kad gradientai ir parametrai išliktų gerai kontroliuojami.
+Reikalingos inicializavimo euristikos, kad pradiniai gradientai nebūtų nei per dideli, nei per maži.
+Atsitiktinis inicializavimas yra esminis užtikrinant, kad simetrija būtų sulaužyta prieš optimizavimą.
+Xavier inicializavimas siūlo, kad kiekvieno sluoksnio bet kurios išvesties dispersijos neveiktų įvesčių skaičius, o bet kurio gradiento dispersijos neveiktų išvesčių skaičius.
+ReLU aktyvacijos funkcijos sušvelnina nykstančių gradientų problemą. Tai gali paspartinti konvergavimą.
 
-## Exercises
+## Pratimai
 
-1. Can you design other cases where a neural network might exhibit symmetry that needs breaking, besides the permutation symmetry in an MLP's layers?
-1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
-1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
-1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on layerwise adaptive rate scaling  for inspiration :cite:`You.Gitman.Ginsburg.2017`.
+1. Ar galite sugalvoti kitų atvejų, kai neuroninis tinklas gali pasižymėti simetrija, kurią reikia laužyti, be keitinių simetrijos MLP sluoksniuose?
+1. Ar galime inicializuoti visus svorių parametrus tiesinėje regresijoje arba softmax regresijoje tokia pačia reikšme?
+1. Susiraskite analizines dviejų matricų sandaugos tikrinių reikšmių ribas. Ką tai pasako apie tai, kaip užtikrinti, kad gradientai būtų gerai sąlygoti?
+1. Jei žinome, kad kai kurie nariai diverguoja, ar galime tai ištaisyti vėliau? Įkvėpimo ieškokite straipsnyje apie sluoksnių adaptyvųjį sparto mastelio keitimą :cite:`You.Gitman.Ginsburg.2017`.
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/103)
+[Diskusijos](https://discuss.d2l.ai/t/103)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/104)
+[Diskusijos](https://discuss.d2l.ai/t/104)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/235)
+[Diskusijos](https://discuss.d2l.ai/t/235)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17986)
+[Diskusijos](https://discuss.d2l.ai/t/17986)
 :end_tab:

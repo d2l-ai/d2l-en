@@ -1,27 +1,27 @@
-#  Preliminaries
+#  Pradinės žinios
 :label:`chap_preliminaries`
 
-To prepare for your dive into deep learning,
-you will need a few survival skills:
-(i) techniques for storing and manipulating data;
-(ii) libraries for ingesting 
-and preprocessing data from a variety of sources;
-(iii) knowledge of the basic linear algebraic operations
-that we apply to high-dimensional data elements;
-(iv) just enough calculus to determine
-which direction to adjust each parameter
-in order to decrease the loss function;
-(v) the ability to automatically compute derivatives
-so that you can forget much of 
-the calculus you just learned;
-(vi) some basic fluency in probability,
-our primary language for reasoning under uncertainty;
-and (vii) some aptitude for finding answers 
-in the official documentation when you get stuck.
+Kad pasiruoštumėte pasinerti į gilųjį mokymąsi,
+jums prireiks kelių išlikimo įgūdžių:
+(i) duomenų saugojimo ir apdorojimo metodų;
+(ii) bibliotekų, skirtų duomenims iš įvairių šaltinių
+įkelti ir iš anksto apdoroti;
+(iii) pagrindinių tiesinės algebros operacijų, kurias taikome
+aukštos dimensijos duomenų elementams, išmanymo;
+(iv) tiek matematinės analizės, kad galėtumėte nustatyti,
+kuria kryptimi koreguoti kiekvieną parametrą,
+norint sumažinti nuostolių funkciją;
+(v) gebėjimo automatiškai skaičiuoti išvestines,
+kad galėtumėte pamiršti didelę dalį
+ką tik išmoktos matematinės analizės;
+(vi) pagrindinių tikimybių teorijos įgūdžių,
+mūsų pagrindinės kalbos samprotauti esant neapibrėžtumui;
+ir (vii) gebėjimo rasti atsakymus
+oficialioje dokumentacijoje, kai užstringate.
 
-In short, this chapter provides a rapid introduction 
-to the basics that you will need to follow 
-*most* of the technical content in this book.
+Trumpai tariant, šiame skyriuje greitai pristatome pagrindus,
+kurių reikės, kad suprastumėte *didžiąją dalį*
+šios knygos techninio turinio.
 
 ```toc
 :maxdepth: 2
@@ -34,4 +34,3 @@ autograd
 probability
 lookup-api
 ```
-

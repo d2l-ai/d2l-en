@@ -1,28 +1,28 @@
-# Multilayer Perceptrons
+# Daugiasluoksniai perceptronai
 :label:`chap_perceptrons`
 
-In this chapter, we will introduce your first truly *deep* network.
-The simplest deep networks are called *multilayer perceptrons*,
-and they consist of multiple layers of neurons
-each fully connected to those in the layer below
-(from which they receive input)
-and those above (which they, in turn, influence).
-Although automatic differentiation
-significantly simplifies the implementation of deep learning algorithms,
-we will dive deep into how these gradients
-are calculated in deep networks.
-Then we will
-be ready to
-discuss issues relating to numerical stability and parameter initialization
-that are key to successfully training deep networks.
-When we train such high-capacity models we run the risk of overfitting. Thus, we will
-revisit regularization and generalization
-for deep networks.
-Throughout, we aim
-to give you a firm grasp not just of the concepts but also of the practice of using deep networks.
-At the end of this chapter, we apply what we have introduced so far to a real case: house price
-prediction. We punt matters relating to the computational performance, scalability, and efficiency
-of our models to subsequent chapters.
+Šiame skyriuje pristatysime jūsų pirmąjį tikrai *gilų* tinklą.
+Paprasčiausi giliejie tinklai vadinami *daugiasluoksniais perceptronais*,
+ir juos sudaro keli neuronų sluoksniai,
+kurių kiekvienas pilnai sujungtas su žemiau esančio sluoksnio neuronais
+(iš kurių gauna įvestį)
+ir aukščiau esančiais (kuriems, savo ruožtu, daro įtaką).
+Nors automatinis diferencijavimas
+labai supaprastina giliojo mokymosi algoritmų įgyvendinimą,
+išsamiai pasigilinsime, kaip šie gradientai
+apskaičiuojami giliuosiuose tinkluose.
+Tada būsime
+pasirengę
+aptarti klausimus, susijusius su skaitiniu stabilumu ir parametrų inicializavimu,
+kurie yra esminiai sėkmingam giliųjų tinklų apmokymui.
+Apmokydami tokius didelės talpos modelius, rizikuojame persimokyti. Todėl vėl
+nagrinėsime reguliarizavimą ir apibendrinimą
+giliesiems tinklams.
+Visame skyriuje siekiame
+suteikti jums tvirtą ne tik sąvokų, bet ir giliųjų tinklų naudojimo praktikos supratimą.
+Šio skyriaus pabaigoje pritaikome tai, ką iki šiol pristatėme, realiam atvejui: namų kainų
+prognozavimui. Klausimus, susijusius su skaičiavimo našumu, mastelio keitimu ir mūsų modelių
+efektyvumu, paliekame tolesniems skyriams.
 
 ```toc
 :maxdepth: 2
@@ -35,4 +35,3 @@ generalization-deep
 dropout
 kaggle-house-price
 ```
-

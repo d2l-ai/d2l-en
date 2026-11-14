@@ -3,17 +3,17 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Softmax Regression Implementation from Scratch
+# Softmax regresijos įgyvendinimas nuo nulio
 :label:`sec_softmax_scratch`
 
-Because softmax regression is so fundamental,
-we believe that you ought to know
-how to implement it yourself.
-Here, we limit ourselves to defining the
-softmax-specific aspects of the model
-and reuse the other components
-from our linear regression section,
-including the training loop.
+Kadangi softmax regresija tokia fundamentali,
+manome, kad turėtumėte mokėti
+ją įgyvendinti patys.
+Čia apsiribojame modelio
+softmax specifinių aspektų apibrėžimu
+ir pakartotinai naudojame kitus komponentus
+iš savo tiesinės regresijos skyrelio,
+įskaitant apmokymo ciklą.
 
 ```{.python .input}
 %%tab mxnet
@@ -43,17 +43,17 @@ from jax import numpy as jnp
 from functools import partial
 ```
 
-## The Softmax
+## Softmax funkcija
 
-Let's begin with the most important part:
-the mapping from scalars to probabilities.
-For a refresher, recall the operation of the sum operator
-along specific dimensions in a tensor,
-as discussed in :numref:`subsec_lin-alg-reduction`
-and :numref:`subsec_lin-alg-non-reduction`.
-[**Given a matrix `X` we can sum over all elements (by default) or only
-over elements in the same axis.**]
-The `axis` variable lets us compute row and column sums:
+Pradėkime nuo svarbiausios dalies:
+atvaizdžio iš skaliarų į tikimybes.
+Kad atsigaivintumėte, prisiminkite sumavimo operatoriaus veikimą
+pagal konkrečias tenzoriaus dimensijas,
+kaip aptarta :numref:`subsec_lin-alg-reduction`
+ir :numref:`subsec_lin-alg-non-reduction`.
+[**Turint matricą `X`, galime sumuoti per visus elementus (pagal numatytuosius nustatymus) arba tik
+per tos pačios ašies elementus.**]
+Kintamasis `axis` leidžia apskaičiuoti eilučių ir stulpelių sumas:
 
 ```{.python .input}
 %%tab all
@@ -61,21 +61,21 @@ X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
 
-Computing the softmax requires three steps:
-(i) exponentiation of each term;
-(ii) a sum over each row to compute the normalization constant for each example;
-(iii) division of each row by its normalization constant,
-ensuring that the result sums to 1:
+Softmax apskaičiavimas reikalauja trijų žingsnių:
+(i) kiekvieno nario kėlimo eksponente;
+(ii) sumos per kiekvieną eilutę, kad apskaičiuotume kiekvieno pavyzdžio normalizavimo konstantą;
+(iii) kiekvienos eilutės dalybos iš jos normalizavimo konstantos,
+užtikrinant, kad rezultato suma lygi 1:
 
 (**
 $$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
 **)
 
-The (logarithm of the) denominator
-is called the (log) *partition function*.
-It was introduced in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
-to sum over all possible states in a thermodynamic ensemble.
-The implementation is straightforward:
+Vardiklio (logaritmas) vadinamas (logaritmine) *statistine suma*
+(angl. *partition function*).
+Ji buvo pristatyta [statistinėje fizikoje](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics)),
+sumuojant per visas galimas termodinaminio ansamblio būsenas.
+Įgyvendinimas paprastas:
 
 ```{.python .input}
 %%tab all
@@ -85,10 +85,10 @@ def softmax(X):
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
-For any input `X`, [**we turn each element
-into a nonnegative number.
-Each row sums up to 1,**]
-as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While it is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep learning frameworks have such protections built in and we will be using the built-in softmax going forward.
+Bet kuriai įvesčiai `X` [**kiekvieną elementą paverčiame
+neneigiamu skaičiumi.
+Kiekvienos eilutės suma lygi 1,**]
+kaip ir reikalaujama iš tikimybės. Dėmesio: aukščiau pateiktas kodas *nėra* atsparus labai dideliems ar labai mažiems argumentams. Nors jo pakanka, kad parodytų, kas vyksta, *neturėtumėte* naudoti šio kodo tiesiogiai jokiam rimtam tikslui. Giliojo mokymosi karkasuose tokios apsaugos jau yra įtaisytos, ir toliau naudosime įtaisytąjį softmax.
 
 ```{.python .input}
 %%tab mxnet
@@ -111,34 +111,34 @@ X_prob = softmax(X)
 X_prob, d2l.reduce_sum(X_prob, 1)
 ```
 
-## The Model
+## Modelis
 
-We now have everything that we need
-to implement [**the softmax regression model.**]
-As in our linear regression example,
-each instance will be represented
-by a fixed-length vector.
-Since the raw data here consists
-of $28 \times 28$ pixel images,
-[**we flatten each image,
-treating them as vectors of length 784.**]
-In later chapters, we will introduce
-convolutional neural networks,
-which exploit the spatial structure
-in a more satisfying way.
+Dabar turime viską, ko reikia
+[**softmax regresijos modeliui**] įgyvendinti.
+Kaip ir mūsų tiesinės regresijos pavyzdyje,
+kiekvienas egzempliorius bus atvaizduojamas
+fiksuoto ilgio vektoriumi.
+Kadangi čia neapdoroti duomenys sudaryti
+iš $28 \times 28$ pikselių vaizdų,
+[**kiekvieną vaizdą išlyginame,
+laikydami jį 784 ilgio vektoriumi.**]
+Vėlesniuose skyriuose pristatysime
+konvoliucinius neuroninius tinklus,
+kurie erdvinę struktūrą išnaudoja
+patenkinamesniu būdu.
 
 
-In softmax regression,
-the number of outputs from our network
-should be equal to the number of classes.
-(**Since our dataset has 10 classes,
-our network has an output dimension of 10.**)
-Consequently, our weights constitute a $784 \times 10$ matrix
-plus a $1 \times 10$ row vector for the biases.
-As with linear regression,
-we initialize the weights `W`
-with Gaussian noise.
-The biases are initialized as zeros.
+Softmax regresijoje
+mūsų tinklo išvesčių skaičius
+turėtų būti lygus klasių skaičiui.
+(**Kadangi mūsų duomenų rinkinyje yra 10 klasių,
+mūsų tinklo išvesties dimensija yra 10.**)
+Todėl mūsų svoriai sudaro $784 \times 10$ matricą
+plius $1 \times 10$ eilutės vektorių poslinkiams.
+Kaip ir su tiesine regresija,
+svorius `W` inicializuojame
+Gauso triukšmu.
+Poslinkiai inicializuojami nuliais.
 
 ```{.python .input}
 %%tab mxnet
@@ -195,11 +195,11 @@ class SoftmaxRegressionScratch(d2l.Classifier):
         self.b = self.param('b', nn.initializers.zeros, self.num_outputs)
 ```
 
-The code below defines how the network
-maps each input to an output.
-Note that we flatten each $28 \times 28$ pixel image in the batch
-into a vector using `reshape`
-before passing the data through our model.
+Toliau pateiktas kodas apibrėžia, kaip tinklas
+atvaizduoja kiekvieną įvestį į išvestį.
+Atkreipkite dėmesį, kad kiekvieną minirinkinio $28 \times 28$ pikselių vaizdą
+išlyginame į vektorių naudodami `reshape`
+prieš perduodami duomenis per mūsų modelį.
 
 ```{.python .input}
 %%tab all
@@ -209,27 +209,27 @@ def forward(self, X):
     return softmax(d2l.matmul(X, self.W) + self.b)
 ```
 
-## The Cross-Entropy Loss
+## Kryžminės entropijos nuostoliai
 
-Next we need to implement the cross-entropy loss function
-(introduced in :numref:`subsec_softmax-regression-loss-func`).
-This may be the most common loss function
-in all of deep learning.
-At the moment, applications of deep learning
-easily cast as classification problems
-far outnumber those better treated as regression problems.
+Toliau turime įgyvendinti kryžminės entropijos nuostolių funkciją
+(pristatytą :numref:`subsec_softmax-regression-loss-func`).
+Tai gali būti dažniausia nuostolių funkcija
+visame giliajame mokyme.
+Šiuo metu giliojo mokymosi taikymų,
+lengvai apibūdinamų kaip klasifikavimo uždaviniai,
+yra gerokai daugiau nei tų, kuriuos geriau traktuoti kaip regresijos uždavinius.
 
-Recall that cross-entropy takes the negative log-likelihood
-of the predicted probability assigned to the true label.
-For efficiency we avoid Python for-loops and use indexing instead.
-In particular, the one-hot encoding in $\mathbf{y}$
-allows us to select the matching terms in $\hat{\mathbf{y}}$.
+Prisiminkite, kad kryžminė entropija ima prognozuotos tikimybės,
+priskirtos tikrajam žymeniui, neigiamą logaritminį tikėtinumą.
+Dėl efektyvumo vengiame Python ciklų „for" ir vietoj to naudojame indeksavimą.
+Visų pirma fiktyvusis kodavimas $\mathbf{y}$
+leidžia mums pasirinkti atitinkamus $\hat{\mathbf{y}}$ narius.
 
-To see this in action we [**create sample data `y_hat`
-with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
-The correct labels are $0$ and $2$ respectively (i.e., the first and third class).
-[**Using `y` as the indices of the probabilities in `y_hat`,**]
-we can pick out terms efficiently.
+Kad pamatytume tai veikiant, [**sukuriame pavyzdinius duomenis `y_hat`
+su 2 pavyzdžių prognozuotomis tikimybėmis per 3 klases ir jų atitinkamais žymenimis `y`.**]
+Teisingi žymenys yra atitinkamai $0$ ir $2$ (t. y. pirmoji ir trečioji klasė).
+[**Naudodami `y` kaip tikimybių `y_hat` indeksus,**]
+galime efektyviai išrinkti narius.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -246,17 +246,17 @@ tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 ```
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
+Dabar galime (**įgyvendinti kryžminės entropijos nuostolių funkciją**) suvidurkindami pasirinktų tikimybių logaritmus.
 :end_tab:
 
 :begin_tab:`jax`
-Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
+Dabar galime (**įgyvendinti kryžminės entropijos nuostolių funkciją**) suvidurkindami pasirinktų tikimybių logaritmus.
 
-Note that to make use of `jax.jit` to speed up JAX implementations, and
-to make sure `loss` is a pure function, the `cross_entropy` function is re-defined
-inside the `loss` to avoid usage of any global variables or functions
-which may render the `loss` function impure.
-We refer interested readers to the [JAX documentation](https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#pure-functions) on `jax.jit` and pure functions.
+Atkreipkite dėmesį, kad norint pasinaudoti `jax.jit` JAX įgyvendinimams pagreitinti
+ir užtikrinti, kad `loss` būtų gryna funkcija, funkcija `cross_entropy` iš naujo apibrėžiama
+`loss` viduje, kad būtų išvengta bet kokių globalių kintamųjų ar funkcijų naudojimo,
+dėl kurių funkcija `loss` galėtų tapti negryna.
+Besidominčius skaitytojus nukreipiame į [JAX dokumentaciją](https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#pure-functions) apie `jax.jit` ir grynąsias funkcijas.
 :end_tab:
 
 ```{.python .input}
@@ -296,27 +296,26 @@ def loss(self, params, X, y, state):
     return cross_entropy(y_hat, y), {}
 ```
 
-## Training
+## Apmokymas
 
-We reuse the `fit` method defined in :numref:`sec_linear_scratch` to [**train the model with 10 epochs.**]
-Note that the number of epochs (`max_epochs`),
-the minibatch size (`batch_size`),
-and learning rate (`lr`)
-are adjustable hyperparameters.
-That means that while these values are not
-learned during our primary training loop,
-they still influence the performance
-of our model, both vis-à-vis training
-and generalization performance.
-In practice you will want to choose these values
-based on the *validation* split of the data
-and then, ultimately, to evaluate your final model
-on the *test* split.
-As discussed in :numref:`subsec_generalization-model-selection`,
-we will regard the test data of Fashion-MNIST
-as the validation set, thus
-reporting validation loss and validation accuracy
-on this split.
+Pakartotinai naudojame metodą `fit`, apibrėžtą :numref:`sec_linear_scratch`, kad [**apmokytume modelį 10 epochų.**]
+Atkreipkite dėmesį, kad epochų skaičius (`max_epochs`),
+minirinkinio dydis (`batch_size`)
+ir mokymosi sparta (`lr`)
+yra reguliuojami hiperparametrai.
+Tai reiškia, kad nors šių reikšmių
+neišmokstame per pagrindinį apmokymo ciklą,
+jos vis tiek veikia mūsų modelio
+našumą, tiek apmokymo,
+tiek apibendrinimo požiūriu.
+Praktikoje šias reikšmes norėsite rinktis
+pagal *validavimo* duomenų dalį
+ir galiausiai įvertinti savo galutinį modelį
+*testavimo* dalyje.
+Kaip aptarta :numref:`subsec_generalization-model-selection`,
+Fashion-MNIST testavimo duomenis laikysime
+validavimo aibe, taigi
+šioje dalyje pateiksime validavimo nuostolius ir validavimo tikslumą.
 
 ```{.python .input}
 %%tab all
@@ -326,10 +325,10 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-## Prediction
+## Prognozavimas
 
-Now that training is complete,
-our model is ready to [**classify some images.**]
+Kai apmokymas baigtas,
+mūsų modelis yra pasirengęs [**klasifikuoti kai kuriuos vaizdus.**]
 
 ```{.python .input}
 %%tab all
@@ -341,11 +340,11 @@ if tab.selected('jax'):
 preds.shape
 ```
 
-We are more interested in the images we label *incorrectly*. We visualize them by
-comparing their actual labels
-(first line of text output)
-with the predictions from the model
-(second line of text output).
+Labiau domina vaizdai, kuriuos žymime *neteisingai*. Vizualizuojame juos
+palygindami jų tikruosius žymenis
+(pirmoji teksto išvesties eilutė)
+su modelio prognozėmis
+(antroji teksto išvesties eilutė).
 
 ```{.python .input}
 %%tab all
@@ -356,47 +355,47 @@ labels = [a+'\n'+b for a, b in zip(
 data.visualize([X, y], labels=labels)
 ```
 
-## Summary
+## Santrauka
 
-By now we are starting to get some experience
-with solving linear regression
-and classification problems.
-With it, we have reached what would arguably be
-the state of the art of 1960--1970s of statistical modeling.
-In the next section, we will show you how to leverage
-deep learning frameworks to implement this model
-much more efficiently.
+Dabar jau pradedame įgyti patirties
+sprendžiant tiesinės regresijos
+ir klasifikavimo uždavinius.
+Su ja pasiekėme tai, kas, galima sakyti, yra
+1960–1970-ųjų statistinio modeliavimo pažangos viršūnė.
+Kitame skyrelyje parodysime, kaip pasinaudoti
+giliojo mokymosi karkasais šiam modeliui įgyvendinti
+daug efektyviau.
 
-## Exercises
+## Pratimai
 
-1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. As discussed in :numref:`sec_softmax` this can cause numerical instabilities.
-    1. Test whether `softmax` still works correctly if an input has a value of $100$.
-    1. Test whether `softmax` still works correctly if the largest of all inputs is smaller than $-100$.
-    1. Implement a fix by looking at the value relative to the largest entry in the argument.
-1. Implement a `cross_entropy` function that follows the definition of the cross-entropy loss function $\sum_i y_i \log \hat{y}_i$.
-    1. Try it out in the code example of this section.
-    1. Why do you think it runs more slowly?
-    1. Should you use it? When would it make sense to?
-    1. What do you need to be careful of? Hint: consider the domain of the logarithm.
-1. Is it always a good idea to return the most likely label? For example, would you do this for medical diagnosis? How would you try to address this?
-1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
-1. Experiment with the hyperparameters of the code in this section. In particular:
-    1. Plot how the validation loss changes as you change the learning rate.
-    1. Do the validation and training loss change as you change the minibatch size? How large or small do you need to go before you see an effect?
+1. Šiame skyrelyje softmax funkciją įgyvendinome tiesiogiai pagal softmax operacijos matematinį apibrėžimą. Kaip aptarta :numref:`sec_softmax`, tai gali sukelti skaitinį nestabilumą.
+    1. Patikrinkite, ar `softmax` vis dar veikia teisingai, jei įvestis turi reikšmę $100$.
+    1. Patikrinkite, ar `softmax` vis dar veikia teisingai, jei didžiausia iš visų įvesčių yra mažesnė nei $-100$.
+    1. Įgyvendinkite pataisą, nagrinėdami reikšmę, palyginti su didžiausiu argumento įrašu.
+1. Įgyvendinkite funkciją `cross_entropy`, kuri atitinka kryžminės entropijos nuostolių funkcijos apibrėžimą $\sum_i y_i \log \hat{y}_i$.
+    1. Išbandykite ją šio skyrelio kodo pavyzdyje.
+    1. Kodėl, jūsų manymu, ji veikia lėčiau?
+    1. Ar turėtumėte ją naudoti? Kada tai būtų prasminga?
+    1. Į ką reikia būti atsargiems? Užuomina: apsvarstykite logaritmo apibrėžimo sritį.
+1. Ar visada gera mintis grąžinti labiausiai tikėtiną žymenį? Pavyzdžiui, ar taip darytumėte medicininei diagnozei? Kaip bandytumėte tai spręsti?
+1. Tarkime, kad norime naudoti softmax regresiją kitam žodžiui prognozuoti pagal kai kuriuos požymius. Kokios problemos gali kilti dėl didelio žodyno?
+1. Eksperimentuokite su šio skyrelio kodo hiperparametrais. Visų pirma:
+    1. Nubraižykite, kaip kinta validavimo nuostoliai keičiant mokymosi spartą.
+    1. Ar validavimo ir apmokymo nuostoliai keičiasi keičiant minirinkinio dydį? Kiek didelį ar mažą jį reikia pasirinkti, kad pamatytumėte poveikį?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/50)
+[Diskusijos](https://discuss.d2l.ai/t/50)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/51)
+[Diskusijos](https://discuss.d2l.ai/t/51)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/225)
+[Diskusijos](https://discuss.d2l.ai/t/225)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17982)
+[Diskusijos](https://discuss.d2l.ai/t/17982)
 :end_tab:
