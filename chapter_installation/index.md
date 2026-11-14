@@ -1,118 +1,118 @@
-# Installation
+# Diegimas
 :label:`chap_installation`
 
-In order to get up and running,
-we will need an environment for running Python,
-the Jupyter Notebook, the relevant libraries,
-and the code needed to run the book itself.
+Kad galėtume pradėti darbą,
+mums reikės aplinkos, kurioje būtų galima paleisti Python,
+„Jupyter Notebook", reikalingas bibliotekas
+ir kodą, kurio reikia pačiai knygai vykdyti.
 
-## Installing Miniconda
+## Miniconda diegimas
 
-Your simplest option is to install
-[Miniconda](https://conda.io/en/latest/miniconda.html).
-Note that the Python 3.x version is required.
-You can skip the following steps
-if your machine already has conda installed.
+Paprasčiausias variantas –
+įdiegti [Miniconda](https://conda.io/en/latest/miniconda.html).
+Atkreipkite dėmesį, kad reikalinga Python 3.x versija.
+Šiuos veiksmus galite praleisti,
+jei jūsų kompiuteryje jau įdiegta conda.
 
-Visit the Miniconda website and determine
-the appropriate version for your system
-based on your Python 3.x version and machine architecture.
-Suppose that your Python version is 3.9
-(our tested version).
-If you are using macOS,
-you would download the bash script
-whose name contains the strings "MacOSX",
-navigate to the download location,
-and execute the installation as follows
-(taking Intel Macs as an example):
+Apsilankykite Miniconda svetainėje ir nustatykite
+tinkamą versiją savo sistemai
+pagal savo Python 3.x versiją ir kompiuterio architektūrą.
+Tarkime, kad naudojate Python 3.9
+(tai mūsų išbandyta versija).
+Jei naudojate macOS,
+atsisiųskite bash scenarijų,
+kurio pavadinime yra eilutė „MacOSX",
+nueikite į atsisiuntimo vietą
+ir paleiskite diegimą taip
+(pavyzdys skirtas „Intel" procesorių „Mac" kompiuteriams):
 
 ```bash
-# The file name is subject to changes
+# Failo pavadinimas gali keistis
 sh Miniconda3-py39_4.12.0-MacOSX-x86_64.sh -b
 ```
 
 
-A Linux user
-would download the file
-whose name contains the strings "Linux"
-and execute the following at the download location:
+„Linux" naudotojas
+atsisiųstų failą,
+kurio pavadinime yra eilutė „Linux",
+ir atsisiuntimo vietoje paleistų:
 
 ```bash
-# The file name is subject to changes
+# Failo pavadinimas gali keistis
 sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b
 ```
 
 
-A Windows user would download and install Miniconda by following its [online instructions](https://conda.io/en/latest/miniconda.html).
-On Windows, you may search for `cmd` to open the Command Prompt (command-line interpreter) for running commands.
+„Windows" naudotojas Miniconda atsisiunčia ir įdiegia pagal [diegimo instrukcijas internete](https://conda.io/en/latest/miniconda.html).
+„Windows" sistemoje komandoms vykdyti komandų eilutę (komandų interpretatorių) galite atidaryti ieškodami `cmd`.
 
-Next, initialize the shell so we can run `conda` directly.
+Toliau inicializuokite komandų aplinką (angl. *shell*), kad galėtume tiesiogiai vykdyti `conda`.
 
 ```bash
 ~/miniconda3/bin/conda init
 ```
 
 
-Then close and reopen your current shell.
-You should be able to create
-a new environment as follows:
+Tada uždarykite ir iš naujo atidarykite savo dabartinę komandų aplinką.
+Dabar turėtumėte galėti sukurti
+naują aplinką taip:
 
 ```bash
 conda create --name d2l python=3.9 -y
 ```
 
 
-Now we can activate the `d2l` environment:
+Dabar galime aktyvuoti `d2l` aplinką:
 
 ```bash
 conda activate d2l
 ```
 
 
-## Installing the Deep Learning Framework and the `d2l` Package
+## Giliojo mokymosi karkaso ir `d2l` paketo diegimas
 
-Before installing any deep learning framework,
-please first check whether or not
-you have proper GPUs on your machine
-(the GPUs that power the display
-on a standard laptop are not relevant for our purposes).
-For example,
-if your computer has NVIDIA GPUs and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
-then you are all set.
-If your machine does not house any GPU,
-there is no need to worry just yet.
-Your CPU provides more than enough horsepower
-to get you through the first few chapters.
-Just remember that you will want to access GPUs
-before running larger models.
+Prieš diegdami bet kurį giliojo mokymosi karkasą (angl. *framework*),
+pirmiausia patikrinkite, ar
+jūsų kompiuteryje yra tinkamų grafinių procesorių (GPU)
+(standartiniame nešiojamajame kompiuteryje
+vaizdą rodantys grafiniai procesoriai mums netinka).
+Pavyzdžiui,
+jei jūsų kompiuteryje yra NVIDIA grafinių procesorių ir įdiegta [CUDA](https://developer.nvidia.com/cuda-downloads),
+viskas paruošta.
+Jei jūsų kompiuteryje grafinio procesoriaus nėra,
+kol kas nėra dėl ko nerimauti.
+Centrinio procesoriaus (CPU) galios
+pakanka pirmiesiems skyriams.
+Tik atminkite, kad didesniems modeliams
+vykdyti grafinio procesoriaus prireiks.
 
 
 :begin_tab:`mxnet`
 
-To install a GPU-enabled version of MXNet,
-we need to find out what version of CUDA you have installed.
-You can check this by running `nvcc --version`
-or `cat /usr/local/cuda/version.txt`.
-Assume that you have installed CUDA 11.2,
-then execute the following command:
+Norėdami įdiegti MXNet versiją su GPU palaikymu,
+turime išsiaiškinti, kokia CUDA versija įdiegta.
+Tai galite patikrinti paleidę `nvcc --version`
+arba `cat /usr/local/cuda/version.txt`.
+Tarkime, kad įdiegta CUDA 11.2,
+tada vykdykite šią komandą:
 
 ```bash
-# For macOS and Linux users
+# macOS ir „Linux" naudotojams
 pip install mxnet-cu112==1.9.1
 
-# For Windows users
+# „Windows" naudotojams
 pip install mxnet-cu112==1.9.1 -f https://dist.mxnet.io/python
 ```
 
 
-You may change the last digits according to your CUDA version, e.g., `cu101` for
-CUDA 10.1 and `cu90` for CUDA 9.0.
+Paskutinius skaitmenis galite keisti pagal savo CUDA versiją, pvz., `cu101`
+CUDA 10.1 ir `cu90` CUDA 9.0.
 
 
-If your machine has no NVIDIA GPUs
-or CUDA,
-you can install the CPU version
-as follows:
+Jei jūsų kompiuteryje nėra NVIDIA grafinių procesorių
+ar CUDA,
+galite įdiegti CPU versiją
+taip:
 
 ```bash
 pip install mxnet==1.9.1
@@ -124,7 +124,7 @@ pip install mxnet==1.9.1
 
 :begin_tab:`pytorch`
 
-You can install PyTorch (the specified versions are tested at the time of writing) with either CPU or GPU support as follows:
+PyTorch (nurodytos versijos išbandytos rašymo metu) su CPU arba GPU palaikymu galite įdiegti taip:
 
 ```bash
 pip install torch==2.0.0 torchvision==0.15.1
@@ -134,7 +134,7 @@ pip install torch==2.0.0 torchvision==0.15.1
 :end_tab:
 
 :begin_tab:`tensorflow`
-You can install TensorFlow with either CPU or GPU support as follows:
+TensorFlow su CPU arba GPU palaikymu galite įdiegti taip:
 
 ```bash
 pip install tensorflow==2.12.0 tensorflow-probability==0.20.0
@@ -144,7 +144,7 @@ pip install tensorflow==2.12.0 tensorflow-probability==0.20.0
 :end_tab:
 
 :begin_tab:`jax`
-You can install JAX and Flax with either CPU or GPU support as follows:
+JAX ir Flax su CPU arba GPU palaikymu galite įdiegti taip:
 
 ```bash
 # GPU
@@ -152,10 +152,10 @@ pip install "jax[cuda11_pip]==0.4.13" -f https://storage.googleapis.com/jax-rele
 ```
 
 
-If your machine has no NVIDIA GPUs
-or CUDA,
-you can install the CPU version
-as follows:
+Jei jūsų kompiuteryje nėra NVIDIA grafinių procesorių
+ar CUDA,
+galite įdiegti CPU versiją
+taip:
 
 ```bash
 # CPU
@@ -166,26 +166,25 @@ pip install "jax[cpu]==0.4.13" flax==0.7.0
 :end_tab:
 
 
-Our next step is to install
-the `d2l` package that we developed
-in order to encapsulate
-frequently used functions and classes
-found throughout this book:
+Kitas žingsnis – įdiegti
+mūsų sukurtą `d2l` paketą,
+kuriame sutelktos
+visoje knygoje
+dažnai naudojamos funkcijos ir klasės:
 
 ```bash
 pip install d2l==1.0.3
 ```
 
 
-## Downloading and Running the Code
+## Kodo atsisiuntimas ir paleidimas
 
-Next, you will want to download the notebooks
-so that you can run each of the book's code blocks.
-Simply click on the "Notebooks" tab at the top
-of any HTML page on [the D2L.ai website](https://d2l.ai/)
-to download the code and then unzip it.
-Alternatively, you can fetch the notebooks
-from the command line as follows:
+Toliau norėsite atsisiųsti sąsiuvinius (angl. *notebooks*),
+kad galėtumėte paleisti kiekvieną knygos kodo bloką.
+Tiesiog spustelėkite skirtuką „Notebooks" bet kurio HTML
+puslapio viršuje [D2L.ai svetainėje](https://d2l.ai/),
+kad atsisiųstumėte kodą, ir jį išarchyvuokite.
+Arba sąsiuvinius galite gauti iš komandų eilutės taip:
 
 :begin_tab:`mxnet`
 
@@ -236,40 +235,40 @@ cd jax
 
 :end_tab:
 
-If you do not already have `unzip` installed, first run `sudo apt-get install unzip`.
-Now we can start the Jupyter Notebook server by running:
+Jei `unzip` dar neįdiegta, pirmiausia paleiskite `sudo apt-get install unzip`.
+Dabar „Jupyter Notebook" serverį galime paleisti vykdydami:
 
 ```bash
 jupyter notebook
 ```
 
 
-At this point, you can open http://localhost:8888
-(it may have already opened automatically) in your web browser.
-Then we can run the code for each section of the book.
-Whenever you open a new command line window,
-you will need to execute `conda activate d2l`
-to activate the runtime environment
-before running the D2L notebooks,
-or updating your packages
-(either the deep learning framework
-or the `d2l` package).
-To exit the environment,
-run `conda deactivate`.
+Šiuo metu naršyklėje galite atidaryti http://localhost:8888
+(ji gali būti atsidariusi automatiškai).
+Tada galime vykdyti kiekvieno knygos skyrelio kodą.
+Kai tik atidarote naują komandų eilutės langą,
+prieš paleisdami D2L sąsiuvinius
+arba atnaujindami paketus
+(giliojo mokymosi karkasą
+ar `d2l` paketą),
+turėsite paleisti `conda activate d2l`,
+kad aktyvuotumėte vykdymo aplinką.
+Norėdami išeiti iš aplinkos,
+paleiskite `conda deactivate`.
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/23)
+[Diskusijos](https://discuss.d2l.ai/t/23)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/24)
+[Diskusijos](https://discuss.d2l.ai/t/24)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/436)
+[Diskusijos](https://discuss.d2l.ai/t/436)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17964)
+[Diskusijos](https://discuss.d2l.ai/t/17964)
 :end_tab:

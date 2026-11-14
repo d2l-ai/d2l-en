@@ -1,984 +1,976 @@
-# Introduction
+# Įvadas
 :label:`chap_introduction`
 
-Until recently, nearly every computer program
-that you might have interacted with during
-an ordinary day
-was coded up as a rigid set of rules
-specifying precisely how it should behave.
-Say that we wanted to write an application
-to manage an e-commerce platform.
-After huddling around a whiteboard
-for a few hours to ponder the problem,
-we might settle on the broad strokes
-of a working solution, for example:
-(i) users interact with the application through an interface
-running in a web browser or mobile application;
-(ii) our application interacts with a commercial-grade database engine
-to keep track of each user's state and maintain records
-of historical transactions;
-and (iii) at the heart of our application,
-the *business logic* (you might say, the *brains*) of our application
-spells out a set of rules that map every conceivable circumstance
-to the corresponding action that our program should take.
+Dar visai neseniai beveik kiekviena kompiuterio programa,
+su kuria galėjote bendrauti
+įprastą dieną,
+buvo sukurta kaip griežtas taisyklių rinkinys,
+tiksliai nurodantis, kaip ji turi elgtis.
+Tarkime, kad norėjome parašyti programą
+elektroninės prekybos platformai valdyti.
+Kelias valandas susikūprinę prie lentos
+ir svarstydami uždavinį,
+galime sutarti dėl bendrų veikiančio sprendimo brūkšnių, pavyzdžiui:
+(i) naudotojai su programa bendrauja per sąsają,
+veikiančią interneto naršyklėje ar mobiliojoje programėlėje;
+(ii) mūsų programa bendrauja su komercinio lygio duomenų bazių varikliu,
+kad sektų kiekvieno naudotojo būseną ir saugotų
+istorinių sandorių įrašus;
+ir (iii) mūsų programos šerdyje
+*verslo logika* (galima sakyti, mūsų programos *smegenys*)
+išdėsto taisyklių rinkinį, kuris kiekvieną įsivaizduojamą aplinkybę
+susieja su atitinkamu veiksmu, kurį mūsų programa turi atlikti.
 
-To build the brains of our application,
-we might enumerate all the common events
-that our program should handle.
-For example, whenever a customer clicks
-to add an item to their shopping cart,
-our program should add an entry
-to the shopping cart database table,
-associating that user's ID
-with the requested product's ID.
-We might then attempt to step through
-every possible corner case,
-testing the appropriateness of our rules
-and making any necessary modifications.
-What happens if a user
-initiates a purchase with an empty cart?
-While few developers ever get it
-completely right the first time
-(it might take some test runs to work out the kinks),
-for the most part we can write such programs
-and confidently launch them
-*before* ever seeing a real customer.
-Our ability to manually design automated systems
-that drive functioning products and systems,
-often in novel situations,
-is a remarkable cognitive feat.
-And when you are able to devise solutions
-that work $100\%$ of the time,
-you typically should not be
-worrying about machine learning.
+Kad sukurtume savo programos smegenis,
+galime išvardyti visus dažnus įvykius,
+kuriuos mūsų programa turi apdoroti.
+Pavyzdžiui, kai tik klientas spusteli,
+kad pridėtų prekę į savo krepšelį,
+mūsų programa turi pridėti įrašą
+į krepšelio duomenų bazės lentelę,
+susiedama to naudotojo ID
+su užsakytos prekės ID.
+Tada galėtume bandyti peržiūrėti
+visus įmanomus ribinius atvejus,
+tikrindami savo taisyklių tinkamumą
+ir atlikdami reikiamus pakeitimus.
+Kas atsitinka, jei naudotojas
+pradeda pirkimą su tuščiu krepšeliu?
+Nors nedaug kūrėjų iš pirmo karto viską padaro
+visiškai teisingai
+(gali prireikti kelių bandomųjų paleidimų klaidoms ištaisyti),
+daugumą tokių programų galime parašyti
+ir užtikrintai paleisti
+*dar prieš* pamatydami tikrą klientą.
+Mūsų gebėjimas rankiniu būdu projektuoti automatizuotas sistemas,
+kurios valdo veikiančius produktus ir sistemas,
+dažnai naujose situacijose,
+yra nepaprastas pažintinis žygdarbis.
+O kai sugebate sukurti sprendimus,
+veikiančius $100\%$ atvejų,
+paprastai neturėtumėte
+sukti galvos dėl mašininio mokymosi.
 
-Fortunately for the growing community
-of machine learning scientists,
-many tasks that we would like to automate
-do not bend so easily to human ingenuity.
-Imagine huddling around the whiteboard
-with the smartest minds you know,
-but this time you are tackling
-one of the following problems:
+Mašininio mokymosi mokslininkų bendruomenei augant,
+daugelis užduočių, kurias norėtume automatizuoti,
+taip lengvai nepasiduoda žmogaus išradingumui.
+Įsivaizduokite, kad vėl susikūprinę prie lentos
+su protingiausiais jums žinomais žmonėmis,
+bet šįkart sprendžiate
+vieną iš šių uždavinių:
 
-* Write a program that predicts tomorrow's weather given geographic information, satellite images, and a trailing window of past weather.
-* Write a program that takes in a factoid question, expressed in free-form text, and  answers it correctly.
-* Write a program that, given an image, identifies every person depicted in it and draws outlines around each.
-* Write a program that presents users with products that they are likely to enjoy but unlikely, in the natural course of browsing, to encounter.
+* Parašyti programą, kuri prognozuoja rytojaus orus pagal geografinę informaciją, palydovų vaizdus ir pastarojo laikotarpio orų duomenis.
+* Parašyti programą, kuri priima laisvos formos tekstu išreikštą faktinį klausimą ir jį teisingai atsako.
+* Parašyti programą, kuri pagal vaizdą atpažįsta kiekvieną jame pavaizduotą žmogų ir apveda kiekvieną kontūru.
+* Parašyti programą, kuri naudotojams pateikia produktus, kurie jiems greičiausiai patiks, bet kurių jie tikriausiai nesutiktų įprastai naršydami.
 
-For these problems,
-even elite programmers would struggle
-to code up solutions from scratch.
-The reasons can vary.
-Sometimes the program that we are looking for
-follows a pattern that changes over time,
-so there is no fixed right answer!
-In such cases, any successful solution
-must adapt gracefully to a changing world.
-At other times, the relationship (say between pixels,
-and abstract categories) may be too complicated,
-requiring thousands or millions of computations
-and following unknown principles.
-In the case of image recognition,
-the precise steps required to perform the task
-lie beyond our conscious understanding,
-even though our subconscious cognitive processes
-execute the task effortlessly.
+Šiems uždaviniams spręsti
+net elitiniams programuotojams būtų sunku
+sukurti sprendimus nuo nulio.
+Priežastys gali būti įvairios.
+Kartais ieškoma programa
+atitinka šabloną, kuris keičiasi laikui bėgant,
+todėl nėra fiksuoto teisingo atsakymo!
+Tokiais atvejais bet kuris sėkmingas sprendimas
+turi sklandžiai prisitaikyti prie besikeičiančio pasaulio.
+Kitais atvejais ryšys (tarkime, tarp pikselių
+ir abstrakčių kategorijų) gali būti per sudėtingas,
+reikalaujantis tūkstančių ar milijonų skaičiavimų
+ir besiremiantis nežinomais principais.
+Vaizdų atpažinimo atveju
+tikslūs užduočiai atlikti reikalingi žingsniai
+yra už mūsų sąmoningo supratimo ribų,
+nors mūsų pasąmonės pažintiniai procesai
+užduotį atlieka be pastangų.
 
 
-*Machine learning* is the study of algorithms
-that can learn from experience.
-As a machine learning algorithm accumulates more experience,
-typically in the form of observational data
-or interactions with an environment,
-its performance improves.
-Contrast this with our deterministic e-commerce platform,
-which follows the same business logic,
-no matter how much experience accrues,
-until the developers themselves learn and decide
-that it is time to update the software.
-In this book, we will teach you
-the fundamentals of machine learning,
-focusing in particular on *deep learning*,
-a powerful set of techniques
-driving innovations in areas as diverse as computer vision,
-natural language processing, healthcare, and genomics.
+*Mašininis mokymasis* yra algoritmų,
+galinčių mokytis iš patirties, tyrimas.
+Mašininio mokymosi algoritmui kaupiant vis daugiau patirties,
+dažniausiai stebėjimo duomenų
+ar sąveikos su aplinka forma,
+jo našumas gerėja.
+Palyginkite tai su mūsų deterministine elektroninės prekybos platforma,
+kuri laikosi tos pačios verslo logikos,
+kad ir kiek patirties sukauptų,
+kol patys kūrėjai išmoksta ir nusprendžia,
+kad laikas atnaujinti programinę įrangą.
+Šioje knygoje išmokysime jus
+mašininio mokymosi pagrindų,
+ypač daug dėmesio skirdami *giliajam mokymuisi* –
+galingam metodų rinkiniui,
+skatinančiam inovacijas tokiose skirtingose srityse
+kaip kompiuterinė rega,
+natūraliosios kalbos apdorojimas, sveikatos priežiūra ir genomika.
 
-## A Motivating Example
+## Motyvuojantis pavyzdys
 
-Before beginning writing, the authors of this book,
-like much of the work force, had to become caffeinated.
-We hopped in the car and started driving.
-Using an iPhone, Alex called out "Hey Siri",
-awakening the phone's voice recognition system.
-Then Mu commanded "directions to Blue Bottle coffee shop".
-The phone quickly displayed the transcription of his command.
-It also recognized that we were asking for directions
-and launched the Maps application (app)
-to fulfill our request.
-Once launched, the Maps app identified a number of routes.
-Next to each route, the phone displayed a predicted transit time.
-While this story was fabricated for pedagogical convenience,
-it demonstrates that in the span of just a few seconds,
-our everyday interactions with a smart phone
-can engage several machine learning models.
+Prieš pradėdami rašyti, šios knygos autoriai,
+kaip ir didelė dalis darbo jėgos, turėjo prisigerti kofeino.
+Sėdome į automobilį ir pajudėjome.
+Naudodamas „iPhone", Alex tarė „Hey Siri",
+pažadindamas telefono balso atpažinimo sistemą.
+Tada Mu įsakė „kelias į kavinę „Blue Bottle"".
+Telefonas greitai parodė jo komandos transkripciją.
+Jis taip pat atpažino, kad prašome nurodyti kelią,
+ir paleido žemėlapių programą (angl. *app*),
+kad įvykdytų mūsų prašymą.
+Paleista žemėlapių programa nustatė keletą maršrutų.
+Šalia kiekvieno maršruto telefonas parodė prognozuojamą kelionės laiką.
+Nors ši istorija sugalvota pedagoginiam patogumui,
+ji rodo, kad vos per kelias sekundes
+mūsų kasdienė sąveika su išmaniuoju telefonu
+gali pasitelkti kelis mašininio mokymosi modelius.
 
 
-Imagine just writing a program to respond to a *wake word*
-such as "Alexa", "OK Google", and "Hey Siri".
-Try coding it up in a room by yourself
-with nothing but a computer and a code editor,
-as illustrated in :numref:`fig_wake_word`.
-How would you write such a program from first principles?
-Think about it... the problem is hard.
-Every second, the microphone will collect roughly
-44,000 samples.
-Each sample is a measurement of the amplitude of the sound wave.
-What rule could map reliably from a snippet of raw audio to confident predictions
-$\{\textrm{yes}, \textrm{no}\}$
-about whether the snippet contains the wake word?
-If you are stuck, do not worry.
-We do not know how to write such a program from scratch either.
-That is why we use machine learning.
+Įsivaizduokite, kad tiesiog rašote programą, reaguojančią į *žadinimo žodį* (angl. *wake word*),
+tokį kaip „Alexa", „OK Google" ir „Hey Siri".
+Pabandykite ją užprogramuoti vieni kambaryje,
+turėdami tik kompiuterį ir kodo redaktorių,
+kaip parodyta :numref:`fig_wake_word`.
+Kaip tokią programą parašytumėte iš pirmųjų principų?
+Pagalvokite... uždavinys sunkus.
+Kas sekundę mikrofonas surenka maždaug
+44 000 atskaitų.
+Kiekviena atskaita yra garso bangos amplitudės matavimas.
+Kokia taisyklė galėtų patikimai susieti neapdoroto garso fragmentą su patikliomis prognozėmis
+$\{\textrm{taip}, \textrm{ne}\}$
+apie tai, ar fragmente yra žadinimo žodis?
+Jei užstrigote, nesijaudinkite.
+Mes irgi nežinome, kaip tokią programą parašyti nuo nulio.
+Todėl ir naudojame mašininį mokymąsi.
 
-![Identify a wake word.](../img/wake-word.svg)
+![Žadinimo žodžio atpažinimas.](../img/wake-word.svg)
 :label:`fig_wake_word`
 
 
-Here is the trick.
-Often, even when we do not know how to tell a computer
-explicitly how to map from inputs to outputs,
-we are nonetheless capable of performing the cognitive feat ourselves.
-In other words, even if you do not know
-how to program a computer to recognize the word "Alexa",
-you yourself are able to recognize it.
-Armed with this ability, we can collect a huge *dataset*
-containing examples of audio snippets and associated labels,
-indicating which snippets contain the wake word.
-In the currently dominant approach to machine learning,
-we do not attempt to design a system
-*explicitly* to recognize wake words.
-Instead, we define a flexible program
-whose behavior is determined by a number of *parameters*.
-Then we use the dataset to determine the best possible parameter values,
-i.e., those that improve the performance of our program
-with respect to a chosen performance measure.
+Štai gudrybė.
+Dažnai, net kai nežinome, kaip kompiuteriui
+aiškiai nurodyti, kaip susieti įvestis su išvestimis,
+mes vis tiek patys sugebame atlikti tą pažintinį žygdarbį.
+Kitaip tariant, net jei nežinote,
+kaip užprogramuoti kompiuterį atpažinti žodį „Alexa",
+jūs pats jį sugebate atpažinti.
+Turėdami šį gebėjimą, galime surinkti didžiulį *duomenų rinkinį* (angl. *dataset*),
+kuriame yra garso fragmentų pavyzdžių ir susijusių žymių,
+nurodančių, kuriuose fragmentuose yra žadinimo žodis.
+Šiuo metu vyraujančiame mašininio mokymosi požiūryje
+nebandome kurti sistemos, skirtos
+*aiškiai* atpažinti žadinimo žodžius.
+Vietoj to apibrėžiame lanksčią programą,
+kurios elgesį lemia keletas *parametrų*.
+Tada naudojame duomenų rinkinį geriausioms galimoms parametrų reikšmėms nustatyti,
+t. y. toms, kurios pagerina mūsų programos veikimą
+pagal pasirinktą veikimo matą.
 
-You can think of the parameters as knobs that we can turn,
-manipulating the behavior of the program.
-Once the parameters are fixed, we call the program a *model*.
-The set of all distinct programs (input--output mappings)
-that we can produce just by manipulating the parameters
-is called a *family* of models.
-And the "meta-program" that uses our dataset
-to choose the parameters is called a *learning algorithm*.
+Parametrus galite įsivaizduoti kaip rankenėles, kurias galime sukti,
+keisdami programos elgesį.
+Kai parametrai fiksuoti, programą vadiname *modeliu*.
+Visų skirtingų programų (įvesčių ir išvesčių atvaizdžių),
+kurias galime sukurti vien keisdami parametrus,
+aibė vadinama modelių *šeima*.
+O „metaprograma", kuri naudoja mūsų duomenų rinkinį
+parametrams parinkti, vadinama *mokymosi algoritmu*.
 
-Before we can go ahead and engage the learning algorithm,
-we have to define the problem precisely,
-pinning down the exact nature of the inputs and outputs,
-and choosing an appropriate model family.
-In this case,
-our model receives a snippet of audio as *input*,
-and the model
-generates a selection among
-$\{\textrm{yes}, \textrm{no}\}$ as *output*.
-If all goes according to plan
-the model's guesses will
-typically be correct as to
-whether the snippet contains the wake word.
+Prieš pradėdami taikyti mokymosi algoritmą,
+turime tiksliai apibrėžti uždavinį,
+tiksliai nustatydami įvesčių ir išvesčių pobūdį
+ir pasirinkdami tinkamą modelių šeimą.
+Šiuo atveju
+mūsų modelis kaip *įvestį* gauna garso fragmentą,
+o kaip *išvestį* modelis
+pateikia pasirinkimą iš
+$\{\textrm{taip}, \textrm{ne}\}$.
+Jei viskas vyks pagal planą,
+modelio spėjimai paprastai bus teisingi
+dėl to, ar fragmente yra žadinimo žodis.
 
-If we choose the right family of models,
-there should exist one setting of the knobs
-such that the model fires "yes" every time it hears the word "Alexa".
-Because the exact choice of the wake word is arbitrary,
-we will probably need a model family sufficiently rich that,
-via another setting of the knobs, it could fire "yes"
-only upon hearing the word "Apricot".
-We expect that the same model family should be suitable
-for "Alexa" recognition and "Apricot" recognition
-because they seem, intuitively, to be similar tasks.
-However, we might need a different family of models entirely
-if we want to deal with fundamentally different inputs or outputs,
-say if we wanted to map from images to captions,
-or from English sentences to Chinese sentences.
+Jei pasirinksime tinkamą modelių šeimą,
+turėtų egzistuoti viena rankenėlių padėtis,
+kuriai esant modelis pasako „taip" kiekvieną kartą išgirdęs žodį „Alexa".
+Kadangi žadinimo žodžio pasirinkimas yra savavališkas,
+mums greičiausiai prireiks pakankamai turtingos modelių šeimos, kuri,
+pakeitus rankenėlių padėtį, galėtų pasakyti „taip"
+tik išgirdusi žodį „Apricot".
+Tikimės, kad ta pati modelių šeima turėtų tikti
+„Alexa" ir „Apricot" atpažinimui,
+nes intuityviai jos atrodo panašios užduotys.
+Tačiau mums gali prireikti visiškai kitokios modelių šeimos,
+jei norime dirbti su iš esmės skirtingomis įvestimis ar išvestimis,
+pavyzdžiui, jei norėtume atvaizduoti paveikslėlius į jų aprašymus
+arba anglų kalbos sakinius į kinų kalbos sakinius.
 
-As you might guess, if we just set all of the knobs randomly,
-it is unlikely that our model will recognize "Alexa",
-"Apricot", or any other English word.
-In machine learning,
-the *learning* is the process
-by which we discover the right setting of the knobs
-for coercing the desired behavior from our model.
-In other words,
-we *train* our model with data.
-As shown in :numref:`fig_ml_loop`, the training process usually looks like the following:
+Kaip galite nuspėti, jei visas rankenėles nustatytume atsitiktinai,
+vargu ar mūsų modelis atpažins „Alexa",
+„Apricot" ar bet kurį kitą anglų kalbos žodį.
+Mašininiame mokymesi
+*mokymasis* yra procesas,
+kurio metu surandame tinkamą rankenėlių padėtį,
+kad iš modelio išgautume norimą elgesį.
+Kitaip tariant,
+mes *apmokome* savo modelį naudodami duomenis.
+Kaip parodyta :numref:`fig_ml_loop`, apmokymo procesas paprastai atrodo taip:
 
-1. Start off with a randomly initialized model that cannot do anything useful.
-1. Grab some of your data (e.g., audio snippets and corresponding $\{\textrm{yes}, \textrm{no}\}$ labels).
-1. Tweak the knobs to make the model perform better as assessed on those examples.
-1. Repeat Steps 2 and 3 until the model is awesome.
+1. Pradėkite nuo atsitiktinai inicializuoto modelio, kuris nieko naudingo negali.
+1. Paimkite dalį savo duomenų (pvz., garso fragmentus ir atitinkamas $\{\textrm{taip}, \textrm{ne}\}$ žymes).
+1. Pakoreguokite rankenėles, kad modelis geriau veiktų pagal šiuos pavyzdžius.
+1. Kartokite 2 ir 3 žingsnius, kol modelis taps puikus.
 
-![A typical training process.](../img/ml-loop.svg)
+![Tipinis apmokymo procesas.](../img/ml-loop.svg)
 :label:`fig_ml_loop`
 
-To summarize, rather than code up a wake word recognizer,
-we code up a program that can *learn* to recognize wake words,
-if presented with a large labeled dataset.
-You can think of this act of determining a program's behavior
-by presenting it with a dataset as *programming with data*.
-That is to say, we can "program" a cat detector
-by providing our machine learning system
-with many examples of cats and dogs.
-This way the detector will eventually learn to emit
-a very large positive number if it is a cat,
-a very large negative number if it is a dog,
-and something closer to zero if it is not sure.
-This barely scratches the surface of what machine learning can do.
-Deep learning, which we will explain in greater detail later,
-is just one among many popular methods
-for solving machine learning problems.
+Apibendrinant, užuot programavę žadinimo žodžio atpažintuvą,
+programuojame programą, kuri gali *išmokti* atpažinti žadinimo žodžius,
+jei jai pateikiamas didelis žymėtas duomenų rinkinys.
+Šį programos elgesio nustatymą pateikiant jai duomenų rinkinį
+galite laikyti *programavimu duomenimis*.
+Tai reiškia, kad galime „užprogramuoti" kačių detektorių,
+pateikdami savo mašininio mokymosi sistemai
+daug kačių ir šunų pavyzdžių.
+Taip detektorius galiausiai išmoks išduoti
+labai didelį teigiamą skaičių, jei tai katė,
+labai didelį neigiamą skaičių, jei tai šuo,
+ir kažką arčiau nulio, jei neužtikrintas.
+Tai vos paliečia tai, ką gali mašininis mokymasis.
+Gilusis mokymasis, kurį vėliau paaiškinsime išsamiau,
+yra tik vienas iš daugelio populiarių metodų
+mašininio mokymosi uždaviniams spręsti.
 
 
-## Key Components
+## Pagrindiniai komponentai
 
-In our wake word example, we described a dataset
-consisting of audio snippets and binary labels,
-and we gave a hand-wavy sense of how we might train
-a model to approximate a mapping from snippets to classifications.
-This sort of problem,
-where we try to predict a designated unknown label
-based on known inputs
-given a dataset consisting of examples
-for which the labels are known,
-is called *supervised learning*.
-This is just one among many kinds of machine learning problems.
-Before we explore other varieties,
-we would like to shed more light
-on some core components that will follow us around,
-no matter what kind of machine learning problem we tackle:
+Savo žadinimo žodžio pavyzdyje aprašėme duomenų rinkinį,
+sudarytą iš garso fragmentų ir dvejetainių žymių,
+ir bendrais bruožais parodėme, kaip galėtume apmokyti
+modelį, aproksimuojantį fragmentų atvaizdavimą į klasifikavimo rezultatus.
+Tokio tipo uždavinys,
+kai bandome prognozuoti nurodytą nežinomą žymę
+pagal žinomas įvestis,
+turėdami duomenų rinkinį, sudarytą iš pavyzdžių,
+kurių žymės žinomos,
+vadinamas *prižiūrimu mokymu*.
+Tai tik vienas iš daugelio mašininio mokymosi uždavinių tipų.
+Prieš nagrinėdami kitas atmainas,
+norėtume daugiau papasakoti
+apie kai kuriuos pagrindinius komponentus, kurie mus lydės,
+kad ir kokio tipo mašininio mokymosi uždavinį spręstume:
 
-1. The *data* that we can learn from.
-1. A *model* of how to transform the data.
-1. An *objective function* that quantifies how well (or badly) the model is doing.
-1. An *algorithm* to adjust the model's parameters to optimize the objective function.
+1. *Duomenys*, iš kurių galime mokytis.
+1. *Modelis*, nurodantis, kaip transformuoti duomenis.
+1. *Tikslo funkcija*, kiekybiškai įvertinanti, kaip gerai (ar blogai) veikia modelis.
+1. *Algoritmas*, koreguojantis modelio parametrus tikslo funkcijai optimizuoti.
 
-### Data
+### Duomenys
 
-It might go without saying that you cannot do data science without data.
-We could lose hundreds of pages pondering what precisely data *is*,
-but for now, we will focus on the key properties
-of the datasets that we will be concerned with.
-Generally, we are concerned with a collection of examples.
-In order to work with data usefully, we typically
-need to come up with a suitable numerical representation.
-Each *example* (or *data point*, *data instance*, *sample*)
-typically consists of a set of attributes
-called *features* (sometimes called *covariates* or *inputs*),
-based on which the model must make its predictions.
-In supervised learning problems,
-our goal is to predict the value of a special attribute,
-called the *label* (or *target*),
-that is not part of the model's input.
+Galbūt savaime suprantama, kad be duomenų duomenų mokslo daryti neįmanoma.
+Galėtume praleisti šimtus puslapių svarstydami, kas tiksliai yra *duomenys*,
+tačiau kol kas sutelksime dėmesį į pagrindines
+mus dominančių duomenų rinkinių savybes.
+Paprastai mus domina pavyzdžių rinkinys.
+Kad galėtume naudingai dirbti su duomenimis, paprastai
+reikia sugalvoti tinkamą skaitinį vaizdavimą.
+Kiekvieną *pavyzdį* (angl. *example*, arba *data point*, *data instance*, *sample*)
+paprastai sudaro atributų rinkinys,
+vadinamas *požymiais* (angl. *features*; kartais vadinamais *kovariantėmis* arba *įvestimis*),
+pagal kuriuos modelis turi pateikti savo prognozes.
+Prižiūrimo mokymo uždaviniuose
+mūsų tikslas yra prognozuoti ypatingo atributo reikšmę,
+vadinamo *žyme* (angl. *label*, arba *target*),
+kuris nėra modelio įvesties dalis.
 
-If we were working with image data,
-each example might consist of an
-individual photograph (the features)
-and a number indicating the category
-to which the photograph belongs (the label).
-The photograph would be represented numerically
-as three grids of numerical values representing
-the brightness of red, green, and blue light
-at each pixel location.
-For example, a $200\times 200$ pixel color photograph
-would consist of $200\times200\times3=120000$ numerical values.
+Jei dirbtume su vaizdų duomenimis,
+kiekvieną pavyzdį galėtų sudaryti
+atskira nuotrauka (požymiai)
+ir skaičius, nurodantis kategoriją,
+kuriai nuotrauka priklauso (žymė).
+Nuotrauka skaitiniu būdu būtų vaizduojama
+trimis skaitinių reikšmių tinklais, žyminčiais
+raudonos, žalios ir mėlynos šviesos ryškumą
+kiekvienoje pikselio vietoje.
+Pavyzdžiui, $200\times 200$ pikselių spalvotą nuotrauką
+sudarytų $200\times200\times3=120000$ skaitinių reikšmių.
 
-Alternatively, we might work with electronic health record data
-and tackle the task of predicting the likelihood
-that a given patient  will survive the next 30 days.
-Here, our features might consist of a collection
-of readily available attributes
-and frequently recorded measurements,
-including age, vital signs, comorbidities,
-current medications, and recent procedures.
-The label available for training would be a binary value
-indicating whether each patient in the historical data
-survived within the 30-day window.
+Arba galėtume dirbti su elektroninių sveikatos įrašų duomenimis
+ir spręsti užduotį prognozuoti tikimybę,
+kad duotas pacientas išgyvens kitas 30 dienų.
+Čia mūsų požymius galėtų sudaryti
+lengvai prieinamų atributų
+ir dažnai registruojamų matavimų rinkinys,
+įskaitant amžių, gyvybinius požymius, gretutines ligas,
+dabartinius vaistus ir neseniai atliktas procedūras.
+Apmokymui prieinama žymė būtų dvejetainė reikšmė,
+nurodanti, ar kiekvienas istorinių duomenų pacientas
+išgyveno per 30 dienų laikotarpį.
 
-In such cases, when every example is characterized
-by the same number of numerical features,
-we say that the inputs are fixed-length vectors
-and we call the (constant) length of the vectors
-the *dimensionality* of the data.
-As you might imagine, fixed-length inputs can be convenient,
-giving us one less complication to worry about.
-However, not all data can easily
-be represented as *fixed-length* vectors.
-While we might expect microscope images
-to come from standard equipment,
-we cannot expect images mined from the Internet
-all to have the same resolution or shape.
-For images, we might consider
-cropping them to a standard size,
-but that strategy only gets us so far.
-We risk losing information in the cropped-out portions.
-Moreover, text data resists fixed-length
-representations even more stubbornly.
-Consider the customer reviews left
-on e-commerce sites such as Amazon, IMDb, and TripAdvisor.
-Some are short: "it stinks!".
-Others ramble for pages.
-One major advantage of deep learning over traditional methods
-is the comparative grace with which modern models
-can handle *varying-length* data.
+Tokiais atvejais, kai kiekvieną pavyzdį apibūdina
+tas pats skaitinių požymių skaičius,
+sakome, kad įvestys yra fiksuoto ilgio vektoriai,
+o (pastovų) vektorių ilgį vadiname
+duomenų *dimensija*.
+Kaip galite įsivaizduoti, fiksuoto ilgio įvestys gali būti patogios,
+nes viena problema mažiau, dėl kurios reikia sukti galvą.
+Tačiau ne visus duomenis galima lengvai
+pavaizduoti kaip *fiksuoto ilgio* vektorius.
+Nors galime tikėtis, kad mikroskopo vaizdai
+gaunami iš standartinės įrangos,
+negalime tikėtis, kad iš interneto surinkti vaizdai
+visi turės tą pačią skiriamąją gebą ar formą.
+Vaizdams galėtume apsvarstyti
+apkirpimą iki standartinio dydžio,
+tačiau ši strategija mus nuveda tik iki tam tikros ribos.
+Rizikuojame prarasti informaciją apkirptose dalyse.
+Be to, tekstiniai duomenys dar atkakliau priešinasi fiksuoto ilgio
+vaizdavimui.
+Pagalvokite apie klientų atsiliepimus,
+paliekamus elektroninės prekybos svetainėse, tokiose kaip Amazon, IMDb ir TripAdvisor.
+Kai kurie trumpi: „smirdi!".
+Kiti dėstomi puslapiais.
+Vienas pagrindinių gilaus mokymosi pranašumų prieš tradicinius metodus
+yra santykinis lengvumas, kuriuo šiuolaikiniai modeliai
+gali apdoroti *kintamo ilgio* duomenis.
 
-Generally, the more data we have, the easier our job becomes.
-When we have more data, we can train more powerful models
-and rely less heavily on preconceived assumptions.
-The regime change from (comparatively) small to big data
-is a major contributor to the success of modern deep learning.
-To drive the point home, many of
-the most exciting models in deep learning
-do not work without large datasets.
-Some others might work in the small data regime,
-but are no better than traditional approaches.
+Paprastai kuo daugiau turime duomenų, tuo lengviau mums dirbti.
+Kai turime daugiau duomenų, galime apmokyti galingesnius modelius
+ir mažiau remtis išankstinėmis prielaidomis.
+Perėjimas nuo (santykinai) mažų prie didžiųjų duomenų
+labai prisideda prie šiuolaikinio gilaus mokymosi sėkmės.
+Kad tai būtų aiškiau, daugelis
+įdomiausių gilaus mokymosi modelių
+be didelių duomenų rinkinių neveikia.
+Kai kurie kiti gali veikti ir su nedideliu duomenų kiekiu,
+tačiau nėra geresni už tradicinius metodus.
 
-Finally, it is not enough to have lots of data
-and to process it cleverly.
-We need the *right* data.
-If the data is full of mistakes,
-or if the chosen features are not predictive
-of the target quantity of interest,
-learning is going to fail.
-The situation is captured well by the cliché:
-*garbage in, garbage out*.
-Moreover, poor predictive performance
-is not the only potential consequence.
-In sensitive applications of machine learning,
-like predictive policing, resume screening,
-and risk models used for lending,
-we must be especially alert
-to the consequences of garbage data.
-One commonly occurring failure mode concerns datasets
-where some groups of people are unrepresented
-in the training data.
-Imagine applying a skin cancer recognition system
-that had never seen black skin before.
-Failure can also occur when the data
-does not only under-represent some groups
-but reflects societal prejudices.
-For example, if past hiring decisions
-are used to train a predictive model
-that will be used to screen resumes
-then machine learning models could inadvertently
-capture and automate historical injustices.
-Note that this can all happen without the data scientist
-actively conspiring, or even being aware.
-
-
-### Models
-
-Most machine learning involves transforming the data in some sense.
-We might want to build a system that ingests photos and predicts smiley-ness.
-Alternatively,
-we might want to ingest a set of sensor readings
-and predict how normal vs. anomalous the readings are.
-By *model*, we denote the computational machinery for ingesting data
-of one type,
-and spitting out predictions of a possibly different type.
-In particular, we are interested in *statistical models*
-that can be estimated from data.
-While simple models are perfectly capable of addressing
-appropriately simple problems,
-the problems
-that we focus on in this book stretch the limits of classical methods.
-Deep learning is differentiated from classical approaches
-principally by the set of powerful models that it focuses on.
-These models consist of many successive transformations of the data
-that are chained together top to bottom, thus the name *deep learning*.
-On our way to discussing deep models,
-we will also discuss some more traditional methods.
-
-### Objective Functions
-
-Earlier, we introduced machine learning as learning from experience.
-By *learning* here,
-we mean improving at some task over time.
-But who is to say what constitutes an improvement?
-You might imagine that we could propose updating our model,
-and some people might disagree on whether our proposal
-constituted an improvement or not.
-
-In order to develop a formal mathematical system of learning machines,
-we need to have formal measures of how good (or bad) our models are.
-In machine learning, and optimization more generally,
-we call these *objective functions*.
-By convention, we usually define objective functions
-so that lower is better.
-This is merely a convention.
-You can take any function
-for which higher is better, and turn it into a new function
-that is qualitatively identical but for which lower is better
-by flipping the sign.
-Because we choose lower to be better, these functions are sometimes called
-*loss functions*.
-
-When trying to predict numerical values,
-the most common loss function is *squared error*,
-i.e., the square of the difference between
-the prediction and the ground truth target.
-For classification, the most common objective
-is to minimize error rate,
-i.e., the fraction of examples on which
-our predictions disagree with the ground truth.
-Some objectives (e.g., squared error) are easy to optimize,
-while others (e.g., error rate) are difficult to optimize directly,
-owing to non-differentiability or other complications.
-In these cases, it is common instead to optimize a *surrogate objective*.
-
-During optimization, we think of the loss
-as a function of the model's parameters,
-and treat the training dataset as a constant.
-We learn
-the best values of our model's parameters
-by minimizing the loss incurred on a set
-consisting of some number of examples collected for training.
-However, doing well on the training data
-does not guarantee that we will do well on unseen data.
-So we will typically want to split the available data into two partitions:
-the *training dataset* (or *training set*), for learning model parameters;
-and the *test dataset* (or *test set*), which is held out for evaluation.
-At the end of the day, we typically report
-how our models perform on both partitions.
-You could think of training performance
-as analogous to the scores that a student achieves
-on the practice exams used to prepare for some real final exam.
-Even if the results are encouraging,
-that does not guarantee success on the final exam.
-Over the course of studying, the student
-might begin to memorize the practice questions,
-appearing to master the topic but faltering
-when faced with previously unseen questions
-on the actual final exam.
-When a model performs well on the training set
-but fails to generalize to unseen data,
-we say that it is *overfitting* to the training data.
+Galiausiai nepakanka turėti daug duomenų
+ir juos išmaniai apdoroti.
+Mums reikia *tinkamų* duomenų.
+Jei duomenyse pilna klaidų
+arba jei pasirinkti požymiai nėra prognostiniai
+dominančiam tiksliniam dydžiui,
+mokymasis nepavyks.
+Šią situaciją gerai atspindi štampas:
+*šiukšlės įėjime – šiukšlės išėjime* (angl. *garbage in, garbage out*).
+Be to, prasta prognozavimo kokybė
+nėra vienintelė galima pasekmė.
+Jautriuose mašininio mokymosi taikymuose,
+tokiuose kaip nusikaltimų prognozavimas, gyvenimo aprašymų atranka
+ir skolinimo rizikos modeliai,
+turime būti ypač budrūs
+dėl šiukšlių duomenų pasekmių.
+Vienas dažnai pasitaikantis nesėkmės būdas susijęs su duomenų rinkiniais,
+kuriuose kai kurios žmonių grupės nėra atstovaujamos
+apmokymo duomenyse.
+Įsivaizduokite, kad taikote odos vėžio atpažinimo sistemą,
+kuri niekada nebuvo mačiusi juodos odos.
+Nesėkmė taip pat gali įvykti, kai duomenys
+ne tik nepakankamai atstovauja kai kurioms grupėms,
+bet ir atspindi visuomenės išankstinį nusistatymą.
+Pavyzdžiui, jei ankstesni įdarbinimo sprendimai
+naudojami apmokyti prognozavimo modelį,
+kuris bus naudojamas gyvenimo aprašymams atrinkti,
+mašininio mokymosi modeliai gali netyčia
+perimti ir automatizuoti istorines neteisybes.
+Atkreipkite dėmesį, kad visa tai gali nutikti be to, kad duomenų mokslininkas
+aktyviai sąmokslautų ar net žinotų.
 
 
-### Optimization Algorithms
+### Modeliai
 
-Once we have got some data source and representation,
-a model, and a well-defined objective function,
-we need an algorithm capable of searching
-for the best possible parameters for minimizing the loss function.
-Popular optimization algorithms for deep learning
-are based on an approach called *gradient descent*.
-In brief, at each step, this method
-checks to see, for each parameter,
-how that training set loss would change
-if you perturbed that parameter by just a small amount.
-It would then update the parameter
-in the direction that lowers the loss.
+Dauguma mašininio mokymosi tam tikra prasme reiškia duomenų transformavimą.
+Galime norėti sukurti sistemą, kuri priima nuotraukas ir prognozuoja šypsenos intensyvumą.
+Arba
+galime norėti priimti jutiklių rodmenų rinkinį
+ir prognozuoti, kiek normalūs ar anomalūs tie rodmenys.
+*Modeliu* vadiname skaičiavimo mechanizmą, priimantį
+vieno tipo duomenis
+ir išduodantį galbūt kitokio tipo prognozes.
+Visų pirma mus domina *statistiniai modeliai*,
+kuriuos galima įvertinti iš duomenų.
+Nors paprasti modeliai puikiai tinka
+atitinkamai paprastiems uždaviniams spręsti,
+uždaviniai,
+kuriems skiriame dėmesį šioje knygoje, peržengia klasikinių metodų ribas.
+Gilusis mokymasis nuo klasikinių požiūrių skiriasi
+visų pirma galingų modelių, į kuriuos sutelkia dėmesį, rinkiniu.
+Šiuos modelius sudaro daug iš eilės einančių duomenų transformacijų,
+sujungtų iš viršaus į apačią, todėl ir pavadinimas – *gilusis mokymasis*.
+Eidami prie giliųjų modelių aptarimo,
+aptarsime ir keletą tradicinių metodų.
+
+### Tikslo funkcijos
+
+Anksčiau mašininį mokymąsi pristatėme kaip mokymąsi iš patirties.
+*Mokymusi* čia vadiname
+tam tikros užduoties atlikimo gerėjimą laikui bėgant.
+Bet kas gali pasakyti, kas laikytina pagerėjimu?
+Galite įsivaizduoti, kad galėtume pasiūlyti atnaujinti savo modelį,
+o kai kurie žmonės gali nesutikti, ar mūsų pasiūlymas
+yra pagerėjimas, ar ne.
+
+Kad sukurtume formalią matematinę mokymosi mašinų sistemą,
+mums reikia formalių matų, kaip gerai (ar blogai) veikia mūsų modeliai.
+Mašininiame mokymesi ir bendriau optimizavime
+juos vadiname *tikslo funkcijomis*.
+Pagal susitarimą tikslo funkcijas paprastai apibrėžiame taip,
+kad mažesnė reikšmė būtų geresnė.
+Tai tik susitarimas.
+Bet kurią funkciją,
+kurios didesnė reikšmė geresnė, galite paversti nauja funkcija,
+kokybiškai identiška, bet kurios mažesnė reikšmė geresnė,
+pakeisdami ženklą.
+Kadangi pasirenkame, kad mažesnė reikšmė yra geresnė, šios funkcijos kartais vadinamos
+*nuostolių funkcijomis*.
+
+Bandant prognozuoti skaitines reikšmes,
+dažniausia nuostolių funkcija yra *kvadratinė paklaida*,
+t. y. skirtumo tarp prognozės ir
+etaloninės tikslinės reikšmės kvadratas.
+Klasifikavimo atveju dažniausias tikslas
+yra minimizuoti klaidų dažnį,
+t. y. pavyzdžių dalį,
+kurių mūsų prognozės nesutampa su etalonu.
+Kai kurias tikslo funkcijas (pvz., kvadratinę paklaidą) lengva optimizuoti,
+o kitas (pvz., klaidų dažnį) tiesiogiai optimizuoti sunku
+dėl nediferencijuojamumo ar kitų sunkumų.
+Šiais atvejais įprasta optimizuoti *pakaitinę tikslo funkciją*.
+
+Optimizavimo metu nuostolius laikome
+modelio parametrų funkcija
+ir apmokymo duomenų rinkinį traktuojame kaip konstantą.
+Geriausias modelio parametrų reikšmes randame
+minimizuodami nuostolius, patirtus rinkinyje,
+kurį sudaro apmokymui surinkti pavyzdžiai.
+Tačiau gerai veikti apmokymo duomenims
+negarantuoja, kad gerai veiksime nematytiems duomenims.
+Todėl paprastai norėsime padalyti turimus duomenis į dvi dalis:
+*apmokymo duomenų rinkinį* (angl. *training dataset*, arba *training set*), skirtą modelio parametrams išmokti;
+ir *testavimo duomenų rinkinį* (angl. *test dataset*, arba *test set*), kuris paliekamas vertinimui.
+Galų gale paprastai pateikiame,
+kaip mūsų modeliai veikia abiejose dalyse.
+Apmokymo rezultatus galite laikyti
+analogiškais balams, kuriuos studentas gauna
+per bandomuosius egzaminus, naudojamus ruošiantis tikram baigiamajam egzaminui.
+Net jei rezultatai teikia vilčių,
+tai negarantuoja sėkmės per baigiamąjį egzaminą.
+Mokymosi metu studentas
+gali pradėti įsiminti bandomuosius klausimus
+ir atrodyti įvaldęs temą, bet suklupti,
+susidūręs su anksčiau nematytais klausimais
+tikrame baigiamajame egzamine.
+Kai modelis gerai veikia apmokymo duomenų rinkinyje,
+bet nesugeba generalizuotis nematytiems duomenims,
+sakome, kad jis *persimokė* (angl. *overfitting*) apmokymo duomenims.
 
 
-## Kinds of Machine Learning Problems
+### Optimizavimo algoritmai
 
-The wake word problem in our motivating example
-is just one among many
-that machine learning can tackle.
-To motivate the reader further
-and provide us with some common language
-that will follow us throughout the book,
-we now provide a broad overview of the landscape
-of machine learning problems.
+Kai turime duomenų šaltinį ir jų vaizdavimą,
+modelį ir gerai apibrėžtą tikslo funkciją,
+mums reikia algoritmo, galinčio ieškoti
+geriausių galimų parametrų nuostolių funkcijai minimizuoti.
+Populiarūs giliojo mokymosi optimizavimo algoritmai
+remiasi metodu, vadinamu *gradientiniu nusileidimu*.
+Trumpai tariant, kiekviename žingsnyje šis metodas
+kiekvienam parametrui patikrina,
+kaip pasikeistų apmokymo rinkinio nuostoliai,
+jei tą parametrą sutrikdytume vos nežymiai.
+Tada jis atnaujintų parametrą
+kryptimi, mažinančia nuostolius.
 
-### Supervised Learning
 
-Supervised learning describes tasks
-where we are given a dataset
-containing both features and labels
-and 
-asked to produce a model that predicts the labels when
-given input features.
-Each feature--label pair is called an example.
-Sometimes, when the context is clear,
-we may use the term *examples*
-to refer to a collection of inputs,
-even when the corresponding labels are unknown.
-The supervision comes into play
-because, for choosing the parameters,
-we (the supervisors) provide the model
-with a dataset consisting of labeled examples.
-In probabilistic terms, we typically are interested in estimating
-the conditional probability of a label given input features.
-While it is just one among several paradigms,
-supervised learning accounts for the majority of successful
-applications of machine learning in industry.
-Partly that is because many important tasks
-can be described crisply as estimating the probability
-of something unknown given a particular set of available data:
+## Mašininio mokymosi uždavinių rūšys
 
-* Predict cancer vs. not cancer, given a computer tomography image.
-* Predict the correct translation in French, given a sentence in English.
-* Predict the price of a stock next month based on this month's financial reporting data.
+Žadinimo žodžio uždavinys mūsų motyvuojančiame pavyzdyje
+yra tik vienas iš daugelio,
+kuriuos gali spręsti mašininis mokymasis.
+Kad toliau motyvuotume skaitytoją
+ir suteiktume bendrą kalbą,
+kuri mus lydės visoje knygoje,
+dabar pateikiame bendrą mašininio mokymosi uždavinių
+panoramos apžvalgą.
 
-While all supervised learning problems
-are captured by the simple description
-"predicting the labels given input features",
-supervised learning itself can take diverse forms
-and require tons of modeling decisions,
-depending on (among other considerations)
-the type, size, and quantity of the inputs and outputs.
-For example, we use different models
-for processing sequences of arbitrary lengths
-and fixed-length vector representations.
-We will visit many of these problems
-in depth throughout this book.
+### Prižiūrimas mokymas
 
-Informally, the learning process looks something like the following.
-First, grab a big collection of examples for which the features are known
-and select from them a random subset,
-acquiring the ground truth labels for each.
-Sometimes these labels might be available data that have already been collected
-(e.g., did a patient die within the following year?)
-and other times we might need to employ human annotators to label the data,
-(e.g., assigning images to categories).
-Together, these inputs and corresponding labels comprise the training set.
-We feed the training dataset into a supervised learning algorithm,
-a function that takes as input a dataset
-and outputs another function: the learned model.
-Finally, we can feed previously unseen inputs to the learned model,
-using its outputs as predictions of the corresponding label.
-The full process is drawn in :numref:`fig_supervised_learning`.
+Prižiūrimas mokymas apibūdina užduotis,
+kuriose mums pateikiamas duomenų rinkinys,
+turintis ir požymius, ir žymes,
+ir prašoma sukurti modelį, kuris prognozuoja žymes, kai
+pateikiami įvesties požymiai.
+Kiekviena požymių ir žymės pora vadinama pavyzdžiu.
+Kartais, kai kontekstas aiškus,
+terminą *pavyzdžiai* galime vartoti
+įvesčių rinkiniui žymėti,
+net kai atitinkamos žymės nežinomos.
+Priežiūra atsiranda todėl, kad parametrams parinkti
+mes (prižiūrėtojai) pateikiame modeliui
+duomenų rinkinį, sudarytą iš pažymėtų pavyzdžių.
+Tikimybiniais terminais paprastai mus domina įvertinti
+žymės sąlyginę tikimybę, kai duoti įvesties požymiai.
+Nors tai tik viena iš kelių paradigmų,
+prižiūrimas mokymas sudaro daugumą sėkmingų
+mašininio mokymosi taikymų pramonėje.
+Iš dalies taip yra todėl, kad daug svarbių užduočių
+galima aiškiai apibūdinti kaip kažko nežinomo tikimybės įvertinimą,
+kai duotas konkretus turimų duomenų rinkinys:
 
-![Supervised learning.](../img/supervised-learning.svg)
+* Prognozuoti vėžys ar ne vėžys, kai duotas kompiuterinės tomografijos vaizdas.
+* Prognozuoti teisingą vertimą į prancūzų kalbą, kai duotas sakinys anglų kalba.
+* Prognozuoti akcijos kainą kitą mėnesį pagal šio mėnesio finansinės atskaitomybės duomenis.
+
+Nors visi prižiūrimo mokymo uždaviniai
+apibūdinami paprastu aprašymu
+„žymių prognozavimas pagal įvesties požymius",
+pats prižiūrimas mokymas gali įgauti įvairias formas
+ir reikalauti daugybės modeliavimo sprendimų,
+priklausomai (be kitų aplinkybių) nuo
+įvesčių ir išvesčių tipo, dydžio ir kiekio.
+Pavyzdžiui, naudojame skirtingus modelius
+savavališko ilgio sekoms
+ir fiksuoto ilgio vektorių vaizdavimams apdoroti.
+Daugelį šių uždavinių nuodugniai nagrinėsime visoje knygoje.
+
+Neformaliai kalbant, mokymosi procesas atrodo maždaug taip.
+Pirmiausia paimkite didelį pavyzdžių rinkinį, kurių požymiai žinomi,
+ir pasirinkite iš jų atsitiktinį poaibį,
+gaudami kiekvieno etalonines žymes.
+Kartais šios žymės gali būti jau surinkti turimi duomenys
+(pvz., ar pacientas mirė per ateinančius metus?),
+o kitais atvejais gali tekti pasitelkti žmones anotatorius duomenims pažymėti
+(pvz., priskirti vaizdus kategorijoms).
+Šios įvestys ir atitinkamos žymės kartu sudaro apmokymo rinkinį.
+Apmokymo duomenų rinkinį pateikiame prižiūrimo mokymosi algoritmui,
+funkcijai, kuri kaip įvestį priima duomenų rinkinį
+ir išveda kitą funkciją – išmoktą modelį.
+Galiausiai išmoktam modeliui galime pateikti anksčiau nematytas įvestis
+ir jo išvestis naudoti kaip atitinkamos žymės prognozes.
+Visas procesas pavaizduotas :numref:`fig_supervised_learning`.
+
+![Prižiūrimas mokymas.](../img/supervised-learning.svg)
 :label:`fig_supervised_learning`
 
-#### Regression
+#### Regresija
 
-Perhaps the simplest supervised learning task
-to wrap your head around is *regression*.
-Consider, for example, a set of data harvested
-from a database of home sales.
-We might construct a table,
-in which each row corresponds to a different house,
-and each column corresponds to some relevant attribute,
-such as the square footage of a house,
-the number of bedrooms, the number of bathrooms,
-and the number of minutes (walking) to the center of town.
-In this dataset, each example would be a specific house,
-and the corresponding feature vector would be one row in the table.
-If you live in New York or San Francisco,
-and you are not the CEO of Amazon, Google, Microsoft, or Facebook,
-the (sq. footage, no. of bedrooms, no. of bathrooms, walking distance)
-feature vector for your home might look something like: $[600, 1, 1, 60]$.
-However, if you live in Pittsburgh, it might look more like $[3000, 4, 3, 10]$.
-Fixed-length feature vectors like this are essential
-for most classic machine learning algorithms.
+Gal paprasčiausia prižiūrimo mokymo užduotis,
+kurią lengva suvokti, yra *regresija*.
+Panagrinėkime, pavyzdžiui, duomenų rinkinį, surinktą
+iš būsto pardavimų duomenų bazės.
+Galėtume sudaryti lentelę,
+kurioje kiekviena eilutė atitinka skirtingą namą,
+o kiekvienas stulpelis – tam tikrą svarbų atributą,
+pavyzdžiui, namo plotą kvadratiniais pėdomis,
+miegamųjų skaičių, vonios kambarių skaičių
+ir minučių (pėsčiomis) iki miesto centro skaičių.
+Šiame duomenų rinkinyje kiekvienas pavyzdys būtų konkretus namas,
+o atitinkamas požymių vektorius – viena lentelės eilutė.
+Jei gyvenate Niujorke ar San Franciske
+ir nesate „Amazon", „Google", „Microsoft" ar „Facebook" vadovas,
+jūsų namų požymių vektorius
+(plotas kv. pėdomis, miegamųjų skaičius, vonios kambarių skaičius, atstumas pėsčiomis)
+galėtų atrodyti maždaug taip: $[600, 1, 1, 60]$.
+Tačiau jei gyvenate Pitsburge, jis galėtų atrodyti labiau panašiai į $[3000, 4, 3, 10]$.
+Tokie fiksuoto ilgio požymių vektoriai yra būtini
+daugumai klasikinių mašininio mokymosi algoritmų.
 
-What makes a problem a regression is actually
-the form of the target.
-Say that you are in the market for a new home.
-You might want to estimate the fair market value of a house,
-given some features such as above.
-The data here might consist of historical home listings
-and the labels might be the observed sales prices.
-When labels take on arbitrary numerical values
-(even within some interval),
-we call this a *regression* problem.
-The goal is to produce a model whose predictions
-closely approximate the actual label values.
-
-
-Lots of practical problems are easily described as regression problems.
-Predicting the rating that a user will assign to a movie
-can be thought of as a regression problem
-and if you designed a great algorithm
-to accomplish this feat in 2009,
-you might have won the [1-million-dollar Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
-Predicting the length of stay for patients in the hospital
-is also a regression problem.
-A good rule of thumb is that any *how much?* or *how many?* problem
-is likely to be regression. For example:
-
-* How many hours will this surgery take?
-* How much rainfall will this town have in the next six hours?
+Tai, kas uždavinį paverčia regresija, iš tikrųjų yra
+tikslinio dydžio forma.
+Tarkime, kad ketinate įsigyti naują namą.
+Galbūt norėsite įvertinti teisingą namo rinkos vertę,
+kai duoti kai kurie požymiai, pavyzdžiui, minėtieji.
+Duomenys čia galėtų būti istoriniai būsto skelbimai,
+o žymės – stebėtos pardavimo kainos.
+Kai žymės įgyja savavališkas skaitines reikšmes
+(net tam tikrame intervale),
+tai vadiname *regresijos* uždaviniu.
+Tikslas – sukurti modelį, kurio prognozės
+glaudžiai aproksimuoja tikrąsias žymių reikšmes.
 
 
-Even if you have never worked with machine learning before,
-you have probably worked through a regression problem informally.
-Imagine, for example, that you had your drains repaired
-and that your contractor spent 3 hours
-removing gunk from your sewage pipes.
-Then they sent you a bill of 350 dollars.
-Now imagine that your friend hired the same contractor for 2 hours
-and received a bill of 250 dollars.
-If someone then asked you how much to expect
-on their upcoming gunk-removal invoice
-you might make some reasonable assumptions,
-such as more hours worked costs more dollars.
-You might also assume that there is some base charge
-and that the contractor then charges per hour.
-If these assumptions held true, then given these two data examples,
-you could already identify the contractor's pricing structure:
-100 dollars per hour plus 50 dollars to show up at your house.
-If you followed that much, then you already understand
-the high-level idea behind *linear* regression.
+Daug praktinių uždavinių lengvai apibūdinami kaip regresijos uždaviniai.
+Prognozuoti, kokį įvertinimą naudotojas skirs filmui,
+galima laikyti regresijos uždaviniu,
+ir jei 2009 m. sukūrėte puikų algoritmą šiam žygdarbiui atlikti,
+galbūt būtumėte laimėję [1 milijono dolerių „Netflix" prizą](https://en.wikipedia.org/wiki/Netflix_Prize).
+Prognozuoti pacientų gydymo ligoninėje trukmę
+taip pat yra regresijos uždavinys.
+Gera nykščio taisyklė: bet kuris *kiek?* arba *kiek daug?* uždavinys
+greičiausiai yra regresija. Pavyzdžiui:
 
-In this case, we could produce the parameters
-that exactly matched the contractor's prices.
-Sometimes this is not possible,
-e.g., if some of the variation
-arises from factors beyond your two features.
-In these cases, we will try to learn models
-that minimize the distance between our predictions and the observed values.
-In most of our chapters, we will focus on
-minimizing the squared error loss function.
-As we will see later, this loss corresponds to the assumption
-that our data were corrupted by Gaussian noise.
+* Kiek valandų truks ši operacija?
+* Kiek kritulių iškris šiame mieste per ateinančias šešias valandas?
 
-#### Classification
 
-While regression models are great
-for addressing *how many?* questions,
-lots of problems do not fit comfortably in this template.
-Consider, for example, a bank that wants
-to develop a check scanning feature for its mobile app.
-Ideally, the customer would simply snap a photo of a check
-and the app would automatically recognize the text from the image.
-Assuming that we had some ability
-to segment out image patches
-corresponding to each handwritten character,
-then the primary remaining task would be
-to determine which character among some known set
-is depicted in each image patch.
-These kinds of *which one?* problems are called *classification*
-and require a different set of tools
-from those used for regression,
-although many techniques will carry over.
+Net jei niekada nedirbote su mašininiu mokymusi,
+tikriausiai neformaliai sprendėte regresijos uždavinį.
+Įsivaizduokite, pavyzdžiui, kad remontavote kanalizaciją
+ir meistras 3 valandas
+valė nešvarumus iš jūsų kanalizacijos vamzdžių.
+Tada jis atsiuntė 350 dolerių sąskaitą.
+Dabar įsivaizduokite, kad jūsų draugas pasamdė tą patį meistrą 2 valandoms
+ir gavo 250 dolerių sąskaitą.
+Jei kas nors paklaustų, ko tikėtis
+iš jo būsimos nešvarumų valymo sąskaitos,
+galėtumėte padaryti keletą pagrįstų prielaidų,
+pavyzdžiui, kad daugiau dirbtų valandų kainuoja daugiau dolerių.
+Taip pat galėtumėte manyti, kad yra tam tikras bazinis mokestis,
+o meistras toliau skaičiuoja už valandą.
+Jei šios prielaidos teisingos, turėdami šiuos du duomenų pavyzdžius,
+jau galėtumėte nustatyti meistro kainodarą:
+100 dolerių už valandą ir 50 dolerių už atvykimą į jūsų namus.
+Jei tai suprantate, jau suprantate
+aukšto lygio idėją, slypinčią už *tiesinės* regresijos.
 
-In *classification*, we want our model to look at features,
-e.g., the pixel values in an image,
-and then predict to which *category*
-(sometimes called a *class*)
-among some discrete set of options,
-an example belongs.
-For handwritten digits, we might have ten classes,
-corresponding to the digits 0 through 9.
-The simplest form of classification is when there are only two classes,
-a problem which we call *binary classification*.
-For example, our dataset could consist of images of animals
-and our labels  might be the classes $\textrm{\{cat, dog\}}$.
-Whereas in regression we sought a regressor to output a numerical value,
-in classification we seek a classifier,
-whose output is the predicted class assignment.
+Šiuo atveju galėjome nustatyti parametrus,
+tiksliai atitinkančius meistro kainas.
+Kartais tai neįmanoma,
+pvz., jei dalis kitimo
+atsiranda dėl veiksnių, nepatenkančių tarp jūsų dviejų požymių.
+Tokiais atvejais bandysime išmokti modelius,
+minimizuojančius atstumą tarp mūsų prognozių ir stebėtų reikšmių.
+Daugumoje savo skyrių sutelksime dėmesį į
+kvadratinės paklaidos nuostolių funkcijos minimizavimą.
+Kaip vėliau pamatysime, šie nuostoliai atitinka prielaidą,
+kad mūsų duomenis iškreipė Gauso triukšmas.
 
-For reasons that we will get into as the book gets more technical,
-it can be difficult to optimize a model that can only output
-a *firm* categorical assignment,
-e.g., either "cat" or "dog".
-In these cases, it is usually much easier to express
-our model in the language of probabilities.
-Given features of an example,
-our model assigns a probability
-to each possible class.
-Returning to our animal classification example
-where the classes are $\textrm{\{cat, dog\}}$,
-a classifier might see an image and output the probability
-that the image is a cat as 0.9.
-We can interpret this number by saying that the classifier
-is 90\% sure that the image depicts a cat.
-The magnitude of the probability for the predicted class
-conveys a notion of uncertainty.
-It is not the only one available
-and we will discuss others in chapters dealing with more advanced topics.
+#### Klasifikavimas
 
-When we have more than two possible classes,
-we call the problem *multiclass classification*.
-Common examples include handwritten character recognition
+Nors regresijos modeliai puikiai tinka
+atsakyti į *kiek?* klausimus,
+daug uždavinių netelpa patogiai į šį šabloną.
+Panagrinėkime, pavyzdžiui, banką, kuris nori
+sukurti čekių skenavimo funkciją savo mobiliajai programėlei.
+Idealiu atveju klientas tiesiog nufotografuotų čekį,
+o programėlė automatiškai atpažintų tekstą iš vaizdo.
+Darant prielaidą, kad turime kokį nors gebėjimą
+išskirti vaizdo fragmentus,
+atitinkančius kiekvieną ranka parašytą simbolį,
+pagrindinė likusi užduotis būtų
+nustatyti, kuris simbolis iš tam tikros žinomos aibės
+pavaizduotas kiekviename vaizdo fragmente.
+Tokio tipo *kuris?* uždaviniai vadinami *klasifikavimu*
+ir reikalauja kitokio įrankių rinkinio
+nei naudojami regresijai,
+nors daug metodų persikelia.
+
+*Klasifikavimo* metu norime, kad mūsų modelis pažvelgtų į požymius,
+pvz., vaizdo pikselių reikšmes,
+ir prognozuotų, kuriai *kategorijai*
+(kartais vadinamai *klase*)
+iš tam tikros diskrečios variantų aibės
+priklauso pavyzdys.
+Ranka rašytiems skaitmenims galėtume turėti dešimt klasių,
+atitinkančių skaitmenis nuo 0 iki 9.
+Paprasčiausia klasifikavimo forma yra tada, kai yra tik dvi klasės,
+tokį uždavinį vadiname *dviejų klasių klasifikavimu*.
+Pavyzdžiui, mūsų duomenų rinkinį galėtų sudaryti gyvūnų vaizdai,
+o žymės galėtų būti klasės $\textrm{\{katė, šuo\}}$.
+Kaip regresijoje ieškojome regresoriaus, išvedančio skaitinę reikšmę,
+taip klasifikavime ieškome klasifikatoriaus,
+kurio išvestis yra prognozuojamas klasės priskyrimas.
+
+Dėl priežasčių, kurias aptarsime, knygai tapus techniškesnei,
+gali būti sunku optimizuoti modelį, galintį išvesti tik
+*griežtą* kategorinį priskyrimą,
+pvz., arba „katė", arba „šuo".
+Tokiais atvejais paprastai daug lengviau išreikšti
+mūsų modelį tikimybių kalba.
+Kai duoti pavyzdžio požymiai,
+mūsų modelis kiekvienai galimai klasei
+priskiria tikimybę.
+Grįždami prie gyvūnų klasifikavimo pavyzdžio,
+kuriame klasės yra $\textrm{\{katė, šuo\}}$,
+klasifikatorius gali pamatyti vaizdą ir išvesti tikimybę,
+kad vaizde yra katė, lygią 0,9.
+Šį skaičių galime interpretuoti sakydami, kad klasifikatorius
+yra 90\% įsitikinęs, kad vaizde pavaizduota katė.
+Prognozuojamos klasės tikimybės dydis
+perteikia neapibrėžtumo sampratą.
+Tai nėra vienintelė galima,
+ir kitas aptarsime skyriuose apie sudėtingesnes temas.
+
+Kai galimų klasių yra daugiau nei dvi,
+uždavinį vadiname *daugelio klasių klasifikavimu*.
+Įprasti pavyzdžiai – ranka rašytų simbolių atpažinimas
 $\textrm{\{0, 1, 2, ... 9, a, b, c, ...\}}$.
-While we attacked regression problems by trying
-to minimize the squared error loss function,
-the common loss function for classification problems is called *cross-entropy*,
-whose name will be demystified
-when we introduce information theory in later chapters.
+Kaip regresijos uždavinius sprendėme bandydami
+minimizuoti kvadratinės paklaidos nuostolių funkciją,
+taip įprasta klasifikavimo uždavinių nuostolių funkcija vadinama *kryžmine entropija*,
+kurios pavadinimas taps aiškus,
+kai vėlesniuose skyriuose pristatysime informacijos teoriją.
 
-Note that the most likely class is not necessarily
-the one that you are going to use for your decision.
-Assume that you find a beautiful mushroom in your backyard
-as shown in :numref:`fig_death_cap`.
+Atkreipkite dėmesį, kad labiausiai tikėtina klasė nebūtinai
+yra ta, kuria remsitės priimdami sprendimą.
+Tarkime, kad savo kieme radote gražų grybą,
+kaip parodyta :numref:`fig_death_cap`.
 
-![Death cap---do not eat!](../img/death-cap.jpg)
+![Žalioji musmirė – nevalgyti!](../img/death-cap.jpg)
 :width:`200px`
 :label:`fig_death_cap`
 
-Now, assume that you built a classifier and trained it
-to predict whether a mushroom is poisonous based on a photograph.
-Say our poison-detection classifier outputs
-that the probability that
-:numref:`fig_death_cap` shows a death cap is 0.2.
-In other words, the classifier is 80\% sure
-that our mushroom is not a death cap.
-Still, you would have to be a fool to eat it.
-That is because the certain benefit of a delicious dinner
-is not worth a 20\% risk of dying from it.
-In other words, the effect of the uncertain risk
-outweighs the benefit by far.
-Thus, in order to make a decision about whether to eat the mushroom,
-we need to compute the expected detriment
-associated with each action
-which depends both on the likely outcomes
-and the benefits or harms associated with each.
-In this case, the detriment incurred
-by eating the mushroom
-might be $0.2 \times \infty + 0.8 \times 0 = \infty$,
-whereas the loss of discarding it
-is $0.2 \times 0 + 0.8 \times 1 = 0.8$.
-Our caution was justified:
-as any mycologist would tell us,
-the mushroom in :numref:`fig_death_cap`
-is actually a death cap.
+Dabar tarkime, kad sukūrėte klasifikatorių ir jį apmokėte,
+kad pagal nuotrauką prognozuotų, ar grybas nuodingas.
+Tarkime, mūsų nuodų aptikimo klasifikatorius išveda,
+kad tikimybė, jog
+:numref:`fig_death_cap` pavaizduota žalioji musmirė, yra 0,2.
+Kitaip tariant, klasifikatorius yra 80\% įsitikinęs,
+kad mūsų grybas nėra žalioji musmirė.
+Vis tiek reikėtų būti kvailiu, norint jį valgyti.
+Taip yra todėl, kad tikra skanios vakarienės nauda
+neverta 20\% rizikos nuo jos mirti.
+Kitaip tariant, neapibrėžtos rizikos poveikis
+gerokai nusveria naudą.
+Taigi, norėdami priimti sprendimą, ar valgyti grybą,
+turime apskaičiuoti tikėtiną žalą,
+susijusią su kiekvienu veiksmu,
+kuri priklauso ir nuo tikėtinų baigčių,
+ir nuo su kiekviena susijusios naudos ar žalos.
+Šiuo atveju žala, patirta
+suvalgius grybą,
+galėtų būti $0.2 \times \infty + 0.8 \times 0 = \infty$,
+o jo išmetimo nuostolis
+yra $0.2 \times 0 + 0.8 \times 1 = 0.8$.
+Mūsų atsargumas pasiteisino:
+kaip pasakytų bet kuris mikologas, grybas
+:numref:`fig_death_cap`
+iš tiesų yra žalioji musmirė.
 
-Classification can get much more complicated than just
-binary or multiclass classification.
-For instance, there are some variants of classification
-addressing hierarchically structured classes.
-In such cases not all errors are equal---if
-we must err, we might prefer to misclassify
-to a related class rather than a distant class.
-Usually, this is referred to as *hierarchical classification*.
-For inspiration, you might think of [Linnaeus](https://en.wikipedia.org/wiki/Carl_Linnaeus),
-who organized fauna in a hierarchy.
+Klasifikavimas gali būti daug sudėtingesnis nei vien
+dviejų ar daugelio klasių klasifikavimas.
+Pavyzdžiui, yra keletas klasifikavimo variantų,
+skirtų hierarchiškai struktūrizuotoms klasėms.
+Tokiais atvejais ne visos klaidos vienodos – jei
+privalome suklysti, galime teikti pirmenybę klasifikavimui
+į giminingą, o ne tolimą klasę.
+Paprastai tai vadinama *hierarchiniu klasifikavimu*.
+Kaip įkvėpimą galite prisiminti [Linėjų](https://en.wikipedia.org/wiki/Carl_Linnaeus),
+kuris suorganizavo fauną hierarchijoje.
 
-In the case of animal classification,
-it might not be so bad to mistake
-a poodle for a schnauzer,
-but our model would pay a huge penalty
-if it confused a poodle with a dinosaur.
-Which hierarchy is relevant might depend
-on how you plan to use the model.
-For example, rattlesnakes and garter snakes
-might be close on the phylogenetic tree,
-but mistaking a rattler for a garter could have fatal consequences.
+Gyvūnų klasifikavimo atveju
+nebūtų taip blogai supainioti
+pudelį su šnauceriu,
+tačiau mūsų modelis sulauktų didžiulės baudos,
+jei supainiotų pudelį su dinozauru.
+Kuri hierarchija aktuali, gali priklausyti
+nuo to, kaip planuojate naudoti modelį.
+Pavyzdžiui, barškuolės ir juostinės gyvatės
+filogenetiniame medyje gali būti arti,
+tačiau supainioti barškuolę su juostine gali turėti mirtinų pasekmių.
 
-#### Tagging
+#### Žymėjimas
 
-Some classification problems fit neatly
-into the binary or multiclass classification setups.
-For example, we could train a normal binary classifier
-to distinguish cats from dogs.
-Given the current state of computer vision,
-we can do this easily, with off-the-shelf tools.
-Nonetheless, no matter how accurate our model gets,
-we might find ourselves in trouble when the classifier
-encounters an image of the *Town Musicians of Bremen*,
-a popular German fairy tale featuring four animals
+Kai kurie klasifikavimo uždaviniai tvarkingai telpa
+į dviejų ar daugelio klasių klasifikavimo schemas.
+Pavyzdžiui, galėtume apmokyti įprastą dviejų klasių klasifikatorių,
+skiriantį kates nuo šunų.
+Atsižvelgiant į dabartinę kompiuterinės regos būklę,
+tai galime padaryti lengvai, naudodami paruoštus įrankius.
+Vis dėlto, kad ir kokiu tikslumu pasižymėtų mūsų modelis,
+galime patekti į bėdą, kai klasifikatorius
+sutinka *Brėmeno miesto muzikantų* vaizdą,
+populiarią vokiečių pasaką, kurioje vaidina keturi gyvūnai
 (:numref:`fig_stackedanimals`).
 
-![A donkey, a dog, a cat, and a rooster.](../img/stackedanimals.png)
+![Asilas, šuo, katė ir gaidys.](../img/stackedanimals.png)
 :width:`300px`
 :label:`fig_stackedanimals`
 
-As you can see, the photo features a cat,
-a rooster, a dog, and a donkey,
-with some trees in the background.
-If we anticipate encountering such images,
-multiclass classification might not be
-the right problem formulation.
-Instead, we might want to give the model the option of
-saying the image depicts a cat, a dog, a donkey,
-*and* a rooster.
+Kaip matote, nuotraukoje yra katė,
+gaidys, šuo ir asilas,
+fone – keli medžiai.
+Jei tikimės susidurti su tokiais vaizdais,
+daugelio klasių klasifikavimas gali nebūti
+tinkama uždavinio formuluotė.
+Vietoj to galbūt norėtume suteikti modeliui galimybę
+pasakyti, kad vaizde yra katė, šuo, asilas
+*ir* gaidys.
 
-The problem of learning to predict classes that are
-not mutually exclusive is called *multi-label classification*.
-Auto-tagging problems are typically best described
-in terms of multi-label classification.
-Think of the tags people might apply
-to posts on a technical blog,
-e.g., "machine learning", "technology", "gadgets",
-"programming languages", "Linux", "cloud computing", "AWS".
-A typical article might have 5--10 tags applied.
-Typically, tags will exhibit some correlation structure.
-Posts about "cloud computing" are likely to mention "AWS"
-and posts about "machine learning" are likely to mention "GPUs".
+Uždavinys išmokti prognozuoti klases, kurios
+nėra viena kitą paneigiančios, vadinamas *daugelio žymenų klasifikavimu*.
+Automatinio žymėjimo uždaviniai paprastai geriausiai apibūdinami
+daugelio žymenų klasifikavimu.
+Pagalvokite apie žymes, kurias žmonės gali priskirti
+techninio tinklaraščio įrašams,
+pvz., „mašininis mokymasis", „technologijos", „įrenginiai",
+„programavimo kalbos", „Linux", „debesų kompiuterija", „AWS".
+Tipiniam straipsniui gali būti priskirta 5–10 žymių.
+Paprastai žymės pasižymės tam tikra koreliacijos struktūra.
+Įrašuose apie „debesų kompiuteriją" greičiausiai minimas „AWS",
+o įrašuose apie „mašininį mokymąsi" greičiausiai minimi „GPU".
 
-Sometimes such tagging problems
-draw on enormous label sets.
-The National Library of Medicine
-employs many professional annotators
-who associate each article to be indexed in PubMed
-with a set of tags drawn from the
-Medical Subject Headings (MeSH) ontology,
-a collection of roughly 28,000 tags.
-Correctly tagging articles is important
-because it allows researchers to conduct
-exhaustive reviews of the literature.
-This is a time-consuming process and typically there is a one-year lag between archiving and tagging.
-Machine learning can provide provisional tags
-until each article has a proper manual review.
-Indeed, for several years, the BioASQ organization
-has [hosted competitions](http://bioasq.org/)
-for this task.
+Kartais tokie žymėjimo uždaviniai
+remiasi milžiniškomis žymių aibėmis.
+Nacionalinė medicinos biblioteka
+samdo daug profesionalių anotatorių,
+kurie kiekvieną straipsnį, indeksuojamą PubMed,
+susieja su žymių rinkiniu, paimtu iš
+Medicinos dalykinių rubrikų (angl. *Medical Subject Headings*, MeSH) ontologijos,
+kurioje yra maždaug 28 000 žymių.
+Teisingas straipsnių žymėjimas svarbus,
+nes leidžia tyrėjams atlikti
+išsamias literatūros apžvalgas.
+Tai daug laiko reikalaujantis procesas, o tarp archyvavimo ir žymėjimo paprastai būna vienerių metų atotrūkis.
+Mašininis mokymasis gali pateikti laikinas žymes,
+kol kiekvienas straipsnis bus tinkamai peržiūrėtas rankiniu būdu.
+Iš tiesų jau kelerius metus BioASQ organizacija
+[rengia konkursus](http://bioasq.org/)
+šiai užduočiai.
 
-#### Search
+#### Paieška
 
-In the field of information retrieval,
-we often impose ranks on sets of items.
-Take web search for example.
-The goal is less to determine *whether*
-a particular page is relevant for a query, 
-but rather which, among a set of relevant results,
-should be shown most prominently
-to a particular user.
-One way of doing this might be
-to first assign a score
-to every element in the set
-and then to retrieve the top-rated elements.
+Informacijos paieškos srityje
+dažnai nustatome elementų aibių reitingus.
+Paimkime, pavyzdžiui, paiešką internete.
+Tikslas yra ne tiek nustatyti, *ar*
+konkretus puslapis aktualus užklausai,
+bet kuris iš aktualių rezultatų aibės
+turėtų būti rodomas ryškiausiai
+konkrečiam naudotojui.
+Vienas būdas tai padaryti galėtų būti
+pirmiausia kiekvienam aibės elementui priskirti
+įvertį
+ir tada gauti aukščiausiai įvertintus elementus.
 [PageRank](https://en.wikipedia.org/wiki/PageRank),
-the original secret sauce behind the Google search engine,
-was an early example of such a scoring system.
-Weirdly, the scoring provided by PageRank
-did not depend on the actual query.
-Instead, they relied on a simple relevance filter
-to identify the set of relevant candidates
-and then used PageRank to prioritize
-the more authoritative pages.
-Nowadays, search engines use machine learning and behavioral models
-to obtain query-dependent relevance scores.
-There are entire academic conferences devoted to this subject.
+pradinė „Google" paieškos variklio paslaptis,
+buvo ankstyvas tokios vertinimo sistemos pavyzdys.
+Keista, bet „PageRank" suteiktas įvertinimas
+nepriklausė nuo tikrosios užklausos.
+Vietoj to jie rėmėsi paprastu aktualumo filtru,
+kad nustatytų aktualių kandidatų aibę,
+ir tada naudojo „PageRank", kad teiktų pirmenybę
+autoritetingesniems puslapiams.
+Šiais laikais paieškos sistemos naudoja mašininį mokymąsi ir elgsenos modelius,
+kad gautų nuo užklausos priklausančius aktualumo įverčius.
+Šiai temai skirtos ištisos akademinės konferencijos.
 
-#### Recommender Systems
+#### Rekomendacinės sistemos
 :label:`subsec_recommender_systems`
 
-Recommender systems are another problem setting
-that is related to search and ranking.
-The problems are similar insofar as the goal
-is to display a set of items relevant to the user.
-The main difference is the emphasis on *personalization*
-to specific users in the context of recommender systems.
-For instance, for movie recommendations,
-the results page for a science fiction fan
-and the results page
-for a connoisseur of Peter Sellers comedies
-might differ significantly.
-Similar problems pop up in other recommendation settings,
-e.g., for retail products, music, and news recommendation.
+Rekomendacinės sistemos yra dar viena uždavinių aplinka,
+susijusi su paieška ir reitingavimu.
+Uždaviniai panašūs tiek, kiek tikslas
+yra parodyti naudotojui aktualių elementų aibę.
+Pagrindinis skirtumas – akcentas į *personalizavimą*
+konkretiems naudotojams rekomendacinių sistemų kontekste.
+Pavyzdžiui, filmų rekomendacijų atveju
+mokslinės fantastikos gerbėjo rezultatų puslapis
+ir Peterio Sellerso komedijų žinovo
+rezultatų puslapis
+gali smarkiai skirtis.
+Panašūs uždaviniai kyla ir kitose rekomendacijų aplinkose,
+pvz., mažmeninės prekybos produktų, muzikos ir naujienų rekomendacijose.
 
-In some cases, customers provide explicit feedback,
-communicating how much they liked a particular product
-(e.g., the product ratings and reviews
-on Amazon, IMDb, or Goodreads).
-In other cases, they provide implicit feedback,
-e.g., by skipping titles on a playlist,
-which might indicate 
-dissatisfaction or maybe just
-indicate
-that the song was inappropriate in context.
-In the simplest formulations,
-these systems are trained
-to estimate some score,
-such as an expected star rating
-or the probability that a given user
-will purchase a particular item.
+Kai kuriais atvejais klientai pateikia aiškų grįžtamąjį ryšį,
+nurodydami, kiek jiems patiko konkretus produktas
+(pvz., produktų įvertinimai ir atsiliepimai
+„Amazon", IMDb ar „Goodreads").
+Kitais atvejais jie pateikia numanomą grįžtamąjį ryšį,
+pvz., praleisdami kūrinius grojaraštyje,
+o tai gali rodyti
+nepasitenkinimą arba galbūt tik tai,
+kad daina buvo netinkama kontekste.
+Paprasčiausiose formuluotėse šios sistemos apmokomos
+įvertinti kokį nors įvertį,
+pvz., tikėtiną žvaigždučių įvertinimą
+arba tikimybę, kad tam tikras naudotojas
+nupirks konkretų elementą.
 
-Given such a model, for any given user,
-we could retrieve the set of objects with the largest scores,
-which could then be recommended to the user.
-Production systems are considerably more advanced
-and take detailed user activity and item characteristics
-into account when computing such scores.
-:numref:`fig_deeplearning_amazon` displays the deep learning books
-recommended by Amazon based on personalization algorithms
-tuned to capture Aston's preferences.
+Turėdami tokį modelį, bet kuriam duotam naudotojui
+galime gauti objektų aibę su didžiausiais įverčiais,
+kuri vėliau galėtų būti rekomenduojama naudotojui.
+Gamybinės sistemos yra gerokai pažangesnės
+ir skaičiuodamos tokius įverčius atsižvelgia į išsamią naudotojo veiklą
+ir elementų charakteristikas.
+:numref:`fig_deeplearning_amazon` parodytos gilaus mokymosi knygos,
+kurias „Amazon" rekomendavo pagal personalizavimo algoritmus,
+suderintus Astono pageidavimams užfiksuoti.
 
-![Deep learning books recommended by Amazon.](../img/deeplearning-amazon.jpg)
+![„Amazon" rekomenduojamos gilaus mokymosi knygos.](../img/deeplearning-amazon.jpg)
 :label:`fig_deeplearning_amazon`
 
-Despite their tremendous economic value,
-recommender systems
-naively built on top of predictive models
-suffer some serious conceptual flaws.
-To start, we only observe *censored feedback*:
-users preferentially rate movies
-that they feel strongly about.
-For example, on a five-point scale,
-you might notice that items receive
-many one- and five-star ratings
-but that there are conspicuously few three-star ratings.
-Moreover, current purchase habits are often a result
-of the recommendation algorithm currently in place,
-but learning algorithms do not always take this detail into account.
-Thus it is possible for feedback loops to form
-where a recommender system preferentially pushes an item
-that is then taken to be better (due to greater purchases)
-and in turn is recommended even more frequently.
-Many of these problems---about
-how to deal with censoring,
-incentives, and feedback loops---are important open research questions.
+Nepaisant didžiulės ekonominės vertės,
+rekomendacinės sistemos,
+naiviai sukurtos ant prognozavimo modelių,
+turi rimtų konceptualių trūkumų.
+Pirmiausia, stebime tik *cenzūruotą grįžtamąjį ryšį*:
+naudotojai pirmiausia vertina filmus,
+dėl kurių jaučia stiprias emocijas.
+Pavyzdžiui, penkių balų skalėje
+galite pastebėti, kad elementai gauna
+daug vienos ir penkių žvaigždučių įvertinimų,
+bet akivaizdžiai mažai trijų žvaigždučių įvertinimų.
+Be to, dabartiniai pirkimo įpročiai dažnai yra šiuo metu
+naudojamo rekomendavimo algoritmo rezultatas,
+tačiau mokymosi algoritmai ne visada atsižvelgia į šią detalę.
+Taigi gali susidaryti grįžtamojo ryšio kilpos,
+kai rekomendacinė sistema pirmiausia siūlo elementą,
+kuris vėliau laikomas geresniu (dėl didesnio pirkimų skaičiaus)
+ir savo ruožtu rekomenduojamas dar dažniau.
+Daugelis šių problemų – apie tai,
+kaip tvarkyti cenzūravimą,
+paskatas ir grįžtamojo ryšio kilpas – yra svarbūs atviri tyrimų klausimai.
 
-#### Sequence Learning
+#### Nuoseklių duomenų mokymasis
 
-So far, we have looked at problems where we have
-some fixed number of inputs and produce a fixed number of outputs.
-For example, we considered predicting house prices
-given a fixed set of features:
-square footage, number of bedrooms,
-number of bathrooms, and the transit time to downtown.
-We also discussed mapping from an image (of fixed dimension)
-to the predicted probabilities that it belongs
-to each among a fixed number of classes
-and predicting star ratings associated with purchases
-based on the user ID and product ID alone.
-In these cases, once our model is trained,
-after each test example is fed into our model,
-it is immediately forgotten.
-We assumed that successive observations were independent
-and thus there was no need to hold on to this context.
+Iki šiol nagrinėjome uždavinius, kuriuose turime
+fiksuotą skaičių įvesčių ir pateikiame fiksuotą skaičių išvesčių.
+Pavyzdžiui, svarstėme namų kainų prognozavimą
+pagal fiksuotą požymių rinkinį:
+plotą kvadratiniais pėdomis, miegamųjų skaičių,
+vonios kambarių skaičių ir kelionės iki miesto centro laiką.
+Taip pat aptarėme atvaizdavimą iš vaizdo (fiksuotos dimensijos)
+į prognozuojamas tikimybes, kad jis priklauso
+kiekvienai iš fiksuoto skaičiaus klasių,
+ir su pirkimais susijusių žvaigždučių įvertinimų prognozavimą
+vien pagal naudotojo ID ir produkto ID.
+Šiais atvejais, kai mūsų modelis apmokytas,
+kiekvienas testavimo pavyzdys, pateiktas modeliui,
+iškart užmirštamas.
+Darėme prielaidą, kad paeiliui einantys stebėjimai nepriklausomi,
+todėl nebuvo reikalo išlaikyti šio konteksto.
 
-But how should we deal with video snippets?
-In this case, each snippet might consist of a different number of frames.
-And our guess of what is going on in each frame might be much stronger
-if we take into account the previous or succeeding frames.
-The same goes for language.
-For example, one popular deep learning problem is machine translation:
-the task of ingesting sentences in some source language
-and predicting their translations in another language.
+Bet kaip turėtume elgtis su vaizdo įrašų fragmentais?
+Šiuo atveju kiekvieną fragmentą gali sudaryti skirtingas kadrų skaičius.
+O mūsų spėjimas, kas vyksta kiekviename kadre, gali būti daug tikslesnis,
+jei atsižvelgsime į ankstesnius ar vėlesnius kadrus.
+Tas pats pasakytina apie kalbą.
+Pavyzdžiui, viena populiari gilaus mokymosi problema yra mašininis vertimas:
+užduotis priimti sakinius pradine kalba
+ir prognozuoti jų vertimus kita kalba.
 
-Such problems also occur in medicine.
-We might want a model to monitor patients in the intensive care unit
-and to fire off alerts whenever their risk of dying in the next 24 hours
-exceeds some threshold.
-Here, we would not throw away everything
-that we know about the patient history every hour,
-because we might not want to make predictions based only
-on the most recent measurements.
+Tokie uždaviniai kyla ir medicinoje.
+Galime norėti modelio, kuris stebėtų pacientus intensyviosios terapijos skyriuje
+ir pateiktų įspėjimus, kai tik jų rizika mirti per artimiausias 24 valandas
+viršija tam tikrą slenkstį.
+Čia nenumestume visko,
+ką žinome apie paciento istoriją kas valandą,
+nes galime nenorėti prognozuoti remdamiesi tik
+naujausiais matavimais.
 
-Questions like these are among the most
-exciting applications of machine learning
-and they are instances of *sequence learning*.
-They require a model either to ingest sequences of inputs
-or to emit sequences of outputs (or both).
-Specifically, *sequence-to-sequence learning* considers problems
-where both inputs and outputs consist of variable-length sequences.
-Examples include machine translation
-and speech-to-text transcription.
-While it is impossible to consider
-all types of sequence transformations,
-the following special cases are worth mentioning.
+Tokie klausimai yra vieni
+įdomiausių mašininio mokymosi taikymų,
+ir jie yra *nuoseklių duomenų mokymosi* atvejai.
+Jie reikalauja, kad modelis priimtų įvesčių sekas
+arba išvestų išvesčių sekas (arba abu).
+Konkrečiai, *sekos į seką mokymasis* nagrinėja uždavinius,
+kuriuose ir įvestis, ir išvestis yra kintamo ilgio sekos.
+Pavyzdžiai – mašininis vertimas
+ir šnekos transkribavimas į tekstą.
+Nors neįmanoma aptarti
+visų sekų transformacijų tipų,
+verta paminėti šiuos ypatinguosius atvejus.
 
-**Tagging and Parsing**.
-This involves annotating a text sequence with attributes.
-Here, the inputs and outputs are *aligned*,
-i.e., they are of the same number
-and occur in a corresponding order.
-For instance, in *part-of-speech (PoS) tagging*,
-we annotate every word in a sentence
-with the corresponding part of speech,
-i.e., "noun" or "direct object".
-Alternatively, we might want to know
-which groups of contiguous words refer to named entities,
-like *people*, *places*, or *organizations*.
-In the cartoonishly simple example below,
-we might just want to indicate whether or not any word in the sentence is part of a named entity (tagged as "Ent").
+**Žymėjimas ir sintaksinė analizė**.
+Tai teksto sekos anotavimas atributais.
+Čia įvestys ir išvestys yra *sulygiuotos*,
+t. y. jų yra tiek pat
+ir jos išdėstytos atitinkama tvarka.
+Pavyzdžiui, *kalbos dalių (angl. part-of-speech, PoS) žymėjimo* metu
+kiekvieną sakinio žodį anotuojame
+atitinkama kalbos dalimi,
+t. y. „daiktavardis" arba „tiesioginis papildinys".
+Arba galime norėti sužinoti,
+kurios gretimų žodžių grupės nurodo įvardytas esybes,
+tokias kaip *žmonės*, *vietos* ar *organizacijos*.
+Toliau pateiktame karikatūriškai paprastame pavyzdyje
+galime tik norėti nurodyti, ar bet kuris sakinio žodis yra įvardytos esybės dalis (pažymėta „Ent").
 
 ```text
 Tom has dinner in Washington with Sally
@@ -986,894 +978,894 @@ Ent  -    -    -     Ent      -    Ent
 ```
 
 
-**Automatic Speech Recognition**.
-With speech recognition, the input sequence
-is an audio recording of a speaker (:numref:`fig_speech`),
-and the output is a transcript of what the speaker said.
-The challenge is that there are many more audio frames
-(sound is typically sampled at 8kHz or 16kHz)
-than text, i.e., there is no 1:1 correspondence between audio and text,
-since thousands of samples may
-correspond to a single spoken word.
-These are sequence-to-sequence learning problems,
-where the output is much shorter than the input.
-While humans are remarkably good at recognizing speech,
-even from low-quality audio,
-getting computers to perform the same feat
-is a formidable challenge.
+**Automatinis šnekos atpažinimas**.
+Šnekos atpažinimo atveju įvesties seka
+yra kalbėtojo garso įrašas (:numref:`fig_speech`),
+o išvestis – to, ką kalbėtojas pasakė, transkripcija.
+Sunkumas tas, kad garso kadrų yra gerokai daugiau
+(garsas paprastai diskretizuojamas 8 kHz arba 16 kHz dažniu)
+nei teksto, t. y. tarp garso ir teksto nėra 1:1 atitikmens,
+nes tūkstančiai atskaitų gali
+atitikti vieną ištartą žodį.
+Tai sekos į seką mokymosi uždaviniai,
+kuriuose išvestis yra gerokai trumpesnė už įvestį.
+Nors žmonės nepaprastai gerai atpažįsta šneką,
+net iš prastos kokybės garso,
+priversti kompiuterius atlikti tą patį žygdarbį
+yra didžiulis iššūkis.
 
-![`-D-e-e-p- L-ea-r-ni-ng-` in an audio recording.](../img/speech.png)
+![`-D-e-e-p- L-ea-r-ni-ng-` garso įraše.](../img/speech.png)
 :width:`700px`
 :label:`fig_speech`
 
-**Text to Speech**.
-This is the inverse of automatic speech recognition.
-Here, the input is text and the output is an audio file.
-In this case, the output is much longer than the input.
+**Teksto į kalbą pavertimas**.
+Tai atvirkštinis automatiniam šnekos atpažinimui uždavinys.
+Čia įvestis yra tekstas, o išvestis – garso failas.
+Šiuo atveju išvestis yra gerokai ilgesnė už įvestį.
 
-**Machine Translation**.
-Unlike the case of speech recognition,
-where corresponding inputs and outputs
-occur in the same order,
-in machine translation,
-unaligned data poses a new challenge.
-Here the input and output sequences
-can have different lengths,
-and the corresponding regions
-of the respective sequences
-may appear in a different order.
-Consider the following illustrative example
-of the peculiar tendency of Germans
-to place the verbs at the end of sentences:
+**Mašininis vertimas**.
+Skirtingai nei šnekos atpažinimo atveju,
+kai atitinkamos įvestys ir išvestys
+išdėstytos ta pačia tvarka,
+mašininiame vertime
+nesulygiuoti duomenys kelia naują iššūkį.
+Čia įvesties ir išvesties sekos
+gali būti skirtingo ilgio,
+o atitinkamos
+atitinkamų sekų sritys
+gali atsirasti skirtinga tvarka.
+Panagrinėkime šį iliustruojantį pavyzdį,
+rodantį savotišką vokiečių polinkį
+dėti veiksmažodžius sakinių gale:
 
 ```text
-German:           Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?
-English:          Have you already looked at this excellent textbook?
-Wrong alignment:  Have you yourself already this excellent textbook looked at?
+Vokiškai:               Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?
+Angliškai:              Have you already looked at this excellent textbook?
+Neteisingas sulygiavimas:  Have you yourself already this excellent textbook looked at?
 ```
 
 
-Many related problems pop up in other learning tasks.
-For instance, determining the order in which a user
-reads a webpage is a two-dimensional layout analysis problem.
-Dialogue problems exhibit all kinds of additional complications,
-where determining what to say next requires taking into account
-real-world knowledge and the prior state of the conversation
-across long temporal distances.
-Such topics are active areas of research.
+Daug susijusių uždavinių iškyla ir kitose mokymosi užduotyse.
+Pavyzdžiui, nustatyti, kokia tvarka naudotojas
+skaito tinklalapį, yra dvimatės maketo analizės uždavinys.
+Dialogo uždaviniai pasižymi įvairiausiomis papildomomis komplikacijomis,
+kai norint nustatyti, ką pasakyti toliau, reikia atsižvelgti į
+realaus pasaulio žinias ir ankstesnę pokalbio būseną
+dideliais laiko atstumais.
+Tokios temos yra aktyvios tyrimų sritys.
 
-### Unsupervised and Self-Supervised Learning
+### Neprižiūrimas ir savaime prižiūrimas mokymasis
 
-The previous examples focused on supervised learning,
-where we feed the model a giant dataset
-containing both the features and corresponding label values.
-You could think of the supervised learner as having
-an extremely specialized job and an extremely dictatorial boss.
-The boss stands over the learner's shoulder and tells them exactly what to do
-in every situation until they learn to map from situations to actions.
-Working for such a boss sounds pretty lame.
-On the other hand, pleasing such a boss is pretty easy.
-You just recognize the pattern as quickly as possible
-and imitate the boss's actions.
+Ankstesni pavyzdžiai sutelkė dėmesį į prižiūrimą mokymą,
+kai modeliui pateikiame milžinišką duomenų rinkinį,
+turintį ir požymius, ir atitinkamas žymių reikšmes.
+Galite įsivaizduoti, kad prižiūrimas besimokantysis turi
+itin specializuotą darbą ir itin diktatorišką viršininką.
+Viršininkas stovi besimokančiajam už nugaros ir tiksliai sako, ką daryti
+kiekvienoje situacijoje, kol šis išmoksta atvaizduoti situacijas į veiksmus.
+Dirbti pas tokį viršininką skamba gana nuobodžiai.
+Kita vertus, tokį viršininką patenkinti gana lengva.
+Tereikia kuo greičiau atpažinti šabloną
+ir imituoti viršininko veiksmus.
 
-Considering the opposite situation,
-it could be frustrating to work for a boss
-who has no idea what they want you to do.
-However, if you plan to be a data scientist,
-you had better get used to it.
-The boss might just hand you a giant dump of data
-and tell you to *do some data science with it!*
-This sounds vague because it is vague.
-We call this class of problems *unsupervised learning*,
-and the type and number of questions we can ask
-is limited only by our creativity.
-We will address unsupervised learning techniques
-in later chapters.
-To whet your appetite for now,
-we describe a few of the following questions you might ask.
+Pažvelgus į priešingą situaciją,
+gali būti varginančiai dirbti pas viršininką,
+kuris neturi supratimo, ką jis nori, kad darytumėte.
+Tačiau jei planuojate tapti duomenų mokslininku,
+verčiau pripraskite.
+Viršininkas gali tiesiog įteikti jums milžinišką duomenų krūvą
+ir pasakyti *„padaryk su tuo šiek tiek duomenų mokslo!"*
+Tai skamba miglotai, nes ir yra miglota.
+Šią uždavinių klasę vadiname *neprižiūrimu mokymu*,
+o klausimų, kuriuos galime užduoti, tipą ir skaičių
+riboja tik mūsų kūrybiškumas.
+Neprižiūrimo mokymo metodus nagrinėsime
+vėlesniuose skyriuose.
+Kol kas, kad sužadintume jūsų apetitą,
+aprašome keletą toliau pateiktų klausimų, kuriuos galėtumėte užduoti.
 
-* Can we find a small number of prototypes
-that accurately summarize the data?
-Given a set of photos, can we group them into landscape photos,
-pictures of dogs, babies, cats, and mountain peaks?
-Likewise, given a collection of users' browsing activities,
-can we group them into users with similar behavior?
-This problem is typically known as *clustering*.
-* Can we find a small number of parameters
-that accurately capture the relevant properties of the data?
-The trajectories of a ball are well described
-by velocity, diameter, and mass of the ball.
-Tailors have developed a small number of parameters
-that describe human body shape fairly accurately
-for the purpose of fitting clothes.
-These problems are referred to as *subspace estimation*.
-If the dependence is linear, it is called *principal component analysis*.
-* Is there a representation of (arbitrarily structured) objects
-in Euclidean space
-such that symbolic properties can be well matched?
-This can be used to describe entities and their relations,
-such as "Rome" $-$ "Italy" $+$ "France" $=$ "Paris".
-* Is there a description of the root causes
-of much of the data that we observe?
-For instance, if we have demographic data
-about house prices, pollution, crime, location,
-education, and salaries, can we discover
-how they are related simply based on empirical data?
-The fields concerned with *causality* and
-*probabilistic graphical models* tackle such questions.
-* Another important and exciting recent development in unsupervised learning
-is the advent of *deep generative models*.
-These models estimate the density of the data,
-either explicitly or *implicitly*.
-Once trained, we can use a generative model
-either to score examples according to how likely they are,
-or to sample synthetic examples from the learned distribution.
-Early deep learning breakthroughs in generative modeling
-came with the invention of *variational autoencoders* :cite:`Kingma.Welling.2014,rezende2014stochastic`
-and continued with the development of *generative adversarial networks* :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
-More recent advances include normalizing flows :cite:`dinh2014nice,dinh2017density` and
-diffusion models :cite:`sohl2015deep,song2019generative,ho2020denoising,song2021score`.
-
-
-
-A further development in unsupervised learning
-has been the rise of *self-supervised learning*,
-techniques that leverage some aspect of the unlabeled data
-to provide supervision.
-For text, we can train models
-to "fill in the blanks"
-by predicting randomly masked words
-using their surrounding words (contexts)
-in big corpora without any labeling effort :cite:`Devlin.Chang.Lee.ea.2018`!
-For images, we may train models
-to tell the relative position
-between two cropped regions
-of the same image :cite:`Doersch.Gupta.Efros.2015`,
-to predict an occluded part of an image
-based on the remaining portions of the image,
-or to predict whether two examples
-are perturbed versions of the same underlying image.
-Self-supervised models often learn representations
-that are subsequently leveraged
-by fine-tuning the resulting models
-on some downstream task of interest.
+* Ar galime rasti nedidelį skaičių prototipų,
+kurie tiksliai apibendrina duomenis?
+Turėdami nuotraukų rinkinį, ar galime jas sugrupuoti į kraštovaizdžių nuotraukas,
+šunų, kūdikių, kačių ir kalnų viršūnių paveikslus?
+Panašiai, turėdami naudotojų naršymo veiklos rinkinį,
+ar galime juos sugrupuoti į panašaus elgesio naudotojus?
+Šis uždavinys paprastai žinomas kaip *klasterizavimas*.
+* Ar galime rasti nedidelį parametrų skaičių,
+kuris tiksliai atspindi svarbias duomenų savybes?
+Kamuoliuko trajektorijas gerai aprašo
+kamuoliuko greitis, skersmuo ir masė.
+Siuvėjai sukūrė nedidelį parametrų skaičių,
+gana tiksliai aprašantį žmogaus kūno formą
+drabužių derinimo tikslais.
+Šie uždaviniai vadinami *poerdvio įvertinimu*.
+Jei priklausomybė tiesinė, tai vadinama *pagrindinių komponenčių analize*.
+* Ar yra (savavališkos struktūros) objektų
+atvaizdis Euklido erdvėje,
+kuriame simbolines savybes būtų galima gerai suderinti?
+Tai galima naudoti esybėms ir jų ryšiams aprašyti,
+pavyzdžiui, „Roma" $-$ „Italija" $+$ „Prancūzija" $=$ „Paryžius".
+* Ar yra didžiosios dalies mūsų stebimų duomenų
+pagrindinių priežasčių aprašymas?
+Pavyzdžiui, jei turime demografinių duomenų
+apie būsto kainas, taršą, nusikalstamumą, vietovę,
+išsilavinimą ir atlyginimus, ar galime išsiaiškinti,
+kaip jie susiję, vien remdamiesi empiriniais duomenimis?
+Su *priežastingumu* ir
+*tikimybiniais grafiniais modeliais* susijusios sritys nagrinėja tokius klausimus.
+* Kita svarbi ir įdomi neseniai įvykusi neprižiūrimo mokymo raida
+yra *giliųjų generatyvinių modelių* atsiradimas.
+Šie modeliai įvertina duomenų tankį,
+aiškiai arba *neaiškiai*.
+Apmokę generatyvinį modelį,
+galime jį naudoti
+pavyzdžiams įvertinti pagal tai, kiek jie tikėtini,
+arba sintetiniams pavyzdžiams iš išmokto skirstinio generuoti.
+Ankstyvieji gilaus mokymosi proveržiai generatyviniame modeliavime
+atėjo išradus *variacinius auto-enkoderius* :cite:`Kingma.Welling.2014,rezende2014stochastic`
+ir tęsėsi kuriant *generatyvinius adversarinius tinklus* :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
+Naujesni pasiekimai apima normalizuojančius srautus :cite:`dinh2014nice,dinh2017density` ir
+difuzijos modelius :cite:`sohl2015deep,song2019generative,ho2020denoising,song2021score`.
 
 
-### Interacting with an Environment
 
-So far, we have not discussed where data actually comes from,
-or what actually happens when a machine learning model generates an output.
-That is because supervised learning and unsupervised learning
-do not address these issues in a very sophisticated way.
-In each case, we grab a big pile of data upfront,
-then set our pattern recognition machines in motion
-without ever interacting with the environment again.
-Because all the learning takes place
-after the algorithm is disconnected from the environment,
-this is sometimes called *offline learning*.
-For example, supervised learning assumes
-the simple interaction pattern
-depicted in :numref:`fig_data_collection`.
+Dar viena neprižiūrimo mokymo raida
+buvo *savaime prižiūrimo mokymosi* iškilimas –
+metodų, kurie naudoja tam tikrą nepažymėtų duomenų aspektą
+priežiūrai suteikti.
+Tekstui galime apmokyti modelius
+„užpildyti tuščias vietas"
+prognozuodami atsitiktinai užmaskuotus žodžius
+pagal juos supančius žodžius (kontekstus)
+dideliuose duomenų rinkiniuose be jokių žymėjimo pastangų :cite:`Devlin.Chang.Lee.ea.2018`!
+Vaizdams galime apmokyti modelius
+nustatyti santykinę padėtį
+tarp dviejų to paties vaizdo
+iškirptų sričių :cite:`Doersch.Gupta.Efros.2015`,
+prognozuoti uždengtą vaizdo dalį
+pagal likusias vaizdo dalis
+arba prognozuoti, ar du pavyzdžiai
+yra sutrikdytos to paties pagrindinio vaizdo versijos.
+Savaime prižiūrimi modeliai dažnai išmoksta reprezentacijas,
+kurios vėliau panaudojamos
+adaptuojant gautus modelius
+tolesnei dominančiai užduočiai.
 
-![Collecting data for supervised learning from an environment.](../img/data-collection.svg)
+
+### Sąveika su aplinka
+
+Iki šiol neaptarėme, iš kur iš tikrųjų atsiranda duomenys
+ar kas iš tikrųjų vyksta, kai mašininio mokymosi modelis sugeneruoja išvestį.
+Taip yra todėl, kad prižiūrimas ir neprižiūrimas mokymas
+šių klausimų neaptaria labai išsamiai.
+Kiekvienu atveju iš anksto pasiimame didelę duomenų krūvą,
+tada paleidžiame savo šablonų atpažinimo mašinas
+niekada daugiau nebendraudami su aplinka.
+Kadangi visas mokymasis vyksta
+algoritmui atsijungus nuo aplinkos,
+tai kartais vadinama *mokymusi neprisijungus* (angl. *offline learning*).
+Pavyzdžiui, prižiūrimas mokymas daro prielaidą apie paprastą
+sąveikos šabloną, pavaizduotą
+:numref:`fig_data_collection`.
+
+![Duomenų rinkimas prižiūrimam mokymui iš aplinkos.](../img/data-collection.svg)
 :label:`fig_data_collection`
 
-This simplicity of offline learning has its charms.
-The upside is that we can worry
-about pattern recognition in isolation,
-with no concern about complications arising
-from interactions with a dynamic environment.
-But this problem formulation is limiting.
-If you grew up reading Asimov's Robot novels,
-then you probably picture artificially intelligent agents
-capable not only of making predictions,
-but also of taking actions in the world.
-We want to think about intelligent *agents*,
-not just predictive models.
-This means that we need to think about choosing *actions*,
-not just making predictions.
-In contrast to mere predictions,
-actions actually impact the environment.
-If we want to train an intelligent agent,
-we must account for the way its actions might
-impact the future observations of the agent, and so offline learning is inappropriate.
+Šis mokymosi neprisijungus paprastumas turi savo žavesio.
+Pranašumas tas, kad galime rūpintis
+šablonų atpažinimu atskirai,
+nesirūpindami dėl komplikacijų, kylančių
+iš sąveikos su dinamine aplinka.
+Tačiau tokia uždavinio formuluotė riboja.
+Jei užaugote skaitydami Asimovo robotų romanus,
+tikriausiai įsivaizduojate dirbtinio intelekto agentus,
+galinčius ne tik prognozuoti,
+bet ir veikti pasaulyje.
+Norime galvoti apie intelektualius *agentus*,
+o ne vien prognozavimo modelius.
+Tai reiškia, kad turime galvoti apie *veiksmų* pasirinkimą,
+o ne vien prognozių darymą.
+Skirtingai nei prognozės,
+veiksmai iš tikrųjų veikia aplinką.
+Jei norime apmokyti intelektualų agentą,
+turime atsižvelgti į tai, kaip jo veiksmai gali
+paveikti būsimus agento stebėjimus, todėl mokymasis neprisijungus netinka.
 
-Considering the interaction with an environment
-opens a whole set of new modeling questions.
-The following are just a few examples.
+Sąveikos su aplinka svarstymas
+atveria visą naujų modeliavimo klausimų rinkinį.
+Štai keletas pavyzdžių.
 
-* Does the environment remember what we did previously?
-* Does the environment want to help us, e.g., a user reading text into a speech recognizer?
-* Does the environment want to beat us, e.g., spammers adapting their emails to evade spam filters?
-* Does the environment have shifting dynamics? For example, would future data always resemble the past or would the patterns change over time, either naturally or in response to our automated tools?
+* Ar aplinka prisimena, ką darėme anksčiau?
+* Ar aplinka nori mums padėti, pvz., naudotojas, kuris skaito tekstą šnekos atpažintuvui?
+* Ar aplinka nori mus nugalėti, pvz., šlamšto siuntėjai, pritaikantys savo laiškus, kad apeitų šlamšto filtrus?
+* Ar aplinkos dinamika kinta? Pavyzdžiui, ar būsimi duomenys visada primins praeities duomenis, ar šablonai keisis laikui bėgant, natūraliai arba reaguodami į mūsų automatizuotas priemones?
 
-These questions raise the problem of *distribution shift*,
-where training and test data are different.
-An example of this, that many of us may have met, is when taking exams written by a lecturer,
-while the homework was composed by their teaching assistants.
-Next, we briefly describe reinforcement learning,
-a rich framework for posing learning problems in which
-an agent interacts with an environment.
+Šie klausimai iškelia *pasiskirstymo pokyčio* problemą,
+kai apmokymo ir testavimo duomenys skiriasi.
+To pavyzdys, su kuriuo daugelis susidūrė, – kai laikome dėstytojo parengtus egzaminus,
+o namų darbus sudarė jo asistentai.
+Toliau trumpai aprašome skatinamąjį mokymąsi –
+turtingą sistemą mokymosi uždaviniams formuluoti, kai
+agentas sąveikauja su aplinka.
 
 
-### Reinforcement Learning
+### Skatinamasis mokymasis
 
-If you are interested in using machine learning
-to develop an agent that interacts with an environment
-and takes actions, then you are probably going to wind up
-focusing on *reinforcement learning*.
-This might include applications to robotics,
-to dialogue systems,
-and even to developing artificial intelligence (AI)
-for video games.
-*Deep reinforcement learning*, which applies
-deep learning to reinforcement learning problems,
-has surged in popularity.
-The breakthrough deep Q-network, that beat humans
-at Atari games using only the visual input :cite:`mnih2015human`,
-and the AlphaGo program, which dethroned the world champion
-at the board game Go :cite:`Silver.Huang.Maddison.ea.2016`,
-are two prominent examples.
+Jei jus domina naudoti mašininį mokymąsi
+sukurti agentą, kuris sąveikauja su aplinka
+ir imasi veiksmų, tikriausiai galiausiai
+sutelksite dėmesį į *skatinamąjį mokymąsi*.
+Tai gali apimti taikymus robotikoje,
+dialogo sistemose
+ir net dirbtinio intelekto (DI) kūrime
+vaizdo žaidimams.
+*Giliojo skatinamojo mokymosi*, kuris taiko
+gilųjį mokymąsi skatinamojo mokymosi uždaviniams,
+populiarumas išaugo.
+Proveržio gilusis Q tinklas, kuris įveikė žmones
+„Atari" žaidimuose naudodamas tik regimąją įvestį :cite:`mnih2015human`,
+ir „AlphaGo" programa, nuversusi pasaulio čempioną
+stalo žaidime „Go" :cite:`Silver.Huang.Maddison.ea.2016`,
+yra du žymūs pavyzdžiai.
 
-Reinforcement learning gives a very general statement of a problem
-in which an agent interacts with an environment over a series of time steps.
-At each time step, the agent receives some *observation*
-from the environment and must choose an *action*
-that is subsequently transmitted back to the environment
-via some mechanism (sometimes called an *actuator*), when, after each loop, 
-the agent receives a reward from the environment.
-This process is illustrated in :numref:`fig_rl-environment`.
-The agent then receives a subsequent observation,
-and chooses a subsequent action, and so on.
-The behavior of a reinforcement learning agent is governed by a *policy*.
-In brief, a *policy* is just a function that maps
-from observations of the environment to actions.
-The goal of reinforcement learning is to produce good policies.
+Skatinamasis mokymasis pateikia labai bendrą uždavinio formuluotę,
+kurioje agentas sąveikauja su aplinka per laiko žingsnių seriją.
+Kiekvienu laiko žingsniu agentas gauna tam tikrą *stebėjimą*
+iš aplinkos ir turi pasirinkti *veiksmą*,
+kuris vėliau per kokį nors mechanizmą (kartais vadinamą *vykdikliu*, angl. *actuator*)
+perduodamas atgal į aplinką, o po kiekvienos kilpos
+agentas gauna atlygį iš aplinkos.
+Šis procesas iliustruotas :numref:`fig_rl-environment`.
+Tada agentas gauna paskesnį stebėjimą
+ir pasirenka paskesnį veiksmą ir t. t.
+Skatinamojo mokymosi agento elgesį lemia *strategija*.
+Trumpai tariant, *strategija* yra tiesiog funkcija, atvaizduojanti
+aplinkos stebėjimus į veiksmus.
+Skatinamojo mokymosi tikslas – sukurti gerąsias strategijas.
 
-![The interaction between reinforcement learning and an environment.](../img/rl-environment.svg)
+![Sąveika tarp skatinamojo mokymosi ir aplinkos.](../img/rl-environment.svg)
 :label:`fig_rl-environment`
 
-It is hard to overstate the generality
-of the reinforcement learning framework.
-For example, supervised learning
-can be recast as reinforcement learning.
-Say we had a classification problem.
-We could create a reinforcement learning agent
-with one action corresponding to each class.
-We could then create an environment which gave a reward
-that was exactly equal to the loss function
-from the original supervised learning problem.
+Sunku pervertinti skatinamojo mokymosi sistemos
+bendrumą.
+Pavyzdžiui, prižiūrimą mokymąsi
+galima perfrazuoti kaip skatinamąjį mokymąsi.
+Tarkime, turime klasifikavimo uždavinį.
+Galėtume sukurti skatinamojo mokymosi agentą,
+turintį po vieną veiksmą kiekvienai klasei.
+Tada galėtume sukurti aplinką, kuri duotų atlygį,
+tiksliai lygų nuostolių funkcijai
+iš pradinio prižiūrimo mokymo uždavinio.
 
-Further, reinforcement learning
-can also address many problems
-that supervised learning cannot.
-For example, in supervised learning,
-we always expect that the training input
-comes associated with the correct label.
-But in reinforcement learning,
-we do not assume that, for each observation
-the environment tells us the optimal action.
-In general, we just get some reward.
-Moreover, the environment may not even tell us
-which actions led to the reward.
+Be to, skatinamasis mokymasis
+gali spręsti ir daug uždavinių,
+kurių prižiūrimas mokymas išspręsti negali.
+Pavyzdžiui, prižiūrimame mokyme
+visada tikimės, kad apmokymo įvestis
+turi susietą teisingą žymę.
+Tačiau skatinamajame mokyme
+nepriimame prielaidos, kad kiekvienam stebėjimui
+aplinka pasako optimalų veiksmą.
+Paprastai tiesiog gauname tam tikrą atlygį.
+Be to, aplinka gali net nepasakyti,
+kurie veiksmai lėmė atlygį.
 
-Consider the game of chess.
-The only real reward signal comes at the end of the game
-when we either win, earning a reward of, say, $1$,
-or when we lose, receiving a reward of, say, $-1$.
-So reinforcement learners must deal
-with the *credit assignment* problem:
-determining which actions to credit or blame for an outcome.
-The same goes for an employee
-who gets a promotion on October 11.
-That promotion likely reflects a number
-of well-chosen actions over the previous year.
-Getting promoted in the future requires figuring out
-which actions along the way led to the earlier promotions.
+Panagrinėkime šachmatų žaidimą.
+Vienintelis tikras atlygio signalas ateina žaidimo pabaigoje,
+kai arba laimime ir gauname, tarkime, $1$ atlygį,
+arba pralaimime ir gauname, tarkime, $-1$ atlygį.
+Todėl skatinamojo mokymosi agentai turi spręsti
+*nuopelnų priskyrimo* problemą:
+nustatyti, kuriems veiksmams priskirti nuopelnus ar kaltę už rezultatą.
+Tas pats pasakytina apie darbuotoją,
+kuris spalio 11 d. gauna paaukštinimą.
+Tas paaukštinimas greičiausiai atspindi daugelį
+gerai parinktų veiksmų per praėjusius metus.
+Norint ateityje gauti paaukštinimą, reikia išsiaiškinti,
+kurie veiksmai pakeliui lėmė ankstesnius paaukštinimus.
 
-Reinforcement learners may also have to deal
-with the problem of partial observability.
-That is, the current observation might not
-tell you everything about your current state.
-Say your cleaning robot found itself trapped
-in one of many identical closets in your house.
-Rescuing the robot involves inferring
-its precise location which might require considering earlier observations prior to it entering the closet.
+Skatinamojo mokymosi agentams taip pat gali tekti spręsti
+dalinio stebimumo problemą.
+Tai reiškia, kad dabartinis stebėjimas gali neparodyti
+visko apie jūsų dabartinę būseną.
+Tarkime, jūsų valymo robotas atsidūrė spąstuose
+viename iš daugelio vienodų jūsų namų sandėliukų.
+Roboto gelbėjimas reiškia
+tikslios jo vietos nustatymą, kuriam gali reikėti atsižvelgti į ankstesnius stebėjimus prieš jam patenkant į sandėliuką.
 
-Finally, at any given point, reinforcement learners
-might know of one good policy,
-but there might be many other better policies
-that the agent has never tried.
-The reinforcement learner must constantly choose
-whether to *exploit* the best (currently) known strategy as a policy,
-or to *explore* the space of strategies,
-potentially giving up some short-term reward
-in exchange for knowledge.
+Galiausiai bet kuriuo momentu skatinamojo mokymosi agentai
+gali žinoti vieną gerą strategiją,
+tačiau gali būti daug kitų geresnių strategijų,
+kurių agentas niekada nebandė.
+Skatinamojo mokymosi agentas turi nuolat rinktis,
+ar *išnaudoti* geriausią (šiuo metu) žinomą strategiją,
+ar *tyrinėti* strategijų erdvę,
+galbūt atsisakydamas trumpalaikio atlygio
+mainais už žinias.
 
-The general reinforcement learning problem
-has a very general setting.
-Actions affect subsequent observations.
-Rewards are only observed when they correspond to the chosen actions.
-The environment may be either fully or partially observed.
-Accounting for all this complexity at once may be asking too much.
-Moreover, not every practical problem exhibits all this complexity.
-As a result, researchers have studied a number of
-special cases of reinforcement learning problems.
+Bendrasis skatinamojo mokymosi uždavinys
+turi labai bendrą nuostatą.
+Veiksmai veikia paskesnius stebėjimus.
+Atlygiai stebimi tik tada, kai jie atitinka pasirinktus veiksmus.
+Aplinka gali būti stebima visiškai arba iš dalies.
+Visą šį sudėtingumą apimti iš karto gali būti per daug.
+Be to, ne kiekvienas praktinis uždavinys pasižymi visu šiuo sudėtingumu.
+Todėl tyrėjai nagrinėjo keletą
+specialių skatinamojo mokymosi uždavinių atvejų.
 
-When the environment is fully observed,
-we call the reinforcement learning problem a *Markov decision process*.
-When the state does not depend on the previous actions,
-we call it a *contextual bandit problem*.
-When there is no state, just a set of available actions
-with initially unknown rewards, we have the classic *multi-armed bandit problem*.
+Kai aplinka stebima visiškai,
+skatinamojo mokymosi uždavinį vadiname *Markovo sprendimo priėmimo procesu*.
+Kai būsena nepriklauso nuo ankstesnių veiksmų,
+tai vadiname *kontekstinio banditų uždaviniu*.
+Kai būsenos nėra, yra tik turimų veiksmų rinkinys
+su iš pradžių nežinomais atlygiais, turime klasikinį *daugiarankio banditų uždavinį*.
 
-## Roots
+## Šaknys
 
-We have just reviewed a small subset of problems
-that machine learning can address.
-For a diverse set of machine learning problems,
-deep learning provides powerful tools for their solution.
-Although many deep learning methods are recent inventions,
-the core ideas behind learning from data
-have been studied for centuries.
-In fact, humans have held the desire to analyze data
-and to predict future outcomes for 
-ages, and it is this desire that is at the root of much of natural science and mathematics.
-Two examples are the Bernoulli distribution, named after
-[Jacob Bernoulli (1655--1705)](https://en.wikipedia.org/wiki/Jacob_Bernoulli),
-and the Gaussian distribution discovered
-by [Carl Friedrich Gauss (1777--1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
-Gauss invented, for instance, the least mean squares algorithm,
-which is still used today for a multitude of problems
-from insurance calculations to medical diagnostics.
-Such tools enhanced the experimental approach
-in the natural sciences---for instance, Ohm's law
-relating current and voltage in a resistor
-is perfectly described by a linear model.
+Ką tik apžvelgėme nedidelį poaibį uždavinių,
+kuriuos gali spręsti mašininis mokymasis.
+Įvairiems mašininio mokymosi uždaviniams
+gilusis mokymasis suteikia galingų jų sprendimo įrankių.
+Nors daugelis gilaus mokymosi metodų yra neseniai išrasti,
+pagrindinės mokymosi iš duomenų idėjos
+nagrinėjamos šimtmečius.
+Tiesą sakant, žmonės nuo seno trokšta analizuoti duomenis
+ir prognozuoti būsimus rezultatus,
+ir būtent šis troškimas yra didelės gamtos mokslų ir matematikos dalies šaknis.
+Du pavyzdžiai – Bernulio skirstinys, pavadintas
+[Jacob Bernoulli (1655–1705)](https://en.wikipedia.org/wiki/Jacob_Bernoulli) vardu,
+ir Gauso skirstinys, atrastas
+[Carl Friedrich Gauss (1777–1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
+Gaussas išrado, pavyzdžiui, mažiausių kvadratų algoritmą,
+kuris iki šiol naudojamas daugybei uždavinių –
+nuo draudimo skaičiavimų iki medicininės diagnostikos.
+Tokios priemonės sustiprino eksperimentinį požiūrį
+gamtos moksluose – pavyzdžiui, Omo dėsnis,
+siejantis srovę ir įtampą rezistoriuje,
+puikiai aprašomas tiesiniu modeliu.
 
-Even in the middle ages, mathematicians
-had a keen intuition of estimates.
-For instance, the geometry book of [Jacob Köbel (1460--1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry)
-illustrates averaging the length of 16 adult men's feet
-to estimate the typical foot length in the population (:numref:`fig_koebel`).
+Net viduramžiais matematikai
+puikiai intuityviai jautė įverčius.
+Pavyzdžiui, [Jacob Köbel (1460–1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry) geometrijos knygoje
+iliustruojama, kaip suvidurkinamas 16 suaugusių vyrų pėdų ilgis,
+siekiant įvertinti tipinį pėdos ilgį populiacijoje (:numref:`fig_koebel`).
 
-![Estimating the length of a foot.](../img/koebel.jpg)
+![Pėdos ilgio įvertinimas.](../img/koebel.jpg)
 :width:`500px`
 :label:`fig_koebel`
 
 
-As a group of individuals exited a church,
-16 adult men were asked to line up in a row
-and have their feet measured.
-The sum of these measurements was then divided by 16
-to obtain an estimate for what now is called one foot.
-This "algorithm" was later improved
-to deal with misshapen feet;
-The two men with the shortest and longest feet were sent away,
-averaging only over the remainder.
-This is among the earliest examples
-of a trimmed mean estimate.
+Kai asmenų grupė išėjo iš bažnyčios,
+16 suaugusių vyrų buvo paprašyta išsirikiuoti į eilę
+ir išmatuoti jų pėdas.
+Šių matavimų suma buvo padalyta iš 16,
+kad būtų gautas įvertis to, kas dabar vadinama viena pėda.
+Šis „algoritmas" vėliau buvo patobulintas,
+kad tiktų netaisyklingos formos pėdoms:
+du vyrai su trumpiausiomis ir ilgiausiomis pėdomis buvo išsiųsti,
+o vidurkis skaičiuotas tik iš likusiųjų.
+Tai vienas ankstyviausių
+nukirsto vidurkio įverčio pavyzdžių.
 
-Statistics really took off with the availability and collection of data.
-One of its pioneers, [Ronald Fisher (1890--1962)](https://en.wikipedia.org/wiki/Ronald_Fisher),
-contributed significantly to its theory
-and also its applications in genetics.
-Many of his algorithms (such as linear discriminant analysis)
-and concepts (such as the Fisher information matrix)
-still hold a prominent place
-in the foundations of modern statistics.
-Even his data resources had a lasting impact.
-The Iris dataset that Fisher released in 1936
-is still sometimes used to demonstrate
-machine learning algorithms.
-Fisher was also a proponent of eugenics,
-which should remind us that the morally dubious use of data science
-has as long and enduring a history as its productive use
-in industry and the natural sciences.
-
-
-Other influences for machine learning
-came from the information theory of
-[Claude Shannon (1916--2001)](https://en.wikipedia.org/wiki/Claude_Shannon)
-and the theory of computation proposed by
-[Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing).
-Turing posed the question "can machines think?”
-in his famous paper *Computing Machinery and Intelligence* :cite:`Turing.1950`.
-Describing what is now known as the Turing test, he proposed that a machine
-can be considered *intelligent* if it is difficult
-for a human evaluator to distinguish between the replies
-from a machine and those of a human, based purely on textual interactions.
-
-Further influences came from neuroscience and psychology.
-After all, humans clearly exhibit intelligent behavior.
-Many scholars have asked whether one could explain
-and possibly reverse engineer this capacity.
-One of the first biologically inspired algorithms
-was formulated by [Donald Hebb (1904--1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
-In his groundbreaking book *The Organization of Behavior* :cite:`Hebb.1949`,
-he posited that neurons learn by positive reinforcement.
-This became known as the Hebbian learning rule.
-These ideas inspired later work, such as
-Rosenblatt's perceptron learning algorithm,
-and laid the foundations of many stochastic gradient descent algorithms
-that underpin deep learning today:
-reinforce desirable behavior and diminish undesirable behavior
-to obtain good settings of the parameters in a neural network.
-
-Biological inspiration is what gave *neural networks* their name.
-For over a century (dating back to the models of Alexander Bain, 1873,
-and James Sherrington, 1890), researchers have tried to assemble
-computational circuits that resemble networks of interacting neurons.
-Over time, the interpretation of biology has become less literal,
-but the name stuck. At its heart lie a few key principles
-that can be found in most networks today:
-
-* The alternation of linear and nonlinear processing units, often referred to as *layers*.
-* The use of the chain rule (also known as *backpropagation*) for adjusting parameters in the entire network at once.
-
-After initial rapid progress, research in neural networks
-languished from around 1995 until 2005.
-This was mainly due to two reasons.
-First, training a network is computationally very expensive.
-While random-access memory was plentiful at the end of the past century,
-computational power was scarce.
-Second, datasets were relatively small.
-In fact, Fisher's Iris dataset from 1936
-was still a popular tool for testing the efficacy of algorithms.
-The MNIST dataset with its 60,000 handwritten digits was considered huge.
-
-Given the scarcity of data and computation,
-strong statistical tools such as kernel methods,
-decision trees, and graphical models
-proved empirically superior in many applications.
-Moreover, unlike neural networks,
-they did not require weeks to train
-and provided predictable results
-with strong theoretical guarantees.
+Statistika tikrai suklestėjo atsiradus duomenims ir jų rinkimui.
+Vienas iš jos pradininkų, [Ronald Fisher (1890–1962)](https://en.wikipedia.org/wiki/Ronald_Fisher),
+reikšmingai prisidėjo prie jos teorijos
+ir taip pat prie jos taikymų genetikoje.
+Daugelis jo algoritmų (pvz., tiesinė diskriminantinė analizė)
+ir sąvokų (pvz., Fišerio informacijos matrica)
+vis dar užima svarbią vietą
+šiuolaikinės statistikos pagrinduose.
+Net jo duomenų šaltiniai paliko ilgalaikį poveikį.
+Irisų duomenų rinkinys, kurį Fisher išleido 1936 m.,
+vis dar kartais naudojamas
+mašininio mokymosi algoritmams demonstruoti.
+Fisher taip pat buvo eugenikos šalininkas,
+o tai turėtų priminti, kad moraliai abejotinas duomenų mokslo naudojimas
+turi tokią pat ilgą ir ištvermingą istoriją kaip ir produktyvus jo naudojimas
+pramonėje ir gamtos moksluose.
 
 
-## The Road to Deep Learning
+Kita įtaka mašininiam mokymuisi
+atėjo iš [Claude Shannon (1916–2001)](https://en.wikipedia.org/wiki/Claude_Shannon)
+informacijos teorijos
+ir [Alan Turing (1912–1954)](https://en.wikipedia.org/wiki/Alan_Turing)
+pasiūlytos skaičiavimo teorijos.
+Turing iškėlė klausimą „ar mašinos gali mąstyti?"
+savo garsiajame straipsnyje *Computing Machinery and Intelligence* :cite:`Turing.1950`.
+Aprašydamas tai, kas dabar žinoma kaip Tiuringo testas, jis pasiūlė, kad mašiną
+galima laikyti *intelektualia*, jei žmogui vertintojui sunku
+atskirti mašinos ir žmogaus atsakymus,
+remiantis vien tekstine sąveika.
 
-Much of this changed with the availability
-of massive amounts of data,
-thanks to the World Wide Web,
-the advent of companies serving
-hundreds of millions of users online,
-a dissemination of low-cost, high-quality sensors,
-inexpensive data storage (Kryder's law),
-and cheap computation (Moore's law).
-In particular, the landscape of computation in deep learning
-was revolutionized by advances in GPUs that were originally engineered for computer gaming.
-Suddenly algorithms and models
-that seemed computationally infeasible
-were within reach.
-This is best illustrated in :numref:`tab_intro_decade`.
+Kita įtaka atėjo iš neurologijos ir psichologijos.
+Juk žmonės akivaizdžiai pasižymi intelektualiu elgesiu.
+Daug mokslininkų klausė, ar šį gebėjimą būtų galima paaiškinti
+ir galbūt atkurti atvirkštinės inžinerijos būdu.
+Vieną pirmųjų biologiškai įkvėptų algoritmų
+suformulavo [Donald Hebb (1904–1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
+Savo novatoriškoje knygoje *The Organization of Behavior* :cite:`Hebb.1949`
+jis teigė, kad neuronai mokosi pagal teigiamą pastiprinimą.
+Tai tapo žinoma kaip Hebo mokymosi taisyklė.
+Šios idėjos įkvėpė vėlesnius darbus, pavyzdžiui,
+Rosenblatto perceptrono mokymosi algoritmą,
+ir padėjo pamatus daugeliui stochastinio gradientinio nusileidimo algoritmų,
+kuriais remiasi šiandienis gilusis mokymasis:
+sustiprinti pageidaujamą elgesį ir sumažinti nepageidaujamą,
+kad gautume gerus neuroninio tinklo parametrų nustatymus.
 
-:Dataset vs. computer memory and computational power
+Biologinė įkvėptis davė *neuroniniams tinklams* pavadinimą.
+Daugiau nei šimtmetį (nuo Alexander Bain 1873 m.
+ir James Sherrington 1890 m. modelių) tyrėjai bandė sukurti
+skaičiavimo grandines, primenančias sąveikaujančių neuronų tinklus.
+Laikui bėgant biologijos interpretacija tapo ne tokia tiesioginė,
+tačiau pavadinimas prigijo. Jo šerdyje yra keli pagrindiniai principai,
+kuriuos galima rasti daugumoje šiandienių tinklų:
+
+* Tiesinių ir netiesinių apdorojimo vienetų kaitaliojimas, dažnai vadinamas *sluoksniais*.
+* Grandinės taisyklės (taip pat žinomos kaip *atgalinis sklidimas*) naudojimas visiems tinklo parametrams koreguoti vienu metu.
+
+Po pradinės sparčios pažangos neuroninių tinklų tyrimai
+merdėjo maždaug nuo 1995 iki 2005 m.
+Tai daugiausia lėmė dvi priežastys.
+Pirma, tinklo apmokymas skaičiavimo požiūriu labai brangus.
+Nors atsitiktinės prieigos atminties pasibaigusio amžiaus pabaigoje buvo daug,
+skaičiavimo galios trūko.
+Antra, duomenų rinkiniai buvo palyginti maži.
+Tiesą sakant, Fisher Irisų duomenų rinkinys iš 1936 m.
+vis dar buvo populiari priemonė algoritmų veiksmingumui tikrinti.
+MNIST duomenų rinkinys su 60 000 ranka rašytų skaitmenų buvo laikomas milžinišku.
+
+Dėl duomenų ir skaičiavimo stokos
+stiprios statistinės priemonės, tokios kaip branduolio metodai,
+sprendimų medžiai ir grafiniai modeliai,
+daugelyje taikymų empiriškai pasirodė pranašesnės.
+Be to, skirtingai nei neuroniniams tinklams,
+jiems apmokyti nereikėjo savaičių
+ir jie pateikė nuspėjamus rezultatus
+su stipriomis teorinėmis garantijomis.
+
+
+## Kelias į gilųjį mokymąsi
+
+Didelė dalis to pasikeitė atsiradus
+didžiuliam duomenų kiekiui
+dėka pasaulinio tinklo (angl. *World Wide Web*),
+bendrovių, aptarnaujančių
+šimtus milijonų naudotojų internete, atsiradimo,
+pigių aukštos kokybės jutiklių paplitimo,
+pigaus duomenų saugojimo (Kryderio dėsnis)
+ir pigių skaičiavimų (Moore'o dėsnis).
+Visų pirma giliojo mokymosi skaičiavimų kraštovaizdį
+pakeitė pažanga grafiniuose procesoriuose (GPU), iš pradžių sukurtuose kompiuteriniams žaidimams.
+Staiga algoritmai ir modeliai,
+kurie atrodė skaičiavimo požiūriu neįgyvendinami,
+tapo pasiekiami.
+Tai geriausiai iliustruoja :numref:`tab_intro_decade`.
+
+:Duomenų rinkinys, kompiuterio atmintis ir skaičiavimo galia
 :label:`tab_intro_decade`
 
-|Decade|Dataset|Memory|Floating point calculations per second|
+|Dešimtmetis|Duomenų rinkinys|Atmintis|Slankiojo kablelio operacijos per sekundę|
 |:--|:-|:-|:-|
-|1970|100 (Iris)|1 KB|100 KF (Intel 8080)|
-|1980|1 K (house prices in Boston)|100 KB|1 MF (Intel 80186)|
-|1990|10 K (optical character recognition)|10 MB|10 MF (Intel 80486)|
-|2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
-|2010|10 G (advertising)|1 GB|1 TF (NVIDIA C2050)|
-|2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
+|1970|100 (Irisai)|1 KB|100 KF (Intel 8080)|
+|1980|1 K (Bostono būsto kainos)|100 KB|1 MF (Intel 80186)|
+|1990|10 K (optinis simbolių atpažinimas)|10 MB|10 MF (Intel 80486)|
+|2000|10 M (tinklalapiai)|100 MB|1 GF (Intel Core)|
+|2010|10 G (reklama)|1 GB|1 TF (NVIDIA C2050)|
+|2020|1 T (socialinis tinklas)|100 GB|1 PF (NVIDIA DGX-2)|
 
 
-Note that random-access memory has not kept pace with the growth in data.
-At the same time, increases in computational power
-have outpaced the growth in datasets.
-This means that statistical models
-need to become more memory efficient,
-and so they are free to spend more computer cycles
-optimizing parameters, thanks to
-the increased compute budget.
-Consequently, the sweet spot in machine learning and statistics
-moved from (generalized) linear models and kernel methods
-to deep neural networks.
-This is also one of the reasons why many of the mainstays
-of deep learning, such as multilayer perceptrons
-:cite:`McCulloch.Pitts.1943`, convolutional neural networks
-:cite:`LeCun.Bottou.Bengio.ea.1998`, long short-term memory
-:cite:`Hochreiter.Schmidhuber.1997`,
-and Q-Learning :cite:`Watkins.Dayan.1992`,
-were essentially "rediscovered" in the past decade,
-after lying comparatively dormant for considerable time.
+Atkreipkite dėmesį, kad atsitiktinės prieigos atmintis neatsiliko nuo duomenų augimo.
+Tuo pat metu skaičiavimo galios augimas
+pralenkė duomenų rinkinių augimą.
+Tai reiškia, kad statistiniai modeliai
+turi tapti efektyvesni atminties požiūriu,
+todėl jie gali laisvai skirti daugiau skaičiavimo ciklų
+parametrams optimizuoti dėl
+išaugusio skaičiavimo biudžeto.
+Todėl mašininio mokymosi ir statistikos optimali sritis
+persikėlė nuo (apibendrintų) tiesinių modelių ir branduolio metodų
+prie giliųjų neuroninių tinklų.
+Tai taip pat viena iš priežasčių, kodėl daug giliojo mokymosi pagrindų,
+tokių kaip daugiasluoksniai perceptronai
+:cite:`McCulloch.Pitts.1943`, konvoliuciniai neuroniniai tinklai
+:cite:`LeCun.Bottou.Bengio.ea.1998`, ilgos trumpalaikės atminties modeliai
+:cite:`Hochreiter.Schmidhuber.1997`
+ir Q mokymasis :cite:`Watkins.Dayan.1992`,
+iš esmės buvo „iš naujo atrasti" per pastarąjį dešimtmetį,
+palyginti ilgą laiką būdami daugiau mažiau užmigę.
 
-The recent progress in statistical models, applications, and algorithms
-has sometimes been likened to the Cambrian explosion:
-a moment of rapid progress in the evolution of species.
-Indeed, the state of the art is not just a mere consequence
-of available resources applied to decades-old algorithms.
-Note that the list of ideas below barely scratches the surface
-of what has helped researchers achieve tremendous progress
-over the past decade.
+Neseniai padaryta pažanga statistiniuose modeliuose, taikymuose ir algoritmuose
+kartais lyginama su Kambro sprogimu –
+spartaus rūšių evoliucijos progreso momentu.
+Iš tiesų geriausi srities sprendimai nėra vien tik
+turimų išteklių, pritaikytų dešimtmečius senų algoritmų, pasekmė.
+Atkreipkite dėmesį, kad toliau pateiktas idėjų sąrašas vos paliečia tai,
+kas padėjo tyrėjams pasiekti didžiulę pažangą
+per pastarąjį dešimtmetį.
 
 
-* Novel methods for capacity control, such as *dropout*
+* Nauji talpos kontrolės metodai, tokie kaip *atsitiktinis praretinimas* (angl. *dropout*)
   :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`,
-  have helped to mitigate overfitting.
-  Here, noise is injected :cite:`Bishop.1995`
-  throughout the neural network during training.
-* *Attention mechanisms* solved a second problem
-  that had plagued statistics for over a century:
-  how to increase the memory and complexity of a system without
-  increasing the number of learnable parameters.
-  Researchers found an elegant solution
-  by using what can only be viewed as
-  a *learnable pointer structure* :cite:`Bahdanau.Cho.Bengio.2014`.
-  Rather than having to remember an entire text sequence, e.g.,
-  for machine translation in a fixed-dimensional representation,
-  all that needed to be stored was a pointer to the intermediate state
-  of the translation process. This allowed for significantly
-  increased accuracy for long sequences, since the model
-  no longer needed to remember the entire sequence before
-  commencing the generation of a new one.
-* Built solely on attention mechanisms,
-  the *Transformer* architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017` has demonstrated superior *scaling* behavior: it performs better with an increase in dataset size, model size, and amount of training compute :cite:`kaplan2020scaling`. This architecture has demonstrated compelling success in a wide range of areas,
-  such as natural language processing :cite:`Devlin.Chang.Lee.ea.2018,brown2020language`, computer vision :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,liu2021swin`, speech recognition :cite:`gulati2020conformer`, reinforcement learning :cite:`chen2021decision`, and graph neural networks :cite:`dwivedi2020generalization`. For example, a single Transformer pretrained on modalities
-  as diverse as text, images, joint torques, and button presses
-  can play Atari, caption images, chat,
-  and control a robot :cite:`reed2022generalist`.
-* Modeling probabilities of text sequences, *language models* can predict text given other text. Scaling up the data, model, and compute has unlocked a growing number of capabilities of language models to perform desired tasks via human-like text generation based on input text :cite:`brown2020language,rae2021scaling,hoffmann2022training,chowdhery2022palm,openai2023gpt4,anil2023palm,touvron2023llama,touvron2023llama2`. For instance, aligning language models with human intent :cite:`ouyang2022training`, OpenAI's [ChatGPT](https://chat.openai.com/) allows users to interact with it in a conversational way to solve problems, such as code debugging and creative writing.
-* Multi-stage designs, e.g., via the memory networks
+  padėjo sušvelninti persimokymą.
+  Čia apmokymo metu triukšmas įterpiamas :cite:`Bishop.1995`
+  visame neuroniniame tinkle.
+* *Dėmesio sutelkimo mechanizmai* išsprendė antrą problemą,
+  kuri kankino statistiką daugiau nei šimtmetį:
+  kaip padidinti sistemos atmintį ir sudėtingumą
+  nedidinant mokomų parametrų skaičiaus.
+  Tyrėjai rado elegantišką sprendimą
+  naudodami tai, ką galima vertinti tik kaip
+  *mokomą rodyklių struktūrą* :cite:`Bahdanau.Cho.Bengio.2014`.
+  Užuot turėję įsiminti visą teksto seką, pvz.,
+  mašininiam vertimui, fiksuotos dimensijos reprezentacijoje,
+  reikėjo saugoti tik rodyklę į tarpinę
+  vertimo proceso būseną. Tai leido gerokai
+  padidinti ilgų sekų tikslumą, nes modeliui
+  nebereikėjo įsiminti visos sekos prieš
+  pradedant generuoti naują.
+* Sukurta vien iš dėmesio sutelkimo mechanizmų,
+  transformerių neuroninio tinklo (angl. *Transformer*) architektūra :cite:`Vaswani.Shazeer.Parmar.ea.2017` parodė puikią *mastelio keitimo* elgseną: ji veikia geriau didėjant duomenų rinkinio dydžiui, modelio dydžiui ir apmokymo skaičiavimų kiekiui :cite:`kaplan2020scaling`. Ši architektūra parodė įtikinamą sėkmę įvairiose srityse,
+  tokiose kaip natūraliosios kalbos apdorojimas :cite:`Devlin.Chang.Lee.ea.2018,brown2020language`, kompiuterinė rega :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,liu2021swin`, šnekos atpažinimas :cite:`gulati2020conformer`, skatinamasis mokymasis :cite:`chen2021decision` ir grafų neuroniniai tinklai :cite:`dwivedi2020generalization`. Pavyzdžiui, vienas transformerių neuroninis tinklas, iš anksto apmokytas su tokiomis skirtingomis modalumo rūšimis
+  kaip tekstas, vaizdai, sąnarių sukimo momentai ir mygtukų paspaudimai,
+  gali žaisti „Atari", aprašyti vaizdus, kalbėtis
+  ir valdyti robotą :cite:`reed2022generalist`.
+* Modeliuodami teksto sekų tikimybes, *kalbos modeliai* gali prognozuoti tekstą pagal kitą tekstą. Didinant duomenis, modelį ir skaičiavimus, atsivėrė vis daugiau kalbos modelių galimybių atlikti norimas užduotis generuojant žmogiškąjį tekstą pagal įvesties tekstą :cite:`brown2020language,rae2021scaling,hoffmann2022training,chowdhery2022palm,openai2023gpt4,anil2023palm,touvron2023llama,touvron2023llama2`. Pavyzdžiui, suderinus kalbos modelius su žmogaus ketinimais :cite:`ouyang2022training`, OpenAI [ChatGPT](https://chat.openai.com/) leidžia naudotojams su juo bendrauti pokalbio forma sprendžiant uždavinius, tokius kaip kodo derinimas ir kūrybinis rašymas.
+* Daugiapakopiai sprendimai, pvz., per atminties tinklus
   :cite:`Sukhbaatar.Weston.Fergus.ea.2015`
-  and the neural programmer-interpreter :cite:`Reed.De-Freitas.2015`
-  permitted statistical modelers to describe iterative approaches to reasoning.
-  These tools allow for an internal state of the deep neural network
-  to be modified repeatedly,
-  thus carrying out subsequent steps
-  in a chain of reasoning, just as a processor
-  can modify memory for a computation.
-* A key development in *deep generative modeling* was the invention
-  of *generative adversarial networks*
+  ir neuroninį programuotoją-interpretatorių :cite:`Reed.De-Freitas.2015`,
+  leido statistiniams modeliuotojams aprašyti iteracinius samprotavimo metodus.
+  Šios priemonės leidžia giliojo neuroninio tinklo vidinę būseną
+  keisti pakartotinai,
+  taip atliekant paskesnius žingsnius
+  samprotavimo grandinėje, kaip procesorius
+  gali keisti atmintį skaičiavimui.
+* Esminė *giliojo generatyvinio modeliavimo* raida buvo
+  *generatyvinių adversarinių tinklų* išradimas
   :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
-  Traditionally, statistical methods for density estimation
-  and generative models focused on finding proper probability distributions
-  and (often approximate) algorithms for sampling from them.
-  As a result, these algorithms were largely limited by the lack of
-  flexibility inherent in the statistical models.
-  The crucial innovation in generative adversarial networks was to replace the sampler
-  by an arbitrary algorithm with differentiable parameters.
-  These are then adjusted in such a way that the discriminator
-  (effectively a two-sample test) cannot distinguish fake from real data.
-  Through the ability to use arbitrary algorithms to generate data,
-  density estimation was opened up to a wide variety of techniques.
-  Examples of galloping zebras :cite:`Zhu.Park.Isola.ea.2017`
-  and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017`
-  are each testimony to this progress.
-  Even amateur doodlers can produce
-  photorealistic images just based on sketches describing the layout of a scene :cite:`Park.Liu.Wang.ea.2019`. 
-* Furthermore, while the diffusion process gradually adds random noise to data samples, *diffusion models* :cite:`sohl2015deep,ho2020denoising` learn the denoising process to gradually construct data samples from random noise, reversing the diffusion process. They have started to replace generative adversarial networks in more recent deep generative models, such as in DALL-E 2 :cite:`ramesh2022hierarchical` and Imagen :cite:`saharia2022photorealistic` for creative art and image generation based on text descriptions.
-* In many cases, a single GPU is insufficient for processing the large amounts of data available for training.
-  Over the past decade the ability to build parallel and
-  distributed training algorithms has improved significantly.
-  One of the key challenges in designing scalable algorithms
-  is that the workhorse of deep learning optimization,
-  stochastic gradient descent, relies on relatively
-  small minibatches of data to be processed.
-  At the same time, small batches limit the efficiency of GPUs.
-  Hence, training on 1,024 GPUs with a minibatch size of,
-  say, 32 images per batch amounts to an aggregate minibatch
-  of about 32,000 images. Work, first by :citet:`Li.2017`
-  and subsequently by :citet:`You.Gitman.Ginsburg.2017`
-  and :citet:`Jia.Song.He.ea.2018` pushed the size up to 64,000 observations,
-  reducing training time for the ResNet-50 model
-  on the ImageNet dataset to less than 7 minutes.
-  By comparison, training times were initially of the order of days.
-* The ability to parallelize computation
-  has also contributed to progress in *reinforcement learning*.
-  This has led to significant progress in computers achieving
-  superhuman performance on tasks like Go, Atari games,
-  Starcraft, and in physics simulations (e.g., using MuJoCo)
-  where environment simulators are available.
-  See, e.g., :citet:`Silver.Huang.Maddison.ea.2016` for a description
-  of such achievements in AlphaGo. In a nutshell,
-  reinforcement learning works best
-  if plenty of (state, action, reward) tuples are available.
-  Simulation provides such an avenue.
-* Deep learning frameworks have played a crucial role
-  in disseminating ideas.
-  The first generation of open-source frameworks
-  for neural network modeling consisted of
+  Tradiciškai statistiniai tankio įvertinimo
+  ir generatyvinių modelių metodai sutelkė dėmesį į tinkamų tikimybių skirstinių radimą
+  ir (dažnai apytikslius) algoritmus atrinkti iš jų.
+  Todėl šiuos algoritmus daugiausia ribojo
+  statistiniams modeliams būdingo lankstumo trūkumas.
+  Lemiama generatyvinių adversarinių tinklų naujovė buvo atrankos algoritmą pakeisti
+  savavališku algoritmu su diferencijuojamais parametrais.
+  Šie parametrai koreguojami taip, kad diskriminatorius
+  (iš esmės dviejų imčių testas) negalėtų atskirti netikrų duomenų nuo tikrų.
+  Dėl galimybės naudoti savavališkus algoritmus duomenims generuoti
+  tankio įvertinimas buvo atvertas daugybei metodų.
+  Šuoliuojančių zebrų pavyzdžiai :cite:`Zhu.Park.Isola.ea.2017`
+  ir netikrų įžymybių veidų pavyzdžiai :cite:`Karras.Aila.Laine.ea.2017`
+  yra šios pažangos liudijimai.
+  Net mėgėjai piešėjai gali sukurti
+  fotorealistiškus vaizdus vien pagal eskizus, aprašančius scenos išdėstymą :cite:`Park.Liu.Wang.ea.2019`.
+* Be to, kol difuzijos procesas palaipsniui prideda atsitiktinį triukšmą prie duomenų pavyzdžių, *difuzijos modeliai* :cite:`sohl2015deep,ho2020denoising` išmoksta triukšmo šalinimo procesą, kad palaipsniui sukonstruotų duomenų pavyzdžius iš atsitiktinio triukšmo, apgręždami difuzijos procesą. Jie pradėjo keisti generatyvinius adversarinius tinklus naujesniuose giliuosiuose generatyviniuose modeliuose, tokiuose kaip DALL-E 2 :cite:`ramesh2022hierarchical` ir Imagen :cite:`saharia2022photorealistic`, skirtuose kūrybiniam menui ir vaizdų generavimui pagal tekstinius aprašymus.
+* Daugeliu atvejų vieno GPU nepakanka dideliems apmokymui prieinamų duomenų kiekiams apdoroti.
+  Per pastarąjį dešimtmetį gebėjimas kurti lygiagrečius ir
+  paskirstytus apmokymo algoritmus gerokai pagerėjo.
+  Vienas pagrindinių iššūkių projektuojant keičiamo mastelio algoritmus
+  yra tas, kad giliojo mokymosi optimizavimo darbinis arklys –
+  stochastinis gradientinis nusileidimas – remiasi santykinai
+  mažų duomenų minirinkinių (angl. *minibatches*) apdorojimu.
+  Tuo pat metu maži rinkiniai riboja GPU efektyvumą.
+  Todėl apmokymas su 1 024 GPU, kai minirinkinio dydis, tarkime,
+  32 vaizdai viename rinkinyje, sudaro bendrą minirinkinį
+  maždaug iš 32 000 vaizdų. :citet:`Li.2017` darbas,
+  o vėliau :citet:`You.Gitman.Ginsburg.2017`
+  ir :citet:`Jia.Song.He.ea.2018` padidino dydį iki 64 000 stebėjimų,
+  sutrumpindami ResNet-50 modelio apmokymo laiką
+  ImageNet duomenų rinkinyje iki mažiau nei 7 minučių.
+  Palyginimui, apmokymo laikas iš pradžių siekė kelias dienas.
+* Gebėjimas lygiagretinti skaičiavimus
+  taip pat prisidėjo prie *skatinamojo mokymosi* pažangos.
+  Tai lėmė didelę pažangą, kai kompiuteriai pasiekė
+  pranašesnį už žmogaus našumą tokiose užduotyse kaip „Go", „Atari" žaidimai,
+  „Starcraft" ir fizikos simuliacijos (pvz., naudojant MuJoCo),
+  kur yra aplinkos simuliatorių.
+  Tokių pasiekimų AlphaGo aprašymą žr., pvz., :citet:`Silver.Huang.Maddison.ea.2016`.
+  Trumpai tariant,
+  skatinamasis mokymasis geriausiai veikia,
+  kai yra daug (būsena, veiksmas, atlygis) rinkinių.
+  Simuliacija suteikia tokią galimybę.
+* Giliojo mokymosi karkasai atliko lemiamą vaidmenį
+  skleidžiant idėjas.
+  Pirmąją atvirojo kodo karkasų
+  neuroninių tinklų modeliavimui kartą sudarė
   [Caffe](https://github.com/BVLC/caffe),
-  [Torch](https://github.com/torch), and
+  [Torch](https://github.com/torch) ir
   [Theano](https://github.com/Theano/Theano).
-  Many seminal papers were written using these tools.
-  These have now been superseded by
-  [TensorFlow](https://github.com/tensorflow/tensorflow) (often used via its high-level API [Keras](https://github.com/keras-team/keras)), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MXNet](https://github.com/apache/incubator-mxnet).
-  The third generation of frameworks consists
-  of so-called *imperative* tools for deep learning,
-  a trend that was arguably ignited by [Chainer](https://github.com/chainer/chainer),
-  which used a syntax similar to Python NumPy to describe models.
-  This idea was adopted by both [PyTorch](https://github.com/pytorch/pytorch),
-  the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet,
-  and [JAX](https://github.com/google/jax).
+  Daug pagrindinių straipsnių parašyta naudojant šias priemones.
+  Dabar jas pakeitė
+  [TensorFlow](https://github.com/tensorflow/tensorflow) (dažnai naudojamas per aukšto lygio API [Keras](https://github.com/keras-team/keras)), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2) ir [Apache MXNet](https://github.com/apache/incubator-mxnet).
+  Trečiąją karkasų kartą sudaro
+  vadinamosios *imperatyvios* giliojo mokymosi priemonės –
+  tendenciją, galima sakyti, uždegė [Chainer](https://github.com/chainer/chainer),
+  kuris modeliams aprašyti naudojo sintaksę, panašią į Python NumPy.
+  Šią idėją perėmė ir [PyTorch](https://github.com/pytorch/pytorch),
+  MXNet [Gluon API](https://github.com/apache/incubator-mxnet)
+  bei [JAX](https://github.com/google/jax).
 
 
-The division of labor between system researchers building better tools
-and statistical modelers building better neural networks
-has greatly simplified things. For instance,
-training a linear logistic regression model
-used to be a nontrivial homework problem,
-worthy to give to new machine learning
-Ph.D. students at Carnegie Mellon University in 2014.
-By now, this task can be accomplished
-with under 10 lines of code,
-putting it firmly within the reach of any programmer.
+Darbo pasidalijimas tarp sistemų tyrėjų, kuriančių geresnes priemones,
+ir statistinių modeliuotojų, kuriančių geresnius neuroninius tinklus,
+labai viską supaprastino. Pavyzdžiui,
+tiesinės logistinės regresijos modelio apmokymas
+anksčiau buvo nebanalus namų darbų uždavinys,
+vertas skirti naujiems mašininio mokymosi
+doktorantams Carnegie Mellon universitete 2014 m.
+Dabar šią užduotį galima atlikti
+naudojant mažiau nei 10 kodo eilučių,
+todėl ji tvirtai pasiekiama bet kuriam programuotojui.
 
 
-## Success Stories
+## Sėkmės istorijos
 
-Artificial intelligence has a long history of delivering results
-that would be difficult to accomplish otherwise.
-For instance, mail sorting systems
-using optical character recognition
-have been deployed since the 1990s.
-This is, after all, the source
-of the famous MNIST dataset
-of handwritten digits.
-The same applies to reading checks for bank deposits and scoring
-creditworthiness of applicants.
-Financial transactions are checked for fraud automatically.
-This forms the backbone of many e-commerce payment systems,
-such as PayPal, Stripe, AliPay, WeChat, Apple, Visa, and MasterCard.
-Computer programs for chess have been competitive for decades.
-Machine learning feeds search, recommendation, personalization,
-and ranking on the Internet.
-In other words, machine learning is pervasive, albeit often hidden from sight.
+Dirbtinis intelektas turi ilgą istoriją, kai pasiekiami rezultatai,
+kurių kitaip būtų sunku pasiekti.
+Pavyzdžiui, laiškų rūšiavimo sistemos,
+naudojančios optinį simbolių atpažinimą,
+diegiamos nuo 1990-ųjų.
+Juk tai yra garsiojo ranka rašytų skaitmenų
+MNIST duomenų rinkinio šaltinis.
+Tas pats pasakytina apie čekių skaitymą banko indėliams ir pareiškėjų
+kreditingumo vertinimą.
+Finansiniai sandoriai automatiškai tikrinami dėl sukčiavimo.
+Tai yra daugelio elektroninės prekybos mokėjimo sistemų pagrindas,
+tokių kaip PayPal, Stripe, AliPay, WeChat, Apple, Visa ir MasterCard.
+Šachmatų kompiuterinės programos konkurencingos jau dešimtmečius.
+Mašininis mokymasis maitina paiešką, rekomendacijas, personalizavimą
+ir reitingavimą internete.
+Kitaip tariant, mašininis mokymasis yra visur paplitęs, nors dažnai paslėptas nuo akių.
 
-It is only recently that AI
-has been in the limelight, mostly due to
-solutions to problems
-that were considered intractable previously
-and that are directly related to consumers.
-Many of such advances are attributed to deep learning.
+Tik neseniai DI
+atsidūrė dėmesio centre, daugiausia dėl
+sprendimų uždaviniams,
+kurie anksčiau buvo laikomi neįveikiamais
+ir yra tiesiogiai susiję su vartotojais.
+Daug tokių pasiekimų priskiriama giliajam mokymuisi.
 
-* Intelligent assistants, such as Apple's Siri,
-  Amazon's Alexa, and Google's assistant,
-  are able to respond to spoken requests
-  with a reasonable degree of accuracy.
-  This includes menial jobs, like turning on light switches,
-  and more complex tasks, such as arranging barber's appointments
-  and offering phone support dialog.
-  This is likely the most noticeable sign
-  that AI is affecting our lives.
-* A key ingredient in digital assistants
-  is their ability to recognize speech accurately.
-  The accuracy of such systems has gradually
-  increased to the point
-  of achieving parity with humans
-  for certain applications :cite:`Xiong.Wu.Alleva.ea.2018`.
-* Object recognition has likewise come a long way.
-  Identifying the object in a picture
-  was a fairly challenging task in 2010.
-  On the ImageNet benchmark researchers from NEC Labs
-  and University of Illinois at Urbana-Champaign
-  achieved a top-five error rate of 28% :cite:`Lin.Lv.Zhu.ea.2010`.
-  By 2017, this error rate was reduced to 2.25% :cite:`Hu.Shen.Sun.2018`.
-  Similarly, stunning results have been achieved
-  for identifying birdsong and for diagnosing skin cancer.
-* Prowess in games used to provide
-  a measuring stick for human ability.
-  Starting from TD-Gammon, a program for playing backgammon
-  using temporal difference reinforcement learning,
-  algorithmic and computational progress
-  has led to algorithms for a wide range of applications.
-  Compared with backgammon, chess has
-  a much more complex state space and set of actions.
-  DeepBlue beat Garry Kasparov using massive parallelism,
-  special-purpose hardware and efficient search
-  through the game tree :cite:`Campbell.Hoane-Jr.Hsu.2002`.
-  Go is more difficult still, due to its huge state space.
-  AlphaGo reached human parity in 2015,
-  using deep learning combined with Monte Carlo tree sampling :cite:`Silver.Huang.Maddison.ea.2016`.
-  The challenge in Poker was that the state space is large
-  and only partially observed
-  (we do not know the opponents' cards).
-  Libratus exceeded human performance in Poker
-  using efficiently structured strategies :cite:`Brown.Sandholm.2017`.
-* Another indication of progress in AI
-  is the advent of self-driving vehicles.
-  While full autonomy is not yet within reach,
-  excellent progress has been made in this direction,
-  with companies such as Tesla, NVIDIA,
-  and Waymo shipping products
-  that enable partial autonomy.
-  What makes full autonomy so challenging
-  is that proper driving requires
-  the ability to perceive, to reason
-  and to incorporate rules into a system.
-  At present, deep learning is used primarily
-  in the visual aspect of these problems.
-  The rest is heavily tuned by engineers.
-
+* Išmanieji asistentai, tokie kaip „Apple" Siri,
+  „Amazon" Alexa ir „Google" asistentas,
+  gali atsakyti į šnekamas užklausas
+  su pagrįstu tikslumo lygiu.
+  Tai apima menkus darbus, pvz., šviesos jungiklių įjungimą,
+  ir sudėtingesnes užduotis, pvz., apsilankymo pas kirpėją suderinimą
+  ir telefoninės pagalbos dialogo teikimą.
+  Tai tikriausiai pats pastebimiausias ženklas,
+  kad DI veikia mūsų gyvenimus.
+* Pagrindinė skaitmeninių asistentų dalis
+  yra jų gebėjimas tiksliai atpažinti šneką.
+  Tokių sistemų tikslumas palaipsniui
+  išaugo tiek,
+  kad kai kuriems taikymams pasiekė
+  lygiavertiškumą su žmonėmis :cite:`Xiong.Wu.Alleva.ea.2018`.
+* Objektų atpažinimas taip pat nuėjo ilgą kelią.
+  Objekto paveikslėlyje nustatymas
+  2010 m. buvo gana sudėtinga užduotis.
+  ImageNet lyginamajame teste NEC Labs
+  ir Ilinojaus universiteto Urbana-Champaign tyrėjai
+  pasiekė 28 % penkių geriausių klaidų dažnį :cite:`Lin.Lv.Zhu.ea.2010`.
+  Iki 2017 m. šis klaidų dažnis sumažėjo iki 2,25 % :cite:`Hu.Shen.Sun.2018`.
+  Panašūs stulbinantys rezultatai pasiekti
+  atpažįstant paukščių giesmes ir diagnozuojant odos vėžį.
+* Žaidimų meistriškumas anksčiau būdavo
+  žmogaus gebėjimų matas.
+  Pradedant TD-Gammon – programa backgammon žaisti,
+  naudojančia skirtumų laike skatinamąjį mokymąsi,
+  algoritminė ir skaičiavimo pažanga
+  lėmė algoritmus plačiam taikymų spektrui.
+  Palyginti su backgammon, šachmatai turi
+  daug sudėtingesnę būsenų erdvę ir veiksmų rinkinį.
+  DeepBlue nugalėjo Garry Kasparovą naudodama didžiulį lygiagretumą,
+  specialios paskirties aparatinę įrangą ir efektyvią paiešką
+  žaidimo medyje :cite:`Campbell.Hoane-Jr.Hsu.2002`.
+  Go dar sunkesnis dėl milžiniškos būsenų erdvės.
+  AlphaGo 2015 m. pasiekė žmogaus lygį,
+  naudodamas gilųjį mokymąsi kartu su Monte Karlo medžio atranka :cite:`Silver.Huang.Maddison.ea.2016`.
+  Pokerio iššūkis buvo tas, kad būsenų erdvė didelė
+  ir stebima tik iš dalies
+  (nežinome priešininkų kortų).
+  Libratus pranoko žmogaus rezultatus pokeryje
+  naudodama efektyviai struktūrizuotas strategijas :cite:`Brown.Sandholm.2017`.
+* Dar vienas DI pažangos ženklas
+  yra savarankiškai vairuojančių transporto priemonių atsiradimas.
+  Nors visiško savarankiškumo dar nepasiekta,
+  šia kryptimi padaryta puiki pažanga,
+  o tokios bendrovės kaip „Tesla", NVIDIA
+  ir „Waymo" pateikia produktus,
+  įgalinančius dalinį savarankiškumą.
+  Visišką savarankiškumą daro tokį sudėtingą tai,
+  kad tinkamam vairavimui reikia
+  gebėjimo suvokti, samprotauti
+  ir į sistemą įtraukti taisykles.
+  Šiuo metu gilusis mokymasis daugiausia naudojamas
+  vizualiniam šių uždavinių aspektui.
+  Likusią dalį labai kruopščiai derina inžinieriai.
 
 
-This barely scratches the surface
-of significant applications of machine learning.
-For instance, robotics, logistics, computational biology,
-particle physics, and astronomy
-owe some of their most impressive recent advances
-at least in parts to machine learning, which is thus becoming
-a ubiquitous tool for engineers and scientists.
 
-Frequently, questions about a coming AI apocalypse
-and the plausibility of a *singularity*
-have been raised in non-technical articles.
-The fear is that somehow machine learning systems
-will become sentient and make decisions,
-independently of their programmers,
-that directly impact the lives of humans.
-To some extent, AI already affects
-the livelihood of humans in direct ways:
-creditworthiness is assessed automatically,
-autopilots mostly navigate vehicles, decisions about
-whether to grant bail use statistical data as input.
-More frivolously, we can ask Alexa to switch on the coffee machine.
+Tai vos paliečia reikšmingus
+mašininio mokymosi taikymus.
+Pavyzdžiui, robotika, logistika, skaičiuojamoji biologija,
+dalelių fizika ir astronomija
+bent iš dalies skolingos mašininiam mokymuisi
+kai kuriais įspūdingiausiais pastarojo meto pasiekimais, todėl jis tampa
+visur paplitusia inžinierių ir mokslininkų priemone.
 
-Fortunately, we are far from a sentient AI system
-that could deliberately manipulate its human creators.
-First, AI systems are engineered,
-trained, and deployed
-in a specific, goal-oriented manner.
-While their behavior might give the illusion
-of general intelligence, it is a combination of rules, heuristics
-and statistical models that underlie the design.
-Second, at present, there are simply no tools for *artificial general intelligence*
-that are able to improve themselves,
-reason about themselves, and that are able to modify,
-extend, and improve their own architecture
-while trying to solve general tasks.
+Dažnai ne techniniuose straipsniuose
+keliami klausimai apie artėjančią DI apokalipsę
+ir *singuliarumo* tikėtinumą.
+Baiminamasi, kad mašininio mokymosi sistemos kažkaip
+taps jaučiančios ir priims sprendimus
+nepriklausomai nuo savo programuotojų,
+tiesiogiai veikiančius žmonių gyvenimus.
+Tam tikru mastu DI jau veikia
+žmonių pragyvenimą tiesioginiais būdais:
+kreditingumas vertinamas automatiškai,
+autopilotai daugiausia valdo transporto priemones, sprendimai dėl
+užstato skyrimo naudoja statistinius duomenis kaip įvestį.
+Dar nerimtiau, galime paprašyti Alexa įjungti kavos aparatą.
 
-A much more pressing concern is how AI is being used in our daily lives.
-It is likely that many routine tasks, currently fulfilled by humans, can and will be automated.
-Farm robots will likely reduce the costs for organic farmers
-but they will also automate harvesting operations.
-This phase of the industrial revolution
-may have profound consequences for large swaths of society,
-since menial jobs provide much employment 
-in many countries.
-Furthermore, statistical models, when applied without care,
-can lead to racial, gender, or age bias and raise
-reasonable concerns about procedural fairness
-if automated to drive consequential decisions.
-It is important to ensure that these algorithms are used with care.
-With what we know today, this strikes us as a much more pressing concern
-than the potential of malevolent superintelligence for destroying humanity.
+Laimei, esame toli nuo jaučiančios DI sistemos,
+kuri galėtų sąmoningai manipuliuoti savo kūrėjais žmonėmis.
+Pirma, DI sistemos projektuojamos,
+apmokomos ir diegiamos
+konkrečiu, į tikslą orientuotu būdu.
+Nors jų elgesys gali sukurti bendrojo intelekto iliuziją,
+dizaino pagrindą sudaro taisyklių, euristikų
+ir statistinių modelių derinys.
+Antra, šiuo metu tiesiog nėra *bendrojo dirbtinio intelekto* priemonių,
+kurios gebėtų pačios save tobulinti,
+samprotauti apie save ir keisti,
+plėsti bei tobulinti savo architektūrą,
+bandydamos spręsti bendrąsias užduotis.
 
-
-## The Essence of Deep Learning
-
-Thus far, we have talked in broad terms about machine learning.
-Deep learning is the subset of machine learning
-concerned with models based on many-layered neural networks.
-It is *deep* in precisely the sense that its models
-learn many *layers* of transformations.
-While this might sound narrow,
-deep learning has given rise
-to a dizzying array of models, techniques,
-problem formulations, and applications.
-Many intuitions have been developed
-to explain the benefits of depth.
-Arguably, all machine learning
-has many layers of computation,
-the first consisting of feature processing steps.
-What differentiates deep learning is that
-the operations learned at each of the many layers
-of representations are learned jointly from data.
-
-The problems that we have discussed so far,
-such as learning from the raw audio signal,
-the raw pixel values of images,
-or mapping between sentences of arbitrary lengths and
-their counterparts in foreign languages,
-are those where deep learning excels
-and traditional methods falter.
-It turns out that these many-layered models
-are capable of addressing low-level perceptual data
-in a way that previous tools could not.
-Arguably the most significant commonality
-in deep learning methods is *end-to-end training*.
-That is, rather than assembling a system
-based on components that are individually tuned,
-one builds the system and then tunes their performance jointly.
-For instance, in computer vision scientists
-used to separate the process of *feature engineering*
-from the process of building machine learning models.
-The Canny edge detector :cite:`Canny.1987`
-and Lowe's SIFT feature extractor :cite:`Lowe.2004`
-reigned supreme for over a decade as algorithms
-for mapping images into feature vectors.
-In bygone days, the crucial part of applying machine learning to these problems
-consisted of coming up with manually-engineered ways
-of transforming the data into some form amenable to shallow models.
-Unfortunately, there is only so much that humans can accomplish
-by ingenuity in comparison with a consistent evaluation
-over millions of choices carried out automatically by an algorithm.
-When deep learning took over,
-these feature extractors were replaced
-by automatically tuned filters that yielded superior accuracy.
-
-Thus, one key advantage of deep learning is that it replaces
-not only the shallow models at the end of traditional learning pipelines,
-but also the labor-intensive process of feature engineering.
-Moreover, by replacing much of the domain-specific preprocessing,
-deep learning has eliminated many of the boundaries
-that previously separated computer vision, speech recognition,
-natural language processing, medical informatics, and other application areas,
-thereby offering a unified set of tools for tackling diverse problems.
-
-Beyond end-to-end training, we are experiencing a transition
-from parametric statistical descriptions to fully nonparametric models.
-When data is scarce, one needs to rely on simplifying assumptions about reality
-in order to obtain useful models.
-When data is abundant, these can be replaced
-by nonparametric models that better fit the data.
-To some extent, this mirrors the progress
-that physics experienced in the middle of the previous century
-with the availability of computers.
-Rather than solving by hand parametric approximations of how electrons behave,
-one can now resort to numerical simulations of the associated partial differential equations.
-This has led to much more accurate models,
-albeit often at the expense of interpretation.
-
-Another difference from previous work is the acceptance of suboptimal solutions,
-dealing with nonconvex nonlinear optimization problems,
-and the willingness to try things before proving them.
-This new-found empiricism in dealing with statistical problems,
-combined with a rapid influx of talent has led
-to rapid progress in the development of practical algorithms,
-albeit in many cases at the expense of modifying
-and re-inventing tools that existed for decades.
-
-In the end, the deep learning community prides itself
-on sharing tools across academic and corporate boundaries,
-releasing many excellent libraries, statistical models,
-and trained networks as open source.
-It is in this spirit that the notebooks forming this book
-are freely available for distribution and use.
-We have worked hard to lower the barriers of access
-for anyone wishing to learn about deep learning
-and we hope that our readers will benefit from this.
+Daug aktualesnis rūpestis yra tai, kaip DI naudojamas mūsų kasdieniame gyvenime.
+Tikėtina, kad daug įprastų užduočių, šiuo metu atliekamų žmonių, gali būti ir bus automatizuotos.
+Ūkio robotai greičiausiai sumažins ekologinių ūkininkų išlaidas,
+bet taip pat automatizuos derliaus nuėmimo operacijas.
+Ši pramonės revoliucijos fazė
+gali turėti didelių pasekmių didelėms visuomenės grupėms,
+nes menki darbai daugelyje šalių
+užtikrina didelę užimtumo dalį.
+Be to, statistiniai modeliai, taikomi nesirūpinant,
+gali lemti rasinį, lyčių ar amžiaus šališkumą ir kelti
+pagrįstų abejonių dėl procedūrinio teisingumo,
+jei automatizuojami priimant reikšmingus sprendimus.
+Svarbu užtikrinti, kad šie algoritmai būtų naudojami rūpestingai.
+Su tuo, ką žinome šiandien, tai mums atrodo daug aktualesnis rūpestis
+nei piktavalio superintelekto galimybė sunaikinti žmoniją.
 
 
-## Summary
+## Giliojo mokymosi esmė
 
-Machine learning studies how computer systems
-can leverage experience (often data)
-to improve performance at specific tasks.
-It combines ideas from statistics, data mining, and optimization.
-Often, it is used as a means of implementing AI solutions.
-As a class of machine learning, representational learning
-focuses on how to automatically find
-the appropriate way to represent data.
-Considered as multi-level representation learning
-through learning many layers of transformations,
-deep learning replaces not only the shallow models
-at the end of traditional machine learning pipelines,
-but also the labor-intensive process of feature engineering.
-Much of the recent progress in deep learning
-has been triggered by an abundance of data
-arising from cheap sensors and Internet-scale applications,
-and by significant progress in computation, mostly through GPUs.
-Furthermore, the availability of efficient deep learning frameworks
-has made design and implementation of whole system optimization significantly easier,
-and this is a key component in obtaining high performance.
+Iki šiol kalbėjome bendrais bruožais apie mašininį mokymąsi.
+Gilusis mokymasis yra mašininio mokymosi poaibis,
+susijęs su modeliais, pagrįstais daugiasluoksniais neuroniniais tinklais.
+Jis yra *gilus* būtent ta prasme, kad jo modeliai
+išmoksta daug transformacijų *sluoksnių*.
+Nors tai gali skambėti siaurai,
+gilusis mokymasis sukėlė
+svaiginantį modelių, metodų,
+uždavinių formuluočių ir taikymų pasirinkimą.
+Sukurta daug intuicijų
+gylio privalumams paaiškinti.
+Galima sakyti, kad visas mašininis mokymasis
+turi daug skaičiavimo sluoksnių,
+iš kurių pirmąjį sudaro požymių apdorojimo žingsniai.
+Giliąjį mokymąsi išskiria tai, kad
+operacijos, išmokstamos kiekviename iš daugelio
+reprezentacijų sluoksnių, išmokstamos kartu iš duomenų.
 
-## Exercises
+Uždaviniai, kuriuos aptarėme iki šiol,
+tokie kaip mokymasis iš neapdoroto garso signalo,
+neapdorotų vaizdų pikselių reikšmių
+ar atvaizdavimas tarp savavališko ilgio sakinių ir
+jų atitikmenų užsienio kalbomis,
+yra tie, kuriuose gilusis mokymasis pasižymi,
+o tradiciniai metodai klumpa.
+Paaiškėjo, kad šie daugiasluoksniai modeliai
+geba apdoroti žemo lygio suvokimo duomenis
+taip, kaip ankstesnės priemonės negalėjo.
+Galima sakyti, kad svarbiausias giliojo mokymosi metodų bendras bruožas
+yra *apmokymas nuo pradžios iki galo* (angl. *end-to-end training*).
+Tai reiškia, kad užuot rinkę sistemą
+iš atskirai suderintų komponentų,
+sukuriama sistema ir tada jų veikimas derinamas kartu.
+Pavyzdžiui, kompiuterinėje regoje mokslininkai
+anksčiau atskirdavo *požymių inžinerijos*
+procesą nuo mašininio mokymosi modelių kūrimo proceso.
+Canny kraštų detektorius :cite:`Canny.1987`
+ir Lowe SIFT požymių išskyrimo metodas :cite:`Lowe.2004`
+daugiau nei dešimtmetį viešpatavo kaip algoritmai,
+atvaizduojantys vaizdus į požymių vektorius.
+Praėjusiais laikais lemiama mašininio mokymosi taikymo šiems uždaviniams dalis
+buvo sugalvoti rankiniu būdu sukurtus
+duomenų transformavimo į tam tikrą sekliems modeliams tinkamą formą būdus.
+Deja, žmonės savo išradingumu gali pasiekti tik tiek,
+palyginti su nuosekliu vertinimu
+milijonuose pasirinkimų, kurį automatiškai atlieka algoritmas.
+Kai viršų ėmė gilusis mokymasis,
+šiuos požymių išskyrimo metodus pakeitė
+automatiškai derinami filtrai, davę pranašesnį tikslumą.
 
-1. Which parts of code that you are currently writing could be "learned",
-   i.e., improved by learning and automatically determining design choices
-   that are made in your code?
-   Does your code include heuristic design choices?
-   What data might you need to learn the desired behavior?
-1. Which problems that you encounter have many examples for their solution,
-   yet no specific way for automating them?
-   These may be prime candidates for using deep learning.
-1. Describe the relationships between algorithms, data, and computation. How do characteristics of the data and the current available computational resources influence the appropriateness of various algorithms?
-1. Name some settings where end-to-end training is not currently the default approach but where it might be useful.
+Taigi vienas pagrindinių giliojo mokymosi privalumų yra tas, kad jis pakeičia
+ne tik sekliuosius modelius tradicinių mokymosi procesų pabaigoje,
+bet ir daug darbo reikalaujantį požymių inžinerijos procesą.
+Be to, pakeisdamas didelę dalį konkrečiai sričiai skirto išankstinio apdorojimo,
+gilusis mokymasis panaikino daugelį ribų,
+kurios anksčiau skyrė kompiuterinę regą, šnekos atpažinimą,
+natūraliosios kalbos apdorojimą, medicinos informatiką ir kitas taikymo sritis,
+taip suteikdamas vieningą priemonių rinkinį įvairiems uždaviniams spręsti.
 
-[Discussions](https://discuss.d2l.ai/t/22)
+Be apmokymo nuo pradžios iki galo, išgyvename perėjimą
+nuo parametrinių statistinių aprašymų prie visiškai neparametrinių modelių.
+Kai duomenų trūksta, reikia pasikliauti supaprastinančiomis prielaidomis apie tikrovę,
+kad gautume naudingus modelius.
+Kai duomenų gausu, jas galima pakeisti
+neparametriniais modeliais, geriau atitinkančiais duomenis.
+Tam tikru mastu tai atspindi pažangą,
+kurią fizika patyrė praėjusio amžiaus viduryje
+atsiradus kompiuteriams.
+Užuot rankomis sprendę parametrines aproksimacijas, kaip elgiasi elektronai,
+dabar galima griebtis atitinkamų dalinių diferencialinių lygčių skaitinių simuliacijų.
+Tai lėmė daug tikslesnius modelius,
+nors dažnai interpretavimo sąskaita.
+
+Kitas skirtumas nuo ankstesnių darbų yra suboptimalių sprendimų priėmimas,
+nekonveksinių netiesinių optimizavimo uždavinių sprendimas
+ir noras bandyti dalykus, kol jų neįrodžius.
+Šis naujai atrastas empirizmas sprendžiant statistinius uždavinius,
+kartu su sparčiu talentų antplūdžiu, lėmė
+greitą pažangą kuriant praktinius algoritmus,
+nors daugeliu atvejų pakeičiant
+ir iš naujo išradinėjant dešimtmečius egzistavusias priemones.
+
+Galiausiai gilaus mokymosi bendruomenė didžiuojasi
+dalydamasi priemonėmis per akademines ir korporacines ribas,
+išleisdama daug puikių bibliotekų, statistinių modelių
+ir apmokytų tinklų kaip atvirąjį kodą.
+Būtent šia dvasia šią knygą sudarantys sąsiuviniai
+yra laisvai prieinami platinti ir naudoti.
+Stengėmės sumažinti prieigos kliūtis
+visiems, norintiems išmokti giliojo mokymosi,
+ir tikimės, kad mūsų skaitytojai iš to pasinaudos.
+
+
+## Santrauka
+
+Mašininis mokymasis tiria, kaip kompiuterinės sistemos
+gali pasinaudoti patirtimi (dažnai duomenimis)
+konkrečių užduočių našumui pagerinti.
+Jis jungia idėjas iš statistikos, duomenų gavybos ir optimizavimo.
+Dažnai jis naudojamas kaip DI sprendimų įgyvendinimo priemonė.
+Kaip mašininio mokymosi klasė, reprezentacijų mokymasis
+sutelkia dėmesį į tai, kaip automatiškai rasti
+tinkamą duomenų vaizdavimo būdą.
+Laikomas daugiapakopiu reprezentacijų mokymusi,
+išmokstant daug transformacijų sluoksnių,
+gilusis mokymasis pakeičia ne tik sekliuosius modelius
+tradicinių mašininio mokymosi procesų pabaigoje,
+bet ir daug darbo reikalaujantį požymių inžinerijos procesą.
+Didelė pastarojo meto giliojo mokymosi pažangos dalis
+buvo paskatinta duomenų gausos,
+atsiradusios dėl pigių jutiklių ir interneto masto taikymų,
+bei didelės skaičiavimų pažangos, daugiausia per GPU.
+Be to, efektyvių giliojo mokymosi karkasų prieinamumas
+gerokai palengvino visos sistemos optimizavimo projektavimą ir įgyvendinimą,
+o tai yra pagrindinis komponentas siekiant aukšto našumo.
+
+## Pratimai
+
+1. Kurias šiuo metu rašomo kodo dalis galima būtų „išmokyti",
+   t. y. pagerinti mokantis ir automatiškai nustatant projektavimo pasirinkimus,
+   kurie daromi jūsų kode?
+   Ar jūsų kode yra euristinių projektavimo pasirinkimų?
+   Kokių duomenų jums galėtų prireikti norimam elgesiui išmokti?
+1. Kurie jūsų sutinkami uždaviniai turi daug sprendimo pavyzdžių,
+   tačiau neturi konkretaus jų automatizavimo būdo?
+   Tai gali būti pagrindiniai kandidatai giliajam mokymuisi taikyti.
+1. Aprašykite ryšius tarp algoritmų, duomenų ir skaičiavimų. Kaip duomenų savybės ir šiuo metu turimi skaičiavimo ištekliai veikia įvairių algoritmų tinkamumą?
+1. Įvardykite kelias aplinkas, kuriose apmokymas nuo pradžios iki galo šiuo metu nėra numatytasis požiūris, bet kuriose jis galėtų būti naudingas.
+
+[Diskusijos](https://discuss.d2l.ai/t/22)

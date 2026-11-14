@@ -1,345 +1,341 @@
-# Preface
+# Pratarmė
 
-Just a few years ago, there were no legions of deep learning scientists
-developing intelligent products and services at major companies and startups.
-When we entered the field, machine learning
-did not command headlines in daily newspapers.
-Our parents had no idea what machine learning was,
-let alone why we might prefer it to a career in medicine or law.
-Machine learning was a blue skies academic discipline
-whose industrial significance was limited
-to a narrow set of real-world applications,
-including speech recognition and computer vision.
-Moreover, many of these applications
-required so much domain knowledge
-that they were often regarded as entirely separate areas
-for which machine learning was one small component.
-At that time, neural networks---the
-predecessors of the deep learning methods
-that we focus on in this book---were
-generally regarded as outmoded.
-
-
-Yet in just a few years, deep learning has taken the world by surprise,
-driving rapid progress in such diverse fields
-as computer vision, natural language processing,
-automatic speech recognition, reinforcement learning,
-and biomedical informatics.
-Moreover, the success of deep learning
-in so many tasks of practical interest
-has even catalyzed developments
-in theoretical machine learning and statistics.
-With these advances in hand,
-we can now build cars that drive themselves
-with more autonomy than ever before
-(though less autonomy than some companies might have you believe),
-dialogue systems that debug code by asking clarifying questions,
-and software agents beating the best human players in the world at board games such as Go, a feat once thought to be decades away.
-Already, these tools exert ever-wider influence on industry and society,
-changing the way movies are made, diseases are diagnosed,
-and playing a growing role in basic sciences---from astrophysics, to climate modeling, to weather prediction, to biomedicine.
+Dar prieš keletą metų gilaus mokymosi mokslininkų legionų,
+kuriančių išmaniuosius produktus ir paslaugas didžiosiose bendrovėse ir naujai įsteigtose įmonėse (angl. *startups*), nebuvo.
+Kai mes įžengėme į šią sritį, mašininis mokymasis
+dienraščių antraštėse dar nefigūravo.
+Mūsų tėvai nenutuokė, kas yra mašininis mokymasis,
+juo labiau – kodėl galėtume jį rinktis vietoj medicinos ar teisės karjeros.
+Mašininis mokymasis buvo „mėlynojo dangaus" akademinė disciplina,
+kurios pramoninė reikšmė apsiribojo
+nedidele realaus pasaulio taikymų aibe,
+įskaitant šnekos atpažinimą ir kompiuterinę regą.
+Be to, daugeliui šių taikymų
+reikėjo tiek srities žinių,
+kad jie dažnai būdavo laikomi visiškai atskiromis sritimis,
+kuriose mašininis mokymasis buvo tik maža dalis.
+Tuo metu neuroniniai tinklai – 
+šioje knygoje nagrinėjamų gilaus mokymosi metodų
+pirmtakai – 
+paprastai buvo laikomi pasenusiais.
 
 
-
-## About This Book
-
-This book represents our attempt to make deep learning approachable,
-teaching you the *concepts*, the *context*, and the *code*.
-
-### One Medium Combining Code, Math, and HTML
-
-For any computing technology to reach its full impact,
-it must be well understood, well documented, and supported by
-mature, well-maintained tools.
-The key ideas should be clearly distilled,
-minimizing the onboarding time needed
-to bring new practitioners up to date.
-Mature libraries should automate common tasks,
-and exemplar code should make it easy for practitioners
-to modify, apply, and extend common applications to suit their needs.
-
-
-As an example, take dynamic web applications.
-Despite a large number of companies, such as Amazon,
-developing successful database-driven web applications in the 1990s,
-the potential of this technology to aid creative entrepreneurs
-was realized to a far greater degree only in the past ten years,
-owing in part to the development of powerful, well-documented frameworks.
+Tačiau vos per keletą metų gilusis mokymasis pasauliui buvo netikėtas,
+paskatinęs sparčią pažangą tokiose skirtingose srityse
+kaip kompiuterinė rega, natūraliosios kalbos apdorojimas,
+automatinis šnekos atpažinimas, skatinamasis mokymasis
+ir biomedicinos informatika.
+Be to, gilaus mokymosi sėkmė
+atliekant tiek daug praktiškai svarbių užduočių
+netgi paskatino pokyčius
+teoriniame mašininiame mokyme ir statistikoje.
+Pasitelkę šiuos pasiekimus,
+dabar galime kurti automobilius, kurie vairuoja patys
+savarankiškiau nei bet kada anksčiau
+(nors ne tokie savarankiški, kaip kai kurios bendrovės norėtų jus įtikinti),
+dialogo sistemas, kurios derina kodą uždavinėdamos patikslinančius klausimus,
+ir programinius agentus, įveikiančius geriausius pasaulio žmones stalo žaidimuose, tokiuose kaip „Go" – tokį žygdarbį dar neseniai laikėme esant dešimtmečių atstumu.
+Šios priemonės jau daro vis platesnę įtaką pramonei ir visuomenei,
+keičia filmų kūrimo būdus, ligų diagnostiką
+ir vis labiau įsitvirtina fundamentiniuose moksluose – nuo astrofizikos iki klimato modeliavimo, orų prognozavimo ir biomedicinos.
 
 
-Testing the potential of deep learning presents unique challenges
-because any single application brings together various disciplines.
-Applying deep learning requires simultaneously understanding
-(i) the motivations for casting a problem in a particular way;
-(ii) the mathematical form of a given model;
-(iii) the optimization algorithms for fitting the models to data;
-(iv) the statistical principles that tell us
-when we should expect our models
-to generalize to unseen data
-and practical methods for certifying
-that they have, in fact, generalized;
-and (v) the engineering techniques
-required to train models efficiently,
-navigating the pitfalls of numerical computing
-and getting the most out of available hardware.
-Teaching the critical thinking skills
-required to formulate problems,
-the mathematics to solve them,
-and the software tools to implement those solutions
-all in one place presents formidable challenges.
-Our goal in this book is to present a unified resource
-to bring would-be practitioners up to speed.
 
-When we started this book project,
-there were no resources that simultaneously
-(i) remained up to date;
-(ii) covered the breadth of modern machine learning practices
-with sufficient technical depth;
-and (iii) interleaved exposition of
-the quality one expects of a textbook
-with the clean runnable code
-that one expects of a hands-on tutorial.
-We found plenty of code examples illustrating
-how to use a given deep learning framework
-(e.g., how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques
-(e.g., code snippets for LeNet, AlexNet, ResNet, etc.)
-scattered across various blog posts and GitHub repositories.
-However, these examples typically focused on
-*how* to implement a given approach,
-but left out the discussion of
-*why* certain algorithmic decisions are made.
-While some interactive resources
-have popped up sporadically
-to address a particular topic,
-e.g., the engaging blog posts
-published on the website [Distill](http://distill.pub), or personal blogs,
-they only covered selected topics in deep learning,
-and often lacked associated code.
-On the other hand, while several deep learning textbooks
-have emerged---e.g., :citet:`Goodfellow.Bengio.Courville.2016`,
-which offers a comprehensive survey
-on the basics of deep learning---these
-resources do not marry the descriptions
-to realizations of the concepts in code,
-sometimes leaving readers clueless
-as to how to implement them.
-Moreover, too many resources
-are hidden behind the paywalls
-of commercial course providers.
+## Apie šią knygą
 
-We set out to create a resource that could
-(i) be freely available for everyone;
-(ii) offer sufficient technical depth
-to provide a starting point on the path
-to actually becoming an applied machine learning scientist;
-(iii) include runnable code, showing readers
-*how* to solve problems in practice;
-(iv) allow for rapid updates, both by us
-and also by the community at large;
-and (v) be complemented by a [forum](https://discuss.d2l.ai/c/5)
-for interactive discussion of technical details and to answer questions.
+Šia knyga siekiame, kad gilusis mokymasis taptų prieinamas,
+mokydami jus *sąvokų*, *konteksto* ir *kodo*.
 
-These goals were often in conflict.
-Equations, theorems, and citations
-are best managed and laid out in LaTeX.
-Code is best described in Python.
-And webpages are native in HTML and JavaScript.
-Furthermore, we want the content to be
-accessible both as executable code, as a physical book,
-as a downloadable PDF, and on the Internet as a website.
-No workflows seemed suited to these demands,
-so we decided to assemble our own (:numref:`sec_how_to_contribute`).
-We settled on GitHub to share the source
-and to facilitate community contributions;
-Jupyter notebooks for mixing code, equations and text;
-Sphinx as a rendering engine;
-and Discourse as a discussion platform.
-While our system is not perfect,
-these choices strike a compromise
-among the competing concerns.
-We believe that *Dive into Deep Learning*
-might be the first book published
-using such an integrated workflow.
+### Viena terpė, jungianti kodą, matematiką ir HTML
+
+Kad bet kuri skaičiavimo technologija pasiektų visą savo poveikį,
+ji turi būti gerai suprasta, gerai dokumentuota ir palaikoma
+brandžių, gerai prižiūrimų įrankių.
+Pagrindinės idėjos turi būti aiškiai išgrynintos,
+kad nauji praktikai kuo greičiau
+įsisavintų reikiamas žinias.
+Brandžios bibliotekos turi automatizuoti įprastas užduotis,
+o pavyzdinis kodas turi leisti praktikams lengvai
+keisti, taikyti ir plėsti įprastus taikymus pagal savo poreikius.
 
 
-### Learning by Doing
+Paimkime dinamines internetines programas kaip pavyzdį.
+Nors 1990-aisiais daug bendrovių, tokių kaip „Amazon",
+kūrė sėkmingas duomenų bazėmis grįstas internetines programas,
+šios technologijos potencialas padėti kūrybingiems verslininkams
+buvo gerokai geriau išnaudotas tik per pastaruosius dešimt metų,
+iš dalies dėl galingų, gerai dokumentuotų karkasų (angl. *frameworks*) atsiradimo.
 
-Many textbooks present concepts in succession,
-covering each in exhaustive detail.
-For example,
-the excellent textbook of
+
+Gilaus mokymosi potencialo išbandymas kelia ypatingų iššūkių,
+nes bet kuriame taikyme susitinka įvairios disciplinos.
+Taikant gilųjį mokymąsi, reikia vienu metu suprasti
+(i) motyvus, kodėl uždavinys formuluojamas būtent taip;
+(ii) duoto modelio matematinę formą;
+(iii) optimizavimo algoritmus, kuriais modeliai pritaikomi duomenims;
+(iv) statistinius principus, kurie nurodo,
+kada galime tikėtis, kad mūsų modeliai
+generalizuosis nematytiems duomenims,
+ir praktinius metodus, leidžiančius patvirtinti,
+kad jie iš tiesų generalizavosi;
+ir (v) inžinerinius metodus,
+reikalingus modeliams efektyviai apmokyti,
+išvengiant skaitinio skaičiavimo spąstų
+ir kuo geriau išnaudojant turimą aparatinę įrangą.
+Vienoje vietoje mokyti kritinio mąstymo įgūdžių,
+reikalingų uždaviniams formuluoti,
+matematikos jiems spręsti
+ir programinių įrankių tiems sprendimams įgyvendinti
+yra didelis iššūkis.
+Šios knygos tikslas – pateikti vieningą šaltinį,
+padedantį būsimiems praktikams greitai įsisavinti reikiamas žinias.
+
+Kai pradėjome šį knygos projektą,
+nebuvo šaltinių, kurie vienu metu
+(i) būtų atnaujinami;
+(ii) pakankamai techniškai gilai apimtų
+šiuolaikinės mašininio mokymosi praktikos platumą;
+ir (iii) derintų vadovėlio lygio
+dėstymą
+su gražiu paleidžiamu kodu,
+kokio tikimasi iš praktinio vadovo.
+Rasdavome daug kodo pavyzdžių, iliustruojančių,
+kaip naudoti tam tikrą gilaus mokymosi karkasą
+(pvz., kaip atlikti pagrindinius skaitinius skaičiavimus su matricomis naudojant TensorFlow)
+arba kaip įgyvendinti konkrečius metodus
+(pvz., LeNet, AlexNet, ResNet ir kitų kodo fragmentus),
+išsibarsčiusių po įvairius tinklaraščių įrašus ir „GitHub" saugyklas.
+Tačiau šie pavyzdžiai paprastai pabrėždavo,
+*kaip* įgyvendinti tam tikrą metodą,
+bet nenagrinėdavo,
+*kodėl* priimami tam tikri algoritmų sprendimai.
+Nors kartais atsirasdavo interaktyvių šaltinių,
+skirtų atskirai temai,
+pvz., įdomūs tinklaraščių įrašai,
+skelbiami svetainėje [Distill](http://distill.pub), ar asmeniniai tinklaraščiai,
+jie apėmė tik pasirinktas gilaus mokymosi temas
+ir dažnai neturėjo susieto kodo.
+Kita vertus, nors pasirodė keli gilaus mokymosi vadovėliai,
+pvz., :citet:`Goodfellow.Bengio.Courville.2016`,
+kuriame pateikiama išsami gilaus mokymosi pagrindų apžvalga,
+šie šaltiniai nesieja aprašymų
+su sąvokų įgyvendinimu kode,
+todėl skaitytojai kartais nesupranta,
+kaip jas įgyvendinti.
+Be to, per daug šaltinių
+yra paslėpta už komercinių kursų teikėjų
+mokamų sienų.
+
+Siekėme sukurti šaltinį, kuris
+(i) būtų laisvai prieinamas visiems;
+(ii) suteiktų pakankamai techninio gylio,
+kad taptų pradžios tašku kelyje
+į taikomojo mašininio mokymosi mokslininko profesiją;
+(iii) turėtų paleidžiamą kodą, parodantį skaitytojams,
+*kaip* spręsti uždavinius praktikoje;
+(iv) leistų greitai atnaujinti tiek mums,
+tiek platesnei bendruomenei;
+ir (v) būtų papildytas [forumu](https://discuss.d2l.ai/c/5),
+skirtu interaktyviai aptarti technines detales ir atsakyti į klausimus.
+
+Šie tikslai dažnai prieštaravo vienas kitam.
+Lygtis, teoremas ir citatas
+geriausia tvarkyti ir maketuoti LaTeX.
+Kodą geriausia aprašyti Python kalba.
+O tinklalapių gimtoji kalba yra HTML ir JavaScript.
+Be to, norime, kad turinys būtų
+prieinamas ir kaip vykdomas kodas, ir kaip fizinė knyga,
+ir kaip atsisiunčiamas PDF, ir internete kaip svetainė.
+Atrodė, kad joks darbo procesas šių reikalavimų neatitinka,
+todėl nusprendėme sukurti savo (:numref:`sec_how_to_contribute`).
+Pasirinkome „GitHub" šaltiniui dalytis
+ir bendruomenės indėliui palengvinti;
+„Jupyter" sąsiuvinius kodui, lygtims ir tekstui jungti;
+Sphinx kaip atvaizdavimo variklį;
+ir „Discourse" kaip diskusijų platformą.
+Nors mūsų sistema nėra tobula,
+šie pasirinkimai yra kompromisas
+tarp konkuruojančių poreikių.
+Manome, kad *Dive into Deep Learning*
+gali būti pirmoji knyga, išleista
+naudojant tokį integruotą darbo procesą.
+
+
+### Mokymasis praktiškai
+
+Daugelis vadovėlių dėsto sąvokas paeiliui,
+išsamiai nagrinėdami kiekvieną.
+Pavyzdžiui,
+puikus
 :citet:`Bishop.2006`
-teaches each topic so thoroughly
-that getting to the chapter
-on linear regression requires
-a nontrivial amount of work.
-While experts love this book
-precisely for its thoroughness,
-for true beginners, this property limits
-its usefulness as an introductory text.
+vadovėlis kiekvieną temą dėsto taip kruopščiai,
+kad iki skyriaus
+apie tiesinę regresiją
+prireikia nemažai pastangų.
+Nors ekspertai šią knygą vertina
+būtent dėl jos kruopštumo,
+tikriems pradedantiesiems ši savybė riboja
+jos naudą kaip įvadinio vadovėlio.
 
-In this book, we teach most concepts *just in time*.
-In other words, you will learn concepts at the very moment
-that they are needed to accomplish some practical end.
-While we take some time at the outset to teach
-fundamental preliminaries, like linear algebra and probability,
-we want you to taste the satisfaction of training your first model
-before worrying about more esoteric concepts.
+Šioje knygoje daugumą sąvokų dėstome *tiksliai laiku*.
+Kitaip tariant, sąvokas išmoksite tuo momentu,
+kai jų prireikia kokiam nors praktiniam tikslui pasiekti.
+Nors pradžioje skiriame šiek tiek laiko pagrindinėms
+pradinėms žinioms, tokioms kaip tiesinė algebra ir tikimybių teorija, dėstyti,
+norime, kad pajustumėte pasitenkinimą apmokę pirmąjį savo modelį,
+dar nesukdami galvos dėl egzotiškesnių sąvokų.
 
-Aside from a few preliminary notebooks that provide a crash course
-in the basic mathematical background,
-each subsequent chapter both introduces a reasonable number of new concepts
-and provides several self-contained working examples, using real datasets.
-This presented an organizational challenge.
-Some models might logically be grouped together in a single notebook.
-And some ideas might be best taught
-by executing several models in succession.
-By contrast, there is a big advantage to adhering
-to a policy of *one working example, one notebook*:
-This makes it as easy as possible for you to
-start your own research projects by leveraging our code.
-Just copy a notebook and start modifying it.
+Be kelių pradinių sąsiuvinių, kuriuose pateikiamas greitasis
+pagrindinio matematinio pagrindo kursas,
+kiekviename tolesniame skyriuje pristatomas pagrįstas naujų sąvokų skaičius
+ir pateikiama keletas savarankiškų veikiančių pavyzdžių su realiais duomenų rinkiniais.
+Tai sukėlė organizacinį iššūkį.
+Kai kurie modeliai logiškai galėtų būti sugrupuoti viename sąsiuvinyje.
+O kai kurias idėjas geriausia dėstyti
+paeiliui vykdant kelis modelius.
+Tačiau laikytis politikos *vienas veikiantis pavyzdys – vienas sąsiuvinis*
+turi didelį privalumą:
+taip jums kuo lengviau
+pradėti savo tyrimų projektus panaudojant mūsų kodą.
+Tiesiog nukopijuokite sąsiuvinį ir pradėkite jį keisti.
 
-Throughout, we interleave the runnable code
-with background material as needed.
-In general, we err on the side of making tools
-available before explaining them fully
-(often filling in the background later).
-For instance, we might use *stochastic gradient descent*
-before explaining why it is useful
-or offering some intuition for why it works.
-This helps to give practitioners the necessary
-ammunition to solve problems quickly,
-at the expense of requiring the reader
-to trust us with some curatorial decisions.
+Visur paleidžiamą kodą pagal poreikį perpinome
+su pagrindine medžiaga.
+Paprastai linkę esame pirmiausia suteikti įrankius
+ir tik paskui juos išsamiai paaiškinti
+(dažnai pagrindus užpildydami vėliau).
+Pavyzdžiui, galime naudoti *stochastinį gradientinį nusileidimą*
+dar nepaaiškinę, kodėl jis naudingas,
+ar nesuteikę intuicijos, kodėl jis veikia.
+Tai suteikia praktikams reikiamos
+„amunicijos" uždaviniams greitai spręsti,
+tačiau skaitytojas turi pasitikėti mūsų
+kai kuriais atrankos sprendimais.
 
-This book teaches deep learning concepts from scratch.
-Sometimes, we delve into fine details about models
-that would typically be hidden from users
-by modern deep learning frameworks.
-This comes up especially in the basic tutorials,
-where we want you to understand everything
-that happens in a given layer or optimizer.
-In these cases, we often present
-two versions of the example:
-one where we implement everything from scratch,
-relying only on NumPy-like functionality
-and automatic differentiation,
-and a more practical example,
-where we write succinct code
-using the high-level APIs of deep learning frameworks.
-After explaining how some component works,
-we rely on the high-level API in subsequent tutorials.
+Ši knyga moko gilaus mokymosi sąvokų nuo nulio.
+Kartais gilinamės į smulkias modelių detales,
+kurias šiuolaikiniai gilaus mokymosi karkasai
+paprastai paslepia nuo naudotojų.
+Tai ypač pasitaiko pradiniuose vadovėliuose,
+kuriuose norime, kad suprastumėte viską,
+kas vyksta konkrečiame sluoksnyje ar optimizatoriuje.
+Šiais atvejais dažnai pateikiame
+dvi pavyzdžio versijas:
+vieną, kurioje viskas įgyvendinama nuo nulio,
+remiantis tik NumPy panašia funkcija
+ir automatiniu diferencijavimu,
+ir praktiškesnį pavyzdį,
+kuriame glaustą kodą rašome
+naudodami aukšto lygio gilaus mokymosi karkasų API.
+Paaiškinę, kaip veikia tam tikras komponentas,
+tolesniuose vadovėliuose remiamės aukšto lygio API.
 
 
-### Content and Structure
+### Turinys ir struktūra
 
-The book can be divided into roughly three parts,
-dealing with preliminaries,
-deep learning techniques,
-and advanced topics
-focused on real systems
-and applications (:numref:`fig_book_org`).
+Knygą galima apytiksliai padalyti į tris dalis,
+kuriose nagrinėjami pradiniai pagrindai,
+gilaus mokymosi metodai
+ir sudėtingesnės temos,
+nukreiptos į realias sistemas
+ir taikymus (:numref:`fig_book_org`).
 
-![Book structure.](../img/book-org.svg)
+![Knygos struktūra.](../img/book-org.svg)
 :label:`fig_book_org`
 
 
-* **Part 1: Basics and Preliminaries**.
-:numref:`chap_introduction` is
-an introduction to deep learning.
-Then, in :numref:`chap_preliminaries`,
-we quickly bring you up to speed
-on the prerequisites required
-for hands-on deep learning,
-such as how to store and manipulate data,
-and how to apply various numerical operations
-based on elementary concepts from linear algebra,
-calculus, and probability.
-:numref:`chap_regression` and :numref:`chap_perceptrons`
-cover the most fundamental concepts and techniques in deep learning,
-including regression and classification;
-linear models; multilayer perceptrons;
-and overfitting and regularization.
+* **1 dalis: pagrindai ir pradinės žinios**.
+:numref:`chap_introduction` yra
+gilaus mokymosi įvadas.
+Tada :numref:`chap_preliminaries`
+greitai supažindiname su būtinomis žiniomis,
+reikalingomis praktiniam giliajam mokymuisi,
+tokiomis kaip duomenų saugojimas ir apdorojimas
+bei įvairių skaitinių operacijų taikymas,
+remiantis pradinėmis tiesinės algebros,
+matematinės analizės ir tikimybių teorijos sąvokomis.
+:numref:`chap_regression` ir :numref:`chap_perceptrons`
+apima pačias pagrindines gilaus mokymosi sąvokas ir metodus,
+įskaitant regresiją ir klasifikavimą,
+tiesinius modelius, daugiasluoksnius perceptronus
+bei persimokymą ir reguliarizaciją.
 
-* **Part 2: Modern Deep Learning Techniques**.
-:numref:`chap_computation` describes
-the key computational components
-of deep learning systems
-and lays the groundwork
-for our subsequent implementations
-of more complex models.
-Next, :numref:`chap_cnn` and :numref:`chap_modern_cnn`
-present convolutional neural networks (CNNs),
-powerful tools that form the backbone
-of most modern computer vision systems.
-Similarly, :numref:`chap_rnn` and :numref:`chap_modern_rnn`
-introduce recurrent neural networks (RNNs),
-models that exploit sequential (e.g., temporal)
-structure in data and are commonly used
-for natural language processing
-and time series prediction.
-In :numref:`chap_attention-and-transformers`,
-we describe a relatively new class of models,
-based on so-called *attention mechanisms*,
-that has displaced RNNs as the dominant architecture
-for most natural language processing tasks.
-These sections will bring you up to speed
-on the most powerful and general tools
-that are widely used by deep learning practitioners.
+* **2 dalis: šiuolaikiniai gilaus mokymosi metodai**.
+:numref:`chap_computation` aprašo
+pagrindinius gilaus mokymosi sistemų
+skaičiavimo komponentus
+ir paruošia pagrindą
+tolesniam sudėtingesnių modelių
+įgyvendinimui.
+Toliau :numref:`chap_cnn` ir :numref:`chap_modern_cnn`
+pristato konvoliucinius neuroninius tinklus (CNN),
+galingas priemones, sudarančias daugumos
+šiuolaikinių kompiuterinės regos sistemų pagrindą.
+Panašiai :numref:`chap_rnn` ir :numref:`chap_modern_rnn`
+pristato rekurentinius neuroninius tinklus (RNN),
+modelius, išnaudojančius nuoseklią (pvz., laikinę)
+duomenų struktūrą ir plačiai naudojamus
+natūraliosios kalbos apdorojimui
+ir laiko eilučių prognozavimui.
+:numref:`chap_attention-and-transformers`
+aprašome gana naują modelių klasę,
+pagrįstą vadinamaisiais *dėmesio sutelkimo mechanizmais*,
+kuri išstūmė RNN kaip vyraujančią architektūrą
+daugumai natūraliosios kalbos apdorojimo užduočių.
+Šie skyriai padės jums įsisavinti
+galingiausias ir universaliausias priemones,
+kurias plačiai naudoja gilaus mokymosi praktikai.
 
-* **Part 3: Scalability, Efficiency, and Applications** (available [online](https://d2l.ai)).
-In Chapter 12,
-we discuss several common optimization algorithms
-used to train deep learning models.
-Next, in Chapter 13,
-we examine several key factors
-that influence the computational performance
-of deep learning code.
-Then, in Chapter 14,
-we illustrate major applications
-of deep learning in computer vision.
-Finally, in Chapter 15 and Chapter 16,
-we demonstrate how to pretrain language representation models
-and apply them to natural language processing tasks.
+* **3 dalis: mastelio keitimas, efektyvumas ir taikymai** (prieinama [internete](https://d2l.ai)).
+12 skyriuje
+aptariame kelis dažnus optimizavimo algoritmus,
+naudojamus giliojo mokymosi modeliams apmokyti.
+Toliau 13 skyriuje
+nagrinėjame keletą pagrindinių veiksnių,
+darančių įtaką gilaus mokymosi kodo
+skaičiavimo našumui.
+Tada 14 skyriuje
+iliustruojame pagrindinius
+gilaus mokymosi taikymus kompiuterinėje regoje.
+Galiausiai 15 ir 16 skyriuose
+parodome, kaip iš anksto apmokyti kalbos reprezentacijų modelius
+ir taikyti juos natūraliosios kalbos apdorojimo užduotims.
 
 
-### Code
+### Kodas
 :label:`sec_code`
 
-Most sections of this book feature executable code.
-We believe that some intuitions are best developed
-via trial and error,
-tweaking the code in small ways and observing the results.
-Ideally, an elegant mathematical theory might tell us
-precisely how to tweak our code to achieve a desired result.
-However, deep learning practitioners today
-must often tread where no solid theory provides guidance.
-Despite our best attempts, formal explanations
-for the efficacy of various techniques are
-still lacking, for a variety of reasons: the mathematics to characterize these models
-can be so difficult;
-the explanation likely depends on properties
-of the data that currently lack clear definitions;
-and serious inquiry on these topics
-has only recently kicked into high gear.
-We are hopeful that as the theory of deep learning progresses,
-each future edition of this book will provide insights
-that eclipse those presently available.
+Daugumoje šios knygos skyrelių yra vykdomo kodo.
+Manome, kad kai kurią intuiciją geriausia ugdyti
+bandymų ir klaidų keliu,
+nedaug pakeičiant kodą ir stebint rezultatus.
+Idealiu atveju elegantiška matematinė teorija mums galėtų pasakyti,
+kaip tiksliai keisti kodą norimam rezultatui pasiekti.
+Tačiau šiandien gilaus mokymosi praktikai
+dažnai turi eiti ten, kur jokia tvirta teorija nepadeda.
+Nepaisant visų pastangų, formalių įvairių metodų
+veiksmingumo paaiškinimų
+vis dar trūksta dėl įvairių priežasčių: matematika šiems modeliams apibūdinti
+gali būti labai sudėtinga;
+paaiškinimas tikriausiai priklauso nuo duomenų savybių,
+kurios šiuo metu neturi aiškių apibrėžčių;
+o rimti šių temų tyrimai
+tik neseniai įsibėgėjo.
+Tikimės, kad gilaus mokymosi teorijai tobulėjant,
+kiekviename būsimame šios knygos leidime bus pateikta įžvalgų,
+pranokstančių dabar turimas.
 
-To avoid unnecessary repetition, we capture
-some of our most frequently imported and used
-functions and classes in the `d2l` package.
-Throughout, we mark blocks of code
-(such as functions, classes,
-or collection of import statements) with `#@save`
-to indicate that they will be accessed later
-via the `d2l` package.
-We offer a detailed overview
-of these classes and functions in :numref:`sec_d2l`.
-The `d2l` package is lightweight and only requires
-the following dependencies:
+Kad išvengtume nereikalingo kartojimo, kai kurias savo dažniausiai importuojamas ir naudojamas
+funkcijas ir klases sutalpiname `d2l` pakete.
+Visur kodo blokus
+(pvz., funkcijas, klases
+ar importo sakinių rinkinius) žymime `#@save`,
+kad nurodytume, jog vėliau jie bus pasiekiami
+per `d2l` paketą.
+Išsamią šių klasių ir funkcijų apžvalgą pateikiame
+:numref:`sec_d2l`.
+`d2l` paketas yra lengvas ir reikalauja tik
+šių priklausomybių:
 
 ```{.python .input}
 #@tab all
@@ -366,75 +362,74 @@ d2l = sys.modules[__name__]
 ```
 
 :begin_tab:`mxnet`
-Most of the code in this book is based on Apache MXNet,
-an open-source framework for deep learning
-that is the preferred choice
-of AWS (Amazon Web Services),
-as well as many colleges and companies.
-All of the code in this book has passed tests
-under the newest MXNet version.
-However, due to the rapid development of deep learning,
-some code *in the print edition*
-may not work properly in future versions of MXNet.
-We plan to keep the online version up to date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
-Below lists dependencies in our MXNet implementation.
+Didžioji šios knygos kodo dalis pagrįsta Apache MXNet,
+atvirojo kodo gilaus mokymosi karkasu,
+kurį renkasi AWS (Amazon Web Services),
+taip pat daug kolegijų ir bendrovių.
+Visas šios knygos kodas išbandytas
+su naujausia MXNet versija.
+Tačiau dėl spartaus gilaus mokymosi vystymosi
+kai kuris kodas *spausdintame leidime*
+gali neveikti tinkamai būsimose MXNet versijose.
+Planuojame palaikyti naujausią internetinę versiją.
+Jei kiltų problemų,
+kreipkitės į :ref:`chap_installation`,
+kad atnaujintumėte savo kodą ir vykdymo aplinką.
+Toliau išvardytos mūsų MXNet įgyvendinimo priklausomybės.
 :end_tab:
 
 :begin_tab:`pytorch`
-Most of the code in this book is based on PyTorch,
-a popular open-source framework
-that has been enthusiastically embraced
-by the deep learning research community.
-All of the code in this book has passed tests
-under the latest stable version of PyTorch.
-However, due to the rapid development of deep learning,
-some code *in the print edition*
-may not work properly in future versions of PyTorch.
-We plan to keep the online version up to date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
-Below lists dependencies in our PyTorch implementation.
+Didžioji šios knygos kodo dalis pagrįsta PyTorch,
+populiariu atvirojo kodo karkasu,
+entuziastingai priimtu
+gilaus mokymosi tyrimų bendruomenės.
+Visas šios knygos kodas išbandytas
+su naujausia stabilia PyTorch versija.
+Tačiau dėl spartaus gilaus mokymosi vystymosi
+kai kuris kodas *spausdintame leidime*
+gali neveikti tinkamai būsimose PyTorch versijose.
+Planuojame palaikyti naujausią internetinę versiją.
+Jei kiltų problemų,
+kreipkitės į :ref:`chap_installation`,
+kad atnaujintumėte savo kodą ir vykdymo aplinką.
+Toliau išvardytos mūsų PyTorch įgyvendinimo priklausomybės.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Most of the code in this book is based on TensorFlow,
-an open-source framework for deep learning
-that is widely adopted in industry
-and popular among researchers.
-All of the code in this book has passed tests
-under the latest stable version TensorFlow.
-However, due to the rapid development of deep learning,
-some code *in the print edition*
-may not work properly in future versions of TensorFlow.
-We plan to keep the online version up to date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
-Below lists dependencies in our TensorFlow implementation.
+Didžioji šios knygos kodo dalis pagrįsta TensorFlow,
+atvirojo kodo gilaus mokymosi karkasu,
+plačiai taikomu pramonėje
+ir populiariu tarp tyrėjų.
+Visas šios knygos kodas išbandytas
+su naujausia stabilia TensorFlow versija.
+Tačiau dėl spartaus gilaus mokymosi vystymosi
+kai kuris kodas *spausdintame leidime*
+gali neveikti tinkamai būsimose TensorFlow versijose.
+Planuojame palaikyti naujausią internetinę versiją.
+Jei kiltų problemų,
+kreipkitės į :ref:`chap_installation`,
+kad atnaujintumėte savo kodą ir vykdymo aplinką.
+Toliau išvardytos mūsų TensorFlow įgyvendinimo priklausomybės.
 :end_tab:
 
 :begin_tab:`jax`
-Most of the code in this book is based on Jax,
-an open-source framework enabling composable function
-transformations such as differentiation of arbitrary
-Python and NumPy functions, as well as JIT compliation,
-vectorization and much more! It is becoming popular in
-the machine learning research space and has an
-easy-to-learn NumPy-like API. Actually, JAX tries
-to achieve 1:1 parity with NumPy, so switching your
-code could be as simple as changing a single import statement!
-However, due to the rapid development of deep learning,
-some code *in the print edition*
-may not work properly in future versions of Jax.
-We plan to keep the online version up to date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
-Below lists dependencies in our JAX implementation.
+Didžioji šios knygos kodo dalis pagrįsta Jax,
+atvirojo kodo karkasu, leidžiančiu komponuoti funkcijų
+transformacijas, tokias kaip savavališkų
+Python ir NumPy funkcijų diferencijavimas, taip pat JIT kompiliavimas,
+vektorizavimas ir daug daugiau! Jis tampa populiarus
+mašininio mokymosi tyrimų srityje ir turi
+lengvai išmokstamą NumPy panašią API. Iš tikrųjų JAX siekia
+1:1 atitikimo su NumPy, todėl kodo perjungimas
+gali būti toks paprastas kaip vieno importo sakinio pakeitimas!
+Tačiau dėl spartaus gilaus mokymosi vystymosi
+kai kuris kodas *spausdintame leidime*
+gali neveikti tinkamai būsimose Jax versijose.
+Planuojame palaikyti naujausią internetinę versiją.
+Jei kiltų problemų,
+kreipkitės į :ref:`chap_installation`,
+kad atnaujintumėte savo kodą ir vykdymo aplinką.
+Toliau išvardytos mūsų JAX įgyvendinimo priklausomybės.
 :end_tab:
 
 ```{.python .input}
@@ -483,67 +478,67 @@ from types import FunctionType
 from typing import Any
 ```
 
-### Target Audience
+### Tikslinė auditorija
 
-This book is for students (undergraduate or graduate),
-engineers, and researchers, who seek a solid grasp
-of the practical techniques of deep learning.
-Because we explain every concept from scratch,
-no previous background in deep learning or machine learning is required.
-Fully explaining the methods of deep learning
-requires some mathematics and programming,
-but we will only assume that you enter with some basics,
-including modest amounts of linear algebra,
-calculus, probability, and Python programming.
-Just in case you have forgotten anything,
-the [online Appendix](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html) provides a refresher
-on most of the mathematics
-you will find in this book.
-Usually, we will prioritize
-intuition and ideas
-over mathematical rigor.
-If you would like to extend these foundations
-beyond the prerequisites to understand our book,
-we happily recommend some other terrific resources:
-*Linear Analysis* by :citet:`Bollobas.1999`
-covers linear algebra and functional analysis in great depth.
+Ši knyga skirta studentams (bakalauro ar magistrantūros),
+inžinieriams ir tyrėjams, siekiantiems tvirtai įvaldyti
+praktinius gilaus mokymosi metodus.
+Kadangi kiekvieną sąvoką aiškiname nuo nulio,
+ankstesnio gilaus ar mašininio mokymosi pasirengimo nereikia.
+Išsamiai paaiškinti gilaus mokymosi metodus
+reikia šiek tiek matematikos ir programavimo,
+tačiau tikimės tik tai, kad turite pagrindų,
+įskaitant nedidelį tiesinės algebros,
+matematinės analizės, tikimybių teorijos ir Python programavimo kiekį.
+Jei ką nors pamiršote,
+[priedas internete](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html) primena
+didžiąją dalį matematikos,
+su kuria susidursite šioje knygoje.
+Paprastai teiksime pirmenybę
+intuicijai ir idėjoms
+prieš matematinį griežtumą.
+Jei norėtumėte išplėsti šiuos pagrindus
+už reikalavimų, būtinų mūsų knygai suprasti,
+mielai rekomenduojame kitų puikių šaltinių:
+*Linear Analysis*, parašyta :citet:`Bollobas.1999`,
+labai išsamiai aprėpia tiesinę algebrą ir funkcinę analizę.
 *All of Statistics* :cite:`Wasserman.2013`
-provides a marvelous introduction to statistics.
-Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918)
-and [courses](https://projects.iq.harvard.edu/stat110/home)
-on probability and inference are pedagogical gems.
-And if you have not used Python before,
-you may want to peruse this [Python tutorial](http://learnpython.org/).
+yra nuostabus statistikos įvadas.
+Joe Blitzsteino [knygos](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918)
+ir [kursai](https://projects.iq.harvard.edu/stat110/home)
+apie tikimybes ir statistinę inferenciją yra pedagoginiai perlai.
+O jei anksčiau nenaudojote Python,
+galbūt norėsite peržvelgti šį [Python vadovėlį](http://learnpython.org/).
 
 
-### Notebooks, Website, GitHub, and Forum
+### Sąsiuviniai, svetainė, GitHub ir forumas
 
-All our notebooks can be downloaded
-from the [D2L.ai website](https://d2l.ai)
-and from [GitHub](https://github.com/d2l-ai/d2l-en).
-Associated with this book we have launched a discussion forum
-at [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
-Whenever you have questions on any section of the book,
-you can find a link to the associated discussion page
-at the end of each notebook.
+Visus mūsų sąsiuvinius galima atsisiųsti
+iš [D2L.ai svetainės](https://d2l.ai)
+ir iš [GitHub](https://github.com/d2l-ai/d2l-en).
+Kartu su šia knyga paleidome diskusijų forumą
+adresu [discuss.d2l.ai](https://discuss.d2l.ai/c/5).
+Kai tik kyla klausimų apie bet kurį knygos skyrelį,
+nuorodą į atitinkamą diskusijų puslapį rasite
+kiekvieno sąsiuvinio pabaigoje.
 
 
 
-## Acknowledgments
+## Padėkos
 
-We are indebted to the hundreds of contributors for both
-the English and the Chinese drafts.
-They helped improve the content and offered valuable feedback.
-This book was originally implemented with MXNet as the primary framework.
-We thank Anirudh Dagar and Yuan Tang for adapting a majority part of earlier MXNet code into PyTorch and TensorFlow implementations, respectively.
-Since July 2021, we have redesigned and reimplemented this book in PyTorch, MXNet, and TensorFlow, choosing PyTorch as the primary framework.
-We thank Anirudh Dagar for adapting a majority part of more recent PyTorch code into JAX implementations.
-We thank Gaosheng Wu, Liujun Hu, Ge Zhang, and Jiehang Xie from Baidu for adapting a majority part of more recent PyTorch code into PaddlePaddle implementations in the Chinese draft.
-We thank Shuai Zhang for integrating the LaTeX style from the press into the PDF building.
+Esame skolingi šimtams bendradarbių tiek
+anglų, tiek kinų kalbos juodraščių rengime.
+Jie padėjo tobulinti turinį ir pateikė vertingų atsiliepimų.
+Ši knyga iš pradžių buvo įgyvendinta naudojant MXNet kaip pagrindinį karkasą.
+Dėkojame Anirudh Dagar ir Yuan Tang už tai, kad didžiąją ankstesnio MXNet kodo dalį pritaikė atitinkamai PyTorch ir TensorFlow įgyvendinimams.
+Nuo 2021 m. liepos mėnesio šią knygą perprojektavome ir iš naujo įgyvendinome PyTorch, MXNet ir TensorFlow, pagrindiniu karkasu pasirinkdami PyTorch.
+Dėkojame Anirudh Dagar už tai, kad didžiąją naujesnio PyTorch kodo dalį pritaikė JAX įgyvendinimams.
+Dėkojame Baidu darbuotojams Gaosheng Wu, Liujun Hu, Ge Zhang ir Jiehang Xie už tai, kad didžiąją naujesnio PyTorch kodo dalį pritaikė PaddlePaddle įgyvendinimams kinų kalbos juodraštyje.
+Dėkojame Shuai Zhang už leidyklos LaTeX stiliaus integravimą į PDF kūrimą.
 
-On GitHub, we thank every contributor of this English draft
-for making it better for everyone.
-Their GitHub IDs or names are (in no particular order):
+„GitHub" platformoje dėkojame kiekvienam šio anglų kalbos juodraščio
+bendradarbiui už tai, kad jį pagerino visiems.
+Jų „GitHub" ID arba vardai yra (jokia tvarka):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu,
 Rahul Agarwal, Mohamed Ali Jamaoui, Michael (Stu) Stewart, Mike Müller,
@@ -586,51 +581,51 @@ Joji Joseph, Anthony Biel, Zeming Zhao, shjustinbaek, gab-chen, nantekoto, Yutar
 Tian-MaoMao, Amin Allahyar, Gijs van Tulder, Mikhail Berkov, iamorphen, Matthew Caseres, Andrew Walsh,
 pggPL, RohanKarthikeyan, Ryan Choi, and Likun Lei.
 
-We thank Amazon Web Services, especially Wen-Ming Ye, George Karypis, Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
-and Andrew Jassy for their generous support in writing this book.
-Without the available time, resources, discussions with colleagues,
-and continuous encouragement, this book would not have happened.
-During the preparation of the book for publication,
-Cambridge University Press has offered excellent support.
-We thank our commissioning editor David Tranah
-for his help and professionalism.
+Dėkojame „Amazon Web Services", ypač Wen-Ming Ye, George Karypis, Swami Sivasubramanian, Peter DeSantis, Adam Selipsky
+ir Andrew Jassy už dosnią paramą rašant šią knygą.
+Be turimo laiko, išteklių, diskusijų su kolegomis
+ir nuolatinio padrąsinimo ši knyga nebūtų atsiradusi.
+Rengiant knygą leidybai,
+Cambridge University Press suteikė puikią pagalbą.
+Dėkojame mūsų užsakančiajam redaktoriui David Tranah
+už pagalbą ir profesionalumą.
 
 
-## Summary
+## Santrauka
 
-Deep learning has revolutionized pattern recognition,
-introducing technology that now powers a wide range of  technologies,
-in such diverse fields as computer vision,
-natural language processing,
-and automatic speech recognition.
-To successfully apply deep learning,
-you must understand how to cast a problem,
-the basic mathematics of modeling,
-the algorithms for fitting your models to data,
-and the engineering techniques to implement it all.
-This book presents a comprehensive resource,
-including prose, figures, mathematics, and code, all in one place.
+Gilusis mokymasis padarė perversmą šablonų atpažinime,
+pristatydamas technologiją, kuri dabar valdo daugybę technologijų
+tokiose skirtingose srityse kaip kompiuterinė rega,
+natūraliosios kalbos apdorojimas
+ir automatinis šnekos atpažinimas.
+Norint sėkmingai taikyti gilųjį mokymąsi,
+reikia suprasti, kaip formuluoti uždavinį,
+pagrindinę modeliavimo matematiką,
+algoritmus modeliams pritaikyti duomenims
+ir inžinerinius metodus visam tam įgyvendinti.
+Ši knyga pateikia išsamų šaltinį,
+apimantį tekstą, paveikslus, matematiką ir kodą, viską vienoje vietoje.
 
 
 
-## Exercises
+## Pratimai
 
-1. Register an account on the discussion forum of this book [discuss.d2l.ai](https://discuss.d2l.ai/).
-1. Install Python on your computer.
-1. Follow the links at the bottom of the section to the forum, where you will be able to seek out help and discuss the book and find answers to your questions by engaging the authors and broader community.
+1. Užsiregistruokite šios knygos diskusijų forume [discuss.d2l.ai](https://discuss.d2l.ai/).
+1. Įdiekite Python savo kompiuteryje.
+1. Sekite nuorodas skyrelio apačioje į forumą, kur galėsite ieškoti pagalbos, aptarti knygą ir rasti atsakymų į savo klausimus bendraudami su autoriais ir platesne bendruomene.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/18)
+[Diskusijos](https://discuss.d2l.ai/t/18)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/20)
+[Diskusijos](https://discuss.d2l.ai/t/20)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/186)
+[Diskusijos](https://discuss.d2l.ai/t/186)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17963)
+[Diskusijos](https://discuss.d2l.ai/t/17963)
 :end_tab:
