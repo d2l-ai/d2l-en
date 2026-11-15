@@ -1,26 +1,24 @@
-# Language Models
+# Kalbos modeliai
 :label:`sec_language-model`
 
-In :numref:`sec_text-sequence`, we saw how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
-The goal of *language models*
-is to estimate the joint probability of the whole sequence:
+:numref:`sec_text-sequence` matėme, kaip tekstų sekas atvaizduoti teksto vienetais, kuriuos galima laikyti diskrečių stebėjimų, pavyzdžiui, žodžių ar simbolių, seka. Tarkime, kad teksto sekos ilgio $T$ teksto vienetai yra $x_1, x_2, \ldots, x_T$.
+*Kalbos modelių* tikslas
+yra įvertinti visos sekos jungtinę tikimybę:
 
 $$P(x_1, x_2, \ldots, x_T),$$
 
-where statistical tools
-in :numref:`sec_sequence`
-can be applied.
+kur galima taikyti statistinius įrankius
+iš :numref:`sec_sequence`.
 
-Language models are incredibly useful. For instance, an ideal language model should generate natural text on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
-Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments.
-Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
+Kalbos modeliai yra nepaprastai naudingi. Pavyzdžiui, idealus kalbos modelis turėtų pats generuoti natūralų tekstą, tiesiog po vieną imdamas teksto vienetą $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
+Visiškai kitaip nei beždžionė, naudojanti rašomąją mašinėlę, visas tokio modelio sugeneruotas tekstas atrodytų kaip natūrali kalba, pvz., anglų kalbos tekstas. Be to, to pakaktų prasmingam dialogui generuoti, tiesiog sąlygojant tekstą pagal ankstesnius dialogo fragmentus.
+Akivaizdu, kad vis dar esame labai toli nuo tokios sistemos sukūrimo, nes jai reikėtų *suprasti* tekstą, o ne tik generuoti gramatiškai prasmingą turinį.
 
-Nonetheless, language models are of great service even in their limited form.
-For instance, the phrases "to recognize speech" and "to wreck a nice beach" sound very similar.
-This can cause ambiguity in speech recognition,
-which is easily resolved through a language model that rejects the second translation as outlandish.
-Likewise, in a document summarization algorithm
-it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
+Nepaisant to, kalbos modeliai labai pravarto net ir ribota forma.
+Pavyzdžiui, frazės „to recognize speech“ ir „to wreck a nice beach“ skamba labai panašiai.
+Tai gali sukelti dviprasmiškumą kalbos atpažinime,
+kuris lengvai išsprendžiamas per kalbos modelį, atmetantį antrą variantą kaip nepagrįstą.
+Lygiai taip pat dokumentų santraukų algoritme verta žinoti, kad „dog bites man“ pasitaiko daug dažniau nei „man bites dog“, o „I want to eat grandma“ yra gana šokiruojantis teiginys, o „I want to eat, grandma“ – daug nekaltesnis.
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -52,26 +50,26 @@ from d2l import jax as d2l
 from jax import numpy as jnp
 ```
 
-## Learning Language Models
+## Kalbos modelių mokymasis
 
-The obvious question is how we should model a document, or even a sequence of tokens. 
-Suppose that we tokenize text data at the word level.
-Let's start by applying basic probability rules:
+Akivaizdus klausimas, kaip turėtume modeliuoti dokumentą ar net teksto vienetų seką.
+Tarkime, kad tekstinius duomenis skaidome žodžių lygiu.
+Pradėkime nuo pagrindinių tikimybių taisyklių taikymo:
 
 $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 
-For example, 
-the probability of a text sequence containing four words would be given as:
+Pavyzdžiui,
+teksto sekos, kurioje yra keturi žodžiai, tikimybė būtų tokia:
 
 $$\begin{aligned}&P(\textrm{deep}, \textrm{learning}, \textrm{is}, \textrm{fun}) \\
 =&P(\textrm{deep}) P(\textrm{learning}  \mid  \textrm{deep}) P(\textrm{is}  \mid  \textrm{deep}, \textrm{learning}) P(\textrm{fun}  \mid  \textrm{deep}, \textrm{learning}, \textrm{is}).\end{aligned}$$
 
-### Markov Models and $n$-grams
+### Markovo modeliai ir $n$-gramos
 :label:`subsec_markov-models-and-n-grams`
 
-Among those sequence model analyses in :numref:`sec_sequence`,
-let's apply Markov models to language modeling.
-A distribution over sequences satisfies the Markov property of first order if $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+Iš :numref:`sec_sequence` sekų modelių analizių
+pritaikykime Markovo modelius kalbos modeliavimui.
+Sekų skirstinys tenkina pirmosios eilės Markovo savybę, jei $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Aukštesnės eilės atitinka ilgesnes priklausomybes. Tai veda prie keleto aproksimacijų, kurias galėtume taikyti sekai modeliuoti:
 
 $$
 \begin{aligned}
@@ -81,57 +79,56 @@ P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_1, x_2) P(x_4 
 \end{aligned}
 $$
 
-The probability formulae that involve one, two, and three variables are typically referred to as *unigram*, *bigram*, and *trigram* models, respectively. 
-In order to compute the language model, we need to calculate the
-probability of words and the conditional probability of a word given
-the previous few words.
-Note that
-such probabilities are
-language model parameters.
+Tikimybių formulės, apimančios vieną, du ir tris kintamuosius, paprastai vadinamos atitinkamai *unigramų*, *bigramų* ir *trigramų* modeliais.
+Kad apskaičiuotume kalbos modelį, turime apskaičiuoti
+žodžių tikimybę ir žodžio sąlyginę tikimybę,
+žinant kelis ankstesnius žodžius.
+Atkreipkite dėmesį, kad
+tokios tikimybės yra
+kalbos modelio parametrai.
 
 
 
-### Word Frequency
+### Žodžių dažnis
 
-Here, we
-assume that the training dataset is a large text corpus, such as all
-Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg),
-and all text posted on the
-web.
-The probability of words can be calculated from the relative word
-frequency of a given word in the training dataset.
-For example, the estimate $\hat{P}(\textrm{deep})$ can be calculated as the
-probability of any sentence starting with the word "deep". A
-slightly less accurate approach would be to count all occurrences of
-the word "deep" and divide it by the total number of words in
-the corpus.
-This works fairly well, particularly for frequent
-words. Moving on, we could attempt to estimate
+Čia
+darome prielaidą, kad mokymo duomenų rinkinys yra didelis teksto tekstynas, pavyzdžiui, visi
+Vikipedijos įrašai, [Gutenbergo projektas](https://en.wikipedia.org/wiki/Project_Gutenberg)
+ir visas internete paskelbtas tekstas.
+Žodžių tikimybę galima apskaičiuoti pagal santykinį
+duoto žodžio dažnį mokymo duomenų rinkinyje.
+Pavyzdžiui, įvertį $\hat{P}(\textrm{deep})$ galima apskaičiuoti kaip
+bet kurio sakinio, prasidedančio žodžiu „deep“, tikimybę. Šiek tiek
+mažiau tikslus būdas būtų suskaičiuoti visus žodžio
+„deep“ pasikartojimus ir padalyti iš bendro žodžių skaičiaus
+tekstyne.
+Tai veikia gana gerai, ypač dažniems
+žodžiams. Eidami toliau, galėtume bandyti įvertinti
 
 $$\hat{P}(\textrm{learning} \mid \textrm{deep}) = \frac{n(\textrm{deep, learning})}{n(\textrm{deep})},$$
 
-where $n(x)$ and $n(x, x')$ are the number of occurrences of singletons
-and consecutive word pairs, respectively.
-Unfortunately, 
-estimating the
-probability of a word pair is somewhat more difficult, since the
-occurrences of "deep learning" are a lot less frequent. 
-In particular, for some unusual word combinations it may be tricky to
-find enough occurrences to get accurate estimates.
-As suggested by the empirical results in :numref:`subsec_natural-lang-stat`,
-things take a turn for the worse for three-word combinations and beyond.
-There will be many plausible three-word combinations that we likely will not see in our dataset.
-Unless we provide some solution to assign such word combinations a nonzero count, we will not be able to use them in a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
+kur $n(x)$ ir $n(x, x')$ yra pavienių žodžių ir
+iš eilės einančių žodžių porų pasikartojimų skaičius.
+Deja,
+žodžių poros tikimybę
+įvertinti šiek tiek sunkiau, nes
+„deep learning“ pasikartojimų yra daug mažiau.
+Visų pirma kai kuriems neįprastiems žodžių deriniams gali būti sunku
+rasti pakankamai pasikartojimų tiksliems įverčiams gauti.
+Kaip rodo empiriniai rezultatai :numref:`subsec_natural-lang-stat`,
+situacija pablogėja trijų žodžių ir didesniems deriniams.
+Bus daug tikėtinų trijų žodžių derinių, kurių greičiausiai nematysime savo duomenų rinkinyje.
+Jei nepateiksime kokio nors sprendimo tokiems žodžių deriniams priskirti nenulinį skaičių, negalėsime jų naudoti kalbos modelyje. Jei duomenų rinkinys mažas arba žodžiai labai reti, galime nerasti nė vieno jų.
 
-### Laplace Smoothing
+### Laplaso glotninimas
 
-A common strategy is to perform some form of *Laplace smoothing*.
-The solution is to
-add a small constant to all counts. 
-Denote by $n$ the total number of words in
-the training set
-and $m$ the number of unique words.
-This solution helps with singletons, e.g., via
+Įprasta strategija – atlikti tam tikrą *Laplaso glotninimo* formą.
+Sprendimas yra
+pridėti nedidelę konstantą prie visų skaičių.
+Pažymėkime $n$ bendrą žodžių skaičių
+mokymo rinkinyje,
+o $m$ – unikalių žodžių skaičių.
+Šis sprendimas padeda su pavieniais žodžiais, pvz., per
 
 $$\begin{aligned}
 	\hat{P}(x) & = \frac{n(x) + \epsilon_1/m}{n + \epsilon_1}, \\
@@ -139,128 +136,123 @@ $$\begin{aligned}
 	\hat{P}(x'' \mid x,x') & = \frac{n(x, x',x'') + \epsilon_3 \hat{P}(x'')}{n(x, x') + \epsilon_3}.
 \end{aligned}$$
 
-Here $\epsilon_1,\epsilon_2$, and $\epsilon_3$ are hyperparameters.
-Take $\epsilon_1$ as an example:
-when $\epsilon_1 = 0$, no smoothing is applied;
-when $\epsilon_1$ approaches positive infinity,
-$\hat{P}(x)$ approaches the uniform probability $1/m$. 
-The above is a rather primitive variant of what
-other techniques can accomplish :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
+Čia $\epsilon_1,\epsilon_2$ ir $\epsilon_3$ yra hiperparametrai.
+Paimkime $\epsilon_1$ kaip pavyzdį:
+kai $\epsilon_1 = 0$, glotninimas netaikomas;
+kai $\epsilon_1$ artėja prie teigiamos begalybės,
+$\hat{P}(x)$ artėja prie tolygiosios tikimybės $1/m$.
+Tai gana primityvus variantas to, ką gali
+pasiekti kitos technikos :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
 
 
-Unfortunately, models like this get unwieldy rather quickly
-for the following reasons. 
-First, 
-as discussed in :numref:`subsec_natural-lang-stat`,
-many $n$-grams occur very rarely, 
-making Laplace smoothing rather unsuitable for language modeling.
-Second, we need to store all counts.
-Third, this entirely ignores the meaning of the words. For
-instance, "cat" and "feline" should occur in related contexts.
-It is quite difficult to adjust such models to additional contexts,
-whereas, deep learning based language models are well suited to
-take this into account.
-Last, long word
-sequences are almost certain to be novel, hence a model that simply
-counts the frequency of previously seen word sequences is bound to perform poorly there.
-Therefore, we focus on using neural networks for language modeling
-in the rest of the chapter.
+Deja, tokie modeliai gana greitai tampa nepatogūs
+dėl šių priežasčių.
+Pirma,
+kaip aptarta :numref:`subsec_natural-lang-stat`,
+daug $n$-gramų pasitaiko labai retai,
+todėl Laplaso glotninimas gana netinka kalbos modeliavimui.
+Antra, turime saugoti visus skaičius.
+Trečia, tai visiškai ignoruoja žodžių prasmę. Pavyzdžiui,
+„cat“ ir „feline“ turėtų pasitaikyti susijusiuose kontekstuose.
+Tokius modelius labai sunku pritaikyti papildomiems kontekstams,
+o giliuoju mokymusi pagrįsti kalbos modeliai puikiai tinka
+tai įvertinti.
+Galiausiai ilgos žodžių
+sekos beveik tikrai yra naujos, todėl modelis, kuris tiesiog
+skaičiuoja anksčiau matytų žodžių sekų dažnį, tikrai veiks prastai.
+Todėl likusioje skyriaus dalyje sutelkiame dėmesį į neuroninių tinklų naudojimą kalbos modeliavimui.
 
 
-## Perplexity
+## Painumas
 :label:`subsec_perplexity`
 
-Next, let's discuss about how to measure the quality of the language model, which we will then use to evaluate our models in the subsequent sections.
-One way is to check how surprising the text is.
-A good language model is able to predict, with high accuracy, the tokens that come next.
-Consider the following continuations of the phrase "It is raining", as proposed by different language models:
+Toliau aptarkime, kaip matuoti kalbos modelio kokybę, kurią vėliau naudosime savo modeliams vertinti kituose skyreliuose.
+Vienas būdas – patikrinti, kiek tekstas stebina.
+Geras kalbos modelis gali labai tiksliai prognozuoti teksto vienetus, kurie ateina toliau.
+Panagrinėkite šiuos frazės „It is raining“ tęsinius, pasiūlytus skirtingų kalbos modelių:
 
-1. "It is raining outside"
-1. "It is raining banana tree"
-1. "It is raining piouw;kcj pwepoiut"
+1. „It is raining outside“
+1. „It is raining banana tree“
+1. „It is raining piouw;kcj pwepoiut“
 
-In terms of quality, Example 1 is clearly the best. The words are sensible and logically coherent.
-While it might not quite accurately reflect which word follows semantically ("in San Francisco" and "in winter" would have been perfectly reasonable extensions), the model is able to capture which kind of word follows.
-Example 2 is considerably worse by producing a nonsensical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Last, Example 3 indicates a poorly trained model that does not fit data properly.
+Kokybės požiūriu 1 pavyzdys akivaizdžiai geriausias. Žodžiai yra prasmingi ir logiškai nuoseklūs.
+Nors jis gali ir nelabai tiksliai atspindėti, kuris žodis semantiškai seka („in San Francisco“ ir „in winter“ būtų buvę visiškai pagrįsti tęsiniai), modelis geba užfiksuoti, kokio tipo žodis seka.
+2 pavyzdys yra gerokai blogesnis, nes sukuria beprasmį tęsinį. Vis dėlto bent jau modelis išmoko rašyti žodžius ir tam tikro laipsnio koreliaciją tarp žodžių. Galiausiai 3 pavyzdys rodo prastai apmokytą modelį, kuris tinkamai neatitinka duomenų.
 
-We might measure the quality of the model by computing  the likelihood of the sequence.
-Unfortunately this is a number that is hard to understand and difficult to compare.
-After all, shorter sequences are much more likely to occur than the longer ones,
-hence evaluating the model on Tolstoy's magnum opus
-*War and Peace* will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella *The Little Prince*. What is missing is the equivalent of an average.
+Modelio kokybę galėtume matuoti skaičiuodami sekos tikėtinumą.
+Deja, tai skaičius, kurį sunku suprasti ir sunku palyginti.
+Juk trumpesnės sekos pasitaiko kur kas tikėtiniau nei ilgesnės,
+todėl modelio vertinimas pagal Tolstojaus šedevrą
+*Karas ir taika* neišvengiamai duos daug mažesnį tikėtinumą nei, pavyzdžiui, pagal Saint-Exupéry apysaką *Mažasis princas*. Trūksta vidurkio atitikmens.
 
-Information theory comes handy here.
-We defined entropy, surprisal, and cross-entropy
-when we introduced the softmax regression
+Čia praverčia informacijos teorija.
+Entropiją, nuostabą ir kryžminę entropiją apibrėžėme,
+kai pristatėme softmax regresiją
 (:numref:`subsec_info_theory_basics`).
-If we want to compress text, we can ask about
-predicting the next token given the current set of tokens.
-A better language model should allow us to predict the next token more accurately.
-Thus, it should allow us to spend fewer bits in compressing the sequence.
-So we can measure it by the cross-entropy loss averaged
-over all the $n$ tokens of a sequence:
+Jei norime suglaudinti tekstą, galime klausti apie
+kito teksto vieneto prognozavimą, turint dabartinį teksto vienetų rinkinį.
+Geresnis kalbos modelis turėtų leisti tiksliau prognozuoti kitą teksto vienetą.
+Taigi jis turėtų leisti sunaudoti mažiau bitų sekai suglaudinti.
+Todėl galime jį matuoti kryžminės entropijos nuostoliu, vidurkintu
+per visus sekos $n$ teksto vienetų:
 
 $$\frac{1}{n} \sum_{t=1}^n -\log P(x_t \mid x_{t-1}, \ldots, x_1),$$
 :eqlabel:`eq_avg_ce_for_lm`
 
-where $P$ is given by a language model and $x_t$ is the actual token observed at time step $t$ from the sequence.
-This makes the performance on documents of different lengths comparable. For historical reasons, scientists in natural language processing prefer to use a quantity called *perplexity*. In a nutshell, it is the exponential of :eqref:`eq_avg_ce_for_lm`:
+kur $P$ pateikia kalbos modelis, o $x_t$ yra faktinis teksto vienetas, stebėtas sekoje laiko žingsniu $t$.
+Tai daro skirtingo ilgio dokumentų našumą palyginamą. Dėl istorinių priežasčių natūraliosios kalbos apdorojimo mokslininkai mieliau naudoja dydį, vadinamą *painumu* (angl. *perplexity*). Trumpai tariant, tai :eqref:`eq_avg_ce_for_lm` eksponentė:
 
 $$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
 
-Perplexity can be best understood as the reciprocal of the geometric mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
+Painumą geriausia suprasti kaip realių pasirinkimų, kuriuos turime nuspręsdami, kurį teksto vienetą rinktis toliau, skaičiaus geometrinio vidurkio atvirkštinį dydį. Pažvelkime į keletą atvejų:
 
-* In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
-* In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
-* At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do for encoding it. Hence, this provides a nontrivial upper bound that any useful model must beat.
+* Geriausiu atveju modelis visada tobulai įvertina tikslinio teksto vieneto tikimybę kaip 1. Šiuo atveju modelio painumas yra 1.
+* Blogiausiu atveju modelis visada prognozuoja tikslinio teksto vieneto tikimybę kaip 0. Šioje situacijoje painumas yra teigiama begalybė.
+* Bazinėje linijoje modelis prognozuoja tolygųjį skirstinį per visus turimus žodyno teksto vienetus. Šiuo atveju painumas lygus unikalių žodyno teksto vienetų skaičiui. Iš tikrųjų, jei saugotume seką be jokio glaudinimo, tai būtų geriausia, ką galėtume padaryti ją koduodami. Todėl tai suteikia netrivialią viršutinę ribą, kurią turi įveikti bet kuris naudingas modelis.
 
-## Partitioning Sequences
+## Sekų skaidymas
 :label:`subsec_partitioning-seqs`
 
-We will design language models using neural networks
-and use perplexity to evaluate 
-how good the model is at 
-predicting the next token given the current set of tokens
-in text sequences.
-Before introducing the model,
-let's assume that it
-processes a minibatch of sequences with predefined length
-at a time.
-Now the question is how to [**read minibatches of input sequences and target sequences at random**].
+Kalbos modelius projektuosime naudodami neuroninius tinklus
+ir naudosime painumą, kad įvertintume,
+kaip gerai modelis
+prognozuoja kitą teksto vienetą, turint dabartinį teksto vienetų rinkinį
+teksto sekose.
+Prieš pristatydami modelį,
+tarkime, kad jis
+vienu metu apdoroja minirinkinį iš iš anksto nustatyto ilgio sekų.
+Dabar klausimas, kaip [**atsitiktinai skaityti įvesties sekų ir tikslinių sekų minirinkinius**].
 
 
-Suppose that the dataset takes the form of a sequence of $T$ token indices in `corpus`.
-We will
-partition it
-into subsequences, where each subsequence has $n$ tokens (time steps).
-To iterate over 
-(almost) all the tokens of the entire dataset 
-for each epoch
-and obtain all possible length-$n$ subsequences,
-we can introduce randomness.
-More concretely,
-at the beginning of each epoch,
-discard the first $d$ tokens,
-where $d\in [0,n)$ is uniformly sampled at random.
-The rest of the sequence
-is then partitioned
-into $m=\lfloor (T-d)/n \rfloor$ subsequences.
-Denote by $\mathbf x_t = [x_t, \ldots, x_{t+n-1}]$ the length-$n$ subsequence starting from token $x_t$ at time step $t$. 
-The resulting $m$ partitioned subsequences
-are 
+Tarkime, kad duomenų rinkinys yra $T$ teksto vienetų indeksų seka `corpus`.
+Suskaidysime ją
+į posekius, kur kiekvienas posekis turi $n$ teksto vienetų (laiko žingsnių).
+Kad kiekvienai epochai iteruotume per
+(beveik) visus viso duomenų rinkinio teksto vienetus
+ir gautume visus galimus ilgio $n$ posekius,
+galime įvesti atsitiktinumą.
+Konkrečiau,
+kiekvienos epochos pradžioje
+atmetame pirmuosius $d$ teksto vienetų,
+kur $d\in [0,n)$ atsitiktinai imamas tolygiai.
+Likusi sekos dalis
+tada skaidoma
+į $m=\lfloor (T-d)/n \rfloor$ posekių.
+Pažymėkime $\mathbf x_t = [x_t, \ldots, x_{t+n-1}]$ ilgio $n$ posekį, prasidedantį nuo teksto vieneto $x_t$ laiko žingsniu $t$.
+Gauti $m$ suskaidytų posekių yra
 $\mathbf x_d, \mathbf x_{d+n}, \ldots, \mathbf x_{d+n(m-1)}.$
-Each subsequence will be used as an input sequence into the language model.
+Kiekvienas posekis bus naudojamas kaip įvesties seka kalbos modeliui.
 
 
-For language modeling,
-the goal is to predict the next token based on the tokens we have seen so far; hence the targets (labels) are the original sequence, shifted by one token.
-The target sequence for any input sequence $\mathbf x_t$
-is $\mathbf x_{t+1}$ with length $n$.
+Kalbos modeliavimui
+tikslas yra prognozuoti kitą teksto vienetą pagal iki šiol matytus teksto vienetus; todėl tikslai (žymenys) yra originali seka, pastumta vienu teksto vienetu.
+Bet kurios įvesties sekos $\mathbf x_t$ tikslinė seka
+yra $\mathbf x_{t+1}$, kurios ilgis $n$.
 
-![Obtaining five pairs of input sequences and target sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
+![Penkių įvesties sekų ir tikslinių sekų porų gavimas iš suskaidytų ilgio 5 posekių.](../img/lang-model-data.svg)
 :label:`fig_lang_model_data`
 
-:numref:`fig_lang_model_data` shows an example of obtaining five pairs of input sequences and target sequences with $n=5$ and $d=2$.
+:numref:`fig_lang_model_data` parodytas penkių įvesties sekų ir tikslinių sekų porų gavimo pavyzdys, kai $n=5$ ir $d=2$.
 
 ```{.python .input  n=5}
 %%tab all
@@ -274,13 +266,13 @@ def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
     self.X, self.Y = array[:,:-1], array[:,1:]
 ```
 
-To train language models,
-we will randomly sample 
-pairs of input sequences and target sequences
-in minibatches.
-The following data loader randomly generates a minibatch from the dataset each time.
-The argument `batch_size` specifies the number of subsequence examples in each minibatch
-and `num_steps` is the subsequence length in tokens.
+Kalbos modeliams apmokyti
+atsitiktinai imsime
+įvesties sekų ir tikslinių sekų poras
+minirinkiniuose.
+Šis duomenų įkėliklis kiekvieną kartą atsitiktinai sugeneruoja minirinkinį iš duomenų rinkinio.
+Argumentas `batch_size` nurodo posekių pavyzdžių skaičių kiekviename minirinkinyje,
+o `num_steps` yra posekio ilgis teksto vienetais.
 
 ```{.python .input  n=6}
 %%tab all
@@ -291,11 +283,11 @@ def get_dataloader(self, train):
     return self.get_tensorloader([self.X, self.Y], train, idx)
 ```
 
-As we can see in the following, 
-a minibatch of target sequences
-can be obtained 
-by shifting the input sequences
-by one token.
+Kaip matome toliau,
+tikslinių sekų minirinkinį
+galima gauti
+pastūmus įvesties sekas
+vienu teksto vienetu.
 
 ```{.python .input  n=7}
 %%tab all
@@ -305,38 +297,38 @@ for X, Y in data.train_dataloader():
     break
 ```
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-Language models estimate the joint probability of a text sequence. For long sequences, $n$-grams provide a convenient model by truncating the dependence. However, there is a lot of structure but not enough frequency to deal efficiently with infrequent word combinations via Laplace smoothing. Thus, we will focus on neural language modeling in subsequent sections.
-To train language models, we can randomly sample pairs of input sequences and target sequences in minibatches. After training, we will use perplexity to measure the language model quality.
+Kalbos modeliai įvertina teksto sekos jungtinę tikimybę. Ilgoms sekoms $n$-gramos yra patogus modelis, nes sutrumpina priklausomybę. Tačiau yra daug struktūros, bet nepakanka dažnio, kad efektyviai susidorotume su retais žodžių deriniais per Laplaso glotninimą. Todėl vėlesniuose skyreliuose sutelksime dėmesį į neuroninį kalbos modeliavimą.
+Kalbos modeliams apmokyti galime atsitiktinai imti įvesties sekų ir tikslinių sekų poras minirinkiniuose. Po apmokymo naudosime painumą kalbos modelio kokybei matuoti.
 
-Language models can be scaled up with increased data size, model size, and amount in training compute. Large language models can perform desired tasks by predicting output text given input text instructions. As we will discuss later (e.g., :numref:`sec_large-pretraining-transformers`),
-at the present moment
-large language models form the basis of state-of-the-art systems across diverse tasks.
+Kalbos modelius galima didinti didinant duomenų dydį, modelio dydį ir apmokymo skaičiavimų kiekį. Dideli kalbos modeliai gali atlikti norimas užduotis prognozuodami išvesties tekstą pagal įvesties teksto nurodymus. Kaip aptarsime vėliau (pvz., :numref:`sec_large-pretraining-transformers`),
+šiuo metu
+dideli kalbos modeliai sudaro pažangiausių įvairių užduočių sistemų pagrindą.
 
 
-## Exercises
+## Pratimai
 
-1. Suppose there are 100,000 words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
-1. How would you model a dialogue?
-1. What other methods can you think of for reading long sequence data?
-1. Consider our method for discarding a uniformly random number of the first few tokens at the beginning of each epoch.
-    1. Does it really lead to a perfectly uniform distribution over the sequences on the document?
-    1. What would you have to do to make things even more uniform? 
-1. If we want a sequence example to be a complete sentence, what kind of problem does this introduce in minibatch sampling? How can we fix it?
+1. Tarkime, mokymo duomenų rinkinyje yra 100 000 žodžių. Kiek žodžių dažnių ir kelių gretimų žodžių dažnių turi saugoti keturgramė?
+1. Kaip modeliuotumėte dialogą?
+1. Kokių kitų ilgų sekų duomenų skaitymo metodų galite sugalvoti?
+1. Apsvarstykite mūsų metodą atmesti tolygiai atsitiktinį skaičių pirmųjų teksto vienetų kiekvienos epochos pradžioje.
+    1. Ar tai tikrai lemia visiškai tolygų sekų skirstinį dokumente?
+    1. Ką reikėtų padaryti, kad viskas būtų dar tolygiau?
+1. Jei norime, kad sekos pavyzdys būtų pilnas sakinys, kokią problemą tai sukelia minirinkinių atrankoje? Kaip ją galime ištaisyti?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/117)
+[Diskusijos](https://discuss.d2l.ai/t/117)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/118)
+[Diskusijos](https://discuss.d2l.ai/t/118)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1049)
+[Diskusijos](https://discuss.d2l.ai/t/1049)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18012)
+[Diskusijos](https://discuss.d2l.ai/t/18012)
 :end_tab:

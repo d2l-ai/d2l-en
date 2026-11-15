@@ -3,14 +3,14 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Convolutions for Images
+# Konvoliucijos vaizdams
 :label:`sec_conv_layer`
 
-Now that we understand how convolutional layers work in theory,
-we are ready to see how they work in practice.
-Building on our motivation of convolutional neural networks
-as efficient architectures for exploring structure in image data,
-we stick with images as our running example.
+Dabar, kai teoriškai suprantame, kaip veikia konvoliuciniai sluoksniai,
+esame pasirengę pamatyti, kaip jie veikia praktikoje.
+Remdamiesi savo konvoliucinių neuroninių tinklų motyvacija
+kaip efektyvių architektūrų vaizdo duomenų struktūrai tyrinėti,
+kaip nuolatinį pavyzdį toliau naudojame vaizdus.
 
 ```{.python .input}
 %%tab mxnet
@@ -41,45 +41,45 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## The Cross-Correlation Operation
+## Kryžminės koreliacijos operacija
 
-Recall that strictly speaking, convolutional layers
-are a  misnomer, since the operations they express
-are more accurately described as cross-correlations.
-Based on our descriptions of convolutional layers in :numref:`sec_why-conv`,
-in such a layer, an input tensor
-and a kernel tensor are combined
-to produce an output tensor through a (**cross-correlation operation.**)
+Prisiminkite, kad griežtai kalbant, konvoliucinių sluoksnių pavadinimas
+yra klaidingas, nes jų išreiškiamos operacijos
+tiksliau apibūdinamos kaip kryžminės koreliacijos.
+Remiantis mūsų konvoliucinių sluoksnių aprašymais :numref:`sec_why-conv`,
+tokiame sluoksnyje įvesties tenzorius
+ir branduolio tenzorius sujungiami,
+kad per (**kryžminės koreliacijos operaciją**) būtų gautas išvesties tenzorius.
 
-Let's ignore channels for now and see how this works
-with two-dimensional data and hidden representations.
-In :numref:`fig_correlation`,
-the input is a two-dimensional tensor
-with a height of 3 and width of 3.
-We mark the shape of the tensor as $3 \times 3$ or ($3$, $3$).
-The height and width of the kernel are both 2.
-The shape of the *kernel window* (or *convolution window*)
-is given by the height and width of the kernel
-(here it is $2 \times 2$).
+Kol kas ignoruokime kanalus ir pažiūrėkime, kaip tai veikia
+su dvimačiais duomenimis ir paslėptaisiais atvaizdais.
+:numref:`fig_correlation`
+įvestis yra dvimatis tenzorius,
+kurio aukštis 3 ir plotis 3.
+Tenzoriaus formą žymime $3 \times 3$ arba ($3$, $3$).
+Branduolio aukštis ir plotis abu yra 2.
+*Branduolio lango* (arba *konvoliucijos lango*) forma
+nustatoma pagal branduolio aukštį ir plotį
+(čia tai $2 \times 2$).
 
-![Two-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
+![Dvimatė kryžminės koreliacijos operacija. Pažymėtos dalys yra pirmasis išvesties elementas ir įvesties bei branduolio tenzoriaus elementai, naudoti išvesčiai skaičiuoti: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
 :label:`fig_correlation`
 
-In the two-dimensional cross-correlation operation,
-we begin with the convolution window positioned
-at the upper-left corner of the input tensor
-and slide it across the input tensor,
-both from left to right and top to bottom.
-When the convolution window slides to a certain position,
-the input subtensor contained in that window
-and the kernel tensor are multiplied elementwise
-and the resulting tensor is summed up
-yielding a single scalar value.
-This result gives the value of the output tensor
-at the corresponding location.
-Here, the output tensor has a height of 2 and width of 2
-and the four elements are derived from
-the two-dimensional cross-correlation operation:
+Dvimatėje kryžminės koreliacijos operacijoje
+pradedame nuo konvoliucijos lango, padėto
+įvesties tenzoriaus viršutiniame kairiajame kampe,
+ir slenkame jį per įvesties tenzorių
+iš kairės į dešinę ir iš viršaus į apačią.
+Kai konvoliucijos langas pasislenka į tam tikrą padėtį,
+šiame lange esantis įvesties potenzorius
+ir branduolio tenzorius sudauginami elementas po elemento,
+o gautas tenzorius susumuojamas,
+gaunant vieną skaliarinę reikšmę.
+Šis rezultatas yra išvesties tenzoriaus reikšmė
+atitinkamoje vietoje.
+Čia išvesties tenzoriaus aukštis yra 2, o plotis – 2,
+ir keturi elementai gaunami
+iš dvimatės kryžminės koreliacijos operacijos:
 
 $$
 0\times0+1\times1+3\times2+4\times3=19,\\
@@ -88,25 +88,25 @@ $$
 4\times0+5\times1+7\times2+8\times3=43.
 $$
 
-Note that along each axis, the output size
-is slightly smaller than the input size.
-Because the kernel has width and height greater than $1$,
-we can only properly compute the cross-correlation
-for locations where the kernel fits wholly within the image,
-the output size is given by the input size $n_\textrm{h} \times n_\textrm{w}$
-minus the size of the convolution kernel $k_\textrm{h} \times k_\textrm{w}$
-via
+Atkreipkite dėmesį, kad išilgai kiekvienos ašies išvesties dydis
+yra šiek tiek mažesnis už įvesties dydį.
+Kadangi branduolio plotis ir aukštis didesni nei $1$,
+kryžminę koreliaciją galime tinkamai apskaičiuoti tik
+vietoms, kuriose branduolys visiškai telpa vaizde,
+todėl išvesties dydis lygus įvesties dydžiui $n_\textrm{h} \times n_\textrm{w}$,
+atėmus konvoliucijos branduolio dydį $k_\textrm{h} \times k_\textrm{w}$,
+pagal
 
 $$(n_\textrm{h}-k_\textrm{h}+1) \times (n_\textrm{w}-k_\textrm{w}+1).$$
 
-This is the case since we need enough space
-to "shift" the convolution kernel across the image.
-Later we will see how to keep the size unchanged
-by padding the image with zeros around its boundary
-so that there is enough space to shift the kernel.
-Next, we implement this process in the `corr2d` function,
-which accepts an input tensor `X` and a kernel tensor `K`
-and returns an output tensor `Y`.
+Taip yra todėl, kad mums reikia pakankamai vietos
+konvoliucijos branduoliui „pastumti“ per vaizdą.
+Vėliau pamatysime, kaip išlaikyti dydį nepakitusį,
+papildant vaizdą nuliais aplink jo kraštą,
+kad būtų pakankamai vietos branduoliui slinkti.
+Toliau šį procesą įgyvendiname funkcijoje `corr2d`,
+kuri priima įvesties tenzorių `X` ir branduolio tenzorių `K`
+ir grąžina išvesties tenzorių `Y`.
 
 ```{.python .input}
 %%tab mxnet
@@ -157,10 +157,10 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K`
-from :numref:`fig_correlation`
-to [**validate the output of the above implementation**]
-of the two-dimensional cross-correlation operation.
+Galime sukonstruoti įvesties tenzorių `X` ir branduolio tenzorių `K`
+iš :numref:`fig_correlation`,
+kad [**patvirtintume aukščiau pateikto įgyvendinimo išvestį**]
+dvimatei kryžminės koreliacijos operacijai.
 
 ```{.python .input}
 %%tab all
@@ -169,22 +169,22 @@ K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 corr2d(X, K)
 ```
 
-## Convolutional Layers
+## Konvoliuciniai sluoksniai
 
-A convolutional layer cross-correlates the input and kernel
-and adds a scalar bias to produce an output.
-The two parameters of a convolutional layer
-are the kernel and the scalar bias.
-When training models based on convolutional layers,
-we typically initialize the kernels randomly,
-just as we would with a fully connected layer.
+Konvoliucinis sluoksnis kryžmiškai koreliuoja įvestį ir branduolį
+ir prideda skaliarinį poslinkį, kad gautų išvestį.
+Du konvoliucinio sluoksnio parametrai
+yra branduolys ir skaliarinis poslinkis.
+Apmokant modelius, pagrįstus konvoliuciniais sluoksniais,
+branduolius paprastai inicializuojame atsitiktinai,
+lygiai kaip ir pilnai sujungtame sluoksnyje.
 
-We are now ready to [**implement a two-dimensional convolutional layer**]
-based on the `corr2d` function defined above.
-In the `__init__` constructor method,
-we declare `weight` and `bias` as the two model parameters.
-The forward propagation method
-calls the `corr2d` function and adds the bias.
+Dabar esame pasirengę [**įgyvendinti dvimatį konvoliucinį sluoksnį**],
+pagrįstą aukščiau apibrėžta funkcija `corr2d`.
+Konstruktoriaus metode `__init__`
+deklaruojame `weight` ir `bias` kaip du modelio parametrus.
+Tiesioginio sklidimo metodas
+kviečia funkciją `corr2d` ir prideda poslinkį.
 
 ```{.python .input}
 %%tab mxnet
@@ -240,22 +240,21 @@ class Conv2D(nn.Module):
         return corr2d(x, self.weight) + self.bias
 ```
 
-In
-$h \times w$ convolution
-or an $h \times w$ convolution kernel,
-the height and width of the convolution kernel are $h$ and $w$, respectively.
-We also refer to
-a convolutional layer with an $h \times w$
-convolution kernel simply as an $h \times w$ convolutional layer.
+Sąvokoje
+$h \times w$ konvoliucija
+arba $h \times w$ konvoliucijos branduolys
+konvoliucijos branduolio aukštis ir plotis yra atitinkamai $h$ ir $w$.
+Taip pat konvoliucinį sluoksnį su $h \times w$
+konvoliucijos branduoliu vadiname tiesiog $h \times w$ konvoliuciniu sluoksniu.
 
 
-## Object Edge Detection in Images
+## Objekto kraštų aptikimas vaizduose
 
-Let's take a moment to parse [**a simple application of a convolutional layer:
-detecting the edge of an object in an image**]
-by finding the location of the pixel change.
-First, we construct an "image" of $6\times 8$ pixels.
-The middle four columns are black ($0$) and the rest are white ($1$).
+Skirkime akimirką išnagrinėti [**paprastą konvoliucinio sluoksnio taikymą:
+objekto krašto aptikimą vaizde**],
+randant pikselių pokyčio vietą.
+Pirmiausia sukonstruojame $6\times 8$ pikselių „vaizdą“.
+Vidurinieji keturi stulpeliai yra juodi ($0$), o likę – balti ($1$).
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -278,22 +277,22 @@ X = X.at[:, 2:6].set(0)
 X
 ```
 
-Next, we construct a kernel `K` with a height of 1 and a width of 2.
-When we perform the cross-correlation operation with the input,
-if the horizontally adjacent elements are the same,
-the output is 0. Otherwise, the output is nonzero.
-Note that this kernel is a special case of a finite difference operator. At location $(i,j)$ it computes $x_{i,j} - x_{(i+1),j}$, i.e., it computes the difference between the values of horizontally adjacent pixels. This is a discrete approximation of the first derivative in the horizontal direction. After all, for a function $f(i,j)$ its derivative $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Let's see how this works in practice.
+Toliau sukonstruojame branduolį `K`, kurio aukštis 1, o plotis 2.
+Kai atliekame kryžminės koreliacijos operaciją su įvestimi,
+jei horizontaliai gretimi elementai yra vienodi,
+išvestis yra 0. Priešingu atveju išvestis yra nenulinė.
+Atkreipkite dėmesį, kad šis branduolys yra ypatingas baigtinių skirtumų operatoriaus atvejis. Vietoje $(i,j)$ jis apskaičiuoja $x_{i,j} - x_{(i+1),j}$, t. y. apskaičiuoja skirtumą tarp horizontaliai gretimų pikselių reikšmių. Tai yra diskreti pirmosios išvestinės horizontalia kryptimi aproksimacija. Juk funkcijai $f(i,j)$ jos išvestinė $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Pažiūrėkime, kaip tai veikia praktikoje.
 
 ```{.python .input}
 %%tab all
 K = d2l.tensor([[1.0, -1.0]])
 ```
 
-We are ready to perform the cross-correlation operation
-with arguments `X` (our input) and `K` (our kernel).
-As you can see, [**we detect $1$ for the edge from white to black
-and $-1$ for the edge from black to white.**]
-All other outputs take value $0$.
+Esame pasirengę atlikti kryžminės koreliacijos operaciją
+su argumentais `X` (mūsų įvestis) ir `K` (mūsų branduolys).
+Kaip matote, [**aptinkame $1$ kraštui iš baltos į juodą
+ir $-1$ kraštui iš juodos į baltą.**]
+Visos kitos išvestys įgyja reikšmę $0$.
 
 ```{.python .input}
 %%tab all
@@ -301,35 +300,34 @@ Y = corr2d(X, K)
 Y
 ```
 
-We can now apply the kernel to the transposed image.
-As expected, it vanishes. [**The kernel `K` only detects vertical edges.**]
+Dabar galime pritaikyti branduolį transponuotam vaizdui.
+Kaip tikėtasi, jis išnyksta. [**Branduolys `K` aptinka tik vertikalius kraštus.**]
 
 ```{.python .input}
 %%tab all
 corr2d(d2l.transpose(X), K)
 ```
 
-## Learning a Kernel
+## Branduolio mokymasis
 
-Designing an edge detector by finite differences `[1, -1]` is neat
-if we know this is precisely what we are looking for.
-However, as we look at larger kernels,
-and consider successive layers of convolutions,
-it might be impossible to specify
-precisely what each filter should be doing manually.
+Kraštų detektoriaus projektavimas baigtiniais skirtumais `[1, -1]` yra puiku,
+jei žinome, kad tiksliai to ir ieškome.
+Tačiau, kai žiūrime į didesnius branduolius
+ir svarstome nuoseklius konvoliucijų sluoksnius,
+gali būti neįmanoma rankiniu būdu tiksliai nurodyti,
+ką turėtų daryti kiekvienas filtras.
 
-Now let's see whether we can [**learn the kernel that generated `Y` from `X`**]
-by looking at the input--output pairs only.
-We first construct a convolutional layer
-and initialize its kernel as a random tensor.
-Next, in each iteration, we will use the squared error
-to compare `Y` with the output of the convolutional layer.
-We can then calculate the gradient to update the kernel.
-For the sake of simplicity,
-in the following
-we use the built-in class
-for two-dimensional convolutional layers
-and ignore the bias.
+Dabar pažiūrėkime, ar galime [**išmokti branduolį, sugeneravusį `Y` iš `X`**],
+žiūrėdami tik į įvesties ir išvesties poras.
+Pirmiausia sukonstruojame konvoliucinį sluoksnį
+ir inicializuojame jo branduolį kaip atsitiktinį tenzorių.
+Toliau kiekvienoje iteracijoje naudosime kvadratinę paklaidą,
+kad palygintume `Y` su konvoliucinio sluoksnio išvestimi.
+Tada galime apskaičiuoti gradientą branduoliui atnaujinti.
+Paprastumo dėlei toliau
+naudojame įtaisytąją klasę
+dvimačiams konvoliuciniams sluoksniams
+ir ignoruojame poslinkį.
 
 ```{.python .input}
 %%tab mxnet
@@ -435,7 +433,7 @@ for i in range(10):
         print(f'epoch {i + 1}, loss {l:.3f}')
 ```
 
-Note that the error has dropped to a small value after 10 iterations. Now we will [**take a look at the kernel tensor we learned.**]
+Atkreipkite dėmesį, kad po 10 iteracijų paklaida nukrito iki mažos reikšmės. Dabar [**pažiūrėsime į išmoktą branduolio tenzorių.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -457,140 +455,138 @@ d2l.reshape(conv2d.get_weights()[0], (1, 2))
 params['params']['kernel'].reshape((1, 2))
 ```
 
-Indeed, the learned kernel tensor is remarkably close
-to the kernel tensor `K` we defined earlier.
+Iš tiesų išmoktas branduolio tenzorius yra stebėtinai artimas
+anksčiau apibrėžtam branduolio tenzoriui `K`.
 
-## Cross-Correlation and Convolution
+## Kryžminė koreliacija ir konvoliucija
 
-Recall our observation from :numref:`sec_why-conv` of the correspondence
-between the cross-correlation and convolution operations.
-Here let's continue to consider two-dimensional convolutional layers.
-What if such layers
-perform strict convolution operations
-as defined in :eqref:`eq_2d-conv-discrete`
-instead of cross-correlations?
-In order to obtain the output of the strict *convolution* operation, we only need to flip the two-dimensional kernel tensor both horizontally and vertically, and then perform the *cross-correlation* operation with the input tensor.
+Prisiminkite mūsų pastebėjimą iš :numref:`sec_why-conv` apie atitiktį
+tarp kryžminės koreliacijos ir konvoliucijos operacijų.
+Čia toliau nagrinėkime dvimačius konvoliucinius sluoksnius.
+Kas, jei tokie sluoksniai
+atliktų griežtas konvoliucijos operacijas,
+apibrėžtas :eqref:`eq_2d-conv-discrete`,
+užuot atlikę kryžmines koreliacijas?
+Kad gautume griežtos *konvoliucijos* operacijos išvestį, tereikia apversti dvimatį branduolio tenzorių ir horizontaliai, ir vertikaliai, o tada atlikti *kryžminės koreliacijos* operaciją su įvesties tenzoriumi.
 
-It is noteworthy that since kernels are learned from data in deep learning,
-the outputs of convolutional layers remain unaffected
-no matter such layers
-perform
-either the strict convolution operations
-or the cross-correlation operations.
+Pažymėtina, kad kadangi giliajame mokyme branduoliai išmokstami iš duomenų,
+konvoliucinių sluoksnių išvestys išlieka nepaveiktos
+nesvarbu, ar tokie sluoksniai
+atlieka
+griežtas konvoliucijos operacijas,
+ar kryžminės koreliacijos operacijas.
 
-To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is here denoted as the matrix $\mathbf{K}$.
-Assuming that other conditions remain unchanged,
-when this layer instead performs strict *convolution*,
-the learned kernel $\mathbf{K}'$ will be the same as $\mathbf{K}$
-after $\mathbf{K}'$ is
-flipped both horizontally and vertically.
-That is to say,
-when the convolutional layer
-performs strict *convolution*
-for the input in :numref:`fig_correlation`
-and $\mathbf{K}'$,
-the same output in :numref:`fig_correlation`
-(cross-correlation of the input and $\mathbf{K}$)
-will be obtained.
+Kad tai iliustruotume, tarkime, kad konvoliucinis sluoksnis atlieka *kryžminę koreliaciją* ir išmoksta branduolį iš :numref:`fig_correlation`, čia žymimą matrica $\mathbf{K}$.
+Darant prielaidą, kad kitos sąlygos nesikeičia,
+kai šis sluoksnis vietoj to atlieka griežtą *konvoliuciją*,
+išmoktas branduolys $\mathbf{K}'$ bus toks pat kaip $\mathbf{K}$,
+kai $\mathbf{K}'$ yra
+apverstas ir horizontaliai, ir vertikaliai.
+Tai reiškia, kad
+kai konvoliucinis sluoksnis
+atlieka griežtą *konvoliuciją*
+:numref:`fig_correlation` įvesčiai
+ir $\mathbf{K}'$,
+bus gauta ta pati :numref:`fig_correlation` išvestis
+(įvesties ir $\mathbf{K}$ kryžminė koreliacija).
 
-In keeping with standard terminology in deep learning literature,
-we will continue to refer to the cross-correlation operation
-as a convolution even though, strictly-speaking, it is slightly different.
-Furthermore,
-we use the term *element* to refer to
-an entry (or component) of any tensor representing a layer representation or a convolution kernel.
+Laikydamiesi standartinės giliojo mokymosi literatūros terminijos,
+toliau kryžminės koreliacijos operaciją vadinsime
+konvoliucija, nors griežtai kalbant ji šiek tiek skiriasi.
+Be to,
+terminą *elementas* vartojame
+sluoksnio atvaizdą ar konvoliucijos branduolį atitinkančio bet kurio tenzoriaus įrašui (ar komponentei) žymėti.
 
 
-## Feature Map and Receptive Field
+## Požymių žemėlapis ir lokali matymo sritis
 
-As described in :numref:`subsec_why-conv-channels`,
-the convolutional layer output in
+Kaip aprašyta :numref:`subsec_why-conv-channels`,
+konvoliucinio sluoksnio išvestis
 :numref:`fig_correlation`
-is sometimes called a *feature map*,
-as it can be regarded as
-the learned representations (features)
-in the spatial dimensions (e.g., width and height)
-to the subsequent layer.
-In CNNs,
-for any element $x$ of some layer,
-its *receptive field* refers to
-all the elements (from all the previous layers)
-that may affect the calculation of $x$
-during the forward propagation.
-Note that the receptive field
-may be larger than the actual size of the input.
+kartais vadinama *požymių žemėlapiu*,
+nes ją galima laikyti
+išmoktais atvaizdais (požymiais)
+erdvinėse dimensijose (pvz., plotyje ir aukštyje),
+skirtais kitam sluoksniui.
+CNN
+bet kurio sluoksnio elemento $x$
+*lokali matymo sritis* (angl. *receptive field*) reiškia
+visus elementus (iš visų ankstesnių sluoksnių),
+kurie gali paveikti $x$ skaičiavimą
+tiesioginio sklidimo metu.
+Atkreipkite dėmesį, kad lokali matymo sritis
+gali būti didesnė nei tikrasis įvesties dydis.
 
-Let's continue to use :numref:`fig_correlation` to explain the receptive field.
-Given the $2 \times 2$ convolution kernel,
-the receptive field of the shaded output element (of value $19$)
-is
-the four elements in the shaded portion of the input.
-Now let's denote the $2 \times 2$
-output as $\mathbf{Y}$
-and consider a deeper CNN
-with an additional $2 \times 2$ convolutional layer that takes $\mathbf{Y}$
-as its input, outputting
-a single element $z$.
-In this case,
-the receptive field of $z$
-on $\mathbf{Y}$ includes all the four elements of $\mathbf{Y}$,
-while
-the receptive field
-on the input includes all the nine input elements.
-Thus,
-when any element in a feature map
-needs a larger receptive field
-to detect input features over a broader area,
-we can build a deeper network.
+Toliau naudokime :numref:`fig_correlation`, kad paaiškintume lokalią matymo sritį.
+Turint $2 \times 2$ konvoliucijos branduolį,
+pažymėto išvesties elemento (kurio reikšmė $19$)
+lokali matymo sritis yra
+keturi įvesties elementai pažymėtoje dalyje.
+Dabar $2 \times 2$ išvestį pažymėkime $\mathbf{Y}$
+ir panagrinėkime gilesnį CNN
+su papildomu $2 \times 2$ konvoliuciniu sluoksniu, kuris priima $\mathbf{Y}$
+kaip savo įvestį ir išveda
+vieną elementą $z$.
+Šiuo atveju
+$z$ lokali matymo sritis
+$\mathbf{Y}$ atžvilgiu apima visus keturis $\mathbf{Y}$ elementus,
+o
+lokali matymo sritis
+įvesties atžvilgiu apima visus devynis įvesties elementus.
+Taigi,
+kai bet kuriam požymių žemėlapio elementui
+reikia didesnės lokalios matymo srities,
+kad aptiktų įvesties požymius platesnėje srityje,
+galime sukurti gilesnį tinklą.
 
 
-Receptive fields derive their name from neurophysiology.
-A series of experiments on a range of animals using different stimuli
-:cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` explored the response of what is called the visual
-cortex on said stimuli. By and large they found that lower levels respond to edges and related
-shapes. Later on, :citet:`Field.1987` illustrated this effect on natural
-images with, what can only be called, convolutional kernels.
-We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities.
+Lokalios matymo sritys savo pavadinimą gavo iš neurofiziologijos.
+Eksperimentų serija su įvairiais gyvūnais naudojant skirtingus dirgiklius
+:cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` tyrė vadinamosios regimosios
+žievės atsaką į minėtus dirgiklius. Apskritai jie nustatė, kad žemesni lygiai reaguoja į kraštus ir susijusias
+formas. Vėliau :citet:`Field.1987` iliustravo šį efektą natūraliuose
+vaizduose su tuo, ką galima pavadinti tik konvoliucijos branduoliais.
+:numref:`field_visual` perspausdiname pagrindinį paveikslą, kad iliustruotume stulbinamus panašumus.
 
-![Figure and caption taken from :citet:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
+![Paveikslas ir jo aprašas paimti iš :citet:`Field.1987`: kodavimo šešiais skirtingais kanalais pavyzdys. (Kairėje) Šešių jutiklių tipų, susijusių su kiekvienu kanalu, pavyzdžiai. (Dešinėje) Vaizdo (viduryje) konvoliucija su šešiais jutikliais, parodytais (kairėje). Atskirų jutiklių atsakas nustatomas imant šių filtruotų vaizdų imtis atstumu, proporcingu jutiklio dydžiui (parodyta taškais). Ši diagrama rodo tik lyginių simetrinių jutiklių atsaką.](../img/field-visual.png)
 :label:`field_visual`
 
-As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated in, for example, :citet:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in deep learning.
+Paaiškėja, kad šis ryšys galioja net požymiams, apskaičiuotiems gilesniuose tinklų, apmokytų vaizdų klasifikavimo užduotims, sluoksniuose, kaip parodyta, pavyzdžiui, :citet:`Kuzovkin.Vicente.Petton.ea.2018`. Pakanka pasakyti, kad konvoliucijos pasirodė esančios neįtikėtinai galingu kompiuterinio matymo įrankiu – ir biologijoje, ir kode. Todėl nenuostabu (žvelgiant atgal), kad jos pranašavo pastarąją giliojo mokymosi sėkmę.
 
-## Summary
+## Santrauka
 
-The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix--matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible because of that. After all, it means that chip designers can invest in fast computation rather than memory when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it does open the door to ubiquitous and affordable computer vision.
+Pagrindinis konvoliucinio sluoksnio skaičiavimas yra kryžminės koreliacijos operacija. Matėme, kad jos reikšmei apskaičiuoti pakanka paprasto įdėtinio ciklo for. Jei turime kelis įvesties ir kelis išvesties kanalus, atliekame matricų ir matricų operaciją tarp kanalų. Kaip matyti, skaičiavimas yra paprastas ir, svarbiausia, labai *lokalus*. Tai suteikia reikšmingas aparatinės įrangos optimizavimo galimybes, ir daugelis naujausių kompiuterinio matymo rezultatų yra įmanomi tik dėl to. Juk tai reiškia, kad lustų projektuotojai, optimizuodami konvoliucijoms, gali investuoti į greitą skaičiavimą, o ne į atmintį. Nors tai gali neduoti optimalių sprendimų kitiems taikymams, tai atveria duris visur esančiam ir prieinamam kompiuteriniam matymui.
 
-In terms of convolutions themselves, they can be used for many purposes, for example detecting edges and lines, blurring images, or sharpening them. Most importantly, it is not necessary that the statistician (or engineer) invents suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature maps in the brain. This gives us confidence that we are on the right track.
+Kalbant apie pačias konvoliucijas, jas galima naudoti daugeliui tikslų, pavyzdžiui, kraštams ir linijoms aptikti, vaizdams sulieti ar paryškinti. Svarbiausia, kad statistikui (ar inžinieriui) nebūtina išrasti tinkamų filtrų. Vietoj to galime tiesiog juos *išmokti* iš duomenų. Tai pakeičia požymių inžinerijos euristikas įrodymais pagrįsta statistika. Galiausiai, ir labai maloniai, šie filtrai yra naudingi ne tik giliesiems tinklams kurti, bet ir atitinka lokalias matymo sritis bei požymių žemėlapius smegenyse. Tai suteikia mums pasitikėjimo, kad esame teisingame kelyje.
 
-## Exercises
+## Pratimai
 
-1. Construct an image `X` with diagonal edges.
-    1. What happens if you apply the kernel `K` in this section to it?
-    1. What happens if you transpose `X`?
-    1. What happens if you transpose `K`?
-1. Design some kernels manually.
-    1. Given a directional vector $\mathbf{v} = (v_1, v_2)$, derive an edge-detection kernel that detects
-       edges orthogonal to $\mathbf{v}$, i.e., edges in the direction $(v_2, -v_1)$.
-    1. Derive a finite difference operator for the second derivative. What is the minimum
-       size of the convolutional kernel associated with it? Which structures in images respond most strongly to it?
-    1. How would you design a blur kernel? Why might you want to use such a kernel?
-    1. What is the minimum size of a kernel to obtain a derivative of order $d$?
-1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
-1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel tensors?
+1. Sukonstruokite vaizdą `X` su įstrižais kraštais.
+    1. Kas nutinka, kai pritaikote šio skyrelio branduolį `K`?
+    1. Kas nutinka, kai transponuojate `X`?
+    1. Kas nutinka, kai transponuojate `K`?
+1. Suprojektuokite keletą branduolių rankiniu būdu.
+    1. Turint krypties vektorių $\mathbf{v} = (v_1, v_2)$, išveskite kraštų aptikimo branduolį, aptinkantį
+       kraštus, ortogonalius $\mathbf{v}$, t. y. kraštus kryptimi $(v_2, -v_1)$.
+    1. Išveskite baigtinių skirtumų operatorių antrajai išvestinei. Koks yra minimalus
+       su juo susijusio konvoliucijos branduolio dydis? Kokios vaizdų struktūros į jį reaguoja stipriausiai?
+    1. Kaip suprojektuotumėte suliejimo branduolį? Kodėl galėtumėte norėti naudoti tokį branduolį?
+    1. Koks yra minimalus branduolio dydis, norint gauti $d$ eilės išvestinę?
+1. Kai bandote automatiškai rasti gradientą mūsų sukurtai klasei `Conv2D`, kokį klaidos pranešimą matote?
+1. Kaip pavaizduoti kryžminės koreliacijos operaciją kaip matricų daugybą, pakeitus įvesties ir branduolio tenzorius?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/65)
+[Diskusijos](https://discuss.d2l.ai/t/65)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/66)
+[Diskusijos](https://discuss.d2l.ai/t/66)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/271)
+[Diskusijos](https://discuss.d2l.ai/t/271)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17996)
+[Diskusijos](https://discuss.d2l.ai/t/17996)
 :end_tab:

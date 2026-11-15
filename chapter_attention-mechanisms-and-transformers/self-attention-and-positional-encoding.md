@@ -3,28 +3,28 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# Self-Attention and Positional Encoding
+# Saviraiška dėmesio sutelkimo transformacija ir pozicinis kodavimas
 :label:`sec_self-attention-and-positional-encoding`
 
-In deep learning, we often use CNNs or RNNs to encode sequences.
-Now with attention mechanisms in mind, 
-imagine feeding a sequence of tokens 
-into an attention mechanism
-such that at every step,
-each token has its own query, keys, and values.
-Here, when computing the value of a token's representation at the next layer,
-the token can attend (via its query vector) to any other's token 
-(matching based on their key vectors).
-Using the full set of query-key compatibility scores,
-we can compute, for each token, a representation
-by building the appropriate weighted sum
-over the other tokens. 
-Because every token is attending to each other token
-(unlike the case where decoder steps attend to encoder steps),
-such architectures are typically described as *self-attention* models :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, 
-and elsewhere described as *intra-attention* model :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
-In this section, we will discuss sequence encoding using self-attention,
-including using additional information for the sequence order.
+Giliajame mokymesi sekoms koduoti dažnai naudojame CNN arba RNN.
+Dabar, turėdami omenyje dėmesio sutelkimo mechanizmus,
+įsivaizduokime, kad teksto vienetų seką paduodame
+į dėmesio sutelkimo mechanizmą taip,
+kad kiekviename žingsnyje
+kiekvienas teksto vienetas turi savo užklausą, raktus ir reikšmes.
+Čia, apskaičiuodamas teksto vieneto vaizdo reikšmę kitame sluoksnyje,
+teksto vienetas gali sutelkti dėmesį (per savo užklausos vektorių) į bet kurį kitą teksto vienetą
+(sutapatinant pagal jų raktų vektorius).
+Naudodami visą užklausos ir rakto suderinamumo įverčių aibę,
+galime apskaičiuoti kiekvieno teksto vieneto vaizdą,
+sudarydami atitinkamą svertinę sumą
+per kitus teksto vienetus.
+Kadangi kiekvienas teksto vienetas sutelkia dėmesį į kiekvieną kitą teksto vienetą
+(priešingai nei atveju, kai dekodavimo žingsniai sutelkia dėmesį į kodavimo žingsnius),
+tokios architektūros paprastai apibūdinamos kaip *saviraiškės dėmesio sutelkimo transformacijos* (angl. *self-attention*) modeliai :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`,
+o kitur apibūdinamos kaip *vidinio dėmesio* (angl. *intra-attention*) modelis :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
+Šiame skyrelyje aptarsime sekų kodavimą naudojant saviraiškę dėmesio sutelkimo transformaciją,
+įskaitant papildomos informacijos apie sekos tvarką naudojimą.
 
 ```{.python .input}
 %%tab mxnet
@@ -58,24 +58,24 @@ from jax import numpy as jnp
 import jax
 ```
 
-## [**Self-Attention**]
+## [**Saviraiška dėmesio sutelkimo transformacija**]
 
-Given a sequence of input tokens
-$\mathbf{x}_1, \ldots, \mathbf{x}_n$ where any $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
-its self-attention outputs
-a sequence of the same length
+Duotai įvesties teksto vienetų sekai
+$\mathbf{x}_1, \ldots, \mathbf{x}_n$, kur bet kuris $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
+jos saviraiška dėmesio sutelkimo transformacija išveda
+to paties ilgio seką
 $\mathbf{y}_1, \ldots, \mathbf{y}_n$,
-where
+kur
 
 $$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
 
-according to the definition of attention pooling in
+pagal dėmesio sutelkimo apibrėžimą
 :eqref:`eq_attention_pooling`.
-Using multi-head attention,
-the following code snippet
-computes the self-attention of a tensor
-with shape (batch size, number of time steps or sequence length in tokens, $d$).
-The output tensor has the same shape.
+Naudodamas lygiagrečią dėmesio sutelkimo transformaciją,
+toliau pateiktas kodo fragmentas
+apskaičiuoja tenzoriaus saviraišką dėmesio sutelkimo transformaciją,
+kurio forma (rinkinio dydis, laiko žingsnių skaičius arba sekos ilgis teksto vienetais, $d$).
+Išvesties tenzorius turi tą pačią formą.
 
 ```{.python .input}
 %%tab pytorch
@@ -132,132 +132,128 @@ d2l.check_shape(attention.init_with_output(d2l.get_key(), X, X, X, valid_lens,
                 (batch_size, num_queries, num_hiddens))
 ```
 
-## Comparing CNNs, RNNs, and Self-Attention
+## CNN, RNN ir saviraiškės dėmesio sutelkimo transformacijos palyginimas
 :label:`subsec_cnn-rnn-self-attention`
 
-Let's
-compare architectures for mapping
-a sequence of $n$ tokens
-to another one of equal length,
-where each input or output token is represented by
-a $d$-dimensional vector.
-Specifically,
-we will consider CNNs, RNNs, and self-attention.
-We will compare their
-computational complexity, 
-sequential operations,
-and maximum path lengths.
-Note that sequential operations prevent parallel computation,
-while a shorter path between
-any combination of sequence positions
-makes it easier to learn long-range dependencies 
-within the sequence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
+Palyginkime architektūras, skirtas
+$n$ teksto vienetų sekai atvaizduoti
+į kitą tokio paties ilgio seką,
+kur kiekvienas įvesties ar išvesties teksto vienetas vaizduojamas
+$d$ matmenų vektoriumi.
+Konkrečiai,
+nagrinėsime CNN, RNN ir saviraišką dėmesio sutelkimo transformaciją.
+Palyginsime jų
+skaičiavimo sudėtingumą,
+nuoseklias operacijas
+ir didžiausius kelio ilgius.
+Atkreipkite dėmesį, kad nuoseklios operacijos neleidžia lygiagretinti skaičiavimų,
+o trumpesnis kelias tarp
+bet kurio sekos pozicijų derinio
+palengvina ilgo nuotolio priklausomybių sekoje mokymąsi :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
 
 
-![Comparing CNN (padding tokens are omitted), RNN, and self-attention architectures.](../img/cnn-rnn-self-attention.svg)
+![CNN (užpildymo teksto vienetai praleisti), RNN ir saviraiškės dėmesio sutelkimo transformacijos architektūrų palyginimas.](../img/cnn-rnn-self-attention.svg)
 :label:`fig_cnn-rnn-self-attention`
 
 
 
-Let's regard any text sequence as a "one-dimensional image". Similarly, one-dimensional CNNs can process local features such as $n$-grams in text.
-Given a sequence of length $n$,
-consider a convolutional layer whose kernel size is $k$,
-and whose numbers of input and output channels are both $d$.
-The computational complexity of the convolutional layer is $\mathcal{O}(knd^2)$.
-As :numref:`fig_cnn-rnn-self-attention` shows,
-CNNs are hierarchical,
-so there are $\mathcal{O}(1)$ sequential operations
-and the maximum path length is $\mathcal{O}(n/k)$.
-For example, $\mathbf{x}_1$ and $\mathbf{x}_5$
-are within the receptive field of a two-layer CNN
-with kernel size 3 in :numref:`fig_cnn-rnn-self-attention`.
+Bet kurią teksto seką laikykime „vienmačiu vaizdu“. Panašiai vienmačiai CNN gali apdoroti lokalius požymius, tokius kaip $n$-gramos tekste.
+Duotai $n$ ilgio sekai
+apsvarstykime konvoliucinį sluoksnį, kurio branduolio dydis yra $k$,
+o įvesties ir išvesties kanalų skaičius abu yra $d$.
+Konvoliucinio sluoksnio skaičiavimo sudėtingumas yra $\mathcal{O}(knd^2)$.
+Kaip rodo :numref:`fig_cnn-rnn-self-attention`,
+CNN yra hierarchiniai,
+todėl yra $\mathcal{O}(1)$ nuoseklių operacijų,
+o didžiausias kelio ilgis yra $\mathcal{O}(n/k)$.
+Pavyzdžiui, :numref:`fig_cnn-rnn-self-attention` $\mathbf{x}_1$ ir $\mathbf{x}_5$
+patenka į dviejų sluoksnių CNN su 3 dydžio branduoliu
+lokalią matymo sritį.
 
-When updating the hidden state of RNNs,
-multiplication of the $d \times d$ weight matrix
-and the $d$-dimensional hidden state has 
-a computational complexity of $\mathcal{O}(d^2)$.
-Since the sequence length is $n$,
-the computational complexity of the recurrent layer
-is $\mathcal{O}(nd^2)$.
-According to :numref:`fig_cnn-rnn-self-attention`,
-there are $\mathcal{O}(n)$ sequential operations
-that cannot be parallelized
-and the maximum path length is also $\mathcal{O}(n)$.
+Atnaujinant RNN paslėptąją būseną,
+$d \times d$ svorių matricos
+ir $d$ matmenų paslėptosios būsenos daugyba turi
+$\mathcal{O}(d^2)$ skaičiavimo sudėtingumą.
+Kadangi sekos ilgis yra $n$,
+rekurentinio sluoksnio skaičiavimo sudėtingumas
+yra $\mathcal{O}(nd^2)$.
+Pagal :numref:`fig_cnn-rnn-self-attention`
+yra $\mathcal{O}(n)$ nuoseklių operacijų,
+kurių negalima lygiagretinti,
+o didžiausias kelio ilgis taip pat yra $\mathcal{O}(n)$.
 
-In self-attention,
-the queries, keys, and values 
-are all $n \times d$ matrices.
-Consider the scaled dot product attention in
+Saviraiškėje dėmesio sutelkimo transformacijoje
+užklausos, raktai ir reikšmės
+yra visos $n \times d$ matricos.
+Apsvarstykime mastelio keičiamos skaliarinės sandaugos dėmesį
 :eqref:`eq_softmax_QK_V`,
-where an $n \times d$ matrix is multiplied by
-a $d \times n$ matrix,
-then the output $n \times n$ matrix is multiplied
-by an $n \times d$ matrix.
-As a result,
-the self-attention
-has a $\mathcal{O}(n^2d)$ computational complexity.
-As we can see from :numref:`fig_cnn-rnn-self-attention`,
-each token is directly connected
-to any other token via self-attention.
-Therefore,
-computation can be parallel with $\mathcal{O}(1)$ sequential operations
-and the maximum path length is also $\mathcal{O}(1)$.
+kur $n \times d$ matrica dauginama iš
+$d \times n$ matricos,
+o tada gauta $n \times n$ išvesties matrica dauginama
+iš $n \times d$ matricos.
+Dėl to
+saviraiškė dėmesio sutelkimo transformacija
+turi $\mathcal{O}(n^2d)$ skaičiavimo sudėtingumą.
+Kaip matome iš :numref:`fig_cnn-rnn-self-attention`,
+kiekvienas teksto vienetas tiesiogiai sujungtas
+su bet kuriuo kitu teksto vienetu per saviraišką dėmesio sutelkimo transformaciją.
+Todėl
+skaičiavimas gali būti lygiagretus su $\mathcal{O}(1)$ nuoseklių operacijų,
+o didžiausias kelio ilgis taip pat yra $\mathcal{O}(1)$.
 
-All in all,
-both CNNs and self-attention enjoy parallel computation
-and self-attention has the shortest maximum path length.
-However, the quadratic computational complexity with respect to the sequence length
-makes self-attention prohibitively slow for very long sequences.
-
-
+Apskritai
+ir CNN, ir saviraiškė dėmesio sutelkimo transformacija leidžia lygiagretų skaičiavimą,
+o saviraiškė dėmesio sutelkimo transformacija turi trumpiausią didžiausią kelio ilgį.
+Tačiau kvadratinis skaičiavimo sudėtingumas sekos ilgio atžvilgiu
+daro saviraišką dėmesio sutelkimo transformaciją nepriimtinai lėtą labai ilgoms sekoms.
 
 
 
-## [**Positional Encoding**]
+
+
+## [**Pozicinis kodavimas**]
 :label:`subsec_positional-encoding`
 
 
-Unlike RNNs, which recurrently process
-tokens of a sequence one-by-one,
-self-attention ditches
-sequential operations in favor of 
-parallel computation.
-Note that self-attention by itself
-does not preserve the order of the sequence. 
-What do we do if it really matters 
-that the model knows in which order
-the input sequence arrived?
+Skirtingai nei RNN, rekurentiškai apdorojantys
+sekos teksto vienetus po vieną,
+saviraiškė dėmesio sutelkimo transformacija atsisako
+nuosekliųjų operacijų lygiagrečiojo skaičiavimo naudai.
+Atkreipkite dėmesį, kad saviraiškė dėmesio sutelkimo transformacija pati savaime
+nesaugo sekos tvarkos.
+Ką daryti, jei tikrai svarbu,
+kad modelis žinotų, kokia tvarka
+atėjo įvesties seka?
 
-The dominant approach for preserving 
-information about the order of tokens
-is to represent this to the model 
-as an additional input associated 
-with each token. 
-These inputs are called *positional encodings*,
-and they can either be learned or fixed *a priori*.
-We now describe a simple scheme for fixed positional encodings
-based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
+Dominuojantis metodas informacijai apie teksto vienetų tvarką išsaugoti
+yra tai pateikti modeliui
+kaip papildomą įvestį, susietą
+su kiekvienu teksto vienetu.
+Šios įvestys vadinamos *poziciniais kodavimais*,
+ir jie gali būti arba išmokti, arba nustatyti *a priori*.
+Dabar aprašome paprastą fiksuotų pozicinių kodavimų schemą,
+pagrįstą sinuso ir kosinuso funkcijomis :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 
-Suppose that the input representation 
-$\mathbf{X} \in \mathbb{R}^{n \times d}$ 
-contains the $d$-dimensional embeddings 
-for $n$ tokens of a sequence.
-The positional encoding outputs
-$\mathbf{X} + \mathbf{P}$
-using a positional embedding matrix 
-$\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
-whose element on the $i^\textrm{th}$ row 
-and the $(2j)^\textrm{th}$
-or the $(2j + 1)^\textrm{th}$ column is
+Tarkime, kad įvesties vaizdas
+$\mathbf{X} \in \mathbb{R}^{n \times d}$
+turi $d$ matmenų įterpinius
+$n$ sekos teksto vienetų.
+Pozicinis kodavimas išveda
+$\mathbf{X} + \mathbf{P}$,
+naudodamas tos pačios formos pozicinių įterpinių matricą
+$\mathbf{P} \in \mathbb{R}^{n \times d}$,
+kurios elementas $i$-ojoje eilutėje
+ir $(2j)$-ajame
+arba $(2j + 1)$-ajame stulpelyje yra
 
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 :eqlabel:`eq_positional-encoding-def`
 
-At first glance,
-this trigonometric function
-design looks weird.
-Before we give explanations of this design,
-let's first implement it in the following `PositionalEncoding` class.
+Iš pirmo žvilgsnio
+šis trigonometrinių funkcijų
+dizainas atrodo keistas.
+Prieš paaiškindami šį dizainą,
+pirmiausia įgyvendinkime jį toliau pateiktoje klasėje `PositionalEncoding`.
 
 ```{.python .input}
 %%tab mxnet
@@ -343,19 +339,19 @@ class PositionalEncoding(nn.Module):  #@save
         return nn.Dropout(self.dropout)(X, deterministic=not training)
 ```
 
-In the positional embedding matrix $\mathbf{P}$,
-[**rows correspond to positions within a sequence
-and columns represent different positional encoding dimensions**].
-In the example below,
-we can see that
-the $6^{\textrm{th}}$ and the $7^{\textrm{th}}$
-columns of the positional embedding matrix 
-have a higher frequency than 
-the $8^{\textrm{th}}$ and the $9^{\textrm{th}}$
-columns.
-The offset between 
-the $6^{\textrm{th}}$ and the $7^{\textrm{th}}$ (same for the $8^{\textrm{th}}$ and the $9^{\textrm{th}}$) columns
-is due to the alternation of sine and cosine functions.
+Pozicinių įterpinių matricoje $\mathbf{P}$
+[**eilutės atitinka pozicijas sekoje,
+o stulpeliai vaizduoja skirtingas pozicinio kodavimo dimensijas**].
+Toliau pateiktame pavyzdyje
+matome, kad
+pozicinių įterpinių matricos $6$-asis ir $7$-asis
+stulpeliai
+turi aukštesnį dažnį nei
+$8$-asis ir $9$-asis
+stulpeliai.
+Poslinkis tarp
+$6$-ojo ir $7$-ojo (taip pat $8$-ojo ir $9$-ojo) stulpelių
+atsiranda dėl sinuso ir kosinuso funkcijų kaitaliojimosi.
 
 ```{.python .input}
 %%tab mxnet
@@ -401,14 +397,14 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
-### Absolute Positional Information
+### Absoliuti pozicinė informacija
 
-To see how the monotonically decreased frequency
-along the encoding dimension relates to absolute positional information,
-let's print out [**the binary representations**] of $0, 1, \ldots, 7$.
-As we can see, the lowest bit, the second-lowest bit, 
-and the third-lowest bit alternate on every number, 
-every two numbers, and every four numbers, respectively.
+Kad pamatytume, kaip monotoniškai mažėjantis dažnis
+išilgai kodavimo dimensijos susijęs su absoliučia pozicine informacija,
+išspausdinkime [**dvejetainius vaizdus**] skaičių $0, 1, \ldots, 7$.
+Kaip matome, žemiausias bitas, antras žemiausias bitas
+ir trečias žemiausias bitas keičiasi atitinkamai kas skaičių,
+kas du skaičius ir kas keturis skaičius.
 
 ```{.python .input}
 %%tab all
@@ -416,16 +412,16 @@ for i in range(8):
     print(f'{i} in binary is {i:>03b}')
 ```
 
-In binary representations, a higher bit 
-has a lower frequency than a lower bit.
-Similarly, as demonstrated in the heat map below,
-[**the positional encoding decreases
-frequencies along the encoding dimension**]
-by using trigonometric functions.
-Since the outputs are float numbers,
-such continuous representations
-are more space-efficient
-than binary representations.
+Dvejetainiuose vaizduose aukštesnis bitas
+turi žemesnį dažnį nei žemesnis bitas.
+Panašiai, kaip parodyta toliau pateiktame šilumos žemėlapyje,
+[**pozicinis kodavimas mažina
+dažnius išilgai kodavimo dimensijos**],
+naudodamas trigonometrines funkcijas.
+Kadangi išvestys yra slankiojo kablelio skaičiai,
+tokie tolydūs vaizdai
+yra efektyvesni vietos požiūriu
+nei dvejetainiai vaizdai.
 
 ```{.python .input}
 %%tab mxnet
@@ -455,28 +451,28 @@ d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
-### Relative Positional Information
+### Santykinė pozicinė informacija
 
-Besides capturing absolute positional information,
-the above positional encoding
-also allows
-a model to easily learn to attend by relative positions.
-This is because
-for any fixed position offset $\delta$,
-the positional encoding at position $i + \delta$
-can be represented by a linear projection
-of that at position $i$.
+Be absoliučios pozicinės informacijos užfiksavimo,
+aukščiau pateiktas pozicinis kodavimas
+taip pat leidžia
+modeliui lengvai išmokti sutelkti dėmesį pagal santykines pozicijas.
+Taip yra todėl, kad
+bet kuriam fiksuotam pozicijos poslinkiui $\delta$
+pozicinis kodavimas pozicijoje $i + \delta$
+gali būti pavaizduotas tiesine to paties kodavimo pozicijoje $i$
+projekcija.
 
 
-This projection can be explained
-mathematically.
-Denoting
+Šią projekciją galima paaiškinti
+matematiškai.
+Pažymėjus
 $\omega_j = 1/10000^{2j/d}$,
-any pair of $(p_{i, 2j}, p_{i, 2j+1})$ 
-in :eqref:`eq_positional-encoding-def`
-can 
-be linearly projected to $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
-for any fixed offset $\delta$:
+bet kuri pora $(p_{i, 2j}, p_{i, 2j+1})$
+:eqref:`eq_positional-encoding-def`
+gali
+būti tiesiškai suprojektuota į $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
+bet kuriam fiksuotam poslinkiui $\delta$:
 
 $$\begin{aligned}
 \begin{bmatrix} \cos(\delta \omega_j) & \sin(\delta \omega_j) \\  -\sin(\delta \omega_j) & \cos(\delta \omega_j) \\ \end{bmatrix}
@@ -487,39 +483,39 @@ $$\begin{aligned}
 \begin{bmatrix} p_{i+\delta, 2j} \\  p_{i+\delta, 2j+1} \\ \end{bmatrix},
 \end{aligned}$$
 
-where the $2\times 2$ projection matrix does not depend on any position index $i$.
+kur $2\times 2$ projekcijos matrica nepriklauso nuo jokio pozicijos indekso $i$.
 
-## Summary
+## Santrauka
 
-In self-attention, the queries, keys, and values all come from the same place.
-Both CNNs and self-attention enjoy parallel computation
-and self-attention has the shortest maximum path length.
-However, the quadratic computational complexity
-with respect to the sequence length
-makes self-attention prohibitively slow
-for very long sequences.
-To use the sequence order information, 
-we can inject absolute or relative positional information 
-by adding positional encoding to the input representations.
+Saviraiškėje dėmesio sutelkimo transformacijoje užklausos, raktai ir reikšmės visos ateina iš to paties šaltinio.
+Ir CNN, ir saviraiškė dėmesio sutelkimo transformacija leidžia lygiagretų skaičiavimą,
+o saviraiškė dėmesio sutelkimo transformacija turi trumpiausią didžiausią kelio ilgį.
+Tačiau kvadratinis skaičiavimo sudėtingumas
+sekos ilgio atžvilgiu
+daro saviraišką dėmesio sutelkimo transformaciją nepriimtinai lėtą
+labai ilgoms sekoms.
+Kad naudotume sekos tvarkos informaciją,
+galime įterpti absoliučią arba santykinę pozicinę informaciją,
+pridėdami pozicinį kodavimą prie įvesties vaizdų.
 
-## Exercises
+## Pratimai
 
-1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could the possible issues be?
-1. Can you design a learnable positional encoding method?
-1. Can we assign different learned embeddings according to different offsets between queries and keys that are compared in self-attention? Hint: you may refer to relative position embeddings :cite:`shaw2018self,huang2018music`.
+1. Tarkime, kad projektuojame gilią architektūrą sekai pavaizduoti, sukraudami saviraiškės dėmesio sutelkimo transformacijos sluoksnius su poziciniu kodavimu. Kokios gali būti galimos problemos?
+1. Ar galite suprojektuoti išmokstamą pozicinio kodavimo metodą?
+1. Ar galime priskirti skirtingus išmoktus įterpinius pagal skirtingus poslinkius tarp užklausų ir raktų, lyginamų saviraiškėje dėmesio sutelkimo transformacijoje? Užuomina: galite remtis santykinių pozicijų įterpiniais :cite:`shaw2018self,huang2018music`.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/1651)
+[Diskusijos](https://discuss.d2l.ai/t/1651)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1652)
+[Diskusijos](https://discuss.d2l.ai/t/1652)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3870)
+[Diskusijos](https://discuss.d2l.ai/t/3870)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18030)
+[Diskusijos](https://discuss.d2l.ai/t/18030)
 :end_tab:

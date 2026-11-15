@@ -3,41 +3,41 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# The Encoder--Decoder Architecture
+# Kodavimo ir dekodavimo architektūra
 :label:`sec_encoder-decoder`
 
-In general sequence-to-sequence problems
-like machine translation
+Bendrosiose sekos į seką problemose,
+tokiose kaip mašininis vertimas
 (:numref:`sec_machine_translation`),
-inputs and outputs are of varying lengths
-that are unaligned.
-The standard approach to handling this sort of data
-is to design an *encoder--decoder* architecture (:numref:`fig_encoder_decoder`)
-consisting of two major components:
-an *encoder* that takes a variable-length sequence as input,
-and a *decoder* that acts as a conditional language model,
-taking in the encoded input
-and the leftwards context of the target sequence
-and predicting the subsequent token in the target sequence.
+įvestys ir išvestys yra kintamo ilgio
+ir nesulygiuotos.
+Standartinis tokių duomenų tvarkymo metodas
+yra suprojektuoti *kodavimo ir dekodavimo* architektūrą (:numref:`fig_encoder_decoder`),
+sudarytą iš dviejų pagrindinių komponentų:
+*kodavimo bloko* (angl. *encoder*), kuris kaip įvestį priima kintamo ilgio seką,
+ir *dekodavimo bloko* (angl. *decoder*), veikiančio kaip sąlyginis kalbos modelis,
+priimančio užkoduotą įvestį
+ir tikslinės sekos kairįjį kontekstą
+bei prognozuojančio kitą tikslinės sekos teksto vienetą.
 
 
-![The encoder--decoder architecture.](../img/encoder-decoder.svg)
+![Kodavimo ir dekodavimo architektūra.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
 
-Let's take machine translation from English to French as an example.
-Given an input sequence in English:
-"They", "are", "watching", ".",
-this encoder--decoder architecture
-first encodes the variable-length input into a state,
-then decodes the state
-to generate the translated sequence,
-token by token, as output:
-"Ils", "regardent", ".".
-Since the encoder--decoder architecture
-forms the basis of different sequence-to-sequence models
-in subsequent sections,
-this section will convert this architecture
-into an interface that will be implemented later.
+Paimkime kaip pavyzdį mašininį vertimą iš anglų į prancūzų kalbą.
+Turint įvesties seką anglų kalba:
+„They“, „are“, „watching“, „.“,
+ši kodavimo ir dekodavimo architektūra
+pirmiausia užkoduoja kintamo ilgio įvestį į būseną,
+tada dekoduoja būseną,
+kad sugeneruotų išverstą seką,
+teksto vienetas po teksto vieneto, kaip išvestį:
+„Ils“, „regardent“, „.“.
+Kadangi kodavimo ir dekodavimo architektūra
+sudaro skirtingų sekos į seką modelių pagrindą
+vėlesniuose skyreliuose,
+šiame skyrelyje ši architektūra
+paverčiama sąsaja, kuri bus įgyvendinta vėliau.
 
 ```{.python .input}
 %%tab mxnet
@@ -63,13 +63,13 @@ from d2l import jax as d2l
 from flax import linen as nn
 ```
 
-## (**Encoder**)
+## (**Kodavimo blokas**)
 
-In the encoder interface,
-we just specify that
-the encoder takes variable-length sequences as input `X`.
-The implementation will be provided
-by any model that inherits this base `Encoder` class.
+Kodavimo bloko sąsajoje
+tik nurodome, kad
+kodavimo blokas kaip įvestį `X` priima kintamo ilgio sekas.
+Įgyvendinimą pateiks
+bet kuris modelis, paveldintis šią bazinę `Encoder` klasę.
 
 ```{.python .input}
 %%tab mxnet
@@ -119,22 +119,22 @@ class Encoder(nn.Module):  #@save
         raise NotImplementedError
 ```
 
-## [**Decoder**]
+## [**Dekodavimo blokas**]
 
-In the following decoder interface,
-we add an additional `init_state` method
-to convert the encoder output (`enc_all_outputs`)
-into the encoded state.
-Note that this step
-may require extra inputs,
-such as the valid length of the input,
-which was explained
-in :numref:`sec_machine_translation`.
-To generate a variable-length sequence token by token,
-every time the decoder may map an input
-(e.g., the generated token at the previous time step)
-and the encoded state
-into an output token at the current time step.
+Toliau pateiktoje dekodavimo bloko sąsajoje
+pridedame papildomą metodą `init_state`,
+kad kodavimo bloko išvestį (`enc_all_outputs`)
+paverstume užkoduota būsena.
+Atkreipkite dėmesį, kad šis žingsnis
+gali reikalauti papildomų įvesčių,
+tokių kaip galiojantis įvesties ilgis,
+paaiškintas
+:numref:`sec_machine_translation`.
+Kad kintamo ilgio seką sugeneruotume teksto vienetas po teksto vieneto,
+kiekvieną kartą dekodavimo blokas gali atvaizduoti įvestį
+(pvz., ankstesniu laiko žingsniu sugeneruotą teksto vienetą)
+ir užkoduotą būseną
+į išvesties teksto vienetą dabartiniu laiko žingsniu.
 
 ```{.python .input}
 %%tab mxnet
@@ -196,13 +196,13 @@ class Decoder(nn.Module):  #@save
         raise NotImplementedError
 ```
 
-## [**Putting the Encoder and Decoder Together**]
+## [**Kodavimo ir dekodavimo blokų sujungimas**]
 
-In the forward propagation,
-the output of the encoder
-is used to produce the encoded state,
-and this state will be further used
-by the decoder as one of its input.
+Tiesioginio sklidimo metu
+kodavimo bloko išvestis
+naudojama užkoduotai būsenai sukurti,
+o ši būsena toliau naudojama
+dekodavimo bloko kaip viena iš jo įvesčių.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -251,42 +251,42 @@ class EncoderDecoder(d2l.Classifier):  #@save
         return self.decoder(dec_X, dec_state, training=self.training)[0]
 ```
 
-In the next section,
-we will see how to apply RNNs to design
-sequence-to-sequence models based on
-this encoder--decoder architecture.
+Kitame skyrelyje
+pamatysime, kaip taikyti RNN projektuojant
+sekos į seką modelius, pagrįstus
+šia kodavimo ir dekodavimo architektūra.
 
 
-## Summary
+## Santrauka
 
-Encoder-decoder architectures
-can handle inputs and outputs
-that both consist of variable-length sequences
-and thus are suitable for sequence-to-sequence problems
-such as machine translation.
-The encoder takes a variable-length sequence as input
-and transforms it into a state with a fixed shape.
-The decoder maps the encoded state of a fixed shape
-to a variable-length sequence.
+Kodavimo ir dekodavimo architektūros
+gali tvarkyti įvestis ir išvestis,
+kurios abi yra kintamo ilgio sekos,
+todėl tinka sekos į seką problemoms,
+tokioms kaip mašininis vertimas.
+Kodavimo blokas kaip įvestį priima kintamo ilgio seką
+ir paverčia ją fiksuotos formos būsena.
+Dekodavimo blokas fiksuotos formos užkoduotą būseną
+atvaizduoja į kintamo ilgio seką.
 
 
-## Exercises
+## Pratimai
 
-1. Suppose that we use neural networks to implement the encoder--decoder architecture. Do the encoder and the decoder have to be the same type of neural network?
-1. Besides machine translation, can you think of another application where the encoder--decoder architecture can be applied?
+1. Tarkime, kad kodavimo ir dekodavimo architektūrai įgyvendinti naudojame neuroninius tinklus. Ar kodavimo ir dekodavimo blokai turi būti to paties tipo neuroniniai tinklai?
+1. Be mašininio vertimo, ar galite sugalvoti kitą taikymą, kuriame galima taikyti kodavimo ir dekodavimo architektūrą?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/341)
+[Diskusijos](https://discuss.d2l.ai/t/341)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1061)
+[Diskusijos](https://discuss.d2l.ai/t/1061)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3864)
+[Diskusijos](https://discuss.d2l.ai/t/3864)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18021)
+[Diskusijos](https://discuss.d2l.ai/t/18021)
 :end_tab:

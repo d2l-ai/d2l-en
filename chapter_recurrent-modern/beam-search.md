@@ -1,253 +1,249 @@
-# Beam Search
+# Spindulio paieška
 :label:`sec_beam-search`
 
-In :numref:`sec_seq2seq`, 
-we introduced the encoder--decoder architecture,
-and the standard techniques for training them end-to-end. However, when it came to test-time prediction,
-we mentioned only the *greedy* strategy,
-where we select at each time step 
-the token given the highest 
-predicted probability of coming next, 
-until, at some time step, 
-we find that we have predicted
-the special end-of-sequence "&lt;eos&gt;" token.
-In this section, we will begin 
-by formalizing this *greedy search* strategy
-and identifying some problems 
-that practitioners tend to run into.
-Subsequently, we compare this strategy
-with two alternatives:
-*exhaustive search* (illustrative but not practical)
-and *beam search* (the standard method in practice).
+:numref:`sec_seq2seq`
+pristatėme kodavimo ir dekodavimo architektūrą
+ir standartines jų apmokymo nuo pradžios iki galo technikas. Tačiau kalbėdami apie prognozavimą tikrinimo metu,
+minėjome tik *godžiąją* strategiją,
+kai kiekviename laiko žingsnyje pasirenkame
+teksto vienetą, kuriam prognozuojama didžiausia
+tikimybė būti kitam,
+kol kuriame nors laiko žingsnyje
+nuspėjame
+specialų sekos pabaigos „&lt;eos&gt;“ teksto vienetą.
+Šiame skyrelyje pradėsime
+formalizuodami šią *godžiąją paiešką*
+ir nustatydami kai kurias problemas,
+su kuriomis praktikai paprastai susiduria.
+Vėliau palyginsime šią strategiją
+su dviem alternatyvomis:
+*pilna paieška* (iliustratyvi, bet nepraktiška)
+ir *spindulio paieška* (standartinis metodas praktikoje).
 
-Let's begin by setting up our mathematical notation,
-borrowing conventions from :numref:`sec_seq2seq`.
-At any time step $t'$, the decoder outputs 
-predictions representing the probability 
-of each token in the vocabulary 
-coming next in the sequence 
-(the likely value of $y_{t'+1}$), 
-conditioned on the previous tokens
-$y_1, \ldots, y_{t'}$ and 
-the context variable $\mathbf{c}$,
-produced by the encoder 
-to represent the input sequence.
-To quantify computational cost,
-denote by $\mathcal{Y}$
-the output vocabulary 
-(including the special end-of-sequence token "&lt;eos&gt;").
-Let's also specify the maximum number of tokens
-of an output sequence as $T'$.
-Our goal is to search for an ideal output from all 
+Pradėkime nustatydami savo matematinį žymėjimą,
+pasiskolindami sutartis iš :numref:`sec_seq2seq`.
+Bet kuriuo laiko žingsniu $t'$ dekodavimo blokas išveda
+prognozes, vaizduojančias kiekvieno žodyno teksto vieneto
+tikimybę būti kitam sekoje
+(tikėtina $y_{t'+1}$ reikšmė),
+sąlygojamą ankstesnių teksto vienetų
+$y_1, \ldots, y_{t'}$ ir
+konteksto kintamojo $\mathbf{c}$,
+kurį sukuria kodavimo blokas
+įvesties sekai pavaizduoti.
+Skaičiavimo kainai įvertinti
+pažymėkime $\mathcal{Y}$
+išvesties žodyną
+(įskaitant specialų sekos pabaigos teksto vienetą „&lt;eos&gt;“).
+Taip pat nurodykime didžiausią išvesties sekos teksto vienetų skaičių kaip $T'$.
+Mūsų tikslas yra ieškoti idealios išvesties tarp visų
 $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$
-possible output sequences.
-Note that this slightly overestimates 
-the number of distinct outputs 
-because there are no subsequent tokens
-once the  "&lt;eos&gt;" token occurs.
-However, for our purposes, 
-this number roughly captures 
-the size of the search space.
+galimų išvesties sekų.
+Atkreipkite dėmesį, kad tai šiek tiek pervertina
+skirtingų išvesčių skaičių,
+nes pasirodžius „&lt;eos&gt;“ teksto vienetui
+paskesnių teksto vienetų nėra.
+Tačiau mūsų tikslams šis skaičius apytiksliai atspindi
+paieškos erdvės dydį.
 
 
-## Greedy Search
+## Godžioji paieška
 
-Consider the simple *greedy search* strategy from :numref:`sec_seq2seq`.
-Here, at any time step $t'$, 
-we simply select the token 
-with the highest conditional probability
-from $\mathcal{Y}$, i.e., 
+Apsvarstykime paprastą *godžiosios paieškos* strategiją iš :numref:`sec_seq2seq`.
+Čia bet kuriuo laiko žingsniu $t'$
+tiesiog pasirenkame teksto vienetą
+su didžiausia sąlygine tikimybe
+iš $\mathcal{Y}$, t. y.
 
 $$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} P(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
 
-Once our model outputs "&lt;eos&gt;" 
-(or we reach the maximum length $T'$)
-the output sequence is completed.
+Kai tik mūsų modelis išveda „&lt;eos&gt;“
+(arba pasiekiame didžiausią ilgį $T'$),
+išvesties seka baigta.
 
-This strategy might look reasonable, 
-and in fact it is not so bad!
-Considering how computationally undemanding it is,
-you'd be hard pressed to get more bang for your buck. 
-However, if we put aside efficiency for a minute,
-it might seem more reasonable to search 
-for the *most likely sequence*, 
-not the sequence of (greedily selected) *most likely tokens*.
-It turns out that these two objects can be quite different. 
-The most likely sequence is the one that maximizes the expression
+Ši strategija gali atrodyti pagrįsta,
+ir iš tiesų ji nėra tokia bloga!
+Turint omenyje, kokia ji nereikli skaičiavimams,
+sunku gauti didesnę naudą už tuos pačius pinigus.
+Tačiau jei minutei nustumsime efektyvumą į šalį,
+gali atrodyti pagrįsčiau ieškoti
+*tikėtiniausios sekos*,
+o ne (godžiai pasirinktų) *tikėtiniausių teksto vienetų sekos*.
+Pasirodo, šie du objektai gali labai skirtis.
+Tikėtiniausia seka yra ta, kuri maksimizuoja išraišką
 $\prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
-In our machine translation example,
-if the decoder truly recovered the probabilities
-of the underlying generative process, 
-then this would give us the most likely translation.
-Unfortunately, there is no guarantee 
-that greedy search will give us this sequence.
+Mūsų mašininio vertimo pavyzdyje,
+jei dekodavimo blokas tikrai atkurtų
+pagrindinio generatyvinio proceso tikimybes,
+tai tai duotų mums tikėtiniausią vertimą.
+Deja, nėra garantijos,
+kad godžioji paieška mums duos šią seką.
 
-Let's illustrate it with an example.
-Suppose that there are four tokens 
-"A", "B", "C", and "&lt;eos&gt;" in the output dictionary.
-In :numref:`fig_s2s-prob1`,
-the four numbers under each time step represent
-the conditional probabilities of generating "A", "B", "C", 
-and "&lt;eos&gt;" respectively, at that time step.
+Iliustruokime tai pavyzdžiu.
+Tarkime, kad išvesties žodyne yra keturi teksto vienetai
+„A“, „B“, „C“ ir „&lt;eos&gt;“.
+:numref:`fig_s2s-prob1`
+keturi skaičiai po kiekvienu laiko žingsniu reiškia
+sąlygines tikimybes sugeneruoti atitinkamai „A“, „B“, „C“
+ir „&lt;eos&gt;“ tuo laiko žingsniu.
 
-![At each time step, greedy search selects the token with the highest conditional probability.](../img/s2s-prob1.svg)
+![Kiekvienu laiko žingsniu godžioji paieška pasirenka teksto vienetą su didžiausia sąlygine tikimybe.](../img/s2s-prob1.svg)
 :label:`fig_s2s-prob1`
 
-At each time step, greedy search selects 
-the token with the highest conditional probability. 
-Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" 
-will be predicted (:numref:`fig_s2s-prob1`). 
-The conditional probability of this output sequence
-is $0.5\times0.4\times0.4\times0.6 = 0.048$.
+Kiekvienu laiko žingsniu godžioji paieška pasirenka
+teksto vienetą su didžiausia sąlygine tikimybe.
+Todėl bus prognozuojama išvesties seka „A“, „B“, „C“ ir „&lt;eos&gt;“
+(:numref:`fig_s2s-prob1`).
+Šios išvesties sekos sąlyginė tikimybė
+yra $0{,}5\times0{,}4\times0{,}4\times0{,}6 = 0{,}048$.
 
 
-Next, let's look at another example in :numref:`fig_s2s-prob2`. 
-Unlike in :numref:`fig_s2s-prob1`, 
-at time step 2 we select the token "C", 
-which has the *second* highest conditional probability.
+Toliau pažvelkime į kitą pavyzdį :numref:`fig_s2s-prob2`.
+Skirtingai nei :numref:`fig_s2s-prob1`,
+2 laiko žingsniu pasirenkame teksto vienetą „C“,
+kuris turi *antrą* pagal dydį sąlyginę tikimybę.
 
-![The four numbers under each time step represent 
-the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step. 
-At time step 2, the token "C", which has the second highest conditional probability, 
-is selected.](../img/s2s-prob2.svg)
+![Keturi skaičiai po kiekvienu laiko žingsniu reiškia
+sąlygines tikimybes sugeneruoti „A“, „B“, „C“ ir „&lt;eos&gt;“ tuo laiko žingsniu.
+2 laiko žingsniu pasirinktas teksto vienetas „C“, turintis antrą pagal dydį sąlyginę tikimybę.](../img/s2s-prob2.svg)
 :label:`fig_s2s-prob2`
 
-Since the output subsequences at time steps 1 and 2, 
-on which time step 3 is based, 
-have changed from "A" and "B" in :numref:`fig_s2s-prob1` 
-to "A" and "C" in :numref:`fig_s2s-prob2`, 
-the conditional probability of each token 
-at time step 3 has also changed in :numref:`fig_s2s-prob2`. 
-Suppose that we choose the token "B" at time step 3. 
-Now time step 4 is conditional on
-the output subsequence at the first three time steps
-"A", "C", and "B", 
-which has changed from "A", "B", and "C" in :numref:`fig_s2s-prob1`. 
-Therefore, the conditional probability of generating 
-each token at time step 4 in :numref:`fig_s2s-prob2` 
-is also different from that in :numref:`fig_s2s-prob1`. 
-As a result, the conditional probability of the output sequence 
-"A", "C", "B", and "&lt;eos&gt;" in :numref:`fig_s2s-prob2`
-is $0.5\times0.3 \times0.6\times0.6=0.054$, 
-which is greater than that of greedy search in :numref:`fig_s2s-prob1`. 
-In this example, the output sequence "A", "B", "C", and "&lt;eos&gt;" 
-obtained by the greedy search is not optimal.
+Kadangi išvesties posekiai 1 ir 2 laiko žingsniais,
+kuriais remiasi 3 laiko žingsnis,
+pasikeitė iš „A“ ir „B“ :numref:`fig_s2s-prob1`
+į „A“ ir „C“ :numref:`fig_s2s-prob2`,
+kiekvieno teksto vieneto sąlyginė tikimybė
+3 laiko žingsniu taip pat pasikeitė :numref:`fig_s2s-prob2`.
+Tarkime, kad 3 laiko žingsniu pasirenkame teksto vienetą „B“.
+Dabar 4 laiko žingsnis sąlygojamas
+pirmųjų trijų laiko žingsnių išvesties posekiu
+„A“, „C“ ir „B“,
+kuris pasikeitė iš „A“, „B“ ir „C“ :numref:`fig_s2s-prob1`.
+Todėl kiekvieno teksto vieneto generavimo sąlyginė tikimybė
+4 laiko žingsniu :numref:`fig_s2s-prob2`
+taip pat skiriasi nuo tos :numref:`fig_s2s-prob1`.
+Dėl to išvesties sekos
+„A“, „C“, „B“ ir „&lt;eos&gt;“ sąlyginė tikimybė :numref:`fig_s2s-prob2`
+yra $0{,}5\times0{,}3 \times0{,}6\times0{,}6=0{,}054$,
+kuri yra didesnė nei godžiosios paieškos :numref:`fig_s2s-prob1`.
+Šiame pavyzdyje išvesties seka „A“, „B“, „C“ ir „&lt;eos&gt;“,
+gauta godžiąja paieška, nėra optimali.
 
 
 
 
 
-## Exhaustive Search
+## Pilna paieška
 
-If the goal is to obtain the most likely sequence, 
-we may consider using *exhaustive search*: 
-enumerate all the possible output sequences 
-with their conditional probabilities,
-and then output the one that scores 
-the highest predicted probability.
-
-
-While this would certainly give us what we desire,
-it would come at a prohibitive computational cost 
-of $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$,
-exponential in the sequence length and with an enormous
-base given by the vocabulary size.
-For example, when $|\mathcal{Y}|=10000$ and $T'=10$, 
-both small numbers when compared with ones in real applications, we will need to evaluate $10000^{10} = 10^{40}$ sequences, which is already beyond the capabilities of any foreseeable computers.
-On the other hand, the computational cost of greedy search is 
-$\mathcal{O}(\left|\mathcal{Y}\right|T')$: 
-miraculously cheap but far from optimal.
-For example, when $|\mathcal{Y}|=10000$ and $T'=10$, 
-we only need to evaluate $10000\times10=10^5$ sequences.
+Jei tikslas yra gauti tikėtiniausią seką,
+galime svarstyti naudoti *pilną paiešką*:
+išvardyti visas galimas išvesties sekas
+su jų sąlyginėmis tikimybėmis
+ir tada išvesti tą, kuri gauna
+didžiausią prognozuojamą tikimybę.
 
 
-## Beam Search
+Nors tai tikrai duotų tai, ko norime,
+tai kainuotų nepriimtinai daug skaičiavimų:
+$\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$,
+eksponentiškai pagal sekos ilgį ir su milžinišku
+pagrindu, nustatomu žodyno dydžio.
+Pavyzdžiui, kai $|\mathcal{Y}|=10000$ ir $T'=10$,
+abi mažos, palyginti su realių taikymų skaičiais, turėsime įvertinti $10000^{10} = 10^{40}$ sekų, o tai jau viršija bet kokių numatomų kompiuterių galimybes.
+Kita vertus, godžiosios paieškos skaičiavimo kaina yra
+$\mathcal{O}(\left|\mathcal{Y}\right|T')$:
+stebuklingai pigi, bet tolima nuo optimalios.
+Pavyzdžiui, kai $|\mathcal{Y}|=10000$ ir $T'=10$,
+reikia įvertinti tik $10000\times10=10^5$ sekų.
 
-You could view sequence decoding strategies as lying on a spectrum,
-with *beam search* striking a compromise 
-between the efficiency of greedy search
-and the optimality of exhaustive search.
-The most straightforward version of beam search 
-is characterized by a single hyperparameter,
-the *beam size*, $k$.
-Let's explain this terminology.
-At time step 1, we select the $k$ tokens 
-with the highest predicted probabilities.
-Each of them will be the first token of 
-$k$ candidate output sequences, respectively.
-At each subsequent time step, 
-based on the $k$ candidate output sequences
-at the previous time step,
-we continue to select $k$ candidate output sequences 
-with the highest predicted probabilities 
-from $k\left|\mathcal{Y}\right|$ possible choices.
 
-![The process of beam search (beam size $=2$; maximum length of an output sequence $=3$). The candidate output sequences are $\mathit{A}$, $\mathit{C}$, $\mathit{AB}$, $\mathit{CE}$, $\mathit{ABD}$, and $\mathit{CED}$.](../img/beam-search.svg)
+## Spindulio paieška
+
+Sekų dekodavimo strategijas galite vertinti kaip išsidėsčiusias spektre,
+kai *spindulio paieška* randa kompromisą
+tarp godžiosios paieškos efektyvumo
+ir pilnos paieškos optimalumo.
+Paprasčiausia spindulio paieškos versija
+apibūdinama vienu hiperparametru –
+*spindulio dydžiu* $k$.
+Paaiškinkime šią terminologiją.
+1 laiko žingsniu pasirenkame $k$ teksto vienetų
+su didžiausiomis prognozuojamomis tikimybėmis.
+Kiekvienas iš jų bus atitinkamai pirmasis
+$k$ kandidatinių išvesties sekų teksto vienetas.
+Kiekvienu paskesniu laiko žingsniu,
+remdamiesi $k$ kandidatinių išvesties sekų
+ankstesniame laiko žingsnyje,
+toliau renkame $k$ kandidatinių išvesties sekų
+su didžiausiomis prognozuojamomis tikimybėmis
+iš $k\left|\mathcal{Y}\right|$ galimų pasirinkimų.
+
+![Spindulio paieškos procesas (spindulio dydis $=2$; didžiausias išvesties sekos ilgis $=3$). Kandidatinės išvesties sekos yra $\mathit{A}$, $\mathit{C}$, $\mathit{AB}$, $\mathit{CE}$, $\mathit{ABD}$ ir $\mathit{CED}$.](../img/beam-search.svg)
 :label:`fig_beam-search`
 
 
-:numref:`fig_beam-search` demonstrates the 
-process of beam search with an example. 
-Suppose that the output vocabulary
-contains only five elements: 
-$\mathcal{Y} = \{A, B, C, D, E\}$, 
-where one of them is “&lt;eos&gt;”. 
-Let the beam size be two and 
-the maximum length of an output sequence be three. 
-At time step 1, 
-suppose that the tokens with the highest conditional probabilities 
-$P(y_1 \mid \mathbf{c})$ are $A$ and $C$. 
-At time step 2, for all $y_2 \in \mathcal{Y},$ 
-we compute 
+:numref:`fig_beam-search` pavyzdžiu demonstruoja
+spindulio paieškos procesą.
+Tarkime, kad išvesties žodyne
+yra tik penki elementai:
+$\mathcal{Y} = \{A, B, C, D, E\}$,
+kurių vienas yra „&lt;eos&gt;“.
+Tegul spindulio dydis yra du, o
+didžiausias išvesties sekos ilgis – trys.
+1 laiko žingsniu
+tarkime, kad teksto vienetai su didžiausiomis sąlyginėmis tikimybėmis
+$P(y_1 \mid \mathbf{c})$ yra $A$ ir $C$.
+2 laiko žingsniu visiems $y_2 \in \mathcal{Y},$
+apskaičiuojame
 
-$$\begin{aligned}P(A, y_2 \mid \mathbf{c}) = P(A \mid \mathbf{c})P(y_2 \mid A, \mathbf{c}),\\ P(C, y_2 \mid \mathbf{c}) = P(C \mid \mathbf{c})P(y_2 \mid C, \mathbf{c}),\end{aligned}$$  
+$$\begin{aligned}P(A, y_2 \mid \mathbf{c}) = P(A \mid \mathbf{c})P(y_2 \mid A, \mathbf{c}),\\ P(C, y_2 \mid \mathbf{c}) = P(C \mid \mathbf{c})P(y_2 \mid C, \mathbf{c}),\end{aligned}$$
 
-and pick the largest two among these ten values, say
-$P(A, B \mid \mathbf{c})$ and $P(C, E \mid \mathbf{c})$.
-Then at time step 3, for all $y_3 \in \mathcal{Y}$, we compute 
+ir iš šių dešimties reikšmių pasirenkame didžiausias dvi, tarkime,
+$P(A, B \mid \mathbf{c})$ ir $P(C, E \mid \mathbf{c})$.
+Tada 3 laiko žingsniu visiems $y_3 \in \mathcal{Y}$ apskaičiuojame
 
-$$\begin{aligned}P(A, B, y_3 \mid \mathbf{c}) = P(A, B \mid \mathbf{c})P(y_3 \mid A, B, \mathbf{c}),\\P(C, E, y_3 \mid \mathbf{c}) = P(C, E \mid \mathbf{c})P(y_3 \mid C, E, \mathbf{c}),\end{aligned}$$ 
+$$\begin{aligned}P(A, B, y_3 \mid \mathbf{c}) = P(A, B \mid \mathbf{c})P(y_3 \mid A, B, \mathbf{c}),\\P(C, E, y_3 \mid \mathbf{c}) = P(C, E \mid \mathbf{c})P(y_3 \mid C, E, \mathbf{c}),\end{aligned}$$
 
-and pick the largest two among these ten values, say 
-$P(A, B, D \mid \mathbf{c})$   and  $P(C, E, D \mid  \mathbf{c}).$
-As a result, we get six candidates output sequences: 
-(i) $A$; (ii) $C$; (iii) $A$, $B$; (iv) $C$, $E$; (v) $A$, $B$, $D$; and (vi) $C$, $E$, $D$. 
+ir iš šių dešimties reikšmių pasirenkame didžiausias dvi, tarkime,
+$P(A, B, D \mid \mathbf{c})$   ir  $P(C, E, D \mid  \mathbf{c}).$
+Dėl to gauname šešias kandidatines išvesties sekas:
+(i) $A$; (ii) $C$; (iii) $A$, $B$; (iv) $C$, $E$; (v) $A$, $B$, $D$; ir (vi) $C$, $E$, $D$.
 
 
-In the end, we obtain the set of final candidate output sequences 
-based on these six sequences (e.g., discard portions including and after “&lt;eos&gt;”).
-Then we choose the output sequence which maximizes the following score:
+Galiausiai gauname galutinių kandidatinių išvesties sekų aibę
+remdamiesi šiomis šešiomis sekomis (pvz., atmesdami dalis, įskaitant „&lt;eos&gt;“ ir po jo einančias).
+Tada pasirenkame išvesties seką, maksimizuojančią šį įvertį:
 
 $$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c});$$
 :eqlabel:`eq_beam-search-score`
 
-here $L$ is the length of the final candidate sequence 
-and $\alpha$ is usually set to 0.75. 
-Since a longer sequence has more logarithmic terms 
-in the summation of :eqref:`eq_beam-search-score`,
-the term $L^\alpha$ in the denominator penalizes
-long sequences.
+čia $L$ yra galutinės kandidatinės sekos ilgis,
+o $\alpha$ paprastai nustatomas 0,75.
+Kadangi ilgesnė seka turi daugiau logaritminių narių
+:eqref:`eq_beam-search-score` sumoje,
+narys $L^\alpha$ vardiklyje baudžia
+ilgas sekas.
 
-The computational cost of beam search is $\mathcal{O}(k\left|\mathcal{Y}\right|T')$. 
-This result is in between that of greedy search and that of exhaustive search.
-Greedy search can be treated as a special case of beam search 
-arising when the beam size is set to 1.
-
-
+Spindulio paieškos skaičiavimo kaina yra $\mathcal{O}(k\left|\mathcal{Y}\right|T')$.
+Šis rezultatas yra tarp godžiosios paieškos ir pilnos paieškos.
+Godžioji paieška gali būti laikoma ypatingu spindulio paieškos atveju,
+kai spindulio dydis nustatomas 1.
 
 
-## Summary
-
-Sequence searching strategies include 
-greedy search, exhaustive search, and beam search.
-Beam search provides a trade-off between accuracy and 
-computational cost via the flexible choice of the beam size.
 
 
-## Exercises
+## Santrauka
 
-1. Can we treat exhaustive search as a special type of beam search? Why or why not?
-1. Apply beam search in the machine translation problem in :numref:`sec_seq2seq`. How does the beam size affect the translation results and the prediction speed?
-1. We used language modeling for generating text following  user-provided prefixes in :numref:`sec_rnn-scratch`. Which kind of search strategy does it use? Can you improve it?
+Sekų paieškos strategijos apima
+godžiąją paiešką, pilną paiešką ir spindulio paiešką.
+Spindulio paieška suteikia kompromisą tarp tikslumo ir
+skaičiavimo kainos lanksčiai pasirenkant spindulio dydį.
 
-[Discussions](https://discuss.d2l.ai/t/338)
+
+## Pratimai
+
+1. Ar galime pilną paiešką laikyti ypatingu spindulio paieškos tipu? Kodėl taip arba kodėl ne?
+1. Pritaikykite spindulio paiešką mašininio vertimo problemai :numref:`sec_seq2seq`. Kaip spindulio dydis veikia vertimo rezultatus ir prognozavimo greitį?
+1. Kalbos modeliavimą naudojome tekstui po vartotojo pateiktų priešdėlių generuoti :numref:`sec_rnn-scratch`. Kokio tipo paieškos strategiją jis naudoja? Ar galite ją patobulinti?
+
+[Diskusijos](https://discuss.d2l.ai/t/338)

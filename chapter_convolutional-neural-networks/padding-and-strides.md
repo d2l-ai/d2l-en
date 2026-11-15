@@ -3,37 +3,37 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Padding and Stride
+# Papildymas ir žingsnis
 :label:`sec_padding`
 
-Recall the example of a convolution in :numref:`fig_correlation`. 
-The input had both a height and width of 3
-and the convolution kernel had both a height and width of 2,
-yielding an output representation with dimension $2\times2$.
-Assuming that the input shape is $n_\textrm{h}\times n_\textrm{w}$
-and the convolution kernel shape is $k_\textrm{h}\times k_\textrm{w}$,
-the output shape will be $(n_\textrm{h}-k_\textrm{h}+1) \times (n_\textrm{w}-k_\textrm{w}+1)$: 
-we can only shift the convolution kernel so far until it runs out
-of pixels to apply the convolution to. 
+Prisiminkite konvoliucijos pavyzdį :numref:`fig_correlation`.
+Įvesties aukštis ir plotis buvo 3,
+o konvoliucijos branduolio aukštis ir plotis – 2,
+gaunant išvesties atvaizdą, kurio dimensija $2\times2$.
+Tarkime, kad įvesties forma yra $n_\textrm{h}\times n_\textrm{w}$,
+o konvoliucijos branduolio forma – $k_\textrm{h}\times k_\textrm{w}$,
+tuomet išvesties forma bus $(n_\textrm{h}-k_\textrm{h}+1) \times (n_\textrm{w}-k_\textrm{w}+1)$:
+konvoliucijos branduolį galime pastumti tik tiek, kol pritrūksta
+pikselių, kuriems taikyti konvoliuciją.
 
-In the following we will explore a number of techniques, 
-including padding and strided convolutions,
-that offer more control over the size of the output. 
-As motivation, note that since kernels generally
-have width and height greater than $1$,
-after applying many successive convolutions,
-we tend to wind up with outputs that are
-considerably smaller than our input.
-If we start with a $240 \times 240$ pixel image,
-ten layers of $5 \times 5$ convolutions
-reduce the image to $200 \times 200$ pixels,
-slicing off $30 \%$ of the image and with it
-obliterating any interesting information
-on the boundaries of the original image.
-*Padding* is the most popular tool for handling this issue.
-In other cases, we may want to reduce the dimensionality drastically,
-e.g., if we find the original input resolution to be unwieldy.
-*Strided convolutions* are a popular technique that can help in these instances.
+Toliau išnagrinėsime keletą technikų,
+įskaitant papildymą ir konvoliucijas su žingsniu,
+suteikiančių daugiau kontrolės išvesties dydžiui.
+Kaip motyvaciją atkreipkite dėmesį, kad kadangi branduolių
+plotis ir aukštis paprastai didesni nei $1$,
+pritaikius daug nuoseklių konvoliucijų,
+dažniausiai gauname išvestis, kurios yra
+gerokai mažesnės už įvestį.
+Jei pradedame nuo $240 \times 240$ pikselių vaizdo,
+dešimt $5 \times 5$ konvoliucijų sluoksnių
+sumažina vaizdą iki $200 \times 200$ pikselių,
+nupjaudami $30 \%$ vaizdo ir kartu
+sunaikindami bet kokią įdomią informaciją
+originalaus vaizdo pakraščiuose.
+*Papildymas* yra populiariausia priemonė šiai problemai spręsti.
+Kitais atvejais galime norėti drastiškai sumažinti dimensiją,
+pvz., jei originali įvesties skyra mums pasirodo nepatogi.
+*Konvoliucijos su žingsniu* yra populiari technika, galinti padėti tokiais atvejais.
 
 ```{.python .input}
 %%tab mxnet
@@ -61,77 +61,77 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Padding
+## Papildymas
 
-As described above, one tricky issue when applying convolutional layers
-is that we tend to lose pixels on the perimeter of our image. Consider :numref:`img_conv_reuse` that depicts the pixel utilization as a function of the convolution kernel size and the position within the image. The pixels in the corners are hardly used at all. 
+Kaip aprašyta aukščiau, viena keblumo priežastis taikant konvoliucinius sluoksnius
+yra ta, kad prarandame pikselius vaizdo perimetre. Panagrinėkite :numref:`img_conv_reuse`, vaizduojantį pikselių panaudojimą kaip konvoliucijos branduolio dydžio ir vietos vaizde funkciją. Kampuose esantys pikseliai beveik nenaudojami.
 
-![Pixel utilization for convolutions of size $1 \times 1$, $2 \times 2$, and $3 \times 3$ respectively.](../img/conv-reuse.svg)
+![Pikselių panaudojimas $1 \times 1$, $2 \times 2$ ir $3 \times 3$ dydžio konvoliucijoms.](../img/conv-reuse.svg)
 :label:`img_conv_reuse`
 
-Since we typically use small kernels,
-for any given convolution
-we might only lose a few pixels
-but this can add up as we apply
-many successive convolutional layers.
-One straightforward solution to this problem
-is to add extra pixels of filler around the boundary of our input image,
-thus increasing the effective size of the image.
-Typically, we set the values of the extra pixels to zero.
-In :numref:`img_conv_pad`, we pad a $3 \times 3$ input,
-increasing its size to $5 \times 5$.
-The corresponding output then increases to a $4 \times 4$ matrix.
-The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+0\times2+0\times3=0$.
+Kadangi paprastai naudojame mažus branduolius,
+bet kuriai konkrečiai konvoliucijai
+galime prarasti tik kelis pikselius,
+bet tai gali susikaupti, kai taikome
+daug nuoseklių konvoliucinių sluoksnių.
+Vienas paprastas šios problemos sprendimas
+yra pridėti papildomų užpildo pikselių aplink įvesties vaizdo kraštą,
+taip padidinant efektyvų vaizdo dydį.
+Paprastai papildomų pikselių reikšmes nustatome lygias nuliui.
+:numref:`img_conv_pad` papildome $3 \times 3$ įvestį,
+padidindami jos dydį iki $5 \times 5$.
+Atitinkama išvestis tada padidėja iki $4 \times 4$ matricos.
+Pažymėtos dalys yra pirmasis išvesties elementas ir įvesties bei branduolio tenzoriaus elementai, naudoti išvesčiai skaičiuoti: $0\times0+0\times1+0\times2+0\times3=0$.
 
-![Two-dimensional cross-correlation with padding.](../img/conv-pad.svg)
+![Dvimatė kryžminė koreliacija su papildymu.](../img/conv-pad.svg)
 :label:`img_conv_pad`
 
-In general, if we add a total of $p_\textrm{h}$ rows of padding
-(roughly half on top and half on bottom)
-and a total of $p_\textrm{w}$ columns of padding
-(roughly half on the left and half on the right),
-the output shape will be
+Apskritai, jei pridedame iš viso $p_\textrm{h}$ papildymo eilučių
+(maždaug pusę viršuje ir pusę apačioje)
+ir iš viso $p_\textrm{w}$ papildymo stulpelių
+(maždaug pusę kairėje ir pusę dešinėje),
+išvesties forma bus
 
 $$(n_\textrm{h}-k_\textrm{h}+p_\textrm{h}+1)\times(n_\textrm{w}-k_\textrm{w}+p_\textrm{w}+1).$$
 
-This means that the height and width of the output
-will increase by $p_\textrm{h}$ and $p_\textrm{w}$, respectively.
+Tai reiškia, kad išvesties aukštis ir plotis
+padidės atitinkamai $p_\textrm{h}$ ir $p_\textrm{w}$.
 
-In many cases, we will want to set $p_\textrm{h}=k_\textrm{h}-1$ and $p_\textrm{w}=k_\textrm{w}-1$
-to give the input and output the same height and width.
-This will make it easier to predict the output shape of each layer
-when constructing the network.
-Assuming that $k_\textrm{h}$ is odd here,
-we will pad $p_\textrm{h}/2$ rows on both sides of the height.
-If $k_\textrm{h}$ is even, one possibility is to
-pad $\lceil p_\textrm{h}/2\rceil$ rows on the top of the input
-and $\lfloor p_\textrm{h}/2\rfloor$ rows on the bottom.
-We will pad both sides of the width in the same way.
+Daugeliu atvejų norėsime nustatyti $p_\textrm{h}=k_\textrm{h}-1$ ir $p_\textrm{w}=k_\textrm{w}-1$,
+kad įvestis ir išvestis turėtų tą patį aukštį ir plotį.
+Tai palengvins kiekvieno sluoksnio išvesties formos numatymą
+konstruojant tinklą.
+Darant prielaidą, kad čia $k_\textrm{h}$ yra nelyginis,
+papildysime $p_\textrm{h}/2$ eilučių abiejose aukščio pusėse.
+Jei $k_\textrm{h}$ yra lyginis, viena galimybė yra
+papildyti $\lceil p_\textrm{h}/2\rceil$ eilučių įvesties viršuje
+ir $\lfloor p_\textrm{h}/2\rfloor$ eilučių apačioje.
+Abi pločio puses papildysime tuo pačiu būdu.
 
-CNNs commonly use convolution kernels
-with odd height and width values, such as 1, 3, 5, or 7.
-Choosing odd kernel sizes has the benefit
-that we can preserve the dimensionality
-while padding with the same number of rows on top and bottom,
-and the same number of columns on left and right.
+CNN dažniausiai naudoja konvoliucijos branduolius
+su nelyginėmis aukščio ir pločio reikšmėmis, tokiomis kaip 1, 3, 5 ar 7.
+Nelyginių branduolių dydžių pasirinkimas turi tą privalumą,
+kad galime išlaikyti dimensiją,
+papildydami vienodu eilučių skaičiumi viršuje ir apačioje
+bei vienodu stulpelių skaičiumi kairėje ir dešinėje.
 
-Moreover, this practice of using odd kernels
-and padding to precisely preserve dimensionality
-offers a clerical benefit.
-For any two-dimensional tensor `X`,
-when the kernel's size is odd
-and the number of padding rows and columns
-on all sides are the same,
-thereby producing an output with the same height and width as the input,
-we know that the output `Y[i, j]` is calculated
-by cross-correlation of the input and convolution kernel
-with the window centered on `X[i, j]`.
+Be to, ši praktika naudoti nelyginius branduolius
+ir papildymą, kad tiksliai išlaikytume dimensiją,
+suteikia raštvedybinės naudos.
+Bet kuriam dvimačiam tenzoriui `X`,
+kai branduolio dydis yra nelyginis,
+o papildymo eilučių ir stulpelių skaičius
+visose pusėse yra vienodas,
+taip gaunant išvestį, kurios aukštis ir plotis yra tokie patys kaip įvesties,
+žinome, kad išvestis `Y[i, j]` apskaičiuojama
+įvesties ir konvoliucijos branduolio kryžmine koreliacija,
+kai langas yra centruotas ties `X[i, j]`.
 
-In the following example, we create a two-dimensional convolutional layer
-with a height and width of 3
-and (**apply 1 pixel of padding on all sides.**)
-Given an input with a height and width of 8,
-we find that the height and width of the output is also 8.
+Toliau pateiktame pavyzdyje sukuriame dvimatį konvoliucinį sluoksnį,
+kurio aukštis ir plotis yra 3,
+ir (**visose pusėse pritaikome 1 pikselio papildymą.**)
+Turint įvestį, kurios aukštis ir plotis yra 8,
+randame, kad išvesties aukštis ir plotis taip pat yra 8.
 
 ```{.python .input}
 %%tab mxnet
@@ -207,9 +207,9 @@ X = jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()), shape=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
-When the height and width of the convolution kernel are different,
-we can make the output and input have the same height and width
-by [**setting different padding numbers for height and width.**]
+Kai konvoliucijos branduolio aukštis ir plotis skiriasi,
+galime padaryti, kad išvestis ir įvestis turėtų tą patį aukštį ir plotį,
+[**nustatydami skirtingus papildymo skaičius aukščiui ir pločiui.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -243,50 +243,50 @@ conv2d = nn.Conv(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
 
-## Stride
+## Žingsnis
 
-When computing the cross-correlation,
-we start with the convolution window
-at the upper-left corner of the input tensor,
-and then slide it over all locations both down and to the right.
-In the previous examples, we defaulted to sliding one element at a time.
-However, sometimes, either for computational efficiency
-or because we wish to downsample,
-we move our window more than one element at a time,
-skipping the intermediate locations. This is particularly useful if the convolution 
-kernel is large since it captures a large area of the underlying image.
+Skaičiuodami kryžminę koreliaciją,
+pradedame nuo konvoliucijos lango
+įvesties tenzoriaus viršutiniame kairiajame kampe,
+o tada slenkame jį per visas vietas žemyn ir į dešinę.
+Ankstesniuose pavyzdžiuose pagal numatytuosius nustatymus slinkome po vieną elementą.
+Tačiau kartais, arba dėl skaičiavimo efektyvumo,
+arba todėl, kad norime sumažinti diskretizavimo dažnį,
+savo langą judiname daugiau nei vienu elementu vienu metu,
+praleisdami tarpines vietas. Tai ypač naudinga, jei konvoliucijos
+branduolys yra didelis, nes jis apima didelę pagrindinio vaizdo sritį.
 
-We refer to the number of rows and columns traversed per slide as *stride*.
-So far, we have used strides of 1, both for height and width.
-Sometimes, we may want to use a larger stride.
-:numref:`img_conv_stride` shows a two-dimensional cross-correlation operation
-with a stride of 3 vertically and 2 horizontally.
-The shaded portions are the output elements as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
-We can see that when the second element of the first column is generated,
-the convolution window slides down three rows.
-The convolution window slides two columns to the right
-when the second element of the first row is generated.
-When the convolution window continues to slide two columns to the right on the input,
-there is no output because the input element cannot fill the window
-(unless we add another column of padding).
+Eilučių ir stulpelių skaičių, kurį peržengiame per vieną slinkimą, vadiname *žingsniu*.
+Iki šiol naudojome 1 žingsnius – ir aukščiui, ir pločiui.
+Kartais galime norėti naudoti didesnį žingsnį.
+:numref:`img_conv_stride` parodyta dvimatė kryžminės koreliacijos operacija
+su žingsniu 3 vertikaliai ir 2 horizontaliai.
+Pažymėtos dalys yra išvesties elementai ir įvesties bei branduolio tenzoriaus elementai, naudoti išvesčiai skaičiuoti: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
+Matome, kad generuojant antrąjį pirmojo stulpelio elementą,
+konvoliucijos langas slenka žemyn per tris eilutes.
+Konvoliucijos langas slenka dviem stulpeliais į dešinę,
+kai generuojamas antrasis pirmosios eilutės elementas.
+Kai konvoliucijos langas toliau slenka dviem stulpeliais į dešinę įvestyje,
+išvesties nėra, nes įvesties elementas negali užpildyti lango
+(nebent pridėtume dar vieną papildymo stulpelį).
 
-![Cross-correlation with strides of 3 and 2 for height and width, respectively.](../img/conv-stride.svg)
+![Kryžminė koreliacija su žingsniais 3 ir 2 atitinkamai aukščiui ir pločiui.](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
-In general, when the stride for the height is $s_\textrm{h}$
-and the stride for the width is $s_\textrm{w}$, the output shape is
+Apskritai, kai aukščio žingsnis yra $s_\textrm{h}$,
+o pločio žingsnis – $s_\textrm{w}$, išvesties forma yra
 
 $$\lfloor(n_\textrm{h}-k_\textrm{h}+p_\textrm{h}+s_\textrm{h})/s_\textrm{h}\rfloor \times \lfloor(n_\textrm{w}-k_\textrm{w}+p_\textrm{w}+s_\textrm{w})/s_\textrm{w}\rfloor.$$
 
-If we set $p_\textrm{h}=k_\textrm{h}-1$ and $p_\textrm{w}=k_\textrm{w}-1$,
-then the output shape can be simplified to
+Jei nustatome $p_\textrm{h}=k_\textrm{h}-1$ ir $p_\textrm{w}=k_\textrm{w}-1$,
+išvesties formą galima supaprastinti iki
 $\lfloor(n_\textrm{h}+s_\textrm{h}-1)/s_\textrm{h}\rfloor \times \lfloor(n_\textrm{w}+s_\textrm{w}-1)/s_\textrm{w}\rfloor$.
-Going a step further, if the input height and width
-are divisible by the strides on the height and width,
-then the output shape will be $(n_\textrm{h}/s_\textrm{h}) \times (n_\textrm{w}/s_\textrm{w})$.
+Žengiant dar žingsnį, jei įvesties aukštis ir plotis
+dalijasi iš aukščio ir pločio žingsnių,
+tuomet išvesties forma bus $(n_\textrm{h}/s_\textrm{h}) \times (n_\textrm{w}/s_\textrm{w})$.
 
-Below, we [**set the strides on both the height and width to 2**],
-thus halving the input height and width.
+Toliau [**nustatome ir aukščio, ir pločio žingsnius lygius 2**],
+taip perpus sumažindami įvesties aukštį ir plotį.
 
 ```{.python .input}
 %%tab mxnet
@@ -312,7 +312,7 @@ conv2d = nn.Conv(1, kernel_size=(3, 3), padding=1, strides=2)
 comp_conv2d(conv2d, X).shape
 ```
 
-Let's look at (**a slightly more complicated example**).
+Pažvelkime į (**šiek tiek sudėtingesnį pavyzdį**).
 
 ```{.python .input}
 %%tab mxnet
@@ -339,37 +339,37 @@ conv2d = nn.Conv(1, kernel_size=(3, 5), padding=(0, 1), strides=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_\textrm{h}, p_\textrm{w})$ padding. Most commonly we set $p_\textrm{h} = p_\textrm{w}$, in which case we simply state that we choose padding $p$. 
+Papildymas gali padidinti išvesties aukštį ir plotį. Tai dažnai naudojama, kad išvestis turėtų tokį patį aukštį ir plotį kaip įvestis, siekiant išvengti nepageidaujamo išvesties susitraukimo. Be to, tai užtikrina, kad visi pikseliai naudojami vienodai dažnai. Paprastai renkamės simetrišką papildymą abiejose įvesties aukščio ir pločio pusėse. Šiuo atveju kalbame apie $(p_\textrm{h}, p_\textrm{w})$ papildymą. Dažniausiai nustatome $p_\textrm{h} = p_\textrm{w}$, ir tada tiesiog sakome, kad pasirenkame papildymą $p$.
 
-A similar convention applies to strides. When horizontal stride $s_\textrm{h}$ and vertical stride $s_\textrm{w}$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
+Panaši konvencija taikoma žingsniams. Kai horizontalus žingsnis $s_\textrm{h}$ ir vertikalus žingsnis $s_\textrm{w}$ sutampa, tiesiog kalbame apie žingsnį $s$. Žingsnis gali sumažinti išvesties skyrą, pavyzdžiui, sumažindamas išvesties aukštį ir plotį iki tik $1/n$ įvesties aukščio ir pločio, kai $n > 1$. Pagal numatytuosius nustatymus papildymas yra 0, o žingsnis – 1.
 
-So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provided an extensive overview of those (albeit without a clear case for when to use nonzero paddings unless artifacts occur). 
+Iki šiol visas aptartas papildymas tiesiog išplėsdavo vaizdus nuliais. Tai turi didelį skaičiavimo privalumą, nes jį padaryti elementaru. Be to, operatorius galima suprojektuoti taip, kad jie netiesiogiai pasinaudotų šiuo papildymu, nereikalaujant skirti papildomos atminties. Tuo pat metu tai leidžia CNN užkoduoti numanomą pozicijos informaciją vaizde, tiesiog išmokstant, kur yra „tuščia vieta“. Yra daug alternatyvų papildymui nuliais. :citet:`Alsallakh.Kokhlikyan.Miglani.ea.2020` pateikė išsamią jų apžvalgą (nors be aiškaus atvejo, kada naudoti nenulinį papildymą, nebent atsiranda artefaktų).
 
 
-## Exercises
+## Pratimai
 
-1. Given the final code example in this section with kernel size $(3, 5)$, padding $(0, 1)$, and stride $(3, 4)$, 
-   calculate the output shape to check if it is consistent with the experimental result.
-1. For audio signals, what does a stride of 2 correspond to?
-1. Implement mirror padding, i.e., padding where the border values are simply mirrored to extend tensors. 
-1. What are the computational benefits of a stride larger than 1?
-1. What might be statistical benefits of a stride larger than 1?
-1. How would you implement a stride of $\frac{1}{2}$? What does it correspond to? When would this be useful?
+1. Turint paskutinį šio skyrelio kodo pavyzdį su branduolio dydžiu $(3, 5)$, papildymu $(0, 1)$ ir žingsniu $(3, 4)$,
+   apskaičiuokite išvesties formą, kad patikrintumėte, ar ji atitinka eksperimento rezultatą.
+1. Garso signalams, ką atitinka žingsnis 2?
+1. Įgyvendinkite veidrodinį papildymą, t. y. papildymą, kai kraštų reikšmės tiesiog atspindimos tenzoriams išplėsti.
+1. Kokia yra skaičiavimo nauda iš didesnio nei 1 žingsnio?
+1. Kokia gali būti statistinė nauda iš didesnio nei 1 žingsnio?
+1. Kaip įgyvendintumėte žingsnį $\frac{1}{2}$? Ką jis atitinka? Kada tai būtų naudinga?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/67)
+[Diskusijos](https://discuss.d2l.ai/t/67)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/68)
+[Diskusijos](https://discuss.d2l.ai/t/68)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/272)
+[Diskusijos](https://discuss.d2l.ai/t/272)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17997)
+[Diskusijos](https://discuss.d2l.ai/t/17997)
 :end_tab:

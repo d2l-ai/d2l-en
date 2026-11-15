@@ -1,22 +1,22 @@
-# Concise Implementation of Recurrent Neural Networks
+# Glaustas rekurentinių neuroninių tinklų įgyvendinimas
 :label:`sec_rnn-concise`
 
-Like most of our from-scratch implementations,
-:numref:`sec_rnn-scratch` was designed 
-to provide insight into how each component works.
-But when you are using RNNs every day 
-or writing production code,
-you will want to rely more on libraries
-that cut down on both implementation time 
-(by supplying library code for common models and functions)
-and computation time 
-(by optimizing the heck out of these library implementations).
-This section will show you how to implement 
-the same language model more efficiently
-using the high-level API provided 
-by your deep learning framework.
-We begin, as before, by loading 
-*The Time Machine* dataset.
+Kaip ir dauguma mūsų įgyvendinimų nuo nulio,
+:numref:`sec_rnn-scratch` buvo sukurtas
+siekiant suteikti įžvalgą, kaip veikia kiekvienas komponentas.
+Tačiau kai RNN naudojate kasdien
+arba rašote produkcinį kodą,
+norėsite labiau remtis bibliotekomis,
+kurios sutrumpina ir įgyvendinimo laiką
+(pateikdamos bibliotekų kodą įprastiems modeliams ir funkcijoms),
+ir skaičiavimo laiką
+(iki kraštutinumo optimizuodamos šiuos bibliotekų įgyvendinimus).
+Šiame skyrelyje parodysime, kaip įgyvendinti
+tą patį kalbos modelį efektyviau,
+naudojant aukšto lygio API,
+kurį teikia jūsų giliojo mokymosi karkasas.
+Pradedame, kaip ir anksčiau, įkeldami
+*Laiko mašinos* duomenų rinkinį.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -52,29 +52,29 @@ from flax import linen as nn
 from jax import numpy as jnp
 ```
 
-## [**Defining the Model**]
+## [**Modelio apibrėžimas**]
 
-We define the following class
-using the RNN implemented
-by high-level APIs.
+Apibrėžiame šią klasę,
+naudodami aukšto lygio API
+įgyvendintą RNN.
 
 :begin_tab:`mxnet`
-Specifically, to initialize the hidden state,
-we invoke the member method `begin_state`.
-This returns a list that contains
-an initial hidden state
-for each example in the minibatch,
-whose shape is
-(number of hidden layers, batch size, number of hidden units).
-For some models to be introduced later
-(e.g., long short-term memory),
-this list will also contain other information.
+Konkrečiai, kad inicializuotume paslėptąją būseną,
+iškviečiame nario metodą `begin_state`.
+Jis grąžina sąrašą, kuriame yra
+pradinė paslėptoji būsena
+kiekvienam minirinkinio pavyzdžiui,
+kurios forma
+(paslėptųjų sluoksnių skaičius, rinkinio dydis, paslėptųjų vienetų skaičius).
+Kai kuriems vėliau pristatomiems modeliams
+(pvz., ilgos trumpalaikės atminties),
+šiame sąraše bus ir kitos informacijos.
 :end_tab:
 
 :begin_tab:`jax`
-Flax does not provide an RNNCell for concise implementation of Vanilla RNNs
-as of today. There are more advanced variants of RNNs like LSTMs and GRUs
-which are available in the Flax `linen` API.
+Flax šiuo metu nesiūlo RNNCell paprastiems RNN glaustai įgyvendinti.
+Yra pažangesnių RNN variantų, tokių kaip LSTM ir GRU,
+kurie yra prieinami Flax `linen` API.
 :end_tab:
 
 ```{.python .input}
@@ -133,9 +133,9 @@ class RNN(nn.Module):  #@save
         raise NotImplementedError
 ```
 
-Inheriting from the `RNNLMScratch` class in :numref:`sec_rnn-scratch`, 
-the following `RNNLM` class defines a complete RNN-based language model.
-Note that we need to create a separate fully connected output layer.
+Paveldėdama iš klasės `RNNLMScratch` iš :numref:`sec_rnn-scratch`,
+toliau pateikta klasė `RNNLM` apibrėžia pilną RNN pagrįstą kalbos modelį.
+Atkreipkite dėmesį, kad turime sukurti atskirą pilnai sujungtą išvesties sluoksnį.
 
 ```{.python .input}
 %%tab pytorch
@@ -184,12 +184,12 @@ class RNNLM(d2l.RNNLMScratch):  #@save
         return self.output_layer(rnn_outputs)
 ```
 
-## Training and Predicting
+## Mokymas ir prognozavimas
 
-Before training the model, let's [**make a prediction 
-with a model initialized with random weights.**]
-Given that we have not trained the network, 
-it will generate nonsensical predictions.
+Prieš apmokydami modelį, [**padarykime prognozę
+su modeliu, inicializuotu atsitiktiniais svoriais.**]
+Kadangi tinklo neapmokėme,
+jis sugeneruos beprasmes prognozes.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -202,7 +202,7 @@ model = RNNLM(rnn, vocab_size=len(data.vocab), lr=1)
 model.predict('it has', 20, data.vocab)
 ```
 
-Next, we [**train our model, leveraging the high-level API**].
+Toliau [**apmokome savo modelį, pasinaudodami aukšto lygio API**].
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -214,11 +214,11 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-Compared with :numref:`sec_rnn-scratch`,
-this model achieves comparable perplexity,
-but runs faster due to the optimized implementations.
-As before, we can generate predicted tokens 
-following the specified prefix string.
+Palyginti su :numref:`sec_rnn-scratch`,
+šis modelis pasiekia panašų painumą,
+bet veikia greičiau dėl optimizuotų įgyvendinimų.
+Kaip ir anksčiau, galime generuoti prognozuojamus teksto vienetus,
+einančius po nurodytos priešdėlio eilutės.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -230,32 +230,31 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-## Summary
+## Santrauka
 
-High-level APIs in deep learning frameworks provide implementations of standard RNNs.
-These libraries help you to avoid wasting time reimplementing standard models.
-Moreover,
-framework implementations are often highly optimized, 
-  leading to significant (computational) performance gains 
-  when compared with implementations from scratch.
+Giliojo mokymosi karkasų aukšto lygio API teikia standartinių RNN įgyvendinimus.
+Šios bibliotekos padeda neeikvoti laiko standartinių modelių įgyvendinimui iš naujo.
+Be to,
+karkasų įgyvendinimai dažnai yra labai optimizuoti,
+todėl, palyginti su įgyvendinimais nuo nulio, gaunamas reikšmingas (skaičiavimo) našumo pagerėjimas.
 
-## Exercises
+## Pratimai
 
-1. Can you make the RNN model overfit using the high-level APIs?
-1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
+1. Ar galite priversti RNN modelį persimokyti naudodami aukšto lygio API?
+1. Įgyvendinkite :numref:`sec_sequence` autoregresinį modelį naudodami RNN.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/335)
+[Diskusijos](https://discuss.d2l.ai/t/335)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1053)
+[Diskusijos](https://discuss.d2l.ai/t/1053)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/2211)
+[Diskusijos](https://discuss.d2l.ai/t/2211)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18015)
+[Diskusijos](https://discuss.d2l.ai/t/18015)
 :end_tab:

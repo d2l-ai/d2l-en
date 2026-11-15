@@ -3,33 +3,33 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Network in Network (NiN)
+# Tinklas tinkle (NiN)
 :label:`sec_nin`
 
-LeNet, AlexNet, and VGG all share a common design pattern:
-extract features exploiting *spatial* structure
-via a sequence of convolutions and pooling layers
-and post-process the representations via fully connected layers.
-The improvements upon LeNet by AlexNet and VGG mainly lie
-in how these later networks widen and deepen these two modules.
+LeNet, AlexNet ir VGG visi turi bendrą dizaino šabloną:
+išskirti požymius, išnaudojant *erdvinę* struktūrą,
+per konvoliucijų ir sutelkimo sluoksnių seką,
+ir apdoroti atvaizdus pilnai sujungtais sluoksniais.
+AlexNet ir VGG patobulinimai, palyginti su LeNet, daugiausia slypi
+tame, kaip šie vėlesni tinklai praplečia ir pagilina šiuos du modulius.
 
-This design poses two major challenges.
-First, the fully connected layers at the end
-of the architecture consume tremendous numbers of parameters. For instance, even a simple
-model such as VGG-11 requires a monstrous matrix, occupying almost
-400MB of RAM in single precision (FP32). This is a significant impediment to computation, in particular on
-mobile and embedded devices. After all, even high-end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4S had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
+Šis dizainas kelia du pagrindinius iššūkius.
+Pirma, pilnai sujungti sluoksniai architektūros pabaigoje
+naudoja milžinišką parametrų skaičių. Pavyzdžiui, net paprastam
+modeliui, tokiam kaip VGG-11, reikia siaubingos matricos, užimančios beveik
+400 MB RAM viengubo tikslumo (FP32) formatu. Tai didelė kliūtis skaičiavimams, ypač
+mobiliuosiuose ir įterptuosiuose įrenginiuose. Juk net aukščiausios klasės mobilieji telefonai turi ne daugiau kaip 8 GB RAM. Kai buvo išrastas VGG, tai buvo dydžio eile mažiau (iPhone 4S turėjo 512 MB). Todėl būtų buvę sunku pateisinti didžiosios atminties dalies skyrimą vaizdų klasifikatoriui.
 
-Second, it is equally impossible to add fully connected layers
-earlier in the network to increase the degree of nonlinearity: doing so would destroy the
-spatial structure and require potentially even more memory.
+Antra, lygiai taip pat neįmanoma pridėti pilnai sujungtų sluoksnių
+anksčiau tinkle, kad padidėtų netiesiškumo laipsnis: tai sunaikintų
+erdvinę struktūrą ir galbūt pareikalautų dar daugiau atminties.
 
-The *network in network* (*NiN*) blocks :cite:`Lin.Chen.Yan.2013` offer an alternative,
-capable of solving both problems in one simple strategy.
-They were proposed based on a very simple insight: (i) use $1 \times 1$ convolutions to add
-local nonlinearities across the channel activations and (ii) use global average pooling to integrate
-across all locations in the last representation layer. Note that global average pooling would not
-be effective, were it not for the added nonlinearities. Let's dive into this in detail.
+*Tinklo tinkle* (*NiN*) blokai :cite:`Lin.Chen.Yan.2013` siūlo alternatyvą,
+galinčią išspręsti abi problemas viena paprasta strategija.
+Jie buvo pasiūlyti remiantis labai paprasta įžvalga: (i) naudoti $1 \times 1$ konvoliucijas, kad
+būtų pridėti lokalūs netiesiškumai kanalų aktyvacijose, ir (ii) naudoti globalų sutelkimą vidurkinant, kad
+būtų integruojama per visas vietas paskutiniame atvaizdų sluoksnyje. Atkreipkite dėmesį, kad globalus sutelkimas vidurkinant nebūtų
+veiksmingas be pridėtų netiesiškumų. Pažvelkime į tai išsamiai.
 
 ```{.python .input}
 %%tab mxnet
@@ -60,23 +60,23 @@ import jax
 from jax import numpy as jnp
 ```
 
-## (**NiN Blocks**)
+## (**NiN blokai**)
 
-Recall :numref:`subsec_1x1`. In it we said that the inputs and outputs of convolutional layers
-consist of four-dimensional tensors with axes
-corresponding to the example, channel, height, and width.
-Also recall that the inputs and outputs of fully connected layers
-are typically two-dimensional tensors corresponding to the example and feature.
-The idea behind NiN is to apply a fully connected layer
-at each pixel location (for each height and width).
-The resulting $1 \times 1$ convolution can be thought of as
-a fully connected layer acting independently on each pixel location.
+Prisiminkite :numref:`subsec_1x1`. Joje sakėme, kad konvoliucinių sluoksnių įvestys ir išvestys
+yra keturmačiai tenzoriai, kurių ašys
+atitinka pavyzdį, kanalą, aukštį ir plotį.
+Taip pat prisiminkite, kad pilnai sujungtų sluoksnių įvestys ir išvestys
+paprastai yra dvimačiai tenzoriai, atitinkantys pavyzdį ir požymį.
+NiN idėja – taikyti pilnai sujungtą sluoksnį
+kiekvienoje pikselio vietoje (kiekvienam aukščiui ir pločiui).
+Gautą $1 \times 1$ konvoliuciją galima laikyti
+pilnai sujungtu sluoksniu, veikiančiu nepriklausomai kiekvienoje pikselio vietoje.
 
-:numref:`fig_nin` illustrates the main structural
-differences between VGG and NiN, and their blocks.
-Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and at the end where we no longer require a giant fully connected layer.
+:numref:`fig_nin` iliustruoja pagrindinius struktūrinius
+VGG ir NiN skirtumus bei jų blokus.
+Atkreipkite dėmesį ir į NiN blokų skirtumą (po pradinės konvoliucijos eina $1 \times 1$ konvoliucijos, o VGG išlaiko $3 \times 3$ konvoliucijas), ir į pabaigą, kur nebereikia milžiniško pilnai sujungto sluoksnio.
 
-![Comparing the architectures of VGG and NiN, and of their blocks.](../img/nin.svg)
+![VGG ir NiN bei jų blokų architektūrų palyginimas.](../img/nin.svg)
 :width:`600px`
 :label:`fig_nin`
 
@@ -123,18 +123,18 @@ def nin_block(out_channels, kernel_size, strides, padding):
         nn.Conv(out_channels, kernel_size=(1, 1)), nn.relu])
 ```
 
-## [**NiN Model**]
+## [**NiN modelis**]
 
-NiN uses the same initial convolution sizes as AlexNet (it was proposed shortly thereafter).
-The kernel sizes are $11\times 11$, $5\times 5$, and $3\times 3$, respectively,
-and the numbers of output channels match those of AlexNet. Each NiN block is followed by a max-pooling layer
-with a stride of 2 and a window shape of $3\times 3$.
+NiN naudoja tokius pat pradinių konvoliucijų dydžius kaip AlexNet (jis pasiūlytas netrukus po to).
+Branduolių dydžiai atitinkamai yra $11\times 11$, $5\times 5$ ir $3\times 3$,
+o išvesties kanalų skaičius sutampa su AlexNet. Po kiekvieno NiN bloko eina sutelkimo imant maksimumą sluoksnis
+su 2 žingsniu ir $3\times 3$ lango forma.
 
-The second significant difference between NiN and both AlexNet and VGG
-is that NiN avoids fully connected layers altogether.
-Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
-yielding a vector of logits.
-This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time.
+Antrasis reikšmingas NiN skirtumas nuo AlexNet ir VGG
+yra tas, kad NiN visiškai vengia pilnai sujungtų sluoksnių.
+Vietoj to NiN naudoja NiN bloką su išvesties kanalų skaičiumi, lygiu žymenų klasių skaičiui, po kurio eina *globalaus* sutelkimo vidurkinant sluoksnis,
+gaunantis logitų vektorių.
+Šis dizainas gerokai sumažina reikalingų modelio parametrų skaičių, nors ir gali pailginti mokymo laiką.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -205,7 +205,7 @@ class NiN(d2l.Classifier):
         ])
 ```
 
-We create a data example to see [**the output shape of each block**].
+Sukuriame duomenų pavyzdį, kad pamatytume [**kiekvieno bloko išvesties formą**].
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -222,10 +222,10 @@ NiN().layer_summary((1, 224, 224, 1))
 NiN(training=False).layer_summary((1, 224, 224, 1))
 ```
 
-## [**Training**]
+## [**Mokymas**]
 
-As before we use Fashion-MNIST to train the model using the same 
-optimizer that we used for AlexNet and VGG.
+Kaip ir anksčiau, naudojame Fashion-MNIST modeliui apmokyti, naudodami tą patį
+optimizavimo algoritmą, kurį naudojome AlexNet ir VGG.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -246,33 +246,33 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary
+## Santrauka
 
-NiN has dramatically fewer parameters than AlexNet and VGG. This stems primarily from the fact that it needs no giant fully connected layers. Instead, it uses global average pooling to aggregate across all image locations after the last stage of the network body. This obviates the need for expensive (learned) reduction operations and replaces them by a simple average. What surprised researchers at the time was the fact that this averaging operation did not harm accuracy. Note that averaging across a low-resolution representation (with many channels) also adds to the amount of translation invariance that the network can handle. 
+NiN turi dramatiškai mažiau parametrų nei AlexNet ir VGG. Tai daugiausia kyla iš to, kad jam nereikia milžiniškų pilnai sujungtų sluoksnių. Vietoj to jis naudoja globalų sutelkimą vidurkinant, kad agreguotų per visas vaizdo vietas po paskutinio tinklo korpuso etapo. Tai panaikina poreikį brangioms (išmokstamoms) skyros mažinimo operacijoms ir pakeičia jas paprastu vidurkiu. Tyrėjus tuo metu nustebino tai, kad ši vidurkinimo operacija nepakenkė tikslumui. Atkreipkite dėmesį, kad vidurkinimas per žemos skyros atvaizdą (su daug kanalų) taip pat padidina postūmio invariantiškumo kiekį, kurį tinklas gali apdoroti.
 
-Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$ convolutions aids the quest for fewer parameters further. It can cater for a significant amount of nonlinearity across channels within any given location. Both $1 \times 1$ convolutions and global average pooling significantly influenced subsequent CNN designs. 
+Rinkimasis mažiau konvoliucijų su plačiais branduoliais ir jų keitimas $1 \times 1$ konvoliucijomis dar labiau padeda siekiant mažiau parametrų. Jos gali užtikrinti nemažą netiesiškumo kiekį per kanalus bet kurioje duotoje vietoje. Ir $1 \times 1$ konvoliucijos, ir globalus sutelkimas vidurkinant reikšmingai paveikė vėlesnių CNN dizainus.
 
-## Exercises
+## Pratimai
 
-1. Why are there two $1\times 1$ convolutional layers per NiN block? Increase their number to three. Reduce their number to one. What changes?
-1. What changes if you replace the $1 \times 1$ convolutions by $3 \times 3$ convolutions? 
-1. What happens if you replace the global average pooling by a fully connected layer (speed, accuracy, number of parameters)?
-1. Calculate the resource usage for NiN.
-    1. What is the number of parameters?
-    1. What is the amount of computation?
-    1. What is the amount of memory needed during training?
-    1. What is the amount of memory needed during prediction?
-1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
-1. Use the structural design decisions in VGG that led to VGG-11, VGG-16, and VGG-19 to design a family of NiN-like networks.
+1. Kodėl kiekviename NiN bloke yra du $1\times 1$ konvoliuciniai sluoksniai? Padidinkite jų skaičių iki trijų. Sumažinkite iki vieno. Kas pasikeičia?
+1. Kas pasikeičia, jei $1 \times 1$ konvoliucijas pakeisite $3 \times 3$ konvoliucijomis?
+1. Kas nutinka, jei globalų sutelkimą vidurkinant pakeisite pilnai sujungtu sluoksniu (greitis, tikslumas, parametrų skaičius)?
+1. Apskaičiuokite NiN išteklių naudojimą.
+    1. Koks yra parametrų skaičius?
+    1. Koks yra skaičiavimų kiekis?
+    1. Koks yra mokymo metu reikalingas atminties kiekis?
+    1. Koks yra prognozavimo metu reikalingas atminties kiekis?
+1. Kokios galimos problemos, jei $384 \times 5 \times 5$ atvaizdą vienu žingsniu sumažinsime iki $10 \times 5 \times 5$ atvaizdo?
+1. Pasinaudokite VGG struktūriniais dizaino sprendimais, kurie lėmė VGG-11, VGG-16 ir VGG-19, kad suprojektuotumėte į NiN panašių tinklų šeimą.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/79)
+[Diskusijos](https://discuss.d2l.ai/t/79)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/80)
+[Diskusijos](https://discuss.d2l.ai/t/80)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18003)
+[Diskusijos](https://discuss.d2l.ai/t/18003)
 :end_tab:

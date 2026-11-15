@@ -1,98 +1,97 @@
-# Working with Sequences
+# Darbas su sekomis
 :label:`sec_sequence`
 
-Up until now, we have focused on models whose inputs
-consisted of a single feature vector $\mathbf{x} \in \mathbb{R}^d$.
-The main change of perspective when developing models
-capable of processing sequences is that we now
-focus on inputs that consist of an ordered list
-of feature vectors $\mathbf{x}_1, \dots, \mathbf{x}_T$,
-where each feature vector $\mathbf{x}_t$ is
-indexed by a time step $t \in \mathbb{Z}^+$
-lying in $\mathbb{R}^d$.
+Iki šiol daugiausia dėmesio skyrėme modeliams, kurių įvestis
+sudarė vienas požymių vektorius $\mathbf{x} \in \mathbb{R}^d$.
+Pagrindinis perspektyvos pasikeitimas kuriant modelius,
+gebančius apdoroti sekas, yra tas, kad dabar
+sutelkiame dėmesį į įvestis, sudarytas iš sutvarkyto
+požymių vektorių sąrašo $\mathbf{x}_1, \dots, \mathbf{x}_T$,
+kur kiekvienas požymių vektorius $\mathbf{x}_t$
+indeksuojamas laiko žingsniu $t \in \mathbb{Z}^+$
+ir yra erdvėje $\mathbb{R}^d$.
 
-Some datasets consist of a single massive sequence.
-Consider, for example, the extremely long streams
-of sensor readings that might be available to climate scientists.
-In such cases, we might create training datasets
-by randomly sampling subsequences of some predetermined length.
-More often, our data arrives as a collection of sequences.
-Consider the following examples:
-(i) a collection of documents,
-each represented as its own sequence of words,
-and each having its own length $T_i$;
-(ii) sequence representation of
-patient stays in the hospital,
-where each stay consists of a number of events
-and the sequence length depends roughly
-on the length of the stay.
-
-
-Previously, when dealing with individual inputs,
-we assumed that they were sampled independently
-from the same underlying distribution $P(X)$.
-While we still assume that entire sequences
-(e.g., entire documents or patient trajectories)
-are sampled independently,
-we cannot assume that the data arriving
-at each time step are independent of each other.
-For example, the words that likely to appear later in a document
-depend heavily on words occurring earlier in the document.
-The medicine a patient is likely to receive
-on the 10th day of a hospital visit
-depends heavily on what transpired
-in the previous nine days.
-
-This should come as no surprise.
-If we did not believe that the elements in a sequence were related,
-we would not have bothered to model them as a sequence in the first place.
-Consider the usefulness of the auto-fill features
-that are popular on search tools and modern email clients.
-They are useful precisely because it is often possible
-to predict (imperfectly, but better than random guessing)
-what the likely continuations of a sequence might be,
-given some initial prefix.
-For most sequence models,
-we do not require independence,
-or even stationarity, of our sequences.
-Instead, we require only that
-the sequences themselves are sampled
-from some fixed underlying distribution
-over entire sequences.
-
-This flexible approach allows for such phenomena
-as (i) documents looking significantly different
-at the beginning than at the end;
-or (ii) patient status evolving either
-towards recovery or towards death
-over the course of a hospital stay;
-or (iii) customer taste evolving in predictable ways
-over the course of continued interaction with a recommender system.
+Kai kuriuos duomenų rinkinius sudaro viena milžiniška seka.
+Pavyzdžiui, apsvarstykite itin ilgus jutiklių rodmenų srautus,
+kurie gali būti prieinami klimato mokslininkams.
+Tokiais atvejais mokymo duomenų rinkinius galime sukurti
+atsitiktinai imdami iš anksto nustatyto ilgio posekius.
+Dažniau mūsų duomenys pateikiami kaip sekų rinkinys.
+Panagrinėkite šiuos pavyzdžius:
+(i) dokumentų rinkinys,
+kurių kiekvienas pavaizduotas kaip sava žodžių seka
+ir turi savo ilgį $T_i$;
+(ii) pacientų buvimo ligoninėje sekos atvaizdas,
+kur kiekvieną buvimą sudaro keli įvykiai,
+o sekos ilgis maždaug priklauso
+nuo buvimo trukmės.
 
 
-We sometimes wish to predict a fixed target $y$
-given sequentially structured input
-(e.g., sentiment classification based on a movie review).
-At other times, we wish to predict a sequentially structured target
-($y_1, \ldots, y_T$)
-given a fixed input (e.g., image captioning).
-Still other times, our goal is to predict sequentially structured targets
-based on sequentially structured inputs
-(e.g., machine translation or video captioning).
-Such sequence-to-sequence tasks take two forms:
-(i) *aligned*: where the input at each time step
-aligns with a corresponding target (e.g., part of speech tagging);
-(ii) *unaligned*: where the input and target
-do not necessarily exhibit a step-for-step correspondence
-(e.g., machine translation).
+Anksčiau, dirbdami su atskiromis įvestimis,
+darėme prielaidą, kad jos buvo atrinktos nepriklausomai
+iš to paties pagrindinio skirstinio $P(X)$.
+Nors vis dar darome prielaidą, kad ištisos sekos
+(pvz., ištisi dokumentai ar pacientų trajektorijos)
+atrenkamos nepriklausomai,
+negalime daryti prielaidos, kad duomenys, gaunami
+kiekvienu laiko žingsniu, yra nepriklausomi vienas nuo kito.
+Pavyzdžiui, žodžiai, kurie tikėtina pasirodys vėliau dokumente,
+labai priklauso nuo žodžių, pasirodžiusių anksčiau dokumente.
+Vaistai, kuriuos pacientas greičiausiai gaus
+10-ąją buvimo ligoninėje dieną,
+labai priklauso nuo to, kas įvyko
+per ankstesnes devynias dienas.
 
-Before we worry about handling targets of any kind,
-we can tackle the most straightforward problem:
-unsupervised density modeling (also called *sequence modeling*).
-Here, given a collection of sequences,
-our goal is to estimate the probability mass function
-that tells us how likely we are to see any given sequence,
-i.e., $p(\mathbf{x}_1, \ldots, \mathbf{x}_T)$.
+Tai neturėtų stebinti.
+Jei netikėtume, kad sekos elementai yra susiję,
+nė nesivargintume jų modeliuoti kaip sekos.
+Apsvarstykite automatinio užbaigimo funkcijų,
+populiarių paieškos įrankiuose ir šiuolaikiniuose el. pašto klientuose, naudingumą.
+Jos naudingos būtent todėl, kad dažnai įmanoma
+nuspėti (netobulai, bet geriau nei atsitiktinai),
+kokie gali būti tikėtini sekos tęsiniai,
+turint pradinį priešdėlį.
+Daugeliui sekų modelių
+nereikalaujame sekų nepriklausomumo
+ar net stacionarumo.
+Vietoj to reikalaujame tik, kad
+pačios sekos būtų atrenkamos
+iš tam tikro fiksuoto pagrindinio skirstinio
+ištisoms sekoms.
+
+Šis lankstus požiūris leidžia tokius reiškinius kaip
+(i) dokumentai, kurių pradžia gerokai skiriasi
+nuo pabaigos;
+arba (ii) paciento būklė, besikeičianti
+link pasveikimo arba link mirties
+buvimo ligoninėje metu;
+arba (iii) klientų skonis, nuspėjamai besikeičiantis
+nuolat sąveikaujant su rekomendavimo sistema.
+
+
+Kartais norime prognozuoti fiksuotą tikslą $y$,
+turėdami nuosekliai struktūrizuotą įvestį
+(pvz., nuotaikų klasifikavimas pagal filmo apžvalgą).
+Kitais atvejais norime prognozuoti nuosekliai struktūrizuotą tikslą
+($y_1, \ldots, y_T$),
+turėdami fiksuotą įvestį (pvz., vaizdų aprašų generavimas).
+Dar kitais atvejais mūsų tikslas yra prognozuoti nuosekliai struktūrizuotus tikslus
+pagal nuosekliai struktūrizuotas įvestis
+(pvz., mašininis vertimas ar vaizdo įrašų aprašų generavimas).
+Tokios sekos į seką užduotys turi dvi formas:
+(i) *sulygiuotos*: kai įvestis kiekvienu laiko žingsniu
+sulygiuota su atitinkamu tikslu (pvz., kalbos dalių žymėjimas);
+(ii) *nesulygiuotos*: kai įvestis ir tikslas
+nebūtinai rodo atitikimą žingsnis į žingsnį
+(pvz., mašininis vertimas).
+
+Prieš rūpindamiesi bet kokių tikslų apdorojimu,
+galime spręsti paprasčiausią uždavinį:
+neprižiūrimąjį tankio modeliavimą (dar vadinamą *sekų modeliavimu*).
+Čia, turint sekų rinkinį,
+mūsų tikslas yra įvertinti tikimybių masės funkciją,
+kuri parodo, kiek tikėtina matyti bet kurią duotą seką,
+t. y. $p(\mathbf{x}_1, \ldots, \mathbf{x}_T)$.
 
 ```{.python .input  n=6}
 %load_ext d2lbook.tab
@@ -132,273 +131,271 @@ from jax import numpy as jnp
 import numpy as np
 ```
 
-## Autoregressive Models
+## Autoregresiniai modeliai
 
 
-Before introducing specialized neural networks
-designed to handle sequentially structured data,
-let's take a look at some actual sequence data
-and build up some basic intuitions and statistical tools.
-In particular, we will focus on stock price data
-from the FTSE 100 index (:numref:`fig_ftse100`).
-At each *time step* $t \in \mathbb{Z}^+$, we observe
-the price, $x_t$, of the index at that time.
+Prieš pristatydami specializuotus neuroninius tinklus,
+skirtus nuosekliai struktūrizuotiems duomenims apdoroti,
+pažvelkime į tikrus sekų duomenis
+ir susikurkime keletą pagrindinių intuicijų bei statistinių įrankių.
+Visų pirma sutelksime dėmesį į akcijų kainų duomenis
+iš FTSE 100 indekso (:numref:`fig_ftse100`).
+Kiekvienu *laiko žingsniu* $t \in \mathbb{Z}^+$ stebime
+indekso kainą $x_t$ tuo metu.
 
 
-![FTSE 100 index over about 30 years.](../img/ftse100.png)
+![FTSE 100 indeksas per maždaug 30 metų.](../img/ftse100.png)
 :width:`400px`
 :label:`fig_ftse100`
 
 
-Now suppose that a trader would like to make short-term trades,
-strategically getting into or out of the index,
-depending on whether they believe
-that it will rise or decline
-in the subsequent time step.
-Absent any other features
-(news, financial reporting data, etc.),
-the only available signal for predicting
-the subsequent value is the history of prices to date.
-The trader is thus interested in knowing
-the probability distribution
+Tarkime, kad prekiautojas nori sudaryti trumpalaikius sandorius,
+strategiškai įeidamas į indeksą ar iš jo išeidamas,
+priklausomai nuo to, ar mano,
+kad jis kils ar kris
+kitu laiko žingsniu.
+Neturint jokių kitų požymių
+(naujienų, finansinės atskaitomybės duomenų ir pan.),
+vienintelis prieinamas signalas kitai reikšmei prognozuoti
+yra iki šiol buvusių kainų istorija.
+Todėl prekiautojui įdomu žinoti
+tikimybių skirstinį
 
 $$P(x_t \mid x_{t-1}, \ldots, x_1)$$
 
-over prices that the index might take
-in the subsequent time step.
-While estimating the entire distribution
-over a continuously valued random variable
-can be difficult, the trader would be happy
-to focus on a few key statistics of the distribution,
-particularly the expected value and the variance.
-One simple strategy for estimating the conditional expectation
+kainų, kurias indeksas gali įgyti
+kitu laiko žingsniu.
+Nors visą skirstinį
+tolydžiai kintančio atsitiktinio dydžio įvertinti
+gali būti sunku, prekiautojas mielai
+sutelktų dėmesį į kelias pagrindines skirstinio statistikas,
+ypač į laukiamąją reikšmę ir dispersiją.
+Viena paprasta sąlyginės vidurkio
+įvertinimo strategija
 
 $$\mathbb{E}[(x_t \mid x_{t-1}, \ldots, x_1)],$$
 
-would be to apply a linear regression model
-(recall :numref:`sec_linear_regression`).
-Such models that regress the value of a signal
-on the previous values of that same signal
-are naturally called *autoregressive models*.
-There is just one major problem: the number of inputs,
-$x_{t-1}, \ldots, x_1$ varies, depending on $t$.
-In other words, the number of inputs increases
-with the amount of data that we encounter.
-Thus if we want to treat our historical data
-as a training set, we are left with the problem
-that each example has a different number of features.
-Much of what follows in this chapter
-will revolve around techniques
-for overcoming these challenges
-when engaging in such *autoregressive* modeling problems
-where the object of interest is
+būtų pritaikyti tiesinės regresijos modelį
+(prisiminkite :numref:`sec_linear_regression`).
+Tokie modeliai, regresuojantys signalo reikšmę
+pagal ankstesnes to paties signalo reikšmes,
+natūraliai vadinami *autoregresiniais modeliais*.
+Yra tik viena didelė problema: įvesčių skaičius
+$x_{t-1}, \ldots, x_1$ kinta priklausomai nuo $t$.
+Kitaip tariant, įvesčių skaičius didėja
+didėjant sutiktų duomenų kiekiui.
+Todėl jei norime savo istorinius duomenis traktuoti
+kaip mokymo rinkinį, lieka problema,
+kad kiekvienas pavyzdys turi skirtingą požymių skaičių.
+Didelė dalis to, kas bus aptarta šiame skyriuje,
+sukasi apie technikas,
+skirtas įveikti šiuos iššūkius
+sprendžiant tokius *autoregresinio* modeliavimo uždavinius,
+kur dominantis objektas yra
 $P(x_t \mid x_{t-1}, \ldots, x_1)$
-or some statistic(s) of this distribution.
+arba kokia nors šio skirstinio statistika (statistikos).
 
-A few strategies recur frequently.
-First of all,
-we might believe that although long sequences
-$x_{t-1}, \ldots, x_1$ are available,
-it may not be necessary
-to look back so far in the history
-when predicting the near future.
-In this case we might content ourselves
-to condition on some window of length $\tau$
-and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations.
-The immediate benefit is that now the number of arguments
-is always the same, at least for $t > \tau$.
-This allows us to train any linear model or deep network
-that requires fixed-length vectors as inputs.
-Second, we might develop models that maintain
-some summary $h_t$ of the past observations
-(see :numref:`fig_sequence-model`)
-and at the same time update $h_t$
-in addition to the prediction $\hat{x}_t$.
-This leads to models that estimate not only $x_t$
-with $\hat{x}_t = P(x_t \mid h_{t})$
-but also updates of the form
+Kelios strategijos kartojasi dažnai.
+Pirma,
+galime manyti, kad nors ilgos sekos
+$x_{t-1}, \ldots, x_1$ yra prieinamos,
+gali būti nebūtina žvelgti taip toli atgal į istoriją,
+prognozuojant artimą ateitį.
+Šiuo atveju galime tenkintis
+sąlygojimu pagal tam tikrą $\tau$ ilgio langą
+ir naudoti tik stebėjimus $x_{t-1}, \ldots, x_{t-\tau}$.
+Tiesioginė nauda ta, kad dabar argumentų skaičius
+visada yra toks pat, bent jau kai $t > \tau$.
+Tai leidžia apmokyti bet kokį tiesinį modelį ar gilųjį tinklą,
+kuriam reikia fiksuoto ilgio vektorių kaip įvesčių.
+Antra, galime kurti modelius, kurie palaiko
+tam tikrą ankstesnių stebėjimų santrauką $h_t$
+(žr. :numref:`fig_sequence-model`)
+ir tuo pat metu atnaujina $h_t$
+be prognozės $\hat{x}_t$.
+Tai veda prie modelių, kurie vertina ne tik $x_t$
+pagal $\hat{x}_t = P(x_t \mid h_{t})$,
+bet ir atnaujinimus pavidalo
 $h_t = g(h_{t-1}, x_{t-1})$.
-Since $h_t$ is never observed,
-these models are also called
-*latent autoregressive models*.
+Kadangi $h_t$ niekada nestebimas,
+šie modeliai taip pat vadinami
+*latentiniais autoregresiniais modeliais*.
 
-![A latent autoregressive model.](../img/sequence-model.svg)
+![Latentinis autoregresinis modelis.](../img/sequence-model.svg)
 :label:`fig_sequence-model`
 
-To construct training data from historical data, one
-typically creates examples by sampling windows randomly.
-In general, we do not expect time to stand still.
-However, we often assume that while
-the specific values of $x_t$ might change,
-the dynamics according to which each subsequent
-observation is generated given the previous observations do not.
-Statisticians call dynamics that do not change *stationary*.
+Norint sukonstruoti mokymo duomenis iš istorinių duomenų,
+paprastai pavyzdžiai kuriami atsitiktinai imant langus.
+Apskritai nesitikime, kad laikas sustos.
+Tačiau dažnai darome prielaidą, kad nors
+konkrečios $x_t$ reikšmės gali keistis,
+dinamika, pagal kurią generuojamas kiekvienas vėlesnis
+stebėjimas, žinant ankstesnius stebėjimus, nesikeičia.
+Statistikai dinamiką, kuri nesikeičia, vadina *stacionaria*.
 
 
 
-## Sequence Models
+## Sekų modeliai
 
-Sometimes, especially when working with language,
-we wish to estimate the joint probability
-of an entire sequence.
-This is a common task when working with sequences
-composed of discrete *tokens*, such as words.
-Generally, these estimated functions are called *sequence models*
-and for natural language data, they are called *language models*.
-The field of sequence modeling has been driven so much by natural language processing,
-that we often describe sequence models as "language models",
-even when dealing with non-language data.
-Language models prove useful for all sorts of reasons.
-Sometimes we want to evaluate the likelihood of sentences.
-For example, we might wish to compare
-the naturalness of two candidate outputs
-generated by a machine translation system
-or by a speech recognition system.
-But language modeling gives us not only
-the capacity to *evaluate* likelihood,
-but the ability to *sample* sequences,
-and even to optimize for the most likely sequences.
+Kartais, ypač dirbant su kalba,
+norime įvertinti visos sekos
+jungtinę tikimybę.
+Tai įprasta užduotis dirbant su sekomis,
+sudarytomis iš diskrečių *teksto vienetų*, pavyzdžiui, žodžių.
+Apskritai šios įvertintos funkcijos vadinamos *sekų modeliais*,
+o natūraliosios kalbos duomenims – *kalbos modeliais*.
+Sekų modeliavimo sritį taip stipriai skatino natūraliosios kalbos apdorojimas,
+kad sekų modelius dažnai vadiname „kalbos modeliais“,
+net kai dirbame su ne kalbos duomenimis.
+Kalbos modeliai pasirodo naudingi įvairiais tikslais.
+Kartais norime įvertinti sakinių tikėtinumą.
+Pavyzdžiui, galime norėti palyginti
+dviejų kandidatų, sugeneruotų mašininio vertimo sistemos
+ar kalbos atpažinimo sistemos, natūralumą.
+Tačiau kalbos modeliavimas suteikia mums ne tik
+gebėjimą *įvertinti* tikėtinumą,
+bet ir gebėjimą *imti imtis* sekų
+ir netgi optimizuoti pagal labiausiai tikėtinas sekas.
 
-While language modeling might not, at first glance, look
-like an autoregressive problem,
-we can reduce language modeling to autoregressive prediction
-by decomposing the joint density  of a sequence $p(x_1, \ldots, x_T)$
-into the product of conditional densities
-in a left-to-right fashion
-by applying the chain rule of probability:
+Nors kalbos modeliavimas iš pirmo žvilgsnio gali neatrodyti
+kaip autoregresinis uždavinys,
+kalbos modeliavimą galime suvesti į autoregresinę prognozę,
+išskaidydami sekos jungtinį tankį $p(x_1, \ldots, x_T)$
+į sąlyginių tankių sandaugą
+iš kairės į dešinę,
+taikydami tikimybių grandinės taisyklę:
 
 $$P(x_1, \ldots, x_T) = P(x_1) \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
-Note that if we are working with discrete signals such as words,
-then the autoregressive model must be a probabilistic classifier,
-outputting a full probability distribution
-over the vocabulary for whatever word will come next,
-given the leftwards context.
+Atkreipkite dėmesį, kad jei dirbame su diskrečiais signalais, tokiais kaip žodžiai,
+autoregresinis modelis turi būti tikimybinis klasifikatorius,
+išvedantis pilną tikimybių skirstinį
+žodyno žodžiams, kurie ateis toliau,
+žinant kairiojo konteksto informaciją.
 
 
 
-### Markov Models
+### Markovo modeliai
 :label:`subsec_markov-models`
 
 
-Now suppose that we wish to employ the strategy mentioned above,
-where we condition only on the $\tau$ previous time steps,
-i.e., $x_{t-1}, \ldots, x_{t-\tau}$, rather than
-the entire sequence history $x_{t-1}, \ldots, x_1$.
-Whenever we can throw away the history
-beyond the previous $\tau$ steps
-without any loss in predictive power,
-we say that the sequence satisfies a *Markov condition*,
-i.e., *that the future is conditionally independent of the past,
-given the recent history*.
-When $\tau = 1$, we say that the data is characterized
-by a *first-order Markov model*,
-and when $\tau = k$, we say that the data is characterized
-by a $k^{\textrm{th}}$-order Markov model.
-For when the first-order Markov condition holds ($\tau = 1$)
-the factorization of our joint probability becomes a product
-of probabilities of each word given the previous *word*:
+Dabar tarkime, kad norime pritaikyti aukščiau minėtą strategiją,
+kai sąlygojame tik pagal $\tau$ ankstesnių laiko žingsnių,
+t. y. $x_{t-1}, \ldots, x_{t-\tau}$, o ne
+visą sekos istoriją $x_{t-1}, \ldots, x_1$.
+Kai tik galime atmesti istoriją,
+einančią už ankstesnių $\tau$ žingsnių,
+neprarasdami prognozavimo galios,
+sakome, kad seka tenkina *Markovo sąlygą*,
+t. y. *kad ateitis yra sąlyginai nepriklausoma nuo praeities,
+žinant neseną istoriją*.
+Kai $\tau = 1$, sakome, kad duomenis apibūdina
+*pirmosios eilės Markovo modelis*,
+o kai $\tau = k$, sakome, kad duomenis apibūdina
+$k$-osios eilės Markovo modelis.
+Kai galioja pirmosios eilės Markovo sąlyga ($\tau = 1$),
+mūsų jungtinės tikimybės faktorizacija tampa
+kiekvieno žodžio tikimybių, žinant ankstesnį *žodį*, sandauga:
 
 $$P(x_1, \ldots, x_T) = P(x_1) \prod_{t=2}^T P(x_t \mid x_{t-1}).$$
 
-We often find it useful to work with models that proceed
-as though a Markov condition were satisfied,
-even when we know that this is only *approximately* true.
-With real text documents we continue to gain information
-as we include more and more leftwards context.
-But these gains diminish rapidly.
-Thus, sometimes we compromise, obviating computational and statistical difficulties
-by training models whose validity depends
-on a $k^{\textrm{th}}$-order Markov condition.
-Even today's massive RNN- and Transformer-based language models
-seldom incorporate more than thousands of words of context.
+Dažnai pravartu dirbti su modeliais, kurie veikia
+taip, tarsi Markovo sąlyga būtų tenkinama,
+net kai žinome, kad tai tik *apytiksliai* tiesa.
+Su tikrais tekstiniais dokumentais vis gauname informacijos,
+įtraukdami vis daugiau kairiojo konteksto.
+Tačiau šie laimėjimai sparčiai mažėja.
+Todėl kartais darome kompromisą, išvengdami skaičiavimo ir statistinių sunkumų
+apmokydami modelius, kurių pagrįstumas priklauso
+nuo $k$-osios eilės Markovo sąlygos.
+Net šiandieniniai milžiniški RNN ir transformeriais pagrįsti kalbos modeliai
+retai įtraukia daugiau nei tūkstančius žodžių konteksto.
 
 
-With discrete data, a true Markov model
-simply counts the number of times
-that each word has occurred in each context, producing
-the relative frequency estimate of $P(x_t \mid x_{t-1})$.
-Whenever the data assumes only discrete values
-(as in language),
-the most likely sequence of words can be computed efficiently
-using dynamic programming.
+Su diskrečiais duomenimis tikras Markovo modelis
+tiesiog skaičiuoja, kiek kartų
+kiekvienas žodis pasirodė kiekviename kontekste, taip gaudamas
+santykinio dažnio įvertį $P(x_t \mid x_{t-1})$.
+Kai tik duomenys įgyja tik diskrečias reikšmes
+(kaip kalboje),
+labiausiai tikėtiną žodžių seką galima efektyviai apskaičiuoti
+naudojant dinaminį programavimą.
 
 
-### The Order of Decoding
+### Dekodavimo tvarka
 
-You may be wondering why we represented
-the factorization of a text sequence $P(x_1, \ldots, x_T)$
-as a left-to-right chain of conditional probabilities.
-Why not right-to-left or some other, seemingly random order?
-In principle, there is nothing wrong with unfolding
-$P(x_1, \ldots, x_T)$ in reverse order.
-The result is a valid factorization:
+Galbūt stebitės, kodėl teksto sekos $P(x_1, \ldots, x_T)$
+faktorizaciją pavaizdavome
+kaip sąlyginių tikimybių grandinę iš kairės į dešinę.
+Kodėl ne iš dešinės į kairę ar kita, iš pažiūros atsitiktine tvarka?
+Iš principo nėra nieko blogo išvyniojant
+$P(x_1, \ldots, x_T)$ atvirkštine tvarka.
+Rezultatas yra galiojanti faktorizacija:
 
 $$P(x_1, \ldots, x_T) = P(x_T) \prod_{t=T-1}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
 
 
-However, there are many reasons why factorizing text
-in the same direction in which we read it
-(left-to-right for most languages,
-but right-to-left for Arabic and Hebrew)
-is preferred for the task of language modeling.
-First, this is just a more natural direction for us to think about.
-After all we all read text every day,
-and this process is guided by our ability
-to anticipate which words and phrases
-are likely to come next.
-Just think of how many times you have completed
-someone else's sentence.
-Thus, even if we had no other reason to prefer such in-order decodings,
-they would be useful if only because we have better intuitions
-for what should be likely when predicting in this order.
+Tačiau yra daug priežasčių, kodėl teksto faktorizavimas
+ta pačia kryptimi, kuria jį skaitome
+(iš kairės į dešinę daugumai kalbų,
+bet iš dešinės į kairę arabų ir hebrajų kalboms),
+yra pageidautinas kalbos modeliavimo užduočiai.
+Pirma, tai tiesiog mums natūralesnė mąstymo kryptis.
+Juk visi kasdien skaitome tekstą,
+ir šį procesą lemia mūsų gebėjimas
+numatyti, kurie žodžiai ir frazės
+greičiausiai ateis toliau.
+Pagalvokite, kiek kartų esate pabaigę
+kito žmogaus sakinį.
+Taigi, net jei neturėtume jokios kitos priežasties teikti pirmenybę tokiems tvarkingiems dekodavimams,
+jie būtų naudingi bent jau todėl, kad turime geresnes intuicijas,
+kas turėtų būti tikėtina, prognozuojant šia tvarka.
 
-Second, by factorizing in order,
-we can assign probabilities to arbitrarily long sequences
-using the same language model.
-To convert a probability over steps $1$ through $t$
-into one that extends to word $t+1$ we simply
-multiply by the conditional probability
-of the additional token given the previous ones:
+Antra, faktorizuodami iš eilės,
+galime priskirti tikimybes savavališkai ilgoms sekoms
+naudodami tą patį kalbos modelį.
+Norėdami tikimybę žingsniams nuo $1$ iki $t$
+paversti tikimybe, besitęsiančia iki žodžio $t+1$, tiesiog
+padauginame iš papildomo teksto vieneto sąlyginės tikimybės,
+žinant ankstesnius:
 $P(x_{t+1}, \ldots, x_1) = P(x_{t}, \ldots, x_1) \cdot P(x_{t+1} \mid x_{t}, \ldots, x_1)$.
 
-Third, we have stronger predictive models
-for predicting adjacent words than
-words at arbitrary other locations.
-While all orders of factorization are valid,
-they do not necessarily all represent equally easy
-predictive modeling problems.
-This is true not only for language,
-but for other kinds of data as well,
-e.g., when the data is causally structured.
-For example, we believe that future events cannot influence the past.
-Hence, if we change $x_t$, we may be able to influence
-what happens for $x_{t+1}$ going forward but not the converse.
-That is, if we change $x_t$, the distribution over past events will not change.
-In some contexts, this makes it easier to predict $P(x_{t+1} \mid x_t)$
-than to predict $P(x_t \mid x_{t+1})$.
-For instance, in some cases, we can find $x_{t+1} = f(x_t) + \epsilon$
-for some additive noise $\epsilon$,
-whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`.
-This is great news, since it is typically the forward direction
-that we are interested in estimating.
-The book by :citet:`Peters.Janzing.Scholkopf.2017` contains more on this topic.
-We barely scratch the surface of it.
+Trečia, turime stipresnius prognozavimo modelius
+gretimiems žodžiams prognozuoti nei
+žodžiams savavališkose kitose vietose.
+Nors visos faktorizavimo tvarkos yra galiojančios,
+jos nebūtinai visos atitinka vienodai lengvus
+prognozavimo modeliavimo uždavinius.
+Tai teisinga ne tik kalbai,
+bet ir kitokiems duomenims,
+pvz., kai duomenys yra priežastiškai struktūrizuoti.
+Pavyzdžiui, manome, kad ateities įvykiai negali paveikti praeities.
+Todėl, jei pakeisime $x_t$, galbūt galėsime paveikti,
+kas vyks su $x_{t+1}$ toliau, bet ne atvirkščiai.
+Tai yra, jei pakeisime $x_t$, praeities įvykių skirstinys nepasikeis.
+Kai kuriuose kontekstuose dėl to lengviau prognozuoti $P(x_{t+1} \mid x_t)$
+nei $P(x_t \mid x_{t+1})$.
+Pavyzdžiui, kai kuriais atvejais galime rasti $x_{t+1} = f(x_t) + \epsilon$
+su tam tikru adityviuoju triukšmu $\epsilon$,
+o atvirkščiai tai nėra tiesa :cite:`Hoyer.Janzing.Mooij.ea.2009`.
+Tai puiki žinia, nes paprastai mus domina būtent
+tiesioginės krypties vertinimas.
+Daugiau šia tema pateikia :citet:`Peters.Janzing.Scholkopf.2017` knyga.
+Mes vos paliečiame jos paviršių.
 
 
-## Training
+## Mokymas
 
-Before we focus our attention on text data,
-let's first try this out with some
-continuous-valued synthetic data.
+Prieš sutelkdami dėmesį į tekstinius duomenis,
+pirmiausia išbandykime tai su
+tolydžių reikšmių sintetiniais duomenimis.
 
-(**Here, our 1000 synthetic data will follow
-the trigonometric `sin` function,
-applied to 0.01 times the time step.
-To make the problem a little more interesting,
-we corrupt each sample with additive noise.**)
-From this sequence we extract training examples,
-each consisting of features and a label.
+(**Čia mūsų 1000 sintetinių duomenų sekos trigonometrinę funkciją `sin`,
+pritaikytą 0,01 karto didesniam laiko žingsniui.
+Kad uždavinys būtų šiek tiek įdomesnis,
+kiekvieną imtį sugadiname adityviuoju triukšmu.**)
+Iš šios sekos išskiriame mokymo pavyzdžius,
+kurių kiekvieną sudaro požymiai ir žymuo.
 
 ```{.python .input  n=10}
 %%tab all
@@ -422,21 +419,21 @@ data = Data()
 d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-To begin, we try a model that acts as if
-the data satisfied a $\tau^{\textrm{th}}$-order Markov condition,
-and thus predicts $x_t$ using only the past $\tau$ observations.
-[**Thus for each time step we have an example
-with label $y  = x_t$ and features
+Pradėkime nuo modelio, kuris veikia taip,
+tarsi duomenys tenkintų $\tau$-osios eilės Markovo sąlygą,
+ir todėl prognozuoja $x_t$ naudodamas tik ankstesnius $\tau$ stebėjimų.
+[**Taigi kiekvienam laiko žingsniui turime pavyzdį
+su žymeniu $y  = x_t$ ir požymiais
 $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
-The astute reader might have noticed that
-this results in $1000-\tau$ examples,
-since we lack sufficient history for $y_1, \ldots, y_\tau$.
-While we could pad the first $\tau$ sequences with zeros,
-to keep things simple, we drop them for now.
-The resulting dataset contains $T - \tau$ examples,
-where each input to the model has sequence length $\tau$.
-We (**create a data iterator on the first 600 examples**),
-covering a period of the sin function.
+Įžvalgus skaitytojas galėjo pastebėti,
+kad taip gaunama $1000-\tau$ pavyzdžių,
+nes trūksta pakankamos istorijos $y_1, \ldots, y_\tau$.
+Nors galėtume pirmąsias $\tau$ sekų papildyti nuliais,
+paprastumo dėlei kol kas jų atsisakome.
+Gautame duomenų rinkinyje yra $T - \tau$ pavyzdžių,
+kur kiekviena modelio įvestis turi sekos ilgį $\tau$.
+(**Sukuriame duomenų iteratorių pirmiems 600 pavyzdžių**),
+apimantiems vieną sin funkcijos periodą.
 
 ```{.python .input}
 %%tab all
@@ -449,7 +446,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader([self.features, self.labels], train, i)
 ```
 
-In this example our model will be a standard linear regression.
+Šiame pavyzdyje mūsų modelis bus standartinė tiesinė regresija.
 
 ```{.python .input}
 %%tab all
@@ -458,10 +455,10 @@ trainer = d2l.Trainer(max_epochs=5)
 trainer.fit(model, data)
 ```
 
-## Prediction
+## Prognozavimas
 
-[**To evaluate our model, we first check
-how well it performs at one-step-ahead prediction**].
+[**Kad įvertintume savo modelį, pirmiausia patikriname,
+kaip gerai jis prognozuoja vieną žingsnį į priekį**].
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -477,22 +474,22 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
 
-These predictions look good,
-even near the end at $t=1000$.
+Šios prognozės atrodo geros,
+net pabaigoje, ties $t=1000$.
 
-But what if we only observed sequence data
-up until time step 604 (`n_train + tau`)
-and wished to make predictions several steps
-into the future?
-Unfortunately, we cannot directly compute
-the one-step-ahead prediction for time step 609,
-because we do not know the corresponding inputs,
-having seen only up to $x_{604}$.
-We can address this problem by plugging in
-our earlier predictions as inputs to our model
-for making subsequent predictions,
-projecting forward, one step at a time,
-until reaching the desired time step:
+Bet ką daryti, jei stebėjome sekos duomenis
+tik iki 604 laiko žingsnio (`n_train + tau`)
+ir norime daryti prognozes keletą žingsnių
+į ateitį?
+Deja, negalime tiesiogiai apskaičiuoti
+vieno žingsnio į priekį prognozės 609 laiko žingsniui,
+nes nežinome atitinkamų įvesčių,
+matę tik iki $x_{604}$.
+Šią problemą galime spręsti įstatydami
+savo ankstesnes prognozes kaip įvestis į modelį
+vėlesnėms prognozėms daryti,
+projektuodami į priekį, po vieną žingsnį,
+kol pasieksime norimą laiko žingsnį:
 
 $$\begin{aligned}
 \hat{x}_{605} &= f(x_{601}, x_{602}, x_{603}, x_{604}), \\
@@ -502,15 +499,15 @@ $$\begin{aligned}
 \hat{x}_{609} &= f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}),\\
 &\vdots\end{aligned}$$
 
-Generally, for an observed sequence $x_1, \ldots, x_t$,
-its predicted output $\hat{x}_{t+k}$ at time step $t+k$
-is called the $k$*-step-ahead prediction*.
-Since we have observed up to $x_{604}$,
-its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
-In other words, we will have to
-keep on using our own predictions
-to make multistep-ahead predictions.
-Let's see how well this goes.
+Apskritai stebėtai sekai $x_1, \ldots, x_t$
+jos prognozuojama išvestis $\hat{x}_{t+k}$ laiko žingsniu $t+k$
+vadinama $k$*-žingsnių į priekį prognoze*.
+Kadangi stebėjome iki $x_{604}$,
+jos $k$-žingsnių į priekį prognozė yra $\hat{x}_{604+k}$.
+Kitaip tariant, turėsime
+toliau naudoti savo pačių prognozes,
+kad darytume kelių žingsnių į priekį prognozes.
+Pažiūrėkime, kaip tai pavyksta.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -548,30 +545,30 @@ d2l.plot([data.time[data.tau:], data.time[data.num_train+data.tau:]],
          'x', legend=['1-step preds', 'multistep preds'], figsize=(6, 3))
 ```
 
-Unfortunately, in this case we fail spectacularly.
-The predictions decay to a constant
-pretty quickly after a few steps.
-Why did the algorithm perform so much worse
-when predicting further into the future?
-Ultimately, this is down to the fact
-that errors build up.
-Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
-Now the *input* for step 2 is perturbed by $\epsilon_1$,
-hence we suffer some error in the order of
+Deja, šiuo atveju patiriame spektakuliarią nesėkmę.
+Prognozės gana greitai po kelių žingsnių
+nusilpsta iki konstantos.
+Kodėl algoritmas veikė daug prasčiau,
+prognozuodamas toliau į ateitį?
+Galiausiai tai lemia tai,
+kad klaidos kaupiasi.
+Tarkime, kad po 1 žingsnio turime tam tikrą paklaidą $\epsilon_1 = \bar\epsilon$.
+Dabar 2 žingsnio *įvestis* sutrikdoma $\epsilon_1$,
+todėl patiriame tam tikrą paklaidą, kurios eilė
 $\epsilon_2 = \bar\epsilon + c \epsilon_1$
-for some constant $c$, and so on.
-The predictions can diverge rapidly
-from the true observations.
-You may already be familiar
-with this common phenomenon.
-For instance, weather forecasts for the next 24 hours
-tend to be pretty accurate but beyond that,
-accuracy declines rapidly.
-We will discuss methods for improving this
-throughout this chapter and beyond.
+su tam tikra konstanta $c$, ir taip toliau.
+Prognozės gali sparčiai nukrypti
+nuo tikrųjų stebėjimų.
+Galbūt jau esate susipažinę
+su šiuo įprastu reiškiniu.
+Pavyzdžiui, orų prognozės artimiausioms 24 valandoms
+paprastai būna gana tikslios, bet toliau
+tikslumas sparčiai mažėja.
+Metodus, kaip tai pagerinti, aptarsime
+visame šiame skyriuje ir už jo ribų.
 
-Let's [**take a closer look at the difficulties in $k$-step-ahead predictions**]
-by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
+[**Panagrinėkime išsamiau sunkumus $k$-žingsnių į priekį prognozėse**],
+apskaičiuodami prognozes visai sekai, kai $k = 1, 4, 16, 64$.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -609,58 +606,57 @@ d2l.plot(data.time[data.tau+steps[-1]-1:],
          legend=[f'{k}-step preds' for k in steps], figsize=(6, 3))
 ```
 
-This clearly illustrates how the quality of the prediction changes
-as we try to predict further into the future.
-While the 4-step-ahead predictions still look good,
-anything beyond that is almost useless.
+Tai aiškiai iliustruoja, kaip kinta prognozės kokybė,
+kai bandome prognozuoti toliau į ateitį.
+Nors 4 žingsnių į priekį prognozės vis dar atrodo geros,
+bet kas už jų yra beveik nenaudinga.
 
-## Summary
+## Santrauka
 
-There is quite a difference in difficulty
-between interpolation and extrapolation.
-Consequently, if you have a sequence, always respect
-the temporal order of the data when training,
-i.e., never train on future data.
-Given this kind of data,
-sequence models require specialized statistical tools for estimation.
-Two popular choices are autoregressive models
-and latent-variable autoregressive models.
-For causal models (e.g., time going forward),
-estimating the forward direction is typically
-a lot easier than the reverse direction.
-For an observed sequence up to time step $t$,
-its predicted output at time step $t+k$
-is the $k$*-step-ahead prediction*.
-As we predict further in time by increasing $k$,
-the errors accumulate and the quality of the prediction degrades,
-often dramatically.
+Tarp interpoliacijos ir ekstrapoliacijos sudėtingumo yra nemažas skirtumas.
+Todėl, jei turite seką, visada gerbkite
+duomenų laiko tvarką apmokydami,
+t. y. niekada neapmokykite naudodami ateities duomenis.
+Turint tokius duomenis,
+sekų modeliams vertinti reikia specializuotų statistinių įrankių.
+Du populiarūs pasirinkimai yra autoregresiniai modeliai
+ir latentinių kintamųjų autoregresiniai modeliai.
+Priežastiniams modeliams (pvz., laikas eina pirmyn)
+tiesioginės krypties vertinimas paprastai yra
+daug lengvesnis nei atvirkštinės krypties.
+Stebėtai sekai iki laiko žingsnio $t$
+jos prognozuojama išvestis laiko žingsniu $t+k$
+yra $k$*-žingsnių į priekį prognozė*.
+Prognozuojant toliau laike, didinant $k$,
+klaidos kaupiasi, o prognozės kokybė prastėja,
+dažnai dramatiškai.
 
-## Exercises
+## Pratimai
 
-1. Improve the model in the experiment of this section.
-    1. Incorporate more than the past four observations? How many do you really need?
-    1. How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
-    1. Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
-    1. Change the neural network architecture and evaluate the performance. You may train the new model with more epochs. What do you observe?
-1. An investor wants to find a good security to buy.
-   They look at past returns to decide which one is likely to do well.
-   What could possibly go wrong with this strategy?
-1. Does causality also apply to text? To which extent?
-1. Give an example for when a latent autoregressive model
-   might be needed to capture the dynamic of the data.
+1. Patobulinkite šio skyrelio eksperimento modelį.
+    1. Įtraukite daugiau nei ankstesnius keturis stebėjimus? Kiek jų iš tikrųjų reikia?
+    1. Kiek ankstesnių stebėjimų reikėtų, jei nebūtų triukšmo? Užuomina: $\sin$ ir $\cos$ galite užrašyti kaip diferencialinę lygtį.
+    1. Ar galite įtraukti senesnius stebėjimus, išlaikydami bendrą požymių skaičių pastovų? Ar tai pagerina tikslumą? Kodėl?
+    1. Pakeiskite neuroninio tinklo architektūrą ir įvertinkite našumą. Naują modelį galite apmokyti per daugiau epochų. Ką pastebite?
+1. Investuotojas nori rasti gerą vertybinį popierių pirkti.
+   Jis žiūri į ankstesnes grąžas, kad nuspręstų, kuris greičiausiai pasiseks.
+   Kas gali nutikti blogai su šia strategija?
+1. Ar priežastiškumas taip pat taikomas tekstui? Kiek?
+1. Pateikite pavyzdį, kada latentinio autoregresinio modelio
+   gali prireikti duomenų dinamikai užfiksuoti.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/113)
+[Diskusijos](https://discuss.d2l.ai/t/113)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/114)
+[Diskusijos](https://discuss.d2l.ai/t/114)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1048)
+[Diskusijos](https://discuss.d2l.ai/t/1048)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18010)
+[Diskusijos](https://discuss.d2l.ai/t/18010)
 :end_tab:

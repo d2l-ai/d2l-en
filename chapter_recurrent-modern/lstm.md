@@ -1,44 +1,43 @@
-# Long Short-Term Memory (LSTM)
+# Ilga trumpalaikė atmintis (LSTM)
 :label:`sec_lstm`
 
 
-Shortly after the first Elman-style RNNs were trained using backpropagation 
-:cite:`elman1990finding`, the problems of learning long-term dependencies
-(owing to vanishing and exploding gradients)
-became salient, with Bengio and Hochreiter 
-discussing the problem
+Netrukus po to, kai pirmieji Elmano tipo RNN buvo apmokyti naudojant atgalinį sklidimą
+:cite:`elman1990finding`, ilgalaikių priklausomybių mokymosi problemos
+(dėl nykstančių ir sprogstančių gradientų)
+tapo akivaizdžios, ir Bengio bei Hochreiteris
+aptarė šią problemą
 :cite:`bengio1994learning,Hochreiter.Bengio.Frasconi.ea.2001`.
-Hochreiter had articulated this problem as early 
-as 1991 in his Master's thesis, although the results 
-were not widely known because the thesis was written in German.
-While gradient clipping helps with exploding gradients, 
-handling vanishing gradients appears 
-to require a more elaborate solution. 
-One of the first and most successful techniques 
-for addressing vanishing gradients 
-came in the form of the long short-term memory (LSTM) model 
-due to :citet:`Hochreiter.Schmidhuber.1997`. 
-LSTMs resemble standard recurrent neural networks 
-but here each ordinary recurrent node
-is replaced by a *memory cell*.
-Each memory cell contains an *internal state*,
-i.e., a node with a self-connected recurrent edge of fixed weight 1,
-ensuring that the gradient can pass across many time steps 
-without vanishing or exploding.
+Hochreiteris suformulavo šią problemą dar 1991 m. savo magistro darbe, nors rezultatai
+nebuvo plačiai žinomi, nes darbas buvo parašytas vokiečių kalba.
+Nors gradientų apkarpymas padeda sprogstantiems gradientams,
+susidorojimas su nykstančiais gradientais, atrodo,
+reikalauja sudėtingesnio sprendimo.
+Viena pirmųjų ir sėkmingiausių technikų
+nykstantiems gradientams spręsti
+atsirado ilgos trumpalaikės atminties (LSTM) modelio pavidalu,
+kurį pasiūlė :citet:`Hochreiter.Schmidhuber.1997`.
+LSTM primena standartinius rekurentinius neuroninius tinklus,
+tačiau čia kiekvienas įprastas rekurentinis mazgas
+pakeičiamas *atminties ląstele*.
+Kiekviena atminties ląstelė turi *vidinę būseną*,
+t. y. mazgą su savęs paties rekurentine briauna, kurios fiksuotas svoris yra 1,
+užtikrinantį, kad gradientas gali praeiti per daugelį laiko žingsnių
+neišnykdamas ir nesprogdamas.
 
-The term "long short-term memory" comes from the following intuition.
-Simple recurrent neural networks 
-have *long-term memory* in the form of weights.
-The weights change slowly during training, 
-encoding general knowledge about the data.
-They also have *short-term memory*
-in the form of ephemeral activations,
-which pass from each node to successive nodes.
-The LSTM model introduces an intermediate type of storage via the memory cell.
-A memory cell is a composite unit, 
-built from simpler nodes 
-in a specific connectivity pattern,
-with the novel inclusion of multiplicative nodes.
+Terminas „ilga trumpalaikė atmintis“ kyla iš šios intuicijos.
+Paprasti rekurentiniai neuroniniai tinklai
+turi *ilgalaikę atmintį* svorių pavidalu.
+Svoriai apmokymo metu keičiasi lėtai,
+koduodami bendrąsias žinias apie duomenis.
+Jie taip pat turi *trumpalaikę atmintį*
+trumpalaikių aktyvacijų pavidalu,
+kurios sklinda nuo kiekvieno mazgo į paskesnius mazgus.
+LSTM modelis per atminties ląstelę įveda tarpinį saugojimo tipą.
+Atminties ląstelė yra sudėtinis vienetas,
+sudarytas iš paprastesnių mazgų
+tam tikru jungčių šablonu,
+naujai įtraukiant daugybos mazgus.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -74,66 +73,66 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Gated Memory Cell
+## Sklendžių atminties ląstelė
 
-Each memory cell is equipped with an *internal state*
-and a number of multiplicative gates that determine whether
-(i) a given input should impact the internal state (the *input gate*),
-(ii) the internal state should be flushed to $0$ (the *forget gate*),
-and (iii) the internal state of a given neuron 
-should be allowed to impact the cell's output (the *output* gate). 
-
-
-### Gated Hidden State
-
-The key distinction between vanilla RNNs and LSTMs
-is that the latter support gating of the hidden state.
-This means that we have dedicated mechanisms for
-when a hidden state should be *updated* and
-also for when it should be *reset*.
-These mechanisms are learned and they address the concerns listed above.
-For instance, if the first token is of great importance
-we will learn not to update the hidden state after the first observation.
-Likewise, we will learn to skip irrelevant temporary observations.
-Last, we will learn to reset the latent state whenever needed.
-We discuss this in detail below.
-
-### Input Gate, Forget Gate, and Output Gate
-
-The data feeding into the LSTM gates are
-the input at the current time step and
-the hidden state of the previous time step,
-as illustrated in :numref:`fig_lstm_0`.
-Three fully connected layers with sigmoid activation functions
-compute the values of the input, forget, and output gates.
-As a result of the sigmoid activation,
-all values of the three gates
-are in the range of $(0, 1)$.
-Additionally, we require an *input node*,
-typically computed with a *tanh* activation function. 
-Intuitively, the *input gate* determines how much
-of the input node's value should be added 
-to the current memory cell internal state.
-The *forget gate* determines whether to keep
-the current value of the memory or flush it. 
-And the *output gate* determines whether 
-the memory cell should influence the output
-at the current time step. 
+Kiekviena atminties ląstelė turi *vidinę būseną*
+ir keletą daugybinių sklendžių, nustatančių, ar
+(i) duota įvestis turėtų paveikti vidinę būseną (*atidarymo sklendė*),
+(ii) vidinė būsena turėtų būti nuvalyta iki $0$ (*užmiršimo sklendė*),
+ir (iii) duoto neurono vidinei būsenai
+turėtų būti leista paveikti ląstelės išvestį (*išvesties* sklendė).
 
 
-![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg)
+### Sklendėmis valdoma paslėptoji būsena
+
+Pagrindinis skirtumas tarp paprastų RNN ir LSTM
+yra tas, kad pastarieji palaiko paslėptosios būsenos sklendžių valdymą.
+Tai reiškia, kad turime specialius mechanizmus tam,
+kada paslėptoji būsena turėtų būti *atnaujinta* ir
+kada ji turėtų būti *atstatyta*.
+Šie mechanizmai yra išmokstami ir sprendžia aukščiau išvardytas problemas.
+Pavyzdžiui, jei pirmasis teksto vienetas yra labai svarbus,
+išmoksime neatnaujinti paslėptosios būsenos po pirmojo stebėjimo.
+Panašiai išmoksime praleisti nesvarbius laikinus stebėjimus.
+Galiausiai išmoksime atstatyti latentinę būseną, kai tik reikia.
+Tai aptariame išsamiai toliau.
+
+### Atidarymo sklendė, užmiršimo sklendė ir išvesties sklendė
+
+Duomenys, paduodami į LSTM sklendes, yra
+dabartinio laiko žingsnio įvestis ir
+ankstesnio laiko žingsnio paslėptoji būsena,
+kaip iliustruota :numref:`fig_lstm_0`.
+Trys pilnai sujungti sluoksniai su sigmoidinėmis aktyvacijos funkcijomis
+apskaičiuoja atidarymo, užmiršimo ir išvesties sklendžių reikšmes.
+Dėl sigmoidinės aktyvacijos
+visos trijų sklendžių reikšmės
+yra intervale $(0, 1)$.
+Be to, mums reikia *įvesties mazgo*,
+paprastai skaičiuojamo su *tanh* aktyvacijos funkcija.
+Intuityviai *atidarymo sklendė* nustato, kiek
+įvesties mazgo reikšmės turėtų būti pridėta
+prie dabartinės atminties ląstelės vidinės būsenos.
+*Užmiršimo sklendė* nustato, ar išlaikyti
+dabartinę atminties reikšmę, ar ją nuvalyti.
+O *išvesties sklendė* nustato, ar
+atminties ląstelė turėtų paveikti išvestį
+dabartiniu laiko žingsniu.
+
+
+![Atidarymo sklendės, užmiršimo sklendės ir išvesties sklendės skaičiavimas LSTM modelyje.](../img/lstm-0.svg)
 :label:`fig_lstm_0`
 
-Mathematically, suppose that there are $h$ hidden units, 
-the batch size is $n$, and the number of inputs is $d$.
-Thus, the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-and the hidden state of the previous time step 
-is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. 
-Correspondingly, the gates at time step $t$
-are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, 
-the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, 
-and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. 
-They are calculated as follows:
+Matematiškai, tarkime, kad yra $h$ paslėptųjų vienetų,
+rinkinio dydis yra $n$, o įvesčių skaičius yra $d$.
+Taigi įvestis yra $\mathbf{X}_t \in \mathbb{R}^{n \times d}$,
+o ankstesnio laiko žingsnio paslėptoji būsena
+yra $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$.
+Atitinkamai sklendės laiko žingsniu $t$
+apibrėžiamos taip: atidarymo sklendė yra $\mathbf{I}_t \in \mathbb{R}^{n \times h}$,
+užmiršimo sklendė yra $\mathbf{F}_t \in \mathbb{R}^{n \times h}$,
+o išvesties sklendė yra $\mathbf{O}_t \in \mathbb{R}^{n \times h}$.
+Jos apskaičiuojamos taip:
 
 $$
 \begin{aligned}
@@ -143,112 +142,112 @@ $$
 \end{aligned}
 $$
 
-where $\mathbf{W}_{\textrm{xi}}, \mathbf{W}_{\textrm{xf}}, \mathbf{W}_{\textrm{xo}} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{\textrm{hi}}, \mathbf{W}_{\textrm{hf}}, \mathbf{W}_{\textrm{ho}} \in \mathbb{R}^{h \times h}$ are weight parameters 
-and $\mathbf{b}_\textrm{i}, \mathbf{b}_\textrm{f}, \mathbf{b}_\textrm{o} \in \mathbb{R}^{1 \times h}$ are bias parameters.
-Note that broadcasting 
-(see :numref:`subsec_broadcasting`)
-is triggered during the summation.
-We use sigmoid functions 
-(as introduced in :numref:`sec_mlp`) 
-to map the input values to the interval $(0, 1)$.
+kur $\mathbf{W}_{\textrm{xi}}, \mathbf{W}_{\textrm{xf}}, \mathbf{W}_{\textrm{xo}} \in \mathbb{R}^{d \times h}$ ir $\mathbf{W}_{\textrm{hi}}, \mathbf{W}_{\textrm{hf}}, \mathbf{W}_{\textrm{ho}} \in \mathbb{R}^{h \times h}$ yra svorių parametrai,
+o $\mathbf{b}_\textrm{i}, \mathbf{b}_\textrm{f}, \mathbf{b}_\textrm{o} \in \mathbb{R}^{1 \times h}$ yra poslinkio parametrai.
+Atkreipkite dėmesį, kad sumuojant
+įjungiamas transliavimas
+(žr. :numref:`subsec_broadcasting`).
+Naudojame sigmoidines funkcijas
+(kaip pristatyta :numref:`sec_mlp`),
+kad įvesties reikšmes atvaizduotume į intervalą $(0, 1)$.
 
 
-### Input Node
+### Įvesties mazgas
 
-Next we design the memory cell. 
-Since we have not specified the action of the various gates yet, 
-we first introduce the *input node* 
+Toliau projektuojame atminties ląstelę.
+Kadangi dar nenurodėme įvairių sklendžių veikimo,
+pirmiausia pristatome *įvesties mazgą*
 $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$.
-Its computation is similar to that of the three gates described above, 
-but uses a $\tanh$ function with a value range for $(-1, 1)$ as the activation function. 
-This leads to the following equation at time step $t$:
+Jo skaičiavimas panašus į aukščiau aprašytų trijų sklendžių,
+tačiau kaip aktyvacijos funkciją naudoja $\tanh$ funkciją, kurios reikšmių sritis yra $(-1, 1)$.
+Tai veda prie šios lygties laiko žingsniu $t$:
 
 $$\tilde{\mathbf{C}}_t = \textrm{tanh}(\mathbf{X}_t \mathbf{W}_{\textrm{xc}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hc}} + \mathbf{b}_\textrm{c}),$$
 
-where $\mathbf{W}_{\textrm{xc}} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{\textrm{hc}} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_\textrm{c} \in \mathbb{R}^{1 \times h}$ is a bias parameter.
+kur $\mathbf{W}_{\textrm{xc}} \in \mathbb{R}^{d \times h}$ ir $\mathbf{W}_{\textrm{hc}} \in \mathbb{R}^{h \times h}$ yra svorių parametrai, o $\mathbf{b}_\textrm{c} \in \mathbb{R}^{1 \times h}$ yra poslinkio parametras.
 
-A quick illustration of the input node is shown in :numref:`fig_lstm_1`.
+Trumpa įvesties mazgo iliustracija parodyta :numref:`fig_lstm_1`.
 
-![Computing the input node in an LSTM model.](../img/lstm-1.svg)
+![Įvesties mazgo skaičiavimas LSTM modelyje.](../img/lstm-1.svg)
 :label:`fig_lstm_1`
 
 
-### Memory Cell Internal State
+### Atminties ląstelės vidinė būsena
 
-In LSTMs, the input gate $\mathbf{I}_t$ governs 
-how much we take new data into account via $\tilde{\mathbf{C}}_t$ 
-and the forget gate $\mathbf{F}_t$ addresses 
-how much of the old cell internal state $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. 
-Using the Hadamard (elementwise) product operator $\odot$
-we arrive at the following update equation:
+LSTM atidarymo sklendė $\mathbf{I}_t$ valdo,
+kiek naujų duomenų atsižvelgiame per $\tilde{\mathbf{C}}_t$,
+o užmiršimo sklendė $\mathbf{F}_t$ nustato,
+kiek senos ląstelės vidinės būsenos $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ išlaikome.
+Naudodami Hadamardo (elementų lygmens) sandaugos operatorių $\odot$,
+gauname šią atnaujinimo lygtį:
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
-If the forget gate is always 1 and the input gate is always 0, 
-the memory cell internal state $\mathbf{C}_{t-1}$
-will remain constant forever, 
-passing unchanged to each subsequent time step.
-However, input gates and forget gates
-give the model the flexibility of being able to learn 
-when to keep this value unchanged
-and when to perturb it in response 
-to subsequent inputs. 
-In practice, this design alleviates the vanishing gradient problem,
-resulting in models that are much easier to train,
-especially when facing datasets with long sequence lengths. 
+Jei užmiršimo sklendė visada yra 1, o atidarymo sklendė visada yra 0,
+atminties ląstelės vidinė būsena $\mathbf{C}_{t-1}$
+liks pastovi amžinai,
+nepakitusi perduodama į kiekvieną paskesnį laiko žingsnį.
+Tačiau atidarymo ir užmiršimo sklendės
+suteikia modeliui lankstumą išmokti,
+kada išlaikyti šią reikšmę nepakeistą
+ir kada ją sutrikdyti reaguojant
+į paskesnes įvestis.
+Praktikoje šis dizainas sušvelnina nykstančio gradiento problemą,
+dėl to modelius daug lengviau apmokyti,
+ypač kai susiduriama su duomenų rinkiniais su ilgomis sekomis.
 
-We thus arrive at the flow diagram in :numref:`fig_lstm_2`.
+Taip prieiname prie srauto diagramos :numref:`fig_lstm_2`.
 
-![Computing the memory cell internal state in an LSTM model.](../img/lstm-2.svg)
+![Atminties ląstelės vidinės būsenos skaičiavimas LSTM modelyje.](../img/lstm-2.svg)
 
 :label:`fig_lstm_2`
 
 
-### Hidden State
+### Paslėptoji būsena
 
-Last, we need to define how to compute the output
-of the memory cell, i.e., the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$, as seen by other layers. 
-This is where the output gate comes into play.
-In LSTMs, we first apply $\tanh$ to the memory cell internal state
-and then apply another point-wise multiplication,
-this time with the output gate.
-This ensures that the values of $\mathbf{H}_t$ 
-are always in the interval $(-1, 1)$:
+Galiausiai turime apibrėžti, kaip apskaičiuoti atminties ląstelės
+išvestį, t. y. paslėptąją būseną $\mathbf{H}_t \in \mathbb{R}^{n \times h}$, kurią mato kiti sluoksniai.
+Čia į žaidimą įsijungia išvesties sklendė.
+LSTM pirmiausia pritaikome $\tanh$ atminties ląstelės vidinei būsenai,
+o tada atliekame dar vieną taškinę daugybą,
+šį kartą su išvesties sklende.
+Tai užtikrina, kad $\mathbf{H}_t$ reikšmės
+visada yra intervale $(-1, 1)$:
 
 $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 
-Whenever the output gate is close to 1, 
-we allow the memory cell internal state to impact the subsequent layers uninhibited,
-whereas for output gate values close to 0,
-we prevent the current memory from impacting other layers of the network
-at the current time step. 
-Note that a memory cell can accrue information 
-across many time steps without impacting the rest of the network
-(as long as the output gate takes values close to 0),
-and then suddenly impact the network at a subsequent time step
-as soon as the output gate flips from values close to 0
-to values close to 1. :numref:`fig_lstm_3` has a graphical illustration of the data flow.
+Kai išvesties sklendė artima 1,
+leidžiame atminties ląstelės vidinei būsenai netrukdomai paveikti paskesnius sluoksnius,
+o kai išvesties sklendės reikšmės artimos 0,
+neleidžiame dabartinei atminčiai paveikti kitų tinklo sluoksnių
+dabartiniu laiko žingsniu.
+Atkreipkite dėmesį, kad atminties ląstelė gali kaupti informaciją
+per daugelį laiko žingsnių, nepaveikdama likusio tinklo
+(kol išvesties sklendė įgyja reikšmes, artimas 0),
+o tada staiga paveikti tinklą paskesniu laiko žingsniu,
+vos tik išvesties sklendė persijungia iš reikšmių, artimų 0,
+į reikšmes, artimas 1. :numref:`fig_lstm_3` pateikta grafinė duomenų srauto iliustracija.
 
-![Computing the hidden state in an LSTM model.](../img/lstm-3.svg)
+![Paslėptosios būsenos skaičiavimas LSTM modelyje.](../img/lstm-3.svg)
 :label:`fig_lstm_3`
 
 
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-Now let's implement an LSTM from scratch.
-As same as the experiments in :numref:`sec_rnn-scratch`,
-we first load *The Time Machine* dataset.
+Dabar įgyvendinkime LSTM nuo nulio.
+Kaip ir :numref:`sec_rnn-scratch` eksperimentuose,
+pirmiausia įkeliame *Laiko mašinos* duomenų rinkinį.
 
-### [**Initializing Model Parameters**]
+### [**Modelio parametrų inicializavimas**]
 
-Next, we need to define and initialize the model parameters. 
-As previously, the hyperparameter `num_hiddens` 
-dictates the number of hidden units.
-We initialize weights following a Gaussian distribution
-with 0.01 standard deviation, 
-and we set the biases to 0.
+Toliau turime apibrėžti ir inicializuoti modelio parametrus.
+Kaip ir anksčiau, hiperparametras `num_hiddens`
+nurodo paslėptųjų vienetų skaičių.
+Svorius inicializuojame pagal Gauso skirstinį
+su 0,01 standartiniu nuokrypiu,
+o poslinkius nustatome į 0.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -302,22 +301,22 @@ class LSTMScratch(d2l.Module):
 ```
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-[**The actual model**] is defined as described above,
-consisting of three gates and an input node. 
-Note that only the hidden state is passed to the output layer.
+[**Tikrasis modelis**] apibrėžiamas, kaip aprašyta aukščiau,
+ir sudarytas iš trijų sklendžių ir įvesties mazgo.
+Atkreipkite dėmesį, kad į išvesties sluoksnį perduodama tik paslėptoji būsena.
 :end_tab:
 
 :begin_tab:`jax`
-[**The actual model**] is defined as described above,
-consisting of three gates and an input node. 
-Note that only the hidden state is passed to the output layer.
-A long for-loop in the `forward` method will result in an extremely long
-JIT compilation time for the first run. As a solution to this, instead
-of using a for-loop to update the state with every time step,
-JAX has `jax.lax.scan` utility transformation to achieve the same behavior.
-It takes in an initial state called `carry` and an `inputs` array which
-is scanned on its leading axis. The `scan` transformation ultimately
-returns the final state and the stacked outputs as expected.
+[**Tikrasis modelis**] apibrėžiamas, kaip aprašyta aukščiau,
+ir sudarytas iš trijų sklendžių ir įvesties mazgo.
+Atkreipkite dėmesį, kad į išvesties sluoksnį perduodama tik paslėptoji būsena.
+Ilgas ciklas for metode `forward` lems itin ilgą
+JIT kompiliavimo laiką pirmojo paleidimo metu. Kaip sprendimą, užuot
+naudojus ciklą for būsenai atnaujinti kiekvienu laiko žingsniu,
+JAX turi `jax.lax.scan` pagalbinę transformaciją tam pačiam elgesiui pasiekti.
+Ji priima pradinę būseną, vadinamą `carry`, ir masyvą `inputs`, kuris
+skenuojamas pagal pirmąją ašį. Transformacija `scan` galiausiai
+grąžina galutinę būseną ir sukrautas išvestis, kaip tikimasi.
 :end_tab:
 
 ```{.python .input}
@@ -389,9 +388,9 @@ def forward(self, inputs, H_C=None):
     return outputs, carry
 ```
 
-### [**Training**] and Prediction
+### [**Mokymas**] ir prognozavimas
 
-Let's train an LSTM model by instantiating the `RNNLMScratch` class from :numref:`sec_rnn-scratch`.
+Apmokykime LSTM modelį, sukurdami klasės `RNNLMScratch` iš :numref:`sec_rnn-scratch` egzempliorių.
 
 ```{.python .input}
 %%tab all
@@ -408,15 +407,15 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## [**Concise Implementation**]
+## [**Glaustas įgyvendinimas**]
 
-Using high-level APIs,
-we can directly instantiate an LSTM model.
-This encapsulates all the configuration details 
-that we made explicit above. 
-The code is significantly faster as it uses 
-compiled operators rather than Python
-for many details that we spelled out before.
+Naudodami aukšto lygio API,
+galime tiesiogiai sukurti LSTM modelį.
+Tai įkapsuliuoja visas konfigūracijos detales,
+kurias aukščiau pateikėme aiškiai.
+Kodas yra gerokai greitesnis, nes naudoja
+sukompiliuotus operatorius, o ne Python,
+daugeliui detalių, kurias išdėstėme anksčiau.
 
 ```{.python .input}
 %%tab mxnet
@@ -508,52 +507,52 @@ model.predict('it has', 20, data.vocab)
 model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
-LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
-Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) is quite costly because of the long range dependency of the sequence.
-Later we will encounter alternative models such as Transformers that can be used in some cases.
+LSTM yra prototipinis latentinio kintamojo autoregresinis modelis su netrivialiu būsenos valdymu.
+Per daugelį metų buvo pasiūlyta daug jų variantų, pvz., keli sluoksniai, liekamosios jungtys, skirtingi reguliarizacijos tipai. Tačiau LSTM ir kitų sekų modelių (tokių kaip GRU) apmokymas yra gana brangus dėl ilgo sekos priklausomybių nuotolio.
+Vėliau susidursime su alternatyviais modeliais, tokiais kaip transformeriai, kuriuos kai kuriais atvejais galima naudoti.
 
 
-## Summary
+## Santrauka
 
-While LSTMs were published in 1997, 
-they rose to great prominence 
-with some victories in prediction competitions in the mid-2000s,
-and became the dominant models for sequence learning from 2011 
-until the rise of Transformer models, starting in 2017.
-Even Tranformers owe some of their key ideas 
-to architecture design innovations introduced by the LSTM.
-
-
-LSTMs have three types of gates: 
-input gates, forget gates, and output gates 
-that control the flow of information.
-The hidden layer output of LSTM includes the hidden state and the memory cell internal state. 
-Only the hidden state is passed into the output layer while 
-the memory cell internal state remains entirely internal.
-LSTMs can alleviate vanishing and exploding gradients.
+Nors LSTM buvo paskelbti 1997 m.,
+jie išgarsėjo
+po kelių pergalių prognozavimo konkursuose 2000-ųjų viduryje
+ir tapo dominuojančiais sekų mokymosi modeliais nuo 2011 m.
+iki transformerių modelių iškilimo, prasidėjusio 2017 m.
+Net transformeriai kai kurias savo pagrindines idėjas
+yra skolingi LSTM pristatytoms architektūros dizaino naujovėms.
 
 
+LSTM turi tris sklendžių tipus:
+atidarymo, užmiršimo ir išvesties sklendes,
+kurios valdo informacijos srautą.
+LSTM paslėptojo sluoksnio išvestis apima paslėptąją būseną ir atminties ląstelės vidinę būseną.
+Į išvesties sluoksnį perduodama tik paslėptoji būsena,
+o atminties ląstelės vidinė būsena lieka visiškai vidinė.
+LSTM gali sušvelninti nykstančius ir sprogstančius gradientus.
 
-## Exercises
 
-1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
-1. How would you need to change the model to generate proper words rather than just sequences of characters?
-1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
-1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
-1. Implement an LSTM model for time series prediction rather than character sequence prediction.
+
+## Pratimai
+
+1. Pakoreguokite hiperparametrus ir išanalizuokite jų įtaką veikimo laikui, painumui ir išvesties sekai.
+1. Kaip reikėtų pakeisti modelį, kad jis generuotų tinkamus žodžius, o ne tik simbolių sekas?
+1. Palyginkite GRU, LSTM ir įprastų RNN skaičiavimo kainą duotai paslėptajai dimensijai. Ypatingą dėmesį skirkite apmokymo ir išvedimo kainai.
+1. Kadangi kandidatinė atminties ląstelė užtikrina, kad reikšmių sritis yra tarp $-1$ ir $1$, naudodama funkciją $\tanh$, kodėl paslėptoji būsena turi vėl naudoti funkciją $\tanh$, kad užtikrintų, jog išvesties reikšmių sritis yra tarp $-1$ ir $1$?
+1. Įgyvendinkite LSTM modelį laiko eilučių prognozavimui, o ne simbolių sekos prognozavimui.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/343)
+[Diskusijos](https://discuss.d2l.ai/t/343)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1057)
+[Diskusijos](https://discuss.d2l.ai/t/1057)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3861)
+[Diskusijos](https://discuss.d2l.ai/t/3861)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18016)
+[Diskusijos](https://discuss.d2l.ai/t/18016)
 :end_tab:

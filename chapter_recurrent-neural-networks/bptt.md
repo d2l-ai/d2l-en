@@ -1,318 +1,316 @@
-# Backpropagation Through Time
+# Atgalinis sklidimas laike
 :label:`sec_bptt`
 
-If you completed the exercises in :numref:`sec_rnn-scratch`,
-you would have seen that gradient clipping is vital 
-for preventing the occasional massive gradients
-from destabilizing training.
-We hinted that the exploding gradients
-stem from backpropagating across long sequences.
-Before introducing a slew of modern RNN architectures,
-let's take a closer look at how *backpropagation*
-works in sequence models in mathematical detail.
-Hopefully, this discussion will bring some precision 
-to the notion of *vanishing* and *exploding* gradients.
-If you recall our discussion of forward and backward 
-propagation through computational graphs
-when we introduced MLPs in :numref:`sec_backprop`,
-then forward propagation in RNNs
-should be relatively straightforward.
-Applying backpropagation in RNNs 
-is called *backpropagation through time* :cite:`Werbos.1990`.
-This procedure requires us to expand (or unroll) 
-the computational graph of an RNN
-one time step at a time.
-The unrolled RNN is essentially 
-a feedforward neural network 
-with the special property 
-that the same parameters 
-are repeated throughout the unrolled network,
-appearing at each time step.
-Then, just as in any feedforward neural network,
-we can apply the chain rule, 
-backpropagating gradients through the unrolled net.
-The gradient with respect to each parameter
-must be summed across all places 
-that the parameter occurs in the unrolled net.
-Handling such weight tying should be familiar 
-from our chapters on convolutional neural networks.
+Jei atlikote :numref:`sec_rnn-scratch` pratimus,
+matėte, kad gradientų apkarpymas yra gyvybiškai svarbus
+siekiant užkirsti kelią retkarčiais pasitaikantiems milžiniškiems gradientams
+destabilizuoti apmokymą.
+Užsiminėme, kad sprogstantys gradientai
+kyla iš atgalinio sklidimo per ilgas sekas.
+Prieš pristatydami daugybę šiuolaikinių RNN architektūrų,
+atidžiau pažvelkime, kaip *atgalinis sklidimas*
+veikia sekų modeliuose, matematiškai išsamiai.
+Tikimės, kad ši diskusija suteiks tikslumo
+*nykstančių* ir *sprogstančių* gradientų sampratai.
+Jei prisimenate mūsų diskusiją apie tiesioginį ir atgalinį
+sklidimą per skaičiavimo grafus,
+kai pristatėme MLP :numref:`sec_backprop`,
+tai tiesioginis sklidimas RNN
+turėtų būti santykinai paprastas.
+Atgalinio sklidimo taikymas RNN
+vadinamas *atgaliniu sklidimu laike* :cite:`Werbos.1990`.
+Ši procedūra reikalauja išskleisti (arba išvynioti)
+RNN skaičiavimo grafą
+po vieną laiko žingsnį.
+Išvyniotas RNN iš esmės yra
+tiesioginio sklidimo neuroninis tinklas
+su ta ypatinga savybe,
+kad tie patys parametrai
+kartojami visame išvyniotame tinkle,
+pasirodydami kiekviename laiko žingsnyje.
+Tada, kaip ir bet kuriame tiesioginio sklidimo neuroniniame tinkle,
+galime taikyti grandinės taisyklę,
+atgaline kryptimi sklidindami gradientus per išvyniotą tinklą.
+Gradientas kiekvieno parametro atžvilgiu
+turi būti susumuotas per visas vietas,
+kuriose parametras pasitaiko išvyniotame tinkle.
+Tokio svorių susiejimo tvarkymas turėtų būti pažįstamas
+iš mūsų skyrių apie konvoliucinius neuroninius tinklus.
 
 
-Complications arise because sequences
-can be rather long.
-It is not unusual to work with text sequences
-consisting of over a thousand tokens. 
-Note that this poses problems both from 
-a computational (too much memory)
-and optimization (numerical instability)
-standpoint. 
-Input from the first step passes through
-over 1000 matrix products before arriving at the output, 
-and another 1000 matrix products 
-are required to compute the gradient. 
-We now analyze what can go wrong and 
-how to address it in practice.
+Komplikacijų kyla dėl to, kad sekos
+gali būti gana ilgos.
+Nėra neįprasta dirbti su teksto sekomis,
+sudarytomis iš daugiau nei tūkstančio teksto vienetų.
+Atkreipkite dėmesį, kad tai kelia problemų ir
+skaičiavimo (per daug atminties),
+ir optimizavimo (skaitinis nestabilumas)
+požiūriu.
+Įvestis iš pirmojo žingsnio praeina per
+daugiau nei 1000 matricų sandaugų, kol pasiekia išvestį,
+ir dar 1000 matricų sandaugų
+reikia gradientui apskaičiuoti.
+Dabar išanalizuosime, kas gali nepavykti ir
+kaip su tuo susidoroti praktikoje.
 
 
-## Analysis of Gradients in RNNs
+## Gradientų RNN analizė
 :label:`subsec_bptt_analysis`
 
-We start with a simplified model of how an RNN works.
-This model ignores details about the specifics 
-of the hidden state and how it is updated.
-The mathematical notation here
-does not explicitly distinguish
-scalars, vectors, and matrices.
-We are just trying to develop some intuition.
-In this simplified model,
-we denote $h_t$ as the hidden state,
-$x_t$ as input, and $o_t$ as output
-at time step $t$.
-Recall our discussions in
-:numref:`subsec_rnn_w_hidden_states`
-that the input and the hidden state
-can be concatenated before being multiplied 
-by one weight variable in the hidden layer.
-Thus, we use $w_\textrm{h}$ and $w_\textrm{o}$ to indicate the weights 
-of the hidden layer and the output layer, respectively.
-As a result, the hidden states and outputs 
-at each time step are
+Pradedame nuo supaprastinto modelio, kaip veikia RNN.
+Šis modelis ignoruoja paslėptosios būsenos
+specifikos ir jos atnaujinimo detales.
+Matematinis žymėjimas čia
+aiškiai neskiria
+skaliarų, vektorių ir matricų.
+Tik bandome susikurti šiek tiek intuicijos.
+Šiame supaprastintame modelyje
+$h_t$ žymime paslėptąją būseną,
+$x_t$ – įvestį, o $o_t$ – išvestį
+laiko žingsniu $t$.
+Prisiminkite mūsų diskusijas
+:numref:`subsec_rnn_w_hidden_states`,
+kad įvestis ir paslėptoji būsena
+gali būti sujungtos prieš dauginant
+iš vieno paslėptojo sluoksnio svorio kintamojo.
+Todėl $w_\textrm{h}$ ir $w_\textrm{o}$ naudojame paslėptojo sluoksnio ir išvesties sluoksnio svoriams žymėti atitinkamai.
+Dėl to paslėptosios būsenos ir išvestys
+kiekvienu laiko žingsniu yra
 
 $$\begin{aligned}h_t &= f(x_t, h_{t-1}, w_\textrm{h}),\\o_t &= g(h_t, w_\textrm{o}),\end{aligned}$$
 :eqlabel:`eq_bptt_ht_ot`
 
-where $f$ and $g$ are transformations
-of the hidden layer and the output layer, respectively.
-Hence, we have a chain of values 
-$\{\ldots, (x_{t-1}, h_{t-1}, o_{t-1}), (x_{t}, h_{t}, o_t), \ldots\}$ 
-that depend on each other via recurrent computation.
-The forward propagation is fairly straightforward.
-All we need is to loop through the $(x_t, h_t, o_t)$ triples one time step at a time.
-The discrepancy between output $o_t$ and the desired target $y_t$ 
-is then evaluated by an objective function 
-across all the $T$ time steps as
+kur $f$ ir $g$ yra atitinkamai
+paslėptojo sluoksnio ir išvesties sluoksnio transformacijos.
+Taigi turime reikšmių grandinę
+$\{\ldots, (x_{t-1}, h_{t-1}, o_{t-1}), (x_{t}, h_{t}, o_t), \ldots\}$,
+kurios priklauso viena nuo kitos per rekurentinį skaičiavimą.
+Tiesioginis sklidimas yra gana paprastas.
+Reikia tik eiti ciklu per trejetus $(x_t, h_t, o_t)$ po vieną laiko žingsnį.
+Neatitikimas tarp išvesties $o_t$ ir norimo tikslo $y_t$
+tada įvertinamas tikslo funkcija
+per visus $T$ laiko žingsnių taip:
 
 $$L(x_1, \ldots, x_T, y_1, \ldots, y_T, w_\textrm{h}, w_\textrm{o}) = \frac{1}{T}\sum_{t=1}^T l(y_t, o_t).$$
 
 
 
-For backpropagation, matters are a bit trickier, 
-especially when we compute the gradients 
-with regard to the parameters $w_\textrm{h}$ of the objective function $L$. 
-To be specific, by the chain rule,
+Atgaliniam sklidimui reikalai yra šiek tiek sudėtingesni,
+ypač kai skaičiuojame gradientus
+tikslo funkcijos $L$ parametrų $w_\textrm{h}$ atžvilgiu.
+Konkrečiai, pagal grandinės taisyklę,
 
 $$\begin{aligned}\frac{\partial L}{\partial w_\textrm{h}}  & = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial w_\textrm{h}}  \\& = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial o_t} \frac{\partial g(h_t, w_\textrm{o})}{\partial h_t}  \frac{\partial h_t}{\partial w_\textrm{h}}.\end{aligned}$$
 :eqlabel:`eq_bptt_partial_L_wh`
 
-The first and the second factors of the
-product in :eqref:`eq_bptt_partial_L_wh`
-are easy to compute.
-The third factor $\partial h_t/\partial w_\textrm{h}$ is where things get tricky, 
-since we need to recurrently compute the effect of the parameter $w_\textrm{h}$ on $h_t$.
-According to the recurrent computation
-in :eqref:`eq_bptt_ht_ot`,
-$h_t$ depends on both $h_{t-1}$ and $w_\textrm{h}$,
-where computation of $h_{t-1}$
-also depends on $w_\textrm{h}$.
-Thus, evaluating the total derivate of $h_t$ 
-with respect to $w_\textrm{h}$ using the chain rule yields
+Pirmąjį ir antrąjį sandaugos narį
+:eqref:`eq_bptt_partial_L_wh`
+lengva apskaičiuoti.
+Trečiasis narys $\partial h_t/\partial w_\textrm{h}$ yra ten, kur reikalai pasidaro sudėtingi,
+nes turime rekurentiškai apskaičiuoti parametro $w_\textrm{h}$ poveikį $h_t$.
+Pagal rekurentinį skaičiavimą
+:eqref:`eq_bptt_ht_ot`,
+$h_t$ priklauso ir nuo $h_{t-1}$, ir nuo $w_\textrm{h}$,
+kur $h_{t-1}$ skaičiavimas
+taip pat priklauso nuo $w_\textrm{h}$.
+Taigi, įvertinus pilnąją $h_t$ išvestinę
+$w_\textrm{h}$ atžvilgiu pagal grandinės taisyklę, gaunama
 
 $$\frac{\partial h_t}{\partial w_\textrm{h}}= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}} +\frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial h_{t-1}} \frac{\partial h_{t-1}}{\partial w_\textrm{h}}.$$
 :eqlabel:`eq_bptt_partial_ht_wh_recur`
 
 
-To derive the above gradient, assume that we have 
-three sequences $\{a_{t}\},\{b_{t}\},\{c_{t}\}$ 
-satisfying $a_{0}=0$ and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1, 2,\ldots$.
-Then for $t\geq 1$, it is easy to show
+Kad išvestume aukščiau pateiktą gradientą, tarkime, kad turime
+tris sekas $\{a_{t}\},\{b_{t}\},\{c_{t}\}$,
+tenkinančias $a_{0}=0$ ir $a_{t}=b_{t}+c_{t}a_{t-1}$, kai $t=1, 2,\ldots$.
+Tada, kai $t\geq 1$, lengva parodyti, kad
 
 $$a_{t}=b_{t}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}c_{j}\right)b_{i}.$$
 :eqlabel:`eq_bptt_at`
 
-By substituting $a_t$, $b_t$, and $c_t$ according to
+Pakeitę $a_t$, $b_t$ ir $c_t$ pagal
 
 $$\begin{aligned}a_t &= \frac{\partial h_t}{\partial w_\textrm{h}},\\
 b_t &= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}}, \\
 c_t &= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial h_{t-1}},\end{aligned}$$
 
-the gradient computation in :eqref:`eq_bptt_partial_ht_wh_recur` satisfies
+gradiento skaičiavimas :eqref:`eq_bptt_partial_ht_wh_recur` tenkina
 $a_{t}=b_{t}+c_{t}a_{t-1}$.
-Thus, per :eqref:`eq_bptt_at`, 
-we can remove the recurrent computation 
-in :eqref:`eq_bptt_partial_ht_wh_recur` with
+Taigi, pagal :eqref:`eq_bptt_at`,
+galime pašalinti rekurentinį skaičiavimą
+:eqref:`eq_bptt_partial_ht_wh_recur` su
 
 $$\frac{\partial h_t}{\partial w_\textrm{h}}=\frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t} \frac{\partial f(x_{j},h_{j-1},w_\textrm{h})}{\partial h_{j-1}} \right) \frac{\partial f(x_{i},h_{i-1},w_\textrm{h})}{\partial w_\textrm{h}}.$$
 :eqlabel:`eq_bptt_partial_ht_wh_gen`
 
-While we can use the chain rule to compute $\partial h_t/\partial w_\textrm{h}$ recursively, 
-this chain can get very long whenever $t$ is large.
-Let's discuss a number of strategies for dealing with this problem.
+Nors galime naudoti grandinės taisyklę $\partial h_t/\partial w_\textrm{h}$ apskaičiuoti rekursyviai,
+ši grandinė gali tapti labai ilga, kai tik $t$ didelis.
+Aptarkime keletą strategijų, kaip susidoroti su šia problema.
 
-### Full Computation ### 
+### Pilnas skaičiavimas ###
 
-One idea might be to compute the full sum in :eqref:`eq_bptt_partial_ht_wh_gen`.
-However, this is very slow and gradients can blow up,
-since subtle changes in the initial conditions
-can potentially affect the outcome a lot.
-That is, we could see things similar to the butterfly effect,
-where minimal changes in the initial conditions 
-lead to disproportionate changes in the outcome.
-This is generally undesirable.
-After all, we are looking for robust estimators that generalize well. 
-Hence this strategy is almost never used in practice.
+Viena idėja gali būti apskaičiuoti pilną sumą :eqref:`eq_bptt_partial_ht_wh_gen`.
+Tačiau tai labai lėta, o gradientai gali sprogti,
+nes subtilūs pradinių sąlygų pokyčiai
+gali potencialiai labai paveikti rezultatą.
+Tai yra, galėtume pamatyti kažką panašaus į drugelio efektą,
+kai minimalūs pradinių sąlygų pokyčiai
+lemia neproporcingus rezultato pokyčius.
+Tai paprastai nepageidautina.
+Juk ieškome tvirtų įvertinių, kurie gerai apibendrina.
+Todėl ši strategija praktikoje beveik niekada nenaudojama.
 
-### Truncating Time Steps###
+### Laiko žingsnių nukirtimas ###
 
-Alternatively,
-we can truncate the sum in
+Alternatyviai,
+galime nukirsti sumą
 :eqref:`eq_bptt_partial_ht_wh_gen`
-after $\tau$ steps. 
-This is what we have been discussing so far. 
-This leads to an *approximation* of the true gradient,
-simply by terminating the sum at $\partial h_{t-\tau}/\partial w_\textrm{h}$. 
-In practice this works quite well. 
-It is what is commonly referred to as truncated 
-backpropgation through time :cite:`Jaeger.2002`.
-One of the consequences of this is that the model 
-focuses primarily on short-term influence 
-rather than long-term consequences. 
-This is actually *desirable*, since it biases the estimate 
-towards simpler and more stable models.
+po $\tau$ žingsnių.
+Tai yra tai, ką iki šiol aptarinėjome.
+Tai veda prie tikrojo gradiento *aproksimacijos*,
+tiesiog nutraukiant sumą ties $\partial h_{t-\tau}/\partial w_\textrm{h}$.
+Praktikoje tai veikia gana gerai.
+Tai dažniausiai vadinama nukirstu
+atgaliniu sklidimu laike :cite:`Jaeger.2002`.
+Viena iš to pasekmių yra ta, kad modelis
+pirmiausia sutelkia dėmesį į trumpalaikę įtaką,
+o ne į ilgalaikes pasekmes.
+Tai iš tikrųjų *pageidautina*, nes šališkai nukreipia įvertį
+link paprastesnių ir stabilesnių modelių.
 
 
-### Randomized Truncation ### 
+### Atsitiktinis nukirtimas ###
 
-Last, we can replace $\partial h_t/\partial w_\textrm{h}$
-by a random variable which is correct in expectation 
-but truncates the sequence.
-This is achieved by using a sequence of $\xi_t$
-with predefined $0 \leq \pi_t \leq 1$,
-where $P(\xi_t = 0) = 1-\pi_t$ and 
-$P(\xi_t = \pi_t^{-1}) = \pi_t$, thus $E[\xi_t] = 1$.
-We use this to replace the gradient
+Galiausiai galime pakeisti $\partial h_t/\partial w_\textrm{h}$
+atsitiktiniu dydžiu, kuris yra teisingas laukiamąja prasme,
+bet nukirsta seką.
+Tai pasiekiama naudojant seką $\xi_t$
+su iš anksto nustatytais $0 \leq \pi_t \leq 1$,
+kur $P(\xi_t = 0) = 1-\pi_t$ ir
+$P(\xi_t = \pi_t^{-1}) = \pi_t$, taigi $E[\xi_t] = 1$.
+Tai naudojame gradientui
 $\partial h_t/\partial w_\textrm{h}$
-in :eqref:`eq_bptt_partial_ht_wh_recur`
-with
+:eqref:`eq_bptt_partial_ht_wh_recur`
+pakeisti
 
 $$z_t= \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial w_\textrm{h}} +\xi_t \frac{\partial f(x_{t},h_{t-1},w_\textrm{h})}{\partial h_{t-1}} \frac{\partial h_{t-1}}{\partial w_\textrm{h}}.$$
 
 
-It follows from the definition of $\xi_t$ 
-that $E[z_t] = \partial h_t/\partial w_\textrm{h}$.
-Whenever $\xi_t = 0$ the recurrent computation
-terminates at that time step $t$.
-This leads to a weighted sum of sequences of varying lengths,
-where long sequences are rare but appropriately overweighted. 
-This idea was proposed by 
+Iš $\xi_t$ apibrėžimo išplaukia,
+kad $E[z_t] = \partial h_t/\partial w_\textrm{h}$.
+Kai tik $\xi_t = 0$, rekurentinis skaičiavimas
+nutraukiamas tuo laiko žingsniu $t$.
+Tai veda prie svertinės skirtingo ilgio sekų sumos,
+kur ilgos sekos yra retos, bet tinkamai persvertos.
+Šią idėją pasiūlė
 :citet:`Tallec.Ollivier.2017`.
 
-### Comparing Strategies
+### Strategijų palyginimas
 
-![Comparing strategies for computing gradients in RNNs. From top to bottom: randomized truncation, regular truncation, and full computation.](../img/truncated-bptt.svg)
+![Gradientų skaičiavimo RNN strategijų palyginimas. Iš viršaus į apačią: atsitiktinis nukirtimas, įprastas nukirtimas ir pilnas skaičiavimas.](../img/truncated-bptt.svg)
 :label:`fig_truncated_bptt`
 
 
-:numref:`fig_truncated_bptt` illustrates the three strategies 
-when analyzing the first few characters of *The Time Machine* 
-using backpropagation through time for RNNs:
+:numref:`fig_truncated_bptt` iliustruoja tris strategijas,
+analizuojant pirmuosius kelis *Laiko mašinos* simbolius
+naudojant atgalinį sklidimą laike RNN:
 
-* The first row is the randomized truncation that partitions the text into segments of varying lengths.
-* The second row is the regular truncation that breaks the text into subsequences of the same length. This is what we have been doing in RNN experiments.
-* The third row is the full backpropagation through time that leads to a computationally infeasible expression.
+* Pirmoji eilutė yra atsitiktinis nukirtimas, kuris skaido tekstą į skirtingo ilgio segmentus.
+* Antroji eilutė yra įprastas nukirtimas, kuris skaido tekstą į vienodo ilgio posekius. Tai yra tai, ką darėme RNN eksperimentuose.
+* Trečioji eilutė yra pilnas atgalinis sklidimas laike, vedantis prie skaičiavimo požiūriu neįgyvendinamos išraiškos.
 
 
-Unfortunately, while appealing in theory, 
-randomized truncation does not work 
-much better than regular truncation, 
-most likely due to a number of factors.
-First, the effect of an observation
-after a number of backpropagation steps 
-into the past is quite sufficient 
-to capture dependencies in practice. 
-Second, the increased variance counteracts the fact 
-that the gradient is more accurate with more steps. 
-Third, we actually *want* models that have only 
-a short range of interactions. 
-Hence, regularly truncated backpropagation through time 
-has a slight regularizing effect that can be desirable.
+Deja, nors teoriškai patrauklus,
+atsitiktinis nukirtimas neveikia
+daug geriau nei įprastas nukirtimas,
+greičiausiai dėl keleto veiksnių.
+Pirma, stebėjimo poveikio
+po keleto atgalinio sklidimo žingsnių
+į praeitį pakanka
+priklausomybėms praktikoje užfiksuoti.
+Antra, padidėjusi dispersija neutralizuoja faktą,
+kad gradientas yra tikslesnis su daugiau žingsnių.
+Trečia, mes iš tikrųjų *norime* modelių, turinčių tik
+trumpą sąveikų nuotolį.
+Todėl įprastai nukirstas atgalinis sklidimas laike
+turi nedidelį reguliarizuojantį poveikį, kuris gali būti pageidautinas.
 
-## Backpropagation Through Time in Detail
+## Atgalinis sklidimas laike išsamiai
 
-After discussing the general principle,
-let's discuss backpropagation through time in detail.
-In contrast to the analysis in :numref:`subsec_bptt_analysis`,
-in the following we will show how to compute
-the gradients of the objective function
-with respect to all the decomposed model parameters.
-To keep things simple, we consider 
-an RNN without bias parameters,
-whose activation function in the hidden layer
-uses the identity mapping ($\phi(x)=x$).
-For time step $t$, let the single example input 
-and the target be $\mathbf{x}_t \in \mathbb{R}^d$ and $y_t$, respectively. 
-The hidden state $\mathbf{h}_t \in \mathbb{R}^h$ 
-and the output $\mathbf{o}_t \in \mathbb{R}^q$
-are computed as
+Aptarę bendrąjį principą,
+aptarkime atgalinį sklidimą laike išsamiai.
+Priešingai nei analizėje :numref:`subsec_bptt_analysis`,
+toliau parodysime, kaip apskaičiuoti
+tikslo funkcijos gradientus
+visų išskaidytų modelio parametrų atžvilgiu.
+Kad viskas būtų paprasta, nagrinėjame
+RNN be poslinkio parametrų,
+kurio aktyvacijos funkcija paslėptajame sluoksnyje
+naudoja tapatybės atvaizdavimą ($\phi(x)=x$).
+Laiko žingsniui $t$ tegul vieno pavyzdžio įvestis
+ir tikslas yra atitinkamai $\mathbf{x}_t \in \mathbb{R}^d$ ir $y_t$.
+Paslėptoji būsena $\mathbf{h}_t \in \mathbb{R}^h$
+ir išvestis $\mathbf{o}_t \in \mathbb{R}^q$
+apskaičiuojamos taip:
 
 $$\begin{aligned}\mathbf{h}_t &= \mathbf{W}_\textrm{hx} \mathbf{x}_t + \mathbf{W}_\textrm{hh} \mathbf{h}_{t-1},\\
 \mathbf{o}_t &= \mathbf{W}_\textrm{qh} \mathbf{h}_{t},\end{aligned}$$
 
-where $\mathbf{W}_\textrm{hx} \in \mathbb{R}^{h \times d}$, $\mathbf{W}_\textrm{hh} \in \mathbb{R}^{h \times h}$, and
+kur $\mathbf{W}_\textrm{hx} \in \mathbb{R}^{h \times d}$, $\mathbf{W}_\textrm{hh} \in \mathbb{R}^{h \times h}$ ir
 $\mathbf{W}_\textrm{qh} \in \mathbb{R}^{q \times h}$
-are the weight parameters.
-Denote by $l(\mathbf{o}_t, y_t)$
-the loss at time step $t$. 
-Our objective function,
-the loss over $T$ time steps
-from the beginning of the sequence is thus
+yra svorių parametrai.
+Pažymėkime $l(\mathbf{o}_t, y_t)$
+nuostolį laiko žingsniu $t$.
+Mūsų tikslo funkcija,
+nuostoliai per $T$ laiko žingsnių
+nuo sekos pradžios, todėl yra
 
 $$L = \frac{1}{T} \sum_{t=1}^T l(\mathbf{o}_t, y_t).$$
 
 
-In order to visualize the dependencies among
-model variables and parameters during computation
-of the RNN,
-we can draw a computational graph for the model,
-as shown in :numref:`fig_rnn_bptt`.
-For example, the computation of the hidden states of time step 3,
-$\mathbf{h}_3$, depends on the model parameters
-$\mathbf{W}_\textrm{hx}$ and $\mathbf{W}_\textrm{hh}$,
-the hidden state of the previous time step $\mathbf{h}_2$,
-and the input of the current time step $\mathbf{x}_3$.
+Kad vizualizuotume priklausomybes tarp
+modelio kintamųjų ir parametrų skaičiavimo
+RNN metu,
+galime nubraižyti modelio skaičiavimo grafą,
+kaip parodyta :numref:`fig_rnn_bptt`.
+Pavyzdžiui, 3 laiko žingsnio paslėptųjų būsenų skaičiavimas,
+$\mathbf{h}_3$, priklauso nuo modelio parametrų
+$\mathbf{W}_\textrm{hx}$ ir $\mathbf{W}_\textrm{hh}$,
+ankstesnio laiko žingsnio paslėptosios būsenos $\mathbf{h}_2$
+ir dabartinio laiko žingsnio įvesties $\mathbf{x}_3$.
 
-![Computational graph showing dependencies for an RNN model with three time steps. Boxes represent variables (not shaded) or parameters (shaded) and circles represent operators.](../img/rnn-bptt.svg)
+![Skaičiavimo grafas, rodantis priklausomybes RNN modeliui su trimis laiko žingsniais. Dėžutės reiškia kintamuosius (neuždengtos) arba parametrus (uždengtos), o apskritimai – operatorius.](../img/rnn-bptt.svg)
 :label:`fig_rnn_bptt`
 
-As just mentioned, the model parameters in :numref:`fig_rnn_bptt` 
-are $\mathbf{W}_\textrm{hx}$, $\mathbf{W}_\textrm{hh}$, and $\mathbf{W}_\textrm{qh}$. 
-Generally, training this model requires 
-gradient computation with respect to these parameters
-$\partial L/\partial \mathbf{W}_\textrm{hx}$, $\partial L/\partial \mathbf{W}_\textrm{hh}$, and $\partial L/\partial \mathbf{W}_\textrm{qh}$.
-According to the dependencies in :numref:`fig_rnn_bptt`,
-we can traverse in the opposite direction of the arrows
-to calculate and store the gradients in turn.
-To flexibly express the multiplication of 
-matrices, vectors, and scalars of different shapes
-in the chain rule,
-we continue to use the $\textrm{prod}$ operator 
-as described in :numref:`sec_backprop`.
+Kaip ką tik minėta, modelio parametrai :numref:`fig_rnn_bptt`
+yra $\mathbf{W}_\textrm{hx}$, $\mathbf{W}_\textrm{hh}$ ir $\mathbf{W}_\textrm{qh}$.
+Apskritai šio modelio apmokymas reikalauja
+gradientų skaičiavimo šių parametrų atžvilgiu
+$\partial L/\partial \mathbf{W}_\textrm{hx}$, $\partial L/\partial \mathbf{W}_\textrm{hh}$ ir $\partial L/\partial \mathbf{W}_\textrm{qh}$.
+Pagal :numref:`fig_rnn_bptt` priklausomybes
+galime eiti priešinga rodyklėms kryptimi,
+kad paeiliui apskaičiuotume ir saugotume gradientus.
+Kad lanksčiai išreikštume skirtingų formų
+matricų, vektorių ir skaliarų daugybą
+grandinės taisyklėje,
+toliau naudojame operatorių $\textrm{prod}$,
+aprašytą :numref:`sec_backprop`.
 
 
-First of all, differentiating the objective function
-with respect to the model output at any time step $t$
-is fairly straightforward:
+Visų pirma, tikslo funkcijos diferencijavimas
+modelio išvesties atžvilgiu bet kuriuo laiko žingsniu $t$
+yra gana paprastas:
 
 $$\frac{\partial L}{\partial \mathbf{o}_t} =  \frac{\partial l (\mathbf{o}_t, y_t)}{T \cdot \partial \mathbf{o}_t} \in \mathbb{R}^q.$$
 :eqlabel:`eq_bptt_partial_L_ot`
 
-Now we can calculate the gradient of the objective 
-with respect to the parameter $\mathbf{W}_\textrm{qh}$
-in the output layer:
-$\partial L/\partial \mathbf{W}_\textrm{qh} \in \mathbb{R}^{q \times h}$. 
-Based on :numref:`fig_rnn_bptt`, 
-the objective $L$ depends on $\mathbf{W}_\textrm{qh}$ 
-via $\mathbf{o}_1, \ldots, \mathbf{o}_T$. 
-Using the chain rule yields
+Dabar galime apskaičiuoti tikslo gradientą
+išvesties sluoksnio parametro $\mathbf{W}_\textrm{qh}$ atžvilgiu:
+$\partial L/\partial \mathbf{W}_\textrm{qh} \in \mathbb{R}^{q \times h}$.
+Remiantis :numref:`fig_rnn_bptt`,
+tikslas $L$ priklauso nuo $\mathbf{W}_\textrm{qh}$
+per $\mathbf{o}_1, \ldots, \mathbf{o}_T$.
+Pritaikius grandinės taisyklę, gaunama
 
 $$
 \frac{\partial L}{\partial \mathbf{W}_\textrm{qh}}
@@ -320,64 +318,64 @@ $$
 = \sum_{t=1}^T \frac{\partial L}{\partial \mathbf{o}_t} \mathbf{h}_t^\top,
 $$
 
-where $\partial L/\partial \mathbf{o}_t$
-is given by :eqref:`eq_bptt_partial_L_ot`.
+kur $\partial L/\partial \mathbf{o}_t$
+pateikiamas :eqref:`eq_bptt_partial_L_ot`.
 
-Next, as shown in :numref:`fig_rnn_bptt`,
-at the final time step $T$,
-the objective function
-$L$ depends on the hidden state $\mathbf{h}_T$ 
-only via $\mathbf{o}_T$.
-Therefore, we can easily find the gradient 
+Toliau, kaip parodyta :numref:`fig_rnn_bptt`,
+paskutiniu laiko žingsniu $T$
+tikslo funkcija
+$L$ priklauso nuo paslėptosios būsenos $\mathbf{h}_T$
+tik per $\mathbf{o}_T$.
+Todėl galime lengvai rasti gradientą
 $\partial L/\partial \mathbf{h}_T \in \mathbb{R}^h$
-using the chain rule:
+naudodami grandinės taisyklę:
 
 $$\frac{\partial L}{\partial \mathbf{h}_T} = \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{o}_T}, \frac{\partial \mathbf{o}_T}{\partial \mathbf{h}_T} \right) = \mathbf{W}_\textrm{qh}^\top \frac{\partial L}{\partial \mathbf{o}_T}.$$
 :eqlabel:`eq_bptt_partial_L_hT_final_step`
 
-It gets trickier for any time step $t < T$,
-where the objective function $L$ depends on 
-$\mathbf{h}_t$ via $\mathbf{h}_{t+1}$ and $\mathbf{o}_t$.
-According to the chain rule,
-the gradient of the hidden state
+Sudėtingiau yra bet kuriam laiko žingsniui $t < T$,
+kur tikslo funkcija $L$ priklauso nuo
+$\mathbf{h}_t$ per $\mathbf{h}_{t+1}$ ir $\mathbf{o}_t$.
+Pagal grandinės taisyklę,
+paslėptosios būsenos gradientą
 $\partial L/\partial \mathbf{h}_t \in \mathbb{R}^h$
-at any time step $t < T$ can be recurrently computed as:
+bet kuriuo laiko žingsniu $t < T$ galima rekurentiškai apskaičiuoti taip:
 
 
 $$\frac{\partial L}{\partial \mathbf{h}_t} = \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{h}_{t+1}}, \frac{\partial \mathbf{h}_{t+1}}{\partial \mathbf{h}_t} \right) + \textrm{prod}\left(\frac{\partial L}{\partial \mathbf{o}_t}, \frac{\partial \mathbf{o}_t}{\partial \mathbf{h}_t} \right) = \mathbf{W}_\textrm{hh}^\top \frac{\partial L}{\partial \mathbf{h}_{t+1}} + \mathbf{W}_\textrm{qh}^\top \frac{\partial L}{\partial \mathbf{o}_t}.$$
 :eqlabel:`eq_bptt_partial_L_ht_recur`
 
-For analysis, expanding the recurrent computation
-for any time step $1 \leq t \leq T$ gives
+Analizei išskleidus rekurentinį skaičiavimą
+bet kuriam laiko žingsniui $1 \leq t \leq T$, gaunama
 
 $$\frac{\partial L}{\partial \mathbf{h}_t}= \sum_{i=t}^T {\left(\mathbf{W}_\textrm{hh}^\top\right)}^{T-i} \mathbf{W}_\textrm{qh}^\top \frac{\partial L}{\partial \mathbf{o}_{T+t-i}}.$$
 :eqlabel:`eq_bptt_partial_L_ht`
 
-We can see from :eqref:`eq_bptt_partial_L_ht` 
-that this simple linear example already
-exhibits some key problems of long sequence models:
-it involves potentially very large powers of $\mathbf{W}_\textrm{hh}^\top$.
-In it, eigenvalues smaller than 1 vanish
-and eigenvalues larger than 1 diverge.
-This is numerically unstable,
-which manifests itself in the form of vanishing 
-and exploding gradients.
-One way to address this is to truncate the time steps
-at a computationally convenient size 
-as discussed in :numref:`subsec_bptt_analysis`. 
-In practice, this truncation can also be effected 
-by detaching the gradient after a given number of time steps.
-Later on, we will see how more sophisticated sequence models 
-such as long short-term memory can alleviate this further. 
+Iš :eqref:`eq_bptt_partial_L_ht` matome,
+kad šis paprastas tiesinis pavyzdys jau
+parodo kai kurias pagrindines ilgų sekų modelių problemas:
+jis apima potencialiai labai dideles $\mathbf{W}_\textrm{hh}^\top$ laipsnius.
+Jame tikrinės reikšmės, mažesnės nei 1, išnyksta,
+o didesnės nei 1 – diverguoja.
+Tai skaitiniu požiūriu nestabilu,
+o tai pasireiškia nykstančiais
+ir sprogstančiais gradientais.
+Vienas būdas tai spręsti yra nukirsti laiko žingsnius
+skaičiavimo požiūriu patogiu dydžiu,
+kaip aptarta :numref:`subsec_bptt_analysis`.
+Praktikoje šį nukirtimą taip pat galima atlikti
+atjungiant gradientą po tam tikro laiko žingsnių skaičiaus.
+Vėliau pamatysime, kaip sudėtingesni sekų modeliai,
+tokie kaip ilga trumpalaikė atmintis, gali tai dar labiau sušvelninti.
 
-Finally, :numref:`fig_rnn_bptt` shows 
-that the objective function $L$ 
-depends on model parameters $\mathbf{W}_\textrm{hx}$ and $\mathbf{W}_\textrm{hh}$
-in the hidden layer via hidden states
+Galiausiai :numref:`fig_rnn_bptt` rodo,
+kad tikslo funkcija $L$
+priklauso nuo modelio parametrų $\mathbf{W}_\textrm{hx}$ ir $\mathbf{W}_\textrm{hh}$
+paslėptajame sluoksnyje per paslėptąsias būsenas
 $\mathbf{h}_1, \ldots, \mathbf{h}_T$.
-To compute gradients with respect to such parameters
-$\partial L / \partial \mathbf{W}_\textrm{hx} \in \mathbb{R}^{h \times d}$ and $\partial L / \partial \mathbf{W}_\textrm{hh} \in \mathbb{R}^{h \times h}$,
-we apply the chain rule giving
+Kad apskaičiuotume gradientus šių parametrų atžvilgiu
+$\partial L / \partial \mathbf{W}_\textrm{hx} \in \mathbb{R}^{h \times d}$ ir $\partial L / \partial \mathbf{W}_\textrm{hh} \in \mathbb{R}^{h \times h}$,
+taikome grandinės taisyklę, gaudami
 
 $$
 \begin{aligned}
@@ -390,43 +388,43 @@ $$
 \end{aligned}
 $$
 
-where $\partial L/\partial \mathbf{h}_t$
-which is recurrently computed by
+kur $\partial L/\partial \mathbf{h}_t$,
+kuris rekurentiškai apskaičiuojamas pagal
 :eqref:`eq_bptt_partial_L_hT_final_step`
-and :eqref:`eq_bptt_partial_L_ht_recur`
-is the key quantity that affects the numerical stability.
+ir :eqref:`eq_bptt_partial_L_ht_recur`,
+yra pagrindinis dydis, darantis įtaką skaitiniam stabilumui.
 
 
 
-Since backpropagation through time is the application of backpropagation in RNNs,
-as we have explained in :numref:`sec_backprop`,
-training RNNs alternates forward propagation with
-backpropagation through time.
-Moreover, backpropagation through time
-computes and stores the above gradients in turn.
-Specifically, stored intermediate values
-are reused to avoid duplicate calculations,
-such as storing $\partial L/\partial \mathbf{h}_t$
-to be used in computation of both $\partial L / \partial \mathbf{W}_\textrm{hx}$ 
-and $\partial L / \partial \mathbf{W}_\textrm{hh}$.
+Kadangi atgalinis sklidimas laike yra atgalinio sklidimo taikymas RNN,
+kaip paaiškinome :numref:`sec_backprop`,
+RNN apmokymas kaitaliuoja tiesioginį sklidimą su
+atgaliniu sklidimu laike.
+Be to, atgalinis sklidimas laike
+paeiliui apskaičiuoja ir saugo aukščiau pateiktus gradientus.
+Konkrečiai, saugomos tarpinės reikšmės
+naudojamos pakartotinai, kad būtų išvengta dubliuotų skaičiavimų,
+pavyzdžiui, saugojamas $\partial L/\partial \mathbf{h}_t$,
+kuris naudojamas skaičiuojant ir $\partial L / \partial \mathbf{W}_\textrm{hx}$,
+ir $\partial L / \partial \mathbf{W}_\textrm{hh}$.
 
 
-## Summary
+## Santrauka
 
-Backpropagation through time is merely an application of backpropagation to sequence models with a hidden state.
-Truncation, such as regular or randomized, is needed for computational convenience and numerical stability.
-High powers of matrices can lead to divergent or vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
-For efficient computation, intermediate values are cached during backpropagation through time.
+Atgalinis sklidimas laike yra tik atgalinio sklidimo taikymas sekų modeliams su paslėptąja būsena.
+Nukirtimas, įprastas ar atsitiktinis, reikalingas skaičiavimo patogumui ir skaitiniam stabilumui.
+Dideli matricų laipsniai gali lemti diverguojančias ar nykstančias tikrines reikšmes. Tai pasireiškia sprogstančiais ar nykstančiais gradientais.
+Efektyviam skaičiavimui atgalinio sklidimo laike metu tarpinės reikšmės talpinamos podėlyje.
 
 
 
-## Exercises
+## Pratimai
 
-1. Assume that we have a symmetric matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_i$ whose corresponding eigenvectors are $\mathbf{v}_i$ ($i = 1, \ldots, n$). Without loss of generality, assume that they are ordered in the order $|\lambda_i| \geq |\lambda_{i+1}|$. 
-   1. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
-   1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$, with high probability $\mathbf{M}^k \mathbf{x}$ will be very much aligned with the eigenvector $\mathbf{v}_1$ 
-of $\mathbf{M}$. Formalize this statement.
-   1. What does the above result mean for gradients in RNNs?
-1. Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
+1. Tarkime, kad turime simetrinę matricą $\mathbf{M} \in \mathbb{R}^{n \times n}$ su tikrinėmis reikšmėmis $\lambda_i$, kurias atitinkantys tikriniai vektoriai yra $\mathbf{v}_i$ ($i = 1, \ldots, n$). Be bendrumo apribojimo, tarkime, kad jos išdėstytos tvarka $|\lambda_i| \geq |\lambda_{i+1}|$.
+   1. Parodykite, kad $\mathbf{M}^k$ turi tikrines reikšmes $\lambda_i^k$.
+   1. Įrodykite, kad atsitiktiniam vektoriui $\mathbf{x} \in \mathbb{R}^n$ su didele tikimybe $\mathbf{M}^k \mathbf{x}$ bus labai gerai sulygiuotas su $\mathbf{M}$ tikriniu vektoriumi $\mathbf{v}_1$.
+Formalizuokite šį teiginį.
+   1. Ką aukščiau pateiktas rezultatas reiškia gradientams RNN?
+1. Be gradientų apkarpymo, ar galite sugalvoti kitų būdų susidoroti su gradientų sprogimu rekurentiniuose neuroniniuose tinkluose?
 
-[Discussions](https://discuss.d2l.ai/t/334)
+[Diskusijos](https://discuss.d2l.ai/t/334)

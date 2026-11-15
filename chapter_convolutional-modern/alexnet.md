@@ -3,66 +3,66 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Deep Convolutional Neural Networks (AlexNet)
+# Gilieji konvoliuciniai neuroniniai tinklai (AlexNet)
 :label:`sec_alexnet`
 
 
-Although CNNs were well known
-in the computer vision and machine learning communities
-following the introduction of LeNet :cite:`LeCun.Jackel.Bottou.ea.1995`,
-they did not immediately dominate the field.
-Although LeNet achieved good results on early small datasets,
-the performance and feasibility of training CNNs
-on larger, more realistic datasets had yet to be established.
-In fact, for much of the intervening time between the early 1990s
-and the watershed results of 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012`,
-neural networks were often surpassed by other machine learning methods,
-such as kernel methods :cite:`Scholkopf.Smola.2002`, ensemble methods :cite:`Freund.Schapire.ea.1996`,
-and structured estimation :cite:`Taskar.Guestrin.Koller.2004`.
+Nors CNN buvo gerai žinomi
+kompiuterinės regos ir mašininio mokymosi bendruomenėse
+po LeNet pristatymo :cite:`LeCun.Jackel.Bottou.ea.1995`,
+jie nedelsiant nepradėjo dominuoti srityje.
+Nors LeNet pasiekė gerų rezultatų su ankstyvaisiais mažais duomenų rinkiniais,
+CNN apmokymo našumas ir įmanomumas
+su didesniais, realistiškesniais duomenų rinkiniais dar turėjo būti įrodytas.
+Iš tiesų, didžiąją laiko tarp 1990-ųjų pradžios
+ir 2012 m. lūžio rezultatų :cite:`Krizhevsky.Sutskever.Hinton.2012`
+neuroninius tinklus dažnai pralenkdavo kiti mašininio mokymosi metodai,
+tokie kaip branduolių metodai :cite:`Scholkopf.Smola.2002`, ansamblių metodai :cite:`Freund.Schapire.ea.1996`
+ir struktūrizuotas vertinimas :cite:`Taskar.Guestrin.Koller.2004`.
 
-For computer vision, this comparison is perhaps not entirely accurate.
-That is, although the inputs to convolutional networks
-consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
-Instead, typical computer vision pipelines
-consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`Sivic.Zisserman.2003`.
-Rather than *learning* the features, the features were *crafted*.
-Most of the progress came from having more clever ideas for feature extraction on the one hand and deep insight into geometry :cite:`Hartley.Zisserman.2000` on the other. The learning algorithm was often considered an afterthought.
+Kompiuterinei regai šis palyginimas galbūt nėra visiškai tikslus.
+Tai yra, nors konvoliucinių tinklų įvestis
+sudaro neapdoroti ar lengvai apdoroti (pvz., centruoti) pikselių reikšmės, specialistai niekada nepaduotų neapdorotų pikselių tradiciniams modeliams.
+Vietoj to tipiniai kompiuterinės regos konvejeriai
+buvo sudaryti iš rankiniu būdu sukurtų požymių išskyrimo konvejerių, tokių kaip SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006` ir vizualinių žodžių maišai :cite:`Sivic.Zisserman.2003`.
+Užuot požymius *išmokę*, juos *sukonstravo* žmonės.
+Didžioji pažanga kilo iš gudresnių idėjų požymiams išskirti, viena vertus, ir gilios geometrijos įžvalgos :cite:`Hartley.Zisserman.2000`, kita vertus. Mokymosi algoritmas dažnai būdavo laikomas antraeiliu dalyku.
 
-Although some neural network accelerators were available in the 1990s,
-they were not yet sufficiently powerful to make
-deep multichannel, multilayer CNNs
-with a large number of parameters. For instance, NVIDIA's GeForce 256 from 1999
-was able to process at most 480 million floating-point operations, such as additions and multiplications, per second (MFLOPS), without any meaningful
-programming framework for operations beyond games. Today's accelerators are able to perform in excess of 1000 TFLOPs per device.
-Moreover, datasets were still relatively small: OCR on 60,000 low-resolution $28 \times 28$ pixel images was considered a highly challenging task.
-Added to these obstacles, key tricks for training neural networks
-including parameter initialization heuristics :cite:`Glorot.Bengio.2010`,
-clever variants of stochastic gradient descent :cite:`Kingma.Ba.2014`,
-non-squashing activation functions :cite:`Nair.Hinton.2010`,
-and effective regularization techniques :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` were still missing.
+Nors 1990-aisiais buvo prieinami kai kurie neuroninių tinklų greitintuvai,
+jie dar nebuvo pakankamai galingi, kad leistų sukurti
+gilius daugiakanalius, daugiasluoksnius CNN
+su dideliu parametrų skaičiumi. Pavyzdžiui, NVIDIA GeForce 256 iš 1999 m.
+sugebėjo apdoroti daugiausia 480 milijonų slankiojo kablelio operacijų, tokių kaip sudėtis ir daugyba, per sekundę (MFLOPS), be jokio prasmingo
+programavimo karkaso operacijoms, išskyrus žaidimus. Šiandieniniai greitintuvai gali atlikti daugiau nei 1000 TFLOPs viename įrenginyje.
+Be to, duomenų rinkiniai vis dar buvo santykinai maži: OCR su 60 000 mažos skyros $28 \times 28$ pikselių vaizdų buvo laikomas labai sudėtinga užduotimi.
+Prie šių kliūčių prisidėjo ir tai, kad trūko pagrindinių neuroninių tinklų apmokymo gudrybių,
+įskaitant parametrų inicializavimo euristikas :cite:`Glorot.Bengio.2010`,
+gudrius stochastinio gradientinio nusileidimo variantus :cite:`Kingma.Ba.2014`,
+nesuspaudžiančias aktyvacijos funkcijas :cite:`Nair.Hinton.2010`
+ir veiksmingas reguliarizacijos technikas :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`.
 
-Thus, rather than training *end-to-end* (pixel to classification) systems,
-classical pipelines looked more like this:
+Taigi, užuot apmokius *nuo galo iki galo* (nuo pikselio iki klasifikavimo) sistemas,
+klasikiniai konvejeriai atrodė maždaug taip:
 
-1. Obtain an interesting dataset. In the early days, these datasets required expensive sensors. For instance, the [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) of 1994 sported a whopping 0.3 megapixel (VGA) resolution, capable of storing up to 8 images, all for the price of \$1000.
-1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries by lucky graduate students.
-1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines. OpenCV still provides SIFT extractors to this day!
-1. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
+1. Gaukite įdomų duomenų rinkinį. Ankstyvaisiais laikais šiems duomenų rinkiniams reikėjo brangių jutiklių. Pavyzdžiui, [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) iš 1994 m. turėjo net 0,3 megapikselio (VGA) skyrą, galėjo saugoti iki 8 vaizdų, ir visa tai už \$1000.
+1. Iš anksto apdorokite duomenų rinkinį rankiniu būdu sukurtais požymiais, pagrįstais optikos, geometrijos, kitų analitinių įrankių žiniomis ir kartais atsitiktiniais laimingų doktorantų atradimais.
+1. Praleiskite duomenis per standartinį požymių išskyrimo priemonių rinkinį, tokį kaip SIFT (mastelio atžvilgiu invariantiška požymių transformacija) :cite:`Lowe.2004`, SURF (pagreitinti tvirti požymiai) :cite:`Bay.Tuytelaars.Van-Gool.2006` ar bet kuris kitas rankiniu būdu suderintas konvejeris. OpenCV iki šiol teikia SIFT išskyrimo priemones!
+1. Gautus atvaizdus supilkite į savo mėgstamą klasifikatorių, greičiausiai tiesinį modelį ar branduolių metodą, ir apmokykite klasifikatorių.
 
-If you spoke to machine learning researchers,
-they would reply that machine learning was both important and beautiful.
-Elegant theories proved the properties of various classifiers :cite:`boucheron2005theory` and convex
-optimization :cite:`Boyd.Vandenberghe.2004` had become the mainstay for obtaining them.
-The field of machine learning was thriving, rigorous, and eminently useful. However,
-if you spoke to a computer vision researcher,
-you would hear a very different story.
-The dirty truth of image recognition, they would tell you,
-is that features, geometry :cite:`Hartley.Zisserman.2000,hartley2009global`, and engineering,
-rather than novel learning algorithms, drove progress.
-Computer vision researchers justifiably believed
-that a slightly bigger or cleaner dataset
-or a slightly improved feature-extraction pipeline
-mattered far more to the final accuracy than any learning algorithm.
+Jei kalbėtumėte su mašininio mokymosi tyrėjais,
+jie atsakytų, kad mašininis mokymasis yra ir svarbus, ir gražus.
+Elegantiškos teorijos įrodė įvairių klasifikatorių savybes :cite:`boucheron2005theory`, o iškilusis
+optimizavimas :cite:`Boyd.Vandenberghe.2004` tapo pagrindine priemone jiems gauti.
+Mašininio mokymosi sritis klestėjo, buvo griežta ir nepaprastai naudinga. Tačiau
+jei kalbėtumėte su kompiuterinės regos tyrėju,
+išgirstumėte visai kitokią istoriją.
+Purvina vaizdų atpažinimo tiesa, pasakytų jie,
+yra ta, kad pažangą varė požymiai, geometrija :cite:`Hartley.Zisserman.2000,hartley2009global` ir inžinerija,
+o ne nauji mokymosi algoritmai.
+Kompiuterinės regos tyrėjai pagrįstai tikėjo,
+kad šiek tiek didesnis ar švaresnis duomenų rinkinys
+arba šiek tiek patobulintas požymių išskyrimo konvejeris
+galutiniam tikslumui turėjo kur kas didesnę reikšmę nei bet koks mokymosi algoritmas.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -93,233 +93,233 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Representation Learning
+## Atvaizdų mokymasis
 
-Another way to cast the state of affairs is that
-the most important part of the pipeline was the representation.
-And up until 2012 the representation was calculated mostly mechanically.
-In fact, engineering a new set of feature functions, improving results, and writing up the method
-all featured prominently in papers.
+Kitaip tariant, padėtį galima apibūdinti taip:
+svarbiausia konvejerio dalis buvo atvaizdas.
+Ir iki 2012 m. atvaizdas daugiausia buvo skaičiuojamas mechaniškai.
+Iš tikrųjų naujo požymių funkcijų rinkinio kūrimas, rezultatų gerinimas ir metodo aprašymas
+užėmė svarbią vietą straipsniuose.
 SIFT :cite:`Lowe.2004`,
 SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`,
-HOG (histograms of oriented gradient) :cite:`Dalal.Triggs.2005`,
-bags of visual words :cite:`Sivic.Zisserman.2003`,
-and similar feature extractors ruled the roost.
+HOG (orientuotų gradientų histogramos) :cite:`Dalal.Triggs.2005`,
+vizualinių žodžių maišai :cite:`Sivic.Zisserman.2003`
+ir panašios požymių išskyrimo priemonės viešpatavo.
 
-Another group of researchers,
-including Yann LeCun, Geoff Hinton, Yoshua Bengio,
-Andrew Ng, Shun-ichi Amari, and Juergen Schmidhuber,
-had different plans.
-They believed that features themselves ought to be learned.
-Moreover, they believed that to be reasonably complex,
-the features ought to be hierarchically composed
-with multiple jointly learned layers, each with learnable parameters.
-In the case of an image, the lowest layers might come
-to detect edges, colors, and textures, by analogy with how the visual system in animals
-processes its input. In particular, the automatic design of visual features such as those obtained
-by sparse coding :cite:`olshausen1996emergence` remained an open challenge until the advent of modern CNNs.
-It was not until :citet:`Dean.Corrado.Monga.ea.2012,le2013building` that the idea of generating features
-from image data automatically gained significant traction.
+Kita tyrėjų grupė,
+įskaitant Yanną LeCuną, Geoffą Hintoną, Yoshuą Bengio,
+Andrew Ng, Shun-ichi Amari ir Juergeną Schmidhuberį,
+turėjo kitokių planų.
+Jie tikėjo, kad pačius požymius reikėtų išmokti.
+Be to, jie tikėjo, kad norint būti pakankamai sudėtingi,
+požymiai turėtų būti hierarchiškai sudaromi
+iš kelių kartu išmokstamų sluoksnių, kurių kiekvienas turi išmokstamų parametrų.
+Vaizdo atveju žemiausi sluoksniai gali
+išmokti aptikti kraštus, spalvas ir tekstūras, panašiai kaip gyvūnų regos sistema
+apdoroja savo įvestį. Visų pirma automatinis regos požymių, tokių kaip gaunami
+retu kodavimu :cite:`olshausen1996emergence`, kūrimas liko atviru iššūkiu iki šiuolaikinių CNN atsiradimo.
+Tik :citet:`Dean.Corrado.Monga.ea.2012,le2013building` darbais idėja automatiškai generuoti požymius
+iš vaizdo duomenų sulaukė didelio dėmesio.
 
-The first modern CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, named
-*AlexNet* after one of its inventors, Alex Krizhevsky, is largely an evolutionary improvement
-over LeNet. It achieved excellent performance in the 2012 ImageNet challenge.
+Pirmasis šiuolaikinis CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, pavadintas
+*AlexNet* vieno iš jo išradėjų Alexo Krizhevsky vardu, iš esmės yra evoliucinis
+LeNet patobulinimas. Jis pasiekė puikių rezultatų 2012 m. ImageNet konkurse.
 
-![Image filters learned by the first layer of AlexNet. Reproduction courtesy of :citet:`Krizhevsky.Sutskever.Hinton.2012`.](../img/filters.png)
+![AlexNet pirmojo sluoksnio išmokti vaizdų filtrai. Atkurta :citet:`Krizhevsky.Sutskever.Hinton.2012` leidimu.](../img/filters.png)
 :width:`400px`
 :label:`fig_filters`
 
-Interestingly, in the lowest layers of the network,
-the model learned feature extractors that resembled some traditional filters.
+Įdomu tai, kad žemiausiuose tinklo sluoksniuose
+modelis išmoko požymių išskyrimo priemones, panašias į kai kuriuos tradicinius filtrus.
 :numref:`fig_filters`
-shows lower-level image descriptors.
-Higher layers in the network might build upon these representations
-to represent larger structures, like eyes, noses, blades of grass, and so on.
-Even higher layers might represent whole objects
-like people, airplanes, dogs, or frisbees.
-Ultimately, the final hidden state learns a compact representation
-of the image that summarizes its contents
-such that data belonging to different categories can be easily separated.
+parodo žemesnio lygio vaizdų deskriptorius.
+Aukštesni tinklo sluoksniai gali remtis šiais atvaizdais,
+kad atvaizduotų didesnes struktūras, pavyzdžiui, akis, nosis, žolės stiebelius ir pan.
+Dar aukštesni sluoksniai gali atvaizduoti ištisus objektus,
+tokius kaip žmonės, lėktuvai, šunys ar skraidančios lėkštės.
+Galiausiai paskutinė paslėptoji būsena išmoksta kompaktišką
+vaizdo atvaizdą, apibendrinantį jo turinį taip,
+kad skirtingoms kategorijoms priklausančius duomenis būtų lengva atskirti.
 
-AlexNet (2012) and its precursor LeNet (1995) share many architectural elements. This begs the question: why did it take so long?
-A key difference was that, over the previous two decades, the amount of data and the computing power available had increased significantly. As such AlexNet was much larger: it was trained on much more data, and on much faster GPUs compared to the CPUs available in 1995.
+AlexNet (2012) ir jo pirmtakas LeNet (1995) turi daug bendrų architektūros elementų. Kyla klausimas: kodėl prireikė tiek daug laiko?
+Pagrindinis skirtumas buvo tas, kad per ankstesnius du dešimtmečius duomenų kiekis ir prieinama skaičiavimo galia gerokai išaugo. Todėl AlexNet buvo daug didesnis: jis buvo apmokytas su daug didesniu duomenų kiekiu ir daug greitesniais GPU, palyginti su 1995 m. prieinamais CPU.
 
-### Missing Ingredient: Data
+### Trūkstamas ingredientas: duomenys
 
-Deep models with many layers require large amounts of data
-in order to enter the regime
-where they significantly outperform traditional methods
-based on convex optimizations (e.g., linear and kernel methods).
-However, given the limited storage capacity of computers,
-the relative expense of (imaging) sensors,
-and the comparatively tighter research budgets in the 1990s,
-most research relied on tiny datasets.
-Numerous papers relied on the UCI collection of datasets,
-many of which contained only hundreds or (a few) thousands of images
-captured in low resolution and often with an artificially clean background.
+Giliems modeliams su daug sluoksnių reikia didelių duomenų kiekių,
+kad pasiektų režimą,
+kuriame jie gerokai pralenkia tradicinius metodus,
+pagrįstus iškiliaisiais optimizavimo uždaviniais (pvz., tiesinius ir branduolių metodus).
+Tačiau dėl ribotos kompiuterių saugojimo talpos,
+santykinės (vaizdo) jutiklių kainos
+ir palyginti griežtesnių tyrimų biudžetų 1990-aisiais
+dauguma tyrimų rėmėsi mažyčiais duomenų rinkiniais.
+Daugelis straipsnių rėmėsi UCI duomenų rinkinių kolekcija,
+iš kurių daugelyje buvo tik šimtai ar (keli) tūkstančiai vaizdų,
+užfiksuotų žema skyra ir dažnai su dirbtinai švariu fonu.
 
-In 2009, the ImageNet dataset was released :cite:`Deng.Dong.Socher.ea.2009`,
-challenging researchers to learn models from 1 million examples,
-1000 each from 1000 distinct categories of objects. The categories themselves
-were based on the most popular noun nodes in WordNet :cite:`Miller.1995`.
-The ImageNet team used Google Image Search to prefilter large candidate sets
-for each category and employed
-the Amazon Mechanical Turk crowdsourcing pipeline
-to confirm for each image whether it belonged to the associated category.
-This scale was unprecedented, exceeding others by over an order of magnitude
-(e.g., CIFAR-100 has 60,000 images). Another aspect was that the images were at
-relatively high resolution of $224 \times 224$ pixels, unlike the 80 million-sized
-TinyImages dataset :cite:`Torralba.Fergus.Freeman.2008`, consisting of $32 \times 32$ pixel thumbnails.
-This allowed for the formation of higher-level features.
-The associated competition, dubbed the ImageNet Large Scale Visual Recognition
-Challenge :cite:`russakovsky2015imagenet`,
-pushed computer vision and machine learning research forward,
-challenging researchers to identify which models performed best
-at a greater scale than academics had previously considered. The largest vision datasets, such as LAION-5B
-:cite:`schuhmann2022laion` contain billions of images with additional metadata.
+2009 m. buvo išleistas ImageNet duomenų rinkinys :cite:`Deng.Dong.Socher.ea.2009`,
+metantis tyrėjams iššūkį išmokti modelius iš 1 milijono pavyzdžių,
+po 1000 iš 1000 skirtingų objektų kategorijų. Pačios kategorijos
+buvo pagrįstos populiariausiais WordNet daiktavardžių mazgais :cite:`Miller.1995`.
+ImageNet komanda naudojo „Google Image Search“, kad iš anksto atfiltruotų didelius kandidatų rinkinius
+kiekvienai kategorijai, ir pasitelkė
+„Amazon Mechanical Turk“ būrinio darbo konvejerį,
+kad kiekvienam vaizdui patvirtintų, ar jis priklauso atitinkamai kategorijai.
+Šis mastas buvo precedento neturintis, viršijantis kitus daugiau nei dydžio eile
+(pvz., CIFAR-100 turi 60 000 vaizdų). Kitas aspektas buvo tas, kad vaizdai buvo
+santykinai aukštos $224 \times 224$ pikselių skyros, skirtingai nei 80 milijonų dydžio
+TinyImages duomenų rinkinys :cite:`Torralba.Fergus.Freeman.2008`, sudarytas iš $32 \times 32$ pikselių miniatiūrų.
+Tai leido formuoti aukštesnio lygio požymius.
+Susijęs konkursas, pavadintas ImageNet didelio masto vizualinio atpažinimo
+iššūkiu :cite:`russakovsky2015imagenet`,
+paspartino kompiuterinės regos ir mašininio mokymosi tyrimus,
+metęs tyrėjams iššūkį nustatyti, kurie modeliai veikia geriausiai
+didesniu mastu, nei akademikai anksčiau buvo svarstę. Didžiausi regos duomenų rinkiniai, tokie kaip LAION-5B
+:cite:`schuhmann2022laion`, turi milijardus vaizdų su papildomais metaduomenimis.
 
-### Missing Ingredient: Hardware
+### Trūkstamas ingredientas: aparatinė įranga
 
-Deep learning models are voracious consumers of compute cycles.
-Training can take hundreds of epochs, and each iteration
-requires passing data through many layers of computationally expensive
-linear algebra operations.
-This is one of the main reasons why in the 1990s and early 2000s,
-simple algorithms based on the more-efficiently optimized
-convex objectives were preferred.
+Giliojo mokymosi modeliai yra negailestingi skaičiavimo ciklų vartotojai.
+Apmokymas gali trukti šimtus epochų, o kiekviena iteracija
+reikalauja perduoti duomenis per daugybę skaičiavimo požiūriu brangių
+tiesinės algebros operacijų sluoksnių.
+Tai viena pagrindinių priežasčių, kodėl 1990-aisiais ir 2000-ųjų pradžioje
+buvo teikiama pirmenybė paprastiems algoritmams, pagrįstiems efektyviau optimizuojamais
+iškiliaisiais tikslais.
 
-*Graphical processing units* (GPUs) proved to be a game changer
-in making deep learning feasible.
-These chips had earlier been developed for accelerating
-graphics processing to benefit computer games.
-In particular, they were optimized for high throughput $4 \times 4$
-matrix--vector products, which are needed for many computer graphics tasks.
-Fortunately, the math is strikingly similar
-to that required for calculating convolutional layers.
-Around that time, NVIDIA and ATI had begun optimizing GPUs
-for general computing operations :cite:`Fernando.2004`,
-going as far as to market them as *general-purpose GPUs* (GPGPUs).
+*Grafikos apdorojimo įrenginiai* (GPU) pasirodė esą lūžio taškas,
+leidęs įgyvendinti gilųjį mokymąsi.
+Šie lustai anksčiau buvo sukurti grafikos apdorojimui
+pagreitinti kompiuteriniams žaidimams.
+Visų pirma jie buvo optimizuoti dideliam pralaidumui $4 \times 4$
+matricų ir vektorių sandaugoms, reikalingoms daugeliui kompiuterinės grafikos užduočių.
+Laimei, matematika stulbinamai panaši
+į reikalingą konvoliuciniams sluoksniams skaičiuoti.
+Maždaug tuo metu NVIDIA ir ATI pradėjo optimizuoti GPU
+bendrosios paskirties skaičiavimo operacijoms :cite:`Fernando.2004`,
+net rinkodaroje juos pristatydamos kaip *bendrosios paskirties GPU* (GPGPU).
 
-To provide some intuition, consider the cores of a modern microprocessor
-(CPU).
-Each of the cores is fairly powerful running at a high clock frequency
-and sporting large caches (up to several megabytes of L3).
-Each core is well-suited to executing a wide range of instructions,
-with branch predictors, a deep pipeline, specialized execution units,
-speculative execution,
-and many other bells and whistles
-that enable it to run a large variety of programs with sophisticated control flow.
-This apparent strength, however, is also its Achilles heel:
-general-purpose cores are very expensive to build. They excel at general-purpose
-code with lots of control flow.
-This requires lots of chip area, not just for the
-actual ALU (arithmetic logical unit) where computation happens, but also for
-all the aforementioned bells and whistles, plus
-memory interfaces, caching logic between cores,
-high-speed interconnects, and so on. CPUs are
-comparatively bad at any single task when compared with dedicated hardware.
-Modern laptops have 4--8 cores,
-and even high-end servers rarely exceed 64 cores per socket,
-simply because it is not cost-effective.
+Kad įgytume intuiciją, panagrinėkime šiuolaikinio mikroprocesoriaus (CPU)
+branduolius.
+Kiekvienas branduolys yra gana galingas, veikia aukštu taktiniu dažniu
+ir turi didelius podėlius (iki kelių megabaitų L3).
+Kiekvienas branduolys tinka vykdyti plačią instrukcijų įvairovę,
+turi šakų nuspėjiklius, gilų konvejerį, specializuotus vykdymo blokus,
+spekuliatyvų vykdymą
+ir daugybę kitų papildomų funkcijų,
+leidžiančių paleisti didelę programų įvairovę su sudėtinga valdymo eiga.
+Tačiau šis akivaizdus stiprumas yra ir jo Achilo kulnas:
+bendrosios paskirties branduolius labai brangu gaminti. Jie išsiskiria bendrosios paskirties
+kodu su daug valdymo eigos.
+Tam reikia daug lusto ploto, ne tik
+tikrajam ALU (aritmetinio loginio bloko), kuriame vyksta skaičiavimai, bet ir
+visoms minėtoms papildomoms funkcijoms, taip pat
+atminties sąsajoms, podėlio logikai tarp branduolių,
+sparčioms jungtims ir t. t. CPU yra
+palyginti prasti bet kuriai vienai užduočiai, palyginti su specializuota aparatine įranga.
+Šiuolaikiniai nešiojamieji kompiuteriai turi 4–8 branduolius,
+o net aukščiausios klasės serveriai retai viršija 64 branduolius viename lizde,
+tiesiog todėl, kad tai nėra ekonomiška.
 
-By comparison, GPUs can consist of thousands of small processing elements (NIVIDA's latest Ampere chips have up to 6912 CUDA cores), often grouped into larger groups (NVIDIA calls them warps).
-The details differ somewhat between NVIDIA, AMD, ARM and other chip vendors. While each core is relatively weak,
-running at about 1GHz clock frequency,
-it is the total number of such cores that makes GPUs orders of magnitude faster than CPUs.
-For instance, NVIDIA's recent Ampere A100 GPU offers over 300 TFLOPs per chip for specialized 16-bit precision (BFLOAT16) matrix-matrix multiplications, and up to 20 TFLOPs for more general-purpose floating point operations (FP32).
-At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs. For instance, Amazon's Graviton 3  reaches 2 TFLOPs peak performance for 16-bit precision operations, a number similar to the GPU performance of Apple's M1 processor.
+Palyginimui, GPU gali būti sudaryti iš tūkstančių mažų apdorojimo elementų (naujausi NVIDIA Ampere lustai turi iki 6912 CUDA branduolių), dažnai sugrupuotų į didesnes grupes (NVIDIA jas vadina verpstėmis, angl. *warps*).
+Detalės šiek tiek skiriasi tarp NVIDIA, AMD, ARM ir kitų lustų gamintojų. Nors kiekvienas branduolys yra santykinai silpnas,
+veikia apie 1 GHz taktiniu dažniu,
+būtent bendras tokių branduolių skaičius daro GPU eilėmis greitesnius už CPU.
+Pavyzdžiui, naujausias NVIDIA Ampere A100 GPU siūlo daugiau nei 300 TFLOPs viename luste specializuotoms 16 bitų tikslumo (BFLOAT16) matricų sandaugoms ir iki 20 TFLOPs bendresnės paskirties slankiojo kablelio operacijoms (FP32).
+Tuo pat metu CPU slankiojo kablelio našumas retai viršija 1 TFLOPs. Pavyzdžiui, Amazon Graviton 3 pasiekia 2 TFLOPs didžiausią našumą 16 bitų tikslumo operacijoms, panašų į Apple M1 procesoriaus GPU našumą.
 
-There are many reasons why GPUs are much faster than CPUs in terms of FLOPs.
-First, power consumption tends to grow *quadratically* with clock frequency.
-Hence, for the power budget of a CPU core that runs four times faster (a typical number),
-you can use 16 GPU cores at $\frac{1}{4}$ the speed,
-which yields $16 \times \frac{1}{4} = 4$ times the performance.
-Second, GPU cores are much simpler
-(in fact, for a long time they were not even *able*
-to execute general-purpose code),
-which makes them more energy efficient. For instance, (i) they tend not to support speculative evaluation, (ii) it typically is not possible to program each processing element individually, and (iii) the caches per core tend to be much smaller.
-Last, many operations in deep learning require high memory bandwidth.
-Again, GPUs shine here with buses that are at least 10 times as wide as many CPUs.
+Yra daug priežasčių, kodėl GPU yra daug greitesni už CPU FLOPs požiūriu.
+Pirma, energijos suvartojimas linkęs augti *kvadratiškai* didėjant taktiniam dažniui.
+Todėl už CPU branduolio, veikiančio keturis kartus greičiau (tipinis skaičius), energijos biudžetą
+galite naudoti 16 GPU branduolių, veikiančių $\frac{1}{4}$ greičio,
+o tai duoda $16 \times \frac{1}{4} = 4$ kartus didesnį našumą.
+Antra, GPU branduoliai yra daug paprastesni
+(iš tikrųjų ilgą laiką jie net negalėjo
+vykdyti bendrosios paskirties kodo),
+todėl jie efektyvesni energijos požiūriu. Pavyzdžiui, (i) jie paprastai nepalaiko spekuliatyvaus vertinimo, (ii) paprastai neįmanoma programuoti kiekvieno apdorojimo elemento atskirai, ir (iii) podėliai vienam branduoliui paprastai yra gerokai mažesni.
+Galiausiai daugeliui giliojo mokymosi operacijų reikia didelio atminties pralaidumo.
+Čia vėlgi GPU spindi su magistralėmis, bent 10 kartų platesnėmis nei daugelio CPU.
 
-Back to 2012. A major breakthrough came
-when Alex Krizhevsky and Ilya Sutskever
-implemented a deep CNN
-that could run on GPUs.
-They realized that the computational bottlenecks in CNNs,
-convolutions and matrix multiplications,
-are all operations that could be parallelized in hardware.
-Using two NVIDIA GTX 580s with 3GB of memory, either of which was capable of 1.5 TFLOPs (still a challenge for most CPUs a decade later),
-they implemented fast convolutions.
-The [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/) code
-was good enough that for several years
-it was the industry standard and powered
-the first couple of years of the deep learning boom.
+Grįžkime į 2012-uosius. Didelis proveržis įvyko,
+kai Alexas Krizhevsky ir Ilya Sutskever
+įgyvendino gilų CNN,
+galintį veikti GPU.
+Jie suprato, kad skaičiavimo kliūtys CNN –
+konvoliucijos ir matricų daugyba –
+yra operacijos, kurias galima lygiagretinti aparatinėje įrangoje.
+Naudodami du NVIDIA GTX 580 su 3 GB atminties, kurių kiekvienas pajėgė 1,5 TFLOPs (dešimtmetį vėliau vis dar iššūkis daugumai CPU),
+jie įgyvendino greitas konvoliucijas.
+[cuda-convnet](https://code.google.com/archive/p/cuda-convnet/) kodas
+buvo pakankamai geras, kad kelerius metus
+jis buvo pramonės standartas ir varė
+pirmuosius porą giliojo mokymosi bumo metų.
 
 ## AlexNet
 
-AlexNet, which employed an 8-layer CNN,
-won the ImageNet Large Scale Visual Recognition Challenge 2012
-by a large margin :cite:`Russakovsky.Deng.Huang.ea.2013`.
-This network showed, for the first time,
-that the features obtained by learning can transcend manually-designed features, breaking the previous paradigm in computer vision.
+AlexNet, naudojęs 8 sluoksnių CNN,
+laimėjo 2012 m. ImageNet didelio masto vizualinio atpažinimo iššūkį
+dideliu skirtumu :cite:`Russakovsky.Deng.Huang.ea.2013`.
+Šis tinklas pirmą kartą parodė,
+kad išmoktais gauti požymiai gali pranokti rankiniu būdu sukurtus požymius, sulaužydamas ankstesnę kompiuterinės regos paradigmą.
 
-The architectures of AlexNet and LeNet are strikingly similar,
-as :numref:`fig_alexnet` illustrates.
-Note that we provide a slightly streamlined version of AlexNet
-removing some of the design quirks that were needed in 2012
-to make the model fit on two small GPUs.
+AlexNet ir LeNet architektūros yra stulbinamai panašios,
+kaip iliustruoja :numref:`fig_alexnet`.
+Atkreipkite dėmesį, kad pateikiame šiek tiek supaprastintą AlexNet versiją,
+pašalinę kai kuriuos dizaino keistumus, kurių prireikė 2012 m.,
+kad modelis tilptų į du mažus GPU.
 
-![From LeNet (left) to AlexNet (right).](../img/alexnet.svg)
+![Nuo LeNet (kairėje) iki AlexNet (dešinėje).](../img/alexnet.svg)
 :label:`fig_alexnet`
 
-There are also significant differences between AlexNet and LeNet.
-First, AlexNet is much deeper than the comparatively small LeNet-5.
-AlexNet consists of eight layers: five convolutional layers,
-two fully connected hidden layers, and one fully connected output layer.
-Second, AlexNet used the ReLU instead of the sigmoid
-as its activation function. Let's delve into the details below.
+Tarp AlexNet ir LeNet yra ir reikšmingų skirtumų.
+Pirma, AlexNet yra daug gilesnis nei palyginti mažas LeNet-5.
+AlexNet sudaro aštuoni sluoksniai: penki konvoliuciniai sluoksniai,
+du pilnai sujungti paslėptieji sluoksniai ir vienas pilnai sujungtas išvesties sluoksnis.
+Antra, AlexNet kaip aktyvacijos funkciją naudojo ReLU vietoj sigmoidės.
+Pažvelkime į detales toliau.
 
-### Architecture
+### Architektūra
 
-In AlexNet's first layer, the convolution window shape is $11\times11$.
-Since the images in ImageNet are eight times taller and wider
-than the MNIST images,
-objects in ImageNet data tend to occupy more pixels with more visual detail.
-Consequently, a larger convolution window is needed to capture the object.
-The convolution window shape in the second layer
-is reduced to $5\times5$, followed by $3\times3$.
-In addition, after the first, second, and fifth convolutional layers,
-the network adds max-pooling layers
-with a window shape of $3\times3$ and a stride of 2.
-Moreover, AlexNet has ten times more convolution channels than LeNet.
+AlexNet pirmajame sluoksnyje konvoliucijos lango forma yra $11\times11$.
+Kadangi ImageNet vaizdai yra aštuonis kartus aukštesni ir platesni
+nei MNIST vaizdai,
+ImageNet duomenų objektai paprastai užima daugiau pikselių su daugiau vizualinių detalių.
+Todėl objektui užfiksuoti reikalingas didesnis konvoliucijos langas.
+Konvoliucijos lango forma antrajame sluoksnyje
+sumažinama iki $5\times5$, o po to – iki $3\times3$.
+Be to, po pirmojo, antrojo ir penktojo konvoliucinių sluoksnių
+tinklas prideda sutelkimo imant maksimumą sluoksnius
+su $3\times3$ lango forma ir 2 žingsniu.
+Be to, AlexNet turi dešimt kartų daugiau konvoliucijos kanalų nei LeNet.
 
-After the final convolutional layer, there are two huge fully connected layers
-with 4096 outputs.
-These layers require nearly 1GB model parameters.
-Because of the limited memory in early GPUs,
-the original AlexNet used a dual data stream design,
-so that each of their two GPUs could be responsible
-for storing and computing only its half of the model.
-Fortunately, GPU memory is comparatively abundant now,
-so we rarely need to break up models across GPUs these days
-(our version of the AlexNet model deviates
-from the original paper in this aspect).
+Po paskutinio konvoliucinio sluoksnio yra du milžiniški pilnai sujungti sluoksniai
+su 4096 išėjimais.
+Šiems sluoksniams reikia beveik 1 GB modelio parametrų.
+Dėl ribotos ankstyvųjų GPU atminties
+originalus AlexNet naudojo dvigubo duomenų srauto dizainą,
+kad kiekvienas iš dviejų GPU galėtų būti atsakingas
+už tik savo modelio pusės saugojimą ir skaičiavimą.
+Laimei, GPU atmintis dabar yra palyginti gausi,
+todėl šiais laikais retai tenka skaidyti modelius tarp GPU
+(mūsų AlexNet modelio versija šiuo aspektu
+skiriasi nuo originalaus straipsnio).
 
-### Activation Functions
+### Aktyvacijos funkcijos
 
-Furthermore, AlexNet changed the sigmoid activation function to a simpler ReLU activation function. On the one hand, the computation of the ReLU activation function is simpler. For example, it does not have the exponentiation operation found in the sigmoid activation function.
- On the other hand, the ReLU activation function makes model training easier when using different parameter initialization methods. This is because, when the output of the sigmoid activation function is very close to 0 or 1, the gradient of these regions is almost 0, so that backpropagation cannot continue to update some of the model parameters. By contrast, the gradient of the ReLU activation function in the positive interval is always 1 (:numref:`subsec_activation-functions`). Therefore, if the model parameters are not properly initialized, the sigmoid function may obtain a gradient of almost 0 in the positive interval, meaning that the model cannot be effectively trained.
+Be to, AlexNet pakeitė sigmoidinę aktyvacijos funkciją paprastesne ReLU aktyvacijos funkcija. Viena vertus, ReLU aktyvacijos funkcijos skaičiavimas yra paprastesnis. Pavyzdžiui, joje nėra eksponentinės operacijos, kuri yra sigmoidinėje aktyvacijos funkcijoje.
+ Kita vertus, ReLU aktyvacijos funkcija palengvina modelio apmokymą naudojant skirtingus parametrų inicializavimo metodus. Taip yra todėl, kad kai sigmoidinės aktyvacijos funkcijos išvestis yra labai artima 0 ar 1, šių sričių gradientas yra beveik 0, todėl atgalinis sklidimas negali toliau atnaujinti kai kurių modelio parametrų. Priešingai, ReLU aktyvacijos funkcijos gradientas teigiamame intervale visada yra 1 (:numref:`subsec_activation-functions`). Todėl, jei modelio parametrai tinkamai neinicializuoti, sigmoidinė funkcija gali gauti beveik 0 gradientą teigiamame intervale, o tai reiškia, kad modelio negalima efektyviai apmokyti.
 
-### Capacity Control and Preprocessing
+### Pajėgumo kontrolė ir išankstinis apdorojimas
 
-AlexNet controls the model complexity of the fully connected layer
-by dropout (:numref:`sec_dropout`),
-while LeNet only uses weight decay.
-To augment the data even further, the training loop of AlexNet
-added a great deal of image augmentation,
-such as flipping, clipping, and color changes.
-This makes the model more robust and the larger sample size effectively reduces overfitting.
-See :citet:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
+AlexNet kontroliuoja pilnai sujungto sluoksnio modelio sudėtingumą
+dropout (:numref:`sec_dropout`),
+o LeNet naudoja tik svorių silpnėjimą.
+Kad duomenys būtų dar labiau papildyti, AlexNet mokymo ciklas
+pridėjo daug vaizdų papildymo,
+pavyzdžiui, apvertimą, iškirpimą ir spalvų pakeitimus.
+Tai daro modelį atsparesnį, o didesnis imties dydis efektyviai mažina persimokymą.
+Išsamią tokių išankstinio apdorojimo žingsnių apžvalgą žr. :citet:`Buslaev.Iglovikov.Khvedchenya.ea.2020`.
 
 ```{.python .input  n=5}
 %%tab pytorch, mxnet, tensorflow
@@ -409,7 +409,7 @@ class AlexNet(d2l.Classifier):
         ])
 ```
 
-We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
+[**Sukonstruojame vieno kanalo duomenų pavyzdį**], kurio ir aukštis, ir plotis yra 224, (**kad stebėtume kiekvieno sluoksnio išvesties formą**). Jis atitinka AlexNet architektūrą :numref:`fig_alexnet`.
 
 ```{.python .input  n=6}
 %%tab pytorch, mxnet
@@ -426,25 +426,25 @@ AlexNet().layer_summary((1, 224, 224, 1))
 AlexNet(training=False).layer_summary((1, 224, 224, 1))
 ```
 
-## Training
+## Mokymas
 
-Although AlexNet was trained on ImageNet in :citet:`Krizhevsky.Sutskever.Hinton.2012`,
-we use Fashion-MNIST here
-since training an ImageNet model to convergence could take hours or days
-even on a modern GPU.
-One of the problems with applying AlexNet directly on [**Fashion-MNIST**]
-is that its (**images have lower resolution**) ($28 \times 28$ pixels)
-(**than ImageNet images.**)
-To make things work, (**we upsample them to $224 \times 224$**).
-This is generally not a smart practice, as it simply increases the computational
-complexity without adding information. Nonetheless, we do it here to be faithful to the AlexNet architecture.
-We perform this resizing with the `resize` argument in the `d2l.FashionMNIST` constructor.
+Nors AlexNet buvo apmokytas su ImageNet :citet:`Krizhevsky.Sutskever.Hinton.2012`,
+čia naudojame Fashion-MNIST,
+nes ImageNet modelio apmokymas iki konvergavimo gali užtrukti valandas ar dienas
+net su šiuolaikiniu GPU.
+Viena iš problemų taikant AlexNet tiesiogiai su [**Fashion-MNIST**]
+yra ta, kad jo (**vaizdai turi mažesnę skyrą**) ($28 \times 28$ pikselių)
+(**nei ImageNet vaizdai.**)
+Kad viskas veiktų, (**padidiname jų skyrą iki $224 \times 224$**).
+Paprastai tai nėra išmintinga praktika, nes tiesiog padidina skaičiavimo
+sudėtingumą nepridedant informacijos. Vis dėlto čia tai darome, kad išliktume ištikimi AlexNet architektūrai.
+Šį dydžio keitimą atliekame naudodami argumentą `resize` konstruktoriuje `d2l.FashionMNIST`.
 
-Now, we can [**start training AlexNet.**]
-Compared to LeNet in :numref:`sec_lenet`,
-the main change here is the use of a smaller learning rate
-and much slower training due to the deeper and wider network,
-the higher image resolution, and the more costly convolutions.
+Dabar galime [**pradėti AlexNet apmokymą.**]
+Palyginti su LeNet :numref:`sec_lenet`,
+pagrindinis pakeitimas čia yra mažesnio mokymosi greičio naudojimas
+ir daug lėtesnis apmokymas dėl gilesnio ir platesnio tinklo,
+didesnės vaizdo skyros ir brangesnių konvoliucijų.
 
 ```{.python .input  n=8}
 %%tab pytorch, mxnet, jax
@@ -463,42 +463,42 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Discussion
+## Diskusija
 
-AlexNet's structure bears a striking resemblance to LeNet, with a number of critical improvements, both for accuracy (dropout) and for ease of training (ReLU). What is equally striking is the amount of progress that has been made in terms of deep learning tooling. What was several months of work in 2012 can now be accomplished in a dozen lines of code using any modern framework.
+AlexNet struktūra stulbinamai panaši į LeNet su keliais esminiais patobulinimais, tiek tikslumui (dropout), tiek apmokymo paprastumui (ReLU). Ne mažiau stulbinanti yra pažanga, padaryta giliojo mokymosi įrankių srityje. Tai, kas 2012 m. buvo kelių mėnesių darbas, dabar gali būti atlikta keliolika kodo eilučių naudojant bet kurį šiuolaikinį karkasą.
 
-Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$, respectively. This corresponds to 164 MB of memory and 81 MFLOPs of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Note that even though the number of parameters exceeds by far the amount of training data in our experiments (the last two layers have more than 40 million parameters, trained on a datasets of 60 thousand images), there is hardly any overfitting: training and validation loss are virtually identical throughout training. This is due to the improved regularization, such as dropout, inherent in modern deep network designs.
+Peržiūrėdami architektūrą matome, kad AlexNet turi Achilo kulną efektyvumo požiūriu: paskutiniai du paslėptieji sluoksniai reikalauja atitinkamai $6400 \times 4096$ ir $4096 \times 4096$ dydžio matricų. Tai atitinka 164 MB atminties ir 81 MFLOPs skaičiavimų, o tai yra nemenkos sąnaudos, ypač mažesniuose įrenginiuose, tokiuose kaip mobilieji telefonai. Tai viena iš priežasčių, kodėl AlexNet buvo pralenktas daug efektyvesnių architektūrų, kurias aptarsime kituose skyreliuose. Vis dėlto tai yra esminis žingsnis nuo negilių iki šiandien naudojamų gilių tinklų. Atkreipkite dėmesį, kad nors parametrų skaičius toli viršija mokymo duomenų kiekį mūsų eksperimentuose (paskutiniai du sluoksniai turi daugiau nei 40 milijonų parametrų, apmokytų su 60 tūkstančių vaizdų duomenų rinkiniu), persimokymo vargu ar pastebime: mokymo ir validavimo nuostoliai visą apmokymą praktiškai sutampa. Taip yra dėl pagerintos reguliarizacijos, tokios kaip dropout, būdingos šiuolaikiniams giliųjų tinklų dizainams.
 
-Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet's, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`Dean.Corrado.Monga.ea.2012` nor Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` existed, and Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` still lacked many distinguishing features. It was the availability of TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` that dramatically changed the situation.
+Nors atrodo, kad AlexNet įgyvendinime yra tik kelios eilutės daugiau nei LeNet, akademinei bendruomenei prireikė daugelio metų priimti šį konceptualų pokytį ir pasinaudoti puikiais jo eksperimentiniais rezultatais. Tai taip pat lėmė efektyvių skaičiavimo įrankių trūkumas. Tuo metu neegzistavo nei DistBelief :cite:`Dean.Corrado.Monga.ea.2012`, nei Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014`, o Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` dar trūko daug išskirtinių savybių. Būtent TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` atsiradimas dramatiškai pakeitė situaciją.
 
-## Exercises
+## Pratimai
 
-1. Following up on the discussion above, analyze the computational properties of AlexNet.
-    1. Compute the memory footprint for convolutions and fully connected layers, respectively. Which one dominates?
-    1. Calculate the computational cost for the convolutions and the fully connected layers.
-    1. How does the memory (read and write bandwidth, latency, size) affect computation? Is there any difference in its effects for training and inference?
-1. You are a chip designer and need to trade off computation and memory bandwidth. For example, a faster chip requires more power and possibly a larger chip area. More memory bandwidth requires more pins and control logic, thus also more area. How do you optimize?
-1. Why do engineers no longer report performance benchmarks on AlexNet?
-1. Try increasing the number of epochs when training AlexNet. Compared with LeNet, how do the results differ? Why?
-1. AlexNet may be too complex for the Fashion-MNIST dataset, in particular due to the low resolution of the initial images.
-    1. Try simplifying the model to make the training faster, while ensuring that the accuracy does not drop significantly.
-    1. Design a better model that works directly on $28 \times 28$ images.
-1. Modify the batch size, and observe the changes in throughput (images/s), accuracy, and GPU memory.
-1. Apply dropout and ReLU to LeNet-5. Does it improve? Can you improve things further by preprocessing to take advantage of the invariances inherent in the images?
-1. Can you make AlexNet overfit? Which feature do you need to remove or change to break training?
+1. Tęsdami aukščiau pateiktą diskusiją, išanalizuokite AlexNet skaičiavimo savybes.
+    1. Apskaičiuokite atminties apimtį atitinkamai konvoliucijoms ir pilnai sujungtiems sluoksniams. Kuri dominuoja?
+    1. Apskaičiuokite konvoliucijų ir pilnai sujungtų sluoksnių skaičiavimo kainą.
+    1. Kaip atmintis (skaitymo ir rašymo pralaidumas, delsa, dydis) veikia skaičiavimą? Ar jos poveikis skiriasi mokymui ir išvedimui?
+1. Esate lustų projektuotojas ir turite rasti kompromisą tarp skaičiavimo ir atminties pralaidumo. Pavyzdžiui, greitesniam lustui reikia daugiau galios ir galbūt didesnio lusto ploto. Didesniam atminties pralaidumui reikia daugiau kontaktų ir valdymo logikos, taigi taip pat daugiau ploto. Kaip optimizuotumėte?
+1. Kodėl inžinieriai nebeskelbia AlexNet našumo lyginamųjų testų?
+1. Pabandykite padidinti epochų skaičių apmokydami AlexNet. Kuo rezultatai skiriasi, palyginti su LeNet? Kodėl?
+1. AlexNet gali būti pernelyg sudėtingas Fashion-MNIST duomenų rinkiniui, ypač dėl žemos pradinių vaizdų skyros.
+    1. Pabandykite supaprastinti modelį, kad apmokymas būtų greitesnis, užtikrindami, kad tikslumas gerokai nenukristų.
+    1. Suprojektuokite geresnį modelį, veikiantį tiesiogiai su $28 \times 28$ vaizdais.
+1. Pakeiskite minirinkinio dydį ir stebėkite pralaidumo (vaizdų/s), tikslumo ir GPU atminties pokyčius.
+1. Pritaikykite dropout ir ReLU LeNet-5. Ar tai pagerina rezultatus? Ar galite dar labiau pagerinti, pasitelkę išankstinį apdorojimą, kad pasinaudotumėte vaizduose būdingomis invariantėmis?
+1. Ar galite priversti AlexNet persimokyti? Kokią savybę reikia pašalinti ar pakeisti, kad apmokymas sutriktų?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/75)
+[Diskusijos](https://discuss.d2l.ai/t/75)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/76)
+[Diskusijos](https://discuss.d2l.ai/t/76)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/276)
+[Diskusijos](https://discuss.d2l.ai/t/276)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18001)
+[Diskusijos](https://discuss.d2l.ai/t/18001)
 :end_tab:

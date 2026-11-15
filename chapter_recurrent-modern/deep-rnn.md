@@ -1,94 +1,90 @@
-# Deep Recurrent Neural Networks
+# Gilieji rekurentiniai neuroniniai tinklai
 
 :label:`sec_deep_rnn`
 
-Up until now, we have focused on defining networks 
-consisting of a sequence input, 
-a single hidden RNN layer,
-and an output layer. 
-Despite having just one hidden layer 
-between the input at any time step
-and the corresponding output,
-there is a sense in which these networks are deep.
-Inputs from the first time step can influence
-the outputs at the final time step $T$ 
-(often 100s or 1000s of steps later).
-These inputs pass through $T$ applications
-of the recurrent layer before reaching 
-the final output. 
-However, we often also wish to retain the ability
-to express complex relationships 
-between the inputs at a given time step
-and the outputs at that same time step.
-Thus we often construct RNNs that are deep
-not only in the time direction 
-but also in the input-to-output direction.
-This is precisely the notion of depth
-that we have already encountered 
-in our development of MLPs
-and deep CNNs.
+Iki šiol daugiausia dėmesio skyrėme tinklų apibrėžimui,
+sudarytų iš sekos įvesties,
+vieno paslėptojo RNN sluoksnio
+ir išvesties sluoksnio.
+Nepaisant to, kad tarp įvesties bet kuriuo laiko žingsniu
+ir atitinkamos išvesties yra tik vienas paslėptasis sluoksnis,
+tam tikra prasme šie tinklai yra gilūs.
+Įvestys iš pirmojo laiko žingsnio gali paveikti
+išvestis paskutiniu laiko žingsniu $T$
+(dažnai praėjus šimtams ar tūkstančiams žingsnių).
+Šios įvestys $T$ kartų praeina per rekurentinį sluoksnį,
+kol pasiekia galutinę išvestį.
+Tačiau dažnai taip pat norime išlaikyti galimybę
+išreikšti sudėtingus ryšius
+tarp įvesčių duotu laiko žingsniu
+ir išvesčių tuo pačiu laiko žingsniu.
+Todėl dažnai kuriame RNN, kurie yra gilūs
+ne tik laiko kryptimi,
+bet ir kryptimi nuo įvesties iki išvesties.
+Tai būtent ta gylio samprata,
+su kuria jau susidūrėme
+kurdami MLP ir gilius CNN.
 
 
-The standard method for building this sort of deep RNN 
-is strikingly simple: we stack the RNNs on top of each other. 
-Given a sequence of length $T$, the first RNN produces 
-a sequence of outputs, also of length $T$.
-These, in turn, constitute the inputs to the next RNN layer. 
-In this short section, we illustrate this design pattern
-and present a simple example for how to code up such stacked RNNs.
-Below, in :numref:`fig_deep_rnn`, we illustrate
-a deep RNN with $L$ hidden layers.
-Each hidden state operates on a sequential input
-and produces a sequential output.
-Moreover, any RNN cell (white box in :numref:`fig_deep_rnn`) at each time step
-depends on both the same layer's 
-value at the previous time step
-and the previous layer's value 
-at the same time step. 
+Standartinis tokio giliojo RNN kūrimo metodas
+stulbinamai paprastas: RNN sukrauname vieną ant kito.
+Duotai $T$ ilgio sekai pirmasis RNN sukuria
+išvesčių seką, taip pat $T$ ilgio.
+Jos savo ruožtu sudaro kito RNN sluoksnio įvestis.
+Šiame trumpame skyrelyje iliustruojame šį dizaino šabloną
+ir pateikiame paprastą pavyzdį, kaip užprogramuoti tokius sukrautus RNN.
+Toliau :numref:`fig_deep_rnn` iliustruojame
+gilųjį RNN su $L$ paslėptųjų sluoksnių.
+Kiekviena paslėptoji būsena veikia sekos įvestį
+ir sukuria sekos išvestį.
+Be to, bet kuri RNN ląstelė (balta dėžutė :numref:`fig_deep_rnn`) kiekvienu laiko žingsniu
+priklauso ir nuo to paties sluoksnio
+reikšmės ankstesniu laiko žingsniu,
+ir nuo ankstesnio sluoksnio reikšmės
+tuo pačiu laiko žingsniu.
 
-![Architecture of a deep RNN.](../img/deep-rnn.svg)
+![Giliojo RNN architektūra.](../img/deep-rnn.svg)
 :label:`fig_deep_rnn`
 
-Formally, suppose that we have a minibatch input
-$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples $=n$; number of inputs in each example $=d$) at time step $t$.
-At the same time step, 
-let the hidden state of the $l^\textrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
-(number of hidden units $=h$)
-and the output layer variable be 
-$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ 
-(number of outputs: $q$).
-Setting $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
-the hidden state of
-the $l^\textrm{th}$ hidden layer
-that uses the activation function $\phi_l$
-is calculated as follows:
+Formaliai, tarkime, kad turime minirinkinio įvestį
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$
+(pavyzdžių skaičius $=n$; įvesčių skaičius kiekviename pavyzdyje $=d$) laiko žingsniu $t$.
+Tuo pačiu laiko žingsniu
+tegul $l$-ojo paslėptojo sluoksnio ($l=1,\ldots,L$) paslėptoji būsena yra $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$
+(paslėptųjų vienetų skaičius $=h$),
+o išvesties sluoksnio kintamasis yra
+$\mathbf{O}_t \in \mathbb{R}^{n \times q}$
+(išvesčių skaičius: $q$).
+Nustačius $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
+$l$-ojo paslėptojo sluoksnio,
+naudojančio aktyvacijos funkciją $\phi_l$,
+paslėptoji būsena apskaičiuojama taip:
 
 $$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{\textrm{xh}}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{\textrm{hh}}^{(l)}  + \mathbf{b}_\textrm{h}^{(l)}),$$
 :eqlabel:`eq_deep_rnn_H`
 
-where the weights $\mathbf{W}_{\textrm{xh}}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{\textrm{hh}}^{(l)} \in \mathbb{R}^{h \times h}$, together with
-the bias $\mathbf{b}_\textrm{h}^{(l)} \in \mathbb{R}^{1 \times h}$, 
-are the model parameters of the $l^\textrm{th}$ hidden layer.
+kur svoriai $\mathbf{W}_{\textrm{xh}}^{(l)} \in \mathbb{R}^{h \times h}$ ir $\mathbf{W}_{\textrm{hh}}^{(l)} \in \mathbb{R}^{h \times h}$ kartu su
+poslinkiu $\mathbf{b}_\textrm{h}^{(l)} \in \mathbb{R}^{1 \times h}$
+yra $l$-ojo paslėptojo sluoksnio modelio parametrai.
 
-At the end, the calculation of the output layer 
-is only based on the hidden state 
-of the final $L^\textrm{th}$ hidden layer:
+Galiausiai išvesties sluoksnio skaičiavimas
+remiasi tik galutinio $L$-ojo paslėptojo sluoksnio
+paslėptąja būsena:
 
 $$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q},$$
 
-where the weight $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$ 
-and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ 
-are the model parameters of the output layer.
+kur svoris $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$
+ir poslinkis $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$
+yra išvesties sluoksnio modelio parametrai.
 
-Just as with MLPs, the number of hidden layers $L$ 
-and the number of hidden units $h$ are hyperparameters
-that we can tune.
-Common RNN layer widths ($h$) are in the range $(64, 2056)$,
-and common depths ($L$) are in the range $(1, 8)$. 
-In addition, we can easily get a deep-gated RNN
-by replacing the hidden state computation in :eqref:`eq_deep_rnn_H`
-with that from an LSTM or a GRU.
+Kaip ir MLP atveju, paslėptųjų sluoksnių skaičius $L$
+ir paslėptųjų vienetų skaičius $h$ yra hiperparametrai,
+kuriuos galime derinti.
+Įprasti RNN sluoksnių pločiai ($h$) yra intervale $(64, 2056)$,
+o įprasti gyliai ($L$) – intervale $(1, 8)$.
+Be to, lengvai galime gauti gilųjį sklendėmis valdomą RNN,
+pakeitę paslėptosios būsenos skaičiavimą :eqref:`eq_deep_rnn_H`
+LSTM ar GRU skaičiavimu.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -124,11 +120,11 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-To implement a multilayer RNN from scratch,
-we can treat each layer as an `RNNScratch` instance
-with its own learnable parameters.
+Kad įgyvendintume daugiasluoksnį RNN nuo nulio,
+kiekvieną sluoksnį galime traktuoti kaip `RNNScratch` egzempliorių
+su savais mokomais parametrais.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
@@ -166,9 +162,9 @@ class StackedRNNScratch(d2l.Module):
                      for i in range(self.num_layers)]
 ```
 
-The multilayer forward computation
-simply performs forward computation
-layer by layer.
+Daugiasluoksnis tiesioginis skaičiavimas
+tiesiog atlieka tiesioginį skaičiavimą
+sluoksnis po sluoksnio.
 
 ```{.python .input}
 %%tab all
@@ -182,9 +178,9 @@ def forward(self, inputs, Hs=None):
     return outputs, Hs
 ```
 
-As an example, we train a deep GRU model on
-*The Time Machine* dataset (same as in :numref:`sec_rnn-scratch`).
-To keep things simple we set the number of layers to 2.
+Kaip pavyzdį apmokome gilųjį GRU modelį
+*Laiko mašinos* duomenų rinkinyje (kaip :numref:`sec_rnn-scratch`).
+Kad viskas būtų paprasta, sluoksnių skaičių nustatome į 2.
 
 ```{.python .input}
 %%tab all
@@ -203,27 +199,27 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## Concise Implementation
+## Glaustas įgyvendinimas
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-Fortunately many of the logistical details required
-to implement multiple layers of an RNN 
-are readily available in high-level APIs.
-Our concise implementation will use such built-in functionalities.
-The code generalizes the one we used previously in :numref:`sec_gru`,
-letting us specify the number of layers explicitly 
-rather than picking the default of only one layer.
+Laimei, daug logistinių detalių, reikalingų
+kelių RNN sluoksnių įgyvendinimui,
+yra paruoštos aukšto lygio API.
+Mūsų glaustas įgyvendinimas naudos tokias integruotas funkcijas.
+Kodas apibendrina tą, kurį anksčiau naudojome :numref:`sec_gru`,
+leisdamas aiškiai nurodyti sluoksnių skaičių,
+užuot pasirinkus numatytąjį tik vieno sluoksnio variantą.
 :end_tab:
 
 :begin_tab:`jax`
-Flax takes a minimalistic approach while implementing
-RNNs. Defining the number of layers in an RNN or combining it with dropout
-is not available out of the box.
-Our concise implementation will use all built-in functionalities and
-add `num_layers` and `dropout` features on top.
-The code generalizes the one we used previously in :numref:`sec_gru`,
-allowing specification of the number of layers explicitly
-rather than picking the default of a single layer.
+Flax įgyvendindamas RNN laikosi minimalistinio požiūrio.
+RNN sluoksnių skaičiaus apibrėžimas ar jo derinimas su dropout
+nėra pasiekiamas iš dėžės.
+Mūsų glaustas įgyvendinimas naudos visas integruotas funkcijas ir
+papildomai pridės `num_layers` ir `dropout` galimybes.
+Kodas apibendrina tą, kurį anksčiau naudojome :numref:`sec_gru`,
+leisdamas aiškiai nurodyti sluoksnių skaičių,
+užuot pasirinkus numatytąjį vieno sluoksnio variantą.
 :end_tab:
 
 ```{.python .input}
@@ -296,14 +292,14 @@ class GRU(d2l.RNN):  #@save
         return X, jnp.array(new_state)
 ```
 
-The architectural decisions such as choosing hyperparameters 
-are very similar to those of :numref:`sec_gru`.
-We pick the same number of inputs and outputs 
-as we have distinct tokens, i.e., `vocab_size`.
-The number of hidden units is still 32.
-The only difference is that we now 
-(**select a nontrivial number of hidden layers 
-by specifying the value of `num_layers`.**)
+Architektūriniai sprendimai, tokie kaip hiperparametrų pasirinkimas,
+labai panašūs į :numref:`sec_gru`.
+Pasirenkame tiek pat įvesčių ir išvesčių,
+kiek turime skirtingų teksto vienetų, t. y. `vocab_size`.
+Paslėptųjų vienetų skaičius vis dar yra 32.
+Vienintelis skirtumas, kad dabar
+(**pasirenkame netrivialų paslėptųjų sluoksnių skaičių,
+nurodydami `num_layers` reikšmę.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -344,37 +340,37 @@ model.predict('it has', 20, data.vocab)
 model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
-## Summary
+## Santrauka
 
-In deep RNNs, the hidden state information is passed 
-to the next time step of the current layer 
-and the current time step of the next layer.
-There exist many different flavors of deep RNNs, such as LSTMs, GRUs, or vanilla RNNs. 
-Conveniently, these models are all available 
-as parts of the high-level APIs of deep learning frameworks.
-Initialization of models requires care. 
-Overall, deep RNNs require considerable amount of work 
-(such as learning rate and clipping) 
-to ensure proper convergence.
+Gilieji RNN perduoda paslėptosios būsenos informaciją
+į kitą dabartinio sluoksnio laiko žingsnį
+ir į dabartinį kito sluoksnio laiko žingsnį.
+Egzistuoja daug skirtingų gilųjų RNN variantų, tokių kaip LSTM, GRU ar paprasti RNN.
+Patogu, kad visi šie modeliai pasiekiami
+kaip giliojo mokymosi karkasų aukšto lygio API dalis.
+Modelių inicializavimas reikalauja atidumo.
+Apskritai gilieji RNN reikalauja nemažai darbo
+(pvz., mokymosi greičio ir apkarpymo derinimo),
+kad būtų užtikrintas tinkamas konvergavimas.
 
-## Exercises
+## Pratimai
 
-1. Replace the GRU by an LSTM and compare the accuracy and training speed.
-1. Increase the training data to include multiple books. How low can you go on the perplexity scale?
-1. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
+1. Pakeiskite GRU į LSTM ir palyginkite tikslumą bei apmokymo greitį.
+1. Padidinkite apmokymo duomenis, įtraukdami kelias knygas. Kokio žemo painumo galite pasiekti?
+1. Ar norėtumėte modeliuodami tekstą derinti skirtingų autorių šaltinius? Kodėl tai gera idėja? Kas gali nepavykti?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/340)
+[Diskusijos](https://discuss.d2l.ai/t/340)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1058)
+[Diskusijos](https://discuss.d2l.ai/t/1058)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3862)
+[Diskusijos](https://discuss.d2l.ai/t/3862)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18018)
+[Diskusijos](https://discuss.d2l.ai/t/18018)
 :end_tab:

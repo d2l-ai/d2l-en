@@ -3,39 +3,39 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# Multi-Head Attention
+# Lygiagreti dėmesio sutelkimo transformacija
 :label:`sec_multihead-attention`
 
 
-In practice, given the same set of queries, keys, and values we may want our model to combine knowledge from
-different behaviors of the same attention mechanism,
-such as capturing dependencies of various ranges
-(e.g., shorter-range vs. longer-range) within a sequence.
-Thus, it may be beneficial to allow our attention mechanism to jointly use different representation subspaces of queries, keys, and values.
+Praktikoje, turint tą pačią užklausų, raktų ir reikšmių aibę, galime norėti, kad mūsų modelis derintų žinias iš
+skirtingų to paties dėmesio sutelkimo mechanizmo elgesių,
+pavyzdžiui, užfiksuotų skirtingo nuotolio priklausomybes
+(pvz., trumpesnio ir ilgesnio nuotolio) sekoje.
+Todėl gali būti naudinga leisti mūsų dėmesio sutelkimo mechanizmui kartu naudoti skirtingus užklausų, raktų ir reikšmių vaizdų poerdvius.
 
 
-To this end, instead of performing 
-a single attention pooling,
-queries, keys, and values
-can be transformed
-with $h$ independently learned linear projections.
-Then these $h$ projected queries, keys, and values
-are fed into attention pooling in parallel.
-In the end,
-$h$ attention-pooling outputs
-are concatenated and 
-transformed with another learned linear projection
-to produce the final output.
-This design
-is called *multi-head attention*,
-where each of the $h$ attention pooling outputs
-is a *head* :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
-Using fully connected layers
-to perform learnable linear transformations,
+Šiuo tikslu užuot atlikus
+vieną dėmesio sutelkimą,
+užklausas, raktus ir reikšmes
+galima transformuoti
+$h$ nepriklausomai išmoktų tiesinių projekcijų.
+Tada šios $h$ suprojektuotų užklausų, raktų ir reikšmių
+paduodamos į dėmesio sutelkimą lygiagrečiai.
+Galiausiai
+$h$ dėmesio sutelkimo išvesčių
+sujungiamos ir
+transformuojamos dar viena išmokta tiesine projekcija,
+kad būtų gauta galutinė išvestis.
+Šis dizainas
+vadinamas *lygiagrečia dėmesio sutelkimo transformacija* (angl. *multi-head attention*),
+kur kiekviena iš $h$ dėmesio sutelkimo išvesčių
+yra *vienetas* (angl. *head*) :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
+Naudodama pilnai sujungtus sluoksnius
+išmokstamoms tiesinėms transformacijoms atlikti,
 :numref:`fig_multi-head-attention`
-describes multi-head attention.
+aprašo lygiagrečią dėmesio sutelkimo transformaciją.
 
-![Multi-head attention, where multiple heads are concatenated then linearly transformed.](../img/multi-head-attention.svg)
+![Lygiagreti dėmesio sutelkimo transformacija, kurioje keli vienetai sujungiami, o tada tiesiškai transformuojami.](../img/multi-head-attention.svg)
 :label:`fig_multi-head-attention`
 
 ```{.python .input}
@@ -69,54 +69,53 @@ from jax import numpy as jnp
 import jax
 ```
 
-## Model
+## Modelis
 
-Before providing the implementation of multi-head attention,
-let's formalize this model mathematically.
-Given a query $\mathbf{q} \in \mathbb{R}^{d_q}$,
-a key $\mathbf{k} \in \mathbb{R}^{d_k}$,
-and a value $\mathbf{v} \in \mathbb{R}^{d_v}$,
-each attention head $\mathbf{h}_i$  ($i = 1, \ldots, h$)
-is computed as
+Prieš pateikdami lygiagrečios dėmesio sutelkimo transformacijos įgyvendinimą,
+formalizuokime šį modelį matematiškai.
+Duotai užklausai $\mathbf{q} \in \mathbb{R}^{d_q}$,
+raktui $\mathbf{k} \in \mathbb{R}^{d_k}$
+ir reikšmei $\mathbf{v} \in \mathbb{R}^{d_v}$
+kiekvienas dėmesio sutelkimo vienetas $\mathbf{h}_i$  ($i = 1, \ldots, h$)
+apskaičiuojamas kaip
 
 $$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathbf W_i^{(v)}\mathbf v) \in \mathbb R^{p_v},$$
 
-where 
+kur
 $\mathbf W_i^{(q)}\in\mathbb R^{p_q\times d_q}$,
-$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$,
-and $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$
-are learnable parameters and
-$f$ is attention pooling,
-such as
-additive attention and scaled dot product attention
-in :numref:`sec_attention-scoring-functions`.
-The multi-head attention output
-is another linear transformation via 
-learnable parameters
+$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$
+ir $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$
+yra mokomi parametrai, o
+$f$ yra dėmesio sutelkimas,
+pavyzdžiui,
+adityvinis dėmesys ir mastelio keičiamos skaliarinės sandaugos dėmesys
+:numref:`sec_attention-scoring-functions`.
+Lygiagrečios dėmesio sutelkimo transformacijos išvestis
+yra dar viena tiesinė transformacija per
+mokomus parametrus
 $\mathbf W_o\in\mathbb R^{p_o\times h p_v}$
-of the concatenation of $h$ heads:
+iš $h$ vienetų sujungimo:
 
 $$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \mathbb{R}^{p_o}.$$
 
-Based on this design, each head may attend
-to different parts of the input.
-More sophisticated functions 
-than the simple weighted average can be expressed.
+Remiantis šiuo dizainu, kiekvienas vienetas gali sutelkti dėmesį
+į skirtingas įvesties dalis.
+Galima išreikšti sudėtingesnes funkcijas
+nei paprastas svertinis vidurkis.
 
-## Implementation
+## Įgyvendinimas
 
-In our implementation,
-we [**choose the scaled dot product attention
-for each head**] of the multi-head attention.
-To avoid significant growth of computational cost and parametrization cost,
-we set $p_q = p_k = p_v = p_o / h$.
-Note that $h$ heads can be computed in parallel
-if we set the number of outputs 
-of linear transformations
-for the query, key, and value
-to $p_q h = p_k h = p_v h = p_o$.
-In the following implementation,
-$p_o$ is specified via the argument `num_hiddens`.
+Savo įgyvendinime
+[**kiekvienam lygiagrečios dėmesio sutelkimo transformacijos vienetui
+pasirenkame mastelio keičiamos skaliarinės sandaugos dėmesį**].
+Kad išvengtume reikšmingo skaičiavimo kainos ir parametrizavimo kainos augimo,
+nustatome $p_q = p_k = p_v = p_o / h$.
+Atkreipkite dėmesį, kad $h$ vienetų galima apskaičiuoti lygiagrečiai,
+jei užklausos, rakto ir reikšmės
+tiesinių transformacijų išvesčių skaičių
+nustatome į $p_q h = p_k h = p_v h = p_o$.
+Toliau pateiktame įgyvendinime
+$p_o$ nurodomas per argumentą `num_hiddens`.
 
 ```{.python .input}
 %%tab mxnet
@@ -275,11 +274,11 @@ class MultiHeadAttention(nn.Module):  #@save
         return self.W_o(output_concat), attention_weights
 ```
 
-To allow for [**parallel computation of multiple heads**],
-the above `MultiHeadAttention` class uses two transposition methods as defined below.
-Specifically,
-the `transpose_output` method reverses the operation
-of the `transpose_qkv` method.
+Kad būtų galima [**lygiagrečiai skaičiuoti kelis vienetus**],
+aukščiau pateikta klasė `MultiHeadAttention` naudoja du toliau apibrėžtus transponavimo metodus.
+Konkrečiai,
+metodas `transpose_output` atstato operaciją,
+kurią atlieka metodas `transpose_qkv`.
 
 ```{.python .input}
 %%tab mxnet
@@ -377,11 +376,11 @@ def transpose_output(self, X):
     return X.reshape((X.shape[0], X.shape[1], -1))
 ```
 
-Let's [**test our implemented**] `MultiHeadAttention` class
-using a toy example where keys and values are the same.
-As a result,
-the shape of the multi-head attention output
-is (`batch_size`, `num_queries`, `num_hiddens`).
+[**Išbandykime mūsų įgyvendintą**] klasę `MultiHeadAttention`
+naudodami žaislinį pavyzdį, kuriame raktai ir reikšmės yra tos pačios.
+Dėl to
+lygiagrečios dėmesio sutelkimo transformacijos išvesties forma
+yra (`batch_size`, `num_queries`, `num_hiddens`).
 
 ```{.python .input}
 %%tab pytorch
@@ -446,31 +445,31 @@ d2l.check_shape(attention.init_with_output(d2l.get_key(), X, Y, Y, valid_lens,
                 (batch_size, num_queries, num_hiddens))
 ```
 
-## Summary
+## Santrauka
 
-Multi-head attention combines knowledge of the same attention pooling 
-via different representation subspaces of queries, keys, and values.
-To compute multiple heads of multi-head attention in parallel, 
-proper tensor manipulation is needed.
+Lygiagreti dėmesio sutelkimo transformacija derina to paties dėmesio sutelkimo žinias
+per skirtingus užklausų, raktų ir reikšmių vaizdų poerdvius.
+Kad kelis lygiagrečios dėmesio sutelkimo transformacijos vienetus būtų galima apskaičiuoti lygiagrečiai,
+reikia tinkamo tenzorių manipuliavimo.
 
 
-## Exercises
+## Pratimai
 
-1. Visualize attention weights of multiple heads in this experiment.
-1. Suppose that we have a trained model based on multi-head attention and we want to prune less important attention heads to increase the prediction speed. How can we design experiments to measure the importance of an attention head?
+1. Vizualizuokite kelių vienetų dėmesio svorius šiame eksperimente.
+1. Tarkime, kad turime apmokytą modelį, pagrįstą lygiagrečia dėmesio sutelkimo transformacija, ir norime išretinti (angl. *prune*) mažiau svarbius dėmesio sutelkimo vienetus, kad padidintume prognozavimo greitį. Kaip galime suprojektuoti eksperimentus dėmesio sutelkimo vieneto svarbai išmatuoti?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/1634)
+[Diskusijos](https://discuss.d2l.ai/t/1634)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1635)
+[Diskusijos](https://discuss.d2l.ai/t/1635)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3869)
+[Diskusijos](https://discuss.d2l.ai/t/3869)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18029)
+[Diskusijos](https://discuss.d2l.ai/t/18029)
 :end_tab:

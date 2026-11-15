@@ -3,40 +3,40 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Pooling
+# Sutelkimas
 :label:`sec_pooling`
 
-In many cases our ultimate task asks some global question about the image,
-e.g., *does it contain a cat?* Consequently, the units of our final layer 
-should be sensitive to the entire input.
-By gradually aggregating information, yielding coarser and coarser maps,
-we accomplish this goal of ultimately learning a global representation,
-while keeping all of the advantages of convolutional layers at the intermediate layers of processing.
-The deeper we go in the network,
-the larger the receptive field (relative to the input)
-to which each hidden node is sensitive. Reducing spatial resolution 
-accelerates this process, 
-since the convolution kernels cover a larger effective area. 
+Daugeliu atvejų mūsų galutinė užduotis kelia kokį nors globalų klausimą apie vaizdą,
+pvz., *ar jame yra katė?* Todėl mūsų paskutinio sluoksnio vienetai
+turėtų būti jautrūs visai įvesčiai.
+Palaipsniui agreguodami informaciją, gaudami vis grubesnius žemėlapius,
+pasiekiame šį tikslą – galiausiai išmokti globalų atvaizdą,
+išlaikydami visus konvoliucinių sluoksnių privalumus tarpiniuose apdorojimo lygiuose.
+Kuo giliau einame tinkle,
+tuo didesnė lokali matymo sritis (įvesties atžvilgiu),
+kuriai yra jautrus kiekvienas paslėptasis mazgas. Erdvinės skyros mažinimas
+pagreitina šį procesą,
+nes konvoliucijos branduoliai apima didesnę efektyvią sritį.
 
-Moreover, when detecting lower-level features, such as edges
-(as discussed in :numref:`sec_conv_layer`),
-we often want our representations to be somewhat invariant to translation.
-For instance, if we take the image `X`
-with a sharp delineation between black and white
-and shift the whole image by one pixel to the right,
-i.e., `Z[i, j] = X[i, j + 1]`,
-then the output for the new image `Z` might be vastly different.
-The edge will have shifted by one pixel.
-In reality, objects hardly ever occur exactly at the same place.
-In fact, even with a tripod and a stationary object,
-vibration of the camera due to the movement of the shutter
-might shift everything by a pixel or so
-(high-end cameras are loaded with special features to address this problem).
+Be to, aptikdami žemesnio lygio požymius, tokius kaip kraštai
+(kaip aptarta :numref:`sec_conv_layer`),
+dažnai norime, kad mūsų atvaizdai būtų šiek tiek invariantiški postūmiui.
+Pavyzdžiui, jei paimame vaizdą `X`
+su ryškiu juodos ir baltos ribojimu
+ir pastumiame visą vaizdą vienu pikseliu į dešinę,
+t. y. `Z[i, j] = X[i, j + 1]`,
+tuomet naujo vaizdo `Z` išvestis gali labai skirtis.
+Kraštas pasislinks vienu pikseliu.
+Realybėje objektai vargu ar kada pasitaiko tiksliai toje pačioje vietoje.
+Iš tiesų, net su trikoju ir nejudančiu objektu,
+fotoaparato vibracija dėl užraktės judėjimo
+gali viską pastumti maždaug vienu pikseliu
+(aukščiausios klasės fotoaparatai turi specialių funkcijų šiai problemai spręsti).
 
-This section introduces *pooling layers*,
-which serve the dual purposes of
-mitigating the sensitivity of convolutional layers to location
-and of spatially downsampling representations.
+Šiame skyrelyje pristatomi *sutelkimo sluoksniai*,
+turintys dvejopą paskirtį:
+sumažinti konvoliucinių sluoksnių jautrumą vietai
+ir erdviškai sumažinti atvaizdų diskretizavimo dažnį.
 
 ```{.python .input}
 %%tab mxnet
@@ -61,47 +61,46 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Maximum Pooling and Average Pooling
+## Sutelkimas imant maksimumą ir sutelkimas vidurkinant
 
-Like convolutional layers, *pooling* operators
-consist of a fixed-shape window that is slid over
-all regions in the input according to its stride,
-computing a single output for each location traversed
-by the fixed-shape window (sometimes known as the *pooling window*).
-However, unlike the cross-correlation computation
-of the inputs and kernels in the convolutional layer,
-the pooling layer contains no parameters (there is no *kernel*).
-Instead, pooling operators are deterministic,
-typically calculating either the maximum or the average value
-of the elements in the pooling window.
-These operations are called *maximum pooling* (*max-pooling* for short)
-and *average pooling*, respectively.
+Kaip ir konvoliuciniai sluoksniai, *sutelkimo* operatoriai
+susideda iš fiksuotos formos lango, kuris slenkamas per
+visas įvesties sritis pagal savo žingsnį,
+apskaičiuojant vieną išvestį kiekvienai vietai, kurią peržengia
+fiksuotos formos langas (kartais žinomas kaip *sutelkimo langas*).
+Tačiau, skirtingai nuo įvesčių ir branduolių kryžminės koreliacijos
+skaičiavimo konvoliuciniame sluoksnyje,
+sutelkimo sluoksnis neturi parametrų (nėra *branduolio*).
+Vietoj to sutelkimo operatoriai yra deterministiniai,
+paprastai apskaičiuojantys arba maksimalią, arba vidutinę
+sutelkimo lange esančių elementų reikšmę.
+Šios operacijos vadinamos atitinkamai *sutelkimu imant maksimumą* (trumpiau *max-pooling*)
+ir *sutelkimu vidurkinant*.
 
-*Average pooling* is essentially as old as CNNs. The idea is akin to 
-downsampling an image. Rather than just taking the value of every second (or third) 
-pixel for the lower resolution image, we can average over adjacent pixels to obtain 
-an image with better signal-to-noise ratio since we are combining the information 
-from multiple adjacent pixels. *Max-pooling* was introduced in 
-:citet:`Riesenhuber.Poggio.1999` in the context of cognitive neuroscience to describe 
-how information aggregation might be aggregated hierarchically for the purpose 
-of object recognition; there already was an earlier version in speech recognition :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. In almost all cases, max-pooling, as it is also referred to, 
-is preferable to average pooling. 
+*Sutelkimas vidurkinant* iš esmės yra tiek pat senas kaip CNN. Idėja panaši į
+vaizdo diskretizavimo dažnio mažinimą. Užuot tiesiog paėmę kas antro (ar trečio)
+pikselio reikšmę mažesnės skyros vaizdui, galime vidurkinti gretimus pikselius, kad gautume
+vaizdą su geresniu signalo ir triukšmo santykiu, nes sujungiame informaciją
+iš kelių gretimų pikselių. *Sutelkimas imant maksimumą* buvo pristatytas
+:citet:`Riesenhuber.Poggio.1999` kognityvinės neurologijos kontekste, siekiant apibūdinti,
+kaip informacija gali būti hierarchiškai agreguojama objektų atpažinimo tikslais;
+jau buvo ir ankstesnė versija kalbos atpažinime :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. Beveik visais atvejais sutelkimas imant maksimumą,
+kaip jis taip pat vadinamas, yra geresnis už sutelkimą vidurkinant.
 
-In both cases, as with the cross-correlation operator,
-we can think of the pooling window
-as starting from the upper-left of the input tensor
-and sliding across it from left to right and top to bottom.
-At each location that the pooling window hits,
-it computes the maximum or average
-value of the input subtensor in the window,
-depending on whether max or average pooling is employed.
+Abiem atvejais, kaip ir su kryžminės koreliacijos operatoriumi,
+sutelkimo langą galime įsivaizduoti
+kaip pradedantį nuo viršutinio kairiojo įvesties tenzoriaus kampo
+ir slenkantį per jį iš kairės į dešinę ir iš viršaus į apačią.
+Kiekvienoje vietoje, kurią pasiekia sutelkimo langas,
+jis apskaičiuoja lange esančio įvesties potenzorio maksimalią arba vidutinę
+reikšmę, priklausomai nuo to, ar naudojamas sutelkimas imant maksimumą, ar vidurkinant.
 
 
-![Max-pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as the input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
+![Sutelkimas imant maksimumą su $2\times 2$ sutelkimo langu. Pažymėtos dalys yra pirmasis išvesties elementas ir įvesties tenzoriaus elementai, naudoti išvesčiai skaičiuoti: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
 :label:`fig_pooling`
 
-The output tensor in :numref:`fig_pooling`  has a height of 2 and a width of 2.
-The four elements are derived from the maximum value in each pooling window:
+:numref:`fig_pooling` išvesties tenzoriaus aukštis yra 2, o plotis – 2.
+Keturi elementai gaunami iš maksimalios reikšmės kiekviename sutelkimo lange:
 
 $$
 \max(0, 1, 3, 4)=4,\\
@@ -110,24 +109,24 @@ $$
 \max(4, 5, 7, 8)=8.\\
 $$
 
-More generally, we can define a $p \times q$ pooling layer by aggregating over 
-a region of said size. Returning to the problem of edge detection, 
-we use the output of the convolutional layer
-as input for $2\times 2$ max-pooling.
-Denote by `X` the input of the convolutional layer input and `Y` the pooling layer output. 
-Regardless of whether or not the values of `X[i, j]`, `X[i, j + 1]`, 
-`X[i+1, j]` and `X[i+1, j + 1]` are different,
-the pooling layer always outputs `Y[i, j] = 1`.
-That is to say, using the $2\times 2$ max-pooling layer,
-we can still detect if the pattern recognized by the convolutional layer
-moves no more than one element in height or width.
+Bendriau, galime apibrėžti $p \times q$ sutelkimo sluoksnį, agreguodami per
+tokio dydžio sritį. Grįžtant prie kraštų aptikimo problemos,
+konvoliucinio sluoksnio išvestį naudojame
+kaip $2\times 2$ sutelkimo imant maksimumą įvestį.
+Pažymėkime `X` konvoliucinio sluoksnio įvestį, o `Y` – sutelkimo sluoksnio išvestį.
+Nepriklausomai nuo to, ar `X[i, j]`, `X[i, j + 1]`,
+`X[i+1, j]` ir `X[i+1, j + 1]` reikšmės skiriasi,
+sutelkimo sluoksnis visada išveda `Y[i, j] = 1`.
+Tai yra, naudodami $2\times 2$ sutelkimo imant maksimumą sluoksnį,
+vis tiek galime aptikti, ar šablonas, atpažintas konvoliucinio sluoksnio,
+pasislinko ne daugiau nei vienu elementu aukščio ar pločio kryptimi.
 
-In the code below, we (**implement the forward propagation
-of the pooling layer**) in the `pool2d` function.
-This function is similar to the `corr2d` function
-in :numref:`sec_conv_layer`.
-However, no kernel is needed, computing the output
-as either the maximum or the average of each region in the input.
+Žemiau pateiktame kode funkcijoje `pool2d` (**įgyvendiname sutelkimo sluoksnio
+tiesioginį sklidimą**).
+Ši funkcija panaši į funkciją `corr2d`
+iš :numref:`sec_conv_layer`.
+Tačiau branduolio nereikia, išvestis apskaičiuojama
+kaip kiekvienos įvesties srities maksimumas arba vidurkis.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -173,7 +172,7 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-We can construct the input tensor `X` in :numref:`fig_pooling` to [**validate the output of the two-dimensional max-pooling layer**].
+Galime sukonstruoti įvesties tenzorių `X` iš :numref:`fig_pooling`, kad [**patvirtintume dvimačio sutelkimo imant maksimumą sluoksnio išvestį**].
 
 ```{.python .input}
 %%tab all
@@ -181,27 +180,27 @@ X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 pool2d(X, (2, 2))
 ```
 
-Also, we can experiment with (**the average pooling layer**).
+Taip pat galime eksperimentuoti su (**sutelkimo vidurkinant sluoksniu**).
 
 ```{.python .input}
 %%tab all
 pool2d(X, (2, 2), 'avg')
 ```
 
-## [**Padding and Stride**]
+## [**Papildymas ir žingsnis**]
 
-As with convolutional layers, pooling layers
-change the output shape.
-And as before, we can adjust the operation to achieve a desired output shape
-by padding the input and adjusting the stride.
-We can demonstrate the use of padding and strides
-in pooling layers via the built-in two-dimensional max-pooling layer from the deep learning framework.
-We first construct an input tensor `X` whose shape has four dimensions,
-where the number of examples (batch size) and number of channels are both 1.
+Kaip ir konvoliuciniai sluoksniai, sutelkimo sluoksniai
+keičia išvesties formą.
+Ir kaip anksčiau, galime pakoreguoti operaciją, kad pasiektume norimą išvesties formą,
+papildydami įvestį ir koreguodami žingsnį.
+Papildymo ir žingsnių naudojimą sutelkimo sluoksniuose
+galime pademonstruoti per įtaisytąjį dvimatį sutelkimo imant maksimumą sluoksnį iš giliojo mokymosi karkaso.
+Pirmiausia sukonstruojame įvesties tenzorių `X`, kurio forma turi keturias dimensijas,
+kur pavyzdžių skaičius (minirinkinio dydis) ir kanalų skaičius abu yra 1.
 
 :begin_tab:`tensorflow`
-Note that unlike other frameworks, TensorFlow
-prefers and is optimized for *channels-last* input.
+Atkreipkite dėmesį, kad skirtingai nei kiti karkasai, TensorFlow
+teikia pirmenybę *kanalų gale* (angl. *channels-last*) įvesčiai ir yra jai optimizuotas.
 :end_tab:
 
 ```{.python .input}
@@ -216,8 +215,8 @@ X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
 X
 ```
 
-Since pooling aggregates information from an area, (**deep learning frameworks default to matching pooling window sizes and stride.**) For instance, if we use a pooling window of shape `(3, 3)`
-we get a stride shape of `(3, 3)` by default.
+Kadangi sutelkimas agreguoja informaciją iš srities, (**giliojo mokymosi karkasai pagal numatytuosius nustatymus suderina sutelkimo langų dydžius ir žingsnį.**) Pavyzdžiui, jei naudojame formos `(3, 3)` sutelkimo langą,
+pagal numatytuosius nustatymus gauname formos `(3, 3)` žingsnį.
 
 ```{.python .input}
 %%tab mxnet
@@ -246,7 +245,7 @@ pool2d(X)
 nn.max_pool(X, window_shape=(3, 3), strides=(3, 3))
 ```
 
-Needless to say, [**the stride and padding can be manually specified**] to override framework defaults if required.
+Nereikia nė sakyti, kad [**žingsnį ir papildymą galima nurodyti rankiniu būdu**], norint pakeisti karkaso numatytąsias reikšmes.
 
 ```{.python .input}
 %%tab mxnet
@@ -275,7 +274,7 @@ X_padded = jnp.pad(X, ((0, 0), (1, 0), (1, 0), (0, 0)), mode='constant')
 nn.max_pool(X_padded, window_shape=(3, 3), padding='VALID', strides=(2, 2))
 ```
 
-Of course, we can specify an arbitrary rectangular pooling window with arbitrary height and width respectively, as the example below shows.
+Žinoma, galime nurodyti savavališką stačiakampį sutelkimo langą su atitinkamai savavališku aukščiu ir pločiu, kaip rodo žemiau pateiktas pavyzdys.
 
 ```{.python .input}
 %%tab mxnet
@@ -306,20 +305,20 @@ X_padded = jnp.pad(X, ((0, 0), (0, 0), (1, 1), (0, 0)), mode='constant')
 nn.max_pool(X_padded, window_shape=(2, 3), strides=(2, 3), padding='VALID')
 ```
 
-## Multiple Channels
+## Keli kanalai
 
-When processing multi-channel input data,
-[**the pooling layer pools each input channel separately**],
-rather than summing the inputs up over channels
-as in a convolutional layer.
-This means that the number of output channels for the pooling layer
-is the same as the number of input channels.
-Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with two channels.
+Apdorojant daugiakanalius įvesties duomenis,
+[**sutelkimo sluoksnis sutelkia kiekvieną įvesties kanalą atskirai**],
+užuot sumavęs įvestis per kanalus,
+kaip konvoliuciniame sluoksnyje.
+Tai reiškia, kad sutelkimo sluoksnio išvesties kanalų skaičius
+yra toks pat kaip įvesties kanalų skaičius.
+Toliau sujungsime tenzorius `X` ir `X + 1`
+kanalų dimensijoje, kad sukonstruotume įvestį su dviem kanalais.
 
 :begin_tab:`tensorflow`
-Note that this will require a
-concatenation along the last dimension for TensorFlow due to the channels-last syntax.
+Atkreipkite dėmesį, kad TensorFlow dėl kanalų gale sintaksės tam reikės
+sujungimo išilgai paskutinės dimensijos.
 :end_tab:
 
 ```{.python .input}
@@ -335,7 +334,7 @@ X = d2l.concat([X, X + 1], 3)
 X
 ```
 
-As we can see, the number of output channels is still two after pooling.
+Kaip matome, išvesties kanalų skaičius po sutelkimo vis dar yra du.
 
 ```{.python .input}
 %%tab mxnet
@@ -366,45 +365,44 @@ nn.max_pool(X_padded, window_shape=(3, 3), padding='VALID', strides=(2, 2))
 ```
 
 :begin_tab:`tensorflow`
-Note that the output for the TensorFlow pooling appears at first glance to be different, however
-numerically the same results are presented as MXNet and PyTorch.
-The difference lies in the dimensionality, and reading the
-output vertically yields the same output as the other implementations.
+Atkreipkite dėmesį, kad TensorFlow sutelkimo išvestis iš pirmo žvilgsnio atrodo kitokia, tačiau
+skaitine prasme pateikiami tie patys rezultatai kaip MXNet ir PyTorch.
+Skirtumas yra dimensijoje, o skaitant
+išvestį vertikaliai gaunama tokia pati išvestis kaip kitose įgyvendinimuose.
 :end_tab:
 
-## Summary
+## Santrauka
 
-Pooling is an exceedingly simple operation. It does exactly what its name indicates, aggregate results over a window of values. All convolution semantics, such as strides and padding apply in the same way as they did previously. Note that pooling is indifferent to channels, i.e., it leaves the number of channels unchanged and it applies to each channel separately. Lastly, of the two popular pooling choices, max-pooling is preferable to average pooling, as it confers some degree of invariance to output. A popular choice is to pick a pooling window size of $2 \times 2$ to quarter the spatial resolution of output. 
+Sutelkimas yra nepaprastai paprasta operacija. Ji daro būtent tai, ką rodo jos pavadinimas – agreguoja rezultatus per reikšmių langą. Visa konvoliucijų semantika, tokia kaip žingsniai ir papildymas, taikoma taip pat, kaip ir anksčiau. Atkreipkite dėmesį, kad sutelkimas yra abejingas kanalams, t. y. jis nekeičia kanalų skaičiaus ir taikomas kiekvienam kanalui atskirai. Galiausiai, iš dviejų populiarių sutelkimo pasirinkimų, sutelkimas imant maksimumą yra geresnis už sutelkimą vidurkinant, nes suteikia tam tikrą invariantiškumo laipsnį išvesčiai. Populiarus pasirinkimas yra rinktis $2 \times 2$ sutelkimo lango dydį, kad ketvirtadaliu sumažėtų išvesties erdvinė skyra.
 
-Note that there are many more ways of reducing resolution beyond pooling. For instance, in stochastic pooling :cite:`Zeiler.Fergus.2013` and fractional max-pooling :cite:`Graham.2014` aggregation is combined with randomization. This can slightly improve the accuracy in some cases. Lastly, as we will see later with the attention mechanism, there are more refined ways of aggregating over outputs, e.g., by using the alignment between a query and representation vectors. 
+Atkreipkite dėmesį, kad be sutelkimo yra daug daugiau skyros mažinimo būdų. Pavyzdžiui, stochastiniame sutelkime :cite:`Zeiler.Fergus.2013` ir trupmeniniame sutelkime imant maksimumą :cite:`Graham.2014` agregavimas derinamas su atsitiktinumu. Tai kai kuriais atvejais gali šiek tiek pagerinti tikslumą. Galiausiai, kaip pamatysime vėliau su dėmesio sutelkimo mechanizmu, yra rafinuotesnių būdų agreguoti išvestis, pvz., naudojant užklausos ir atvaizdų vektorių sulygiavimą.
 
 
-## Exercises
+## Pratimai
 
-1. Implement average pooling through a convolution. 
-1. Prove that max-pooling cannot be implemented through a convolution alone. 
-1. Max-pooling can be accomplished using ReLU operations, i.e., $\textrm{ReLU}(x) = \max(0, x)$.
-    1. Express $\max (a, b)$ by using only ReLU operations.
-    1. Use this to implement max-pooling by means of convolutions and ReLU layers. 
-    1. How many channels and layers do you need for a $2 \times 2$ convolution? How many for a $3 \times 3$ convolution?
-1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_\textrm{h}\times p_\textrm{w}$ with a padding of $(p_\textrm{h}, p_\textrm{w})$ and a stride of $(s_\textrm{h}, s_\textrm{w})$.
-1. Why do you expect max-pooling and average pooling to work differently?
-1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
-1. We could use the softmax operation for pooling. Why might it not be so popular?
+1. Įgyvendinkite sutelkimą vidurkinant per konvoliuciją.
+1. Įrodykite, kad sutelkimo imant maksimumą negalima įgyvendinti vien per konvoliuciją.
+1. Sutelkimą imant maksimumą galima atlikti naudojant ReLU operacijas, t. y. $\textrm{ReLU}(x) = \max(0, x)$.
+    1. Išreikškite $\max (a, b)$ naudodami tik ReLU operacijas.
+    1. Panaudokite tai, kad įgyvendintumėte sutelkimą imant maksimumą per konvoliucijas ir ReLU sluoksnius.
+    1. Kiek kanalų ir sluoksnių jums reikia $2 \times 2$ konvoliucijai? O kiek $3 \times 3$ konvoliucijai?
+1. Kokia yra sutelkimo sluoksnio skaičiavimo kaina? Tarkime, kad sutelkimo sluoksnio įvesties dydis yra $c\times h\times w$, sutelkimo lango forma yra $p_\textrm{h}\times p_\textrm{w}$, papildymas – $(p_\textrm{h}, p_\textrm{w})$, o žingsnis – $(s_\textrm{h}, s_\textrm{w})$.
+1. Kodėl tikitės, kad sutelkimas imant maksimumą ir sutelkimas vidurkinant veiks skirtingai?
+1. Ar mums reikia atskiro sutelkimo imant minimumą sluoksnio? Ar galite jį pakeisti kita operacija?
+1. Sutelkimui galėtume naudoti softmax operaciją. Kodėl ji gali būti nelabai populiari?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/71)
+[Diskusijos](https://discuss.d2l.ai/t/71)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/72)
+[Diskusijos](https://discuss.d2l.ai/t/72)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/274)
+[Diskusijos](https://discuss.d2l.ai/t/274)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17999)
+[Diskusijos](https://discuss.d2l.ai/t/17999)
 :end_tab:
-

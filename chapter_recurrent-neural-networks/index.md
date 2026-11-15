@@ -1,142 +1,140 @@
-# Recurrent Neural Networks
+# Rekurentiniai neuroniniai tinklai
 :label:`chap_rnn`
 
-Up until now, we have focused primarily on fixed-length data.
-When introducing linear and logistic regression
-in :numref:`chap_regression` and :numref:`chap_classification`
-and multilayer perceptrons in :numref:`chap_perceptrons`,
-we were happy to assume that each feature vector $\mathbf{x}_i$
-consisted of a fixed number of components $x_1, \dots, x_d$,
-where each numerical feature $x_j$
-corresponded to a particular attribute.
-These datasets are sometimes called *tabular*,
-because they can be arranged in tables,
-where each example $i$ gets its own row,
-and each attribute gets its own column.
-Crucially, with tabular data, we seldom
-assume any particular structure over the columns.
+Iki šiol daugiausia dėmesio skyrėme fiksuoto ilgio duomenims.
+Pristatydami tiesinę ir logistinę regresiją
+:numref:`chap_regression` ir :numref:`chap_classification`
+bei daugiasluoksnius perceptronus :numref:`chap_perceptrons`,
+mielai darėme prielaidą, kad kiekvienas požymių vektorius $\mathbf{x}_i$
+susideda iš fiksuoto skaičiaus komponenčių $x_1, \dots, x_d$,
+kur kiekvienas skaitinis požymis $x_j$
+atitiko tam tikrą atributą.
+Šie duomenų rinkiniai kartais vadinami *lentelės pavidalo*,
+nes juos galima išdėstyti lentelėse,
+kuriose kiekvienas pavyzdys $i$ gauna savo eilutę,
+o kiekvienas atributas – savo stulpelį.
+Esminis dalykas: su lentelės pavidalo duomenimis retai
+darome kokias nors prielaidas apie stulpelių struktūrą.
 
-Subsequently, in :numref:`chap_cnn`,
-we moved on to image data, where inputs consist
-of the raw pixel values at each coordinate in an image.
-Image data hardly fitted the bill
-of a protypical tabular dataset.
-There, we needed to call upon convolutional neural networks (CNNs)
-to handle the hierarchical structure and invariances.
-However, our data were still of fixed length.
-Every Fashion-MNIST image is represented
-as a $28 \times 28$ grid of pixel values.
-Moreover, our goal was to develop a model
-that looked at just one image and then
-outputted a single prediction.
-But what should we do when faced with a
-sequence of images, as in a video,
-or when tasked with producing
-a sequentially structured prediction,
-as in the case of image captioning?
+Vėliau :numref:`chap_cnn`
+perėjome prie vaizdų duomenų, kur įvestis sudaro
+neapdorotos pikselių reikšmės kiekvienoje vaizdo koordinatėje.
+Vaizdų duomenys vargu ar atitiko
+prototipinio lentelės pavidalo duomenų rinkinio apibrėžimą.
+Ten turėjome pasitelkti konvoliucinius neuroninius tinklus (CNN),
+kad susidorotume su hierarchine struktūra ir invariantiškumais.
+Tačiau mūsų duomenys vis dar buvo fiksuoto ilgio.
+Kiekvienas Fashion-MNIST vaizdas pateikiamas
+kaip $28 \times 28$ pikselių reikšmių tinklelis.
+Be to, mūsų tikslas buvo sukurti modelį,
+kuris žiūrėtų tik į vieną vaizdą ir
+išvestų vieną prognozę.
+Bet ką daryti, kai susiduriame su
+vaizdų seka, kaip vaizdo įraše,
+arba kai reikia sukurti
+nuosekliai struktūrizuotą prognozę,
+kaip vaizdų aprašų generavimo atveju?
 
-A great many learning tasks require dealing with sequential data.
-Image captioning, speech synthesis, and music generation
-all require that models produce outputs consisting of sequences.
-In other domains, such as time series prediction,
-video analysis, and musical information retrieval,
-a model must learn from inputs that are sequences.
-These demands often arise simultaneously:
-tasks such as translating passages of text
-from one natural language to another,
-engaging in dialogue, or controlling a robot,
-demand that models both ingest and output
-sequentially structured data.
-
-
-Recurrent neural networks (RNNs) are deep learning models
-that capture the dynamics of sequences via
-*recurrent* connections, which can be thought of
-as cycles in the network of nodes.
-This might seem counterintuitive at first.
-After all, it is the feedforward nature of neural networks
-that makes the order of computation unambiguous.
-However, recurrent edges are defined in a precise way
-that ensures that no such ambiguity can arise.
-Recurrent neural networks are *unrolled* across time steps (or sequence steps),
-with the *same* underlying parameters applied at each step.
-While the standard connections are applied *synchronously*
-to propagate each layer's activations
-to the subsequent layer *at the same time step*,
-the recurrent connections are *dynamic*,
-passing information across adjacent time steps.
-As the unfolded view in :numref:`fig_unfolded-rnn` reveals,
-RNNs can be thought of as feedforward neural networks
-where each layer's parameters (both conventional and recurrent)
-are shared across time steps.
+Daugelis mokymosi užduočių reikalauja dirbti su nuosekliais duomenimis.
+Vaizdų aprašų generavimas, kalbos sintezė ir muzikos generavimas
+reikalauja, kad modeliai kurtų sekas sudarančias išvestis.
+Kitose srityse, tokiose kaip laiko eilučių prognozavimas,
+vaizdo analizė ir muzikinės informacijos paieška,
+modelis turi mokytis iš įvesčių, kurios yra sekos.
+Šie reikalavimai dažnai iškyla vienu metu:
+tokioms užduotims kaip teksto ištraukų vertimas
+iš vienos natūraliosios kalbos į kitą,
+dialogas ar roboto valdymas
+reikia, kad modeliai ir priimtų, ir išvestų
+nuosekliai struktūrizuotus duomenis.
 
 
-![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over time steps. Here, recurrent edges span adjacent time steps, while conventional connections are computed synchronously.](../img/unfolded-rnn.svg)
+Rekurentiniai neuroniniai tinklai (RNN) yra giliojo mokymosi modeliai,
+užfiksuojantys sekų dinamiką per
+*rekurentines* jungtis, kurias galima įsivaizduoti
+kaip ciklus mazgų tinkle.
+Iš pradžių tai gali atrodyti prieštaringa intuicijai.
+Juk būtent neuroninių tinklų tiesioginio sklidimo prigimtis
+daro skaičiavimo tvarką nedviprasmišką.
+Tačiau rekurentinės briaunos apibrėžiamos tiksliai taip,
+kad tokio dviprasmiškumo negalėtų kilti.
+Rekurentiniai neuroniniai tinklai yra *išvynioti* per laiko žingsnius (arba sekos žingsnius),
+taikant *tuos pačius* pagrindinius parametrus kiekviename žingsnyje.
+Nors standartinės jungtys taikomos *sinchroniškai*,
+kad kiekvieno sluoksnio aktyvacijos sklistų
+į kitą sluoksnį *tuo pačiu laiko žingsniu*,
+rekurentinės jungtys yra *dinaminės*
+ir perduoda informaciją tarp gretimų laiko žingsnių.
+Kaip atskleidžia išvyniotas vaizdas :numref:`fig_unfolded-rnn`,
+RNN galima laikyti tiesioginio sklidimo neuroniniais tinklais,
+kuriuose kiekvieno sluoksnio parametrai (ir įprasti, ir rekurentiniai)
+yra bendri per laiko žingsnius.
+
+
+![Kairėje rekurentinės jungtys pavaizduotos ciklinėmis briaunomis. Dešinėje išvyniojame RNN per laiko žingsnius. Čia rekurentinės briaunos jungia gretimus laiko žingsnius, o įprastos jungtys skaičiuojamos sinchroniškai.](../img/unfolded-rnn.svg)
 :label:`fig_unfolded-rnn`
 
 
-Like neural networks more broadly,
-RNNs have a long discipline-spanning history,
-originating as models of the brain popularized
-by cognitive scientists and subsequently adopted
-as practical modeling tools employed
-by the machine learning community.
-As we do for deep learning more broadly,
-in this book we adopt the machine learning perspective,
-focusing on RNNs as practical tools that rose
-to popularity in the 2010s owing to
-breakthrough results on such diverse tasks
-as handwriting recognition :cite:`graves2008novel`,
-machine translation :cite:`Sutskever.Vinyals.Le.2014`,
-and recognizing medical diagnoses :cite:`Lipton.Kale.2016`.
-We point the reader interested in more
-background material to a publicly available
-comprehensive review :cite:`Lipton.Berkowitz.Elkan.2015`.
-We also note that sequentiality is not unique to RNNs.
-For example, the CNNs that we already introduced
-can be adapted to handle data of varying length,
-e.g., images of varying resolution.
-Moreover, RNNs have recently ceded considerable
-market share to Transformer models,
-which will be covered in :numref:`chap_attention-and-transformers`.
-However, RNNs rose to prominence as the default models
-for handling complex sequential structure in deep learning,
-and remain staple models for sequential modeling to this day.
-The stories of RNNs and of sequence modeling
-are inextricably linked, and this is as much
-a chapter about the ABCs of sequence modeling problems
-as it is a chapter about RNNs.
+Kaip ir neuroniniai tinklai apskritai,
+RNN turi ilgą, kelias discipliną apimančią istoriją:
+jie atsirado kaip smegenų modeliai, kuriuos išpopuliarino
+kognityvinių mokslų atstovai, o vėliau
+mašininio mokymosi bendruomenė juos perėmė
+kaip praktines modeliavimo priemones.
+Kaip ir apskritai kalbėdami apie gilųjį mokymąsi,
+šioje knygoje laikomės mašininio mokymosi perspektyvos,
+sutelkdami dėmesį į RNN kaip praktines priemones, kurios išpopuliarėjo
+2010-aisiais dėl proveržio rezultatų tokiose įvairiose užduotyse
+kaip rankraščio atpažinimas :cite:`graves2008novel`,
+mašininis vertimas :cite:`Sutskever.Vinyals.Le.2014`
+ir medicininių diagnozių atpažinimas :cite:`Lipton.Kale.2016`.
+Skaitytojus, norinčius daugiau
+fono medžiagos, nukreipiame į viešai prieinamą
+išsamią apžvalgą :cite:`Lipton.Berkowitz.Elkan.2015`.
+Taip pat pažymime, kad nuoseklumas nėra būdingas vien RNN.
+Pavyzdžiui, jau pristatytus CNN
+galima pritaikyti kintamo ilgio duomenims apdoroti,
+pvz., skirtingos skyros vaizdams.
+Be to, RNN neseniai užleido didelę rinkos dalį
+transformerių modeliams,
+kuriuos aptarsime :numref:`chap_attention-and-transformers`.
+Tačiau RNN išgarsėjo kaip numatytieji modeliai
+sudėtingai nuoseklei struktūrai giliajame mokyme apdoroti
+ir iki šiol išlieka pagrindiniais nuoseklaus modeliavimo modeliais.
+RNN ir sekų modeliavimo istorijos yra neatskiriamai susijusios,
+todėl šis skyrius yra tiek pat
+apie sekų modeliavimo uždavinių ABC, kiek ir apie RNN.
 
 
-One key insight paved the way for a revolution in sequence modeling.
-While the inputs and targets for many fundamental tasks in machine learning
-cannot easily be represented as fixed-length vectors,
-they can often nevertheless be represented as
-varying-length sequences of fixed-length vectors.
-For example, documents can be represented as sequences of words;
-medical records can often be represented as sequences of events
-(encounters, medications, procedures, lab tests, diagnoses);
-videos can be represented as varying-length sequences of still images.
+Viena esminė įžvalga atvėrė kelią sekų modeliavimo revoliucijai.
+Nors daugelio pagrindinių mašininio mokymosi užduočių įvesčių ir tikslų
+negalima lengvai pavaizduoti fiksuoto ilgio vektoriais,
+jas dažnai vis tiek galima pavaizduoti
+kintamo ilgio fiksuoto ilgio vektorių sekomis.
+Pavyzdžiui, dokumentus galima pavaizduoti žodžių sekomis;
+medicininius įrašus dažnai galima pavaizduoti įvykių sekomis
+(apsilankymai, vaistai, procedūros, laboratoriniai tyrimai, diagnozės);
+vaizdo įrašus galima pavaizduoti kintamo ilgio nejudančių vaizdų sekomis.
 
 
-While sequence models have popped up in numerous application areas,
-basic research in the area has been driven predominantly
-by advances on core tasks in natural language processing.
-Thus, throughout this chapter, we will focus
-our exposition and examples on text data.
-If you get the hang of these examples,
-then applying the models to other data modalities
-should be relatively straightforward.
-In the next few sections, we introduce basic
-notation for sequences and some evaluation measures
-for assessing the quality of sequentially structured model outputs.
-After that, we discuss basic concepts of a language model
-and use this discussion to motivate our first RNN models.
-Finally, we describe the method for calculating gradients
-when backpropagating through RNNs and explore some challenges
-that are often encountered when training such networks,
-motivating the modern RNN architectures that will follow
-in :numref:`chap_modern_rnn`.
+Nors sekų modeliai pasirodė daugybėje taikymo sričių,
+fundamentinius tyrimus šioje srityje daugiausia skatino
+pažanga sprendžiant pagrindines natūraliosios kalbos apdorojimo užduotis.
+Todėl visame šiame skyriuje savo pateikimą ir pavyzdžius
+sutelksime į tekstinius duomenis.
+Jei suprasite šiuos pavyzdžius,
+modelių taikymas kitoms duomenų modalumo rūšims
+turėtų būti santykinai paprastas.
+Per kelis kitus skyrelius pristatysime pagrindinius
+sekų žymėjimus ir kai kuriuos vertinimo matus,
+skirtus nuosekliai struktūrizuotų modelio išvesčių kokybei įvertinti.
+Po to aptarsime pagrindines kalbos modelio sąvokas
+ir šią diskusiją panaudosime savo pirmųjų RNN modelių motyvacijai.
+Galiausiai aprašysime gradientų skaičiavimo metodą,
+kai atgaliniu sklidimu einama per RNN, ir išnagrinėsime kai kuriuos iššūkius,
+dažnai pasitaikančius apmokant tokius tinklus,
+kurie paskatino šiuolaikines RNN architektūras, aptariamas
+:numref:`chap_modern_rnn`.
 
 ```toc
 :maxdepth: 2
@@ -149,4 +147,3 @@ rnn-scratch
 rnn-concise
 bptt
 ```
-

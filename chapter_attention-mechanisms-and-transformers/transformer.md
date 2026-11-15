@@ -3,29 +3,28 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# The Transformer Architecture
+# Transformerių architektūra
 :label:`sec_transformer`
 
 
-We have compared CNNs, RNNs, and self-attention in
-:numref:`subsec_cnn-rnn-self-attention`.
-Notably, self-attention
-enjoys both parallel computation and
-the shortest maximum path length.
-Therefore,
-it is appealing to design deep architectures
-by using self-attention.
-Unlike earlier self-attention models
-that still rely on RNNs for input representations :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017`,
-the Transformer model
-is solely based on attention mechanisms
-without any convolutional or recurrent layer :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
-Though originally proposed
-for sequence-to-sequence learning on text data,
-Transformers have been
-pervasive in a wide range of
-modern deep learning applications,
-such as in areas to do with language, vision, speech, and reinforcement learning.
+:numref:`subsec_cnn-rnn-self-attention`
+palyginome CNN, RNN ir saviraišką dėmesio sutelkimo transformaciją.
+Pažymėtina, kad saviraiškė dėmesio sutelkimo transformacija
+leidžia ir lygiagretų skaičiavimą, ir
+turi trumpiausią didžiausią kelio ilgį.
+Todėl
+patrauklu projektuoti gilias architektūras
+naudojant saviraišką dėmesio sutelkimo transformaciją.
+Skirtingai nei ankstesni saviraiškės dėmesio sutelkimo modeliai,
+vis dar besiremiantys RNN įvesties vaizdams :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017`,
+transformerio modelis
+pagrįstas vien dėmesio sutelkimo mechanizmais,
+be jokių konvoliucinių ar rekurentinių sluoksnių :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
+Nors iš pradžių buvo pasiūlytas
+sekos į seką mokymuisi su tekstiniais duomenimis,
+transformeriai išplito
+plačiame šiuolaikinių giliojo mokymosi taikymų spektre,
+pavyzdžiui, kalbos, regos, kalbėjimo ir skatinamojo mokymosi srityse.
 
 ```{.python .input}
 %%tab mxnet
@@ -64,101 +63,99 @@ import math
 import pandas as pd
 ```
 
-## Model
+## Modelis
 
-As an instance of the encoder--decoder
-architecture,
-the overall architecture of
-the Transformer
-is presented in :numref:`fig_transformer`.
-As we can see,
-the Transformer is composed of an encoder and a decoder.
-In contrast to
-Bahdanau attention
-for sequence-to-sequence learning
-in :numref:`fig_s2s_attention_details`,
-the input (source) and output (target)
-sequence embeddings
-are added with positional encoding
-before being fed into
-the encoder and the decoder
-that stack modules based on self-attention.
+Kaip kodavimo ir dekodavimo
+architektūros pavyzdys,
+bendra
+transformerio architektūra
+pateikta :numref:`fig_transformer`.
+Kaip matome,
+transformeris sudarytas iš kodavimo ir dekodavimo bloko.
+Skirtingai nei
+Bahdanau dėmesio sutelkimas
+sekos į seką mokymuisi
+:numref:`fig_s2s_attention_details`,
+įvesties (šaltinio) ir išvesties (tikslo)
+sekų įterpiniai
+sudedami su poziciniu kodavimu
+prieš paduodant į
+kodavimo ir dekodavimo blokus,
+kurie kraunami iš modulių, pagrįstų saviraiške dėmesio sutelkimo transformacija.
 
-![The Transformer architecture.](../img/transformer.svg)
+![Transformerio architektūra.](../img/transformer.svg)
 :width:`320px`
 :label:`fig_transformer`
 
 
-Now we provide an overview of the
-Transformer architecture in :numref:`fig_transformer`.
-At a high level,
-the Transformer encoder is a stack of multiple identical layers,
-where each layer
-has two sublayers (either is denoted as $\textrm{sublayer}$).
-The first
-is a multi-head self-attention pooling
-and the second is a positionwise feed-forward network.
-Specifically,
-in the encoder self-attention,
-queries, keys, and values are all from the
-outputs of the previous encoder layer.
-Inspired by the ResNet design of :numref:`sec_resnet`,
-a residual connection is employed
-around both sublayers.
-In the Transformer,
-for any input $\mathbf{x} \in \mathbb{R}^d$ at any position of the sequence,
-we require that $\textrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
-the residual connection $\mathbf{x} + \textrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
-This addition from the residual connection is immediately
-followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
-As a result, the Transformer encoder outputs a $d$-dimensional vector representation
-for each position of the input sequence.
+Dabar pateikiame
+transformerio architektūros :numref:`fig_transformer` apžvalgą.
+Aukštu lygiu transformerio kodavimo blokas yra kelių vienodų sluoksnių rietuvė,
+kur kiekvienas sluoksnis
+turi du porsluoksnius (kiekvienas žymimas $\textrm{sublayer}$).
+Pirmasis
+yra lygiagreti saviraiškė dėmesio sutelkimo transformacija
+o antrasis – pozicinis tiesioginio sklidimo tinklas.
+Konkrečiai,
+kodavimo bloko saviraiškėje dėmesio sutelkimo transformacijoje
+užklausos, raktai ir reikšmės visos yra iš
+ankstesnio kodavimo bloko sluoksnio išvesčių.
+Įkvėpta :numref:`sec_resnet` ResNet dizaino,
+aplink abu porsluoksnius naudojama
+liekamoji jungtis.
+Transformeryje
+bet kuriai įvesčiai $\mathbf{x} \in \mathbb{R}^d$ bet kurioje sekos pozicijoje
+reikalaujame, kad $\textrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$, kad
+liekamoji jungtis $\mathbf{x} + \textrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ būtų įmanoma.
+Iškart po šio liekamosios jungties sudėjimo
+atliekama sluoksnio normalizacija :cite:`Ba.Kiros.Hinton.2016`.
+Dėl to transformerio kodavimo blokas išveda $d$ matmenų vektoriaus vaizdą
+kiekvienai įvesties sekos pozicijai.
 
-The Transformer decoder is also a stack of multiple identical layers
-with residual connections and layer normalizations.
-As well as the two sublayers described in
-the encoder, the decoder inserts
-a third sublayer, known as
-the encoder--decoder attention,
-between these two.
-In the encoder--decoder attention,
-queries are from the
-outputs of the decoder's self-attention sublayer,
-and the keys and values are
-from the Transformer encoder outputs.
-In the decoder self-attention,
-queries, keys, and values are all from the
-outputs of the previous decoder layer.
-However, each position in the decoder is
-allowed only to attend to all positions in the decoder
-up to that position.
-This *masked* attention
-preserves the autoregressive property,
-ensuring that the prediction only depends
-on those output tokens that have been generated.
+Transformerio dekodavimo blokas taip pat yra kelių vienodų sluoksnių rietuvė
+su liekamosiomis jungtimis ir sluoksnio normalizacijomis.
+Be dviejų kodavimo bloke aprašytų porsluoksnių, dekodavimo blokas įterpia
+trečią porsluoksnį, žinomą kaip
+kodavimo ir dekodavimo dėmesio sutelkimas,
+tarp šių dviejų.
+Kodavimo ir dekodavimo dėmesio sutelkime
+užklausos yra iš
+dekodavimo bloko saviraiškės dėmesio sutelkimo porsluoksnio išvesčių,
+o raktai ir reikšmės yra
+iš transformerio kodavimo bloko išvesčių.
+Dekodavimo bloko saviraiškėje dėmesio sutelkime
+užklausos, raktai ir reikšmės visos yra iš
+ankstesnio dekodavimo bloko sluoksnio išvesčių.
+Tačiau kiekvienai dekodavimo bloko pozicijai
+leidžiama sutelkti dėmesį tik į visas dekodavimo bloko pozicijas
+iki tos pozicijos imtinai.
+Šis *maskuotas* dėmesio sutelkimas
+išlaiko autoregresinę savybę,
+užtikrindamas, kad prognozė priklauso tik
+nuo tų išvesties teksto vienetų, kurie jau sugeneruoti.
 
 
-We have already described and implemented
-multi-head attention based on scaled dot products
-in :numref:`sec_multihead-attention`
-and positional encoding in :numref:`subsec_positional-encoding`.
-In the following, we will implement
-the rest of the Transformer model.
+Jau aprašėme ir įgyvendinome
+lygiagrečią dėmesio sutelkimo transformaciją, pagrįstą mastelio keičiamomis skaliarinėmis sandaugomis,
+:numref:`sec_multihead-attention`
+ir pozicinį kodavimą :numref:`subsec_positional-encoding`.
+Toliau įgyvendinsime
+likusią transformerio modelio dalį.
 
-## [**Positionwise Feed-Forward Networks**]
+## [**Pozicinio tiesioginio sklidimo tinklai**]
 :label:`subsec_positionwise-ffn`
 
-The positionwise feed-forward network transforms
-the representation at all the sequence positions
-using the same MLP.
-This is why we call it *positionwise*.
-In the implementation below,
-the input `X` with shape
-(batch size, number of time steps or sequence length in tokens,
-number of hidden units or feature dimension)
-will be transformed by a two-layer MLP into
-an output tensor of shape
-(batch size, number of time steps, `ffn_num_outputs`).
+Pozicinio tiesioginio sklidimo tinklas transformuoja
+vaizdą visose sekos pozicijose
+naudodamas tą patį MLP.
+Todėl jį vadiname *poziciniu*.
+Toliau pateiktame įgyvendinime
+įvestis `X` su forma
+(rinkinio dydis, laiko žingsnių skaičius arba sekos ilgis teksto vienetais,
+paslėptųjų vienetų skaičius arba požymių dimensija)
+bus dviejų sluoksnių MLP paversta
+išvesties tenzoriumi, kurio forma
+(rinkinio dydis, laiko žingsnių skaičius, `ffn_num_outputs`).
 
 ```{.python .input}
 %%tab mxnet
@@ -217,15 +214,15 @@ class PositionWiseFFN(nn.Module):  #@save
         return self.dense2(nn.relu(self.dense1(X)))
 ```
 
-The following example
-shows that [**the innermost dimension
-of a tensor changes**] to
-the number of outputs in
-the positionwise feed-forward network.
-Since the same MLP transforms
-at all the positions,
-when the inputs at all these positions are the same,
-their outputs are also identical.
+Toliau pateiktas pavyzdys
+rodo, kad [**giliausia tenzoriaus
+dimensija pasikeičia**] į
+išvesčių skaičių
+pozicinio tiesioginio sklidimo tinkle.
+Kadangi tas pats MLP transformuoja
+visose pozicijose,
+kai įvestys visose šiose pozicijose yra tos pačios,
+jų išvestys taip pat yra identiškos.
 
 ```{.python .input}
 %%tab mxnet
@@ -253,35 +250,35 @@ ffn = PositionWiseFFN(4, 8)
 ffn.init_with_output(d2l.get_key(), jnp.ones((2, 3, 4)))[0][0]
 ```
 
-## Residual Connection and Layer Normalization
+## Liekamoji jungtis ir sluoksnio normalizacija
 
-Now let's focus on the "add & norm" component in :numref:`fig_transformer`.
-As we described at the beginning of this section,
-this is a residual connection immediately
-followed by layer normalization.
-Both are key to effective deep architectures.
+Dabar susitelkime į „sudėk ir normalizuok“ komponentą :numref:`fig_transformer`.
+Kaip aprašėme šio skyrelio pradžioje,
+tai yra liekamoji jungtis, iškart po kurios
+eina sluoksnio normalizacija.
+Abi yra svarbios efektyvioms gilioms architektūroms.
 
-In :numref:`sec_batch_norm`,
-we explained how batch normalization
-recenters and rescales across the examples within
-a minibatch.
-As discussed in :numref:`subsec_layer-normalization-in-bn`,
-layer normalization is the same as batch normalization
-except that the former
-normalizes across the feature dimension,
-thus enjoying benefits of scale independence and batch size independence.
-Despite its pervasive applications
-in computer vision,
-batch normalization
-is usually empirically
-less effective than layer normalization
-in natural language processing
-tasks, where the inputs are often
-variable-length sequences.
+:numref:`sec_batch_norm`
+paaiškinome, kaip rinkinio normalizacija
+perkelia centrą ir keičia mastelį per pavyzdžius
+minirinkinyje.
+Kaip aptarta :numref:`subsec_layer-normalization-in-bn`,
+sluoksnio normalizacija yra tokia pati kaip rinkinio normalizacija,
+tik pirmoji
+normalizuoja per požymių dimensiją,
+todėl turi nuo mastelio ir nuo rinkinio dydžio nepriklausomumo privalumų.
+Nepaisant plataus taikymo
+kompiuterinėje regoje,
+rinkinio normalizacija
+empiriškai paprastai yra
+mažiau veiksminga nei sluoksnio normalizacija
+natūraliosios kalbos apdorojimo
+užduotyse, kuriose įvestys dažnai yra
+kintamo ilgio sekos.
 
-The following code snippet
-[**compares the normalization across different dimensions
-by layer normalization and batch normalization**].
+Toliau pateiktas kodo fragmentas
+[**palygina normalizavimą skirtingomis dimensijomis
+sluoksnio normalizacija ir rinkinio normalizacija**].
 
 ```{.python .input}
 %%tab mxnet
@@ -323,9 +320,9 @@ print('layer norm:', ln.init_with_output(d2l.get_key(), X)[0],
                                            use_running_average=False)[0])
 ```
 
-Now we can implement the `AddNorm` class
-[**using a residual connection followed by layer normalization**].
-Dropout is also applied for regularization.
+Dabar galime įgyvendinti klasę `AddNorm`
+[**naudodami liekamąją jungtį, po kurios eina sluoksnio normalizacija**].
+Reguliarizacijai taip pat taikomas dropout.
 
 ```{.python .input}
 %%tab mxnet
@@ -378,9 +375,9 @@ class AddNorm(nn.Module):  #@save
             nn.Dropout(self.dropout)(Y, deterministic=not training) + X)
 ```
 
-The residual connection requires that
-the two inputs are of the same shape
-so that [**the output tensor also has the same shape after the addition operation**].
+Liekamoji jungtis reikalauja, kad
+dvi įvestys būtų tos pačios formos,
+kad [**išvesties tenzorius po sudėties operacijos taip pat turėtų tą pačią formą**].
 
 ```{.python .input}
 %%tab mxnet
@@ -415,17 +412,15 @@ output, _ = add_norm.init_with_output(d2l.get_key(), d2l.ones(shape),
 d2l.check_shape(output, shape)
 ```
 
-## Encoder
+## Kodavimo blokas
 :label:`subsec_transformer-encoder`
 
-With all the essential components to assemble
-the Transformer encoder,
-let's start by
-implementing [**a single layer within the encoder**].
-The following `TransformerEncoderBlock` class
-contains two sublayers: multi-head self-attention and positionwise feed-forward networks,
-where a residual connection followed by layer normalization is employed
-around both sublayers.
+Turėdami visus esminius komponentus transformerio kodavimo blokui surinkti,
+pradėkime
+įgyvendindami [**vieną kodavimo bloko sluoksnį**].
+Toliau pateikta klasė `TransformerEncoderBlock`
+turi du porsluoksnius: lygiagrečią saviraišką dėmesio sutelkimo transformaciją ir poziciniu tiesioginio sklidimo tinklus,
+kur aplink abu porsluoksnius naudojama liekamoji jungtis, po kurios eina sluoksnio normalizacija.
 
 ```{.python .input}
 %%tab mxnet
@@ -507,9 +502,9 @@ class TransformerEncoderBlock(nn.Module):  #@save
         return self.addnorm2(Y, self.ffn(Y), training=training), attention_weights
 ```
 
-As we can see,
-[**no layer in the Transformer encoder
-changes the shape of its input.**]
+Kaip matome,
+[**joks transformerio kodavimo bloko sluoksnis
+nekeičia savo įvesties formos.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -548,13 +543,13 @@ encoder_blk = TransformerEncoderBlock(24, 48, 8, 0.5)
 d2l.check_shape(output, X.shape)
 ```
 
-In the following [**Transformer encoder**] implementation,
-we stack `num_blks` instances of the above `TransformerEncoderBlock` classes.
-Since we use the fixed positional encoding
-whose values are always between $-1$ and $1$,
-we multiply values of the learnable input embeddings
-by the square root of the embedding dimension
-to rescale before summing up the input embedding and the positional encoding.
+Toliau pateiktame [**transformerio kodavimo bloko**] įgyvendinime
+sukrauname `num_blks` aukščiau pateiktų klasių `TransformerEncoderBlock` egzempliorių.
+Kadangi naudojame fiksuotą pozicinį kodavimą,
+kurio reikšmės visada yra tarp $-1$ ir $1$,
+mokomų įvesties įterpinių reikšmes
+padauginame iš įterpinio dimensijos kvadratinės šaknies,
+kad pakeistume mastelį prieš sudedant įvesties įterpinį ir pozicinį kodavimą.
 
 ```{.python .input}
 %%tab mxnet
@@ -679,9 +674,9 @@ class TransformerEncoder(d2l.Encoder):  #@save
         return X
 ```
 
-Below we specify hyperparameters to [**create a two-layer Transformer encoder**].
-The shape of the Transformer encoder output
-is (batch size, number of time steps, `num_hiddens`).
+Toliau nurodome hiperparametrus, kad [**sukurtume dviejų sluoksnių transformerio kodavimo bloką**].
+Transformerio kodavimo bloko išvesties forma
+yra (rinkinio dydis, laiko žingsnių skaičius, `num_hiddens`).
 
 ```{.python .input}
 %%tab mxnet
@@ -712,45 +707,45 @@ d2l.check_shape(encoder.init_with_output(d2l.get_key(),
                 (2, 100, 24))
 ```
 
-## Decoder
+## Dekodavimo blokas
 
-As shown in :numref:`fig_transformer`,
-[**the Transformer decoder
-is composed of multiple identical layers**].
-Each layer is implemented in the following
-`TransformerDecoderBlock` class,
-which contains three sublayers:
-decoder self-attention,
-encoder--decoder attention,
-and positionwise feed-forward networks.
-These sublayers employ
-a residual connection around them
-followed by layer normalization.
+Kaip parodyta :numref:`fig_transformer`,
+[**transformerio dekodavimo blokas
+sudarytas iš kelių vienodų sluoksnių**].
+Kiekvienas sluoksnis įgyvendintas toliau pateiktoje
+klasėje `TransformerDecoderBlock`,
+kuri turi tris porsluoksnius:
+dekodavimo bloko saviraišką dėmesio sutelkimo transformaciją,
+kodavimo ir dekodavimo dėmesio sutelkimą
+ir poziciniu tiesioginio sklidimo tinklus.
+Šie porsluoksniai naudoja
+aplink juos liekamąją jungtį,
+po kurios eina sluoksnio normalizacija.
 
 
-As we described earlier in this section,
-in the masked multi-head decoder self-attention
-(the first sublayer),
-queries, keys, and values
-all come from the outputs of the previous decoder layer.
-When training sequence-to-sequence models,
-tokens at all the positions (time steps)
-of the output sequence
-are known.
-However,
-during prediction
-the output sequence is generated token by token;
-thus,
-at any decoder time step
-only the generated tokens
-can be used in the decoder self-attention.
-To preserve autoregression in the decoder,
-its masked self-attention
-specifies  `dec_valid_lens` so that
-any query
-only attends to
-all positions in the decoder
-up to the query position.
+Kaip aprašėme anksčiau šiame skyrelyje,
+maskuotoje lygiagrečioje dekodavimo bloko saviraiškėje dėmesio sutelkimo transformacijoje
+(pirmajame porsluoksnyje)
+užklausos, raktai ir reikšmės
+visos ateina iš ankstesnio dekodavimo bloko sluoksnio išvesčių.
+Apmokant sekos į seką modelius,
+teksto vienetai visose išvesties sekos
+pozicijose (laiko žingsniuose)
+yra žinomi.
+Tačiau
+prognozavimo metu
+išvesties seka generuojama teksto vienetas po teksto vieneto;
+todėl
+bet kuriuo dekodavimo bloko laiko žingsniu
+dekodavimo bloko saviraiškėje dėmesio sutelkimo transformacijoje
+galima naudoti tik jau sugeneruotus teksto vienetus.
+Kad dekodavimo bloke išliktų autoregresija,
+jo maskuota saviraiškė dėmesio sutelkimo transformacija
+nurodo `dec_valid_lens`, kad
+bet kuri užklausa
+sutelktų dėmesį tik į
+visas dekodavimo bloko pozicijas
+iki užklausos pozicijos.
 
 ```{.python .input}
 %%tab mxnet
@@ -949,11 +944,11 @@ class TransformerDecoderBlock(nn.Module):
         return self.addnorm3(Z, self.ffn(Z), training=training), state, attention_w1, attention_w2
 ```
 
-To facilitate scaled dot product operations
-in the encoder--decoder attention
-and addition operations in the residual connections,
-[**the feature dimension (`num_hiddens`) of the decoder is
-the same as that of the encoder.**]
+Kad palengvintume mastelio keičiamos skaliarinės sandaugos operacijas
+kodavimo ir dekodavimo dėmesio sutelkime
+ir sudėties operacijas liekamosiose jungtyse,
+[**dekodavimo bloko požymių dimensija (`num_hiddens`)
+yra tokia pati kaip kodavimo bloko.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -990,14 +985,13 @@ d2l.check_shape(decoder_blk.init_with_output(d2l.get_key(), X, state)[0][0],
                 X.shape)
 ```
 
-Now we [**construct the entire Transformer decoder**]
-composed of `num_blks` instances of `TransformerDecoderBlock`.
-In the end,
-a fully connected layer computes the prediction
-for all the `vocab_size` possible output tokens.
-Both of the decoder self-attention weights
-and the encoder--decoder attention weights
-are stored for later visualization.
+Dabar [**sukonstruojame visą transformerio dekodavimo bloką**],
+sudarytą iš `num_blks` `TransformerDecoderBlock` egzempliorių.
+Galiausiai pilnai sujungtas sluoksnis apskaičiuoja prognozę
+visiems `vocab_size` galimiems išvesties teksto vienetams.
+Tiek dekodavimo bloko saviraiškės dėmesio sutelkimo svoriai,
+tiek kodavimo ir dekodavimo dėmesio sutelkimo svoriai
+saugomi vėlesniam vizualizavimui.
 
 ```{.python .input}
 %%tab mxnet
@@ -1153,16 +1147,16 @@ class TransformerDecoder(nn.Module):
         return self.dense(X), state
 ```
 
-## [**Training**]
+## [**Mokymas**]
 
-Let's instantiate an encoder--decoder model
-by following the Transformer architecture.
-Here we specify that
-both the Transformer encoder and the Transformer decoder
-have two layers using 4-head attention.
-As in :numref:`sec_seq2seq_training`,
-we train the Transformer model
-for sequence-to-sequence learning on the English--French machine translation dataset.
+Sukurkime kodavimo ir dekodavimo modelį
+pagal transformerio architektūrą.
+Čia nurodome, kad
+ir transformerio kodavimo blokas, ir transformerio dekodavimo blokas
+turi du sluoksnius su 4 vienetų dėmesio sutelkimu.
+Kaip :numref:`sec_seq2seq_training`,
+apmokome transformerio modelį
+sekos į seką mokymuisi anglų–prancūzų mašininio vertimo duomenų rinkinyje.
 
 ```{.python .input}
 %%tab all
@@ -1201,9 +1195,9 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-After training,
-we use the Transformer model
-to [**translate a few English sentences**] into French and compute their BLEU scores.
+Po apmokymo
+naudojame transformerio modelį,
+kad [**išverstume kelis anglų kalbos sakinius**] į prancūzų kalbą ir apskaičiuotume jų BLEU įverčius.
 
 ```{.python .input}
 %%tab all
@@ -1225,9 +1219,9 @@ for en, fr, p in zip(engs, fras, preds):
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
-Let's [**visualize the Transformer attention weights**] when translating the final English sentence into French.
-The shape of the encoder self-attention weights
-is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
+[**Vizualizuokime transformerio dėmesio svorius**], verčiant paskutinį anglų kalbos sakinį į prancūzų kalbą.
+Kodavimo bloko saviraiškės dėmesio sutelkimo svorių forma
+yra (kodavimo bloko sluoksnių skaičius, dėmesio sutelkimo vienetų skaičius, `num_steps` arba užklausų skaičius, `num_steps` arba raktų ir reikšmių porų skaičius).
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -1252,16 +1246,16 @@ d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
 
-In the encoder self-attention,
-both queries and keys come from the same input sequence.
-Since padding tokens do not carry meaning,
-with specified valid length of the input sequence
-no query attends to positions of padding tokens.
-In the following,
-two layers of multi-head attention weights
-are presented row by row.
-Each head independently attends
-based on a separate representation subspace of queries, keys, and values.
+Kodavimo bloko saviraiškėje dėmesio sutelkimo transformacijoje
+ir užklausos, ir raktai ateina iš tos pačios įvesties sekos.
+Kadangi užpildymo teksto vienetai neturi prasmės,
+su nurodytu įvesties sekos galiojančiu ilgiu
+jokia užklausa nesutelkia dėmesio į užpildymo teksto vienetų pozicijas.
+Toliau
+du lygiagrečios dėmesio sutelkimo transformacijos svorių sluoksniai
+pateikiami eilutė po eilutės.
+Kiekvienas vienetas nepriklausomai sutelkia dėmesį
+pagal atskirą užklausų, raktų ir reikšmių vaizdų poerdvį.
 
 ```{.python .input}
 %%tab mxnet, tensorflow, jax
@@ -1278,17 +1272,17 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-[**To visualize the decoder self-attention weights and the encoder--decoder attention weights,
-we need more data manipulations.**]
-For example,
-we fill the masked attention weights with zero.
-Note that
-the decoder self-attention weights
-and the encoder--decoder attention weights
-both have the same queries:
-the beginning-of-sequence token followed by
-the output tokens and possibly
-end-of-sequence tokens.
+[**Kad vizualizuotume dekodavimo bloko saviraiškės dėmesio sutelkimo svorius ir kodavimo ir dekodavimo dėmesio sutelkimo svorius,
+reikia daugiau duomenų manipuliacijų.**]
+Pavyzdžiui,
+užmaskuotus dėmesio svorius užpildome nuliu.
+Atkreipkite dėmesį, kad
+dekodavimo bloko saviraiškės dėmesio sutelkimo svoriai
+ir kodavimo ir dekodavimo dėmesio sutelkimo svoriai
+abu turi tas pačias užklausas:
+sekos pradžios teksto vienetą, po kurio eina
+išvesties teksto vienetai ir galbūt
+sekos pabaigos teksto vienetai.
 
 ```{.python .input}
 %%tab mxnet
@@ -1351,8 +1345,8 @@ d2l.check_shape(dec_inter_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
 
-Because of the autoregressive property of the decoder self-attention,
-no query attends to key--value pairs after the query position.
+Dėl dekodavimo bloko saviraiškės dėmesio sutelkimo transformacijos autoregresinės savybės
+jokia užklausa nesutelkia dėmesio į raktų ir reikšmių poras po užklausos pozicijos.
 
 ```{.python .input}
 %%tab all
@@ -1362,10 +1356,10 @@ d2l.show_heatmaps(
     titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
 
-Similar to the case in the encoder self-attention,
-via the specified valid length of the input sequence,
-[**no query from the output sequence
-attends to those padding tokens from the input sequence.**]
+Panašiai kaip kodavimo bloko saviraiškės dėmesio sutelkimo transformacijos atveju,
+per nurodytą įvesties sekos galiojantį ilgį
+[**jokia užklausa iš išvesties sekos
+nesutelkia dėmesio į tuos užpildymo teksto vienetus iš įvesties sekos.**]
 
 ```{.python .input}
 %%tab all
@@ -1375,48 +1369,48 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-Although the Transformer architecture
-was originally proposed for sequence-to-sequence learning,
-as we will discover later in the book,
-either the Transformer encoder
-or the Transformer decoder
-is often individually used
-for different deep learning tasks.
+Nors transformerio architektūra
+iš pradžių buvo pasiūlyta sekos į seką mokymuisi,
+kaip atrasime vėliau knygoje,
+arba transformerio kodavimo blokas,
+arba transformerio dekodavimo blokas
+dažnai naudojamas atskirai
+skirtingoms giliojo mokymosi užduotims.
 
-## Summary
+## Santrauka
 
-The Transformer is an instance of the encoder--decoder architecture,
-though either the encoder or the decoder can be used individually in practice.
-In the Transformer architecture, multi-head self-attention is used
-for representing the input sequence and the output sequence,
-though the decoder has to preserve the autoregressive property via a masked version.
-Both the residual connections and the layer normalization in the Transformer
-are important for training a very deep model.
-The positionwise feed-forward network in the Transformer model
-transforms the representation at all the sequence positions using the same MLP.
+Transformeris yra kodavimo ir dekodavimo architektūros pavyzdys,
+nors praktikoje kodavimo arba dekodavimo bloką galima naudoti atskirai.
+Transformerių architektūroje lygiagreti saviraiškė dėmesio sutelkimo transformacija naudojama
+įvesties ir išvesties sekoms vaizduoti,
+nors dekodavimo blokas turi išlaikyti autoregresinę savybę per maskuotą versiją.
+Ir liekamosios jungtys, ir sluoksnio normalizacija transformeryje
+yra svarbios apmokant labai gilų modelį.
+Pozicinis tiesioginio sklidimo tinklas transformerio modelyje
+transformuoja vaizdą visose sekos pozicijose naudodamas tą patį MLP.
 
 
-## Exercises
+## Pratimai
 
-1. Train a deeper Transformer in the experiments. How does it affect the training speed and the translation performance?
-1. Is it a good idea to replace scaled dot product attention with additive attention in the Transformer? Why?
-1. For language modeling, should we use the Transformer encoder, decoder, or both? How would you design this method?
-1. What challenges can Transformers face if input sequences are very long? Why?
-1. How would you improve the computational and memory efficiency of Transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
+1. Apmokykite gilesnį transformerį eksperimentuose. Kaip tai veikia apmokymo greitį ir vertimo kokybę?
+1. Ar gera idėja transformeryje mastelio keičiamos skaliarinės sandaugos dėmesį pakeisti adityviniu dėmesiu? Kodėl?
+1. Kalbos modeliavimui, ar turėtume naudoti transformerio kodavimo bloką, dekodavimo bloką, ar abu? Kaip suprojektuotumėte šį metodą?
+1. Su kokiais iššūkiais gali susidurti transformeriai, jei įvesties sekos labai ilgos? Kodėl?
+1. Kaip pagerintumėte transformerių skaičiavimo ir atminties efektyvumą? Užuomina: galite remtis apžvalginiu straipsniu :citet:`Tay.Dehghani.Bahri.ea.2020`.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/348)
+[Diskusijos](https://discuss.d2l.ai/t/348)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1066)
+[Diskusijos](https://discuss.d2l.ai/t/1066)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3871)
+[Diskusijos](https://discuss.d2l.ai/t/3871)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18031)
+[Diskusijos](https://discuss.d2l.ai/t/18031)
 :end_tab:
 

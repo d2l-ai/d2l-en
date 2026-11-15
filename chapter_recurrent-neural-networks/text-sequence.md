@@ -1,20 +1,20 @@
-# Converting Raw Text into Sequence Data
+# Neapdoroto teksto konvertavimas į sekų duomenis
 :label:`sec_text-sequence`
 
-Throughout this book,
-we will often work with text data
-represented as sequences
-of words, characters, or word pieces.
-To get going, we will need some basic
-tools for converting raw text
-into sequences of the appropriate form.
-Typical preprocessing pipelines
-execute the following steps:
+Visoje šioje knygoje
+dažnai dirbsime su tekstiniais duomenimis,
+pavaizduotais kaip žodžių, simbolių
+ar žodžių dalių sekos.
+Kad galėtume pradėti, mums reikės keleto pagrindinių
+įrankių neapdorotam tekstui paversti
+tinkamo pavidalo sekomis.
+Tipiniai išankstinio apdorojimo konvejeriai
+atlieka šiuos žingsnius:
 
-1. Load text as strings into memory.
-1. Split the strings into tokens (e.g., words or characters).
-1. Build a vocabulary dictionary to associate each vocabulary element with a numerical index.
-1. Convert the text into sequences of numerical indices.
+1. Įkelti tekstą kaip eilutes į atmintį.
+1. Suskaidyti eilutes į teksto vienetus (pvz., žodžius ar simbolius).
+1. Sudaryti žodyną, susiejantį kiekvieną žodyno elementą su skaitiniu indeksu.
+1. Konvertuoti tekstą į skaitinių indeksų sekas.
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -59,17 +59,16 @@ import random
 import re
 ```
 
-## Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-Here, we will work with H. G. Wells'
-[The Time Machine](http://www.gutenberg.org/ebooks/35),
-a book containing just over 30,000 words.
-While real applications will typically
-involve significantly larger datasets,
-this is sufficient to demonstrate
-the preprocessing pipeline.
-The following `_download` method
-(**reads the raw text into a string**).
+Čia dirbsime su H. G. Wellso
+[Laiko mašina](http://www.gutenberg.org/ebooks/35),
+knyga, kurioje yra kiek daugiau nei 30 000 žodžių.
+Nors realūs taikymai paprastai
+apima gerokai didesnius duomenų rinkinius,
+to pakanka išankstinio apdorojimo konvejeriui pademonstruoti.
+Toliau pateiktas metodas `_download`
+(**nuskaito neapdorotą tekstą į eilutę**).
 
 ```{.python .input  n=5}
 %%tab all
@@ -86,7 +85,7 @@ raw_text = data._download()
 raw_text[:60]
 ```
 
-For simplicity, we ignore punctuation and capitalization when preprocessing the raw text.
+Paprastumo dėlei, apdorodami neapdorotą tekstą, ignoruojame skyrybos ženklus ir didžiąsias raides.
 
 ```{.python .input  n=6}
 %%tab all
@@ -98,23 +97,23 @@ text = data._preprocess(raw_text)
 text[:60]
 ```
 
-## Tokenization
+## Teksto skaidymas į teksto vienetus
 
-*Tokens* are the atomic (indivisible) units of text.
-Each time step corresponds to 1 token,
-but what precisely constitutes a token is a design choice.
-For example, we could represent the sentence
-"Baby needs a new pair of shoes"
-as a sequence of 7 words,
-where the set of all words comprise
-a large vocabulary (typically tens
-or hundreds of thousands of words).
-Or we would represent the same sentence
-as a much longer sequence of 30 characters,
-using a much smaller vocabulary
-(there are only 256 distinct ASCII characters).
-Below, we tokenize our preprocessed text
-into a sequence of characters.
+*Teksto vienetai* (angl. *tokens*) yra atominiai (nedalomi) teksto vienetai.
+Kiekvienas laiko žingsnis atitinka 1 teksto vienetą,
+tačiau tai, kas tiksliai sudaro teksto vienetą, yra dizaino pasirinkimas.
+Pavyzdžiui, galėtume pavaizduoti sakinį
+„Baby needs a new pair of shoes“
+kaip 7 žodžių seką,
+kur visų žodžių aibė sudaro
+didelį žodyną (paprastai dešimtis
+ar šimtus tūkstančių žodžių).
+Arba tą patį sakinį pavaizduotume
+kaip daug ilgesnę 30 simbolių seką,
+naudodami daug mažesnį žodyną
+(yra tik 256 skirtingi ASCII simboliai).
+Toliau suskaidome savo iš anksto apdorotą tekstą
+į simbolių seką.
 
 ```{.python .input  n=7}
 %%tab all
@@ -126,24 +125,24 @@ tokens = data._tokenize(text)
 ','.join(tokens[:30])
 ```
 
-## Vocabulary
+## Žodynas
 
-These tokens are still strings.
-However, the inputs to our models
-must ultimately consist
-of numerical inputs.
-[**Next, we introduce a class
-for constructing *vocabularies*,
-i.e., objects that associate
-each distinct token value
-with a unique index.**]
-First, we determine the set of unique tokens in our training *corpus*.
-We then assign a numerical index to each unique token.
-Rare vocabulary elements are often dropped for convenience.
-Whenever we encounter a token at training or test time
-that had not been previously seen or was dropped from the vocabulary,
-we represent it by a special "&lt;unk&gt;" token,
-signifying that this is an *unknown* value.
+Šie teksto vienetai vis dar yra eilutės.
+Tačiau mūsų modelių įvestis
+galiausiai turi būti sudaryta
+iš skaitinių įvesčių.
+[**Toliau pristatome klasę
+*žodynams* sudaryti,
+t. y. objektams, kurie susieja
+kiekvieną skirtingą teksto vieneto reikšmę
+su unikaliu indeksu.**]
+Pirmiausia nustatome unikalių teksto vienetų aibę mūsų mokymo *tekstyne*.
+Tada kiekvienam unikaliam teksto vienetui priskiriame skaitinį indeksą.
+Reti žodyno elementai patogumo dėlei dažnai atmetami.
+Kai apmokymo ar testavimo metu sutinkame teksto vienetą,
+kurio anksčiau nebuvome matę arba kuris buvo pašalintas iš žodyno,
+jį pavaizduojame specialiu „&lt;unk&gt;“ teksto vienetu,
+rodančiu, kad tai *nežinoma* reikšmė.
 
 ```{.python .input  n=8}
 %%tab all
@@ -181,12 +180,12 @@ class Vocab:  #@save
         return self.token_to_idx['<unk>']
 ```
 
-We now [**construct a vocabulary**] for our dataset,
-converting the sequence of strings
-into a list of numerical indices.
-Note that we have not lost any information
-and can easily convert our dataset
-back to its original (string) representation.
+Dabar [**sudarome žodyną**] savo duomenų rinkiniui,
+konvertuodami eilučių seką
+į skaitinių indeksų sąrašą.
+Atkreipkite dėmesį, kad neprarandame jokios informacijos
+ir galime lengvai konvertuoti savo duomenų rinkinį
+atgal į originalų (eilučių) atvaizdą.
 
 ```{.python .input  n=9}
 %%tab all
@@ -196,19 +195,19 @@ print('indices:', indices)
 print('words:', vocab.to_tokens(indices))
 ```
 
-## Putting It All Together
+## Viskas kartu
 
-Using the above classes and methods,
-we [**package everything into the following
-`build` method of the `TimeMachine` class**],
-which returns `corpus`, a list of token indices, and `vocab`,
-the vocabulary of *The Time Machine* corpus.
-The modifications we did here are:
-(i) we tokenize text into characters, not words,
-to simplify the training in later sections;
-(ii) `corpus` is a single list, not a list of token lists,
-since each text line in *The Time Machine* dataset
-is not necessarily a sentence or paragraph.
+Naudodami aukščiau pateiktas klases ir metodus,
+[**viską supakuojame į šį
+`TimeMachine` klasės metodą `build`**],
+kuris grąžina `corpus` – teksto vienetų indeksų sąrašą, ir `vocab` –
+*Laiko mašinos* tekstyno žodyną.
+Čia atlikti pakeitimai:
+(i) tekstą skaidome į simbolius, o ne į žodžius,
+kad supaprastintume apmokymą vėlesniuose skyreliuose;
+(ii) `corpus` yra vienas sąrašas, o ne teksto vienetų sąrašų sąrašas,
+nes kiekviena *Laiko mašinos* duomenų rinkinio teksto eilutė
+nebūtinai yra sakinys ar pastraipa.
 
 ```{.python .input  n=10}
 %%tab all
@@ -223,13 +222,13 @@ corpus, vocab = data.build(raw_text)
 len(corpus), len(vocab)
 ```
 
-## Exploratory Language Statistics
+## Tiriamoji kalbos statistika
 :label:`subsec_natural-lang-stat`
 
-Using the real corpus and the `Vocab` class defined over words,
-we can inspect basic statistics concerning word use in our corpus.
-Below, we construct a vocabulary from words used in *The Time Machine*
-and print the ten most frequently occurring of them.
+Naudodami realų tekstyną ir žodžiams apibrėžtą klasę `Vocab`,
+galime patikrinti pagrindinę statistiką apie žodžių vartojimą mūsų tekstyne.
+Toliau sudarome žodyną iš *Laiko mašinoje* vartojamų žodžių
+ir išspausdiname dešimt dažniausiai pasitaikančių.
 
 ```{.python .input  n=11}
 %%tab all
@@ -238,32 +237,32 @@ vocab = Vocab(words)
 vocab.token_freqs[:10]
 ```
 
-Note that (**the ten most frequent words**)
-are not all that descriptive.
-You might even imagine that
-we might see a very similar list
-if we had chosen any book at random.
-Articles like "the" and "a",
-pronouns like "i" and "my",
-and prepositions like "of", "to", and "in"
-occur often because they serve common syntactic roles.
-Such words that are common but not particularly descriptive
-are often called (***stop words***) and,
-in previous generations of text classifiers
-based on so-called bag-of-words representations,
-they were most often filtered out.
-However, they carry meaning and
-it is not necessary to filter them out
-when working with modern RNN- and
-Transformer-based neural models.
-If you look further down the list,
-you will notice
-that word frequency decays quickly.
-The $10^{\textrm{th}}$ most frequent word
-is less than $1/5$ as common as the most popular.
-Word frequency tends to follow a power law distribution
-(specifically the Zipfian) as we go down the ranks.
-To get a better idea, we [**plot the figure of the word frequency**].
+Atkreipkite dėmesį, kad (**dešimt dažniausių žodžių**)
+nėra labai aprašomieji.
+Galite net įsivaizduoti,
+kad matytume labai panašų sąrašą,
+jei būtume pasirinkę bet kurią knygą atsitiktinai.
+Artikeliai, tokie kaip „the“ ir „a“,
+įvardžiai, tokie kaip „i“ ir „my“,
+ir prielinksniai, tokie kaip „of“, „to“ ir „in“,
+pasitaiko dažnai, nes atlieka dažnus sintaksinius vaidmenis.
+Tokie žodžiai, kurie yra dažni, bet nelabai aprašomieji,
+dažnai vadinami (***stop žodžiais***, angl. *stop words*) ir
+ankstesnės kartos teksto klasifikatoriuose,
+pagrįstuose vadinamosiomis žodžių maišo reprezentacijomis,
+jie dažniausiai būdavo filtruojami.
+Tačiau jie turi prasmę, todėl
+dirbant su šiuolaikiniais RNN ir
+transformeriais pagrįstais neuroniniais modeliais
+jų filtruoti nebūtina.
+Jei pažvelgsite žemiau sąraše,
+pastebėsite,
+kad žodžių dažnis greitai mažėja.
+$10$-as dažniausias žodis
+yra mažiau nei $1/5$ tokio paplitimo kaip populiariausias.
+Žodžių dažnis, einant per rangus žemyn, linkęs sekti laipsninį skirstinį
+(konkrečiai Zipfo).
+Kad susidarytume geresnį vaizdą, [**nubraižome žodžių dažnio paveikslą**].
 
 ```{.python .input  n=12}
 %%tab all
@@ -272,25 +271,25 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
 
-After dealing with the first few words as exceptions,
-all the remaining words roughly follow a straight line on a log--log plot.
-This phenomenon is captured by *Zipf's law*,
-which states that the frequency $n_i$
-of the $i^\textrm{th}$ most frequent word is:
+Susitvarkius su pirmaisiais keliais žodžiais kaip išimtimis,
+visi likę žodžiai maždaug seka tiesią liniją logaritminėje–logaritminėje diagramoje.
+Šį reiškinį užfiksuoja *Zipfo dėsnis*,
+teigiantis, kad $i$-ojo dažniausio žodžio dažnis $n_i$
+yra:
 
 $$n_i \propto \frac{1}{i^\alpha},$$
 :eqlabel:`eq_zipf_law`
 
-which is equivalent to
+o tai ekvivalentu
 
 $$\log n_i = -\alpha \log i + c,$$
 
-where $\alpha$ is the exponent that characterizes
-the distribution and $c$ is a constant.
-This should already give us pause for thought if we want
-to model words by counting statistics.
-After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But [**what about the other word combinations, such as two consecutive words (bigrams), three consecutive words (trigrams)**], and beyond?
-Let's see whether the bigram frequency behaves in the same manner as the single word (unigram) frequency.
+kur $\alpha$ yra rodiklis, apibūdinantis
+skirstinį, o $c$ – konstanta.
+Tai jau turėtų priversti mus susimąstyti, jei norime
+modeliuoti žodžius pagal skaičiavimo statistikas.
+Juk gerokai pervertinsime uodegos, dar vadinamos retais žodžiais, dažnį. Bet [**kaip dėl kitų žodžių derinių, tokių kaip du iš eilės einantys žodžiai (bigramos), trys iš eilės einantys žodžiai (trigramos)**] ir daugiau?
+Pažiūrėkime, ar bigramų dažnis elgiasi taip pat kaip pavienio žodžio (unigramos) dažnis.
 
 ```{.python .input  n=13}
 %%tab all
@@ -299,7 +298,7 @@ bigram_vocab = Vocab(bigram_tokens)
 bigram_vocab.token_freqs[:10]
 ```
 
-One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let's see whether the trigram frequency behaves in the same manner.
+Čia verta pažymėti vieną dalyką. Iš dešimties dažniausių žodžių porų devynios sudarytos iš stop žodžių, ir tik viena yra aktuali pačiai knygai – „the time“. Be to, pažiūrėkime, ar trigramų dažnis elgiasi taip pat.
 
 ```{.python .input  n=14}
 %%tab all
@@ -309,7 +308,7 @@ trigram_vocab = Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
 
-Now, let's [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
+Dabar [**vizualizuokime teksto vienetų dažnį**] tarp šių trijų modelių: unigramų, bigramų ir trigramų.
 
 ```{.python .input  n=15}
 %%tab all
@@ -320,47 +319,47 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
-This figure is quite exciting.
-First, beyond unigram words, sequences of words
-also appear to be following Zipf's law,
-albeit with a smaller exponent
-$\alpha$ in :eqref:`eq_zipf_law`,
-depending on the sequence length.
-Second, the number of distinct $n$-grams is not that large.
-This gives us hope that there is quite a lot of structure in language.
-Third, many $n$-grams occur very rarely.
-This makes certain methods unsuitable for language modeling
-and motivates the use of deep learning models.
-We will discuss this in the next section.
+Šis paveikslas yra gana įdomus.
+Pirma, be pavienių žodžių (unigramų), žodžių sekos
+taip pat, atrodo, seka Zipfo dėsnį,
+nors su mažesniu rodikliu
+$\alpha$ :eqref:`eq_zipf_law`,
+priklausomai nuo sekos ilgio.
+Antra, skirtingų $n$-gramų skaičius nėra toks didelis.
+Tai teikia vilčių, kad kalboje yra nemažai struktūros.
+Trečia, daug $n$-gramų pasitaiko labai retai.
+Dėl to tam tikri metodai netinka kalbos modeliavimui
+ir tai motyvuoja naudoti giliojo mokymosi modelius.
+Tai aptarsime kitame skyrelyje.
 
 
-## Summary
+## Santrauka
 
-Text is among the most common forms of sequence data encountered in deep learning.
-Common choices for what constitutes a token are characters, words, and word pieces.
-To preprocess text, we usually (i) split text into tokens; (ii) build a vocabulary to map token strings to numerical indices; and (iii) convert text data into token indices for models to manipulate.
-In practice, the frequency of words tends to follow Zipf's law. This is true not just for individual words (unigrams), but also for $n$-grams.
+Tekstas yra viena dažniausių sekų duomenų formų, sutinkamų giliajame mokyme.
+Dažni pasirinkimai, kas sudaro teksto vienetą, yra simboliai, žodžiai ir žodžių dalys.
+Tekstui iš anksto apdoroti paprastai (i) skaidome tekstą į teksto vienetus; (ii) sudarome žodyną, susiejantį teksto vienetų eilutes su skaitiniais indeksais; ir (iii) konvertuojame tekstinius duomenis į teksto vienetų indeksus, kuriuos modeliai galėtų apdoroti.
+Praktikoje žodžių dažnis linkęs sekti Zipfo dėsnį. Tai teisinga ne tik pavieniams žodžiams (unigramoms), bet ir $n$-gramoms.
 
 
-## Exercises
+## Pratimai
 
-1. In the experiment of this section, tokenize text into words and vary the `min_freq` argument value of the `Vocab` instance. Qualitatively characterize how changes in `min_freq` impact the size of the resulting vocabulary.
-1. Estimate the exponent of Zipfian distribution for unigrams, bigrams, and trigrams in this corpus.
-1. Find some other sources of data (download a standard machine learning dataset, pick another public domain book,
-   scrape a website, etc). For each, tokenize the data at both the word and character levels. How do the vocabulary sizes compare with *The Time Machine* corpus at equivalent values of `min_freq`. Estimate the exponent of the Zipfian distribution corresponding to the unigram and bigram distributions for these corpora. How do they compare with the values that you observed for *The Time Machine* corpus?
+1. Šio skyrelio eksperimente suskaidykite tekstą į žodžius ir keiskite `Vocab` egzemplioriaus argumento `min_freq` reikšmę. Kokybiškai apibūdinkite, kaip `min_freq` pokyčiai veikia gauto žodyno dydį.
+1. Įvertinkite Zipfo skirstinio rodiklį unigramoms, bigramoms ir trigramoms šiame tekstyne.
+1. Raskite kitų duomenų šaltinių (atsisiųskite standartinį mašininio mokymosi duomenų rinkinį, pasirinkite kitą viešojo domeno knygą,
+   nuskaitykite svetainę ir pan.). Kiekvieną iš jų suskaidykite į teksto vienetus ir žodžių, ir simbolių lygiu. Kaip žodynų dydžiai palyginami su *Laiko mašinos* tekstynu esant lygiavertėms `min_freq` reikšmėms? Įvertinkite Zipfo skirstinio rodiklį, atitinkantį unigramų ir bigramų skirstinius šiems tekstynams. Kaip jie palyginami su reikšmėmis, kurias stebėjote *Laiko mašinos* tekstynui?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/117)
+[Diskusijos](https://discuss.d2l.ai/t/117)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/118)
+[Diskusijos](https://discuss.d2l.ai/t/118)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1049)
+[Diskusijos](https://discuss.d2l.ai/t/1049)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18011)
+[Diskusijos](https://discuss.d2l.ai/t/18011)
 :end_tab:

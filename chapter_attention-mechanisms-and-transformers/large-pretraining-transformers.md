@@ -1,463 +1,462 @@
-# Large-Scale Pretraining with Transformers
+# Didelio masto išankstinis transformerių apmokymas
 :label:`sec_large-pretraining-transformers`
 
-So far in our image classification and machine translation experiments,
-models have been trained on datasets with input--output examples
-*from scratch* to perform specific tasks.
-For example, a Transformer was trained
-with English--French pairs (:numref:`sec_transformer`)
-so that this model can translate input English text into French.
-As a result, each model becomes a *specific expert*
-that is sensitive to even a slight shift in data distribution
+Iki šiol mūsų vaizdų klasifikavimo ir mašininio vertimo eksperimentuose
+modeliai būdavo apmokomi duomenų rinkiniuose su įvesties ir išvesties pavyzdžiais
+*nuo nulio* konkrečioms užduotims atlikti.
+Pavyzdžiui, transformeris buvo apmokytas
+su anglų–prancūzų poromis (:numref:`sec_transformer`),
+kad šis modelis galėtų išversti įvestą anglišką tekstą į prancūzų kalbą.
+Dėl to kiekvienas modelis tampa *konkrečiu ekspertu*,
+jautriu net nedideliam duomenų skirstinio pokyčiui
 (:numref:`sec_environment-and-distribution-shift`).
-For better generalized models, or even more competent *generalists*
-that can perform multiple tasks with or without adaptation,
-*pretraining* models on large data has been increasingly common.
+Siekiant geriau apibendrinančių modelių ar net kompetentingesnių *universalistų*,
+galinčių atlikti kelias užduotis su pritaikymu arba be jo,
+vis labiau įprasta modelius *iš anksto apmokyti* dideliuose duomenyse.
 
-Given larger data for pretraining, the Transformer architecture
-performs better with an increased model size and training compute,
-demonstrating superior *scaling* behavior.
-Specifically, performance of Transformer-based language models
-scales as a power law with the amount of model parameters,
-training tokens, and training compute :cite:`kaplan2020scaling`.
-The scalability of Transformers is also evidenced
-by the significantly boosted performance
-from larger vision Transformers trained on larger data
-(discussed in :numref:`sec_vision-transformer`).
-More recent success stories include Gato, a *generalist* model
-that can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Gato is a single  Transformer that scales well when pretrained on diverse modalities,
-including text, images, joint torques, and button presses.
-Notably, all such multimodal data is serialized into a flat sequence of tokens,
-which can be processed akin to text tokens (:numref:`sec_transformer`)
-or image patches (:numref:`sec_vision-transformer`) by Transformers.
+Turint daugiau išankstinio apmokymo duomenų, transformerių architektūra
+veikia geriau didėjant modelio dydžiui ir apmokymo skaičiavimams,
+parodydama puikų *mastelio didinimo* (angl. *scaling*) elgesį.
+Konkrečiai, transformeriais pagrįstų kalbos modelių našumas
+didėja pagal laipsninį dėsnį su modelio parametrų kiekiu,
+apmokymo teksto vienetų skaičiumi ir apmokymo skaičiavimais :cite:`kaplan2020scaling`.
+Transformerių mastelio didinamumą taip pat patvirtina
+gerokai padidėjęs našumas
+didesnių regimųjų transformerių, apmokytų didesniuose duomenyse
+(aptarta :numref:`sec_vision-transformer`).
+Naujesni sėkmės pavyzdžiai apima „Gato“ – *universalų* modelį,
+galintį žaisti „Atari“ žaidimus, aprašyti vaizdus, kalbėtis ir veikti kaip robotas :cite:`reed2022generalist`. „Gato“ yra vienas transformeris, gerai didinantis mastelį, kai iš anksto apmokomas įvairiomis modalybėmis,
+įskaitant tekstą, vaizdus, sąnarių sukimo momentus ir mygtukų paspaudimus.
+Pažymėtina, kad visi tokie daugiamodaliai duomenys serializuojami į plokščią teksto vienetų seką,
+kurią transformeriai gali apdoroti panašiai kaip teksto vienetus (:numref:`sec_transformer`)
+ar vaizdo fragmentus (:numref:`sec_vision-transformer`).
 
-Prior to the compelling success of pretraining Transformers for multimodal data,
-Transformers were extensively pretrained  with a wealth of text.
-Originally proposed for machine translation,
-the Transformer architecture in :numref:`fig_transformer`
-consists of an encoder for representing input sequences
-and a decoder for generating target sequences.
-Primarily, Transformers can be used in three different modes:
-*encoder-only*, *encoder--decoder*, and *decoder-only*.
-To conclude this chapter, we will review these three modes
-and explain the scalability in pretraining Transformers.
+Prieš įtikinamą transformerių išankstinio apmokymo sėkmę daugiamodaliams duomenims,
+transformeriai buvo plačiai iš anksto apmokomi su gausybe teksto.
+Iš pradžių pasiūlyta mašininiam vertimui,
+transformerių architektūra :numref:`fig_transformer`
+susideda iš kodavimo bloko įvesties sekoms vaizduoti
+ir dekodavimo bloko tikslo sekoms generuoti.
+Iš esmės transformerius galima naudoti trimis skirtingais režimais:
+*tik kodavimo blokas*, *kodavimo ir dekodavimo blokas* ir *tik dekodavimo blokas*.
+Šio skyriaus pabaigoje apžvelgsime šiuos tris režimus
+ir paaiškinsime mastelio didinamumą iš anksto apmokant transformerius.
 
-## Encoder-Only
+## Tik kodavimo blokas
 
-When only the Transformer encoder is used,
-a sequence of input tokens is converted
-into the same number of representations
-that can be further projected into output
-(e.g., classification). A Transformer encoder
-consists of  self-attention layers,
-where all input tokens attend to each other.
-For example, vision Transformers depicted in :numref:`fig_vit`
-are encoder-only, converting a sequence of input image patches into
-the representation of a special “&lt;cls&gt;” token.
-Since this representation depends on all input tokens,
-it is further projected into classification labels.
-This design was inspired by an earlier encoder-only Transformer
-pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
+Kai naudojamas tik transformerio kodavimo blokas,
+įvesties teksto vienetų seka paverčiama
+tuo pačiu skaičiumi vaizdų,
+kuriuos galima toliau projektuoti į išvestį
+(pvz., klasifikavimą). Transformerio kodavimo blokas
+sudarytas iš saviraiškės dėmesio sutelkimo transformacijos sluoksnių,
+kuriuose visi įvesties teksto vienetai sutelkia dėmesį vienas į kitą.
+Pavyzdžiui, :numref:`fig_vit` pavaizduoti regimieji transformeriai
+yra tik kodavimo bloko, paverčiantys įvesties vaizdo fragmentų seką į
+specialaus „&lt;cls&gt;“ teksto vieneto vaizdą.
+Kadangi šis vaizdas priklauso nuo visų įvesties teksto vienetų,
+jis toliau projektuojamas į klasifikavimo žymenis.
+Šis dizainas buvo įkvėptas ankstesnio tik kodavimo bloko transformerio,
+iš anksto apmokyto su tekstu: BERT (angl. *Bidirectional Encoder Representations from Transformers*) :cite:`Devlin.Chang.Lee.ea.2018`.
 
 
-### Pretraining BERT
+### BERT išankstinis apmokymas
 
-![Left: Pretraining BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the Transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg)
+![Kairėje: BERT išankstinis apmokymas naudojant maskuotą kalbos modeliavimą. Užmaskuoto teksto vieneto „love“ prognozė priklauso nuo visų įvesties teksto vienetų prieš „love“ ir po jo. Dešinėje: Dėmesio šablonas transformerio kodavimo bloke. Kiekvienas teksto vienetas išilgai vertikalios ašies sutelkia dėmesį į visus įvesties teksto vienetus išilgai horizontalios ašies.](../img/bert-encoder-only.svg)
 :label:`fig_bert-encoder-only`
 
-BERT is pretrained on text sequences using *masked language modeling*:
-input text with randomly masked tokens is fed
-into a Transformer encoder to predict the masked tokens.
-As illustrated in :numref:`fig_bert-encoder-only`,
-an original text sequence "I", "love", "this", "red", "car"
-is prepended with the “&lt;cls&gt;” token, and the “&lt;mask&gt;” token
-randomly replaces "love"; then the cross-entropy loss between the masked token "love"
-and its prediction is to be minimized during pretraining.
-Note that there is no constraint in the attention pattern of Transformer encoders
-(right of :numref:`fig_bert-encoder-only`)
-so all tokens can attend to each other.
-Thus, prediction of "love" depends on input tokens before and after it in the sequence.
-This is why BERT is a "bidirectional encoder".
-Without need for manual labeling, large-scale text data
-from books and Wikipedia can be used for pretraining BERT.
+BERT iš anksto apmokomas teksto sekomis naudojant *maskuotą kalbos modeliavimą*:
+įvesties tekstas su atsitiktinai užmaskuotais teksto vienetais paduodamas
+į transformerio kodavimo bloką užmaskuotiems teksto vienetams prognozuoti.
+Kaip iliustruota :numref:`fig_bert-encoder-only`,
+originali teksto seka „I“, „love“, „this“, „red“, „car“
+papildoma priekyje „&lt;cls&gt;“ teksto vienetu, o „&lt;mask&gt;“ teksto vienetas
+atsitiktinai pakeičia „love“; tada išankstinio apmokymo metu minimizuojamas kryžminės entropijos nuostolis tarp užmaskuoto teksto vieneto „love“
+ir jo prognozės.
+Atkreipkite dėmesį, kad transformerio kodavimo blokų dėmesio šablone nėra apribojimų
+(dešinėje :numref:`fig_bert-encoder-only`),
+todėl visi teksto vienetai gali sutelkti dėmesį vienas į kitą.
+Taigi „love“ prognozė priklauso nuo įvesties teksto vienetų prieš jį ir po jo sekoje.
+Todėl BERT yra „dvikryptis kodavimo blokas“.
+Nereikalaujant rankinio žymėjimo, BERT išankstiniam apmokymui galima naudoti
+didelio masto tekstinius duomenis
+iš knygų ir „Wikipedia“.
 
 
-### Fine-Tuning BERT
+### BERT patikslinimas
 
-The pretrained BERT can be *fine-tuned* to downstream encoding tasks involving single text or text pairs. During fine-tuning, additional layers can be added to BERT with randomized parameters: these parameters and those pretrained BERT parameters will be *updated* to fit training data of downstream tasks.
+Iš anksto apmokytą BERT galima *patikslinti* (angl. *fine-tune*) tolesnėms kodavimo užduotims, apimančioms pavienį tekstą ar teksto poras. Patikslinant prie BERT galima pridėti papildomų sluoksnių su atsitiktiniais parametrais: šie parametrai ir iš anksto apmokyti BERT parametrai bus *atnaujinami*, kad atitiktų tolesnių užduočių apmokymo duomenis.
 
-![Fine-tuning BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
+![BERT patikslinimas nuotaikų analizei.](../img/bert-finetune-classification.svg)
 :label:`fig_bert-finetune-classification`
 
-:numref:`fig_bert-finetune-classification` illustrates
-fine-tuning of BERT for sentiment analysis.
-The Transformer encoder is a pretrained BERT,
-which takes a text sequence as input
-and feeds the “&lt;cls&gt;” representation
-(global representation of the input)
-into an additional fully connected layer
-to predict the sentiment.
-During fine-tuning, the cross-entropy loss
-between the prediction and the label
-on sentiment analysis data
-is minimized via gradient-based algorithms,
-where the additional layer is trained from scratch
-while pretrained parameters of BERT are updated.
-BERT does more than sentiment analysis.
-The general language representations learned
-by the 350-million-parameter BERT
-from 250 billion training tokens
-advanced the state of the art for natural language tasks
-such as single text classification,
-text pair classification or regression,
-text tagging, and question answering.
+:numref:`fig_bert-finetune-classification` iliustruoja
+BERT patikslinimą nuotaikų analizei.
+Transformerio kodavimo blokas yra iš anksto apmokytas BERT,
+kuris kaip įvestį priima teksto seką
+ir paduoda „&lt;cls&gt;“ vaizdą
+(globalų įvesties vaizdą)
+į papildomą pilnai sujungtą sluoksnį
+nuotaikai prognozuoti.
+Patikslinimo metu kryžminės entropijos nuostolis
+tarp prognozės ir žymens
+nuotaikų analizės duomenyse
+minimizuojamas gradientiniais algoritmais,
+kur papildomas sluoksnis apmokomas nuo nulio,
+o iš anksto apmokyti BERT parametrai atnaujinami.
+BERT gali daugiau nei nuotaikų analizę.
+Bendrieji kalbos vaizdai, išmokti
+350 milijonų parametrų BERT
+iš 250 milijardų apmokymo teksto vienetų,
+pagerino pažangiausius rezultatus natūraliosios kalbos užduotyse,
+tokiose kaip pavienio teksto klasifikavimas,
+teksto porų klasifikavimas ar regresija,
+teksto žymėjimas ir atsakymas į klausimus.
 
-You may note that these downstream tasks include text pair understanding.
-BERT pretraining has another loss for predicting
-whether one sentence immediately follows the other.
-However, this loss was later found to be less useful when pretraining RoBERTa,
-a BERT variant of the same size, on 2000 billion tokens :cite:`Liu.Ott.Goyal.ea.2019`.
-Other derivatives of BERT improved model architectures or pretraining objectives,
-such as ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
-SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
-DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
-and ELECTRA (replaced token detection) :cite:`clark2019electra`.
-Moreover, BERT inspired Transformer pretraining in computer vision,
-such as with vision Transformers :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`,
-Swin Transformers :cite:`liu2021swin`,
-and MAE (masked autoencoders) :cite:`he2022masked`.
+Galite pastebėti, kad šios tolesnės užduotys apima teksto porų supratimą.
+BERT išankstinis apmokymas turi dar vieną nuostolį, skirtą prognozuoti,
+ar vienas sakinys iškart seka kitą.
+Tačiau vėliau, iš anksto apmokant RoBERTa –
+to paties dydžio BERT variantą – su 2000 milijardų teksto vienetų, buvo nustatyta, kad šis nuostolis mažiau naudingas :cite:`Liu.Ott.Goyal.ea.2019`.
+Kiti BERT dariniai patobulino modelių architektūras ar išankstinio apmokymo tikslus,
+pavyzdžiui, ALBERT (priverčiant dalytis parametrais) :cite:`lan2019albert`,
+SpanBERT (vaizduojant ir prognozuojant teksto atkarpas) :cite:`joshi2020spanbert`,
+DistilBERT (lengvas dėl žinių distiliavimo) :cite:`sanh2019distilbert`
+ir ELECTRA (pakeistų teksto vienetų aptikimas) :cite:`clark2019electra`.
+Be to, BERT įkvėpė transformerių išankstinį apmokymą kompiuterinėje regoje,
+pavyzdžiui, regimuosius transformerius :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`,
+Swin transformerius :cite:`liu2021swin`
+ir MAE (maskuotus autoenkoderius) :cite:`he2022masked`.
 
-## Encoder--Decoder
+## Kodavimo ir dekodavimo blokas
 
-Since a Transformer encoder converts a sequence of input tokens
-into the same number of output representations,
-the encoder-only mode cannot generate a sequence of arbitrary length as in machine translation.
-As originally proposed for machine translation,
-the Transformer architecture can be outfitted with a decoder
-that autoregressively predicts the target sequence
-of arbitrary length, token by token,
-conditional on both encoder output and decoder output:
-(i) for conditioning on encoder output, encoder--decoder cross-attention
-(multi-head attention of decoder in :numref:`fig_transformer`)
-allows target tokens to attend to *all* input tokens;
-(ii) conditioning on decoder output is achieved
-by a so-called *causal* attention
-(this name is common in the literature but is misleading
-as it has little connection to the proper study of causality)
-pattern (masked multi-head attention of decoder in :numref:`fig_transformer`),
-where any target token can only attend to *past* and *present* tokens in the target sequence.
+Kadangi transformerio kodavimo blokas paverčia įvesties teksto vienetų seką
+tuo pačiu išvesties vaizdų skaičiumi,
+tik kodavimo bloko režimas negali generuoti savavališko ilgio sekos, kaip mašininiame vertime.
+Kaip iš pradžių pasiūlyta mašininiam vertimui,
+transformerių architektūrą galima aprūpinti dekodavimo bloku,
+kuris autoregresiškai prognozuoja savavališko ilgio tikslo seką
+teksto vienetas po teksto vieneto,
+sąlygodamas ir kodavimo bloko išvestimi, ir dekodavimo bloko išvestimi:
+(i) sąlygojant kodavimo bloko išvestimi, kodavimo ir dekodavimo kryžminis dėmesio sutelkimas
+(dekodavimo bloko lygiagreti dėmesio sutelkimo transformacija :numref:`fig_transformer`)
+leidžia tikslo teksto vienetams sutelkti dėmesį į *visus* įvesties teksto vienetus;
+(ii) sąlygojimas dekodavimo bloko išvestimi pasiekiamas
+vadinamuoju *priežastiniu* dėmesio sutelkimu
+(šis pavadinimas įprastas literatūroje, bet klaidinantis,
+nes mažai susijęs su tikru priežastingumo tyrimu)
+šablonu (dekodavimo bloko maskuota lygiagreti dėmesio sutelkimo transformacija :numref:`fig_transformer`),
+kur bet kuris tikslo teksto vienetas gali sutelkti dėmesį tik į *praeities* ir *dabarties* tikslo sekos teksto vienetus.
 
-To pretrain encoder--decoder Transformers beyond human-labeled machine translation data,
-BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring`
-are two concurrently proposed encoder--decoder Transformers
-pretrained on large-scale text corpora.
-Both attempt to reconstruct original text in their pretraining objectives,
-while the former emphasizes noising input
-(e.g., masking, deletion, permutation, and rotation)
-and the latter highlights multitask unification
-with comprehensive ablation studies.
-
-
-### Pretraining T5
+Kad iš anksto apmokytume kodavimo ir dekodavimo transformerius, nepasitelkdami žmonių pažymėtų mašininio vertimo duomenų,
+BART :cite:`lewis2019bart` ir T5 :cite:`raffel2020exploring`
+yra du vienu metu pasiūlyti kodavimo ir dekodavimo transformeriai,
+iš anksto apmokyti didelio masto tekstynuose.
+Abu savo išankstinio apmokymo tiksluose bando atkurti originalų tekstą,
+tačiau pirmasis pabrėžia įvesties triukšminimą
+(pvz., maskavimą, šalinimą, permutaciją ir sukimą),
+o antrasis išryškina daugiauzdavinio vienijimą
+su išsamiais abliacijos tyrimais.
 
 
-As an example of the pretrained Transformer encoder--decoder,
-T5 (Text-to-Text Transfer Transformer)
-unifies many tasks as the same text-to-text problem:
-for any task, the input of the encoder is a task description
-(e.g., "Summarize", ":") followed by task input
-(e.g., a sequence of tokens from an article),
-and the decoder predicts the task output
-(e.g., a sequence of tokens summarizing the input article).
-To perform as text-to-text, T5 is trained
-to generate some target text conditional on input text.
+### T5 išankstinis apmokymas
 
 
-![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the Transformer encoder--decoder. In the encoder self-attention (lower square), all input tokens attend to each other; In the encoder--decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
+Kaip iš anksto apmokyto transformerio kodavimo ir dekodavimo pavyzdys,
+T5 (angl. *Text-to-Text Transfer Transformer*)
+vienija daugelį užduočių į tą pačią teksto į tekstą problemą:
+bet kuriai užduočiai kodavimo bloko įvestis yra užduoties aprašymas
+(pvz., „Summarize“, „:“), po kurio eina užduoties įvestis
+(pvz., straipsnio teksto vienetų seka),
+o dekodavimo blokas prognozuoja užduoties išvestį
+(pvz., teksto vienetų seką, apibendrinančią įvesties straipsnį).
+Kad veiktų kaip tekstas į tekstą, T5 apmokomas
+generuoti tam tikrą tikslo tekstą, sąlygotą įvesties teksto.
+
+
+![Kairėje: T5 išankstinis apmokymas prognozuojant iš eilės einančias atkarpas. Originalus sakinys yra „I“, „love“, „this“, „red“, „car“, kur „love“ pakeistas specialiu „&lt;X&gt;“ teksto vienetu, o iš eilės einantys „red“, „car“ pakeisti specialiu „&lt;Y&gt;“ teksto vienetu. Tikslo seka baigiasi specialiu „&lt;Z&gt;“ teksto vienetu. Dešinėje: Dėmesio šablonas transformerio kodavimo ir dekodavimo bloke. Kodavimo bloko saviraiškėje dėmesio sutelkimo transformacijoje (apatinis kvadratas) visi įvesties teksto vienetai sutelkia dėmesį vienas į kitą; kodavimo ir dekodavimo kryžminiame dėmesio sutelkime (viršutinis stačiakampis) kiekvienas tikslo teksto vienetas sutelkia dėmesį į visus įvesties teksto vienetus; dekodavimo bloko saviraiškėje dėmesio sutelkimo transformacijoje (viršutinis trikampis) kiekvienas tikslo teksto vienetas sutelkia dėmesį tik į dabarties ir praeities tikslo teksto vienetus (priežastinis).](../img/t5-encoder-decoder.svg)
 :label:`fig_t5-encoder-decoder`
 
-To obtain input and output from any original text,
-T5 is pretrained to predict consecutive spans.
-Specifically, tokens from text are randomly replaced
-by special tokens where each consecutive span
-is replaced by the same special token.
-Consider the example in :numref:`fig_t5-encoder-decoder`,
-where the original text is "I", "love", "this", "red", "car".
-Tokens "love", "red", "car" are randomly replaced by special tokens.
-Since "red" and "car" are a consecutive span,
-they are replaced by the same special token.
-As a result, the input sequence is "I", "&lt;X&gt;", "this", "&lt;Y&gt;",
-and the target sequence is
-"&lt;X&gt;", "love", "&lt;Y&gt;", "red", "car", "&lt;Z&gt;",
-where "&lt;Z&gt;" is another special token marking the end.
-As shown in :numref:`fig_t5-encoder-decoder`,
-the decoder has a causal attention pattern to prevent itself
-from attending to future tokens during sequence prediction.
+Kad iš bet kurio originalaus teksto gautų įvestį ir išvestį,
+T5 iš anksto apmokomas prognozuoti iš eilės einančias atkarpas.
+Konkrečiai, teksto vienetai iš teksto atsitiktinai pakeičiami
+specialiais teksto vienetais, kur kiekviena iš eilės einanti atkarpa
+pakeičiama tuo pačiu specialiu teksto vienetu.
+Apsvarstykime pavyzdį :numref:`fig_t5-encoder-decoder`,
+kur originalus tekstas yra „I“, „love“, „this“, „red“, „car“.
+Teksto vienetai „love“, „red“, „car“ atsitiktinai pakeičiami specialiais teksto vienetais.
+Kadangi „red“ ir „car“ yra iš eilės einanti atkarpa,
+jie pakeičiami tuo pačiu specialiu teksto vienetu.
+Dėl to įvesties seka yra „I“, „&lt;X&gt;“, „this“, „&lt;Y&gt;“,
+o tikslo seka yra
+„&lt;X&gt;“, „love“, „&lt;Y&gt;“, „red“, „car“, „&lt;Z&gt;“,
+kur „&lt;Z&gt;“ yra dar vienas specialus teksto vienetas, žymintis pabaigą.
+Kaip parodyta :numref:`fig_t5-encoder-decoder`,
+dekodavimo blokas turi priežastinį dėmesio šabloną, kad sekos prognozavimo metu
+nesutelktų dėmesio į ateities teksto vienetus.
 
-In T5, predicting consecutive span is also referred to
-as reconstructing corrupted text.
-With this objective, T5 is pretrained
-with 1000 billion tokens from the C4
-(Colossal Clean Crawled Corpus) data,
-which consists of clean English text
-from the web :cite:`raffel2020exploring`.
+T5 iš eilės einančių atkarpų prognozavimas taip pat vadinamas
+sugadinto teksto atkūrimu.
+Su šiuo tikslu T5 iš anksto apmokomas
+su 1000 milijardų teksto vienetų iš C4
+(angl. *Colossal Clean Crawled Corpus*) duomenų,
+kuriuos sudaro švarus anglų kalbos tekstas
+iš interneto :cite:`raffel2020exploring`.
 
-### Fine-Tuning T5
+### T5 patikslinimas
 
-Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters)
-on task-specific training data to perform this task.
-Major differences from BERT fine-tuning include:
-(i) T5 input includes task descriptions;
-(ii) T5 can generate sequences
-with arbitrary length
-with its Transformer decoder;
-(iii) No additional layers are required.
+Panašiai kaip BERT, T5 reikia patikslinti (atnaujinant T5 parametrus)
+su konkrečiai užduočiai skirtais apmokymo duomenimis, kad ji būtų atlikta.
+Pagrindiniai skirtumai nuo BERT patikslinimo:
+(i) T5 įvestis apima užduočių aprašymus;
+(ii) T5 gali generuoti savavališko ilgio sekas
+su savo transformerio dekodavimo bloku;
+(iii) nereikia papildomų sluoksnių.
 
-![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the Transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg)
+![T5 patikslinimas teksto apibendrinimui. Ir užduoties aprašymas, ir straipsnio teksto vienetai paduodami į transformerio kodavimo bloką santraukai prognozuoti.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
 :numref:`fig_t5-finetune-summarization`
-explains fine-tuning T5
-using text summarization as an example.
-In this downstream task,
-the task description tokens "Summarize", ":"
-followed by the article tokens are input to the encoder.
+paaiškina T5 patikslinimą,
+kaip pavyzdį naudojant teksto apibendrinimą.
+Šioje tolesnėje užduotyje
+užduoties aprašymo teksto vienetai „Summarize“, „:“,
+po kurių eina straipsnio teksto vienetai, paduodami į kodavimo bloką.
 
-After fine-tuning, the 11-billion-parameter T5 (T5-11B)
-achieved state-of-the-art results on multiple encoding (e.g., classification)
-and generation (e.g., summarization) benchmarks.
-Since released, T5 has been extensively used in later research.
-For example, switch Transformers are designed based on T5
-to activate a subset of the parameters
-for better computational efficiency :cite:`fedus2022switch`.
-In a text-to-image model called Imagen,
-text is input to a frozen T5 encoder (T5-XXL)
-with 4.6 billion parameters :cite:`saharia2022photorealistic`.
-The photorealistic text-to-image examples in :numref:`fig_imagen`
-suggest that the T5 encoder alone may effectively
-represent text even without fine-tuning.
+Po patikslinimo 11 milijardų parametrų T5 (T5-11B)
+pasiekė pažangiausius rezultatus keliuose kodavimo (pvz., klasifikavimo)
+ir generavimo (pvz., apibendrinimo) lyginamuosiuose testuose.
+Nuo išleidimo T5 buvo plačiai naudojamas vėlesniuose tyrimuose.
+Pavyzdžiui, perjungiamieji (angl. *switch*) transformeriai suprojektuoti remiantis T5,
+kad aktyvuotų parametrų pogrupį
+geresniam skaičiavimo efektyvumui :cite:`fedus2022switch`.
+Teksto į vaizdą modelyje „Imagen“
+tekstas paduodamas į užšaldytą T5 kodavimo bloką (T5-XXL)
+su 4,6 milijardo parametrų :cite:`saharia2022photorealistic`.
+Fotorealistiški teksto į vaizdą pavyzdžiai :numref:`fig_imagen`
+rodo, kad vien T5 kodavimo blokas gali veiksmingai
+vaizduoti tekstą net be patikslinimo.
 
-![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :citet:`saharia2022photorealistic`).](../img/imagen.png)
+![Teksto į vaizdą pavyzdžiai, sukurti „Imagen“ modelio, kurio teksto kodavimo blokas yra iš T5 (paveikslai paimti iš :citet:`saharia2022photorealistic`).](../img/imagen.png)
 :width:`700px`
 :label:`fig_imagen`
 
 
-## Decoder-Only
+## Tik dekodavimo blokas
 
 
-We have reviewed encoder-only and encoder--decoder Transformers.
-Alternatively, decoder-only Transformers
-remove the entire encoder and the decoder sublayer
-with the encoder--decoder cross-attention
-from the original encoder--decoder architecture
-depicted in :numref:`fig_transformer`.
-Nowadays, decoder-only Transformers have been the *de facto* architecture
-in large-scale language modeling (:numref:`sec_language-model`),
-which leverages the world's abundant unlabeled text corpora via self-supervised learning.
+Apžvelgėme tik kodavimo bloko ir kodavimo ir dekodavimo transformerius.
+Alternatyviai, tik dekodavimo bloko transformeriai
+pašalina visą kodavimo bloką ir dekodavimo bloko porsluoksnį
+su kodavimo ir dekodavimo kryžminiu dėmesio sutelkimu
+iš originalios kodavimo ir dekodavimo architektūros,
+pavaizduotos :numref:`fig_transformer`.
+Šiandien tik dekodavimo bloko transformeriai yra *de facto* architektūra
+didelio masto kalbos modeliavime (:numref:`sec_language-model`),
+kuris per saviraišką mokymąsi naudoja pasaulio gausius nepažymėtus tekstynus.
 
 
 
-### GPT and GPT-2
+### GPT ir GPT-2
 
-Using language modeling as the training objective,
-the GPT (generative pre-training) model
-chooses a Transformer decoder
-as its backbone :cite:`Radford.Narasimhan.Salimans.ea.2018`.
+Naudodamas kalbos modeliavimą kaip apmokymo tikslą,
+GPT (angl. *generative pre-training*) modelis
+pasirenka transformerio dekodavimo bloką
+kaip savo pagrindą :cite:`Radford.Narasimhan.Salimans.ea.2018`.
 
-![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Both “&lt;bos&gt;” and “&lt;eos&gt;” are special tokens marking the beginning and end of sequences, respectively. Right: Attention pattern in the Transformer decoder. Each token along the vertical axis attends to only its past tokens along the horizontal axis (causal).](../img/gpt-decoder-only.svg)
+![Kairėje: GPT išankstinis apmokymas kalbos modeliavimu. Tikslo seka yra įvesties seka, pastumta vienu teksto vienetu. Ir „&lt;bos&gt;“, ir „&lt;eos&gt;“ yra specialūs teksto vienetai, atitinkamai žymintys sekų pradžią ir pabaigą. Dešinėje: Dėmesio šablonas transformerio dekodavimo bloke. Kiekvienas teksto vienetas išilgai vertikalios ašies sutelkia dėmesį tik į savo praeities teksto vienetus išilgai horizontalios ašies (priežastinis).](../img/gpt-decoder-only.svg)
 :label:`fig_gpt-decoder-only`
 
-Following the autoregressive language model training
-as described in :numref:`subsec_partitioning-seqs`,
-:numref:`fig_gpt-decoder-only` illustrates
-GPT pretraining with a Transformer encoder,
-where the target sequence is the input sequence shifted by one token.
-Note that the attention pattern in the Transformer decoder
-enforces that each token can only attend to its past tokens
-(future tokens cannot be attended to because they have not yet been chosen).
+Laikydamasi autoregresinio kalbos modelio apmokymo,
+aprašyto :numref:`subsec_partitioning-seqs`,
+:numref:`fig_gpt-decoder-only` iliustruoja
+GPT išankstinį apmokymą su transformerio kodavimo bloku,
+kur tikslo seka yra įvesties seka, pastumta vienu teksto vienetu.
+Atkreipkite dėmesį, kad dėmesio šablonas transformerio dekodavimo bloke
+užtikrina, kad kiekvienas teksto vienetas gali sutelkti dėmesį tik į savo praeities teksto vienetus
+(į ateities teksto vienetus negalima sutelkti dėmesio, nes jie dar nepasirinkti).
 
 
-GPT has 100 million parameters and needs to be
-fine-tuned for individual downstream tasks.
-A much larger Transformer-decoder language model,
-GPT-2, was introduced one year later :cite:`Radford.Wu.Child.ea.2019`.
-Compared with the original Transformer decoder in GPT, pre-normalization
-(discussed in :numref:`subsec_vit-encoder`)
-and improved initialization and weight-scaling were adopted in GPT-2.
-Pretrained on 40 GB of text, the 1.5-billion-parameter
-GPT-2 obtained the state-of-the-art results on language modeling benchmarks
-and promising results on multiple other tasks
-*without updating the parameters or architecture*.
+GPT turi 100 milijonų parametrų ir turi būti
+patikslintas atskiroms tolesnėms užduotims.
+Daug didesnis transformerio dekodavimo bloko kalbos modelis,
+GPT-2, buvo pristatytas po metų :cite:`Radford.Wu.Child.ea.2019`.
+Palyginti su originaliu transformerio dekodavimo bloku GPT, GPT-2 buvo pritaikyta išankstinė normalizacija
+(aptarta :numref:`subsec_vit-encoder`)
+ir patobulintas inicializavimas bei svorių mastelio keitimas.
+Iš anksto apmokytas su 40 GB teksto, 1,5 milijardo parametrų
+GPT-2 pasiekė pažangiausius rezultatus kalbos modeliavimo lyginamuosiuose testuose
+ir daug žadančius rezultatus keliose kitose užduotyse
+*neatnaujinant parametrų ar architektūros*.
 
 
-### GPT-3 and Beyond
+### GPT-3 ir toliau
 
-GPT-2 demonstrated potential of using the same language model
-for multiple tasks without updating the model.
-This is more computationally efficient than fine-tuning,
-which requires model updates via gradient computation.
+GPT-2 parodė potencialą naudoti tą patį kalbos modelį
+kelioms užduotims be modelio atnaujinimo.
+Tai skaičiavimo požiūriu efektyviau nei patikslinimas,
+kuriam reikia modelio atnaujinimų per gradientų skaičiavimą.
 
 
-![Zero-shot, one-shot, few-shot in-context learning with language models (Transformer decoders). No parameter update is needed.](../img/gpt-3-xshot.svg)
+![Nulinio, vieno ir kelių pavyzdžių kontekstinis mokymasis su kalbos modeliais (transformerių dekodavimo blokais). Parametrų atnaujinimo nereikia.](../img/gpt-3-xshot.svg)
 :label:`fig_gpt-3-xshot`
 
-Before explaining the more computationally efficient use
-of language models without parameter update,
-recall :numref:`sec_rnn-scratch` that a language model
-can be trained to generate a text sequence
-conditional on some prefix text sequence.
-Thus, a pretrained language model may generate the task output
-as a sequence *without parameter update*,
-conditional on an input sequence with the task description,
-task-specific input--output examples, and a prompt (task input).
-This learning paradigm is called *in-context learning* :cite:`brown2020language`,
-which can be further categorized
-into *zero-shot*, *one-shot*, and *few-shot*,
-when there is no, one, and a few task-specific input--output examples (:numref:`fig_gpt-3-xshot`).
+Prieš aiškindami skaičiavimo požiūriu efektyvesnį
+kalbos modelių naudojimą be parametrų atnaujinimo,
+prisiminkite iš :numref:`sec_rnn-scratch`, kad kalbos modelį
+galima apmokyti generuoti teksto seką,
+sąlygotą tam tikros priešdėlio teksto sekos.
+Taigi iš anksto apmokytas kalbos modelis gali sugeneruoti užduoties išvestį
+kaip seką *be parametrų atnaujinimo*,
+sąlygotą įvesties sekos su užduoties aprašymu,
+konkrečiai užduočiai skirtais įvesties ir išvesties pavyzdžiais ir užklausa (užduoties įvestimi).
+Ši mokymosi paradigma vadinama *kontekstiniu mokymusi* (angl. *in-context learning*) :cite:`brown2020language`,
+kurį galima toliau skirstyti
+į *nulinio pavyzdžio* (angl. *zero-shot*), *vieno pavyzdžio* (angl. *one-shot*) ir *kelių pavyzdžių* (angl. *few-shot*),
+kai konkrečiai užduočiai skirtų įvesties ir išvesties pavyzdžių nėra, yra vienas ir yra keli (:numref:`fig_gpt-3-xshot`).
 
 
-![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :citet:`brown2020language`).](../img/gpt3-xshot-scaling.png)
+![Bendras GPT-3 našumas visuose 42 tikslumu išreikštuose lyginamuosiuose testuose (paaiškinimas pritaikytas ir paveikslas paimtas iš :citet:`brown2020language`).](../img/gpt3-xshot-scaling.png)
 :width:`400px`
 :label:`fig_gpt3-xshot-scaling`
 
-These three settings were tested in GPT-3 :cite:`brown2020language`,
-whose largest version uses data and model size
-about two orders of magnitude larger than those in GPT-2.
-GPT-3 uses the same Transformer decoder architecture
-as its direct predecessor GPT-2
-except that attention patterns
-(at the right in :numref:`fig_gpt-decoder-only`)
-are sparser at alternating layers.
-Pretrained with 300 billion tokens,
-GPT-3 performs better with larger model size,
-where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`).
+Šios trys nuostatos buvo išbandytos GPT-3 :cite:`brown2020language`,
+kurio didžiausia versija naudoja duomenis ir modelio dydį,
+maždaug dviem eilėmis didesnius nei GPT-2.
+GPT-3 naudoja tą pačią transformerio dekodavimo bloko architektūrą
+kaip tiesioginis pirmtakas GPT-2,
+tik dėmesio šablonai
+(dešinėje :numref:`fig_gpt-decoder-only`)
+yra retesni kas antrame sluoksnyje.
+Iš anksto apmokytas su 300 milijardų teksto vienetų,
+GPT-3 veikia geriau su didesniu modelio dydžiu,
+kur kelių pavyzdžių našumas didėja sparčiausiai (:numref:`fig_gpt3-xshot-scaling`).
 
-The subsequent GPT-4 model did not fully disclose technical details in its report :cite:`openai2023gpt4`.
-By contrast with its predecessors, GPT-4
-is a large-scale, multimodal model that
-can take both text and images as input
-and generate text output.
+Vėlesnis GPT-4 modelis savo ataskaitoje visiškai neatskleidė techninių detalių :cite:`openai2023gpt4`.
+Priešingai nei jo pirmtakai, GPT-4
+yra didelio masto daugiamodalis modelis, galintis
+priimti ir tekstą, ir vaizdus kaip įvestį
+ir generuoti teksto išvestį.
 
 
-## Scalability
+## Mastelio didinamumas
 
-:numref:`fig_gpt3-xshot-scaling` empirically demonstrates scalability
-of Transformers in the GPT-3 language model.
-For language modeling, more comprehensive empirical studies
-on the scalability of Transformers have led researchers to see promise
-in training larger Transformers with more data and compute :cite:`kaplan2020scaling`.
+:numref:`fig_gpt3-xshot-scaling` empiriškai parodo transformerių
+mastelio didinamumą GPT-3 kalbos modelyje.
+Kalbos modeliavimui išsamesni empiriniai tyrimai
+apie transformerių mastelio didinamumą paskatino tyrėjus įžvelgti perspektyvą
+apmokyti didesnius transformerius su daugiau duomenų ir skaičiavimų :cite:`kaplan2020scaling`.
 
-![Transformer language model performance improves smoothly as we increase the model size, dataset size, and amount of compute used for training. For optimal performance all three factors must be scaled up in tandem. Empirical performance has a power-law relationship with each individual factor when not bottlenecked by the other two (caption adapted and figure taken from :citet:`kaplan2020scaling`).](../img/scaling-power-law.png)
+![Transformerio kalbos modelio našumas glaudžiai gerėja didinant modelio dydį, duomenų rinkinio dydį ir apmokymui naudojamų skaičiavimų kiekį. Kad našumas būtų optimalus, visi trys veiksniai turi būti didinami kartu. Empirinis našumas turi laipsninio dėsnio ryšį su kiekvienu atskiru veiksniu, kai jo neriboja kiti du (paaiškinimas pritaikytas ir paveikslas paimtas iš :citet:`kaplan2020scaling`).](../img/scaling-power-law.png)
 :width:`700px`
 :label:`fig_scaling-power-law3`
 
-As shown in :numref:`fig_scaling-power-law3`,
-*power-law scaling* can be observed in the performance
-with respect to the model size (number of parameters, excluding embedding layers),
-dataset size (number of training tokens),
-and amount of training compute (PetaFLOP/s-days, excluding embedding layers).
-In general, increasing all these three factors in tandem leads to better performance.
-However, *how* to increase them in tandem
-still remains a matter of debate :cite:`hoffmann2022training`.
+Kaip parodyta :numref:`fig_scaling-power-law3`,
+*laipsninio dėsnio mastelio didinamumas* gali būti stebimas našume
+modelio dydžio atžvilgiu (parametrų skaičius, neįskaitant įterpimo sluoksnių),
+duomenų rinkinio dydžio (apmokymo teksto vienetų skaičius)
+ir apmokymo skaičiavimų kiekio (PetaFLOP/s-dienos, neįskaitant įterpimo sluoksnių).
+Apskritai visų šių trijų veiksnių didinimas kartu lemia geresnį našumą.
+Tačiau *kaip* juos didinti kartu
+vis dar yra diskusijų klausimas :cite:`hoffmann2022training`.
 
-![Transformer language model training runs (figure taken from :citet:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
+![Transformerio kalbos modelio apmokymo paleidimai (paveikslas paimtas iš :citet:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
 :width:`700px`
 :label:`fig_scaling-sample-conv`
 
-As well as increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level achieved by small models, and performance is scaled smoothly with compute.
+Be geresnio našumo, dideli modeliai taip pat pasižymi geresniu pavyzdžių efektyvumu nei maži modeliai. :numref:`fig_scaling-sample-conv` rodo, kad dideliems modeliams reikia mažiau apmokymo pavyzdžių (apdorotų teksto vienetų), kad veiktų tuo pačiu lygiu, kurį pasiekia maži modeliai, o našumas glaudžiai didėja su skaičiavimais.
 
 
 
-![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :citet:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :citet:`brown2020language`).](../img/scaling-gpt3.png)
+![GPT-3 našumas (kryžminės entropijos validavimo nuostolis) seka laipsninio dėsnio tendenciją su apmokymui naudojamų skaičiavimų kiekiu. Laipsninio dėsnio elgesys, stebėtas :citet:`kaplan2020scaling`, tęsiasi dar dvi eiles su tik nedideliais nukrypimais nuo prognozuotos kreivės. Įterpimo parametrai neįtraukti į skaičiavimų ir parametrų skaičių (paaiškinimas pritaikytas ir paveikslas paimtas iš :citet:`brown2020language`).](../img/scaling-gpt3.png)
 :width:`250px`
 :label:`fig_scaling-gpt3`
 
 
-The empirical scaling behaviors in :citet:`kaplan2020scaling` have been tested in subsequent large Transformer models. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
+Empiriniai mastelio didinimo elgesiai, aprašyti :citet:`kaplan2020scaling`, buvo patikrinti vėlesniuose dideliuose transformerių modeliuose. Pavyzdžiui, GPT-3 palaikė šią hipotezę dar dviem eilėmis :numref:`fig_scaling-gpt3`.
 
 
 
 
 
-## Large Language Models
+## Dideli kalbos modeliai
 
-The scalability of Transformers in the GPT series has inspired subsequent large language models. 
-The GPT-2 Transformer decoder was used for training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens, performed competitively across diverse tasks. 
-Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains for much longer (1.4 trillion training tokens), outperforming Gopher on many tasks and with more emphasis on the number of tokens than on the number of parameters.
-To continue the scaling line of language modeling, 
-PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter Transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Its later version, PaLM 2 :cite:`anil2023palm`, scaled data and model roughly 1:1 and improved multilingual and reasoning capabilities. 
-Other large language models, such as Minerva  :cite:`lewkowycz2022solving` that further trains a generalist (PaLM) and Galactica :cite:`taylor2022galactica` that is not trained on a general corpus, have shown promising quantitative and scientific reasoning capabilities.
-
-
-Open-sourced releases, such as OPT (Open Pretrained Transformers) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom`, and FALCON :cite:`penedo2023refinedweb`,
-democratized research and use of large language models.
-Focusing on computational efficiency at inference time,
-the open-sourced Llama 1 :cite:`touvron2023llama` outperformed much larger models by training on more tokens than had been typically used. The updated Llama 2 :cite:`touvron2023llama2` further increased the pretraining corpus by 40%, leading to product models that may match the performance of competitive close-sourced models. 
+Transformerių mastelio didinamumas GPT serijoje įkvėpė vėlesnius didelius kalbos modelius.
+GPT-2 transformerio dekodavimo blokas buvo naudotas apmokant 530 milijardų parametrų „Megatron-Turing NLG“ :cite:`smith2022using` su 270 milijardų apmokymo teksto vienetų. Laikydamasis GPT-2 dizaino, 280 milijardų parametrų „Gopher“ :cite:`rae2021scaling`, iš anksto apmokytas su 300 milijardų teksto vienetų, konkurencingai veikė įvairiose užduotyse.
+Paveldėdamas tą pačią architektūrą ir naudodamas tą patį „Gopher“ skaičiavimo biudžetą, „Chinchilla“ :cite:`hoffmann2022training` yra gerokai mažesnis (70 milijardų parametrų) modelis, kuris apmokomas daug ilgiau (1,4 trilijono apmokymo teksto vienetų), daugelyje užduočių pranokstantis „Gopher“, ir daugiau dėmesio skiriantis teksto vienetų skaičiui nei parametrų skaičiui.
+Siekiant tęsti kalbos modeliavimo mastelio didinimo liniją,
+PaLM (angl. *Pathway Language Model*) :cite:`chowdhery2022palm`, 540 milijardų parametrų transformerio dekodavimo blokas su modifikuotais dizainais, iš anksto apmokytas su 780 milijardų teksto vienetų, pranoko vidutinį žmogaus našumą BIG-Bench lyginamajame teste :cite:`srivastava2022beyond`. Vėlesnė jo versija PaLM 2 :cite:`anil2023palm` didino duomenis ir modelį maždaug santykiu 1:1 ir pagerino daugiakalbes bei samprotavimo galimybes.
+Kiti dideli kalbos modeliai, tokie kaip „Minerva“ :cite:`lewkowycz2022solving`, toliau apmokantis universalų modelį (PaLM), ir „Galactica“ :cite:`taylor2022galactica`, neapmokytas bendrame tekstyne, parodė daug žadančius kiekybinio ir mokslinio samprotavimo gebėjimus.
 
 
+Atvirojo kodo leidimai, tokie kaip OPT (angl. *Open Pretrained Transformers*) :cite:`zhang2022opt`, BLOOM :cite:` scao2022bloom` ir FALCON :cite:`penedo2023refinedweb`,
+demokratizavo didelių kalbos modelių tyrimus ir naudojimą.
+Daugiausia dėmesio skirdamas skaičiavimo efektyvumui išvedimo metu,
+atvirojo kodo „Llama 1“ :cite:`touvron2023llama` pranoko daug didesnius modelius, apmokydamas juos su daugiau teksto vienetų, nei buvo įprasta naudoti. Atnaujintas „Llama 2“ :cite:`touvron2023llama2` dar 40 % padidino išankstinio apmokymo tekstyną, o tai lėmė produktų modelius, kurie gali prilygti konkurencingų uždarojo kodo modelių našumui.
 
-:citet:`wei2022emergent` discussed emergent abilities of large language models that are present in larger models, but not in smaller models.
-However, simply increasing model size does not inherently make models follow human instructions better.
-:citet:`wei2021finetuned,sanh2021multitask` have found that fine-tuning large language models
-on a range of datasets described via *instructions*
-can improve zero-shot performance on held-out tasks.
-Using *reinforcement learning from human feedback*,
-:citet:`ouyang2022training` fine-tuned GPT-3
-to follow a diverse set of instructions.
-Following the resultant InstructGPT which
-aligns language models with human intent
-via fine-tuning :cite:`ouyang2022training`,
+
+
+:citet:`wei2022emergent` aptarė didelių kalbos modelių išryškėjančias (angl. *emergent*) galimybes, esančias didesniuose modeliuose, bet nesančias mažesniuose.
+Tačiau vien modelio dydžio didinimas savaime nepadaro modelių geriau besilaikančių žmogaus nurodymų.
+:citet:`wei2021finetuned,sanh2021multitask` nustatė, kad didelių kalbos modelių patikslinimas
+įvairiuose duomenų rinkiniuose, aprašytuose per *nurodymus*,
+gali pagerinti nulinio pavyzdžio našumą neregėtose užduotyse.
+Naudodami *skatinamąjį mokymąsi iš žmogaus grįžtamojo ryšio*,
+:citet:`ouyang2022training` patikslino GPT-3,
+kad jis laikytųsi įvairių nurodymų.
+Po gauto „InstructGPT“, kuris
+suderina kalbos modelius su žmogaus ketinimais
+per patikslinimą :cite:`ouyang2022training`,
 [ChatGPT](https://chat.openai.com/)
-can generate human-like responses (e.g., code debugging and creative writing)
-based on conversations with humans
-and can perform many natural language processing
-tasks zero-shot :cite:`qin2023chatgpt`.
-:citet:`bai2022constitutional` replaced human inputs (e.g., human-labeled data) with model outputs
-to partially automate the instruction tuning process, which is also known as *reinforcement learning from AI feedback*.
+gali generuoti žmogiškus atsakymus (pvz., kodo derinimą ir kūrybinį rašymą)
+remdamasis pokalbiais su žmonėmis
+ir gali atlikti daugelį natūraliosios kalbos apdorojimo
+užduočių nulinio pavyzdžio režimu :cite:`qin2023chatgpt`.
+:citet:`bai2022constitutional` pakeitė žmogaus įvestis (pvz., žmonių pažymėtus duomenis) modelių išvestimis,
+kad iš dalies automatizuotų nurodymų derinimo procesą, kuris taip pat žinomas kaip *skatinamasis mokymasis iš DI grįžtamojo ryšio*.
 
 
-Large language models offer an exciting prospect
-of formulating text input to induce models to perform desired tasks via in-context learning,
-which is also known as *prompting*.
-Notably,
-*chain-of-thought prompting* :cite:`wei2022chain`,
-an in-context learning method
-with few-shot "question, intermediate reasoning steps, answer" demonstrations,
-elicits the complex reasoning capabilities of
-large language models
-in order to solve mathematical, commonsense, and symbolic reasoning tasks.
-Sampling multiple reasoning paths :cite:`wang2023self`, diversifying few-shot demonstrations :cite:`zhang2023automatic`, 
-and reducing complex problems to sub-problems :cite:`zhou2023least`
-can all improve the reasoning accuracy. In fact, with simple prompts like "Let's think step by step" just before each answer,
-large language models can even perform *zero-shot*
-chain-of-thought reasoning with decent accuracy :cite:`kojima2022large`.
-Even for multimodal inputs consisting of both text and images,
-language models can perform multimodal chain-of-thought reasoning with higher accuracy than using text input only :cite:`zhang2023multicot`.
+Dideli kalbos modeliai suteikia įdomią perspektyvą
+formuluoti teksto įvestį, kad modeliai atliktų norimas užduotis per kontekstinį mokymąsi,
+kuris taip pat žinomas kaip *skatinimas* (angl. *prompting*).
+Pažymėtina,
+*minčių grandinės skatinimas* (angl. *chain-of-thought prompting*) :cite:`wei2022chain`,
+kontekstinio mokymosi metodas
+su kelių pavyzdžių „klausimas, tarpiniai samprotavimo žingsniai, atsakymas“ demonstracijomis,
+išgauna sudėtingas didelių kalbos modelių samprotavimo galimybes,
+kad būtų išspręstos matematinio, sveiko proto ir simbolinio samprotavimo užduotys.
+Kelių samprotavimo kelių ėmimas :cite:`wang2023self`, kelių pavyzdžių demonstracijų įvairinimas :cite:`zhang2023automatic`
+ir sudėtingų problemų suvedimas į pogrupes problemas :cite:`zhou2023least`
+gali pagerinti samprotavimo tikslumą. Iš tiesų, su paprastomis užklausomis, tokiomis kaip „Let's think step by step“ prieš kiekvieną atsakymą,
+dideli kalbos modeliai gali net atlikti *nulinio pavyzdžio*
+minčių grandinės samprotavimą su pakankamu tikslumu :cite:`kojima2022large`.
+Net daugiamodalėms įvestims, sudarytoms ir iš teksto, ir iš vaizdų,
+kalbos modeliai gali atlikti daugiamodalį minčių grandinės samprotavimą didesniu tikslumu nei naudojant vien teksto įvestį :cite:`zhang2023multicot`.
 
 
 
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-Transformers have been pretrained as encoder-only (e.g., BERT), encoder--decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine-tuning) or not (e.g., few-shot). Scalability of Transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since Transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example,
-(i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision Transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there have been no systematic studies on Transformer scalability in multimodal pretraining yet, an all-Transformer text-to-image model called Parti :cite:`yu2022scaling` shows potential of scalability across modalities:
-a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
+Transformeriai buvo iš anksto apmokyti kaip tik kodavimo bloko (pvz., BERT), kodavimo ir dekodavimo bloko (pvz., T5) ir tik dekodavimo bloko (pvz., GPT serija). Iš anksto apmokyti modeliai gali būti pritaikyti skirtingoms užduotims atlikti su modelio atnaujinimu (pvz., patikslinimu) arba be jo (pvz., kelių pavyzdžių). Transformerių mastelio didinamumas rodo, kad geresnis našumas gaunamas iš didesnių modelių, daugiau apmokymo duomenų ir daugiau apmokymo skaičiavimų. Kadangi transformeriai pirmiausia buvo suprojektuoti ir iš anksto apmokyti tekstiniams duomenims, šis skyrelis šiek tiek krypsta į natūraliosios kalbos apdorojimą. Vis dėlto aukščiau aptarti modeliai dažnai randami naujesniuose modeliuose įvairiomis modalybėmis. Pavyzdžiui,
+(i) „Chinchilla“ :cite:`hoffmann2022training` buvo toliau išplėstas iki „Flamingo“ :cite:`alayrac2022flamingo` – regimojo kalbos modelio mokymuisi iš kelių pavyzdžių;
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` ir regimasis transformeris koduoja tekstą ir vaizdus CLIP (angl. *Contrastive Language-Image Pre-training*) :cite:`radford2021learning`, kurio vaizdų ir teksto įterpiniai vėliau buvo pritaikyti DALL-E 2 teksto į vaizdą sistemoje :cite:`ramesh2022hierarchical`. Nors sisteminių transformerių mastelio didinamumo tyrimų daugiamodaliame išankstiniame apmokyme dar nėra, vien transformerių teksto į vaizdą modelis „Parti“ :cite:`yu2022scaling` rodo mastelio didinamumo potencialą per modalybes:
+didesnis „Parti“ geriau geba generuoti didelio tikslumo vaizdus ir suprasti turiningą tekstą (:numref:`fig_parti`).
 
 
-![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :citet:`yu2022scaling`).](../img/parti.png)
+![Vaizdų pavyzdžiai, sugeneruoti iš to paties teksto didėjančių dydžių „Parti“ modeliais (350M, 750M, 3B, 20B) (pavyzdžiai paimti iš :citet:`yu2022scaling`).](../img/parti.png)
 :width:`700px`
 :label:`fig_parti`
 
 
 
 
-## Exercises
+## Pratimai
 
-1. Is it possible to fine-tune T5 using a minibatch consisting of different tasks? Why or why not? How about for GPT-2?
-1. Given a powerful language model, what applications can you think of?
-1. Say that you are asked to fine-tune a language model to perform text classification by adding additional layers. Where will you add them? Why?
-1. Consider sequence-to-sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only Transformers? Why?
+1. Ar įmanoma patikslinti T5 naudojant minirinkinį, sudarytą iš skirtingų užduočių? Kodėl taip arba kodėl ne? O kaip dėl GPT-2?
+1. Turint galingą kalbos modelį, kokius taikymus galite sugalvoti?
+1. Tarkime, kad jūsų prašoma patikslinti kalbos modelį, kad jis atliktų teksto klasifikavimą, pridedant papildomų sluoksnių. Kur juos pridėtumėte? Kodėl?
+1. Apsvarstykite sekos į seką problemas (pvz., mašininį vertimą), kuriose įvesties seka visada pasiekiama viso tikslo sekos prognozavimo metu. Kokie galėtų būti modeliavimo tik dekodavimo bloko transformeriais apribojimai? Kodėl?
 
 
-[Discussions](https://discuss.d2l.ai/t/9232)
+[Diskusijos](https://discuss.d2l.ai/t/9232)

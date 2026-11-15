@@ -1,63 +1,63 @@
-# Bidirectional Recurrent Neural Networks
+# Dvikrypčiai rekurentiniai neuroniniai tinklai
 :label:`sec_bi_rnn`
 
-So far, our working example of a sequence learning task has been language modeling,
-where we aim to predict the next token given all previous tokens in a sequence.
-In this scenario, we wish only to condition upon the leftward context,
-and thus the unidirectional chaining of a standard RNN seems appropriate.
-However, there are many other sequence learning tasks contexts
-where it is perfectly fine to condition the prediction at every time step
-on both the leftward and the rightward context.
-Consider, for example, part of speech detection.
-Why shouldn't we take the context in both directions into account
-when assessing the part of speech associated with a given word?
+Iki šiol mūsų pagrindinis sekų mokymosi užduoties pavyzdys buvo kalbos modeliavimas,
+kai siekiame prognozuoti kitą teksto vienetą, žinodami visus ankstesnius sekos teksto vienetus.
+Šiuo atveju norime sąlygoti tik kairiojo konteksto atžvilgiu,
+todėl standartinio RNN vienakryptė grandinė atrodo tinkama.
+Tačiau yra daug kitų sekų mokymosi užduočių kontekstų,
+kuriuose visiškai tinka prognozę kiekvienu laiko žingsniu
+sąlygoti ir kairiuoju, ir dešiniuoju kontekstu.
+Pavyzdžiui, kalbos dalių nustatymas.
+Kodėl neturėtume atsižvelgti į kontekstą abiem kryptimis,
+vertindami su duotu žodžiu susijusią kalbos dalį?
 
-Another common task---often useful as a pretraining exercise
-prior to fine-tuning a model on an actual task of interest---is
-to mask out random tokens in a text document and then to train
-a sequence model to predict the values of the missing tokens.
-Note that depending on what comes after the blank,
-the likely value of the missing token changes dramatically:
+Kita dažna užduotis – dažnai naudinga kaip išankstinio mokymo pratimas
+prieš modelio patikslinimą tikrajai dominančiai užduočiai –
+yra užmaskuoti atsitiktinius teksto dokumento teksto vienetus ir tada apmokyti
+sekų modelį prognozuoti trūkstamų teksto vienetų reikšmes.
+Atkreipkite dėmesį, kad priklausomai nuo to, kas eina po tuščios vietos,
+tikėtina trūkstamo teksto vieneto reikšmė smarkiai keičiasi:
 
-* I am `___`.
-* I am `___` hungry.
-* I am `___` hungry, and I can eat half a pig.
+* Aš esu `___`.
+* Aš esu `___` alkanas.
+* Aš esu `___` alkanas ir galiu suvalgyti pusę kiaulės.
 
-In the first sentence "happy" seems to be a likely candidate.
-The words "not" and "very" seem plausible in the second sentence,
-but "not" seems incompatible with the third sentences.
-
-
-Fortunately, a simple technique transforms any unidirectional RNN
-into a bidirectional RNN :cite:`Schuster.Paliwal.1997`.
-We simply implement two unidirectional RNN layers
-chained together in opposite directions
-and acting on the same input (:numref:`fig_birnn`).
-For the first RNN layer,
-the first input is $\mathbf{x}_1$
-and the last input is $\mathbf{x}_T$,
-but for the second RNN layer,
-the first input is $\mathbf{x}_T$
-and the last input is $\mathbf{x}_1$.
-To produce the output of this bidirectional RNN layer,
-we simply concatenate together the corresponding outputs
-of the two underlying unidirectional RNN layers.
+Pirmajame sakinyje „laimingas“ atrodo tikėtinas kandidatas.
+Žodžiai „ne“ ir „labai“ atrodo tinkami antrajame sakinyje,
+tačiau „ne“ atrodo nesuderinamas su trečiuoju sakiniu.
 
 
-![Architecture of a bidirectional RNN.](../img/birnn.svg)
+Laimei, paprasta technika bet kurį vienakryptį RNN paverčia
+dvikrypčiu RNN :cite:`Schuster.Paliwal.1997`.
+Tiesiog įgyvendiname du vienakrypčius RNN sluoksnius,
+sujungtus priešingomis kryptimis
+ir veikiančius tą pačią įvestį (:numref:`fig_birnn`).
+Pirmajam RNN sluoksniui
+pirmoji įvestis yra $\mathbf{x}_1$,
+o paskutinė – $\mathbf{x}_T$,
+tačiau antrajam RNN sluoksniui
+pirmoji įvestis yra $\mathbf{x}_T$,
+o paskutinė – $\mathbf{x}_1$.
+Šio dvikrypčio RNN sluoksnio išvesčiai gauti
+tiesiog sujungiame (angl. *concatenate*) atitinkamas
+dviejų pagrindinių vienakrypčių RNN sluoksnių išvestis.
+
+
+![Dvikrypčio RNN architektūra.](../img/birnn.svg)
 :label:`fig_birnn`
 
 
-Formally for any time step $t$,
-we consider a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$
-(number of examples $=n$; number of inputs in each example $=d$)
-and let the hidden layer activation function be $\phi$.
-In the bidirectional architecture,
-the forward and backward hidden states for this time step
-are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$
-and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$, respectively,
-where $h$ is the number of hidden units.
-The forward and backward hidden state updates are as follows:
+Formaliai, bet kuriam laiko žingsniui $t$
+nagrinėjame minirinkinio įvestį $\mathbf{X}_t \in \mathbb{R}^{n \times d}$
+(pavyzdžių skaičius $=n$; įvesčių skaičius kiekviename pavyzdyje $=d$)
+ir tegul paslėptojo sluoksnio aktyvacijos funkcija yra $\phi$.
+Dvikryptėje architektūroje
+šio laiko žingsnio tiesioginė ir atvirkštinė paslėptosios būsenos
+yra atitinkamai $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$
+ir $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$,
+kur $h$ yra paslėptųjų vienetų skaičius.
+Tiesioginės ir atvirkštinės paslėptųjų būsenų atnaujinimai yra tokie:
 
 
 $$
@@ -67,24 +67,24 @@ $$
 \end{aligned}
 $$
 
-where the weights $\mathbf{W}_{\textrm{xh}}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{\textrm{xh}}^{(b)} \in \mathbb{R}^{d \times h}, \textrm{ and } \mathbf{W}_{\textrm{hh}}^{(b)} \in \mathbb{R}^{h \times h}$, and the biases $\mathbf{b}_\textrm{h}^{(f)} \in \mathbb{R}^{1 \times h}$ and $\mathbf{b}_\textrm{h}^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
+kur svoriai $\mathbf{W}_{\textrm{xh}}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{\textrm{xh}}^{(b)} \in \mathbb{R}^{d \times h}, \textrm{ ir } \mathbf{W}_{\textrm{hh}}^{(b)} \in \mathbb{R}^{h \times h}$, o poslinkiai $\mathbf{b}_\textrm{h}^{(f)} \in \mathbb{R}^{1 \times h}$ ir $\mathbf{b}_\textrm{h}^{(b)} \in \mathbb{R}^{1 \times h}$ yra visi modelio parametrai.
 
-Next, we concatenate the forward and backward hidden states
-$\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$
-to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ for feeding into the output layer.
-In deep bidirectional RNNs with multiple hidden layers,
-such information is passed on as *input* to the next bidirectional layer.
-Last, the output layer computes the output
-$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs $=q$):
+Toliau sujungiame tiesioginę ir atvirkštinę paslėptąsias būsenas
+$\overrightarrow{\mathbf{H}}_t$ ir $\overleftarrow{\mathbf{H}}_t$,
+kad gautume paslėptąją būseną $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$, paduodamą į išvesties sluoksnį.
+Giliuosiuose dvikrypčiuose RNN su keliais paslėptaisiais sluoksniais
+tokia informacija perduodama kaip *įvestis* į kitą dvikryptį sluoksnį.
+Galiausiai išvesties sluoksnis apskaičiuoja išvestį
+$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (išvesčių skaičius $=q$):
 
 $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q}.$$
 
-Here, the weight matrix $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{2h \times q}$
-and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$
-are the model parameters of the output layer.
-While technically, the two directions can have different numbers of hidden units,
-this design choice is seldom made in practice.
-We now demonstrate a simple implementation of a bidirectional RNN.
+Čia svorių matrica $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{2h \times q}$
+ir poslinkis $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$
+yra išvesties sluoksnio modelio parametrai.
+Nors techniškai dvi kryptys gali turėti skirtingą paslėptųjų vienetų skaičių,
+šis dizaino pasirinkimas praktikoje daromas retai.
+Dabar pademonstruosime paprastą dvikrypčio RNN įgyvendinimą.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -118,11 +118,11 @@ from d2l import jax as d2l
 from jax import numpy as jnp
 ```
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-If we want to implement a bidirectional RNN from scratch, we can
-include two unidirectional `RNNScratch` instances
-with separate learnable parameters.
+Jei norime įgyvendinti dvikryptį RNN nuo nulio,
+galime įtraukti du vienakrypčius `RNNScratch` egzempliorius
+su atskirais mokomais parametrais.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -148,9 +148,9 @@ class BiRNNScratch(d2l.Module):
         self.num_hiddens *= 2  # The output dimension will be doubled
 ```
 
-States of forward and backward RNNs
-are updated separately,
-while outputs of these two RNNs are concatenated.
+Tiesioginio ir atvirkštinio RNN būsenos
+atnaujinamos atskirai,
+o šių dviejų RNN išvestys sujungiamos.
 
 ```{.python .input}
 %%tab all
@@ -164,19 +164,19 @@ def forward(self, inputs, Hs=None):
     return outputs, (f_H, b_H)
 ```
 
-## Concise Implementation
+## Glaustas įgyvendinimas
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-Using the high-level APIs,
-we can implement bidirectional RNNs more concisely.
-Here we take a GRU model as an example.
+Naudodami aukšto lygio API,
+dvikrypčius RNN galime įgyvendinti glausčiau.
+Čia kaip pavyzdį imame GRU modelį.
 :end_tab:
 
 :begin_tab:`jax`
-Flax API does not offer RNN layers and hence there is no
-notion of any `bidirectional` argument. One needs to manually
-reverse the inputs as shown in the scratch implementation,
-if a bidirectional layer is needed.
+Flax API nesiūlo RNN sluoksnių, todėl nėra
+jokio `bidirectional` argumento sampratos. Jei reikalingas dvikryptis sluoksnis,
+reikia rankiniu būdu apversti įvestis, kaip parodyta
+įgyvendinime nuo nulio.
 :end_tab:
 
 ```{.python .input}
@@ -192,24 +192,24 @@ class BiGRU(d2l.RNN):
         self.num_hiddens *= 2
 ```
 
-## Summary
+## Santrauka
 
-In bidirectional RNNs, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step. Bidirectional RNNs are mostly useful for sequence encoding and the estimation of observations given bidirectional context. Bidirectional RNNs are very costly to train due to long gradient chains.
+Dvikrypčiuose RNN kiekvieno laiko žingsnio paslėptoji būsena vienu metu nustatoma pagal duomenis prieš dabartinį laiko žingsnį ir po jo. Dvikrypčiai RNN daugiausia naudingi sekų kodavimui ir stebėjimų įvertinimui duotame dvikrypčiame kontekste. Dvikrypčius RNN apmokyti labai brangu dėl ilgų gradientų grandinių.
 
-## Exercises
+## Pratimai
 
-1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
-1. Design a bidirectional RNN with multiple hidden layers.
-1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the correct context will be returned? What type of neural architectures is preferred for handling polysemy?
+1. Jei skirtingos kryptys naudoja skirtingą paslėptųjų vienetų skaičių, kaip pasikeis $\mathbf{H}_t$ forma?
+1. Suprojektuokite dvikryptį RNN su keliais paslėptaisiais sluoksniais.
+1. Polisemija natūraliosiose kalbose yra dažna. Pavyzdžiui, žodis „bank“ (angl. krantas / bankas) turi skirtingas reikšmes kontekstuose „i went to the bank to deposit cash“ ir „i went to the bank to sit down“. Kaip galime suprojektuoti neuroninio tinklo modelį, kad pagal duotą konteksto seką ir žodį būtų grąžinamas to žodžio vektorinis vaizdas teisingame kontekste? Kokio tipo neuroninės architektūros pageidautinos polisemijai spręsti?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/339)
+[Diskusijos](https://discuss.d2l.ai/t/339)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1059)
+[Diskusijos](https://discuss.d2l.ai/t/1059)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18019)
+[Diskusijos](https://discuss.d2l.ai/t/18019)
 :end_tab:

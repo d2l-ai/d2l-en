@@ -3,41 +3,41 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Convolutional Neural Networks (LeNet)
+# Konvoliuciniai neuroniniai tinklai (LeNet)
 :label:`sec_lenet`
 
-We now have all the ingredients required to assemble
-a fully-functional CNN.
-In our earlier encounter with image data, we applied
-a linear model with softmax regression (:numref:`sec_softmax_scratch`)
-and an MLP (:numref:`sec_mlp-implementation`)
-to pictures of clothing in the Fashion-MNIST dataset.
-To make such data amenable we first flattened each image from a $28\times28$ matrix
-into a fixed-length $784$-dimensional vector,
-and thereafter processed them in fully connected layers.
-Now that we have a handle on convolutional layers,
-we can retain the spatial structure in our images.
-As an additional benefit of replacing fully connected layers with convolutional layers,
-we will enjoy more parsimonious models that require far fewer parameters.
+Dabar turime visus ingredientus, reikalingus
+pilnai veikiančiam CNN surinkti.
+Ankstesnio susitikimo su vaizdų duomenimis metu taikėme
+tiesinį modelį su softmax regresija (:numref:`sec_softmax_scratch`)
+ir MLP (:numref:`sec_mlp-implementation`)
+drabužių nuotraukoms iš Fashion-MNIST duomenų rinkinio.
+Kad tokie duomenys taptų tinkami, pirmiausia išlyginome kiekvieną vaizdą iš $28\times28$ matricos
+į fiksuoto ilgio $784$ dimensijų vektorių,
+o po to apdorojome juos pilnai sujungtuose sluoksniuose.
+Dabar, kai suprantame konvoliucinius sluoksnius,
+galime išlaikyti vaizdų erdvinę struktūrą.
+Papildomas pilnai sujungtų sluoksnių keitimo konvoliuciniais privalumas –
+taupesni modeliai, kuriems reikia gerokai mažiau parametrų.
 
-In this section, we will introduce *LeNet*,
-among the first published CNNs
-to capture wide attention for its performance on computer vision tasks.
-The model was introduced by (and named for) Yann LeCun,
-then a researcher at AT&T Bell Labs,
-for the purpose of recognizing handwritten digits in images :cite:`LeCun.Bottou.Bengio.ea.1998`.
-This work represented the culmination
-of a decade of research developing the technology;
-LeCun's team published the first study to successfully
-train CNNs via backpropagation :cite:`LeCun.Boser.Denker.ea.1989`.
+Šiame skyrelyje pristatysime *LeNet* –
+vieną pirmųjų paskelbtų CNN,
+sulaukusį plataus dėmesio dėl savo veikimo kompiuterinio matymo užduotyse.
+Modelį pristatė (ir pavadino jo vardu) Yannas LeCunas,
+tuomet AT&T Bell Labs tyrėjas,
+rankraščiu rašytų skaitmenų vaizduose atpažinti :cite:`LeCun.Bottou.Bengio.ea.1998`.
+Šis darbas buvo dešimtmetį trukusių
+technologijos kūrimo tyrimų kulminacija;
+LeCuno komanda paskelbė pirmąjį tyrimą, sėkmingai
+apmokiusį CNN naudojant atgalinį sklidimą :cite:`LeCun.Boser.Denker.ea.1989`.
 
-At the time LeNet achieved outstanding results
-matching the performance of support vector machines,
-then a dominant approach in supervised learning, achieving an error rate of less than 1% per digit.
-LeNet was eventually adapted to recognize digits
-for processing deposits in ATM machines.
-To this day, some ATMs still run the code
-that Yann LeCun and his colleague Leon Bottou wrote in the 1990s!
+Tuo metu LeNet pasiekė puikių rezultatų,
+prilygstančių atraminių vektorių mašinoms,
+tuomet dominavusiam prižiūrimojo mokymosi metodui, pasiekdamas mažesnę nei 1 % paklaidą vienam skaitmeniui.
+Galiausiai LeNet buvo pritaikytas skaitmenims atpažinti
+apdorojant įnašus bankomatuose.
+Iki šiol kai kurie bankomatai vis dar vykdo kodą,
+kurį Yannas LeCunas ir jo kolega Leonas Bottou parašė 1990-aisiais!
 
 ```{.python .input}
 %%tab mxnet
@@ -71,53 +71,53 @@ from types import FunctionType
 
 ## LeNet
 
-At a high level, (**LeNet (LeNet-5) consists of two parts:
-(i) a convolutional encoder consisting of two convolutional layers; and
-(ii) a dense block consisting of three fully connected layers**).
-The architecture is summarized in :numref:`img_lenet`.
+Aukštu lygiu žvelgiant, (**LeNet (LeNet-5) sudaro dvi dalys:
+(i) konvoliucinis kodavimo blokas iš dviejų konvoliucinių sluoksnių; ir
+(ii) tankusis blokas iš trijų pilnai sujungtų sluoksnių**).
+Architektūra apibendrinta :numref:`img_lenet`.
 
-![Data flow in LeNet. The input is a handwritten digit, the output is a probability over 10 possible outcomes.](../img/lenet.svg)
+![Duomenų srautas LeNet. Įvestis yra ranka rašytas skaitmuo, išvestis – 10 galimų baigčių tikimybės.](../img/lenet.svg)
 :label:`img_lenet`
 
-The basic units in each convolutional block
-are a convolutional layer, a sigmoid activation function,
-and a subsequent average pooling operation.
-Note that while ReLUs and max-pooling work better,
-they had not yet been discovered.
-Each convolutional layer uses a $5\times 5$ kernel
-and a sigmoid activation function.
-These layers map spatially arranged inputs
-to a number of two-dimensional feature maps, typically
-increasing the number of channels.
-The first convolutional layer has 6 output channels,
-while the second has 16.
-Each $2\times2$ pooling operation (stride 2)
-reduces dimensionality by a factor of $4$ via spatial downsampling.
-The convolutional block emits an output with shape given by
-(batch size, number of channel, height, width).
+Pagrindiniai kiekvieno konvoliucinio bloko vienetai
+yra konvoliucinis sluoksnis, sigmoidinė aktyvacijos funkcija
+ir po jos einanti sutelkimo vidurkinant operacija.
+Atkreipkite dėmesį, kad nors ReLU ir sutelkimas imant maksimumą veikia geriau,
+jie tuo metu dar nebuvo atrasti.
+Kiekvienas konvoliucinis sluoksnis naudoja $5\times 5$ branduolį
+ir sigmoidinę aktyvacijos funkciją.
+Šie sluoksniai erdviškai išdėstytas įvestis atvaizduoja
+į keletą dvimačių požymių žemėlapių, paprastai
+didindami kanalų skaičių.
+Pirmasis konvoliucinis sluoksnis turi 6 išvesties kanalus,
+o antrasis – 16.
+Kiekviena $2\times2$ sutelkimo operacija (žingsnis 2)
+sumažina dimensiją $4$ kartus erdviškai mažindama diskretizavimo dažnį.
+Konvoliucinis blokas išveda tenzorių, kurio forma
+(minirinkinio dydis, kanalų skaičius, aukštis, plotis).
 
-In order to pass output from the convolutional block
-to the dense block,
-we must flatten each example in the minibatch.
-In other words, we take this four-dimensional input and transform it
-into the two-dimensional input expected by fully connected layers:
-as a reminder, the two-dimensional representation that we desire uses the first dimension to index examples in the minibatch
-and the second to give the flat vector representation of each example.
-LeNet's dense block has three fully connected layers,
-with 120, 84, and 10 outputs, respectively.
-Because we are still performing classification,
-the 10-dimensional output layer corresponds
-to the number of possible output classes.
+Kad išvestį iš konvoliucinio bloko
+perduotume tankiajam blokui,
+turime išlyginti kiekvieną minirinkinio pavyzdį.
+Kitaip tariant, šią keturmatę įvestį transformuojame
+į dvimatę įvestį, kurios tikisi pilnai sujungti sluoksniai:
+primename, kad norimame dvimačiame atvaizde pirmoji dimensija indeksuoja minirinkinio pavyzdžius,
+o antroji pateikia kiekvieno pavyzdžio plokščią vektorinį atvaizdą.
+LeNet tankusis blokas turi tris pilnai sujungtus sluoksnius
+su atitinkamai 120, 84 ir 10 išėjimų.
+Kadangi vis dar sprendžiame klasifikavimo uždavinį,
+10 dimensijų išvesties sluoksnis atitinka
+galimų išvesties klasių skaičių.
 
-While getting to the point where you truly understand
-what is going on inside LeNet may have taken a bit of work,
-we hope that the following code snippet will convince you
-that implementing such models with modern deep learning frameworks
-is remarkably simple.
-We need only to instantiate a `Sequential` block
-and chain together the appropriate layers,
-using Xavier initialization as
-introduced in :numref:`subsec_xavier`.
+Nors suprasti, kas iš tikrųjų vyksta LeNet viduje,
+galėjo pareikalauti šiek tiek pastangų,
+tikimės, kad toliau pateiktas kodo fragmentas įtikins jus,
+jog tokių modelių įgyvendinimas šiuolaikiniais giliojo mokymosi karkasais
+yra nepaprastai paprastas.
+Tereikia sukurti `Sequential` bloką
+ir sujungti į grandinę atitinkamus sluoksnius,
+naudojant Xavier inicializaciją, kaip
+pristatyta :numref:`subsec_xavier`.
 
 ```{.python .input}
 %%tab pytorch
@@ -197,39 +197,39 @@ class LeNet(d2l.Classifier):  #@save
         ])
 ```
 
-We have taken some liberty in the reproduction of LeNet insofar as we have replaced the Gaussian activation layer by
-a softmax layer. This greatly simplifies the implementation, not least due to the
-fact that the Gaussian decoder is rarely used nowadays. Other than that, this network matches
-the original LeNet-5 architecture.
+Šiek tiek laisvai atkūrėme LeNet, nes Gauso aktyvacijos sluoksnį pakeitėme
+softmax sluoksniu. Tai labai supaprastina įgyvendinimą, ne mažiausia dėl to,
+kad Gauso dekoderis šiais laikais retai naudojamas. Kitaip šis tinklas atitinka
+originalią LeNet-5 architektūrą.
 
 :begin_tab:`pytorch, mxnet, tensorflow`
-Let's see what happens inside the network. By passing a
-single-channel (black and white)
-$28 \times 28$ image through the network
-and printing the output shape at each layer,
-we can [**inspect the model**] to ensure
-that its operations line up with
-what we expect from :numref:`img_lenet_vert`.
+Pažiūrėkime, kas vyksta tinkle viduje. Perleidę
+vienkanalį (nespalvotą)
+$28 \times 28$ vaizdą per tinklą
+ir išspausdinę išvesties formą kiekviename sluoksnyje,
+galime [**patikrinti modelį**] ir įsitikinti,
+kad jo operacijos atitinka tai,
+ko tikimės iš :numref:`img_lenet_vert`.
 :end_tab:
 
 :begin_tab:`jax`
-Let's see what happens inside the network. By passing a
-single-channel (black and white)
-$28 \times 28$ image through the network
-and printing the output shape at each layer,
-we can [**inspect the model**] to ensure
-that its operations line up with
-what we expect from :numref:`img_lenet_vert`.
-Flax provides `nn.tabulate`, a nifty method to summarise the layers and
-parameters in our network. Here we use the `bind` method to create a bounded model.
-The variables are now bound to the `d2l.Module` class, i.e., this bounded model
-becomes a stateful object which can then be used to access the `Sequential`
-object attribute `net` and the `layers` within. Note that the `bind` method should
-only be used for interactive experimentation, and is not a direct
-replacement for the `apply` method.
+Pažiūrėkime, kas vyksta tinkle viduje. Perleidę
+vienkanalį (nespalvotą)
+$28 \times 28$ vaizdą per tinklą
+ir išspausdinę išvesties formą kiekviename sluoksnyje,
+galime [**patikrinti modelį**] ir įsitikinti,
+kad jo operacijos atitinka tai,
+ko tikimės iš :numref:`img_lenet_vert`.
+Flax teikia `nn.tabulate` – gražų metodą tinklo sluoksniams ir
+parametrams apibendrinti. Čia naudojame metodą `bind`, kad sukurtume susietąjį modelį.
+Kintamieji dabar yra susieti su klase `d2l.Module`, t. y. šis susietasis modelis
+tampa būsenos objektu, kurį galima naudoti prieigai prie `Sequential`
+objekto atributo `net` ir jame esančių sluoksnių (`layers`). Atkreipkite dėmesį, kad metodą `bind` reikėtų
+naudoti tik interaktyviems eksperimentams, ir jis nėra tiesioginis
+metodo `apply` pakaitalas.
 :end_tab:
 
-![Compressed notation for LeNet-5.](../img/lenet-vert.svg)
+![Suglaudintas LeNet-5 žymėjimas.](../img/lenet-vert.svg)
 :label:`img_lenet_vert`
 
 ```{.python .input}
@@ -274,47 +274,47 @@ model = LeNet()
 model.layer_summary((1, 28, 28, 1))
 ```
 
-Note that the height and width of the representation
-at each layer throughout the convolutional block
-is reduced (compared with the previous layer).
-The first convolutional layer uses two pixels of padding
-to compensate for the reduction in height and width
-that would otherwise result from using a $5 \times 5$ kernel.
-As an aside, the image size of $28 \times 28$ pixels in the original
-MNIST OCR dataset is a result of *trimming* two pixel rows (and columns) from the
-original scans that measured $32 \times 32$ pixels. This was done primarily to
-save space (a 30% reduction) at a time when megabytes mattered.
+Atkreipkite dėmesį, kad atvaizdo aukštis ir plotis
+kiekviename konvoliucinio bloko sluoksnyje
+sumažėja (palyginti su ankstesniu sluoksniu).
+Pirmasis konvoliucinis sluoksnis naudoja dviejų pikselių papildymą,
+kad kompensuotų aukščio ir pločio sumažėjimą,
+kuris kitaip atsirastų naudojant $5 \times 5$ branduolį.
+Pasakysime pro šalį, kad originaliame
+MNIST OCR duomenų rinkinyje $28 \times 28$ pikselių vaizdo dydis atsirado *apkirpus* dvi pikselių eilutes (ir stulpelius) nuo
+originalių $32 \times 32$ pikselių dydžio skenavimų. Tai buvo daroma pirmiausia
+siekiant sutaupyti vietos (30 % sumažinimas) tuo metu, kai megabaitai turėjo reikšmės.
 
-In contrast, the second convolutional layer forgoes padding,
-and thus the height and width are both reduced by four pixels.
-As we go up the stack of layers,
-the number of channels increases layer-over-layer
-from 1 in the input to 6 after the first convolutional layer
-and 16 after the second convolutional layer.
-However, each pooling layer halves the height and width.
-Finally, each fully connected layer reduces dimensionality,
-finally emitting an output whose dimension
-matches the number of classes.
+Priešingai, antrasis konvoliucinis sluoksnis atsisako papildymo,
+todėl aukštis ir plotis abu sumažėja keturiais pikseliais.
+Kylant sluoksnių krūva aukštyn,
+kanalų skaičius didėja sluoksnis po sluoksnio:
+nuo 1 įvestyje iki 6 po pirmojo konvoliucinio sluoksnio
+ir 16 po antrojo konvoliucinio sluoksnio.
+Tačiau kiekvienas sutelkimo sluoksnis perpus sumažina aukštį ir plotį.
+Galiausiai kiekvienas pilnai sujungtas sluoksnis mažina dimensiją,
+ir galiausiai išveda rezultatą, kurio dimensija
+atitinka klasių skaičių.
 
 
-## Training
+## Mokymas
 
-Now that we have implemented the model,
-let's [**run an experiment to see how the LeNet-5 model fares on Fashion-MNIST**].
+Dabar, kai įgyvendinome modelį,
+[**atlikime eksperimentą ir pažiūrėkime, kaip LeNet-5 modelis veikia su Fashion-MNIST**].
 
-While CNNs have fewer parameters,
-they can still be more expensive to compute
-than similarly deep MLPs
-because each parameter participates in many more
-multiplications.
-If you have access to a GPU, this might be a good time
-to put it into action to speed up training.
-Note that
-the `d2l.Trainer` class takes care of all details.
-By default, it initializes the model parameters on the
-available devices.
-Just as with MLPs, our loss function is cross-entropy,
-and we minimize it via minibatch stochastic gradient descent.
+Nors CNN turi mažiau parametrų,
+jų skaičiavimas vis tiek gali būti brangesnis
+nei panašaus gylio MLP,
+nes kiekvienas parametras dalyvauja daug didesniame
+daugybų skaičiuje.
+Jei turite prieigą prie GPU, tai gali būti geras metas
+panaudoti jį mokymui pagreitinti.
+Atkreipkite dėmesį, kad
+klasė `d2l.Trainer` pasirūpina visomis detalėmis.
+Pagal numatytuosius nustatymus ji inicializuoja modelio parametrus
+turimuose įrenginiuose.
+Kaip ir MLP atveju, mūsų nuostolių funkcija yra kryžminė entropija,
+ir ją minimizuojame minirinkinio stochastiniu gradientiniu nusileidimu.
 
 ```{.python .input}
 %%tab pytorch, mxnet, jax
@@ -335,39 +335,39 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary
+## Santrauka
 
-We have made significant progress in this chapter. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp-implementation`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation enabled significantly more complex architectures.
+Šiame skyriuje padarėme didelę pažangą. Perėjome nuo 1980-ųjų MLP prie 1990-ųjų ir 2000-ųjų pradžios CNN. Pasiūlytos architektūros, pvz., LeNet-5 pavidalu, išlieka prasmingos net ir šiandien. Verta palyginti Fashion-MNIST paklaidas, pasiekiamas su LeNet-5, ir su geriausiais įmanomais MLP rezultatais (:numref:`sec_mlp-implementation`), ir su gerokai pažangesnėmis architektūromis, tokiomis kaip ResNet (:numref:`sec_resnet`). LeNet yra daug panašesnis į pastarąsias nei į pirmąsias. Vienas pagrindinių skirtumų, kaip pamatysime, yra tas, kad didesni skaičiavimo kiekiai leido kurti gerokai sudėtingesnes architektūras.
 
-A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp-based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter, we will journey down this rabbit hole to see where it takes us.
+Antrasis skirtumas – santykinis lengvumas, kuriuo sugebėjome įgyvendinti LeNet. Tai, kas anksčiau buvo inžinerinis iššūkis, vertas mėnesių C++ ir asemblerio kodo, inžinerijos SN – ankstyvajam Lisp pagrindu sukurtam giliojo mokymosi įrankiui – gerinti :cite:`Bottou.Le-Cun.1988`, ir galiausiai eksperimentų su modeliais, dabar gali būti atlikta per minutes. Būtent šis neįtikėtinas produktyvumo šuolis ženkliai demokratizavo giliojo mokymosi modelių kūrimą. Kitame skyriuje leisimės į šią triušio olą ir pažiūrėsime, kur ji mus nuves.
 
-## Exercises
+## Pratimai
 
-1. Let's modernize LeNet. Implement and test the following changes:
-    1. Replace average pooling with max-pooling.
-    1. Replace the softmax layer with ReLU.
-1. Try to change the size of the LeNet style network to improve its accuracy in addition to max-pooling and ReLU.
-    1. Adjust the convolution window size.
-    1. Adjust the number of output channels.
-    1. Adjust the number of convolution layers.
-    1. Adjust the number of fully connected layers.
-    1. Adjust the learning rates and other training details (e.g., initialization and number of epochs).
-1. Try out the improved network on the original MNIST dataset.
-1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters and coats).
-1. What happens to the activations when you feed significantly different images into the network (e.g., cats, cars, or even random noise)?
+1. Modernizuokime LeNet. Įgyvendinkite ir išbandykite šiuos pakeitimus:
+    1. Pakeiskite sutelkimą vidurkinant sutelkimu imant maksimumą.
+    1. Pakeiskite softmax sluoksnį ReLU.
+1. Pabandykite pakeisti LeNet tipo tinklo dydį, kad pagerintumėte jo tikslumą, be sutelkimo imant maksimumą ir ReLU.
+    1. Pakoreguokite konvoliucijos lango dydį.
+    1. Pakoreguokite išvesties kanalų skaičių.
+    1. Pakoreguokite konvoliucinių sluoksnių skaičių.
+    1. Pakoreguokite pilnai sujungtų sluoksnių skaičių.
+    1. Pakoreguokite mokymosi greičius ir kitas mokymo detales (pvz., inicializaciją ir epochų skaičių).
+1. Išbandykite patobulintą tinklą su originaliu MNIST duomenų rinkiniu.
+1. Atvaizduokite pirmojo ir antrojo LeNet sluoksnio aktyvacijas skirtingoms įvestims (pvz., megztiniams ir paltams).
+1. Kas nutinka aktyvacijoms, kai į tinklą paduodate gerokai skirtingus vaizdus (pvz., kates, automobilius ar net atsitiktinį triukšmą)?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/73)
+[Diskusijos](https://discuss.d2l.ai/t/73)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/74)
+[Diskusijos](https://discuss.d2l.ai/t/74)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/275)
+[Diskusijos](https://discuss.d2l.ai/t/275)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18000)
+[Diskusijos](https://discuss.d2l.ai/t/18000)
 :end_tab:

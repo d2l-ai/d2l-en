@@ -3,18 +3,18 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Multi-Branch Networks  (GoogLeNet)
+# Daugiašakiai tinklai (GoogLeNet)
 :label:`sec_googlenet`
 
-In 2014, *GoogLeNet*
-won the ImageNet Challenge :cite:`Szegedy.Liu.Jia.ea.2015`, using a structure
-that combined the strengths of NiN :cite:`Lin.Chen.Yan.2013`, repeated blocks :cite:`Simonyan.Zisserman.2014`,
-and a cocktail of convolution kernels. It was arguably also the first network that exhibited a clear distinction among the stem (data ingest), body (data processing), and head (prediction) in a CNN. This design pattern has persisted ever since in the design of deep networks: the *stem* is given by the first two or three convolutions that operate on the image. They extract low-level features from the underlying images. This is followed by a *body* of convolutional blocks. Finally, the *head* maps the features obtained so far to the required classification, segmentation, detection, or tracking problem at hand.
+2014 m. *GoogLeNet*
+laimėjo ImageNet iššūkį :cite:`Szegedy.Liu.Jia.ea.2015`, naudodamas struktūrą,
+kuri sujungė NiN :cite:`Lin.Chen.Yan.2013`, pasikartojančių blokų :cite:`Simonyan.Zisserman.2014`
+ir konvoliucijos branduolių kokteilio stipriąsias puses. Tai taip pat, galima sakyti, buvo pirmasis tinklas, kuriame CNN aiškiai atskirti pradžios dalis (duomenų priėmimas), korpusas (duomenų apdorojimas) ir galva (prognozavimas). Šis dizaino šablonas išliko giliųjų tinklų projektavime iki šiol: *pradžios dalį* sudaro pirmosios dvi ar trys konvoliucijos, veikiančios vaizdą. Jos išskiria žemo lygio požymius iš pradinių vaizdų. Po jos eina konvoliucinių blokų *korpusas*. Galiausiai *galva* atvaizduoja iki šiol gautus požymius į reikiamą klasifikavimo, segmentavimo, aptikimo ar sekimo uždavinį.
 
-The key contribution in GoogLeNet was the design of the network body. It solved the problem of selecting
-convolution kernels in an ingenious way. While other works tried to identify which convolution, ranging from $1 \times 1$ to $11 \times 11$ would be best, it simply *concatenated* multi-branch convolutions.
-In what follows we introduce a slightly simplified version of GoogLeNet: the original design included a number of tricks for stabilizing training through intermediate loss functions, applied to multiple layers of the network. 
-They are no longer necessary due to the availability of improved training algorithms.
+Pagrindinis GoogLeNet indėlis buvo tinklo korpuso dizainas. Jis išradingai išsprendė konvoliucijos branduolių
+pasirinkimo problemą. Kol kiti darbai bandė nustatyti, kuri konvoliucija – nuo $1 \times 1$ iki $11 \times 11$ – būtų geriausia, jis tiesiog *sujungė* daugiašakes konvoliucijas.
+Toliau pristatome šiek tiek supaprastintą GoogLeNet versiją: originalus dizainas apėmė daug gudrybių apmokymui stabilizuoti per tarpines nuostolių funkcijas, taikomas keliems tinklo sluoksniams.
+Jų nebereikia, nes yra patobulintų apmokymo algoritmų.
 
 ```{.python .input}
 %%tab mxnet
@@ -46,29 +46,29 @@ from jax import numpy as jnp
 import jax
 ```
 
-## (**Inception Blocks**)
+## (**Inception blokai**)
 
-The basic convolutional block in GoogLeNet is called an *Inception block*,
-stemming from the meme "we need to go deeper" from the movie *Inception*.
+Pagrindinis GoogLeNet konvoliucinis blokas vadinamas *Inception bloku*,
+pavadintu pagal memą „turime eiti giliau“ iš filmo *Pradžia* (angl. *Inception*).
 
-![Structure of the Inception block.](../img/inception.svg)
+![Inception bloko struktūra.](../img/inception.svg)
 :label:`fig_inception`
 
-As depicted in :numref:`fig_inception`,
-the inception block consists of four parallel branches.
-The first three branches use convolutional layers
-with window sizes of $1\times 1$, $3\times 3$, and $5\times 5$
-to extract information from different spatial sizes.
-The middle two branches also add a $1\times 1$ convolution of the input
-to reduce the number of channels, reducing the model's complexity.
-The fourth branch uses a $3\times 3$ max-pooling layer,
-followed by a $1\times 1$ convolutional layer
-to change the number of channels.
-The four branches all use appropriate padding to give the input and output the same height and width.
-Finally, the outputs along each branch are concatenated
-along the channel dimension and comprise the block's output.
-The commonly-tuned hyperparameters of the Inception block
-are the number of output channels per layer, i.e., how to allocate capacity among convolutions of different size.
+Kaip pavaizduota :numref:`fig_inception`,
+inception blokas susideda iš keturių lygiagrečių šakų.
+Pirmosios trys šakos naudoja konvoliucinius sluoksnius
+su $1\times 1$, $3\times 3$ ir $5\times 5$ lango dydžiais,
+kad išskirtų informaciją iš skirtingų erdvinių dydžių.
+Vidurinės dvi šakos taip pat prideda $1\times 1$ įvesties konvoliuciją,
+kad sumažintų kanalų skaičių ir taip sumažintų modelio sudėtingumą.
+Ketvirtoji šaka naudoja $3\times 3$ sutelkimo imant maksimumą sluoksnį,
+po kurio eina $1\times 1$ konvoliucinis sluoksnis
+kanalų skaičiui pakeisti.
+Visos keturios šakos naudoja tinkamą papildymą, kad įvestis ir išvestis turėtų tą patį aukštį ir plotį.
+Galiausiai kiekvienos šakos išvestys sujungiamos
+kanalų dimensijoje ir sudaro bloko išvestį.
+Dažniausiai derinami Inception bloko hiperparametrai
+yra išvesties kanalų skaičius kiekviename sluoksnyje, t. y. kaip paskirstyti pajėgumą tarp skirtingo dydžio konvoliucijų.
 
 ```{.python .input}
 %%tab mxnet
@@ -179,27 +179,27 @@ class Inception(nn.Module):
         return jnp.concatenate((b1, b2, b3, b4), axis=-1)
 ```
 
-To gain some intuition for why this network works so well,
-consider the combination of the filters.
-They explore the image in a variety of filter sizes.
-This means that details at different extents
-can be recognized efficiently by filters of different sizes.
-At the same time, we can allocate different amounts of parameters
-for different filters.
+Kad įgytume intuiciją, kodėl šis tinklas veikia taip gerai,
+panagrinėkime filtrų derinį.
+Jie tyrinėja vaizdą įvairių dydžių filtrais.
+Tai reiškia, kad skirtingo masto detales
+efektyviai gali atpažinti skirtingo dydžio filtrai.
+Tuo pat metu galime skirtingiems filtrams
+skirti skirtingą parametrų kiekį.
 
 
-## [**GoogLeNet Model**]
+## [**GoogLeNet modelis**]
 
-As shown in :numref:`fig_inception_full`, GoogLeNet uses a stack of a total of 9 inception blocks, arranged into three groups with max-pooling in between,
-and global average pooling in its head to generate its estimates.
-Max-pooling between inception blocks reduces the dimensionality.
-At its stem, the first module is similar to AlexNet and LeNet.
+Kaip parodyta :numref:`fig_inception_full`, GoogLeNet naudoja iš viso 9 inception blokų krūvą, sugrupuotą į tris grupes su sutelkimu imant maksimumą tarp jų,
+o galvoje naudoja globalų sutelkimą vidurkinant savo įverčiams generuoti.
+Sutelkimas imant maksimumą tarp inception blokų mažina dimensiją.
+Pradžios dalyje pirmasis modulis panašus į AlexNet ir LeNet.
 
-![The GoogLeNet architecture.](../img/inception-full-90.svg)
+![GoogLeNet architektūra.](../img/inception-full-90.svg)
 :label:`fig_inception_full`
 
-We can now implement GoogLeNet piece by piece. Let's begin with the stem.
-The first module uses a 64-channel $7\times 7$ convolutional layer.
+Dabar galime įgyvendinti GoogLeNet dalimis. Pradėkime nuo pradžios dalies.
+Pirmasis modulis naudoja 64 kanalų $7\times 7$ konvoliucinį sluoksnį.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -241,9 +241,9 @@ class GoogleNet(d2l.Classifier):
                                       padding='same')])
 ```
 
-The second module uses two convolutional layers:
-first, a 64-channel $1\times 1$ convolutional layer,
-followed by a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second branch in the Inception block and concludes the design of the body. At this point we have 192 channels.
+Antrasis modulis naudoja du konvoliucinius sluoksnius:
+pirmiausia 64 kanalų $1\times 1$ konvoliucinį sluoksnį,
+po kurio eina $3\times 3$ konvoliucinis sluoksnis, utrigubinantis kanalų skaičių. Tai atitinka antrąją Inception bloko šaką ir užbaigia korpuso dizainą. Šiuo metu turime 192 kanalus.
 
 ```{.python .input}
 %%tab all
@@ -275,19 +275,19 @@ def b2(self):
                                                     padding='same')])
 ```
 
-The third module connects two complete Inception blocks in series.
-The number of output channels of the first Inception block is
-$64+128+32+32=256$. This amounts to 
-a ratio of the number of output channels
-among the four branches of $2:4:1:1$. To achieve this, we first reduce the input
-dimensions by $\frac{1}{2}$ and by $\frac{1}{12}$ in the second and third branch respectively
-to arrive at $96 = 192/2$ and $16 = 192/12$ channels respectively.
+Trečiasis modulis nuosekliai sujungia du pilnus Inception blokus.
+Pirmojo Inception bloko išvesties kanalų skaičius yra
+$64+128+32+32=256$. Tai atitinka
+išvesties kanalų skaičiaus santykį
+tarp keturių šakų $2:4:1:1$. Kad tai pasiektume, pirmiausia sumažiname įvesties
+dimensijas $\frac{1}{2}$ ir $\frac{1}{12}$ atitinkamai antrojoje ir trečiojoje šakose,
+kad gautume atitinkamai $96 = 192/2$ ir $16 = 192/12$ kanalų.
 
-The number of output channels of the second Inception block
-is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:2$. As before,
-we need to reduce the number of intermediate dimensions in the second and third channel. A
-scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
-respectively. This is captured by the arguments of the following `Inception` block constructors.
+Antrojo Inception bloko išvesties kanalų skaičius
+padidinamas iki $128+192+96+64=480$, gaunant santykį $128:192:96:64 = 4:6:3:2$. Kaip ir anksčiau,
+turime sumažinti tarpinių dimensijų skaičių antrajame ir trečiajame kanale. Pakanka
+atitinkamai $\frac{1}{2}$ ir $\frac{1}{8}$ mastelio, gaunant atitinkamai $128$ ir $32$ kanalus.
+Tai užfiksuota šių `Inception` bloko konstruktorių argumentuose.
 
 ```{.python .input}
 %%tab all
@@ -316,21 +316,21 @@ def b3(self):
                                                     padding='same')])
 ```
 
-The fourth module is more complicated.
-It connects five Inception blocks in series,
-and they have $192+208+48+64=512$, $160+224+64+64=512$,
-$128+256+64+64=512$, $112+288+64+64=528$,
-and $256+320+128+128=832$ output channels, respectively.
-The number of channels assigned to these branches is similar
-to that in the third module:
-the second branch with the $3\times 3$ convolutional layer
-outputs the largest number of channels,
-followed by the first branch with only the $1\times 1$ convolutional layer,
-the third branch with the $5\times 5$ convolutional layer,
-and the fourth branch with the $3\times 3$ max-pooling layer.
-The second and third branches will first reduce
-the number of channels according to the ratio.
-These ratios are slightly different in different Inception blocks.
+Ketvirtasis modulis yra sudėtingesnis.
+Jis nuosekliai sujungia penkis Inception blokus,
+kurių išvesties kanalų skaičius atitinkamai yra $192+208+48+64=512$, $160+224+64+64=512$,
+$128+256+64+64=512$, $112+288+64+64=528$
+ir $256+320+128+128=832$.
+Šioms šakoms paskirtas kanalų skaičius panašus
+į trečiojo modulio:
+antroji šaka su $3\times 3$ konvoliuciniu sluoksniu
+išveda daugiausia kanalų,
+po jos eina pirmoji šaka tik su $1\times 1$ konvoliuciniu sluoksniu,
+trečioji šaka su $5\times 5$ konvoliuciniu sluoksniu
+ir ketvirtoji šaka su $3\times 3$ sutelkimo imant maksimumą sluoksniu.
+Antroji ir trečioji šakos pirmiausia sumažins
+kanalų skaičių pagal santykį.
+Šie santykiai šiek tiek skiriasi skirtinguose Inception blokuose.
 
 ```{.python .input}
 %%tab all
@@ -371,17 +371,17 @@ def b4(self):
                                                     padding='same')])
 ```
 
-The fifth module has two Inception blocks with $256+320+128+128=832$
-and $384+384+128+128=1024$ output channels.
-The number of channels assigned to each branch
-is the same as that in the third and fourth modules,
-but differs in specific values.
-It should be noted that the fifth block is followed by the output layer.
-This block uses the global average pooling layer
-to change the height and width of each channel to 1, just as in NiN.
-Finally, we turn the output into a two-dimensional array
-followed by a fully connected layer
-whose number of outputs is the number of label classes.
+Penktasis modulis turi du Inception blokus su $256+320+128+128=832$
+ir $384+384+128+128=1024$ išvesties kanalais.
+Kiekvienai šakai paskirtas kanalų skaičius
+toks pat kaip trečiajame ir ketvirtajame moduliuose,
+bet skiriasi konkrečiomis reikšmėmis.
+Reikia pažymėti, kad po penktojo bloko eina išvesties sluoksnis.
+Šis blokas naudoja globalaus sutelkimo vidurkinant sluoksnį,
+kad kiekvieno kanalo aukštį ir plotį pakeistų į 1, kaip ir NiN.
+Galiausiai išvestį paverčiame dvimačiu masyvu,
+po kurio eina pilnai sujungtas sluoksnis,
+kurio išėjimų skaičius yra žymenų klasių skaičius.
 
 ```{.python .input}
 %%tab all
@@ -414,7 +414,7 @@ def b5(self):
                               lambda x: x.reshape((x.shape[0], -1))])
 ```
 
-Now that we defined all blocks `b1` through `b5`, it is just a matter of assembling them all into a full network.
+Dabar, kai apibrėžėme visus blokus `b1`–`b5`, belieka juos visus sujungti į pilną tinklą.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -437,16 +437,15 @@ def __init__(self, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(num_classes)])
 ```
 
-The GoogLeNet model is computationally complex. Note the large number of
-relatively arbitrary hyperparameters in terms of the number of channels chosen, the number of blocks prior to dimensionality reduction, the relative partitioning of capacity across channels, etc. Much of it is due to the 
-fact that at the time when GoogLeNet was introduced, automatic tools for network definition or design exploration 
-were not yet available. For instance, by now we take it for granted that a competent deep learning framework is capable of inferring dimensionalities of input tensors automatically. At the time, many such configurations had to be specified explicitly by the experimenter, thus often slowing down active experimentation. Moreover, the tools needed for automatic exploration were still in flux and initial experiments largely amounted to costly brute-force exploration, genetic algorithms, and similar strategies. 
+GoogLeNet modelis yra skaičiavimo požiūriu sudėtingas. Atkreipkite dėmesį į didelį santykinai savavališkų hiperparametrų skaičių: pasirinktą kanalų skaičių, blokų skaičių prieš dimensijos mažinimą, santykinį pajėgumo paskirstymą tarp kanalų ir t. t. Didžiąja dalimi taip yra dėl to,
+kad tuo metu, kai buvo pristatytas GoogLeNet, dar nebuvo automatinių tinklų apibrėžimo ar dizaino tyrinėjimo
+įrankių. Pavyzdžiui, dabar laikome savaime suprantamu dalyku, kad tinkamas giliojo mokymosi karkasas sugeba automatiškai nustatyti įvesties tenzorių dimensijas. Tuo metu daugelį tokių konfigūracijų eksperimentuotojas turėjo nurodyti aiškiai, todėl dažnai sulėtėdavo aktyvūs eksperimentai. Be to, automatiniam tyrinėjimui reikalingi įrankiai dar tebebuvo kuriami, o pirmieji eksperimentai daugiausia reiškė brangų brutalios jėgos tyrinėjimą, genetinius algoritmus ir panašias strategijas.
 
-For now the only modification we will carry out is to
-[**reduce the input height and width from 224 to 96
-to have a reasonable training time on Fashion-MNIST.**]
-This simplifies the computation. Let's have a look at the
-changes in the shape of the output between the various modules.
+Kol kas vienintelis pakeitimas, kurį atliksime, yra
+[**sumažinti įvesties aukštį ir plotį nuo 224 iki 96,
+kad apmokymo laikas su Fashion-MNIST būtų pagrįstas.**]
+Tai supaprastina skaičiavimą. Pažiūrėkime, kaip
+keičiasi išvesties forma tarp įvairių modulių.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -458,11 +457,10 @@ model = GoogleNet().layer_summary((1, 1, 96, 96))
 model = GoogleNet().layer_summary((1, 96, 96, 1))
 ```
 
-## [**Training**]
+## [**Mokymas**]
 
-As before, we train our model using the Fashion-MNIST dataset.
- We transform it to $96 \times 96$ pixel resolution
- before invoking the training procedure.
+Kaip ir anksčiau, modelį apmokome naudodami Fashion-MNIST duomenų rinkinį.
+ Prieš pradėdami apmokymo procedūrą, transformuojame jį į $96 \times 96$ pikselių skyrą.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -483,39 +481,39 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Discussion
+## Diskusija
 
-A key feature of GoogLeNet is that it is actually *cheaper* to compute than its predecessors
-while simultaneously providing improved accuracy. This marks the beginning of a much more deliberate
-network design that trades off the cost of evaluating a network with a reduction in errors. It also marks the beginning of experimentation at a block level with network design hyperparameters, even though it was entirely manual at the time. We will revisit this topic in :numref:`sec_cnn-design` when discussing strategies for network structure exploration. 
+Pagrindinė GoogLeNet savybė yra ta, kad jį iš tikrųjų *pigiau* skaičiuoti nei pirmtakus,
+kartu užtikrinant didesnį tikslumą. Tai žymi daug apgalvotesnio
+tinklų dizaino pradžią, kuriame vertinimo kaina keičiama į paklaidų sumažinimą. Tai taip pat žymi eksperimentų su tinklo dizaino hiperparametrais blokų lygiu pradžią, nors tuo metu tai buvo visiškai rankinis darbas. Prie šios temos sugrįšime :numref:`sec_cnn-design`, aptardami tinklo struktūros tyrinėjimo strategijas.
 
-Over the following sections we will encounter a number of design choices (e.g., batch normalization, residual connections, and channel grouping) that allow us to improve networks significantly. For now, you can be proud to have implemented what is arguably the first truly modern CNN.
+Kituose skyreliuose susidursime su keliais dizaino sprendimais (pvz., rinkinio normalizacija, liekamosiomis jungtimis ir kanalų grupavimu), leidžiančiais gerokai patobulinti tinklus. Kol kas galite didžiuotis, kad įgyvendinote, galima sakyti, pirmąjį tikrai šiuolaikinį CNN.
 
-## Exercises
+## Pratimai
 
-1. GoogLeNet was so successful that it went through a number of iterations, progressively improving speed and accuracy. Try to implement and run some of them. They include the following:
-    1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described later in :numref:`sec_batch_norm`.
-    1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-    1. Use label smoothing for model regularization, as described in :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-    1. Make further adjustments to the Inception block by adding residual connection :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in :numref:`sec_resnet`.
-1. What is the minimum image size needed for GoogLeNet to work?
-1. Can you design a variant of GoogLeNet that works on Fashion-MNIST's native resolution of $28 \times 28$ pixels? How would you need to change the stem, the body, and the head of the network, if anything at all?
-1. Compare the model parameter sizes of AlexNet, VGG, NiN, and GoogLeNet. How do the latter two network
-   architectures significantly reduce the model parameter size?
-1. Compare the amount of computation needed in GoogLeNet and AlexNet. How does this affect the design of an accelerator chip, e.g., in terms of memory size, memory bandwidth, cache size, the amount of computation, and the benefit of specialized operations?
+1. GoogLeNet buvo toks sėkmingas, kad jis išgyveno keletą iteracijų, palaipsniui gerinant greitį ir tikslumą. Pabandykite įgyvendinti ir paleisti kai kurias iš jų. Jos apima:
+    1. Pridėkite rinkinio normalizacijos sluoksnį :cite:`Ioffe.Szegedy.2015`, kaip aprašyta vėliau :numref:`sec_batch_norm`.
+    1. Atlikite Inception bloko pakeitimus (plotį, konvoliucijų pasirinkimą ir tvarką), kaip aprašyta :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+    1. Naudokite žymenų glotninimą modelio reguliarizacijai, kaip aprašyta :citet:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+    1. Atlikite tolesnius Inception bloko pakeitimus, pridėdami liekamąją jungtį :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, kaip aprašyta vėliau :numref:`sec_resnet`.
+1. Koks yra mažiausias vaizdo dydis, reikalingas GoogLeNet veikti?
+1. Ar galite suprojektuoti GoogLeNet variantą, veikiantį su Fashion-MNIST natyvia $28 \times 28$ pikselių skyra? Kaip reikėtų pakeisti tinklo pradžios dalį, korpusą ir galvą, jei apskritai reikėtų?
+1. Palyginkite AlexNet, VGG, NiN ir GoogLeNet modelio parametrų dydžius. Kaip pastarosios dvi tinklų
+   architektūros gerokai sumažina modelio parametrų dydį?
+1. Palyginkite skaičiavimų kiekį, reikalingą GoogLeNet ir AlexNet. Kaip tai veikia greitintuvo lusto dizainą, pvz., atminties dydžio, atminties pralaidumo, podėlio dydžio, skaičiavimų kiekio ir specializuotų operacijų naudos požiūriu?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/81)
+[Diskusijos](https://discuss.d2l.ai/t/81)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/82)
+[Diskusijos](https://discuss.d2l.ai/t/82)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/316)
+[Diskusijos](https://discuss.d2l.ai/t/316)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18004)
+[Diskusijos](https://discuss.d2l.ai/t/18004)
 :end_tab:

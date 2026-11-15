@@ -3,16 +3,16 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Batch Normalization
+# Rinkinio normalizacija
 :label:`sec_batch_norm`
 
-Training deep neural networks is difficult.
-Getting them to converge in a reasonable amount of time can be tricky.
-In this section, we describe *batch normalization*, a popular and effective technique
-that consistently accelerates the convergence of deep networks :cite:`Ioffe.Szegedy.2015`.
-Together with residual blocks---covered later in :numref:`sec_resnet`---batch normalization
-has made it possible for practitioners to routinely train networks with over 100 layers.
-A secondary (serendipitous) benefit of batch normalization lies in its inherent regularization.
+Giliuosius neuroninius tinklus apmokyti sunku.
+Priversti juos konverguoti per pagrįstą laiką gali būti keblu.
+Šiame skyrelyje aprašome *rinkinio normalizaciją* – populiarią ir veiksmingą techniką,
+nuosekliai pagreitinančią giliųjų tinklų konvergavimą :cite:`Ioffe.Szegedy.2015`.
+Kartu su liekamaisiais blokais, aptariamais vėliau :numref:`sec_resnet`, rinkinio normalizacija
+leido praktikams įprastai apmokyti tinklus, turinčius daugiau nei 100 sluoksnių.
+Antrinė (atsitiktinė) rinkinio normalizacijos nauda slypi jai būdingoje reguliarizacijoje.
 
 ```{.python .input}
 %%tab mxnet
@@ -45,234 +45,232 @@ import jax
 import optax
 ```
 
-## Training Deep Networks
+## Giliųjų tinklų apmokymas
 
-When working with data, we often preprocess before training.
-Choices regarding data preprocessing often make an enormous difference in the final results.
-Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_house`).
-Our first step when working with real data
-was to standardize our input features to have
-zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \boldsymbol{1}$ across multiple observations :cite:`friedman1987exploratory`, frequently rescaling the latter so  that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
-Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
-This can work well, e.g., for spatial sensor data. These preprocessing techniques and many others, are
-beneficial for keeping the estimation problem well controlled. 
-For a review of feature selection and extraction see the article of :citet:`guyon2008feature`, for example.
-Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in support vector machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
+Dirbdami su duomenimis, prieš apmokymą dažnai juos iš anksto apdorojame.
+Duomenų išankstinio apdorojimo pasirinkimai dažnai lemia milžinišką galutinių rezultatų skirtumą.
+Prisiminkite, kaip MLP taikėme būsto kainoms prognozuoti (:numref:`sec_kaggle_house`).
+Pirmasis mūsų žingsnis dirbant su realiais duomenimis
+buvo standartizuoti įvesties požymius, kad jie turėtų
+nulinį vidurkį $\boldsymbol{\mu} = 0$ ir vienetinę dispersiją $\boldsymbol{\Sigma} = \boldsymbol{1}$ per kelis stebėjimus :cite:`friedman1987exploratory`, dažnai perskalinant pastarąją taip, kad įstrižainė būtų vienetinė, t. y. $\Sigma_{ii} = 1$.
+Kita strategija yra perskalinti vektorius iki vienetinio ilgio, galbūt su nuliniu vidurkiu *kiekvienam stebėjimui*.
+Tai gali veikti gerai, pvz., erdvinių jutiklių duomenims. Šios išankstinio apdorojimo technikos ir daugelis kitų
+naudingos, kad vertinimo uždavinys išliktų gerai kontroliuojamas.
+Požymių atrankos ir išskyrimo apžvalgą žr., pavyzdžiui, :citet:`guyon2008feature` straipsnyje.
+Vektorių standartizavimas turi ir malonų šalutinį poveikį – ribojamas jiems taikomų funkcijų sudėtingumas. Pavyzdžiui, garsioji spindulio ir paraštės riba :cite:`Vapnik95` atraminių vektorių mašinose ir perceptrono konvergavimo teorema :cite:`Novikoff62` remiasi apriboto normos įvestimis.
 
-Intuitively, this standardization plays nicely with our optimizers
-since it puts the parameters *a priori* on a similar scale.
-As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
-might not be beneficial. While this is not quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016`, within a unified framework.
+Intuityviai ši standartizacija gerai dera su mūsų optimizavimo algoritmais,
+nes parametrus *a priori* patalpina panašiu mastu.
+Todėl natūralu klausti, ar atitinkamas normalizavimo žingsnis *giliojo* tinklo viduje
+nebūtų naudingas. Nors būtent taip samprotaujant nebuvo išrasta rinkinio normalizacija :cite:`Ioffe.Szegedy.2015`, tai naudingas būdas suprasti ją ir jos giminaitę – sluoksnio normalizaciją :cite:`Ba.Kiros.Hinton.2016` – vieningoje sistemoje.
 
-Second, for a typical MLP or CNN, as we train,
-the variables 
-in intermediate layers (e.g., affine transformation outputs in MLP)
-may take values with widely varying magnitudes:
-whether along the layers from input to output, across units in the same layer,
-and over time due to our updates to the model parameters.
-The inventors of batch normalization postulated informally
-that this drift in the distribution of such variables could hamper the convergence of the network.
-Intuitively, we might conjecture that if one
-layer has variable activations that are 100 times that of another layer,
-this might necessitate compensatory adjustments in the learning rates. Adaptive solvers
-such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018`, or Distributed Shampoo :cite:`anil2020scalable` aim to address this from the viewpoint of optimization, e.g., by adding aspects of second-order methods. 
-The alternative is to prevent the problem from occurring, simply by adaptive normalization.
+Antra, tipiniam MLP ar CNN apmokymo metu
+tarpinių sluoksnių kintamieji
+(pvz., afininės transformacijos išvestys MLP)
+gali įgyti labai skirtingo dydžio reikšmes:
+ir išilgai sluoksnių nuo įvesties iki išvesties, ir tarp to paties sluoksnio vienetų,
+ir laikui bėgant dėl mūsų modelio parametrų atnaujinimų.
+Rinkinio normalizacijos išradėjai neformaliai postulavo,
+kad šis tokių kintamųjų skirstinio dreifas gali trukdyti tinklo konvergavimui.
+Intuityviai galime spėti, kad jei vieno
+sluoksnio kintamųjų aktyvacijos yra 100 kartų didesnės nei kito sluoksnio,
+tai gali reikalauti kompensuojamųjų mokymosi greičio pakeitimų. Adaptyvūs sprendikliai,
+tokie kaip AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` ar Distributed Shampoo :cite:`anil2020scalable`, siekia tai išspręsti optimizavimo požiūriu, pvz., pridėdami antros eilės metodų aspektų.
+Alternatyva yra užkirsti kelią problemos atsiradimui paprasčiausiai adaptyvia normalizacija.
 
-Third, deeper networks are complex and tend to be more liable to overfitting.
-This means that regularization becomes more critical. A common technique for regularization is noise
-injection. This has been known for a long time, e.g., with regard to noise injection for the
-inputs :cite:`Bishop.1995`. It also forms the basis of dropout in :numref:`sec_dropout`. As it turns out, quite serendipitously, batch normalization conveys all three benefits: preprocessing, numerical stability, and regularization.
+Trečia, gilesni tinklai yra sudėtingi ir labiau linkę persimokyti.
+Tai reiškia, kad reguliarizacija tampa kritiškesnė. Įprasta reguliarizacijos technika yra triukšmo
+įterpimas. Tai žinoma jau seniai, pvz., kalbant apie triukšmo įterpimą į
+įvestis :cite:`Bishop.1995`. Tai taip pat yra dropout pagrindas :numref:`sec_dropout`. Paaiškėja, gana atsitiktinai, kad rinkinio normalizacija suteikia visas tris naudas: išankstinį apdorojimą, skaitinį stabilumą ir reguliarizaciją.
 
-Batch normalization is applied to individual layers, or optionally, to all of them:
-In each training iteration,
-we first normalize the inputs (of batch normalization)
-by subtracting their mean and
-dividing by their standard deviation,
-where both are estimated based on the statistics of the current minibatch.
-Next, we apply a scale coefficient and an offset to recover the lost degrees
-of freedom. It is precisely due to this *normalization* based on *batch* statistics
-that *batch normalization* derives its name.
+Rinkinio normalizacija taikoma atskiriems sluoksniams arba, pasirinktinai, jiems visiems:
+kiekvienoje apmokymo iteracijoje
+pirmiausia normalizuojame (rinkinio normalizacijos) įvestis,
+atimdami jų vidurkį ir
+dalydami iš jų standartinio nuokrypio,
+kur abu įvertinami pagal dabartinio minirinkinio statistikas.
+Toliau pritaikome mastelio koeficientą ir postūmį, kad atkurtume prarastus laisvės
+laipsnius. Būtent dėl šios *normalizacijos*, pagrįstos *rinkinio* statistikomis,
+*rinkinio normalizacija* ir gavo savo pavadinimą.
 
-Note that if we tried to apply batch normalization with minibatches of size 1,
-we would not be able to learn anything.
-That is because after subtracting the means,
-each hidden unit would take value 0.
-As you might guess, since we are devoting a whole section to batch normalization,
-with large enough minibatches the approach proves effective and stable.
-One takeaway here is that when applying batch normalization,
-the choice of batch size is
-even more significant than without batch normalization, or at least,
-suitable calibration is needed as we might adjust batch size.
+Atkreipkite dėmesį, kad jei bandytume taikyti rinkinio normalizaciją su 1 dydžio minirinkiniais,
+nieko negalėtume išmokti.
+Taip yra todėl, kad atėmus vidurkius,
+kiekvienas paslėptasis vienetas įgytų reikšmę 0.
+Kaip galite nuspėti, kadangi rinkinio normalizacijai skiriame visą skyrelį,
+su pakankamai dideliais minirinkiniais šis metodas pasirodo veiksmingas ir stabilus.
+Viena išvada čia yra ta, kad taikant rinkinio normalizaciją
+rinkinio dydžio pasirinkimas yra
+dar svarbesnis nei be rinkinio normalizacijos, arba bent jau
+reikia tinkamo kalibravimo, nes galime koreguoti rinkinio dydį.
 
-Denote by $\mathcal{B}$ a minibatch and let $\mathbf{x} \in \mathcal{B}$ be an input to 
-batch normalization ($\textrm{BN}$). In this case the batch normalization is defined as follows:
+Pažymėkime $\mathcal{B}$ minirinkinį, o $\mathbf{x} \in \mathcal{B}$ – rinkinio normalizacijos ($\textrm{BN}$) įvestį.
+Šiuo atveju rinkinio normalizacija apibrėžiama taip:
 
 $$\textrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$
 :eqlabel:`eq_batchnorm`
 
-In :eqref:`eq_batchnorm`,
-$\hat{\boldsymbol{\mu}}_\mathcal{B}$ is the  sample mean
-and $\hat{\boldsymbol{\sigma}}_\mathcal{B}$ is the sample standard deviation of the minibatch $\mathcal{B}$.
-After applying standardization,
-the resulting minibatch
-has zero mean and unit variance.
-The choice of unit variance
-(rather than some other magic number) is arbitrary. We recover this degree of freedom
-by including an elementwise
-*scale parameter* $\boldsymbol{\gamma}$ and *shift parameter* $\boldsymbol{\beta}$
-that have the same shape as $\mathbf{x}$. Both are parameters that
-need to be learned as part of model training.
+:eqref:`eq_batchnorm`
+$\hat{\boldsymbol{\mu}}_\mathcal{B}$ yra minirinkinio $\mathcal{B}$ imties vidurkis,
+o $\hat{\boldsymbol{\sigma}}_\mathcal{B}$ – imties standartinis nuokrypis.
+Pritaikius standartizaciją,
+gautas minirinkinys
+turi nulinį vidurkį ir vienetinę dispersiją.
+Vienetinės dispersijos pasirinkimas
+(o ne kokio nors kito stebuklingo skaičiaus) yra savavališkas. Šį laisvės laipsnį atkuriame
+įtraukdami elementų lygmens
+*mastelio parametrą* $\boldsymbol{\gamma}$ ir *postūmio parametrą* $\boldsymbol{\beta}$,
+kurių forma tokia pati kaip $\mathbf{x}$. Abu yra parametrai, kuriuos
+reikia išmokti modelio apmokymo metu.
 
-The variable magnitudes
-for intermediate layers cannot diverge during training
-since batch normalization actively centers and rescales them back
-to a given mean and size (via $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$).
-Practical experience confirms that, as alluded to when discussing feature rescaling, batch normalization seems to allow for more aggressive learning rates.
-We calculate $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ in :eqref:`eq_batchnorm` as follows:
+Tarpinių sluoksnių kintamųjų dydžiai
+apmokymo metu negali išsiskirti,
+nes rinkinio normalizacija aktyviai centruoja ir perskalina juos atgal
+iki nurodyto vidurkio ir dydžio (per $\hat{\boldsymbol{\mu}}_\mathcal{B}$ ir ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$).
+Praktinė patirtis patvirtina, kad, kaip užsiminėme aptardami požymių perskalinimą, rinkinio normalizacija leidžia naudoti agresyvesnius mokymosi greičius.
+$\hat{\boldsymbol{\mu}}_\mathcal{B}$ ir ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ :eqref:`eq_batchnorm` apskaičiuojame taip:
 
 $$\hat{\boldsymbol{\mu}}_\mathcal{B} = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} \mathbf{x}
 \textrm{ and }
 \hat{\boldsymbol{\sigma}}_\mathcal{B}^2 = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} (\mathbf{x} - \hat{\boldsymbol{\mu}}_{\mathcal{B}})^2 + \epsilon.$$
 
-Note that we add a small constant $\epsilon > 0$
-to the variance estimate
-to ensure that we never attempt division by zero,
-even in cases where the empirical variance estimate might be very small or vanish.
-The estimates $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ counteract the scaling issue
-by using noisy estimates of mean and variance.
-You might think that this noisiness should be a problem.
-On the contrary, it is actually beneficial.
+Atkreipkite dėmesį, kad prie dispersijos įverčio pridedame mažą konstantą $\epsilon > 0$,
+kad niekada nebandytume dalyti iš nulio,
+net tais atvejais, kai empirinis dispersijos įvertis gali būti labai mažas ar išnykti.
+Įverčiai $\hat{\boldsymbol{\mu}}_\mathcal{B}$ ir ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ neutralizuoja mastelio problemą
+naudodami triukšmingus vidurkio ir dispersijos įverčius.
+Galite pamanyti, kad šis triukšmingumas turėtų būti problema.
+Priešingai, jis iš tikrųjų yra naudingas.
 
-This turns out to be a recurring theme in deep learning.
-For reasons that are not yet well-characterized theoretically,
-various sources of noise in optimization
-often lead to faster training and less overfitting:
-this variation appears to act as a form of regularization.
-:citet:`Teye.Azizpour.Smith.2018` and :citet:`Luo.Wang.Shao.ea.2018`
-related the properties of batch normalization to Bayesian priors and penalties, respectively. 
-In particular, this sheds some light on the puzzle
-of why batch normalization works best for moderate minibatch sizes in the 50--100 range.
-This particular size of minibatch seems to inject just the "right amount" of noise per layer, both in terms of scale via $\hat{\boldsymbol{\sigma}}$, and in terms of offset via $\hat{\boldsymbol{\mu}}$: a
-larger minibatch regularizes less due to the more stable estimates, whereas tiny minibatches
-destroy useful signal due to high variance. Exploring this direction further, considering alternative types
-of preprocessing and filtering may yet lead to other effective types of regularization.
+Tai pasirodo esanti pasikartojanti giliojo mokymosi tema.
+Dėl priežasčių, kurios teoriškai dar nėra gerai apibūdintos,
+įvairūs triukšmo šaltiniai optimizavime
+dažnai lemia greitesnį apmokymą ir mažesnį persimokymą:
+atrodo, kad ši variacija veikia kaip reguliarizacijos forma.
+:citet:`Teye.Azizpour.Smith.2018` ir :citet:`Luo.Wang.Shao.ea.2018`
+susiejo rinkinio normalizacijos savybes atitinkamai su Bajeso apriorais ir baudomis.
+Visų pirma tai šiek tiek nušviečia mįslę,
+kodėl rinkinio normalizacija geriausiai veikia vidutinio dydžio minirinkiniams, 50–100 diapazone.
+Atrodo, kad šis konkretus minirinkinio dydis įterpia būtent „tinkamą triukšmo kiekį“ kiekviename sluoksnyje, tiek mastelio požiūriu per $\hat{\boldsymbol{\sigma}}$, tiek postūmio per $\hat{\boldsymbol{\mu}}$: didesnis
+minirinkinys mažiau reguliarizuoja dėl stabilesnių įverčių, o mažyčiai minirinkiniai
+sunaikina naudingą signalą dėl didelės dispersijos. Toliau tyrinėjant šią kryptį, svarstant alternatyvius
+išankstinio apdorojimo ir filtravimo tipus, galbūt bus rasta kitų veiksmingų reguliarizacijos tipų.
 
-Fixing a trained model, you might think
-that we would prefer using the entire dataset
-to estimate the mean and variance.
-Once training is complete, why would we want
-the same image to be classified differently,
-depending on the batch in which it happens to reside?
-During training, such exact calculation is infeasible
-because the intermediate variables
-for all data examples
-change every time we update our model.
-However, once the model is trained,
-we can calculate the means and variances
-of each layer's variables based on the entire dataset.
-Indeed this is standard practice for
-models employing batch normalization;
-thus batch normalization layers function differently
-in *training mode* (normalizing by minibatch statistics)
-than in *prediction mode* (normalizing by dataset statistics).
-In this form they closely resemble the behavior of dropout regularization of :numref:`sec_dropout`,
-where noise is only injected during training.
+Fiksavus apmokytą modelį, galite pamanyti,
+kad mieliau naudotume visą duomenų rinkinį
+vidurkiui ir dispersijai įvertinti.
+Baigus apmokymą, kodėl norėtume,
+kad tas pats vaizdas būtų klasifikuojamas skirtingai,
+priklausomai nuo rinkinio, kuriame jis atsitiktinai atsiduria?
+Apmokymo metu toks tikslus skaičiavimas neįmanomas,
+nes tarpiniai kintamieji
+visiems duomenų pavyzdžiams
+keičiasi kaskart, kai atnaujiname modelį.
+Tačiau kai modelis apmokytas,
+galime apskaičiuoti kiekvieno sluoksnio kintamųjų vidurkius ir dispersijas
+pagal visą duomenų rinkinį.
+Iš tiesų tai yra standartinė praktika
+modeliams, naudojantiems rinkinio normalizaciją;
+todėl rinkinio normalizacijos sluoksniai veikia skirtingai
+*apmokymo režimu* (normalizuojant pagal minirinkinio statistikas)
+nei *prognozavimo režimu* (normalizuojant pagal duomenų rinkinio statistikas).
+Šia forma jie primena dropout reguliarizacijos elgesį :numref:`sec_dropout`,
+kur triukšmas įterpiamas tik apmokymo metu.
 
 
-## Batch Normalization Layers
+## Rinkinio normalizacijos sluoksniai
 
-Batch normalization implementations for fully connected layers
-and convolutional layers are slightly different.
-One key difference between batch normalization and other layers
-is that because the former operates on a full minibatch at a time,
-we cannot just ignore the batch dimension
-as we did before when introducing other layers.
+Rinkinio normalizacijos įgyvendinimai pilnai sujungtiems sluoksniams
+ir konvoliuciniams sluoksniams šiek tiek skiriasi.
+Vienas esminis rinkinio normalizacijos ir kitų sluoksnių skirtumas
+yra tas, kad kadangi pirmoji veikia su visu minirinkiniu vienu metu,
+negalime tiesiog ignoruoti rinkinio dimensijos,
+kaip darėme anksčiau pristatydami kitus sluoksnius.
 
-### Fully Connected Layers
+### Pilnai sujungti sluoksniai
 
-When applying batch normalization to fully connected layers,
-:citet:`Ioffe.Szegedy.2015`, in their original paper inserted batch normalization after the affine transformation
-and *before* the nonlinear activation function. Later applications experimented with
-inserting batch normalization right *after* activation functions.
-Denoting the input to the fully connected layer by $\mathbf{x}$,
-the affine transformation
-by $\mathbf{W}\mathbf{x} + \mathbf{b}$ (with the weight parameter $\mathbf{W}$ and the bias parameter $\mathbf{b}$),
-and the activation function by $\phi$,
-we can express the computation of a batch-normalization-enabled,
-fully connected layer output $\mathbf{h}$ as follows:
+Taikydami rinkinio normalizaciją pilnai sujungtiems sluoksniams,
+:citet:`Ioffe.Szegedy.2015` savo originaliame straipsnyje įterpė rinkinio normalizaciją po afininės transformacijos
+ir *prieš* netiesinę aktyvacijos funkciją. Vėlesni taikymai eksperimentavo
+įterpdami rinkinio normalizaciją iškart *po* aktyvacijos funkcijų.
+Pažymėję pilnai sujungto sluoksnio įvestį $\mathbf{x}$,
+afininę transformaciją
+$\mathbf{W}\mathbf{x} + \mathbf{b}$ (su svorių parametru $\mathbf{W}$ ir poslinkio parametru $\mathbf{b}$),
+o aktyvacijos funkciją $\phi$,
+rinkinio normalizaciją naudojančio
+pilnai sujungto sluoksnio išvesties $\mathbf{h}$ skaičiavimą galime išreikšti taip:
 
 $$\mathbf{h} = \phi(\textrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
 
-Recall that mean and variance are computed
-on the *same* minibatch
-on which the transformation is applied.
+Prisiminkite, kad vidurkis ir dispersija apskaičiuojami
+pagal *tą patį* minirinkinį,
+kuriam taikoma transformacija.
 
-### Convolutional Layers
+### Konvoliuciniai sluoksniai
 
-Similarly, with convolutional layers,
-we can apply batch normalization after the convolution
-but before the nonlinear activation function. The key difference from batch normalization
-in fully connected layers is that we apply the operation on a per-channel basis
-*across all locations*. This is compatible with our assumption of translation
-invariance that led to convolutions: we assumed that the specific location of a pattern
-within an image was not critical for the purpose of understanding.
+Panašiai su konvoliuciniais sluoksniais
+rinkinio normalizaciją galime taikyti po konvoliucijos,
+bet prieš netiesinę aktyvacijos funkciją. Pagrindinis skirtumas nuo rinkinio normalizacijos
+pilnai sujungtuose sluoksniuose yra tas, kad operaciją taikome kiekvienam kanalui atskirai
+*per visas vietas*. Tai suderinama su mūsų postūmio invariantiškumo prielaida, kuri
+paskatino konvoliucijas: darėme prielaidą, kad konkreti šablono vieta
+vaizde nėra kritiška supratimo tikslais.
 
-Assume that our minibatches contain $m$ examples
-and that for each channel,
-the output of the convolution has height $p$ and width $q$.
-For convolutional layers, we carry out each batch normalization
-over the $m \cdot p \cdot q$ elements per output channel simultaneously.
-Thus, we collect the values over all spatial locations
-when computing the mean and variance
-and consequently
-apply the same mean and variance
-within a given channel
-to normalize the value at each spatial location.
-Each channel has its own scale and shift parameters,
-both of which are scalars.
+Tarkime, kad mūsų minirinkiniuose yra $m$ pavyzdžių
+ir kad kiekvienam kanalui
+konvoliucijos išvesties aukštis yra $p$, o plotis – $q$.
+Konvoliuciniams sluoksniams kiekvieną rinkinio normalizaciją atliekame
+vienu metu per $m \cdot p \cdot q$ elementų kiekviename išvesties kanale.
+Taigi skaičiuodami vidurkį ir dispersiją surenkame reikšmes per visas erdvines vietas
+ir todėl
+tą patį vidurkį ir dispersiją
+duotame kanale
+taikome kiekvienos erdvinės vietos reikšmei normalizuoti.
+Kiekvienas kanalas turi savo mastelio ir postūmio parametrus,
+abu yra skaliarai.
 
-### Layer Normalization
+### Sluoksnio normalizacija
 :label:`subsec_layer-normalization-in-bn`
 
-Note that in the context of convolutions the batch normalization is well defined even for
-minibatches of size 1: after all, we have all the locations across an image to average. Consequently,
-mean and variance are well defined, even if it is just within a single observation. This consideration
-led :citet:`Ba.Kiros.Hinton.2016` to introduce the notion of *layer normalization*. It works just like
-a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. For an $n$-dimensional vector $\mathbf{x}$, layer norms are given by 
+Atkreipkite dėmesį, kad konvoliucijų kontekste rinkinio normalizacija yra gerai apibrėžta net
+1 dydžio minirinkiniams: juk turime visas vaizdo vietas, per kurias galime vidurkinti. Todėl
+vidurkis ir dispersija yra gerai apibrėžti, net jei tik vieno stebėjimo ribose. Ši svarstymo kryptis
+paskatino :citet:`Ba.Kiros.Hinton.2016` pristatyti *sluoksnio normalizacijos* sąvoką. Ji veikia lygiai kaip
+rinkinio normalizacija, tik taikoma po vieną stebėjimą. Todėl ir postūmis, ir mastelio koeficientas yra skaliarai. $n$ dimensijų vektoriui $\mathbf{x}$ sluoksnio normalizacija pateikiama taip:
 
 $$\mathbf{x} \rightarrow \textrm{LN}(\mathbf{x}) =  \frac{\mathbf{x} - \hat{\mu}}{\hat\sigma},$$
 
-where scaling and offset are applied coefficient-wise
-and given by 
+kur mastelis ir postūmis taikomi koeficientų lygmeniu
+ir pateikiami taip:
 
 $$\hat{\mu} \stackrel{\textrm{def}}{=} \frac{1}{n} \sum_{i=1}^n x_i \textrm{ and }
 \hat{\sigma}^2 \stackrel{\textrm{def}}{=} \frac{1}{n} \sum_{i=1}^n (x_i - \hat{\mu})^2 + \epsilon.$$
 
-As before we add a small offset $\epsilon > 0$ to prevent division by zero. One of the major benefits of using layer normalization is that it prevents divergence. After all, ignoring $\epsilon$, the output of the layer normalization is scale independent. That is, we have $\textrm{LN}(\mathbf{x}) \approx \textrm{LN}(\alpha \mathbf{x})$ for any choice of $\alpha \neq 0$. This becomes an equality for $|\alpha| \to \infty$ (the approximate equality is due to the offset $\epsilon$ for the variance). 
+Kaip ir anksčiau, pridedame mažą postūmį $\epsilon > 0$, kad išvengtume dalybos iš nulio. Vienas pagrindinių sluoksnio normalizacijos naudojimo privalumų yra tas, kad ji apsaugo nuo divergencijos. Juk, nepaisant $\epsilon$, sluoksnio normalizacijos išvestis nepriklauso nuo mastelio. Tai yra, turime $\textrm{LN}(\mathbf{x}) \approx \textrm{LN}(\alpha \mathbf{x})$ bet kuriam $\alpha \neq 0$. Tai tampa lygybe, kai $|\alpha| \to \infty$ (apytikslė lygybė atsiranda dėl dispersijos postūmio $\epsilon$).
 
-Another advantage of the layer normalization is that it does not depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transformation that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend that interested readers consult the original paper.
+Kitas sluoksnio normalizacijos privalumas yra tas, kad ji nepriklauso nuo minirinkinio dydžio. Ji taip pat nepriklauso nuo to, ar esame apmokymo, ar testavimo režime. Kitaip tariant, tai tiesiog deterministinė transformacija, standartizuojanti aktyvacijas iki nurodyto mastelio. Tai gali būti labai naudinga užkertant kelią divergencijai optimizavime. Tolesnių detalių praleidžiame ir rekomenduojame norintiems perskaityti originalų straipsnį.
 
-### Batch Normalization During Prediction
+### Rinkinio normalizacija prognozavimo metu
 
-As we mentioned earlier, batch normalization typically behaves differently
-in training mode than in prediction mode.
-First, the noise in the sample mean and the sample variance
-arising from estimating each on minibatches
-is no longer desirable once we have trained the model.
-Second, we might not have the luxury
-of computing per-batch normalization statistics.
-For example,
-we might need to apply our model to make one prediction at a time.
+Kaip minėjome anksčiau, rinkinio normalizacija paprastai veikia skirtingai
+apmokymo režimu nei prognozavimo režimu.
+Pirma, imties vidurkio ir imties dispersijos triukšmas,
+atsirandantis juos vertinant pagal minirinkinius,
+nebėra pageidautinas, kai tik apmokome modelį.
+Antra, galbūt neturime prabangos
+skaičiuoti rinkinio normalizacijos statistikų kiekvienam rinkiniui.
+Pavyzdžiui,
+gali tekti taikyti savo modelį darant po vieną prognozę.
 
-Typically, after training, we use the entire dataset
-to compute stable estimates of the variable statistics
-and then fix them at prediction time.
-Hence, batch normalization behaves differently during training than at test time.
-Recall that dropout also exhibits this characteristic.
+Paprastai po apmokymo naudojame visą duomenų rinkinį
+stabiliems kintamųjų statistikų įverčiams apskaičiuoti
+ir tada juos fiksuojame prognozavimo metu.
+Taigi rinkinio normalizacija apmokymo metu veikia kitaip nei testavimo metu.
+Prisiminkite, kad dropout taip pat pasižymi šia savybe.
 
-## (**Implementation from Scratch**)
+## (**Įgyvendinimas nuo nulio**)
 
-To see how batch normalization works in practice, we implement one from scratch below.
+Kad pamatytume, kaip rinkinio normalizacija veikia praktikoje, toliau ją įgyvendiname nuo nulio.
 
 ```{.python .input}
 %%tab mxnet
@@ -378,28 +376,28 @@ def batch_norm(X, deterministic, gamma, beta, moving_mean, moving_var, eps,
     return Y
 ```
 
-We can now [**create a proper `BatchNorm` layer.**]
-Our layer will maintain proper parameters
-for scale `gamma` and shift `beta`,
-both of which will be updated in the course of training.
-Additionally, our layer will maintain
-moving averages of the means and variances
-for subsequent use during model prediction.
+Dabar galime [**sukurti tinkamą `BatchNorm` sluoksnį.**]
+Mūsų sluoksnis saugos tinkamus
+mastelio `gamma` ir postūmio `beta` parametrus,
+kuriuos abu atnaujinsime apmokymo metu.
+Be to, mūsų sluoksnis saugos
+vidurkių ir dispersijų slenkamuosius vidurkius
+vėlesniam naudojimui modelio prognozavimo metu.
 
-Putting aside the algorithmic details,
-note the design pattern underlying our implementation of the layer.
-Typically, we define the mathematics in a separate function, say `batch_norm`.
-We then integrate this functionality into a custom layer,
-whose code mostly addresses bookkeeping matters,
-such as moving data to the right device context,
-allocating and initializing any required variables,
-keeping track of moving averages (here for mean and variance), and so on.
-This pattern enables a clean separation of mathematics from boilerplate code.
-Also note that for the sake of convenience
-we did not worry about automatically inferring the input shape here;
-thus we need to specify the number of features throughout.
-By now all modern deep learning frameworks offer automatic detection of size and shape in the
-high-level batch normalization APIs (in practice we will use this instead).
+Nepaisydami algoritminių detalių,
+atkreipkite dėmesį į dizaino šabloną, slypintį mūsų sluoksnio įgyvendinimo pagrinde.
+Paprastai matematiką apibrėžiame atskiroje funkcijoje, tarkime, `batch_norm`.
+Tada šią funkcionalumą integruojame į pasirinktinį sluoksnį,
+kurio kodas daugiausia sprendžia apskaitos klausimus,
+tokius kaip duomenų perkėlimas į tinkamą įrenginio kontekstą,
+reikalingų kintamųjų paskyrimas ir inicializavimas,
+slenkamųjų vidurkių (čia vidurkio ir dispersijos) sekimas ir pan.
+Šis šablonas leidžia aiškiai atskirti matematiką nuo šablonų kodo.
+Taip pat atkreipkite dėmesį, kad patogumo dėlei
+čia nesirūpinome automatiniu įvesties formos nustatymu;
+todėl turime visur nurodyti požymių skaičių.
+Šiuo metu visi šiuolaikiniai giliojo mokymosi karkasai siūlo automatinį dydžio ir formos nustatymą
+aukšto lygio rinkinio normalizacijos API (praktikoje naudosime būtent jį).
 
 ```{.python .input}
 %%tab mxnet
@@ -554,15 +552,15 @@ class BatchNorm(nn.Module):
         return Y
 ```
 
-We used `momentum` to govern the aggregation over past mean and variance estimates. This is somewhat of a misnomer as it has nothing whatsoever to do with the *momentum* term of optimization. Nonetheless, it is the commonly adopted name for this term and in deference to API naming convention we use the same variable name in our code.
+Naudojome `momentum`, kad valdytume ankstesnių vidurkio ir dispersijos įverčių agregavimą. Tai šiek tiek klaidingas pavadinimas, nes jis neturi nieko bendra su optimizavimo *judesio* nariu. Vis dėlto tai plačiai priimtas šio nario pavadinimas, ir paisydami API pavadinimų konvencijos savo kode naudojame tą patį kintamojo pavadinimą.
 
-## [**LeNet with Batch Normalization**]
+## [**LeNet su rinkinio normalizacija**]
 
-To see how to apply `BatchNorm` in context,
-below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
-Recall that batch normalization is applied
-after the convolutional layers or fully connected layers
-but before the corresponding activation functions.
+Kad pamatytume, kaip `BatchNorm` taikyti kontekste,
+toliau pritaikome jį tradiciniam LeNet modeliui (:numref:`sec_lenet`).
+Prisiminkite, kad rinkinio normalizacija taikoma
+po konvoliucinių ar pilnai sujungtų sluoksnių,
+bet prieš atitinkamas aktyvacijos funkcijas.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -637,13 +635,13 @@ class BNLeNetScratch(d2l.Classifier):
 ```
 
 :begin_tab:`jax`
-Since `BatchNorm` layers need to calculate the batch statistics
-(mean and variance), Flax keeps track of the `batch_stats` dictionary, updating
-them with every minibatch. Collections like `batch_stats` can be stored in the
-`TrainState` object (in the `d2l.Trainer` class defined in
-:numref:`oo-design-training`) as an attribute and during the model's forward pass,
-these should be passed to the `mutable` argument, so that Flax returns the mutated
-variables.
+Kadangi `BatchNorm` sluoksniai turi apskaičiuoti rinkinio statistikas
+(vidurkį ir dispersiją), Flax seka žodyną `batch_stats`, atnaujindamas
+jį su kiekvienu minirinkiniu. Tokias kolekcijas kaip `batch_stats` galima saugoti
+`TrainState` objekte (klasėje `d2l.Trainer`, apibrėžtoje
+:numref:`oo-design-training`) kaip atributą, o modelio tiesioginio sklidimo metu
+jos turėtų būti perduodamos argumentui `mutable`, kad Flax grąžintų pakeistus
+kintamuosius.
 :end_tab:
 
 ```{.python .input}
@@ -661,8 +659,8 @@ def loss(self, params, X, Y, state, averaged=True):
     return (fn(Y_hat, Y).mean(), updates) if averaged else (fn(Y_hat, Y), updates)
 ```
 
-As before, we will [**train our network on the Fashion-MNIST dataset**].
-This code is virtually identical to that when we first trained LeNet.
+Kaip ir anksčiau, [**apmokysime savo tinklą su Fashion-MNIST duomenų rinkiniu**].
+Šis kodas praktiškai identiškas tam, kurį naudojome pirmą kartą apmokydami LeNet.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -683,9 +681,9 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-Let's [**have a look at the scale parameter `gamma`
-and the shift parameter `beta`**] learned
-from the first batch normalization layer.
+Pažvelkime į [**mastelio parametrą `gamma`
+ir postūmio parametrą `beta`**], išmoktus
+pirmajame rinkinio normalizacijos sluoksnyje.
 
 ```{.python .input}
 %%tab mxnet
@@ -709,13 +707,13 @@ trainer.state.params['net']['layers_1']['gamma'].reshape((-1,)), \
 trainer.state.params['net']['layers_1']['beta'].reshape((-1,))
 ```
 
-## [**Concise Implementation**]
+## [**Glaustas įgyvendinimas**]
 
-Compared with the `BatchNorm` class,
-which we just defined ourselves,
-we can use the `BatchNorm` class defined in high-level APIs from the deep learning framework directly.
-The code looks virtually identical
-to our implementation above, except that we no longer need to provide additional arguments for it to get the dimensions right.
+Palyginti su klase `BatchNorm`,
+kurią ką tik patys apibrėžėme,
+galime tiesiogiai naudoti klasę `BatchNorm`, apibrėžtą giliojo mokymosi karkaso aukšto lygio API.
+Kodas atrodo praktiškai identiškas
+mūsų aukščiau pateiktam įgyvendinimui, tik nebereikia nurodyti papildomų argumentų, kad dimensijos būtų teisingos.
 
 ```{.python .input}
 %%tab pytorch, tensorflow, mxnet
@@ -792,10 +790,10 @@ class BNLeNet(d2l.Classifier):
             nn.Dense(self.num_classes)])
 ```
 
-Below, we [**use the same hyperparameters to train our model.**]
-Note that as usual, the high-level API variant runs much faster
-because its code has been compiled to C++ or CUDA
-while our custom implementation must be interpreted by Python.
+Toliau [**naudojame tuos pačius hiperparametrus modeliui apmokyti.**]
+Atkreipkite dėmesį, kad, kaip įprasta, aukšto lygio API variantas veikia gerokai greičiau,
+nes jo kodas sukompiliuotas į C++ ar CUDA,
+o mūsų pasirinktinį įgyvendinimą turi interpretuoti Python.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -816,118 +814,118 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Discussion
+## Diskusija
 
-Intuitively, batch normalization is thought
-to make the optimization landscape smoother.
-However, we must be careful to distinguish between
-speculative intuitions and true explanations
-for the phenomena that we observe when training deep models.
-Recall that we do not even know why simpler
-deep neural networks (MLPs and conventional CNNs)
-generalize well in the first place.
-Even with dropout and weight decay,
-they remain so flexible that their ability to generalize to unseen data
-likely needs significantly more refined learning-theoretic generalization guarantees.
+Intuityviai manoma, kad rinkinio normalizacija
+daro optimizavimo kraštovaizdį glotnesnį.
+Tačiau turime būti atsargūs, skirdami
+spekuliatyvias intuicijas nuo tikrų paaiškinimų
+reiškiniams, kuriuos stebime apmokydami giliuosius modelius.
+Prisiminkite, kad net nežinome, kodėl paprastesni
+gilieji neuroniniai tinklai (MLP ir įprasti CNN)
+apskritai gerai apibendrina.
+Net su dropout ir svorių silpnėjimu
+jie lieka tokie lankstūs, kad jų gebėjimui apibendrinti nematytus duomenis
+tikriausiai reikia gerokai rafinuotesnių mokymosi teorijos apibendrinimo garantijų.
 
-The original paper proposing batch normalization :cite:`Ioffe.Szegedy.2015`, in addition to introducing a powerful and useful tool,
-offered an explanation for why it works:
-by reducing *internal covariate shift*.
-Presumably by *internal covariate shift* they
-meant something like the intuition expressed above---the
-notion that the distribution of variable values changes
-over the course of training.
-However, there were two problems with this explanation:
-i) This drift is very different from *covariate shift*,
-rendering the name a misnomer. If anything, it is closer to concept drift. 
-ii) The explanation offers an under-specified intuition
-but leaves the question of *why precisely this technique works*
-an open question wanting for a rigorous explanation.
-Throughout this book, we aim to convey the intuitions that practitioners
-use to guide their development of deep neural networks.
-However, we believe that it is important
-to separate these guiding intuitions
-from established scientific fact.
-Eventually, when you master this material
-and start writing your own research papers
-you will want to be clear to delineate
-between technical claims and hunches.
+Originalus straipsnis, siūlantis rinkinio normalizaciją :cite:`Ioffe.Szegedy.2015`, be galingo ir naudingo įrankio pristatymo,
+pateikė paaiškinimą, kodėl ji veikia:
+mažindama *vidinį kovariacijų poslinkį* (angl. *internal covariate shift*).
+Tikriausiai *vidiniu kovariacijų poslinkiu* jie
+turėjo omenyje kažką panašaus į aukščiau išreikštą intuiciją –
+sampratą, kad kintamųjų reikšmių skirstinys keičiasi
+apmokymo eigoje.
+Tačiau su šiuo paaiškinimu buvo dvi problemos:
+i) Šis dreifas labai skiriasi nuo *kovariacijų poslinkio*,
+todėl pavadinimas yra klaidingas. Jei kas, jis artimesnis konceptų dreifui.
+ii) Paaiškinimas siūlo nepakankamai apibrėžtą intuiciją,
+bet palieka klausimą, *kodėl būtent ši technika veikia*,
+atvirą ir reikalaujantį griežto paaiškinimo.
+Šioje knygoje siekiame perteikti intuicijas, kuriomis praktikai
+vadovaujasi kurdami giliuosius neuroninius tinklus.
+Tačiau manome, kad svarbu
+atskirti šias vedančias intuicijas
+nuo nusistovėjusių mokslinių faktų.
+Galiausiai, kai įvaldysite šią medžiagą
+ir pradėsite rašyti savo mokslinius straipsnius,
+norėsite aiškiai atriboti
+techninius teiginius nuo nuojautų.
 
-Following the success of batch normalization,
-its explanation in terms of *internal covariate shift*
-has repeatedly surfaced in debates in the technical literature
-and broader discourse about how to present machine learning research.
-In a memorable speech given while accepting a Test of Time Award
-at the 2017 NeurIPS conference,
-Ali Rahimi used *internal covariate shift*
-as a focal point in an argument likening
-the modern practice of deep learning to alchemy.
-Subsequently, the example was revisited in detail
-in a position paper outlining
-troubling trends in machine learning :cite:`Lipton.Steinhardt.2018`.
-Other authors
-have proposed alternative explanations for the success of batch normalization,
-some :cite:`Santurkar.Tsipras.Ilyas.ea.2018`
-claiming that batch normalization's success comes despite exhibiting behavior
-that is in some ways opposite to those claimed in the original paper.
+Po rinkinio normalizacijos sėkmės
+jos paaiškinimas *vidiniu kovariacijų poslinkiu*
+ne kartą iškildavo debatuose techninėje literatūroje
+ir platesniame diskurse apie tai, kaip pristatyti mašininio mokymosi tyrimus.
+Įsimintinoje kalboje, pasakytoje priimant Laiko išbandymo apdovanojimą
+2017 m. NeurIPS konferencijoje,
+Ali Rahimi naudojo *vidinį kovariacijų poslinkį*
+kaip pagrindinį argumentą, lyginantį
+šiuolaikinę giliojo mokymosi praktiką su alchemija.
+Vėliau pavyzdys buvo išsamiai aptartas
+pozicijos dokumente, nubrėžiančiame
+nerimą keliančias mašininio mokymosi tendencijas :cite:`Lipton.Steinhardt.2018`.
+Kiti autoriai
+pasiūlė alternatyvių rinkinio normalizacijos sėkmės paaiškinimų,
+kai kurie :cite:`Santurkar.Tsipras.Ilyas.ea.2018`
+teigia, kad rinkinio normalizacijos sėkmė pasiekiama nepaisant elgesio,
+kuris tam tikra prasme yra priešingas teigiamam originaliame straipsnyje.
 
 
-We note that the *internal covariate shift*
-is no more worthy of criticism than any of
-thousands of similarly vague claims
-made every year in the technical machine learning literature.
-Likely, its resonance as a focal point of these debates
-owes to its broad recognizability for the target audience.
-Batch normalization has proven an indispensable method,
-applied in nearly all deployed image classifiers,
-earning the paper that introduced the technique
-tens of thousands of citations. We conjecture, though, that the guiding principles
-of regularization through noise injection, acceleration through rescaling and lastly preprocessing
-may well lead to further inventions of layers and techniques in the future.
+Pažymime, kad *vidinis kovariacijų poslinkis*
+nėra labiau vertas kritikos nei bet kuris iš
+tūkstančių panašiai neaiškių teiginių,
+kasmet pateikiamų techninėje mašininio mokymosi literatūroje.
+Tikėtina, kad jo rezonansas kaip šių debatų pagrindinio taško
+kyla iš plataus atpažįstamumo tikslinei auditorijai.
+Rinkinio normalizacija pasirodė esanti nepakeičiamas metodas,
+taikomas beveik visuose diegiamuose vaizdų klasifikatoriuose,
+o straipsnis, pristatęs šią techniką, sulaukė
+dešimčių tūkstančių citavimų. Tačiau spėjame, kad vadovaujantys reguliarizacijos principai
+per triukšmo įterpimą, pagreitinimas per perskalinimą ir galiausiai išankstinis apdorojimas
+gali paskatinti ir kitus sluoksnių bei technikų išradimus ateityje.
 
-On a more practical note, there are a number of aspects worth remembering about batch normalization:
+Praktiškesniu požiūriu verta prisiminti kelis rinkinio normalizacijos aspektus:
 
-* During model training, batch normalization continuously adjusts the intermediate output of
-  the network by utilizing the mean and standard deviation of the minibatch, so that the
-  values of the intermediate output in each layer throughout the neural network are more stable.
-* Batch normalization is slightly different for fully connected layers than for convolutional layers. In fact,
-  for convolutional layers, layer normalization can sometimes be used as an alternative.
-* Like a dropout layer, batch normalization layers have different behaviors
-  in training mode than in prediction mode.
-* Batch normalization is useful for regularization and improving convergence in optimization. By contrast,
-  the original motivation of reducing internal covariate shift seems not to be a valid explanation.
-* For more robust models that are less sensitive to input perturbations, consider removing batch normalization :cite:`wang2022removing`.
+* Modelio apmokymo metu rinkinio normalizacija nuolat koreguoja tarpinę
+  tinklo išvestį, naudodama minirinkinio vidurkį ir standartinį nuokrypį, kad
+  tarpinės išvesties reikšmės kiekviename visų neuroninio tinklo sluoksnių lygyje būtų stabilesnės.
+* Rinkinio normalizacija šiek tiek skiriasi pilnai sujungtiems ir konvoliuciniams sluoksniams. Iš tikrųjų
+  konvoliuciniams sluoksniams kartais kaip alternatyvą galima naudoti sluoksnio normalizaciją.
+* Kaip ir dropout sluoksnis, rinkinio normalizacijos sluoksniai veikia skirtingai
+  apmokymo ir prognozavimo režimais.
+* Rinkinio normalizacija naudinga reguliarizacijai ir konvergavimui optimizavime gerinti. Priešingai,
+  originali motyvacija – sumažinti vidinį kovariacijų poslinkį – atrodo nėra pagrįstas paaiškinimas.
+* Norėdami gauti tvirtesnių modelių, mažiau jautrių įvesties trikdžiams, apsvarstykite rinkinio normalizacijos pašalinimą :cite:`wang2022removing`.
 
-## Exercises
+## Pratimai
 
-1. Should we remove the bias parameter from the fully connected layer or the convolutional layer before the batch normalization? Why?
-1. Compare the learning rates for LeNet with and without batch normalization.
-    1. Plot the increase in validation accuracy.
-    1. How large can you make the learning rate before the optimization fails in both cases?
-1. Do we need batch normalization in every layer? Experiment with it.
-1. Implement a "lite" version of batch normalization that only removes the mean, or alternatively one that
-   only removes the variance. How does it behave?
-1. Fix the parameters `beta` and `gamma`. Observe and analyze the results.
-1. Can you replace dropout by batch normalization? How does the behavior change?
-1. Research ideas: think of other normalization transforms that you can apply:
-    1. Can you apply the probability integral transform?
-    1. Can you use a full-rank covariance estimate? Why should you probably not do that? 
-    1. Can you use other compact matrix variants (block-diagonal, low-displacement rank, Monarch, etc.)?
-    1. Does a sparsification compression act as a regularizer?
-    1. Are there other projections (e.g., convex cone, symmetry group-specific transforms) that you can use?
+1. Ar prieš rinkinio normalizaciją turėtume pašalinti poslinkio parametrą iš pilnai sujungto sluoksnio ar konvoliucinio sluoksnio? Kodėl?
+1. Palyginkite LeNet mokymosi greičius su rinkinio normalizacija ir be jos.
+    1. Nubraižykite validavimo tikslumo augimą.
+    1. Kokį didelį mokymosi greitį galite pasirinkti, kol optimizavimas sutrinka abiem atvejais?
+1. Ar mums reikia rinkinio normalizacijos kiekviename sluoksnyje? Eksperimentuokite su tuo.
+1. Įgyvendinkite „lengvą“ rinkinio normalizacijos versiją, kuri pašalina tik vidurkį, arba, alternatyviai, tokią, kuri
+   pašalina tik dispersiją. Kaip ji elgiasi?
+1. Užfiksuokite parametrus `beta` ir `gamma`. Stebėkite ir išanalizuokite rezultatus.
+1. Ar galite pakeisti dropout rinkinio normalizacija? Kaip pasikeičia elgesys?
+1. Tyrimų idėjos: sugalvokite kitų normalizacijos transformacijų, kurias galite taikyti:
+    1. Ar galite pritaikyti tikimybinę integralinę transformaciją?
+    1. Ar galite naudoti pilno rango kovariacijos įvertį? Kodėl tikriausiai neturėtumėte to daryti?
+    1. Ar galite naudoti kitus kompaktiškus matricų variantus (blokinės įstrižainės, mažo poslinkio rango, Monarch ir kt.)?
+    1. Ar suretinimo glaudinimas veikia kaip reguliarizatorius?
+    1. Ar yra kitų projekcijų (pvz., iškilojo kūgio, simetrijos grupei specifinių transformacijų), kurias galite naudoti?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/83)
+[Diskusijos](https://discuss.d2l.ai/t/83)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/84)
+[Diskusijos](https://discuss.d2l.ai/t/84)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/330)
+[Diskusijos](https://discuss.d2l.ai/t/330)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18005)
+[Diskusijos](https://discuss.d2l.ai/t/18005)
 :end_tab:

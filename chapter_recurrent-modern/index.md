@@ -1,67 +1,67 @@
-# Modern Recurrent Neural Networks
+# Šiuolaikiniai rekurentiniai neuroniniai tinklai
 :label:`chap_modern_rnn`
 
-The previous chapter introduced the key ideas 
-behind recurrent neural networks (RNNs). 
-However, just as with convolutional neural networks,
-there has been a tremendous amount of innovation
-in RNN architectures, culminating in several complex
-designs that have proven successful in practice. 
-In particular, the most popular designs 
-feature mechanisms for mitigating the notorious
-numerical instability faced by RNNs,
-as typified by vanishing and exploding gradients.
-Recall that in :numref:`chap_rnn` we dealt 
-with exploding gradients by applying a blunt
-gradient clipping heuristic. 
-Despite the efficacy of this hack,
-it leaves open the problem of vanishing gradients. 
+Ankstesniame skyriuje pristatėme pagrindines idėjas,
+slypinčias už rekurentinių neuroninių tinklų (RNN).
+Tačiau, kaip ir su konvoliuciniais neuroniniais tinklais,
+RNN architektūrose buvo daug naujovių,
+kurios pasiekė kulminaciją keliuose sudėtinguose
+dizainuose, praktikoje pasirodžiusiuose esant sėkmingais.
+Visų pirma populiariausi dizainai
+turi mechanizmus, skirtus sušvelninti liūdnai pagarsėjusį
+RNN skaitinį nestabilumą,
+kurio tipiški pavyzdžiai yra nykstantys ir sprogstantys gradientai.
+Prisiminkite, kad :numref:`chap_rnn` su
+sprogstančiais gradientais susidorojome taikydami paprastą
+gradientų apkarpymo euristiką.
+Nepaisant šios gudrybės veiksmingumo,
+nykstančių gradientų problema lieka neišspręsta.
 
-In this chapter, we introduce the key ideas behind 
-the most successful RNN architectures for sequences,
-which stem from two papers.
-The first, *Long Short-Term Memory* :cite:`Hochreiter.Schmidhuber.1997`,
-introduces the *memory cell*, a unit of computation that replaces 
-traditional nodes in the hidden layer of a network.
-With these memory cells, networks are able 
-to overcome difficulties with training 
-encountered by earlier recurrent networks.
-Intuitively, the memory cell avoids 
-the vanishing gradient problem
-by keeping values in each memory cell's internal state
-cascading along a recurrent edge with weight 1 
-across many successive time steps. 
-A set of multiplicative gates help the network
-to determine not only the inputs to allow 
-into the memory state, 
-but when the content of the memory state 
-should influence the model's output. 
+Šiame skyriuje pristatome pagrindines idėjas,
+slypinčias už sėkmingiausių sekų RNN architektūrų,
+kurios kilo iš dviejų straipsnių.
+Pirmasis, *ilga trumpalaikė atmintis* (angl. *Long Short-Term Memory*) :cite:`Hochreiter.Schmidhuber.1997`,
+pristato *atminties ląstelę* – skaičiavimo vienetą, pakeičiantį
+tradicinius mazgus tinklo paslėptajame sluoksnyje.
+Su šiomis atminties ląstelėmis tinklai geba
+įveikti apmokymo sunkumus,
+su kuriais susidūrė ankstesni rekurentiniai tinklai.
+Intuityviai atminties ląstelė išvengia
+nykstančio gradiento problemos,
+išlaikydama kiekvienos atminties ląstelės vidinės būsenos reikšmes,
+sklindančias rekurentine briauna, kurios svoris yra 1,
+per daugelį paeiliui einančių laiko žingsnių.
+Daugybinių sklendžių rinkinys padeda tinklui
+nustatyti ne tik kokias įvestis leisti
+į atminties būseną,
+bet ir kada atminties būsenos turinys
+turėtų paveikti modelio išvestį.
 
-The second paper, *Bidirectional Recurrent Neural Networks* :cite:`Schuster.Paliwal.1997`,
-introduces an architecture in which information 
-from both the future (subsequent time steps) 
-and the past (preceding time steps)
-are used to determine the output 
-at any point in the sequence.
-This is in contrast to previous networks, 
-in which only past input can affect the output.
-Bidirectional RNNs have become a mainstay 
-for sequence labeling tasks in natural language processing,
-among a myriad of other tasks. 
-Fortunately, the two innovations are not mutually exclusive, 
-and have been successfully combined for phoneme classification
-:cite:`Graves.Schmidhuber.2005` and handwriting recognition :cite:`graves2008novel`.
+Antrasis straipsnis, *dvikryptis rekurentinis neuroninis tinklas* (angl. *Bidirectional Recurrent Neural Networks*) :cite:`Schuster.Paliwal.1997`,
+pristato architektūrą, kurioje informacija
+tiek iš ateities (vėlesnių laiko žingsnių),
+tiek iš praeities (ankstesnių laiko žingsnių)
+naudojama išvesčiai nustatyti
+bet kuriame sekos taške.
+Tai priešinga ankstesniems tinklams,
+kuriuose išvestį gali paveikti tik praeities įvestis.
+Dvikrypčiai RNN tapo pagrindiniu įrankiu
+sekų žymėjimo užduotims natūraliosios kalbos apdorojime,
+be daugybės kitų užduočių.
+Laimei, šios dvi naujovės viena kitos neatmeta
+ir buvo sėkmingai sujungtos fonemų klasifikavimui
+:cite:`Graves.Schmidhuber.2005` ir rankraščio atpažinimui :cite:`graves2008novel`.
 
 
-The first sections in this chapter will explain the LSTM architecture,
-a lighter-weight version called the gated recurrent unit (GRU),
-the key ideas behind bidirectional RNNs 
-and a brief explanation of how RNN layers 
-are stacked together to form deep RNNs. 
-Subsequently, we will explore the application of RNNs
-in sequence-to-sequence tasks, 
-introducing machine translation
-along with key ideas such as *encoder--decoder* architectures and *beam search*.
+Pirmieji šio skyriaus skyreliai paaiškins LSTM architektūrą,
+lengvesnę jos versiją, vadinamą sklendžių rekurentiniu vienetu (GRU),
+pagrindines dvikrypčių RNN idėjas
+ir trumpą paaiškinimą, kaip RNN sluoksniai
+sukraunami kartu, kad sudarytų gilius RNN.
+Vėliau nagrinėsime RNN taikymą
+sekos į seką užduotyse,
+pristatydami mašininį vertimą
+kartu su pagrindinėmis idėjomis, tokiomis kaip *kodavimo ir dekodavimo* architektūros ir *spindulio paieška*.
 
 ```toc
 :maxdepth: 2

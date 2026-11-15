@@ -1,9 +1,9 @@
-# Attention Pooling by Similarity
+# Dėmesio sutelkimas pagal panašumą
 
 :label:`sec_attention-pooling`
 
-Now that we have introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification via kernel density estimation :cite:`Nadaraya.1964,Watson.1964`. This detour simply provides additional background: it is entirely optional and can be skipped if needed. 
-At their core, Nadaraya--Watson estimators rely on some similarity kernel $\alpha(\mathbf{q}, \mathbf{k})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
+Dabar, kai pristatėme pagrindinius dėmesio sutelkimo mechanizmo komponentus, panaudokime juos gana klasikinėje nuostatoje, būtent regresijai ir klasifikavimui per branduolinį tankio vertinimą :cite:`Nadaraya.1964,Watson.1964`. Ši atkarpa tiesiog suteikia papildomo fono: ji visiškai neprivaloma ir, jei reikia, gali būti praleista.
+Iš esmės Nadaraya–Watsono įverčiai remiasi tam tikru panašumo branduoliu $\alpha(\mathbf{q}, \mathbf{k})$, susiejančiu užklausas $\mathbf{q}$ su raktais $\mathbf{k}$. Keli įprasti branduoliai yra
 
 $$\begin{aligned}
 \alpha(\mathbf{q}, \mathbf{k}) & = \exp\left(-\frac{1}{2} \|\mathbf{q} - \mathbf{k}\|^2 \right) && \textrm{Gaussian;} \\
@@ -12,11 +12,11 @@ $$\begin{aligned}
 \end{aligned}
 $$
 
-There are many more choices that we could pick. See a [Wikipedia article](https://en.wikipedia.org/wiki/Kernel_(statistics)) for a more extensive review and how the choice of kernels is related to kernel density estimation, sometimes also called *Parzen Windows* :cite:`parzen1957consistent`. All of the kernels are heuristic and can be tuned. For instance, we can adjust the width, not only on a global basis but even on a per-coordinate basis. Regardless, all of them lead to the following equation for regression and classification alike:
+Galėtume pasirinkti dar daug kitų variantų. Plačiau apie tai žr. [Vikipedijos straipsnyje](https://en.wikipedia.org/wiki/Kernel_(statistics)) ir kaip branduolių pasirinkimas susijęs su branduoliniu tankio vertinimu, kartais dar vadinamu *Parzeno langais* :cite:`parzen1957consistent`. Visi branduoliai yra euristiniai ir juos galima derinti. Pavyzdžiui, galime keisti plotį ne tik globaliai, bet net kiekvienai koordinatei atskirai. Bet kuriuo atveju visi jie veda prie šios lygties, tinkamos ir regresijai, ir klasifikavimui:
 
 $$f(\mathbf{q}) = \sum_i \mathbf{v}_i \frac{\alpha(\mathbf{q}, \mathbf{k}_i)}{\sum_j \alpha(\mathbf{q}, \mathbf{k}_j)}.$$
 
-In the case of a (scalar) regression with observations $(\mathbf{x}_i, y_i)$ for features and labels respectively, $\mathbf{v}_i = y_i$ are scalars, $\mathbf{k}_i = \mathbf{x}_i$ are vectors, and the query $\mathbf{q}$ denotes the new location where $f$ should be evaluated. In the case of (multiclass) classification, we use one-hot-encoding of $y_i$ to obtain $\mathbf{v}_i$. One of the convenient properties of this estimator is that it requires no training. Even more so, if we suitably narrow the kernel with increasing amounts of data, the approach is consistent :cite:`mack1982weak`, i.e., it will converge to some statistically optimal solution. Let's start by inspecting some kernels.
+(Skaliarinės) regresijos atveju su stebėjimais $(\mathbf{x}_i, y_i)$ atitinkamai požymiams ir žymenims, $\mathbf{v}_i = y_i$ yra skaliarai, $\mathbf{k}_i = \mathbf{x}_i$ yra vektoriai, o užklausa $\mathbf{q}$ žymi naują vietą, kurioje reikia įvertinti $f$. (Daugelio klasių) klasifikavimo atveju naudojame $y_i$ vienkartinį kodavimą, kad gautume $\mathbf{v}_i$. Viena iš patogių šio įverčio savybių yra ta, kad jam nereikia apmokymo. Dar daugiau, jei tinkamai siaurintume branduolį didėjant duomenų kiekiui, metodas yra suderintas (angl. *consistent*) :cite:`mack1982weak`, t. y. jis konverguos į tam tikrą statistiškai optimalų sprendinį. Pradėkime nuo kai kurių branduolių tyrimo.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -60,9 +60,9 @@ from jax import numpy as jnp
 from flax import linen as nn
 ```
 
-## [**Kernels and Data**]
+## [**Branduoliai ir duomenys**]
 
-All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *translation and rotation invariant*; that is, if we shift and rotate $\mathbf{k}$ and $\mathbf{q}$ in the same manner, the value of $\alpha$ remains unchanged. For simplicity we thus pick scalar arguments $k, q \in \mathbb{R}$ and pick the key $k = 0$ as the origin. This yields:
+Visi šiame skyrelyje apibrėžti branduoliai $\alpha(\mathbf{k}, \mathbf{q})$ yra *postūmio ir sukimo invariantiški*; t. y. jei postumiame ir pasukame $\mathbf{k}$ ir $\mathbf{q}$ vienodai, $\alpha$ reikšmė nepasikeičia. Todėl paprastumo dėlei pasirenkame skaliarinius argumentus $k, q \in \mathbb{R}$ ir raktą $k = 0$ laikome atskaitos tašku. Tai duoda:
 
 ```{.python .input}
 %%tab all
@@ -107,13 +107,13 @@ for kernel, name, ax in zip(kernels, names, axes):
 d2l.plt.show()
 ```
 
-Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of $1$ (or some otherwise defined hyperparameter) and does so indiscriminately. 
+Skirtingi branduoliai atitinka skirtingas ribos (siekio) ir glotnumo sampratas. Pavyzdžiui, stačiakampis branduolys (angl. *boxcar*) atsižvelgia tik į stebėjimus, esančius ne toliau kaip $1$ atstumu (ar kitaip apibrėžtu hiperparametru), ir tai daro nesirinkdamas.
 
-To see Nadaraya--Watson estimation in action, let's define some training data. In the following we use the dependency
+Kad pamatytume Nadaraya–Watsono vertinimą veikiant, apibrėžkime kai kuriuos apmokymo duomenis. Toliau naudojame priklausomybę
 
 $$y_i = 2\sin(x_i) + x_i + \epsilon,$$
 
-where $\epsilon$ is drawn from a normal distribution with zero mean and unit variance. We draw 40 training examples.
+kur $\epsilon$ imamas iš normaliojo skirstinio su nuliniu vidurkiu ir vienetine dispersija. Ištraukiame 40 apmokymo pavyzdžių.
 
 ```{.python .input}
 %%tab all
@@ -137,11 +137,11 @@ x_val = d2l.arange(0, 5, 0.1)
 y_val = f(x_val)
 ```
 
-## [**Attention Pooling via Nadaraya--Watson Regression**]
+## [**Dėmesio sutelkimas per Nadaraya–Watsono regresiją**]
 
-Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics. Hence we first compute the kernel between all training features (covariates) `x_train` and all validation features `x_val`. This yields a matrix, which we subsequently normalize. When multiplied with the training labels `y_train` we obtain the estimates.
+Turėdami duomenis ir branduolius, mums reikia tik funkcijos, apskaičiuojančios branduolinės regresijos įverčius. Atkreipkite dėmesį, kad taip pat norime gauti santykinius branduolio svorius, kad galėtume atlikti nedidelę diagnostiką. Todėl pirmiausia apskaičiuojame branduolį tarp visų apmokymo požymių (kovariančių) `x_train` ir visų validavimo požymių `x_val`. Gauname matricą, kurią vėliau normalizuojame. Padauginę ją iš apmokymo žymenų `y_train`, gauname įverčius.
 
-Recall attention pooling in :eqref:`eq_attention_pooling`. Let each validation feature be a query, and each training feature--label pair be a key--value pair. As a result, the  normalized relative kernel weights (`attention_w` below) are the *attention weights*.
+Prisiminkite dėmesio sutelkimą :eqref:`eq_attention_pooling`. Tegul kiekvienas validavimo požymis yra užklausa, o kiekviena apmokymo požymio ir žymens pora yra rakto ir reikšmės pora. Todėl normalizuoti santykiniai branduolio svoriai (toliau `attention_w`) yra *dėmesio svoriai*.
 
 ```{.python .input}
 %%tab all
@@ -162,7 +162,7 @@ def nadaraya_watson(x_train, y_train, x_val, kernel):
     return y_hat, attention_w
 ```
 
-Let's have a look at the kind of estimates that the different kernels produce.
+Pažiūrėkime, kokius įverčius sukuria skirtingi branduoliai.
 
 ```{.python .input}
 %%tab all
@@ -191,19 +191,19 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 
-The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function. Only the constant kernel that leads to the trivial estimate $f(x) = \frac{1}{n} \sum_i y_i$ produces a rather unrealistic result. Let's inspect the attention weighting a bit more closely:
+Pirmiausia krenta į akis tai, kad visi trys netrivialūs branduoliai (Gauso, stačiakampis ir Epanechnikovo) sukuria gana tinkamus įverčius, nelabai nutolusius nuo tikrosios funkcijos. Tik pastovusis branduolys, vedantis prie trivialaus įverčio $f(x) = \frac{1}{n} \sum_i y_i$, duoda gana nerealų rezultatą. Atidžiau patikrinkime dėmesio svorius:
 
 ```{.python .input}
 %%tab all
 plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)
 ```
 
-The visualization clearly shows why the estimates for Gaussian, Boxcar, and Epanechikov are very similar: after all, they are derived from very similar attention weights, despite the different functional form of the kernel. This raises the question as to whether this is always the case. 
+Vizualizacija aiškiai parodo, kodėl Gauso, stačiakampio ir Epanechnikovo įverčiai labai panašūs: juk jie gauti iš labai panašių dėmesio svorių, nepaisant skirtingos branduolio funkcinės formos. Tai kelia klausimą, ar taip yra visada.
 
-## [**Adapting Attention Pooling**]
+## [**Dėmesio sutelkimo pritaikymas**]
 
-We could replace the Gaussian kernel with one of a different width. That is, we could use 
-$\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2 \sigma^2} \|\mathbf{q} - \mathbf{k}\|^2 \right)$ where $\sigma^2$ determines the width of the kernel. Let's see whether this affects the outcomes.
+Gauso branduolį galėtume pakeisti kitokio pločio branduoliu. T. y. galėtume naudoti
+$\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2 \sigma^2} \|\mathbf{q} - \mathbf{k}\|^2 \right)$, kur $\sigma^2$ nustato branduolio plotį. Pažiūrėkime, ar tai paveikia rezultatus.
 
 ```{.python .input}
 %%tab all
@@ -217,45 +217,45 @@ kernels = [gaussian_with_width(sigma) for sigma in sigmas]
 plot(x_train, y_train, x_val, y_val, kernels, names)
 ```
 
-Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let's look at the corresponding attention weights.
+Akivaizdu, kad kuo siauresnis branduolys, tuo mažiau glotnus įvertis. Tuo pat metu jis geriau prisitaiko prie lokalių svyravimų. Pažiūrėkime į atitinkamus dėmesio svorius.
 
 ```{.python .input}
 %%tab all
 plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)
 ```
 
-As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal. In fact, :citet:`Silverman86` proposed a heuristic that depends on the local density. Many more such "tricks" have been proposed. For instance, :citet:`norelli2022asif` used a similar nearest-neighbor interpolation technique for designing cross-modal image and text representations. 
+Kaip ir galima tikėtis, kuo siauresnis branduolys, tuo siauresnis didelių dėmesio svorių diapazonas. Taip pat akivaizdu, kad to paties pločio pasirinkimas gali būti neidealus. Iš tiesų :citet:`Silverman86` pasiūlė euristiką, priklausančią nuo lokalaus tankio. Pasiūlyta dar daug tokių „gudrybių“. Pavyzdžiui, :citet:`norelli2022asif` panaudojo panašią artimiausių kaimynų interpoliacijos techniką tarpmodaliniams vaizdų ir teksto vaizdams projektuoti.
 
-The astute reader might wonder why we are providing this deep dive for a method that is over half a century old. First, it is one of the earliest precursors of modern attention mechanisms. Second, it is great for visualization. Third, and just as importantly, it demonstrates the limits of hand-crafted attention mechanisms. A much better strategy is to *learn* the mechanism, by learning the representations for queries and keys. This is what we will embark on in the following sections.
+Įžvalgus skaitytojas gali stebėtis, kodėl pateikiame šią gilią analizę metodui, kuriam daugiau nei pusė amžiaus. Pirma, tai vienas ankstyviausių šiuolaikinių dėmesio sutelkimo mechanizmų pirmtakų. Antra, jis puikiai tinka vizualizavimui. Trečia, ir tiek pat svarbu, jis parodo rankomis kurtų dėmesio sutelkimo mechanizmų ribas. Daug geresnė strategija yra *išmokti* mechanizmą, mokantis užklausų ir raktų vaizdus. Būtent tuo ir užsiimsime kituose skyreliuose.
 
 
-## Summary
+## Santrauka
 
-Nadaraya--Watson kernel regression is an early precursor of the current attention mechanisms. 
-It can be used directly with little to no training or tuning, either for classification or regression. 
-The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available. 
+Nadaraya–Watsono branduolinė regresija yra ankstyvas dabartinių dėmesio sutelkimo mechanizmų pirmtakas.
+Ją galima naudoti tiesiogiai, beveik be apmokymo ar derinimo, tiek klasifikavimui, tiek regresijai.
+Dėmesio svoris priskiriamas pagal užklausos ir rakto panašumą (arba atstumą) ir pagal tai, kiek panašių stebėjimų yra turima.
 
-## Exercises
+## Pratimai
 
-1. Parzen windows density estimates are given by $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Prove that for binary classification the function $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, as obtained by Parzen windows is equivalent to Nadaraya--Watson classification. 
-1. Implement stochastic gradient descent to learn a good value for kernel widths in Nadaraya--Watson regression. 
-    1. What happens if you just use the above estimates to minimize $(f(\mathbf{x_i}) - y_i)^2$ directly? Hint: $y_i$ is part of the terms used to compute $f$.
-    1. Remove $(\mathbf{x}_i, y_i)$ from the estimate for $f(\mathbf{x}_i)$ and optimize over the kernel widths. Do you still observe overfitting?
-1. Assume that all $\mathbf{x}$ lie on the unit sphere, i.e., all satisfy $\|\mathbf{x}\| = 1$. Can you simplify the $\|\mathbf{x} - \mathbf{x}_i\|^2$ term in the exponential? Hint: we will later see that this is very closely related to dot product attention. 
-1. Recall that :citet:`mack1982weak` proved that Nadaraya--Watson estimation is consistent. How quickly should you reduce the scale for the attention mechanism as you get more data? Provide some intuition for your answer. Does it depend on the dimensionality of the data? How?
+1. Parzeno langų tankio įverčiai yra $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Įrodykite, kad dvejetainiam klasifikavimui funkcija $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, gauta Parzeno langais, yra ekvivalenti Nadaraya–Watsono klasifikavimui.
+1. Įgyvendinkite stochastinį gradientinį nusileidimą, kad išmoktumėte gerą branduolių pločių reikšmę Nadaraya–Watsono regresijoje.
+    1. Kas nutinka, jei tiesiog naudojate aukščiau pateiktus įverčius, kad tiesiogiai minimizuotumėte $(f(\mathbf{x_i}) - y_i)^2$? Užuomina: $y_i$ yra viena iš narių, naudojamų $f$ apskaičiuoti.
+    1. Pašalinkite $(\mathbf{x}_i, y_i)$ iš $f(\mathbf{x}_i)$ įverčio ir optimizuokite branduolių pločius. Ar vis dar stebite persimokymą?
+1. Tarkime, kad visi $\mathbf{x}$ guli ant vienetinės sferos, t. y. visi tenkina $\|\mathbf{x}\| = 1$. Ar galite supaprastinti narį $\|\mathbf{x} - \mathbf{x}_i\|^2$ eksponentėje? Užuomina: vėliau pamatysime, kad tai labai glaudžiai susiję su skaliarinės sandaugos dėmesio sutelkimu.
+1. Prisiminkite, kad :citet:`mack1982weak` įrodė, jog Nadaraya–Watsono vertinimas yra suderintas. Kaip greitai turėtumėte mažinti dėmesio sutelkimo mechanizmo mastelį, gaunant daugiau duomenų? Pateikite šiek tiek intuicijos savo atsakymui. Ar tai priklauso nuo duomenų dimensijos? Kaip?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/1598)
+[Diskusijos](https://discuss.d2l.ai/t/1598)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1599)
+[Diskusijos](https://discuss.d2l.ai/t/1599)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3866)
+[Diskusijos](https://discuss.d2l.ai/t/3866)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18026)
+[Diskusijos](https://discuss.d2l.ai/t/18026)
 :end_tab:

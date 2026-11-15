@@ -3,34 +3,34 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Designing Convolution Network Architectures
+# Konvoliucinių tinklų architektūrų projektavimas
 :label:`sec_cnn-design`
 
-The previous sections have taken us on a tour of modern network design for computer vision. Common to all the work we covered was that it greatly relied on the intuition of scientists. Many of the architectures are heavily informed by human creativity and to a much lesser extent by systematic exploration of the design space that deep networks offer. Nonetheless, this *network engineering* approach has been tremendously successful. 
+Ankstesni skyreliai mus supažindino su šiuolaikiniu tinklų dizainu kompiuterinei regai. Visų aptartų darbų bendras bruožas buvo tas, kad jie labai rėmėsi mokslininkų intuicija. Daugelį architektūrų stipriai lėmė žmogaus kūrybiškumas ir daug mažiau – sistemingas dizaino erdvės, kurią siūlo gilieji tinklai, tyrinėjimas. Vis dėlto šis *tinklų inžinerijos* požiūris buvo nepaprastai sėkmingas.
 
-Ever since AlexNet (:numref:`sec_alexnet`)
-beat conventional computer vision models on ImageNet,
-it has become popular to construct very deep networks
-by stacking blocks of convolutions, all designed according to the same pattern. 
-In particular, $3 \times 3$ convolutions were 
-popularized by VGG networks (:numref:`sec_vgg`).
-NiN (:numref:`sec_nin`) showed that even $1 \times 1$ convolutions could 
-be beneficial by adding local nonlinearities. 
-Moreover, NiN solved the problem of aggregating information at the head of a network 
-by aggregating across all locations. 
-GoogLeNet (:numref:`sec_googlenet`) added multiple branches of different convolution width, 
-combining the advantages of VGG and NiN in its Inception block. 
-ResNets (:numref:`sec_resnet`) 
-changed the inductive bias towards the identity mapping (from $f(x) = 0$). This allowed for very deep networks. Almost a decade later, the ResNet design is still popular, a testament to its design. Lastly, ResNeXt (:numref:`subsec_resnext`) added grouped convolutions, offering a better trade-off between parameters and computation. A precursor to Transformers for vision, the Squeeze-and-Excitation Networks (SENets) allow for efficient information transfer between locations
-:cite:`Hu.Shen.Sun.2018`. This was accomplished by computing a per-channel global attention function. 
+Nuo tada, kai AlexNet (:numref:`sec_alexnet`)
+įveikė įprastus kompiuterinės regos modelius su ImageNet,
+tapo populiaru kurti labai gilius tinklus,
+kraunant konvoliucijų blokus, visus suprojektuotus pagal tą patį šabloną.
+Visų pirma $3 \times 3$ konvoliucijas
+išpopuliarino VGG tinklai (:numref:`sec_vgg`).
+NiN (:numref:`sec_nin`) parodė, kad net $1 \times 1$ konvoliucijos gali
+būti naudingos pridedant lokalius netiesiškumus.
+Be to, NiN išsprendė informacijos agregavimo tinklo galvoje problemą,
+agreguodamas per visas vietas.
+GoogLeNet (:numref:`sec_googlenet`) pridėjo kelias skirtingo konvoliucijų pločio šakas,
+savo Inception bloke sujungdamas VGG ir NiN privalumus.
+ResNet (:numref:`sec_resnet`)
+pakeitė induktyvinį šališkumą link tapatybės atvaizdavimo (nuo $f(x) = 0$). Tai leido kurti labai gilius tinklus. Praėjus beveik dešimtmečiui, ResNet dizainas vis dar populiarus, o tai liudija apie jo kokybę. Galiausiai ResNeXt (:numref:`subsec_resnext`) pridėjo grupines konvoliucijas, pasiūlydamas geresnį kompromisą tarp parametrų ir skaičiavimų. Transformerių regai pirmtakai – suspaudimo ir sužadinimo tinklai (angl. Squeeze-and-Excitation Networks, SENet) – leidžia efektyviai perduoti informaciją tarp vietų
+:cite:`Hu.Shen.Sun.2018`. Tai pasiekta apskaičiuojant globalią dėmesio funkciją kiekvienam kanalui.
 
-Up to now we have omitted networks obtained via *neural architecture search* (NAS) :cite:`zoph2016neural,liu2018darts`. We chose to do so since their cost is usually enormous, relying on brute-force search, genetic algorithms, reinforcement learning, or some other form of hyperparameter optimization. Given a fixed search space,
-NAS uses a search strategy to automatically select
-an architecture based on the returned performance estimation.
-The outcome of NAS
-is a single network instance. EfficientNets are a notable outcome of this search :cite:`tan2019efficientnet`.
+Iki šiol praleidome tinklus, gautus per *neuroninių architektūrų paiešką* (angl. *neural architecture search*, NAS) :cite:`zoph2016neural,liu2018darts`. Taip pasirinkome todėl, kad jų kaina paprastai milžiniška, nes jie remiasi brutalios jėgos paieška, genetiniais algoritmais, skatinamuoju mokymusi ar kita hiperparametrų optimizavimo forma. Turint fiksuotą paieškos erdvę,
+NAS naudoja paieškos strategiją, kad automatiškai parinktų
+architektūrą pagal grąžinamą našumo įvertį.
+NAS rezultatas
+yra vienas tinklo egzempliorius. EfficientNet yra žymus šios paieškos rezultatas :cite:`tan2019efficientnet`.
 
-In the following we discuss an idea that is quite different to the quest for the *single best network*. It is computationally relatively inexpensive, it leads to scientific insights on the way, and it is quite effective in terms of the quality of outcomes. Let's review the strategy by :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` to *design network design spaces*. The strategy combines the strength of manual design and NAS. It accomplishes this by operating on *distributions of networks* and optimizing the distributions in a way to obtain good performance for entire families of networks. The outcome of it are *RegNets*, specifically RegNetX and RegNetY, plus a range of guiding principles for the design of performant CNNs.
+Toliau aptariame idėją, gana skirtingą nuo *vienintelio geriausio tinklo* paieškos. Ji skaičiavimo požiūriu santykinai pigi, pakeliui duoda mokslinių įžvalgų ir yra gana veiksminga rezultatų kokybės požiūriu. Apžvelkime :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` strategiją *projektuoti tinklo dizaino erdves*. Strategija sujungia rankinio dizaino ir NAS stiprybes. Tai pasiekiama veikiant su *tinklų skirstiniais* ir optimizuojant skirstinius taip, kad būtų gautas geras visų tinklų šeimų našumas. Rezultatas yra *RegNet* tinklai, konkrečiai RegNetX ir RegNetY, plius kelių vadovaujančių principų rinkinys našių CNN projektavimui.
 
 ```{.python .input}
 %%tab mxnet
@@ -61,26 +61,26 @@ from d2l import jax as d2l
 from flax import linen as nn
 ```
 
-## The AnyNet Design Space
+## AnyNet dizaino erdvė
 :label:`subsec_the-anynet-design-space`
 
-The description below closely follows the reasoning in :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` with some abbreviations to make it fit in the scope of the book. 
-To begin, we need a template for the family of networks to explore. One of the commonalities of the designs in this chapter is that the networks consist of a *stem*, a *body* and a *head*. The stem performs initial image processing, often through convolutions with a larger window size. The body consists of multiple blocks, carrying out the bulk of the transformations needed to go from raw images to object representations. Lastly, the head converts this into the desired outputs, such as via a softmax regressor for multiclass classification. 
-The body, in turn, consists of multiple stages, operating on the image at decreasing resolutions. In fact, both the stem and each subsequent stage quarter the spatial resolution. Lastly, each stage consists of one or more blocks. This pattern is common to all networks, from VGG to ResNeXt. Indeed, for the design of generic AnyNet networks, :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` used the ResNeXt block of :numref:`fig_resnext_block`.
+Toliau pateiktas aprašymas glaudžiai seka :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` samprotavimą su kai kuriais sutrumpinimais, kad tilptų į knygos apimtį.
+Pradėkime nuo to, kad mums reikia šablono tyrinėjamai tinklų šeimai. Vienas iš šiame skyriuje aprašytų dizainų bendrų bruožų yra tas, kad tinklus sudaro *pradžios dalis*, *korpusas* ir *galva*. Pradžios dalis atlieka pradinį vaizdo apdorojimą, dažnai per konvoliucijas su didesniu lango dydžiu. Korpusą sudaro keli blokai, atliekantys didžiąją dalį transformacijų, reikalingų norint iš neapdorotų vaizdų gauti objektų atvaizdus. Galiausiai galva paverčia tai norimomis išvestimis, pavyzdžiui, per softmax regresorių daugiaklasei klasifikacijai.
+Savo ruožtu korpusą sudaro keli etapai, veikiantys vaizdą mažėjančia skyra. Iš tikrųjų ir pradžios dalis, ir kiekvienas paskesnis etapas ketvirtadaliu sumažina erdvinę skyrą. Galiausiai kiekvieną etapą sudaro vienas ar daugiau blokų. Šis šablonas bendras visiems tinklams, nuo VGG iki ResNeXt. Iš tikrųjų bendrų AnyNet tinklų dizainui :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` naudojo ResNeXt bloką iš :numref:`fig_resnext_block`.
 
 
-![The AnyNet design space. The numbers $(\mathit{c}, \mathit{r})$ along each arrow indicate the number of channels $c$ and the resolution $\mathit{r} \times \mathit{r}$ of the images at that point. From left to right: generic network structure composed of stem, body, and head; body composed of four stages; detailed structure of a stage; two alternative structures for blocks, one without downsampling and one that halves the resolution in each dimension. Design choices include depth $\mathit{d_i}$, the number of output channels $\mathit{c_i}$, the number of groups $\mathit{g_i}$, and bottleneck ratio $\mathit{k_i}$ for any stage $\mathit{i}$.](../img/anynet.svg)
+![AnyNet dizaino erdvė. Skaičiai $(\mathit{c}, \mathit{r})$ prie kiekvienos rodyklės nurodo kanalų skaičių $c$ ir vaizdų skyrą $\mathit{r} \times \mathit{r}$ tame taške. Iš kairės į dešinę: bendra tinklo struktūra, sudaryta iš pradžios dalies, korpuso ir galvos; korpusas, sudarytas iš keturių etapų; detali etapo struktūra; dvi alternatyvios blokų struktūros – viena be diskretizavimo dažnio mažinimo, kita perpus sumažinanti skyrą kiekvienoje dimensijoje. Dizaino pasirinkimai apima gylį $\mathit{d_i}$, išvesties kanalų skaičių $\mathit{c_i}$, grupių skaičių $\mathit{g_i}$ ir butelio kakliuko santykį $\mathit{k_i}$ bet kuriam etapui $\mathit{i}$.](../img/anynet.svg)
 :label:`fig_anynet_full`
 
-Let's review the structure outlined in :numref:`fig_anynet_full` in detail. As mentioned, an AnyNet consists of a stem, body, and head. The stem takes as its input RGB images (3 channels), using a $3 \times 3$ convolution with a stride of $2$, followed by a batch norm, to halve the resolution from $r \times r$ to $r/2 \times r/2$. Moreover, it generates $c_0$ channels that serve as input to the body. 
+Išsamiai apžvelkime :numref:`fig_anynet_full` pateiktą struktūrą. Kaip minėta, AnyNet sudaro pradžios dalis, korpusas ir galva. Pradžios dalis kaip įvestį priima RGB vaizdus (3 kanalai), naudoja $3 \times 3$ konvoliuciją su žingsniu $2$, po kurios eina rinkinio normalizacija, kad perpus sumažintų skyrą iš $r \times r$ į $r/2 \times r/2$. Be to, ji generuoja $c_0$ kanalų, kurie tarnauja kaip korpuso įvestis.
 
-Since the network is designed to work well with ImageNet images of shape $224 \times 224 \times 3$, the body serves to reduce this to $7 \times 7 \times c_4$ through 4 stages (recall that $224 / 2^{1+4} = 7$), each with an eventual stride of $2$. Lastly, the head employs an entirely standard design via global average pooling, similar to NiN (:numref:`sec_nin`), followed by a fully connected layer to emit an $n$-dimensional vector for $n$-class classification. 
+Kadangi tinklas suprojektuotas gerai veikti su $224 \times 224 \times 3$ formos ImageNet vaizdais, korpusas tai sumažina iki $7 \times 7 \times c_4$ per 4 etapus (prisiminkite, kad $224 / 2^{1+4} = 7$), kurių kiekvienas turi galutinį žingsnį $2$. Galiausiai galva naudoja visiškai standartinį dizainą su globaliu sutelkimu vidurkinant, panašiai kaip NiN (:numref:`sec_nin`), po kurio eina pilnai sujungtas sluoksnis $n$ dimensijų vektoriui išvesti $n$ klasių klasifikacijai.
 
-Most of the relevant design decisions are inherent to the body of the network. It proceeds in stages, where each stage is composed of the same type of ResNeXt blocks as we discussed in :numref:`subsec_resnext`. The design there is again entirely generic: we begin with a block that halves the resolution by using a stride of $2$ (the rightmost in :numref:`fig_anynet_full`). To match this, the residual branch of the ResNeXt block needs to pass through a $1 \times 1$ convolution. This block is followed by a variable number of additional ResNeXt blocks that leave both resolution and the number of channels unchanged. Note that a common design practice is to add a slight bottleneck in the design of convolutional blocks. 
-As such, with bottleneck ratio $k_i \geq 1$ we afford some number of channels, $c_i/k_i$,  within each block for stage $i$ (as the experiments show, this is not really effective and should be skipped). Lastly, since we are dealing with ResNeXt blocks, we also need to pick the number of groups $g_i$ for grouped convolutions at stage $i$. 
+Dauguma svarbių dizaino sprendimų yra būdingi tinklo korpusui. Jis veikia etapais, kur kiekvieną etapą sudaro to paties tipo ResNeXt blokai, kaip aptarėme :numref:`subsec_resnext`. Dizainas ten vėl visiškai bendras: pradedame nuo bloko, kuris perpus sumažina skyrą naudodamas žingsnį $2$ (dešiniausias :numref:`fig_anynet_full`). Kad tai atitiktų, ResNeXt bloko liekamoji šaka turi praeiti per $1 \times 1$ konvoliuciją. Po šio bloko eina kintamas skaičius papildomų ResNeXt blokų, nekeičiančių nei skyros, nei kanalų skaičiaus. Atkreipkite dėmesį, kad įprasta dizaino praktika yra pridėti nedidelį butelio kakliuką konvoliucinių blokų dizaine.
+Taigi su butelio kakliuko santykiu $k_i \geq 1$ leidžiame sau tam tikrą kanalų skaičių, $c_i/k_i$, kiekviename $i$-ojo etapo bloke (kaip rodo eksperimentai, tai nelabai veiksminga ir to reikėtų atsisakyti). Galiausiai, kadangi turime reikalų su ResNeXt blokais, taip pat turime pasirinkti grupių skaičių $g_i$ grupinėms konvoliucijoms $i$-ajame etape.
 
-This seemingly generic design space provides us nonetheless with many parameters: we can set the block width (number of channels) $c_0, \ldots c_4$, the depth (number of blocks) per stage $d_1, \ldots d_4$, the bottleneck ratios $k_1, \ldots k_4$, and the group widths (numbers of groups) $g_1, \ldots g_4$. 
-In total this adds up to 17 parameters, resulting in an unreasonably large number of configurations that would warrant exploring. We need some tools to reduce this huge design space effectively. This is where the conceptual beauty of design spaces comes in. Before we do so, let's implement the generic design first.
+Ši iš pažiūros bendra dizaino erdvė vis dėlto suteikia mums daug parametrų: galime nustatyti bloko plotį (kanalų skaičių) $c_0, \ldots c_4$, gylį (blokų skaičių) kiekviename etape $d_1, \ldots d_4$, butelio kakliuko santykius $k_1, \ldots k_4$ ir grupių pločius (grupių skaičius) $g_1, \ldots g_4$.
+Iš viso tai sudaro 17 parametrų, todėl gaunamas nepagrįstai didelis konfigūracijų, kurias būtų verta tyrinėti, skaičius. Mums reikia įrankių, kad veiksmingai sumažintume šią milžinišką dizaino erdvę. Čia ir atsiskleidžia konceptualus dizaino erdvių grožis. Prieš tai darydami, pirmiausia įgyvendinkime bendrą dizainą.
 
 ```{.python .input}
 %%tab mxnet
@@ -133,9 +133,9 @@ class AnyNet(d2l.Classifier):
         ])
 ```
 
-Each stage consists of `depth` ResNeXt blocks,
-where `num_channels` specifies the block width.
-Note that the first block halves the height and width of input images.
+Kiekvieną etapą sudaro `depth` ResNeXt blokų,
+kur `num_channels` nurodo bloko plotį.
+Atkreipkite dėmesį, kad pirmasis blokas perpus sumažina įvesties vaizdų aukštį ir plotį.
 
 ```{.python .input}
 %%tab mxnet
@@ -195,8 +195,8 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return nn.Sequential(blk)
 ```
 
-Putting the network stem, body, and head together,
-we complete the implementation of AnyNet.
+Sujungę tinklo pradžios dalį, korpusą ir galvą,
+užbaigiame AnyNet įgyvendinimą.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -243,48 +243,48 @@ def create_net(self):
     return net
 ```
 
-## Distributions and Parameters of Design Spaces
+## Dizaino erdvių skirstiniai ir parametrai
 
-As just discussed in :numref:`subsec_the-anynet-design-space`, parameters of a design space are hyperparameters of networks in that design space.
-Consider the problem of identifying good parameters in the AnyNet design space. We could try finding the *single best* parameter choice for a given amount of computation (e.g., FLOPs and compute time). If we allowed for even only *two* possible choices for each parameter, we would have to explore $2^{17} = 131072$ combinations to find the best solution. This is clearly infeasible because of its exorbitant cost. Even worse, we do not really learn anything from this exercise in terms of how one should design a network. Next time we add, say, an X-stage, or a shift operation, or similar, we would need to start from scratch. Even worse, due to the stochasticity in training (rounding, shuffling, bit errors), no two runs are likely to produce exactly the same results. A better strategy would be to try to determine general guidelines of how the choices of parameters should be related. For instance, the bottleneck ratio, the number of channels, blocks, groups, or their change between layers should ideally be governed by a collection of simple rules. The approach in :citet:`radosavovic2019network` relies on the following four assumptions:
+Kaip ką tik aptarta :numref:`subsec_the-anynet-design-space`, dizaino erdvės parametrai yra tos dizaino erdvės tinklų hiperparametrai.
+Panagrinėkime gerų parametrų nustatymo AnyNet dizaino erdvėje problemą. Galėtume bandyti rasti *vienintelį geriausią* parametrų pasirinkimą duotam skaičiavimų kiekiui (pvz., FLOPs ir skaičiavimo laikui). Jei leistume net tik *dvi* galimas kiekvieno parametro reikšmes, turėtume ištirti $2^{17} = 131072$ derinių, kad rastume geriausią sprendinį. Tai akivaizdžiai neįmanoma dėl pernelyg didelės kainos. Dar blogiau, iš šio pratimo iš tikrųjų nieko neišmokstame apie tai, kaip reikėtų projektuoti tinklą. Kitą kartą pridėję, tarkime, X etapą, postūmio operaciją ar panašiai, turėtume pradėti iš naujo. Dar blogiau, dėl apmokymo stochastiškumo (apvalinimo, maišymo, bitų klaidų) du paleidimai vargu ar duos visiškai tuos pačius rezultatus. Geresnė strategija būtų bandyti nustatyti bendras gaires, kaip turėtų būti susiję parametrų pasirinkimai. Pavyzdžiui, butelio kakliuko santykį, kanalų, blokų, grupių skaičių ar jų kitimą tarp sluoksnių idealiai turėtų valdyti paprastų taisyklių rinkinys. :citet:`radosavovic2019network` požiūris remiasi šiomis keturiomis prielaidomis:
 
-1. We assume that general design principles actually exist, so that many networks satisfying these requirements should offer good performance. Consequently, identifying a *distribution* over networks can be a sensible strategy. In other words, we assume that there are many good needles in the haystack.
-1. We need not train networks to convergence before we can assess whether a network is good. Instead, it is sufficient to use the intermediate results as reliable guidance for final accuracy. Using (approximate) proxies to optimize an objective is referred to as multi-fidelity optimization :cite:`forrester2007multi`. Consequently, design optimization is carried out, based on the accuracy achieved after only a few passes through the dataset, reducing the cost significantly. 
-1. Results obtained at a smaller scale (for smaller networks) generalize to larger ones. Consequently, optimization is carried out for networks that are structurally similar, but with a smaller number of blocks, fewer channels, etc. Only in the end will we need to verify that the so-found networks also offer good performance at scale. 
-1. Aspects of the design can be approximately factorized so that it is possible to infer their effect on the quality of the outcome somewhat independently. In other words, the optimization problem is moderately easy.
+1. Darome prielaidą, kad bendri dizaino principai iš tikrųjų egzistuoja, todėl daug šiuos reikalavimus tenkinančių tinklų turėtų siūlyti gerą našumą. Todėl *skirstinio* per tinklus nustatymas gali būti pagrįsta strategija. Kitaip tariant, darome prielaidą, kad šieno kupetoje yra daug gerų adatų.
+1. Nereikia apmokyti tinklų iki konvergavimo, kad galėtume įvertinti, ar tinklas geras. Vietoj to pakanka naudoti tarpinius rezultatus kaip patikimą gaires galutiniam tikslumui. Naudojimas (apytikslių) pakaitinių dydžių tikslui optimizuoti vadinamas daugiatikslumo optimizavimu :cite:`forrester2007multi`. Todėl dizaino optimizavimas atliekamas pagal tikslumą, pasiektą po vos kelių perėjimų per duomenų rinkinį, taip gerokai sumažinant kainą.
+1. Rezultatai, gauti mažesniu mastu (mažesniems tinklams), apibendrinami didesniems. Todėl optimizavimas atliekamas struktūriškai panašiems tinklams, bet su mažesniu blokų, mažiau kanalų ir pan. Tik pabaigoje reikės patikrinti, ar taip rasti tinklai taip pat siūlo gerą našumą dideliu mastu.
+1. Dizaino aspektus galima apytiksliai išskaidyti, todėl galima gana nepriklausomai nustatyti jų poveikį rezultato kokybei. Kitaip tariant, optimizavimo uždavinys yra vidutiniškai lengvas.
 
-These assumptions allow us to test many networks cheaply. In particular, we can *sample* uniformly from the space of configurations and evaluate their performance. Subsequently, we can evaluate the quality of the choice of parameters by reviewing the *distribution* of error/accuracy that can be achieved with said networks. Denote by $F(e)$ the cumulative distribution function (CDF) for errors committed by networks of a given design space, drawn using probability disribution $p$. That is, 
+Šios prielaidos leidžia pigiai išbandyti daug tinklų. Visų pirma galime *imti imtį* tolygiai iš konfigūracijų erdvės ir įvertinti jų našumą. Vėliau galime įvertinti parametrų pasirinkimo kokybę, apžvelgdami paklaidos / tikslumo, kurį galima pasiekti su minėtais tinklais, *skirstinį*. Pažymėkime $F(e)$ kaupiamąją skirstinio funkciją (KSF) paklaidoms, kurias daro tam tikros dizaino erdvės tinklai, ištraukti naudojant tikimybių skirstinį $p$. Tai yra,
 
 $$F(e, p) \stackrel{\textrm{def}}{=} P_{\textrm{net} \sim p} \{e(\textrm{net}) \leq e\}.$$
 
-Our goal is now to find a distribution $p$ over *networks* such that most networks have a very low error rate and where the support of $p$ is concise. Of course, this is computationally infeasible to perform accurately. We resort to a sample of networks $\mathcal{Z} \stackrel{\textrm{def}}{=} \{\textrm{net}_1, \ldots \textrm{net}_n\}$ (with errors $e_1, \ldots, e_n$, respectively) from $p$ and use the empirical CDF $\hat{F}(e, \mathcal{Z})$ instead:
+Dabar mūsų tikslas yra rasti *tinklų* skirstinį $p$, kad dauguma tinklų turėtų labai mažą paklaidos lygį ir kad $p$ atrama būtų glausta. Žinoma, to tiksliai atlikti skaičiavimo požiūriu neįmanoma. Griebiamės tinklų imties $\mathcal{Z} \stackrel{\textrm{def}}{=} \{\textrm{net}_1, \ldots \textrm{net}_n\}$ (atitinkamai su paklaidomis $e_1, \ldots, e_n$) iš $p$ ir vietoj to naudojame empirinę KSF $\hat{F}(e, \mathcal{Z})$:
 
 $$\hat{F}(e, \mathcal{Z}) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i \leq e).$$
 
-Whenever the CDF for one set of choices majorizes (or matches) another CDF it follows that its choice of parameters is superior (or indifferent). Accordingly 
-:citet:`Radosavovic.Kosaraju.Girshick.ea.2020` experimented with a shared network bottleneck ratio $k_i = k$ for all stages $i$ of the network. This gets rid of three of the four parameters governing the bottleneck ratio. To assess whether this (negatively) affects the performance one can draw networks from the constrained and from the unconstrained distribution and compare the corresonding CDFs. It turns out that this constraint does not affect the accuracy of the distribution of networks at all, as can be seen in the first panel of :numref:`fig_regnet-fig`. 
-Likewise, we could choose to pick the same group width $g_i = g$ occurring at the various stages of the network. Again, this does not affect performance, as can be seen in the second panel of :numref:`fig_regnet-fig`.
-Both steps combined reduce the number of free parameters by six. 
+Kai vieno pasirinkimų rinkinio KSF majoruoja (arba sutampa su) kitą KSF, iš to išplaukia, kad jo parametrų pasirinkimas yra geresnis (arba abejingas). Atitinkamai
+:citet:`Radosavovic.Kosaraju.Girshick.ea.2020` eksperimentavo su bendru tinklo butelio kakliuko santykiu $k_i = k$ visiems tinklo etapams $i$. Taip atsikratoma trijų iš keturių butelio kakliuko santykį valdančių parametrų. Kad įvertintume, ar tai (neigiamai) veikia našumą, galima ištraukti tinklus iš apribotojo ir iš neapribotojo skirstinio ir palyginti atitinkamas KSF. Paaiškėja, kad šis apribojimas visai nepaveikia tinklų skirstinio tikslumo, kaip matyti pirmajame :numref:`fig_regnet-fig` skydelyje.
+Panašiai galėtume pasirinkti tą patį grupės plotį $g_i = g$ įvairiuose tinklo etapuose. Vėlgi tai neįtakoja našumo, kaip matyti antrajame :numref:`fig_regnet-fig` skydelyje.
+Abu žingsniai kartu sumažina laisvųjų parametrų skaičių šešiais.
 
-![Comparing error empirical distribution functions of design spaces. $\textrm{AnyNet}_\mathit{A}$ is the original design space; $\textrm{AnyNet}_\mathit{B}$ ties the bottleneck ratios, $\textrm{AnyNet}_\mathit{C}$ also ties group widths, $\textrm{AnyNet}_\mathit{D}$ increases the network depth across stages. From left to right: (i) tying bottleneck ratios has no effect on performance; (ii) tying group widths has no effect on performance; (iii) increasing network widths (channels) across stages improves performance; (iv) increasing network depths across stages improves performance. Figure courtesy of :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`.](../img/regnet-fig.png)
+![Dizaino erdvių paklaidų empirinių skirstinio funkcijų palyginimas. $\textrm{AnyNet}_\mathit{A}$ yra originali dizaino erdvė; $\textrm{AnyNet}_\mathit{B}$ susieja butelio kakliuko santykius, $\textrm{AnyNet}_\mathit{C}$ taip pat susieja grupių plotį, $\textrm{AnyNet}_\mathit{D}$ didina tinklo gylį per etapus. Iš kairės į dešinę: (i) butelio kakliuko santykių susiejimas neturi poveikio našumui; (ii) grupių pločių susiejimas neturi poveikio našumui; (iii) tinklo pločių (kanalų) didinimas per etapus pagerina našumą; (iv) tinklo gylių didinimas per etapus pagerina našumą. Paveikslas atkurtas :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` leidimu.](../img/regnet-fig.png)
 :label:`fig_regnet-fig`
 
-Next we look for ways to reduce the multitude of potential choices for width and depth of the stages. It is a reasonable assumption that, as we go deeper, the number of channels should increase, i.e., $c_i \geq c_{i-1}$ ($w_{i+1} \geq w_i$ per their notation in :numref:`fig_regnet-fig`), yielding 
-$\textrm{AnyNetX}_D$. Likewise, it is equally reasonable to assume that as the stages progress, they should become deeper, i.e., $d_i \geq d_{i-1}$, yielding $\textrm{AnyNetX}_E$. This can be experimentally verified in the third and fourth panel of :numref:`fig_regnet-fig`, respectively.
+Toliau ieškome būdų sumažinti galimų etapų pločio ir gylio pasirinkimų daugybę. Pagrįsta prielaida, kad gilėjant kanalų skaičius turėtų didėti, t. y. $c_i \geq c_{i-1}$ ($w_{i+1} \geq w_i$ pagal jų žymėjimą :numref:`fig_regnet-fig`), gaunant
+$\textrm{AnyNetX}_D$. Panašiai lygiai taip pat pagrįsta manyti, kad etapams progresuojant jie turėtų gilėti, t. y. $d_i \geq d_{i-1}$, gaunant $\textrm{AnyNetX}_E$. Tai galima eksperimentiškai patikrinti atitinkamai trečiajame ir ketvirtajame :numref:`fig_regnet-fig` skydeliuose.
 
 ## RegNet
 
-The resulting $\textrm{AnyNetX}_E$ design space consists of simple networks
-following easy-to-interpret design principles:
+Gauta $\textrm{AnyNetX}_E$ dizaino erdvė susideda iš paprastų tinklų,
+besilaikančių lengvai interpretuojamų dizaino principų:
 
-* Share the bottleneck ratio $k_i = k$ for all stages $i$;
-* Share the group width $g_i = g$ for all stages $i$;
-* Increase network width across stages: $c_{i} \leq c_{i+1}$;
-* Increase network depth across stages: $d_{i} \leq d_{i+1}$.
+* Bendras butelio kakliuko santykis $k_i = k$ visiems etapams $i$;
+* Bendras grupės plotis $g_i = g$ visiems etapams $i$;
+* Didinamas tinklo plotis per etapus: $c_{i} \leq c_{i+1}$;
+* Didinamas tinklo gylis per etapus: $d_{i} \leq d_{i+1}$.
 
-This leaves us with a final set of choices: how to pick the specific values for the above parameters of the eventual $\textrm{AnyNetX}_E$ design space. By studying the best-performing networks from the distribution in $\textrm{AnyNetX}_E$ one can observe the following: the width of the network ideally increases linearly with the block index across the network, i.e., $c_j \approx c_0 + c_a j$, where $j$ is the block index and slope $c_a > 0$. Given that we get to choose a different block width only per stage, we arrive at a piecewise constant function, engineered to match this dependence. Furthermore, experiments also show that a bottleneck ratio of $k = 1$ performs best, i.e., we are advised not to use bottlenecks at all. 
+Taip lieka paskutinis pasirinkimų rinkinys: kaip parinkti konkrečias aukščiau minėtų galutinės $\textrm{AnyNetX}_E$ dizaino erdvės parametrų reikšmes. Tyrinėjant geriausiai veikiančius tinklus iš $\textrm{AnyNetX}_E$ skirstinio, galima pastebėti: tinklo plotis idealiai didėja tiesiškai su bloko indeksu per tinklą, t. y. $c_j \approx c_0 + c_a j$, kur $j$ yra bloko indeksas, o nuolydis $c_a > 0$. Kadangi skirtingą bloko plotį galime rinktis tik kiekvienam etapui, gauname dalimis pastovią funkciją, sukonstruotą taip, kad atitiktų šią priklausomybę. Be to, eksperimentai taip pat rodo, kad butelio kakliuko santykis $k = 1$ veikia geriausiai, t. y. patariama butelio kakliukų išvis nenaudoti.
 
-We recommend the interested reader reviews further details in the design of specific networks for different amounts of computation by perusing :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`. For instance, an effective 32-layer RegNetX variant is given by $k = 1$ (no bottleneck), $g = 16$ (group width is 16), $c_1 = 32$ and $c_2 = 80$ channels for the first and second stage, respectively, chosen to be $d_1=4$ and $d_2=6$ blocks deep. The astonishing insight from the design is that it still applies, even when investigating networks at a larger scale. Even better, it even holds for Squeeze-and-Excitation (SE) network designs (RegNetY) that have a global channel activation :cite:`Hu.Shen.Sun.2018`.
+Rekomenduojame norintiems skaitytojams susipažinti su tolesnėmis detalėmis, kaip projektuojami konkretūs tinklai skirtingiems skaičiavimų kiekiams, perskaitant :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`. Pavyzdžiui, veiksmingą 32 sluoksnių RegNetX variantą nusako $k = 1$ (be butelio kakliuko), $g = 16$ (grupės plotis yra 16), $c_1 = 32$ ir $c_2 = 80$ kanalų atitinkamai pirmajam ir antrajam etapui, parinkti $d_1=4$ ir $d_2=6$ blokų gylio. Nuostabi dizaino įžvalga yra ta, kad ji vis dar galioja net tiriant didesnio masto tinklus. Dar geriau, ji galioja net suspaudimo ir sužadinimo (SE) tinklų dizainams (RegNetY), turintiems globalią kanalų aktyvaciją :cite:`Hu.Shen.Sun.2018`.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -307,7 +307,7 @@ class RegNetX32(AnyNet):
     arch: tuple = ((4, 32, 16, 1), (6, 80, 16, 1))
 ```
 
-We can see that each RegNetX stage progressively reduces resolution and increases output channels.
+Matome, kad kiekvienas RegNetX etapas palaipsniui mažina skyrą ir didina išvesties kanalus.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -324,9 +324,9 @@ RegNetX32().layer_summary((1, 96, 96, 1))
 RegNetX32(training=False).layer_summary((1, 96, 96, 1))
 ```
 
-## Training
+## Mokymas
 
-Training the 32-layer RegNetX on the Fashion-MNIST dataset is just like before.
+32 sluoksnių RegNetX apmokymas su Fashion-MNIST duomenų rinkiniu vyksta kaip ir anksčiau.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -345,38 +345,37 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Discussion
+## Diskusija
 
-With desirable inductive biases (assumptions or preferences) like locality and translation invariance (:numref:`sec_why-conv`)
-for vision, CNNs have been the dominant architectures in this area. This remained the case from LeNet up until Transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training` started surpassing CNNs in terms of accuracy. While much of the recent progress in terms of vision Transformers *can* be backported into CNNs :cite:`liu2022convnet`, it is only possible at a higher computational cost. Just as importantly, recent hardware optimizations (NVIDIA Ampere and Hopper) have only widened the gap in favor of Transformers. 
+Turėdami pageidaujamus induktyvinius šališkumus (prielaidas ar pirmenybes), tokius kaip lokalumas ir postūmio invariantiškumas (:numref:`sec_why-conv`),
+regai CNN buvo dominuojančios architektūros šioje srityje. Taip buvo nuo LeNet iki tol, kol transformeriai (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training` pradėjo pranokti CNN tikslumo požiūriu. Nors didelę dalį naujausios pažangos regos transformeriuose *galima* perkelti atgal į CNN :cite:`liu2022convnet`, tai įmanoma tik didesne skaičiavimo kaina. Ne mažiau svarbu, kad naujausios aparatinės įrangos optimizacijos (NVIDIA Ampere ir Hopper) tik padidino skirtumą transformerių naudai.
 
-It is worth noting that Transformers have a significantly lower degree of inductive bias towards locality and translation invariance than CNNs. That learned structures prevailed is due, not least, to the availability of large image collections, such as LAION-400m and LAION-5B :cite:`schuhmann2022laion` with up to 5 billion images. Quite surprisingly, some of the more relevant work in this context even includes MLPs :cite:`tolstikhin2021mlp`. 
+Verta pažymėti, kad transformeriai turi gerokai mažesnį induktyvinio šališkumo link lokalumo ir postūmio invariantiškumo laipsnį nei CNN. Tai, kad išmoktos struktūros įgijo viršų, lemia, ne mažiausia, didelių vaizdų kolekcijų, tokių kaip LAION-400m ir LAION-5B :cite:`schuhmann2022laion` su iki 5 milijardų vaizdų, prieinamumas. Gana netikėtai, kai kurie svarbesni šio konteksto darbai apima net MLP :cite:`tolstikhin2021mlp`.
 
-In sum, vision Transformers (:numref:`sec_vision-transformer`) by now lead in terms of 
-state-of-the-art performance in large-scale image classification, 
-showing that *scalability trumps inductive biases* :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
-This includes pretraining large-scale Transformers (:numref:`sec_large-pretraining-transformers`) with multi-head self-attention (:numref:`sec_multihead-attention`). We invite the readers to dive into these chapters for a much more detailed discussion.
+Apibendrinant, regos transformeriai (:numref:`sec_vision-transformer`) šiuo metu pirmauja pagal
+pažangiausią našumą didelio masto vaizdų klasifikavime,
+rodydami, kad *mastelio keitimas nugali induktyvinius šališkumus* :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+Tai apima didelio masto transformerių išankstinį apmokymą (:numref:`sec_large-pretraining-transformers`) su lygiagrečia dėmesio sutelkimo transformacija sau pačiam (:numref:`sec_multihead-attention`). Kviečiame skaitytojus panirti į tuos skyrius, kuriuose pateikta daug išsamesnė diskusija.
 
-## Exercises
+## Pratimai
 
-1. Increase the number of stages to four. Can you design a deeper RegNetX that performs better?
-1. De-ResNeXt-ify RegNets by replacing the ResNeXt block with the ResNet block. How does your new model perform?
-1. Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNetX. How do they perform? Which of ($d_i$, $c_i$, $g_i$, $b_i$) is the most important factor?
-1. Your goal is to design the "perfect" MLP. Can you use the design principles introduced above to find good architectures? Is it possible to extrapolate from small to large networks?
+1. Padidinkite etapų skaičių iki keturių. Ar galite suprojektuoti gilesnį RegNetX, kuris veiktų geriau?
+1. Pašalinkite ResNeXt iš RegNet, pakeisdami ResNeXt bloką ResNet bloku. Kaip veikia jūsų naujas modelis?
+1. Įgyvendinkite kelis „VioNet“ šeimos egzempliorius *pažeisdami* RegNetX dizaino principus. Kaip jie veikia? Kuris iš ($d_i$, $c_i$, $g_i$, $b_i$) yra svarbiausias veiksnys?
+1. Jūsų tikslas – suprojektuoti „tobulą“ MLP. Ar galite naudoti aukščiau pristatytus dizaino principus gerų architektūrų paieškai? Ar įmanoma ekstrapoliuoti iš mažų į didelius tinklus?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/7462)
+[Diskusijos](https://discuss.d2l.ai/t/7462)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/7463)
+[Diskusijos](https://discuss.d2l.ai/t/7463)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/8738)
+[Diskusijos](https://discuss.d2l.ai/t/8738)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18009)
+[Diskusijos](https://discuss.d2l.ai/t/18009)
 :end_tab:
-

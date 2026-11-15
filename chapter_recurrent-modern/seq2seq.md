@@ -3,74 +3,72 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-#  Sequence-to-Sequence Learning for Machine Translation
+#  Sekos į seką mokymasis mašininiam vertimui
 :label:`sec_seq2seq`
 
-In so-called sequence-to-sequence problems such as machine translation
-(as discussed in :numref:`sec_machine_translation`),
-where inputs and outputs each consist 
-of variable-length unaligned sequences,
-we generally rely on encoder--decoder architectures
+Vadinamosiose sekos į seką problemose, tokiose kaip mašininis vertimas
+(aptartas :numref:`sec_machine_translation`),
+kuriose įvestis ir išvestis yra
+kintamo ilgio nesulygiuotos sekos,
+paprastai remiamės kodavimo ir dekodavimo architektūromis
 (:numref:`sec_encoder-decoder`).
-In this section,
-we will demonstrate the application 
-of an encoder--decoder architecture,
-where both the encoder and decoder 
-are implemented as RNNs,
-to the task of machine translation
+Šiame skyrelyje
+pademonstruosime kodavimo ir dekodavimo architektūros taikymą,
+kai tiek kodavimo, tiek dekodavimo blokas
+įgyvendinti kaip RNN,
+mašininio vertimo užduočiai
 :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 
-Here, the encoder RNN will take a variable-length sequence as input 
-and transform it into a fixed-shape hidden state.
-Later, in :numref:`chap_attention-and-transformers`,
-we will introduce attention mechanisms, 
-which allow us to access encoded inputs
-without having to compress the entire input
-into a single fixed-length representation.
+Čia kodavimo RNN kaip įvestį priims kintamo ilgio seką
+ir pavers ją fiksuotos formos paslėptąja būsena.
+Vėliau, :numref:`chap_attention-and-transformers`,
+pristatysime dėmesio sutelkimo mechanizmus,
+leidžiančius pasiekti užkoduotas įvestis
+nespaudžiant visos įvesties
+į vieną fiksuoto ilgio vaizdą.
 
-Then to generate the output sequence, 
-one token at a time,
-the decoder model, 
-consisting of a separate RNN,
-will predict each successive target token
-given both the input sequence
-and the preceding tokens in the output.
-During training, the decoder will typically
-be conditioned upon the preceding tokens
-in the official "ground truth" label. 
-However, at test time, we will want to condition
-each output of the decoder on the tokens already predicted. 
-Note that if we ignore the encoder,
-the decoder in a sequence-to-sequence architecture 
-behaves just like a normal language model.
-:numref:`fig_seq2seq` illustrates
-how to use two RNNs
-for sequence-to-sequence learning
-in machine translation.
+Tada, kad sugeneruotų išvesties seką
+po vieną teksto vienetą,
+dekodavimo modelis,
+sudarytas iš atskiro RNN,
+prognozuos kiekvieną paskesnį tikslo teksto vienetą,
+žinodamas ir įvesties seką,
+ir ankstesnius išvesties teksto vienetus.
+Apmokymo metu dekodavimo blokas paprastai
+bus sąlygojamas ankstesniais teksto vienetais
+oficialiame „tiesos“ žymenyje.
+Tačiau tikrinimo metu norėsime sąlygoti
+kiekvieną dekodavimo bloko išvestį jau prognozuotais teksto vienetais.
+Atkreipkite dėmesį, kad jei ignoruotume kodavimo bloką,
+dekodavimo blokas sekos į seką architektūroje
+elgiasi kaip įprastas kalbos modelis.
+:numref:`fig_seq2seq` iliustruoja,
+kaip naudoti du RNN
+sekos į seką mokymuisi
+mašininiame vertime.
 
 
-![Sequence-to-sequence learning with an RNN encoder and an RNN decoder.](../img/seq2seq.svg)
+![Sekos į seką mokymasis su RNN kodavimo bloku ir RNN dekodavimo bloku.](../img/seq2seq.svg)
 :label:`fig_seq2seq`
 
-In :numref:`fig_seq2seq`,
-the special "&lt;eos&gt;" token
-marks the end of the sequence.
-Our model can stop making predictions
-once this token is generated.
-At the initial time step of the RNN decoder,
-there are two special design decisions to be aware of:
-First, we begin every input with a special 
-beginning-of-sequence "&lt;bos&gt;" token.
-Second, we may feed
-the final hidden state of the encoder
-into the decoder
-at every single decoding time step :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`.
-In some other designs,
-such as that of :citet:`Sutskever.Vinyals.Le.2014`,
-the final hidden state of the RNN encoder
-is used
-to initiate the hidden state of the decoder
-only at the first decoding step.
+:numref:`fig_seq2seq`
+specialus „&lt;eos&gt;“ teksto vienetas
+žymi sekos pabaigą.
+Mūsų modelis gali nustoti prognozuoti,
+kai tik šis teksto vienetas sugeneruojamas.
+Pradiniu RNN dekodavimo bloko laiko žingsniu
+yra du specialūs dizaino sprendimai, į kuriuos verta atkreipti dėmesį:
+pirma, kiekvieną įvestį pradedame specialiu
+sekos pradžios „&lt;bos&gt;“ teksto vienetu.
+Antra, galime paduoti
+galutinę kodavimo bloko paslėptąją būseną
+į dekodavimo bloką
+kiekvienu dekodavimo laiko žingsniu :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`.
+Kai kuriuose kituose dizainuose,
+pavyzdžiui, :citet:`Sutskever.Vinyals.Le.2014`,
+galutinė RNN kodavimo bloko paslėptoji būsena
+naudojama dekodavimo bloko paslėptajai būsenai
+inicializuoti tik pirmuoju dekodavimo žingsniu.
 
 ```{.python .input}
 %%tab mxnet
@@ -112,98 +110,95 @@ import math
 import optax
 ```
 
-## Teacher Forcing
+## Mokytojo priverstinis vedimas
 
-While running the encoder on the input sequence
-is relatively straightforward,
-handling the input and output 
-of the decoder requires more care. 
-The most common approach is sometimes called *teacher forcing*.
-Here, the original target sequence (token labels)
-is fed into the decoder as input.
-More concretely,
-the special beginning-of-sequence token
-and the original target sequence,
-excluding the final token,
-are concatenated as input to the decoder,
-while the decoder output (labels for training) is
-the original target sequence,
-shifted by one token:
-"&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
-"Ils", "regardent", ".", "&lt;eos&gt;" (:numref:`fig_seq2seq`).
+Nors kodavimo bloko paleidimas įvesties sekai
+yra gana paprastas,
+dekodavimo bloko įvesties ir išvesties tvarkymas
+reikalauja daugiau atidumo.
+Dažniausias metodas kartais vadinamas *mokytojo priverstiniu vedimu* (angl. *teacher forcing*).
+Čia originali tikslo seka (teksto vienetų žymenys)
+paduodama į dekodavimo bloką kaip įvestis.
+Konkrečiau,
+specialus sekos pradžios teksto vienetas
+ir originali tikslo seka,
+neįskaitant paskutinio teksto vieneto,
+sujungiami kaip dekodavimo bloko įvestis,
+o dekodavimo bloko išvestis (apmokymo žymenys) yra
+originali tikslo seka,
+pastumta vienu teksto vienetu:
+„&lt;bos&gt;“, „Ils“, „regardent“, „.“ $\rightarrow$
+„Ils“, „regardent“, „.“, „&lt;eos&gt;“ (:numref:`fig_seq2seq`).
 
-Our implementation in
+Mūsų įgyvendinimas
 :numref:`subsec_loading-seq-fixed-len`
-prepared training data for teacher forcing,
-where shifting tokens for self-supervised learning
-is similar to the training of language models in
+paruošė apmokymo duomenis mokytojo priverstiniam vedimui,
+kai teksto vienetų postūmis saviraiškiam mokymuisi
+panašus į kalbos modelių apmokymą
 :numref:`sec_language-model`.
-An alternative approach is
-to feed the *predicted* token
-from the previous time step
-as the current input to the decoder.
+Alternatyvus metodas yra
+paduoti *prognozuotą* teksto vienetą
+iš ankstesnio laiko žingsnio
+kaip dabartinę dekodavimo bloko įvestį.
 
 
-In the following, we explain the design 
-depicted in :numref:`fig_seq2seq`
-in greater detail.
-We will train this model for machine translation
-on the English--French dataset as introduced in
+Toliau išsamiau paaiškiname dizainą,
+pavaizduotą :numref:`fig_seq2seq`.
+Apmokysime šį modelį mašininiam vertimui
+su anglų–prancūzų duomenų rinkiniu, pristatytu
 :numref:`sec_machine_translation`.
 
-## Encoder
+## Kodavimo blokas
 
-Recall that the encoder transforms an input sequence of variable length
-into a fixed-shape *context variable* $\mathbf{c}$ (see :numref:`fig_seq2seq`).
+Prisiminkite, kad kodavimo blokas kintamo ilgio įvesties seką paverčia
+fiksuotos formos *konteksto kintamuoju* $\mathbf{c}$ (žr. :numref:`fig_seq2seq`).
 
 
-Consider a single sequence example (batch size 1).
-Suppose the input sequence is $x_1, \ldots, x_T$, 
-such that $x_t$ is the $t^{\textrm{th}}$ token.
-At time step $t$, the RNN transforms
-the input feature vector $\mathbf{x}_t$ for $x_t$
-and the hidden state $\mathbf{h} _{t-1}$ 
-from the previous time step 
-into the current hidden state $\mathbf{h}_t$.
-We can use a function $f$ to express 
-the transformation of the RNN's recurrent layer:
+Nagrinėkime vienos sekos pavyzdį (rinkinio dydis 1).
+Tarkime, kad įvesties seka yra $x_1, \ldots, x_T$,
+o $x_t$ yra $t$-asis teksto vienetas.
+Laiko žingsniu $t$ RNN paverčia
+$x_t$ įvesties požymių vektorių $\mathbf{x}_t$
+ir ankstesnio laiko žingsnio paslėptąją būseną $\mathbf{h} _{t-1}$
+į dabartinę paslėptąją būseną $\mathbf{h}_t$.
+Galime naudoti funkciją $f$ RNN rekurentinio sluoksnio
+transformacijai išreikšti:
 
 $$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$
 
-In general, the encoder transforms 
-the hidden states at all time steps
-into a context variable through a customized function $q$:
+Apskritai kodavimo blokas paverčia
+visų laiko žingsnių paslėptąsias būsenas
+konteksto kintamuoju per pasirinktinę funkciją $q$:
 
 $$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
-For example, in :numref:`fig_seq2seq`,
-the context variable is just the hidden state $\mathbf{h}_T$
-corresponding to the encoder RNN's representation
-after processing the final token of the input sequence.
+Pavyzdžiui, :numref:`fig_seq2seq`
+konteksto kintamasis yra tiesiog paslėptoji būsena $\mathbf{h}_T$,
+atitinkanti kodavimo RNN vaizdą,
+apdorojus paskutinį įvesties sekos teksto vienetą.
 
-In this example, we have used a unidirectional RNN
-to design the encoder,
-where the hidden state only depends on the input subsequence 
-at and before the time step of the hidden state.
-We can also construct encoders using bidirectional RNNs.
-In this case, a hidden state depends on the subsequence before and after the time step 
-(including the input at the current time step), 
-which encodes the information of the entire sequence.
+Šiame pavyzdyje kodavimo blokui suprojektuoti naudojome vienakryptį RNN,
+kurio paslėptoji būsena priklauso tik nuo įvesties posekio
+paslėptosios būsenos laiko žingsniu ir prieš jį.
+Taip pat galime konstruoti kodavimo blokus naudodami dvikrypčius RNN.
+Šiuo atveju paslėptoji būsena priklauso nuo posekio prieš laiko žingsnį ir po jo
+(įskaitant dabartinio laiko žingsnio įvestį),
+kuri užkoduoja visos sekos informaciją.
 
 
-Now let's [**implement the RNN encoder**].
-Note that we use an *embedding layer*
-to obtain the feature vector for each token in the input sequence.
-The weight of an embedding layer is a matrix,
-where the number of rows corresponds to 
-the size of the input vocabulary (`vocab_size`)
-and number of columns corresponds to 
-the feature vector's dimension (`embed_size`).
-For any input token index $i$,
-the embedding layer fetches the $i^{\textrm{th}}$ row 
-(starting from 0) of the weight matrix
-to return its feature vector.
-Here we implement the encoder with a multilayer GRU.
+Dabar [**įgyvendinkime RNN kodavimo bloką**].
+Atkreipkite dėmesį, kad naudojame *įterpimo sluoksnį*,
+kad gautume kiekvieno įvesties sekos teksto vieneto požymių vektorių.
+Įterpimo sluoksnio svoris yra matrica,
+kurios eilučių skaičius atitinka
+įvesties žodyno dydį (`vocab_size`),
+o stulpelių skaičius atitinka
+požymių vektoriaus dimensiją (`embed_size`).
+Bet kuriam įvesties teksto vieneto indeksui $i$
+įterpimo sluoksnis paima $i$-ąją svorių matricos eilutę
+(skaičiuojant nuo 0),
+kad grąžintų jos požymių vektorių.
+Čia kodavimo bloką įgyvendiname su daugiasluoksniu GRU.
 
 ```{.python .input}
 %%tab mxnet
@@ -303,17 +298,17 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         return outputs, state
 ```
 
-Let's use a concrete example
-to [**illustrate the above encoder implementation.**]
-Below, we instantiate a two-layer GRU encoder
-whose number of hidden units is 16.
-Given a minibatch of sequence inputs `X`
-(batch size $=4$; number of time steps $=9$),
-the hidden states of the final layer
-at all the time steps
-(`enc_outputs` returned by the encoder's recurrent layers)
-are a tensor of shape
-(number of time steps, batch size, number of hidden units).
+Pasinaudokime konkrečiu pavyzdžiu,
+kad [**iliustruotume aukščiau pateiktą kodavimo bloko įgyvendinimą.**]
+Toliau sukuriame dviejų sluoksnių GRU kodavimo bloką,
+kurio paslėptųjų vienetų skaičius yra 16.
+Duotam sekų įvesčių minirinkiniui `X`
+(rinkinio dydis $=4$; laiko žingsnių skaičius $=9$),
+galutinio sluoksnio paslėptosios būsenos
+visais laiko žingsniais
+(`enc_outputs`, grąžinamos kodavimo bloko rekurentinių sluoksnių)
+yra tenzorius, kurio forma
+(laiko žingsnių skaičius, rinkinio dydis, paslėptųjų vienetų skaičius).
 
 ```{.python .input}
 %%tab all
@@ -329,10 +324,10 @@ if tab.selected('jax'):
 d2l.check_shape(enc_outputs, (num_steps, batch_size, num_hiddens))
 ```
 
-Since we are using a GRU here,
-the shape of the multilayer hidden states
-at the final time step is
-(number of hidden layers, batch size, number of hidden units).
+Kadangi čia naudojame GRU,
+daugiasluoksnių paslėptųjų būsenų forma
+paskutiniu laiko žingsniu yra
+(paslėptųjų sluoksnių skaičius, rinkinio dydis, paslėptųjų vienetų skaičius).
 
 ```{.python .input}
 %%tab all
@@ -343,51 +338,51 @@ if tab.selected('tensorflow'):
     d2l.check_shape(enc_state[0], (batch_size, num_hiddens))
 ```
 
-## [**Decoder**]
+## [**Dekodavimo blokas**]
 :label:`sec_seq2seq_decoder`
 
-Given a target output sequence $y_1, y_2, \ldots, y_{T'}$
-for each time step $t'$
-(we use $t^\prime$ to differentiate from the input sequence time steps),
-the decoder assigns a predicted probability
-to each possible token occurring at step $y_{t'+1}$
-conditioned upon the previous tokens in the target
-$y_1, \ldots, y_{t'}$ 
-and the context variable 
-$\mathbf{c}$, i.e., $P(y_{t'+1} \mid y_1, \ldots, y_{t'}, \mathbf{c})$.
+Duotai tikslinei išvesties sekai $y_1, y_2, \ldots, y_{T'}$
+kiekvienam laiko žingsniui $t'$
+(naudojame $t^\prime$, kad atskirtume nuo įvesties sekos laiko žingsnių),
+dekodavimo blokas priskiria prognozuojamą tikimybę
+kiekvienam galimam teksto vienetui, pasirodančiam žingsnyje $y_{t'+1}$,
+sąlygojamą ankstesnių tikslo teksto vienetų
+$y_1, \ldots, y_{t'}$
+ir konteksto kintamojo
+$\mathbf{c}$, t. y. $P(y_{t'+1} \mid y_1, \ldots, y_{t'}, \mathbf{c})$.
 
-To predict the subsequent token $t^\prime+1$ in the target sequence,
-the RNN decoder takes the previous step's target token $y_{t^\prime}$,
-the hidden RNN state from the previous time step $\mathbf{s}_{t^\prime-1}$,
-and the context variable $\mathbf{c}$ as its input,
-and transforms them into the hidden state 
-$\mathbf{s}_{t^\prime}$ at the current time step.
-We can use a function $g$ to express 
-the transformation of the decoder's hidden layer:
+Kad prognozuotų paskesnį tikslinės sekos teksto vienetą $t^\prime+1$,
+RNN dekodavimo blokas kaip įvestį priima ankstesnio žingsnio tikslo teksto vienetą $y_{t^\prime}$,
+ankstesnio laiko žingsnio RNN paslėptąją būseną $\mathbf{s}_{t^\prime-1}$
+ir konteksto kintamąjį $\mathbf{c}$
+ir paverčia juos paslėptąja būsena
+$\mathbf{s}_{t^\prime}$ dabartiniu laiko žingsniu.
+Galime naudoti funkciją $g$ dekodavimo bloko paslėptojo sluoksnio
+transformacijai išreikšti:
 
 $$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$
 :eqlabel:`eq_seq2seq_s_t`
 
-After obtaining the hidden state of the decoder,
-we can use an output layer and the softmax operation 
-to compute the predictive distribution
-$p(y_{t^{\prime}+1} \mid y_1, \ldots, y_{t^\prime}, \mathbf{c})$ 
-over the subsequent output token ${t^\prime+1}$.
+Gavę dekodavimo bloko paslėptąją būseną,
+galime naudoti išvesties sluoksnį ir softmax operaciją
+prognozuojamam skirstiniui
+$p(y_{t^{\prime}+1} \mid y_1, \ldots, y_{t^\prime}, \mathbf{c})$
+paskesniam išvesties teksto vienetui ${t^\prime+1}$ apskaičiuoti.
 
-Following :numref:`fig_seq2seq`,
-when implementing the decoder as follows,
-we directly use the hidden state at the final time step
-of the encoder
-to initialize the hidden state of the decoder.
-This requires that the RNN encoder and the RNN decoder 
-have the same number of layers and hidden units.
-To further incorporate the encoded input sequence information,
-the context variable is concatenated
-with the decoder input at all the time steps.
-To predict the probability distribution of the output token,
-we use a fully connected layer
-to transform the hidden state 
-at the final layer of the RNN decoder.
+Laikydamiesi :numref:`fig_seq2seq`,
+įgyvendindami dekodavimo bloką toliau,
+tiesiogiai naudojame paskutinio laiko žingsnio paslėptąją būseną
+iš kodavimo bloko
+dekodavimo bloko paslėptajai būsenai inicializuoti.
+Tai reikalauja, kad RNN kodavimo blokas ir RNN dekodavimo blokas
+turėtų tiek pat sluoksnių ir paslėptųjų vienetų.
+Kad dar labiau įtrauktume užkoduotos įvesties sekos informaciją,
+konteksto kintamasis sujungiamas
+su dekodavimo bloko įvestimi visais laiko žingsniais.
+Kad prognozuotume išvesties teksto vieneto tikimybių skirstinį,
+naudojame pilnai sujungtą sluoksnį
+RNN dekodavimo bloko
+paskutinio sluoksnio paslėptajai būsenai paversti.
 
 ```{.python .input}
 %%tab mxnet
@@ -525,10 +520,10 @@ class Seq2SeqDecoder(d2l.Decoder):
         return outputs, [enc_output, hidden_state]
 ```
 
-To [**illustrate the implemented decoder**],
-below we instantiate it with the same hyperparameters from the aforementioned encoder.
-As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
-where the final dimension of the tensor stores the predicted token distribution.
+Kad [**iliustruotume įgyvendintą dekodavimo bloką**],
+toliau sukuriame jį su tais pačiais hiperparametrais kaip aukščiau minėtas kodavimo blokas.
+Kaip matome, dekodavimo bloko išvesties forma tampa (rinkinio dydis, laiko žingsnių skaičius, žodyno dydis),
+kur paskutinė tenzoriaus dimensija saugo prognozuojamą teksto vienetų skirstinį.
 
 ```{.python .input}
 %%tab all
@@ -550,18 +545,18 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 ```
 
-The layers in the above RNN encoder--decoder model 
-are summarized in :numref:`fig_seq2seq_details`.
+RNN kodavimo ir dekodavimo modelio sluoksniai aukščiau
+apibendrinti :numref:`fig_seq2seq_details`.
 
-![Layers in an RNN encoder--decoder model.](../img/seq2seq-details.svg)
+![RNN kodavimo ir dekodavimo modelio sluoksniai.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
 
 
 
-## Encoder--Decoder for Sequence-to-Sequence Learning
+## Kodavimo ir dekodavimo blokai sekos į seką mokymuisi
 
 
-Putting it all together in code yields the following:
+Sujungus viską kode, gauname:
 
 ```{.python .input}
 %%tab pytorch, tensorflow, mxnet
@@ -604,27 +599,25 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
         return optax.adam(learning_rate=self.lr)
 ```
 
-## Loss Function with Masking
+## Nuostolio funkcija su maskavimu
 
-At each time step, the decoder predicts 
-a probability distribution for the output tokens.
-As with language modeling, 
-we can apply softmax 
-to obtain the distribution
-and calculate the cross-entropy loss for optimization.
-Recall from :numref:`sec_machine_translation`
-that the special padding tokens
-are appended to the end of sequences
-and so sequences of varying lengths
-can be efficiently loaded
-in minibatches of the same shape.
-However, prediction of padding tokens
-should be excluded from loss calculations.
-To this end, we can 
-[**mask irrelevant entries with zero values**]
-so that multiplication 
-of any irrelevant prediction
-with zero equates to zero.
+Kiekvienu laiko žingsniu dekodavimo blokas prognozuoja
+išvesties teksto vienetų tikimybių skirstinį.
+Kaip ir kalbos modeliavime,
+galime taikyti softmax,
+kad gautume skirstinį,
+ir apskaičiuoti kryžminės entropijos nuostolį optimizavimui.
+Prisiminkite iš :numref:`sec_machine_translation`,
+kad specialūs užpildymo teksto vienetai
+pridedami prie sekų pabaigos,
+todėl skirtingo ilgio sekos gali būti efektyviai įkeliamos
+į tos pačios formos minirinkinius.
+Tačiau užpildymo teksto vienetų prognozė
+turėtų būti neįtraukiama į nuostolio skaičiavimus.
+Šiuo tikslu galime
+[**užmaskuoti nesvarbius elementus nulinėmis reikšmėmis**],
+kad bet kurios nesvarbios prognozės
+daugyba iš nulio duotų nulį.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -650,11 +643,11 @@ def loss(self, params, X, Y, state, averaged=False):
     return d2l.reduce_sum(l * mask) / d2l.reduce_sum(mask), {}
 ```
 
-## [**Training**]
+## [**Mokymas**]
 :label:`sec_seq2seq_training`
 
-Now we can [**create and train an RNN encoder--decoder model**]
-for sequence-to-sequence learning on the machine translation dataset.
+Dabar galime [**sukurti ir apmokyti RNN kodavimo ir dekodavimo modelį**]
+sekos į seką mokymuisi mašininio vertimo duomenų rinkinyje.
 
 ```{.python .input}
 %%tab all
@@ -685,30 +678,30 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## [**Prediction**]
+## [**Prognozavimas**]
 
-To predict the output sequence
-at each step, 
-the predicted token from the previous
-time step is fed into the decoder as an input.
-One simple strategy is to sample whichever token
-that has been assigned by the decoder the highest probability
-when predicting at each step.
-As in training, at the initial time step
-the beginning-of-sequence ("&lt;bos&gt;") token
-is fed into the decoder.
-This prediction process
-is illustrated in :numref:`fig_seq2seq_predict`.
-When the end-of-sequence ("&lt;eos&gt;") token is predicted,
-the prediction of the output sequence is complete.
+Kad prognozuotume išvesties seką
+kiekviename žingsnyje,
+prognozuotas teksto vienetas iš ankstesnio
+laiko žingsnio paduodamas į dekodavimo bloką kaip įvestis.
+Viena paprasta strategija yra pasirinkti tą teksto vienetą,
+kuriam dekodavimo blokas priskyrė didžiausią tikimybę,
+prognozuojant kiekviename žingsnyje.
+Kaip ir apmokant, pradiniu laiko žingsniu
+sekos pradžios („&lt;bos&gt;“) teksto vienetas
+paduodamas į dekodavimo bloką.
+Šis prognozavimo procesas
+iliustruotas :numref:`fig_seq2seq_predict`.
+Kai prognozuojamas sekos pabaigos („&lt;eos&gt;“) teksto vienetas,
+išvesties sekos prognozavimas baigtas.
 
 
-![Predicting the output sequence token by token using an RNN encoder--decoder.](../img/seq2seq-predict.svg)
+![Išvesties sekos prognozavimas teksto vienetas po teksto vieneto naudojant RNN kodavimo ir dekodavimo modelį.](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
 
-In the next section, we will introduce 
-more sophisticated strategies 
-based on beam search (:numref:`sec_beam-search`).
+Kitame skyrelyje pristatysime
+sudėtingesnes strategijas,
+pagrįstas spindulio paieška (:numref:`sec_beam-search`).
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -770,61 +763,59 @@ def predict_step(self, params, batch, num_steps,
                                         enc_attention_weights)
 ```
 
-## Evaluation of Predicted Sequences
+## Prognozuotų sekų vertinimas
 
-We can evaluate a predicted sequence
-by comparing it with the
-target sequence (the ground truth).
-But what precisely is the appropriate measure 
-for comparing similarity between two sequences?
+Prognozuotą seką galime įvertinti
+palygindami ją su
+tikslo seka (tiesa).
+Bet koks tiksliai yra tinkamas matas
+dviejų sekų panašumui palyginti?
 
 
-Bilingual Evaluation Understudy (BLEU),
-though originally proposed for evaluating
-machine translation results :cite:`Papineni.Roukos.Ward.ea.2002`,
-has been extensively used in measuring
-the quality of output sequences for different applications.
-In principle, for any $n$-gram (:numref:`subsec_markov-models-and-n-grams`) in the predicted sequence,
-BLEU evaluates whether this $n$-gram appears
-in the target sequence.
+Dvikalbio vertinimo pakaitalas (angl. *Bilingual Evaluation Understudy*, BLEU),
+nors iš pradžių pasiūlytas mašininio vertimo rezultatams vertinti :cite:`Papineni.Roukos.Ward.ea.2002`,
+buvo plačiai naudojamas matuojant
+išvesties sekų kokybę įvairiuose taikymuose.
+Iš principo, kiekvienai $n$-gramai (:numref:`subsec_markov-models-and-n-grams`) prognozuotoje sekoje
+BLEU vertina, ar ši $n$-grama pasirodo
+tikslo sekoje.
 
-Denote by $p_n$ the precision of an $n$-gram,
-defined as the ratio 
-of the number of matched $n$-grams in
-the predicted and target sequences
-to the number of $n$-grams in the predicted sequence.
-To explain, given a target sequence $A$, $B$, $C$, $D$, $E$, $F$,
-and a predicted sequence $A$, $B$, $B$, $C$, $D$,
-we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
-Now let $\textrm{len}_{\textrm{label}}$ and $\textrm{len}_{\textrm{pred}}$
-be the numbers of tokens in the target sequence 
-and the predicted sequence, respectively.
-Then, BLEU is defined as
+Pažymėkime $p_n$ $n$-gramos tikslumą (angl. *precision*),
+apibrėžiamą kaip sutampančių $n$-gramų skaičiaus
+prognozuotoje ir tikslo sekose
+santykį su $n$-gramų skaičiumi prognozuotoje sekoje.
+Paaiškinimui, duotai tikslo sekai $A$, $B$, $C$, $D$, $E$, $F$
+ir prognozuotai sekai $A$, $B$, $B$, $C$, $D$
+turime $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$ ir $p_4 = 0$.
+Dabar tegul $\textrm{len}_{\textrm{label}}$ ir $\textrm{len}_{\textrm{pred}}$
+yra atitinkamai teksto vienetų skaičius tikslo sekoje
+ir prognozuotoje sekoje.
+Tada BLEU apibrėžiamas kaip
 
 $$ \exp\left(\min\left(0, 1 - \frac{\textrm{len}_{\textrm{label}}}{\textrm{len}_{\textrm{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
 :eqlabel:`eq_bleu`
 
-where $k$ is the longest $n$-gram for matching.
+kur $k$ yra ilgiausia sutapdinimui naudojama $n$-grama.
 
-Based on the definition of BLEU in :eqref:`eq_bleu`,
-whenever the predicted sequence is the same as the target sequence, BLEU is 1.
-Moreover,
-since matching longer $n$-grams is more difficult,
-BLEU assigns a greater weight
-when a longer $n$-gram has high precision.
-Specifically, when $p_n$ is fixed,
-$p_n^{1/2^n}$ increases as $n$ grows (the original paper uses $p_n^{1/n}$).
-Furthermore,
-since
-predicting shorter sequences
-tends to yield a higher $p_n$ value,
-the coefficient before the multiplication term in :eqref:`eq_bleu`
-penalizes shorter predicted sequences.
-For example, when $k=2$,
-given the target sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$,
-although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers the BLEU.
+Pagal BLEU apibrėžimą :eqref:`eq_bleu`,
+kai tik prognozuota seka yra tokia pati kaip tikslo seka, BLEU yra 1.
+Be to,
+kadangi ilgesnių $n$-gramų sutapdinimas yra sunkesnis,
+BLEU priskiria didesnį svorį,
+kai ilgesnė $n$-grama pasiekia aukštą tikslumą.
+Konkrečiai, kai $p_n$ fiksuotas,
+$p_n^{1/2^n}$ didėja augant $n$ (originaliame straipsnyje naudojama $p_n^{1/n}$).
+Be to,
+kadangi
+trumpesnių sekų prognozavimas
+linkęs duoti didesnę $p_n$ reikšmę,
+koeficientas prieš daugybos narį :eqref:`eq_bleu`
+baudžia trumpesnes prognozuotas sekas.
+Pavyzdžiui, kai $k=2$,
+duotai tikslo sekai $A$, $B$, $C$, $D$, $E$, $F$ ir prognozuotai sekai $A$, $B$,
+nors $p_1 = p_2 = 1$, baudos daugiklis $\exp(1-6/2) \approx 0{,}14$ sumažina BLEU.
 
-We [**implement the BLEU measure**] as follows.
+[**Įgyvendiname BLEU matą**] taip.
 
 ```{.python .input}
 %%tab all
@@ -845,10 +836,10 @@ def bleu(pred_seq, label_seq, k):  #@save
     return score
 ```
 
-In the end,
-we use the trained RNN encoder--decoder
-to [**translate a few English sentences into French**]
-and compute the BLEU of the results.
+Galiausiai
+naudojame apmokytą RNN kodavimo ir dekodavimo modelį,
+kad [**išverstume kelis anglų kalbos sakinius į prancūzų kalbą**]
+ir apskaičiuotume rezultatų BLEU.
 
 ```{.python .input}
 %%tab all
@@ -870,38 +861,38 @@ for en, fr, p in zip(engs, fras, preds):
           f'{bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
-## Summary
+## Santrauka
 
-Following the design of the encoder--decoder architecture, we can use two RNNs to design a model for sequence-to-sequence learning.
-In encoder--decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
-When implementing the encoder and the decoder, we can use multilayer RNNs.
-We can use masks to filter out irrelevant computations, such as when calculating the loss.
-For evaluating output sequences,
-BLEU is a popular measure that matches $n$-grams between the predicted sequence and the target sequence.
+Laikydamiesi kodavimo ir dekodavimo architektūros dizaino, galime naudoti du RNN modeliui sekos į seką mokymuisi suprojektuoti.
+Kodavimo ir dekodavimo apmokyme mokytojo priverstinio vedimo metodas paduoda originalias išvesties sekas (priešingai nei prognozes) į dekodavimo bloką.
+Įgyvendindami kodavimo ir dekodavimo blokus, galime naudoti daugiasluoksnius RNN.
+Galime naudoti kaukes nesvarbiems skaičiavimams, pavyzdžiui, skaičiuojant nuostolį, atfiltruoti.
+Išvesties sekoms vertinti
+BLEU yra populiarus matas, sutapdinantis $n$-gramas tarp prognozuotos sekos ir tikslo sekos.
 
 
-## Exercises
+## Pratimai
 
-1. Can you adjust the hyperparameters to improve the translation results?
-1. Rerun the experiment without using masks in the loss calculation. What results do you observe? Why?
-1. If the encoder and the decoder differ in the number of layers or the number of hidden units, how can we initialize the hidden state of the decoder?
-1. In training, replace teacher forcing with feeding the prediction at the previous time step into the decoder. How does this influence the performance?
-1. Rerun the experiment by replacing GRU with LSTM.
-1. Are there any other ways to design the output layer of the decoder?
+1. Ar galite pakoreguoti hiperparametrus, kad pagerintumėte vertimo rezultatus?
+1. Paleiskite eksperimentą iš naujo nenaudodami kaukių nuostolio skaičiavime. Kokius rezultatus stebite? Kodėl?
+1. Jei kodavimo ir dekodavimo blokai skiriasi sluoksnių skaičiumi arba paslėptųjų vienetų skaičiumi, kaip galime inicializuoti dekodavimo bloko paslėptąją būseną?
+1. Apmokyme pakeiskite mokytojo priverstinį vedimą ankstesnio laiko žingsnio prognozės padavimu į dekodavimo bloką. Kaip tai veikia našumą?
+1. Paleiskite eksperimentą iš naujo, pakeisdami GRU į LSTM.
+1. Ar yra kitų būdų suprojektuoti dekodavimo bloko išvesties sluoksnį?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/345)
+[Diskusijos](https://discuss.d2l.ai/t/345)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1062)
+[Diskusijos](https://discuss.d2l.ai/t/1062)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3865)
+[Diskusijos](https://discuss.d2l.ai/t/3865)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18022)
+[Diskusijos](https://discuss.d2l.ai/t/18022)
 :end_tab:
 

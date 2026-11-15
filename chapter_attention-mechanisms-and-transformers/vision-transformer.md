@@ -3,43 +3,43 @@
 tab.interact_select(['pytorch', 'jax'])
 ```
 
-# Transformers for Vision
+# Transformeriai regai
 :label:`sec_vision-transformer`
 
-The Transformer architecture was initially proposed
-for sequence-to-sequence learning,
-with a focus on machine translation.
-Subsequently, Transformers emerged as the model of choice
-in various natural language processing tasks :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring`.
-However, in the field of computer vision
-the dominant architecture has remained
-the CNN (:numref:`chap_modern_cnn`).
-Naturally, researchers started to wonder
-if it might be possible to do better
-by adapting Transformer models to image data.
-This question sparked immense interest
-in the computer vision community.
-Recently, :citet:`ramachandran2019stand` proposed
-a scheme for replacing convolution with self-attention.
-However, its use of specialized patterns in attention
-makes it hard to scale up models on hardware accelerators.
-Then, :citet:`cordonnier2020relationship` theoretically proved
-that self-attention can learn to behave similarly to convolution.
-Empirically, $2 \times 2$ patches were taken from images as inputs,
-but the small patch size makes the model
-only applicable to image data with low resolutions.
+Transformerių architektūra iš pradžių buvo pasiūlyta
+sekos į seką mokymuisi,
+daugiausia dėmesio skiriant mašininiam vertimui.
+Vėliau transformeriai tapo pasirinktu modeliu
+įvairiose natūraliosios kalbos apdorojimo užduotyse :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring`.
+Tačiau kompiuterinės regos srityje
+dominuojanti architektūra liko
+CNN (:numref:`chap_modern_cnn`).
+Natūralu, kad tyrėjai pradėjo svarstyti,
+ar galima pasiekti geresnių rezultatų
+pritaikius transformerių modelius vaizdų duomenims.
+Šis klausimas sukėlė didžiulį susidomėjimą
+kompiuterinės regos bendruomenėje.
+Neseniai :citet:`ramachandran2019stand` pasiūlė
+schemą, kaip konvoliuciją pakeisti saviraiške dėmesio sutelkimo transformacija.
+Tačiau dėl specialių šablonų naudojimo dėmesio sutelkime
+sunku didinti modelių mastelį aparatinės įrangos greitintuvuose.
+Tada :citet:`cordonnier2020relationship` teoriškai įrodė,
+kad saviraiškė dėmesio sutelkimo transformacija gali išmokti elgtis panašiai kaip konvoliucija.
+Empiriškai kaip įvestys buvo imami $2 \times 2$ vaizdo fragmentai (angl. *patches*),
+tačiau dėl mažo fragmento dydžio modelis
+tinka tik žemos skiriamosios gebos vaizdų duomenims.
 
-Without specific constraints on patch size,
-*vision Transformers* (ViTs)
-extract patches from images
-and feed them into a Transformer encoder
-to obtain a global representation,
-which will finally be transformed for classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
-Notably, Transformers show better scalability than CNNs:
-and when training larger models on larger datasets,
-vision Transformers outperform ResNets by a significant margin.
-Similar to the landscape of network architecture design in natural language processing,
-Transformers have also become a game-changer in computer vision.
+Be specialių fragmento dydžio apribojimų,
+*regimieji transformeriai* (angl. *vision Transformers*, ViT)
+išskiria fragmentus iš vaizdų
+ir paduoda juos į transformerio kodavimo bloką,
+kad gautų globalų vaizdą,
+kuris galiausiai transformuojamas klasifikavimui :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+Pažymėtina, kad transformeriai rodo geresnį mastelio didinimą nei CNN:
+apmokant didesnius modelius didesniuose duomenų rinkiniuose,
+regimieji transformeriai pranoksta ResNet žymia persvara.
+Panašiai kaip tinklų architektūros projektavimo kraštovaizdyje natūraliosios kalbos apdorojime,
+transformeriai taip pat tapo lūžio tašku kompiuterinėje regoje.
 
 ```{.python .input}
 %%tab pytorch
@@ -56,47 +56,47 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Model
+## Modelis
 
-:numref:`fig_vit` depicts
-the model architecture of vision Transformers.
-This architecture consists of a stem
-that patchifies images,
-a body based on the multilayer Transformer encoder,
-and a head that transforms the global representation
-into the output label.
+:numref:`fig_vit` pavaizduota
+regimųjų transformerių modelio architektūra.
+Šią architektūrą sudaro įvadas (angl. *stem*),
+kuris suskaido vaizdus į fragmentus,
+kūnas, pagrįstas daugiasluoksniu transformerio kodavimo bloku,
+ir galva, kuri paverčia globalų vaizdą
+išvesties žymeniu.
 
-![The vision Transformer architecture. In this example, an image is split into nine patches. A special “&lt;cls&gt;” token and the nine flattened image patches are transformed via patch embedding and $\mathit{n}$ Transformer encoder blocks into ten representations, respectively. The “&lt;cls&gt;” representation is further transformed into the output label.](../img/vit.svg)
+![Regimojo transformerio architektūra. Šiame pavyzdyje vaizdas padalytas į devynis fragmentus. Specialus „&lt;cls&gt;“ teksto vienetas ir devyni išlyginti vaizdo fragmentai per fragmentų įterpimą ir $\mathit{n}$ transformerio kodavimo bloko blokų paverčiami atitinkamai dešimčia vaizdų. „&lt;cls&gt;“ vaizdas toliau paverčiamas išvesties žymeniu.](../img/vit.svg)
 :label:`fig_vit`
 
-Consider an input image with height $h$, width $w$,
-and $c$ channels.
-Specifying the patch height and width both as $p$,
-the image is split into a sequence of $m = hw/p^2$ patches,
-where each patch is flattened to a vector of length $cp^2$.
-In this way, image patches can be treated similarly to tokens in text sequences by Transformer encoders.
-A special “&lt;cls&gt;” (class) token and
-the $m$ flattened image patches are linearly projected
-into a sequence of $m+1$ vectors,
-summed with learnable positional embeddings.
-The multilayer Transformer encoder
-transforms $m+1$ input vectors
-into the same number of output vector representations of the same length.
-It works exactly the same way as the original Transformer encoder in :numref:`fig_transformer`,
-only differing in the position of normalization.
-Since the “&lt;cls&gt;” token attends to all the image patches
-via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
-its representation from the Transformer encoder output
-will be further transformed into the output label.
+Apsvarstykime įvesties vaizdą, kurio aukštis $h$, plotis $w$
+ir $c$ kanalų.
+Nurodžius, kad fragmento aukštis ir plotis abu yra $p$,
+vaizdas suskaidomas į $m = hw/p^2$ fragmentų seką,
+kur kiekvienas fragmentas išlyginamas į $cp^2$ ilgio vektorių.
+Taip transformerio kodavimo blokai gali traktuoti vaizdo fragmentus panašiai kaip teksto sekų teksto vienetus.
+Specialus „&lt;cls&gt;“ (klasės) teksto vienetas ir
+$m$ išlygintų vaizdo fragmentų tiesiškai projektuojami
+į $m+1$ vektorių seką,
+sudedamą su mokomais poziciniais įterpiniais.
+Daugiasluoksnis transformerio kodavimo blokas
+transformuoja $m+1$ įvesties vektorių
+į tiek pat to paties ilgio išvesties vektorių vaizdų.
+Jis veikia lygiai taip pat kaip originalus transformerio kodavimo blokas :numref:`fig_transformer`,
+skiriasi tik normalizacijos vieta.
+Kadangi „&lt;cls&gt;“ teksto vienetas sutelkia dėmesį į visus vaizdo fragmentus
+per saviraišką dėmesio sutelkimo transformaciją (žr. :numref:`fig_cnn-rnn-self-attention`),
+jo vaizdas iš transformerio kodavimo bloko išvesties
+bus toliau paverčiamas išvesties žymeniu.
 
-## Patch Embedding
+## Fragmentų įterpimas
 
-To implement a vision Transformer, let's start
-with patch embedding in :numref:`fig_vit`.
-Splitting an image into patches
-and linearly projecting these flattened patches
-can be simplified as a single convolution operation,
-where both the kernel size and the stride size are set to the patch size.
+Kad įgyvendintume regimąjį transformerį, pradėkime
+nuo fragmentų įterpimo :numref:`fig_vit`.
+Vaizdo suskaidymą į fragmentus
+ir šių išlygintų fragmentų tiesinį projektavimą
+galima supaprastinti iki vienos konvoliucijos operacijos,
+kur ir branduolio dydis, ir žingsnio dydis nustatomi lygūs fragmento dydžiui.
 
 ```{.python .input}
 %%tab pytorch
@@ -142,9 +142,9 @@ class PatchEmbedding(nn.Module):
         return X.reshape((X.shape[0], -1, X.shape[3]))
 ```
 
-In the following example, taking images with height and width of `img_size` as inputs,
-the patch embedding outputs `(img_size//patch_size)**2` patches
-that are linearly projected to vectors of length `num_hiddens`.
+Toliau pateiktame pavyzdyje, kaip įvestis imant vaizdus, kurių aukštis ir plotis yra `img_size`,
+fragmentų įterpimas išveda `(img_size//patch_size)**2` fragmentų,
+kurie tiesiškai projektuojami į `num_hiddens` ilgio vektorius.
 
 ```{.python .input}
 %%tab pytorch
@@ -164,15 +164,15 @@ output, _ = patch_emb.init_with_output(d2l.get_key(), X)
 d2l.check_shape(output, (batch_size, (img_size//patch_size)**2, num_hiddens))
 ```
 
-## Vision Transformer Encoder
+## Regimojo transformerio kodavimo blokas
 :label:`subsec_vit-encoder`
 
-The MLP of the vision Transformer encoder is slightly different
-from the positionwise FFN of the original Transformer encoder
-(see :numref:`subsec_positionwise-ffn`).
-First, here the activation function uses the Gaussian error linear unit (GELU),
-which can be considered as a smoother version of the ReLU :cite:`Hendrycks.Gimpel.2016`.
-Second, dropout is applied to the output of each fully connected layer in the MLP for regularization.
+Regimojo transformerio kodavimo bloko MLP šiek tiek skiriasi
+nuo originalaus transformerio kodavimo bloko pozicinio tiesioginio sklidimo tinklo
+(žr. :numref:`subsec_positionwise-ffn`).
+Pirma, čia aktyvacijos funkcija naudoja Gauso paklaidos tiesinį vienetą (GELU),
+kurį galima laikyti glotnesne ReLU versija :cite:`Hendrycks.Gimpel.2016`.
+Antra, reguliarizacijai dropout taikomas kiekvieno pilnai sujungto MLP sluoksnio išvesčiai.
 
 ```{.python .input}
 %%tab pytorch
@@ -207,12 +207,12 @@ class ViTMLP(nn.Module):
         return x
 ```
 
-The vision Transformer encoder block implementation
-just follows the pre-normalization design in :numref:`fig_vit`,
-where normalization is applied right *before* multi-head attention or the MLP.
-In contrast to post-normalization ("add & norm" in :numref:`fig_transformer`),
-where normalization is placed right *after* residual connections,
-pre-normalization leads to more effective or efficient training for Transformers :cite:`baevski2018adaptive,wang2019learning,xiong2020layer`.
+Regimojo transformerio kodavimo bloko bloko įgyvendinimas
+tiesiog seka išankstinės normalizacijos dizainą :numref:`fig_vit`,
+kur normalizacija taikoma iškart *prieš* lygiagrečią dėmesio sutelkimo transformaciją arba MLP.
+Skirtingai nei po-normalizacija („sudėk ir normalizuok“ :numref:`fig_transformer`),
+kai normalizacija dedama iškart *po* liekamųjų jungčių,
+išankstinė normalizacija lemia veiksmingesnį ar efektyvesnį transformerių apmokymą :cite:`baevski2018adaptive,wang2019learning,xiong2020layer`.
 
 ```{.python .input}
 %%tab pytorch
@@ -252,8 +252,8 @@ class ViTBlock(nn.Module):
         return X + self.mlp(nn.LayerNorm()(X), training=training)
 ```
 
-Just as in :numref:`subsec_transformer-encoder`,
-no vision Transformer encoder block changes its input shape.
+Kaip ir :numref:`subsec_transformer-encoder`,
+joks regimojo transformerio kodavimo bloko blokas nekeičia savo įvesties formos.
 
 ```{.python .input}
 %%tab pytorch
@@ -270,14 +270,14 @@ encoder_blk = ViTBlock(24, 48, 8, 0.5)
 d2l.check_shape(encoder_blk.init_with_output(d2l.get_key(), X)[0], X.shape)
 ```
 
-## Putting It All Together
+## Viskas kartu
 
-The forward pass of vision Transformers below is straightforward.
-First, input images are fed into an `PatchEmbedding` instance,
-whose output is concatenated with the “&lt;cls&gt;”  token embedding.
-They are summed with learnable positional embeddings before dropout.
-Then the output is fed into the Transformer encoder that stacks `num_blks` instances of the `ViTBlock` class.
-Finally, the representation of the “&lt;cls&gt;”  token is projected by the network head.
+Toliau pateiktas regimųjų transformerių tiesioginis sklidimas yra paprastas.
+Pirmiausia įvesties vaizdai paduodami į `PatchEmbedding` egzempliorių,
+kurio išvestis sujungiama su „&lt;cls&gt;“ teksto vieneto įterpiniu.
+Jie sudedami su mokomais poziciniais įterpiniais prieš dropout.
+Tada išvestis paduodama į transformerio kodavimo bloką, kuris sukrauna `num_blks` klasės `ViTBlock` egzempliorių.
+Galiausiai „&lt;cls&gt;“ teksto vieneto vaizdą projektuoja tinklo galva.
 
 ```{.python .input}
 %%tab pytorch
@@ -354,9 +354,9 @@ class ViT(d2l.Classifier):
         return self.head(X[:, 0])
 ```
 
-## Training
+## Mokymas
 
-Training a vision Transformer on the Fashion-MNIST dataset is just like how CNNs were trained in :numref:`chap_modern_cnn`.
+Regimojo transformerio apmokymas Fashion-MNIST duomenų rinkinyje yra tarsi CNN apmokymas :numref:`chap_modern_cnn`.
 
 ```{.python .input}
 %%tab all
@@ -370,42 +370,42 @@ data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)
 ```
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-You may have noticed that for small datasets like Fashion-MNIST,
-our implemented vision Transformer
-does not outperform the ResNet in :numref:`sec_resnet`.
-Similar observations can be made even on the ImageNet dataset (1.2 million images).
-This is because Transformers *lack* those useful principles in convolution,
-such as translation invariance and locality (:numref:`sec_why-conv`).
-However, the picture changes when training larger models on larger datasets (e.g., 300 million images),
-where vision Transformers outperform ResNets by a large margin in image classification, demonstrating
-intrinsic superiority of Transformers in scalability :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
-The introduction of vision Transformers
-has changed the landscape of network design for modeling image data.
-They were soon shown to be effective on the ImageNet dataset
-with data-efficient training strategies of DeiT :cite:`touvron2021training`.
-However, the quadratic complexity of self-attention
+Galbūt pastebėjote, kad mažuose duomenų rinkiniuose, tokiuose kaip Fashion-MNIST,
+mūsų įgyvendintas regimasis transformeris
+nepralenkia ResNet iš :numref:`sec_resnet`.
+Panašių pastebėjimų galima padaryti net ImageNet duomenų rinkinyje (1,2 milijono vaizdų).
+Taip yra todėl, kad transformeriams *trūksta* tų naudingų konvoliucijos principų,
+tokių kaip postūmio invariantiškumas ir lokalumas (:numref:`sec_why-conv`).
+Tačiau vaizdas pasikeičia apmokant didesnius modelius didesniuose duomenų rinkiniuose (pvz., 300 milijonų vaizdų),
+kur regimieji transformeriai vaizdų klasifikavime pranoksta ResNet didele persvara, parodydami
+būdingą transformerių pranašumą mastelio didinimo prasme :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+Regimųjų transformerių pristatymas
+pakeitė tinklų projektavimo vaizdų duomenims modeliuoti kraštovaizdį.
+Netrukus buvo parodyta, kad jie veiksmingi ImageNet duomenų rinkinyje
+su duomenis taupančiomis DeiT apmokymo strategijomis :cite:`touvron2021training`.
+Tačiau saviraiškės dėmesio sutelkimo transformacijos kvadratinis sudėtingumas
 (:numref:`sec_self-attention-and-positional-encoding`)
-makes the Transformer architecture
-less suitable for higher-resolution images.
-Towards a general-purpose backbone network in computer vision,
-Swin Transformers addressed the quadratic computational complexity
-with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
-and reinstated convolution-like priors,
-extending the applicability of Transformers to a range of computer vision tasks
-beyond image classification with state-of-the-art results :cite:`liu2021swin`.
+daro transformerių architektūrą
+mažiau tinkamą didesnės skiriamosios gebos vaizdams.
+Siekdami bendrosios paskirties pagrindinio tinklo kompiuterinėje regoje,
+Swin transformeriai sprendė kvadratinį skaičiavimo sudėtingumą
+vaizdo dydžio atžvilgiu (:numref:`subsec_cnn-rnn-self-attention`)
+ir grąžino į konvoliuciją panašias prielaidas,
+išplėsdami transformerių pritaikomumą įvairioms kompiuterinės regos užduotims,
+ne tik vaizdų klasifikavimui, su pažangiausiais rezultatais :cite:`liu2021swin`.
 
-## Exercises
+## Pratimai
 
-1. How does the value of `img_size` affect training time?
-1. Instead of projecting the “&lt;cls&gt;” token representation to the output, how would you project the averaged patch representations? Implement this change and see how it affects the accuracy.
-1. Can you modify hyperparameters to improve the accuracy of the vision Transformer?
+1. Kaip `img_size` reikšmė veikia apmokymo laiką?
+1. Užuot projektavus „&lt;cls&gt;“ teksto vieneto vaizdą į išvestį, kaip projektuotumėte vidurkintus fragmentų vaizdus? Įgyvendinkite šį pakeitimą ir pažiūrėkite, kaip jis veikia tikslumą.
+1. Ar galite pakeisti hiperparametrus, kad pagerintumėte regimojo transformerio tikslumą?
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/8943)
+[Diskusijos](https://discuss.d2l.ai/t/8943)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18032)
+[Diskusijos](https://discuss.d2l.ai/t/18032)
 :end_tab:

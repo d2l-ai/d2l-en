@@ -1,19 +1,19 @@
-# Gated Recurrent Units (GRU)
+# Sklendžių rekurentiniai vienetai (GRU)
 :label:`sec_gru`
 
 
-As RNNs and particularly the LSTM architecture (:numref:`sec_lstm`)
-rapidly gained popularity during the 2010s,
-a number of researchers began to experiment 
-with simplified architectures in hopes 
-of retaining the key idea of incorporating
-an internal state and multiplicative gating mechanisms
-but with the aim of speeding up computation.
-The gated recurrent unit (GRU) :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` 
-offered a streamlined version of the LSTM memory cell
-that often achieves comparable performance
-but with the advantage of being faster 
-to compute :cite:`Chung.Gulcehre.Cho.ea.2014`.
+Kadangi RNN, o ypač LSTM architektūra (:numref:`sec_lstm`),
+greitai išpopuliarėjo 2010-aisiais,
+keli tyrėjai pradėjo eksperimentuoti
+su supaprastintomis architektūromis, tikėdamiesi
+išlaikyti pagrindinę idėją – įtraukti
+vidinę būseną ir daugybinius sklendžių mechanizmus,
+bet siekdami pagreitinti skaičiavimą.
+Sklendžių rekurentinis vienetas (GRU) :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014`
+pasiūlė supaprastintą LSTM atminties ląstelės versiją,
+kuri dažnai pasiekia panašų našumą,
+tačiau turi pranašumą – yra greitesnė
+skaičiuoti :cite:`Chung.Gulcehre.Cho.ea.2014`.
 
 ```{.python .input  n=5}
 %load_ext d2lbook.tab
@@ -49,36 +49,36 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Reset Gate and Update Gate
+## Atstatymo sklendė ir atnaujinimo sklendė
 
-Here, the LSTM's three gates are replaced by two:
-the *reset gate* and the *update gate*.
-As with LSTMs, these gates are given sigmoid activations,
-forcing their values to lie in the interval $(0, 1)$.
-Intuitively, the reset gate controls how much of the previous state 
-we might still want to remember.
-Likewise, an update gate would allow us to control 
-how much of the new state is just a copy of the old one.
-:numref:`fig_gru_1` illustrates the inputs for both
-the reset and update gates in a GRU, 
-given the input of the current time step
-and the hidden state of the previous time step.
-The outputs of the gates are given 
-by two fully connected layers
-with a sigmoid activation function.
+Čia trys LSTM sklendės pakeičiamos dviem:
+*atstatymo sklendė* ir *atnaujinimo sklendė*.
+Kaip ir LSTM, šioms sklendėms taikomos sigmoidinės aktyvacijos,
+verčiančios jų reikšmes gulėti intervale $(0, 1)$.
+Intuityviai atstatymo sklendė valdo, kiek ankstesnės būsenos
+vis dar norėtume prisiminti.
+Panašiai atnaujinimo sklendė leistų valdyti,
+kiek naujosios būsenos yra tiesiog senosios kopija.
+:numref:`fig_gru_1` iliustruoja abiejų
+atstatymo ir atnaujinimo sklendžių įvestis GRU,
+duotą dabartinio laiko žingsnio įvestį
+ir ankstesnio laiko žingsnio paslėptąją būseną.
+Sklendžių išvestis pateikia
+du pilnai sujungti sluoksniai
+su sigmoidine aktyvacijos funkcija.
 
-![Computing the reset gate and the update gate in a GRU model.](../img/gru-1.svg)
+![Atstatymo sklendės ir atnaujinimo sklendės skaičiavimas GRU modelyje.](../img/gru-1.svg)
 :label:`fig_gru_1`
 
-Mathematically, for a given time step $t$,
-suppose that the input is a minibatch
-$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-(number of examples $=n$; number of inputs $=d$)
-and the hidden state of the previous time step 
-is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ 
-(number of hidden units $=h$). 
-Then the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ 
-and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
+Matematiškai, duotam laiko žingsniui $t$,
+tarkime, kad įvestis yra minirinkinys
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$
+(pavyzdžių skaičius $=n$; įvesčių skaičius $=d$),
+o ankstesnio laiko žingsnio paslėptoji būsena
+yra $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$
+(paslėptųjų vienetų skaičius $=h$).
+Tada atstatymo sklendė $\mathbf{R}_t \in \mathbb{R}^{n \times h}$
+ir atnaujinimo sklendė $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ apskaičiuojamos taip:
 
 $$
 \begin{aligned}
@@ -87,94 +87,93 @@ $$
 \end{aligned}
 $$
 
-where $\mathbf{W}_{\textrm{xr}}, \mathbf{W}_{\textrm{xz}} \in \mathbb{R}^{d \times h}$ 
-and $\mathbf{W}_{\textrm{hr}}, \mathbf{W}_{\textrm{hz}} \in \mathbb{R}^{h \times h}$ 
-are weight parameters and $\mathbf{b}_\textrm{r}, \mathbf{b}_\textrm{z} \in \mathbb{R}^{1 \times h}$ 
-are bias parameters.
+kur $\mathbf{W}_{\textrm{xr}}, \mathbf{W}_{\textrm{xz}} \in \mathbb{R}^{d \times h}$
+ir $\mathbf{W}_{\textrm{hr}}, \mathbf{W}_{\textrm{hz}} \in \mathbb{R}^{h \times h}$
+yra svorių parametrai, o $\mathbf{b}_\textrm{r}, \mathbf{b}_\textrm{z} \in \mathbb{R}^{1 \times h}$
+yra poslinkio parametrai.
 
 
-## Candidate Hidden State
+## Kandidatinė paslėptoji būsena
 
-Next, we integrate the reset gate $\mathbf{R}_t$ 
-with the regular updating mechanism
-in :eqref:`rnn_h_with_state`,
-leading to the following
-*candidate hidden state*
-$\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ at time step $t$:
+Toliau atstatymo sklendę $\mathbf{R}_t$ integruojame
+į įprastą atnaujinimo mechanizmą
+:eqref:`rnn_h_with_state`,
+gaudami šią
+*kandidatinę paslėptąją būseną*
+$\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ laiko žingsniu $t$:
 
 $$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{\textrm{hh}} + \mathbf{b}_\textrm{h}),$$
 :eqlabel:`gru_tilde_H`
 
-where $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$
-are weight parameters,
+kur $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}$ ir $\mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$
+yra svorių parametrai,
 $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$
-is the bias,
-and the symbol $\odot$ is the Hadamard (elementwise) product operator.
-Here we use a tanh activation function.
+yra poslinkis,
+o simbolis $\odot$ yra Hadamardo (elementų lygmens) sandaugos operatorius.
+Čia naudojame tanh aktyvacijos funkciją.
 
-The result is a *candidate*, since we still need 
-to incorporate the action of the update gate.
-Comparing with :eqref:`rnn_h_with_state`,
-the influence of the previous states
-can now be reduced with the
-elementwise multiplication of
-$\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
-in :eqref:`gru_tilde_H`.
-Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, 
-we recover a vanilla RNN such as that in :eqref:`rnn_h_with_state`.
-For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, 
-the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as input. 
-Any pre-existing hidden state is thus *reset* to defaults.
+Rezultatas yra *kandidatas*, nes dar turime
+įtraukti atnaujinimo sklendės veikimą.
+Palyginti su :eqref:`rnn_h_with_state`,
+ankstesnių būsenų įtaka
+dabar gali būti sumažinta elementų lygmens
+$\mathbf{R}_t$ ir $\mathbf{H}_{t-1}$ daugyba
+:eqref:`gru_tilde_H`.
+Kai tik atstatymo sklendės $\mathbf{R}_t$ elementai artimi 1,
+atkuriame paprastą RNN, tokį kaip :eqref:`rnn_h_with_state`.
+Visiems atstatymo sklendės $\mathbf{R}_t$ elementams, artimiems 0,
+kandidatinė paslėptoji būsena yra MLP su įvestimi $\mathbf{X}_t$ rezultatas.
+Bet kuri jau egzistuojanti paslėptoji būsena taip *atstatoma* į numatytąsias reikšmes.
 
-:numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
+:numref:`fig_gru_2` iliustruoja skaičiavimo srautą pritaikius atstatymo sklendę.
 
-![Computing the candidate hidden state in a GRU model.](../img/gru-2.svg)
+![Kandidatinės paslėptosios būsenos skaičiavimas GRU modelyje.](../img/gru-2.svg)
 :label:`fig_gru_2`
 
 
-## Hidden State
+## Paslėptoji būsena
 
-Finally, we need to incorporate the effect of the update gate $\mathbf{Z}_t$.
-This determines the extent to which the new hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ 
-matches the old state $\mathbf{H}_{t-1}$ compared with how much 
-it resembles the new candidate state $\tilde{\mathbf{H}}_t$.
-The update gate $\mathbf{Z}_t$ can be used for this purpose, 
-simply by taking elementwise convex combinations 
-of $\mathbf{H}_{t-1}$ and $\tilde{\mathbf{H}}_t$.
-This leads to the final update equation for the GRU:
+Galiausiai turime įtraukti atnaujinimo sklendės $\mathbf{Z}_t$ poveikį.
+Ji nustato, kiek nauja paslėptoji būsena $\mathbf{H}_t \in \mathbb{R}^{n \times h}$
+atitinka senąją būseną $\mathbf{H}_{t-1}$, palyginti su tuo, kiek
+ji primena naująją kandidatinę būseną $\tilde{\mathbf{H}}_t$.
+Atnaujinimo sklendę $\mathbf{Z}_t$ šiam tikslui galima naudoti
+tiesiog imant elementų lygmens iškilusius derinius
+$\mathbf{H}_{t-1}$ ir $\tilde{\mathbf{H}}_t$.
+Tai veda prie galutinės GRU atnaujinimo lygties:
 
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
 
-Whenever the update gate $\mathbf{Z}_t$ is close to 1,
-we simply retain the old state. 
-In this case the information from $\mathbf{X}_t$ is ignored, 
-effectively skipping time step $t$ in the dependency chain. 
-By contrast, whenever $\mathbf{Z}_t$ is close to 0,
-the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. 
-:numref:`fig_gru_3` shows the computational flow after the update gate is in action.
+Kai tik atnaujinimo sklendė $\mathbf{Z}_t$ artima 1,
+tiesiog išlaikome seną būseną.
+Šiuo atveju informacija iš $\mathbf{X}_t$ ignoruojama,
+faktiškai praleidžiant laiko žingsnį $t$ priklausomybių grandinėje.
+Priešingai, kai tik $\mathbf{Z}_t$ artima 0,
+nauja latentinė būsena $\mathbf{H}_t$ artėja prie kandidatinės latentinės būsenos $\tilde{\mathbf{H}}_t$.
+:numref:`fig_gru_3` parodo skaičiavimo srautą, kai atnaujinimo sklendė veikia.
 
-![Computing the hidden state in a GRU model.](../img/gru-3.svg)
+![Paslėptosios būsenos skaičiavimas GRU modelyje.](../img/gru-3.svg)
 :label:`fig_gru_3`
 
 
-In summary, GRUs have the following two distinguishing features:
+Apibendrinant, GRU turi šias dvi išskirtines savybes:
 
-* Reset gates help capture short-term dependencies in sequences.
-* Update gates help capture long-term dependencies in sequences.
+* Atstatymo sklendės padeda užfiksuoti trumpalaikes sekų priklausomybes.
+* Atnaujinimo sklendės padeda užfiksuoti ilgalaikes sekų priklausomybes.
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-To gain a better understanding of the GRU model, let's implement it from scratch.
+Kad geriau suprastume GRU modelį, įgyvendinkime jį nuo nulio.
 
-### (**Initializing Model Parameters**)
+### (**Modelio parametrų inicializavimas**)
 
-The first step is to initialize the model parameters.
-We draw the weights from a Gaussian distribution
-with standard deviation to be `sigma` and set the bias to 0. 
-The hyperparameter `num_hiddens` defines the number of hidden units.
-We instantiate all weights and biases relating to the update gate, 
-the reset gate, and the candidate hidden state.
+Pirmas žingsnis – inicializuoti modelio parametrus.
+Svorius imame iš Gauso skirstinio
+su standartiniu nuokrypiu `sigma`, o poslinkį nustatome į 0.
+Hiperparametras `num_hiddens` apibrėžia paslėptųjų vienetų skaičių.
+Sukuriame visus svorius ir poslinkius, susijusius su atnaujinimo sklende,
+atstatymo sklende ir kandidatine paslėptąja būsena.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -225,11 +224,11 @@ class GRUScratch(d2l.Module):
         self.W_xh, self.W_hh, self.b_h = triple('h')  # Candidate hidden state
 ```
 
-### Defining the Model
+### Modelio apibrėžimas
 
-Now we are ready to [**define the GRU forward computation**].
-Its structure is the same as that of the basic RNN cell, 
-except that the update equations are more complex.
+Dabar esame pasiruošę [**apibrėžti GRU tiesioginį skaičiavimą**].
+Jo struktūra tokia pati kaip pagrindinės RNN ląstelės,
+tik atnaujinimo lygtys sudėtingesnės.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -285,10 +284,10 @@ def forward(self, inputs, H=None):
     return outputs, carry
 ```
 
-### Training
+### Mokymas
 
-[**Training**] a language model on *The Time Machine* dataset
-works in exactly the same manner as in :numref:`sec_rnn-scratch`.
+*Laiko mašinos* duomenų rinkinyje [**apmokyti**] kalbos modelį
+veikia lygiai taip pat kaip :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
@@ -305,10 +304,10 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## [**Concise Implementation**]
+## [**Glaustas įgyvendinimas**]
 
-In high-level APIs, we can directly instantiate a GRU model.
-This encapsulates all the configuration detail that we made explicit above.
+Aukšto lygio API galime tiesiogiai sukurti GRU modelį.
+Tai įkapsuliuoja visas konfigūracijos detales, kurias aukščiau pateikėme aiškiai.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -344,8 +343,8 @@ class GRU(d2l.RNN):
         return outputs, H
 ```
 
-The code is significantly faster in training as it uses compiled operators 
-rather than Python.
+Kodas apmokymo metu veikia gerokai greičiau, nes naudoja sukompiliuotus operatorius,
+o ne Python.
 
 ```{.python .input}
 %%tab all
@@ -361,8 +360,8 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-After training, we print out the perplexity on the training set
-and the predicted sequence following the provided prefix.
+Po apmokymo išspausdiname painumą apmokymo aibėje
+ir prognozuojamą seką, einančią po pateikto priešdėlio.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -379,34 +378,34 @@ model.predict('it has', 20, data.vocab)
 model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
-## Summary
+## Santrauka
 
-Compared with LSTMs, GRUs achieve similar performance but tend to be lighter computationally.
-Generally, compared with simple RNNs, gated RNNS, just like LSTMs and GRUs,
-can better capture dependencies for sequences with large time step distances.
-GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. 
-They can also skip subsequences by turning on the update gate.
+Palyginti su LSTM, GRU pasiekia panašų našumą, bet skaičiavimo požiūriu yra lengvesni.
+Apskritai, palyginti su paprastais RNN, sklendėmis valdomi RNN, tokie kaip LSTM ir GRU,
+geriau užfiksuoja priklausomybes sekose, kai laiko žingsnių atstumai dideli.
+GRU kraštutiniu atveju apima paprastus RNN, kai atstatymo sklendė yra įjungta.
+Jie taip pat gali praleisti posekius įjungdami atnaujinimo sklendę.
 
 
-## Exercises
+## Pratimai
 
-1. Assume that we only want to use the input at time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
-1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
-1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
-1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
+1. Tarkime, kad norime naudoti tik laiko žingsnio $t'$ įvestį išvesčiai laiko žingsniu $t > t'$ prognozuoti. Kokios yra geriausios atstatymo ir atnaujinimo sklendžių reikšmės kiekvienam laiko žingsniui?
+1. Pakoreguokite hiperparametrus ir išanalizuokite jų įtaką veikimo laikui, painumui ir išvesties sekai.
+1. Palyginkite `rnn.RNN` ir `rnn.GRU` įgyvendinimų veikimo laiką, painumą ir išvesties eilutes tarpusavyje.
+1. Kas nutiks, jei įgyvendinsite tik dalis GRU, pvz., tik su atstatymo sklende arba tik su atnaujinimo sklende?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/342)
+[Diskusijos](https://discuss.d2l.ai/t/342)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1056)
+[Diskusijos](https://discuss.d2l.ai/t/1056)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3860)
+[Diskusijos](https://discuss.d2l.ai/t/3860)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18017)
+[Diskusijos](https://discuss.d2l.ai/t/18017)
 :end_tab:

@@ -3,47 +3,47 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-# Machine Translation and the Dataset
+# Mašininis vertimas ir duomenų rinkinys
 :label:`sec_machine_translation`
 
-Among the major breakthroughs that prompted 
-widespread interest in modern RNNs
-was a major advance in the applied field of 
-statistical  *machine translation*.
-Here, the model is presented with a sentence in one language
-and must predict the corresponding sentence in another. 
-Note that here the sentences may be of different lengths,
-and that corresponding words in the two sentences 
-may not occur in the same order, 
-owing to differences 
-in the two language's grammatical structure. 
+Tarp pagrindinių proveržių, sukėlusių
+platų susidomėjimą šiuolaikiniais RNN,
+buvo didelė pažanga taikomojoje statistinio
+*mašininio vertimo* srityje.
+Čia modeliui pateikiamas sakinys viena kalba
+ir jis turi prognozuoti atitinkamą sakinį kita kalba.
+Atkreipkite dėmesį, kad čia sakiniai gali būti skirtingo ilgio,
+o atitinkami žodžiai dviejuose sakiniuose
+gali eiti ne ta pačia tvarka
+dėl dviejų kalbų
+gramatinės struktūros skirtumų.
 
 
-Many problems have this flavor of mapping 
-between two such "unaligned" sequences.
-Examples include mapping 
-from dialog prompts to replies
-or from questions to answers.
-Broadly, such problems are called 
-*sequence-to-sequence* (seq2seq) problems 
-and they are our focus for 
-both the remainder of this chapter
-and much of :numref:`chap_attention-and-transformers`.
+Daug problemų turi tokį atvaizdavimo
+tarp dviejų „nesulygiuotų“ sekų pobūdį.
+Pavyzdžiai: atvaizdavimas
+iš dialogo užklausų į atsakymus
+arba iš klausimų į atsakymus.
+Plačiąja prasme tokios problemos vadinamos
+*sekos į seką* (angl. *seq2seq*) problemomis,
+ir jos yra mūsų dėmesio centre
+tiek likusioje šio skyriaus dalyje,
+tiek didelėje :numref:`chap_attention-and-transformers` dalyje.
 
-In this section, we introduce the machine translation problem
-and an example dataset that we will use in the subsequent examples.
-For decades, statistical formulations of translation between languages
-had been popular :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`,
-even before researchers got neural network approaches working
-(methods were often lumped together under the term *neural machine translation*).
+Šiame skyrelyje pristatome mašininio vertimo problemą
+ir pavyzdinį duomenų rinkinį, kurį naudosime tolesniuose pavyzdžiuose.
+Dešimtmečius populiarios buvo statistinės vertimo tarp kalbų formuluotės
+:cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`,
+dar prieš tyrėjams priversdami veikti neuroninių tinklų metodus
+(metodai dažnai buvo suvedami po terminu *neuroninis mašininis vertimas*).
 
 
-First we will need some new code to process our data.
-Unlike the language modeling that we saw in :numref:`sec_language-model`,
-here each example consists of two separate text sequences,
-one in the source language and another (the translation) in the target language.
-The following code snippets will show how 
-to load the preprocessed data into minibatches for training.
+Pirmiausia mums reikės naujo kodo duomenims apdoroti.
+Skirtingai nuo kalbos modeliavimo, kurį matėme :numref:`sec_language-model`,
+čia kiekvieną pavyzdį sudaro dvi atskiros teksto sekos:
+viena šaltinio kalba, o kita (vertimas) – tikslo kalba.
+Toliau pateikti kodo fragmentai parodys,
+kaip įkelti iš anksto apdorotus duomenis į minirinkinius apmokymui.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -74,16 +74,16 @@ from jax import numpy as jnp
 import os
 ```
 
-## [**Downloading and Preprocessing the Dataset**]
+## [**Duomenų rinkinio atsisiuntimas ir išankstinis apdorojimas**]
 
-To begin, we download an English--French dataset
-that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
-Each line in the dataset is a tab-delimited pair 
-consisting of an English text sequence (the *source*) 
-and the translated French text sequence (the *target*).
-Note that each text sequence
-can be just one sentence,
-or a paragraph of multiple sentences.
+Pradžioje atsisiunčiame anglų–prancūzų duomenų rinkinį,
+sudarytą iš [dvikalbių sakinių porų iš Tatoeba projekto](http://www.manythings.org/anki/).
+Kiekviena duomenų rinkinio eilutė yra tabuliacijos ženklais atskirta pora,
+sudaryta iš angliškos teksto sekos (*šaltinio*)
+ir išverstos prancūziškos teksto sekos (*tikslo*).
+Atkreipkite dėmesį, kad kiekviena teksto seka
+gali būti tik vienas sakinys
+arba kelių sakinių pastraipa.
 
 ```{.python .input  n=5}
 %%tab all
@@ -104,12 +104,12 @@ raw_text = data._download()
 print(raw_text[:75])
 ```
 
-After downloading the dataset,
-we [**proceed with several preprocessing steps**]
-for the raw text data.
-For instance, we replace non-breaking space with space,
-convert uppercase letters to lowercase ones,
-and insert space between words and punctuation marks.
+Atsisiuntę duomenų rinkinį,
+neapdorotiems tekstiniams duomenims
+[**atliekame kelis išankstinio apdorojimo žingsnius**].
+Pavyzdžiui, nekeičiamą tarpą (angl. *non-breaking space*) pakeičiame tarpu,
+didžiąsias raides paverčiame mažosiomis
+ir tarp žodžių bei skyrybos ženklų įterpiame tarpą.
 
 ```{.python .input  n=6}
 %%tab all
@@ -130,29 +130,28 @@ text = data._preprocess(raw_text)
 print(text[:80])
 ```
 
-## [**Tokenization**]
+## [**Skaidymas į teksto vienetus**]
 
-Unlike the character-level tokenization
-in :numref:`sec_language-model`,
-for machine translation
-we prefer word-level tokenization here
-(today's state-of-the-art models use 
-more complex tokenization techniques).
-The following `_tokenize` method
-tokenizes the first `max_examples` text sequence pairs,
-where each token is either a word or a punctuation mark.
-We append the special “&lt;eos&gt;” token
-to the end of every sequence to indicate the
-end of the sequence.
-When a model is predicting
-by generating a sequence token after token,
-the generation of the “&lt;eos&gt;” token
-can suggest that the output sequence is complete.
-In the end, the method below returns
-two lists of token lists: `src` and `tgt`.
-Specifically, `src[i]` is a list of tokens from the
-$i^\textrm{th}$ text sequence in the source language (English here) 
-and `tgt[i]` is that in the target language (French here).
+Skirtingai nei simbolių lygmens skaidymas į teksto vienetus
+:numref:`sec_language-model`,
+mašininiam vertimui
+čia pirmenybę teikiame žodžių lygmens skaidymui
+(šiandieniniai pažangiausi modeliai naudoja
+sudėtingesnes skaidymo technikas).
+Toliau pateiktas metodas `_tokenize`
+suskaido į teksto vienetus pirmąsias `max_examples` teksto sekų poras,
+kur kiekvienas teksto vienetas yra žodis arba skyrybos ženklas.
+Prie kiekvienos sekos pabaigos pridedame specialų „&lt;eos&gt;“ teksto vienetą,
+nurodantį sekos pabaigą.
+Kai modelis prognozuoja
+generuodamas seką teksto vienetas po teksto vieneto,
+„&lt;eos&gt;“ teksto vieneto sugeneravimas
+gali rodyti, kad išvesties seka baigta.
+Galiausiai toliau pateiktas metodas grąžina
+du teksto vienetų sąrašų sąrašus: `src` ir `tgt`.
+Konkrečiai, `src[i]` yra teksto vienetų sąrašas iš
+$i$-osios teksto sekos šaltinio kalba (čia anglų),
+o `tgt[i]` – tikslo kalba (čia prancūzų).
 
 ```{.python .input  n=7}
 %%tab all
@@ -175,9 +174,9 @@ src, tgt = data._tokenize(text)
 src[:6], tgt[:6]
 ```
 
-Let's [**plot the histogram of the number of tokens per text sequence.**]
-In this simple English--French dataset,
-most of the text sequences have fewer than 20 tokens.
+[**Nubraižykime teksto vienetų skaičiaus kiekvienoje teksto sekoje histogramą.**]
+Šiame paprastame anglų–prancūzų duomenų rinkinyje
+dauguma teksto sekų turi mažiau nei 20 teksto vienetų.
 
 ```{.python .input  n=8}
 %%tab all
@@ -200,58 +199,58 @@ show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
                         'count', src, tgt);
 ```
 
-## Loading Sequences of Fixed Length
+## Fiksuoto ilgio sekų įkėlimas
 :label:`subsec_loading-seq-fixed-len`
 
-Recall that in language modeling
-[**each example sequence**],
-either a segment of one sentence
-or a span over multiple sentences,
-(**had a fixed length.**)
-This was specified by the `num_steps`
-(number of time steps or tokens) argument from :numref:`sec_language-model`.
-In machine translation, each example is
-a pair of source and target text sequences,
-where the two text sequences may have different lengths.
+Prisiminkite, kad kalbos modeliavime
+[**kiekviena pavyzdinė seka**],
+tiek vieno sakinio segmentas,
+tiek kelių sakinių atkarpa,
+(**turėjo fiksuotą ilgį.**)
+Tai buvo nurodoma argumentu `num_steps`
+(laiko žingsnių arba teksto vienetų skaičius) iš :numref:`sec_language-model`.
+Mašininiame vertime kiekvienas pavyzdys yra
+šaltinio ir tikslo teksto sekų pora,
+kurioje dvi teksto sekos gali būti skirtingo ilgio.
 
-For computational efficiency,
-we can still process a minibatch of text sequences
-at one time by *truncation* and *padding*.
-Suppose that every sequence in the same minibatch
-should have the same length `num_steps`.
-If a text sequence has fewer than `num_steps` tokens,
-we will keep appending the special "&lt;pad&gt;" token
-to its end until its length reaches `num_steps`.
-Otherwise, we will truncate the text sequence
-by only taking its first `num_steps` tokens
-and discarding the remaining.
-In this way, every text sequence
-will have the same length
-to be loaded in minibatches of the same shape.
-Furthermore, we also record length of the source sequence excluding padding tokens.
-This information will be needed by some models that we will cover later.
+Skaičiavimo efektyvumui
+vis tiek galime apdoroti teksto sekų minirinkinį
+vienu metu naudodami *nukirtimą* ir *užpildymą*.
+Tarkime, kad kiekviena to paties minirinkinio seka
+turėtų turėti tą patį ilgį `num_steps`.
+Jei teksto seka turi mažiau nei `num_steps` teksto vienetų,
+prie jos pabaigos tiesiog pridėsime specialų „&lt;pad&gt;“ teksto vienetą,
+kol jos ilgis pasieks `num_steps`.
+Priešingu atveju teksto seką nukirsime,
+paimdami tik pirmuosius jos `num_steps` teksto vienetų
+ir atmesdami likusius.
+Tokiu būdu kiekviena teksto seka
+turės tą patį ilgį
+ir bus įkeliama į tos pačios formos minirinkinius.
+Be to, taip pat įrašome šaltinio sekos ilgį neįskaitant užpildymo teksto vienetų.
+Šios informacijos prireiks kai kuriems vėliau nagrinėjamiems modeliams.
 
 
-Since the machine translation dataset
-consists of pairs of languages,
-we can build two vocabularies for
-both the source language and
-the target language separately.
-With word-level tokenization,
-the vocabulary size will be significantly larger
-than that using character-level tokenization.
-To alleviate this,
-here we treat infrequent tokens
-that appear less than twice
-as the same unknown ("&lt;unk&gt;") token.
-As we will explain later (:numref:`fig_seq2seq`),
-when training with target sequences,
-the decoder output (label tokens)
-can be the same decoder input (target tokens),
-shifted by one token;
-and the special beginning-of-sequence "&lt;bos&gt;" token
-will be used as the first input token
-for predicting the target sequence (:numref:`fig_seq2seq_predict`).
+Kadangi mašininio vertimo duomenų rinkinį
+sudaro kalbų poros,
+galime sudaryti du žodynus –
+atskirai šaltinio kalbai ir
+tikslo kalbai.
+Naudojant žodžių lygmens skaidymą,
+žodyno dydis bus gerokai didesnis
+nei naudojant simbolių lygmens skaidymą.
+Kad tai sušvelnintume,
+čia retus teksto vienetus,
+pasirodančius mažiau nei du kartus,
+traktuojame kaip tą patį nežinomą („&lt;unk&gt;“) teksto vienetą.
+Kaip paaiškinsime vėliau (:numref:`fig_seq2seq`),
+apmokant su tikslo sekomis,
+dekodavimo bloko išvestis (žymenų teksto vienetai)
+gali būti ta pati dekodavimo bloko įvestis (tikslo teksto vienetai),
+pastumta vienu teksto vienetu;
+o specialus sekos pradžios „&lt;bos&gt;“ teksto vienetas
+bus naudojamas kaip pirmasis įvesties teksto vienetas
+tikslo sekai prognozuoti (:numref:`fig_seq2seq_predict`).
 
 ```{.python .input  n=9}
 %%tab all
@@ -287,10 +286,10 @@ def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
             src_vocab, tgt_vocab)
 ```
 
-## [**Reading the Dataset**]
+## [**Duomenų rinkinio skaitymas**]
 
-Finally, we define the `get_dataloader` method
-to return the data iterator.
+Galiausiai apibrėžiame metodą `get_dataloader`,
+kuris grąžina duomenų iteratorių.
 
 ```{.python .input  n=10}
 %%tab all
@@ -300,7 +299,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader(self.arrays, train, idx)
 ```
 
-Let's [**read the first minibatch from the English--French dataset.**]
+[**Perskaitykime pirmąjį minirinkinį iš anglų–prancūzų duomenų rinkinio.**]
 
 ```{.python .input  n=11}
 %%tab all
@@ -312,9 +311,9 @@ print('source len excluding pad:', d2l.astype(src_valid_len, d2l.int32))
 print('label:', d2l.astype(label, d2l.int32))
 ```
 
-We show a pair of source and target sequences
-processed by the above `_build_arrays` method
-(in the string format).
+Parodome šaltinio ir tikslo sekų porą,
+apdorotą aukščiau pateikto metodo `_build_arrays`
+(eilutės formatu).
 
 ```{.python .input  n=12}
 %%tab all
@@ -334,28 +333,28 @@ print('source:', data.src_vocab.to_tokens(d2l.astype(src[0], d2l.int32)))
 print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 ```
 
-## Summary
+## Santrauka
 
-In natural language processing, *machine translation* refers to the task of automatically mapping from a sequence representing a string of text in a *source* language to a string representing a plausible translation in a *target* language. Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization, but the sequence lengths will be much shorter. To mitigate the large vocabulary size, we can treat infrequent tokens as some "unknown" token. We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches. Modern implementations often bucket sequences with similar lengths to avoid wasting excessive computation on padding. 
+Natūraliosios kalbos apdorojime *mašininis vertimas* reiškia užduotį automatiškai atvaizduoti seką, vaizduojančią teksto eilutę *šaltinio* kalba, į eilutę, vaizduojančią tikėtiną vertimą *tikslo* kalba. Naudojant žodžių lygmens skaidymą, žodyno dydis bus gerokai didesnis nei naudojant simbolių lygmens skaidymą, bet sekų ilgiai bus daug trumpesni. Kad sumažintume didelį žodyno dydį, retus teksto vienetus galime traktuoti kaip kokį nors „nežinomą“ teksto vienetą. Teksto sekas galime nukirpti ir užpildyti, kad visos jos turėtų tą patį ilgį ir galėtų būti įkeliamos į minirinkinius. Šiuolaikiniai įgyvendinimai dažnai sugrupuoja panašaus ilgio sekas, kad neeikvotų pernelyg daug skaičiavimų užpildymui.
 
 
-## Exercises
+## Pratimai
 
-1. Try different values of the `max_examples` argument in the `_tokenize` method. How does this affect the vocabulary sizes of the source language and the target language?
-1. Text in some languages such as Chinese and Japanese does not have word boundary indicators (e.g., space). Is word-level tokenization still a good idea for such cases? Why or why not?
+1. Išbandykite skirtingas argumento `max_examples` reikšmes metode `_tokenize`. Kaip tai veikia šaltinio ir tikslo kalbos žodynų dydžius?
+1. Kai kurių kalbų, pavyzdžiui, kinų ir japonų, tekste nėra žodžių ribų žymeklių (pvz., tarpų). Ar žodžių lygmens skaidymas tokiais atvejais vis dar yra gera idėja? Kodėl taip arba kodėl ne?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/344)
+[Diskusijos](https://discuss.d2l.ai/t/344)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1060)
+[Diskusijos](https://discuss.d2l.ai/t/1060)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/3863)
+[Diskusijos](https://discuss.d2l.ai/t/3863)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18020)
+[Diskusijos](https://discuss.d2l.ai/t/18020)
 :end_tab:

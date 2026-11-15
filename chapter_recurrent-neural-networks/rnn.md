@@ -1,33 +1,33 @@
-# Recurrent Neural Networks
+# Rekurentiniai neuroniniai tinklai
 :label:`sec_rnn`
 
 
-In :numref:`sec_language-model` we described Markov models and $n$-grams for language modeling, where the conditional probability of token $x_t$ at time step $t$ only depends on the $n-1$ previous tokens.
-If we want to incorporate the possible effect of tokens earlier than time step $t-(n-1)$ on $x_t$,
-we need to increase $n$.
-However, the number of model parameters would also increase exponentially with it, as we need to store $|\mathcal{V}|^n$ numbers for a vocabulary set $\mathcal{V}$.
-Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a latent variable model,
+:numref:`sec_language-model` aprašėme Markovo modelius ir $n$-gramas kalbos modeliavimui, kur teksto vieneto $x_t$ sąlyginė tikimybė laiko žingsniu $t$ priklauso tik nuo $n-1$ ankstesnių teksto vienetų.
+Jei norime įtraukti galimą teksto vienetų, ankstesnių nei laiko žingsnis $t-(n-1)$, poveikį $x_t$,
+turime didinti $n$.
+Tačiau modelio parametrų skaičius taip pat didėtų eksponentiškai, nes žodyno aibei $\mathcal{V}$ turėtume saugoti $|\mathcal{V}|^n$ skaičių.
+Todėl užuot modeliavus $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$, pageidautina naudoti latentinio kintamojo modelį,
 
 $$P(x_t \mid x_{t-1}, \ldots, x_1) \approx P(x_t \mid h_{t-1}),$$
 
-where $h_{t-1}$ is a *hidden state*  that stores the sequence information up to time step $t-1$.
-In general,
-the hidden state at any time step $t$ could be computed based on both the current input $x_{t}$ and the previous hidden state $h_{t-1}$:
+kur $h_{t-1}$ yra *paslėptoji būsena*, saugojanti sekos informaciją iki laiko žingsnio $t-1$.
+Apskritai
+paslėptąją būseną bet kuriuo laiko žingsniu $t$ galima apskaičiuoti pagal ir dabartinę įvestį $x_{t}$, ir ankstesnę paslėptąją būseną $h_{t-1}$:
 
 $$h_t = f(x_{t}, h_{t-1}).$$
 :eqlabel:`eq_ht_xt`
 
-For a sufficiently powerful function $f$ in :eqref:`eq_ht_xt`, the latent variable model is not an approximation. After all, $h_t$ may simply store all the data it has observed so far.
-However, it could potentially make both computation and storage expensive.
+Pakankamai galingai funkcijai $f$ :eqref:`eq_ht_xt` latentinio kintamojo modelis nėra aproksimacija. Juk $h_t$ gali tiesiog saugoti visus iki šiol stebėtus duomenis.
+Tačiau tai gali padaryti brangius ir skaičiavimus, ir saugojimą.
 
-Recall that we have discussed hidden layers with hidden units in :numref:`chap_perceptrons`.
-It is noteworthy that
-hidden layers and hidden states refer to two very different concepts.
-Hidden layers are, as explained, layers that are hidden from view on the path from input to output.
-Hidden states are technically speaking *inputs* to whatever we do at a given step,
-and they can only be computed by looking at data at previous time steps.
+Prisiminkite, kad paslėptuosius sluoksnius su paslėptaisiais vienetais aptarėme :numref:`chap_perceptrons`.
+Verta pažymėti, kad
+paslėptieji sluoksniai ir paslėptosios būsenos reiškia dvi labai skirtingas sąvokas.
+Paslėptieji sluoksniai, kaip paaiškinta, yra sluoksniai, paslėpti nuo žvilgsnio kelyje nuo įvesties iki išvesties.
+Paslėptosios būsenos techniškai kalbant yra *įvestys* tam, ką darome duotame žingsnyje,
+ir jas galima apskaičiuoti tik žiūrint į ankstesnių laiko žingsnių duomenis.
 
-*Recurrent neural networks* (RNNs) are neural networks with hidden states. Before introducing the RNN model, we first revisit the MLP model introduced in :numref:`sec_mlp`.
+*Rekurentiniai neuroniniai tinklai* (RNN) yra neuroniniai tinklai su paslėptosiomis būsenomis. Prieš pristatydami RNN modelį, pirmiausia grįžkime prie MLP modelio, pristatyto :numref:`sec_mlp`.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -60,106 +60,104 @@ import jax
 from jax import numpy as jnp
 ```
 
-## Neural Networks without Hidden States
+## Neuroniniai tinklai be paslėptųjų būsenų
 
-Let's take a look at an MLP with a single hidden layer.
-Let the hidden layer's activation function be $\phi$.
-Given a minibatch of examples $\mathbf{X} \in \mathbb{R}^{n \times d}$ with batch size $n$ and $d$ inputs, the hidden layer output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
+Pažvelkime į MLP su vienu paslėptuoju sluoksniu.
+Tegul paslėptojo sluoksnio aktyvacijos funkcija yra $\phi$.
+Turint pavyzdžių minirinkinį $\mathbf{X} \in \mathbb{R}^{n \times d}$ su rinkinio dydžiu $n$ ir $d$ įvesčių, paslėptojo sluoksnio išvestis $\mathbf{H} \in \mathbb{R}^{n \times h}$ apskaičiuojama taip:
 
 $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{\textrm{xh}} + \mathbf{b}_\textrm{h}).$$
 :eqlabel:`rnn_h_without_state`
 
-In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
-So armed, we apply broadcasting (see :numref:`subsec_broadcasting`) during the summation.
-Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer, which is given by
+:eqref:`rnn_h_without_state` paslėptajam sluoksniui turime svorių parametrą $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}$, poslinkio parametrą $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$ ir paslėptųjų vienetų skaičių $h$.
+Taip pasiruošę, sumuodami taikome transliavimą (žr. :numref:`subsec_broadcasting`).
+Toliau paslėptojo sluoksnio išvestis $\mathbf{H}$ naudojama kaip išvesties sluoksnio įvestis, kuri pateikiama taip:
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q},$$
 
-where $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$ is the weight parameter, and $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output layer.  If it is a classification problem, we can use $\mathrm{softmax}(\mathbf{O})$ to compute the probability distribution of the output categories.
+kur $\mathbf{O} \in \mathbb{R}^{n \times q}$ yra išvesties kintamasis, $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$ yra svorių parametras, o $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$ yra išvesties sluoksnio poslinkio parametras. Jei tai klasifikavimo uždavinys, galime naudoti $\mathrm{softmax}(\mathbf{O})$ išvesties kategorijų tikimybių skirstiniui apskaičiuoti.
 
-This is entirely analogous to the regression problem we solved previously in :numref:`sec_sequence`, hence we omit details.
-Suffice it to say that we can pick feature-label pairs at random and learn the parameters of our network via automatic differentiation and stochastic gradient descent.
+Tai visiškai analogiška anksčiau :numref:`sec_sequence` išspręstam regresijos uždaviniui, todėl detalių praleidžiame.
+Pakanka pasakyti, kad galime atsitiktinai rinktis požymių ir žymenų poras ir išmokti savo tinklo parametrus per automatinį diferencijavimą ir stochastinį gradientinį nusileidimą.
 
-## Recurrent Neural Networks with Hidden States
+## Rekurentiniai neuroniniai tinklai su paslėptosiomis būsenomis
 :label:`subsec_rnn_w_hidden_states`
 
-Matters are entirely different when we have hidden states. Let's look at the structure in some more detail.
+Reikalai visiškai skiriasi, kai turime paslėptąsias būsenas. Pažvelkime į struktūrą šiek tiek išsamiau.
 
-Assume that we have
-a minibatch of inputs
+Tarkime, kad turime
+įvesčių minirinkinį
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$
-at time step $t$.
-In other words,
-for a minibatch of $n$ sequence examples,
-each row of $\mathbf{X}_t$ corresponds to one example at time step $t$ from the sequence.
-Next,
-denote by $\mathbf{H}_t  \in \mathbb{R}^{n \times h}$ the hidden layer output of time step $t$.
-Unlike with MLP, here we save the hidden layer output $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$ to describe how to use the hidden layer output of the previous time step in the current time step. Specifically, the calculation of the hidden layer output of the current time step is determined by the input of the current time step together with the hidden layer output of the previous time step:
+laiko žingsniu $t$.
+Kitaip tariant,
+$n$ sekų pavyzdžių minirinkiniui
+kiekviena $\mathbf{X}_t$ eilutė atitinka vieną pavyzdį laiko žingsniu $t$ iš sekos.
+Toliau
+pažymėkime $\mathbf{H}_t  \in \mathbb{R}^{n \times h}$ laiko žingsnio $t$ paslėptojo sluoksnio išvestį.
+Skirtingai nei su MLP, čia išsaugome ankstesnio laiko žingsnio paslėptojo sluoksnio išvestį $\mathbf{H}_{t-1}$ ir įvedame naują svorių parametrą $\mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$, aprašantį, kaip naudoti ankstesnio laiko žingsnio paslėptojo sluoksnio išvestį dabartiniame laiko žingsnyje. Konkrečiai, dabartinio laiko žingsnio paslėptojo sluoksnio išvesties skaičiavimą lemia dabartinio laiko žingsnio įvestis kartu su ankstesnio laiko žingsnio paslėptojo sluoksnio išvestimi:
 
 $$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}  + \mathbf{b}_\textrm{h}).$$
 :eqlabel:`rnn_h_with_state`
 
-Compared with :eqref:`rnn_h_without_state`, :eqref:`rnn_h_with_state` adds one more term $\mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ and thus
-instantiates :eqref:`eq_ht_xt`.
-From the relationship between hidden layer outputs $\mathbf{H}_t$ and $\mathbf{H}_{t-1}$ of adjacent time steps,
-we know that these variables captured and retained the sequence's historical information up to their current time step, just like the state or memory of the neural network's current time step. Therefore, such a hidden layer output is called a *hidden state*.
-Since the hidden state uses the same definition of the previous time step in the current time step, the computation of :eqref:`rnn_h_with_state` is *recurrent*. Hence, as we said, neural networks with hidden states
-based on recurrent computation are named
-*recurrent neural networks*.
-Layers that perform
-the computation of :eqref:`rnn_h_with_state`
-in RNNs
-are called *recurrent layers*.
+Palyginti su :eqref:`rnn_h_without_state`, :eqref:`rnn_h_with_state` prideda dar vieną narį $\mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ ir taip
+realizuoja :eqref:`eq_ht_xt`.
+Iš gretimų laiko žingsnių paslėptojo sluoksnio išvesčių $\mathbf{H}_t$ ir $\mathbf{H}_{t-1}$ ryšio
+žinome, kad šie kintamieji užfiksavo ir išlaikė sekos istorinę informaciją iki jų dabartinio laiko žingsnio, lygiai kaip neuroninio tinklo dabartinio laiko žingsnio būsena ar atmintis. Todėl tokia paslėptojo sluoksnio išvestis vadinama *paslėptąja būsena*.
+Kadangi paslėptoji būsena dabartiniame laiko žingsnyje naudoja tą patį ankstesnio laiko žingsnio apibrėžimą, :eqref:`rnn_h_with_state` skaičiavimas yra *rekurentinis*. Todėl, kaip sakėme, neuroniniai tinklai su paslėptosiomis būsenomis,
+pagrįstais rekurentiniu skaičiavimu, vadinami
+*rekurentiniais neuroniniais tinklais*.
+Sluoksniai, kurie RNN atlieka
+:eqref:`rnn_h_with_state` skaičiavimą,
+vadinami *rekurentiniais sluoksniais*.
 
 
-There are many different ways for constructing RNNs.
-Those with a hidden state defined by :eqref:`rnn_h_with_state` are very common.
-For time step $t$,
-the output of the output layer is similar to the computation in the MLP:
+Yra daug skirtingų RNN konstravimo būdų.
+Tie, kurių paslėptoji būsena apibrėžiama :eqref:`rnn_h_with_state`, yra labai įprasti.
+Laiko žingsniui $t$
+išvesties sluoksnio išvestis yra panaši į skaičiavimą MLP:
 
 $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{\textrm{hq}} + \mathbf{b}_\textrm{q}.$$
 
-Parameters of the RNN
-include the weights $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$,
-and the bias $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$
-of the hidden layer,
-together with the weights $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$
-and the bias $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$
-of the output layer.
-It is worth mentioning that
-even at different time steps,
-RNNs always use these model parameters.
-Therefore, the parametrization cost of an RNN
-does not grow as the number of time steps increases.
+RNN parametrai
+apima paslėptojo sluoksnio svorius $\mathbf{W}_{\textrm{xh}} \in \mathbb{R}^{d \times h}, \mathbf{W}_{\textrm{hh}} \in \mathbb{R}^{h \times h}$
+ir poslinkį $\mathbf{b}_\textrm{h} \in \mathbb{R}^{1 \times h}$,
+kartu su išvesties sluoksnio svoriais $\mathbf{W}_{\textrm{hq}} \in \mathbb{R}^{h \times q}$
+ir poslinkiu $\mathbf{b}_\textrm{q} \in \mathbb{R}^{1 \times q}$.
+Verta paminėti, kad
+net skirtingais laiko žingsniais
+RNN visada naudoja šiuos modelio parametrus.
+Todėl RNN parametrizavimo kaina
+nedidėja didėjant laiko žingsnių skaičiui.
 
-:numref:`fig_rnn` illustrates the computational logic of an RNN at three adjacent time steps.
-At any time step $t$,
-the computation of the hidden state can be treated as:
-(i) concatenating the input $\mathbf{X}_t$ at the current time step $t$ and the hidden state $\mathbf{H}_{t-1}$ at the previous time step $t-1$;
-(ii) feeding the concatenation result into a fully connected layer with the activation function $\phi$.
-The output of such a fully connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
-In this case,
-the model parameters are the concatenation of $\mathbf{W}_{\textrm{xh}}$ and $\mathbf{W}_{\textrm{hh}}$, and a bias of $\mathbf{b}_\textrm{h}$, all from :eqref:`rnn_h_with_state`.
-The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$.
-What is more, $\mathbf{H}_t$ will also be
-fed into the fully connected output layer
-to compute the output
-$\mathbf{O}_t$ of the current time step $t$.
+:numref:`fig_rnn` iliustruoja RNN skaičiavimo logiką trijuose gretimuose laiko žingsniuose.
+Bet kuriuo laiko žingsniu $t$
+paslėptosios būsenos skaičiavimą galima traktuoti taip:
+(i) sujungti dabartinio laiko žingsnio $t$ įvestį $\mathbf{X}_t$ ir ankstesnio laiko žingsnio $t-1$ paslėptąją būseną $\mathbf{H}_{t-1}$;
+(ii) sujungimo rezultatą paduoti į pilnai sujungtą sluoksnį su aktyvacijos funkcija $\phi$.
+Tokio pilnai sujungto sluoksnio išvestis yra dabartinio laiko žingsnio $t$ paslėptoji būsena $\mathbf{H}_t$.
+Šiuo atveju
+modelio parametrai yra $\mathbf{W}_{\textrm{xh}}$ ir $\mathbf{W}_{\textrm{hh}}$ sujungimas bei poslinkis $\mathbf{b}_\textrm{h}$, visi iš :eqref:`rnn_h_with_state`.
+Dabartinio laiko žingsnio $t$ paslėptoji būsena $\mathbf{H}_t$ dalyvaus skaičiuojant kito laiko žingsnio $t+1$ paslėptąją būseną $\mathbf{H}_{t+1}$.
+Be to, $\mathbf{H}_t$ taip pat bus
+paduota į pilnai sujungtą išvesties sluoksnį,
+kad būtų apskaičiuota
+dabartinio laiko žingsnio $t$ išvestis
+$\mathbf{O}_t$.
 
-![An RNN with a hidden state.](../img/rnn.svg)
+![RNN su paslėptąja būsena.](../img/rnn.svg)
 :label:`fig_rnn`
 
-We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ for the hidden state is equivalent to
-matrix multiplication of the
-concatenation of $\mathbf{X}_t$ and $\mathbf{H}_{t-1}$
-and the
-concatenation of $\mathbf{W}_{\textrm{xh}}$ and $\mathbf{W}_{\textrm{hh}}$.
-Though this can be proven mathematically,
-in the following we just use a simple code snippet as a demonstration.
-To begin with,
-we define matrices `X`, `W_xh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4), (3, 4), and (4, 4), respectively.
-Multiplying `X` by `W_xh`, and `H` by `W_hh`, and then adding these two products,
-we obtain a matrix of shape (3, 4).
+Ką tik paminėjome, kad paslėptosios būsenos skaičiavimas $\mathbf{X}_t \mathbf{W}_{\textrm{xh}} + \mathbf{H}_{t-1} \mathbf{W}_{\textrm{hh}}$ yra ekvivalentus
+$\mathbf{X}_t$ ir $\mathbf{H}_{t-1}$ sujungimo
+ir
+$\mathbf{W}_{\textrm{xh}}$ bei $\mathbf{W}_{\textrm{hh}}$ sujungimo
+matricų daugybai.
+Nors tai galima įrodyti matematiškai,
+toliau tiesiog naudojame paprastą kodo fragmentą demonstracijai.
+Pirmiausia
+apibrėžiame matricas `X`, `W_xh`, `H` ir `W_hh`, kurių formos atitinkamai yra (3, 1), (1, 4), (3, 4) ir (4, 4).
+Padauginę `X` iš `W_xh`, o `H` iš `W_hh`, ir tada sudėję šias dvi sandaugas,
+gauname formos (3, 4) matricą.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -184,78 +182,78 @@ H, W_hh = jax.random.normal(d2l.get_key(), (3, 4)), jax.random.normal(
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
-Now we concatenate the matrices `X` and `H`
-along columns (axis 1),
-and the matrices
-`W_xh` and `W_hh` along rows (axis 0).
-These two concatenations
-result in
-matrices of shape (3, 5)
-and of shape (5, 4), respectively.
-Multiplying these two concatenated matrices,
-we obtain the same output matrix of shape (3, 4)
-as above.
+Dabar sujungiame matricas `X` ir `H`
+išilgai stulpelių (ašis 1),
+o matricas
+`W_xh` ir `W_hh` – išilgai eilučių (ašis 0).
+Šie du sujungimai
+duoda
+atitinkamai formos (3, 5)
+ir (5, 4) matricas.
+Padauginę šias dvi sujungtas matricas,
+gauname tą pačią formos (3, 4) išvesties matricą
+kaip aukščiau.
 
 ```{.python .input}
 %%tab all
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 ```
 
-## RNN-Based Character-Level Language Models
+## RNN pagrįsti simbolių lygio kalbos modeliai
 
-Recall that for language modeling in :numref:`sec_language-model`,
-we aim to predict the next token based on
-the current and past tokens;
-thus we shift the original sequence by one token
-as the targets (labels).
-:citet:`Bengio.Ducharme.Vincent.ea.2003` first proposed
-to use a neural network for language modeling.
-In the following we illustrate how RNNs can be used to build a language model.
-Let the minibatch size be one, and the sequence of the text be "machine".
-To simplify training in subsequent sections,
-we tokenize text into characters rather than words
-and consider a *character-level language model*.
-:numref:`fig_rnn_train` demonstrates how to predict the next character based on the current and previous characters via an RNN for character-level language modeling.
+Prisiminkite, kad kalbos modeliavimui :numref:`sec_language-model`
+siekiame prognozuoti kitą teksto vienetą pagal
+dabartinius ir ankstesnius teksto vienetus;
+todėl originalią seką pastumiame vienu teksto vienetu
+kaip tikslus (žymenis).
+:citet:`Bengio.Ducharme.Vincent.ea.2003` pirmieji pasiūlė
+naudoti neuroninį tinklą kalbos modeliavimui.
+Toliau iliustruojame, kaip RNN galima naudoti kalbos modeliui sukurti.
+Tegul minirinkinio dydis yra vienas, o teksto seka – „machine“.
+Kad supaprastintume apmokymą kituose skyreliuose,
+tekstą skaidome į simbolius, o ne į žodžius,
+ir nagrinėjame *simbolių lygio kalbos modelį*.
+:numref:`fig_rnn_train` parodo, kaip prognozuoti kitą simbolį pagal dabartinį ir ankstesnius simbolius per RNN simbolių lygio kalbos modeliavimui.
 
-![A character-level language model based on the RNN. The input and target sequences are "machin" and "achine", respectively.](../img/rnn-train.svg)
+![Simbolių lygio kalbos modelis, pagrįstas RNN. Įvesties ir tikslinė sekos yra atitinkamai „machin“ ir „achine“.](../img/rnn-train.svg)
 :label:`fig_rnn_train`
 
-During the training process,
-we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss to compute the error between the model output and the target.
-Because of the recurrent computation of the hidden state in the hidden layer, the output, $\mathbf{O}_3$,  of time step 3 in :numref:`fig_rnn_train` is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the target "h" of this time step.
+Apmokymo proceso metu
+kiekvienam laiko žingsniui atliekame softmax operaciją su išvesties sluoksnio išvestimi, o tada naudojame kryžminės entropijos nuostolį, kad apskaičiuotume paklaidą tarp modelio išvesties ir tikslo.
+Dėl rekurentinio paslėptosios būsenos skaičiavimo paslėptajame sluoksnyje 3 laiko žingsnio išvestį $\mathbf{O}_3$ :numref:`fig_rnn_train` lemia teksto seka „m“, „a“ ir „c“. Kadangi kitas sekos simbolis mokymo duomenyse yra „h“, 3 laiko žingsnio nuostolis priklausys nuo kito simbolio tikimybių skirstinio, sugeneruoto pagal požymių seką „m“, „a“, „c“, ir šio laiko žingsnio tikslo „h“.
 
-In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be an $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
+Praktikoje kiekvienas teksto vienetas pavaizduojamas $d$ dimensijų vektoriumi, o naudojame rinkinio dydį $n>1$. Todėl įvestis $\mathbf X_t$ laiko žingsniu $t$ bus $n\times d$ matrica, identiška tam, ką aptarėme :numref:`subsec_rnn_w_hidden_states`.
 
-In the following sections, we will implement RNNs
-for character-level language models.
-
-
-## Summary
-
-A neural network that uses recurrent computation for hidden states is called a recurrent neural network (RNN).
-The hidden state of an RNN can capture historical information of the sequence up to the current time step. With recurrent computation, the number of RNN model parameters does not grow as the number of time steps increases. As for applications, an RNN can be used to create character-level language models.
+Kituose skyreliuose įgyvendinsime RNN
+simbolių lygio kalbos modeliams.
 
 
-## Exercises
+## Santrauka
 
-1. If we use an RNN to predict the next character in a text sequence, what is the required dimension for any output?
-1. Why can RNNs express the conditional probability of a token at some time step based on all the previous tokens in the text sequence?
-1. What happens to the gradient if you backpropagate through a long sequence?
-1. What are some of the problems associated with the language model described in this section?
+Neuroninis tinklas, naudojantis rekurentinį skaičiavimą paslėptosioms būsenoms, vadinamas rekurentiniu neuroniniu tinklu (RNN).
+RNN paslėptoji būsena gali užfiksuoti sekos istorinę informaciją iki dabartinio laiko žingsnio. Naudojant rekurentinį skaičiavimą, RNN modelio parametrų skaičius nedidėja didėjant laiko žingsnių skaičiui. Taikymų požiūriu RNN galima naudoti simbolių lygio kalbos modeliams kurti.
+
+
+## Pratimai
+
+1. Jei naudojame RNN kitam teksto sekos simboliui prognozuoti, kokia yra reikalinga bet kurios išvesties dimensija?
+1. Kodėl RNN gali išreikšti teksto vieneto sąlyginę tikimybę tam tikru laiko žingsniu pagal visus ankstesnius teksto sekos teksto vienetus?
+1. Kas nutinka gradientui, jei atgaline kryptimi sklidate per ilgą seką?
+1. Kokios yra kai kurios šiame skyrelyje aprašyto kalbos modelio problemos?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/337)
+[Diskusijos](https://discuss.d2l.ai/t/337)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1050)
+[Diskusijos](https://discuss.d2l.ai/t/1050)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1051)
+[Diskusijos](https://discuss.d2l.ai/t/1051)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/180013)
+[Diskusijos](https://discuss.d2l.ai/t/180013)
 :end_tab:

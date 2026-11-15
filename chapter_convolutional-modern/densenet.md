@@ -3,15 +3,15 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Densely Connected Networks (DenseNet)
+# Tankiai sujungti tinklai (DenseNet)
 :label:`sec_densenet`
 
-ResNet significantly changed the view of how to parametrize the functions in deep networks. *DenseNet* (dense convolutional network) is to some extent the logical extension of this :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
-DenseNet is characterized by both the connectivity pattern where
-each layer connects to all the preceding layers
-and the concatenation operation (rather than the addition operator in ResNet) to preserve and reuse features
-from earlier layers.
-To understand how to arrive at it, let's take a small detour to mathematics.
+ResNet gerokai pakeitė požiūrį į tai, kaip parametrizuoti funkcijas giliuosiuose tinkluose. *DenseNet* (tankus konvoliucinis tinklas) tam tikru mastu yra loginis šio požiūrio tęsinys :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+DenseNet pasižymi ir jungčių šablonu, kuriame
+kiekvienas sluoksnis jungiasi su visais ankstesniais sluoksniais,
+ir sujungimo operacija (o ne sudėties operatoriumi, kaip ResNet), skirta išsaugoti ir pakartotinai naudoti požymius
+iš ankstesnių sluoksnių.
+Kad suprastume, kaip prie to prieinama, padarykime nedidelę ekskursiją į matematiką.
 
 ```{.python .input}
 %%tab mxnet
@@ -42,49 +42,49 @@ from jax import numpy as jnp
 import jax
 ```
 
-## From ResNet to DenseNet
+## Nuo ResNet prie DenseNet
 
-Recall the Taylor expansion for functions. At the point $x = 0$ it can be written as
+Prisiminkite funkcijų Teiloro skleidinį. Taške $x = 0$ jį galima užrašyti taip:
 
 $$f(x) = f(0) + x \cdot \left[f'(0) + x \cdot \left[\frac{f''(0)}{2!}  + x \cdot \left[\frac{f'''(0)}{3!}  + \cdots \right]\right]\right].$$
 
 
-The key point is that it decomposes a function into terms of increasingly higher order. In a similar vein, ResNet decomposes functions into
+Svarbiausia, kad jis skaido funkciją į vis aukštesnės eilės narius. Panašiai ResNet skaido funkcijas į
 
 $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x}).$$
 
-That is, ResNet decomposes $f$ into a simple linear term and a more complex
-nonlinear one.
-What if we wanted to capture (not necessarily add) information beyond two terms?
-One such solution is DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+Tai yra, ResNet skaido $f$ į paprastą tiesinį narį ir sudėtingesnį
+netiesinį narį.
+Ką daryti, jei norėtume užfiksuoti (nebūtinai pridėti) informaciją už dviejų narių ribų?
+Vienas toks sprendimas yra DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 
-![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet-block.svg)
+![Pagrindinis ResNet (kairėje) ir DenseNet (dešinėje) skirtumas tarpsluoksnių jungtyse: sudėties ir sujungimo naudojimas.](../img/densenet-block.svg)
 :label:`fig_densenet_block`
 
-As shown in :numref:`fig_densenet_block`, the key difference between ResNet and DenseNet is that in the latter case outputs are *concatenated* (denoted by $[,]$) rather than added.
-As a result, we perform a mapping from $\mathbf{x}$ to its values after applying an increasingly complex sequence of functions:
+Kaip parodyta :numref:`fig_densenet_block`, pagrindinis ResNet ir DenseNet skirtumas yra tas, kad pastaruoju atveju išvestys yra *sujungiamos* (žymima $[,]$), o ne sudedamos.
+Todėl atliekame atvaizdavimą iš $\mathbf{x}$ į jo reikšmes, pritaikius vis sudėtingesnę funkcijų seką:
 
 $$\mathbf{x} \to \left[
 \mathbf{x},
 f_1(\mathbf{x}),
 f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right), f_3\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right), f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right)\right]\right), \ldots\right].$$
 
-In the end, all these functions are combined in MLP to reduce the number of features again. In terms of implementation this is quite simple:
-rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The final layer of such a chain is densely connected to all previous layers. The dense connections are shown in :numref:`fig_densenet`.
+Galiausiai visos šios funkcijos sujungiamos MLP, kad vėl sumažintų požymių skaičių. Įgyvendinimo požiūriu tai gana paprasta:
+užuot sudėję narius, juos sujungiame. DenseNet pavadinimas kilo iš to, kad kintamųjų priklausomybių grafas tampa gana tankus. Paskutinis tokios grandinės sluoksnis yra tankiai sujungtas su visais ankstesniais sluoksniais. Tankios jungtys parodytos :numref:`fig_densenet`.
 
-![Dense connections in DenseNet. Note how the dimensionality increases with depth.](../img/densenet.svg)
+![Tankios jungtys DenseNet. Atkreipkite dėmesį, kaip dimensija didėja didėjant gyliui.](../img/densenet.svg)
 :label:`fig_densenet`
 
-The main components that comprise a DenseNet are *dense blocks* and *transition layers*. The former define how the inputs and outputs are concatenated, while the latter control the number of channels so that it is not too large, 
-since the expansion $\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}),
-f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right), \ldots \right]$ can be quite high-dimensional.
+Pagrindiniai DenseNet komponentai yra *tankieji blokai* ir *pereinamieji sluoksniai*. Pirmieji apibrėžia, kaip sujungiamos įvestys ir išvestys, o antrieji kontroliuoja kanalų skaičių, kad jis nebūtų per didelis,
+nes skleidinys $\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}),
+f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right), \ldots \right]$ gali būti gana didelės dimensijos.
 
 
-## [**Dense Blocks**]
+## [**Tankieji blokai**]
 
-DenseNet uses the modified "batch normalization, activation, and convolution"
-structure of ResNet (see the exercise in :numref:`sec_resnet`).
-First, we implement this convolution block structure.
+DenseNet naudoja modifikuotą ResNet struktūrą „rinkinio normalizacija, aktyvacija ir konvoliucija“
+(žr. pratimą :numref:`sec_resnet`).
+Pirmiausia įgyvendiname šią konvoliucinio bloko struktūrą.
 
 ```{.python .input}
 %%tab mxnet
@@ -138,7 +138,7 @@ class ConvBlock(nn.Module):
         return Y
 ```
 
-A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension. Lazy evaluation allows us to adjust the dimensionality automatically.
+*Tankusis blokas* susideda iš kelių konvoliucinių blokų, kurių kiekvienas naudoja tą patį išvesties kanalų skaičių. Tačiau tiesioginio sklidimo metu kiekvieno konvoliucinio bloko įvestį ir išvestį sujungiame kanalų dimensijoje. Tingusis vertinimas leidžia mums automatiškai pritaikyti dimensiją.
 
 ```{.python .input}
 %%tab mxnet
@@ -207,9 +207,9 @@ class DenseBlock(nn.Module):
         return self.net(X)
 ```
 
-In the following example,
-we [**define a `DenseBlock` instance**] with two convolution blocks of 10 output channels.
-When using an input with three channels, we will get an output with  $3 + 10 + 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
+Šiame pavyzdyje
+[**apibrėžiame `DenseBlock` egzempliorių**] su dviem konvoliuciniais blokais, kurių kiekvienas turi 10 išvesties kanalų.
+Naudojant įvestį su trimis kanalais, gausime išvestį su $3 + 10 + 10=23$ kanalais. Konvoliucinio bloko kanalų skaičius kontroliuoja išvesties kanalų skaičiaus augimą palyginti su įvesties kanalų skaičiumi. Tai taip pat vadinama *augimo sparta*.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -233,9 +233,9 @@ Y = blk.init_with_output(d2l.get_key(), X)[0]
 Y.shape
 ```
 
-## [**Transition Layers**]
+## [**Pereinamieji sluoksniai**]
 
-Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A *transition layer* is used to control the complexity of the model. It reduces the number of channels by using a $1\times 1$ convolution. Moreover, it halves the height and width via average pooling with a stride of 2.
+Kadangi kiekvienas tankusis blokas didins kanalų skaičių, pridėjus jų per daug modelis taps pernelyg sudėtingas. *Pereinamasis sluoksnis* naudojamas modelio sudėtingumui kontroliuoti. Jis sumažina kanalų skaičių naudodamas $1\times 1$ konvoliuciją. Be to, jis perpus sumažina aukštį ir plotį sutelkimu vidurkinant su 2 žingsniu.
 
 ```{.python .input}
 %%tab mxnet
@@ -288,7 +288,7 @@ class TransitionBlock(nn.Module):
         return X
 ```
 
-[**Apply a transition layer**] with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
+[**Pritaikykite pereinamąjį sluoksnį**] su 10 kanalų ankstesnio pavyzdžio tankiojo bloko išvesčiai. Tai sumažina išvesties kanalų skaičių iki 10 ir perpus sumažina aukštį ir plotį.
 
 ```{.python .input}
 %%tab mxnet
@@ -315,9 +315,9 @@ blk = TransitionBlock(10)
 blk.init_with_output(d2l.get_key(), Y)[0].shape
 ```
 
-## [**DenseNet Model**]
+## [**DenseNet modelis**]
 
-Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and max-pooling layer as in ResNet.
+Toliau sukonstruosime DenseNet modelį. DenseNet pirmiausia naudoja tą patį vieną konvoliucinį sluoksnį ir sutelkimo imant maksimumą sluoksnį kaip ResNet.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -367,11 +367,11 @@ class DenseNet(d2l.Classifier):
         ])
 ```
 
-Then, similar to the four modules made up of residual blocks that ResNet uses,
-DenseNet uses four dense blocks.
-As with ResNet, we can set the number of convolutional layers used in each dense block. Here, we set it to 4, consistent with the ResNet-18 model in :numref:`sec_resnet`. Furthermore, we set the number of channels (i.e., growth rate) for the convolutional layers in the dense block to 32, so 128 channels will be added to each dense block.
+Tada, panašiai kaip keturis modulius, sudarytus iš liekamųjų blokų, kuriuos naudoja ResNet,
+DenseNet naudoja keturis tankiuosius blokus.
+Kaip ir ResNet, galime nustatyti kiekviename tankiajame bloke naudojamų konvoliucinių sluoksnių skaičių. Čia nustatome 4, atitinkamai ResNet-18 modeliui iš :numref:`sec_resnet`. Be to, tankiojo bloko konvoliucinių sluoksnių kanalų skaičių (t. y. augimo spartą) nustatome 32, todėl į kiekvieną tankųjį bloką bus pridėta 128 kanalai.
 
-In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels. Similar to ResNet, a global pooling layer and a fully connected layer are connected at the end to produce the output.
+ResNet aukštis ir plotis tarp modulių mažinami liekamuoju bloku su 2 žingsniu. Čia naudojame pereinamąjį sluoksnį, kad perpus sumažintume aukštį ir plotį bei perpus sumažintume kanalų skaičių. Kaip ir ResNet, pabaigoje prijungiamas globalaus sutelkimo sluoksnis ir pilnai sujungtas sluoksnis išvesčiai gauti.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -459,9 +459,9 @@ def create_net(self):
     return net
 ```
 
-## [**Training**]
+## [**Mokymas**]
 
-Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
+Kadangi čia naudojame gilesnį tinklą, šiame skyrelyje sumažinsime įvesties aukštį ir plotį nuo 224 iki 96, kad supaprastintume skaičiavimą.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -480,39 +480,39 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-The main components that comprise DenseNet are dense blocks and transition layers. For the latter, we need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again.
-In terms of cross-layer connections, in contrast to ResNet, where inputs and outputs are added together, DenseNet concatenates inputs and outputs on the channel dimension.
-Although these concatenation operations
-reuse features to achieve computational efficiency,
-unfortunately they lead to heavy GPU memory consumption.
-As a result,
-applying DenseNet may require more memory-efficient implementations that may increase training time :cite:`pleiss2017memory`.
+Pagrindiniai DenseNet komponentai yra tankieji blokai ir pereinamieji sluoksniai. Pastariesiems, komponuodami tinklą, turime išlaikyti dimensiją kontroliuojamą, pridėdami pereinamuosius sluoksnius, kurie vėl sumažina kanalų skaičių.
+Tarpsluoksnių jungčių požiūriu, priešingai nei ResNet, kur įvestys ir išvestys sudedamos, DenseNet sujungia įvestis ir išvestis kanalų dimensijoje.
+Nors šios sujungimo operacijos
+pakartotinai naudoja požymius skaičiavimo efektyvumui pasiekti,
+deja, jos lemia didelį GPU atminties suvartojimą.
+Todėl
+taikant DenseNet gali prireikti atmintį taupančių įgyvendinimų, kurie gali pailginti apmokymo laiką :cite:`pleiss2017memory`.
 
 
-## Exercises
+## Pratimai
 
-1. Why do we use average pooling rather than max-pooling in the transition layer?
-1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?
-1. One problem for which DenseNet has been criticized is its high memory consumption.
-    1. Is this really the case? Try to change the input shape to $224\times 224$ to compare the actual GPU memory consumption empirically.
-    1. Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
-1. Implement the various DenseNet versions presented in Table 1 of the DenseNet paper :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
-1. Design an MLP-based model by applying the DenseNet idea. Apply it to the housing price prediction task in :numref:`sec_kaggle_house`.
+1. Kodėl pereinamajame sluoksnyje naudojame sutelkimą vidurkinant, o ne imant maksimumą?
+1. Vienas iš DenseNet straipsnyje paminėtų privalumų yra tas, kad jo modelio parametrų yra mažiau nei ResNet. Kodėl taip yra?
+1. Viena problema, dėl kurios DenseNet buvo kritikuojamas, yra didelis atminties suvartojimas.
+    1. Ar tai tikrai taip? Pabandykite pakeisti įvesties formą į $224\times 224$, kad empiriškai palygintumėte realų GPU atminties suvartojimą.
+    1. Ar galite sugalvoti alternatyvų atminties suvartojimo mažinimo būdą? Kaip reikėtų pakeisti karkasą?
+1. Įgyvendinkite įvairias DenseNet versijas, pateiktas DenseNet straipsnio 1 lentelėje :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+1. Suprojektuokite MLP pagrįstą modelį, pritaikydami DenseNet idėją. Pritaikykite jį būsto kainų prognozavimo užduočiai iš :numref:`sec_kaggle_house`.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/87)
+[Diskusijos](https://discuss.d2l.ai/t/87)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/88)
+[Diskusijos](https://discuss.d2l.ai/t/88)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/331)
+[Diskusijos](https://discuss.d2l.ai/t/331)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18008)
+[Diskusijos](https://discuss.d2l.ai/t/18008)
 :end_tab:

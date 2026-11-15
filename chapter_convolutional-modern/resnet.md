@@ -3,12 +3,12 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Residual Networks (ResNet) and ResNeXt
+# Liekanų neuroniniai tinklai (ResNet) ir ResNeXt
 :label:`sec_resnet`
 
-As we design ever deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network.
-Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different.
-To make some progress we need a bit of mathematics.
+Kurdami vis gilesnius tinklus, turime suprasti, kaip sluoksnių pridėjimas gali padidinti tinklo sudėtingumą ir raiškumą.
+Dar svarbiau – gebėjimas projektuoti tinklus, kuriuose sluoksnių pridėjimas daro tinklus griežtai raiškesnius, o ne tik kitokius.
+Kad padarytume pažangą, mums reikia šiek tiek matematikos.
 
 ```{.python .input}
 %%tab mxnet
@@ -40,93 +40,92 @@ from jax import numpy as jnp
 import jax
 ```
 
-## Function Classes
+## Funkcijų klasės
 
-Consider $\mathcal{F}$, the class of functions that a specific network architecture (together with learning rates and other hyperparameter settings) can reach.
-That is, for all $f \in \mathcal{F}$ there exists some set of parameters (e.g., weights and biases) that can be obtained through training on a suitable dataset.
-Let's assume that $f^*$ is the "truth" function that we really would like to find.
-If it is in $\mathcal{F}$, we are in good shape but typically we will not be quite so lucky.
-Instead, we will try to find some $f^*_\mathcal{F}$ which is our best bet within $\mathcal{F}$.
-For instance,
-given a dataset with features $\mathbf{X}$
-and labels $\mathbf{y}$,
-we might try finding it by solving the following optimization problem:
+Panagrinėkime $\mathcal{F}$ – funkcijų klasę, kurią gali pasiekti konkreti tinklo architektūra (kartu su mokymosi greičiais ir kitais hiperparametrų nustatymais).
+Tai yra, kiekvienai $f \in \mathcal{F}$ egzistuoja tam tikras parametrų rinkinys (pvz., svoriai ir poslinkiai), kurį galima gauti apmokant tinkamame duomenų rinkinyje.
+Tarkime, kad $f^*$ yra „tiesos“ funkcija, kurią iš tikrųjų norėtume rasti.
+Jei ji yra $\mathcal{F}$, esame geroje padėtyje, tačiau paprastai nebūsime tokie laimingi.
+Vietoj to bandysime rasti tam tikrą $f^*_\mathcal{F}$, kuri yra mūsų geriausias pasirinkimas $\mathcal{F}$ viduje.
+Pavyzdžiui,
+turėdami duomenų rinkinį su požymiais $\mathbf{X}$
+ir žymenimis $\mathbf{y}$,
+galime bandyti ją rasti spręsdami šį optimizavimo uždavinį:
 
 $$f^*_\mathcal{F} \stackrel{\textrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \textrm{ subject to } f \in \mathcal{F}.$$
 
-We know that regularization :cite:`tikhonov1977solutions,morozov2012methods` may control complexity of $\mathcal{F}$
-and achieve consistency, so a larger size of training data
-generally leads to better $f^*_\mathcal{F}$.
-It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse.
-As illustrated by :numref:`fig_functionclasses`,
-for non-nested function classes, a larger function class does not always move closer to the "truth" function $f^*$. For instance,
-on the left of :numref:`fig_functionclasses`,
-though $\mathcal{F}_3$ is closer to $f^*$ than $\mathcal{F}_1$, $\mathcal{F}_6$ moves away and there is no guarantee that further increasing the complexity can reduce the distance from $f^*$.
-With nested function classes
-where $\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_6$
-on the right of :numref:`fig_functionclasses`,
-we can avoid the aforementioned issue from the non-nested function classes.
+Žinome, kad reguliarizacija :cite:`tikhonov1977solutions,morozov2012methods` gali kontroliuoti $\mathcal{F}$ sudėtingumą
+ir pasiekti suderinamumą, todėl didesnis mokymo duomenų kiekis
+paprastai lemia geresnę $f^*_\mathcal{F}$.
+Pagrįsta manyti, kad jei suprojektuosime kitokią ir galingesnę architektūrą $\mathcal{F}'$, turėtume gauti geresnį rezultatą. Kitaip tariant, tikėtumėmės, kad $f^*_{\mathcal{F}'}$ yra „geresnė“ už $f^*_{\mathcal{F}}$. Tačiau jei $\mathcal{F} \not\subseteq \mathcal{F}'$, nėra jokios garantijos, kad taip net nutiks. Iš tikrųjų $f^*_{\mathcal{F}'}$ gali būti ir blogesnė.
+Kaip iliustruoja :numref:`fig_functionclasses`,
+neįdėtoms funkcijų klasėms didesnė funkcijų klasė ne visada priartėja prie „tiesos“ funkcijos $f^*$. Pavyzdžiui,
+:numref:`fig_functionclasses` kairėje,
+nors $\mathcal{F}_3$ yra arčiau $f^*$ nei $\mathcal{F}_1$, $\mathcal{F}_6$ tolsta, ir nėra garantijos, kad tolesnis sudėtingumo didinimas gali sumažinti atstumą iki $f^*$.
+Su įdėtomis funkcijų klasėmis,
+kur $\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_6$,
+:numref:`fig_functionclasses` dešinėje,
+galime išvengti minėtos neįdėtų funkcijų klasių problemos.
 
 
-![For non-nested function classes, a larger (indicated by area) function class does not guarantee we will get closer to the "truth" function ($\mathit{f}^*$). This does not happen in nested function classes.](../img/functionclasses.svg)
+![Neįdėtoms funkcijų klasėms didesnė (nurodyta plotu) funkcijų klasė negarantuoja, kad priartėsime prie „tiesos“ funkcijos ($\mathit{f}^*$). Įdėtose funkcijų klasėse taip nenutinka.](../img/functionclasses.svg)
 :label:`fig_functionclasses`
 
-Thus,
-only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network.
-For deep neural networks,
-if we can
-train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
+Taigi
+tik jei didesnės funkcijų klasės apima mažesnes, esame tikri, kad jų didinimas griežtai padidina tinklo raiškumą.
+Giliesiems neuroniniams tinklams,
+jei galime
+apmokyti naujai pridėtą sluoksnį tapti tapatybės funkcija $f(\mathbf{x}) = \mathbf{x}$, naujas modelis bus toks pat veiksmingas kaip originalus. Kadangi naujas modelis gali gauti geresnį sprendinį, atitinkantį mokymo duomenų rinkinį, pridėtas sluoksnis gali palengvinti mokymo paklaidų mažinimą.
 
-This is the question that :citet:`He.Zhang.Ren.ea.2016` considered when working on very deep computer vision models.
-At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should
-more easily
-contain the identity function as one of its elements.
-These considerations are rather profound but they led to a surprisingly simple
-solution, a *residual block*.
-With it, ResNet won the ImageNet Large Scale Visual Recognition Challenge in 2015. The design had a profound influence on how to
-build deep neural networks. For instance, residual blocks have been added to recurrent networks :cite:`prakash2016neural,kim2017residual`. Likewise, Transformers :cite:`Vaswani.Shazeer.Parmar.ea.2017` use them to stack many layers of networks efficiently. It is also used in graph neural networks :cite:`Kipf.Welling.2016` and, as a basic concept, it has been used extensively in computer vision :cite:`Redmon.Farhadi.2018,Ren.He.Girshick.ea.2015`. 
-Note that residual networks are predated by highway networks :cite:`srivastava2015highway` that share some of the motivation, albeit without the elegant parametrization around the identity function.
+Būtent šį klausimą nagrinėjo :citet:`He.Zhang.Ren.ea.2016`, dirbdami su labai giliais kompiuterinės regos modeliais.
+Jų pasiūlyto *liekanų neuroninio tinklo* (*ResNet*) esmė yra idėja, kad kiekvienas papildomas sluoksnis turėtų
+lengviau
+turėti tapatybės funkciją kaip vieną iš savo elementų.
+Šie svarstymai yra gana gilūs, tačiau jie atvedė prie stebėtinai paprasto
+sprendimo – *liekamojo bloko*.
+Su juo ResNet laimėjo ImageNet didelio masto vizualinio atpažinimo iššūkį 2015 m. Dizainas turėjo didelę įtaką tam, kaip
+kuriami gilieji neuroniniai tinklai. Pavyzdžiui, liekamieji blokai buvo pridėti į rekurentinius tinklus :cite:`prakash2016neural,kim2017residual`. Taip pat transformeriai :cite:`Vaswani.Shazeer.Parmar.ea.2017` jais naudojasi, kad efektyviai sukrautų daug tinklo sluoksnių. Jie taip pat naudojami grafų neuroniniuose tinkluose :cite:`Kipf.Welling.2016` ir, kaip pagrindinė sąvoka, plačiai naudojami kompiuterinėje regoje :cite:`Redmon.Farhadi.2018,Ren.He.Girshick.ea.2015`.
+Atkreipkite dėmesį, kad prieš liekanų tinklus buvo greitkelių tinklai :cite:`srivastava2015highway`, kurie dalijasi dalimi motyvacijos, nors ir be elegantiškos parametrizacijos aplink tapatybės funkciją.
 
 
-## (**Residual Blocks**)
+## (**Liekamieji blokai**)
 :label:`subsec_residual-blks`
 
-Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
-We assume that $f(\mathbf{x})$, the desired underlying mapping we want to obtain by learning, is to be used as input to the activation function on the top.
-On the left,
-the portion within the dotted-line box
-must directly learn $f(\mathbf{x})$.
-On the right,
-the portion within the dotted-line box
-needs to
-learn the *residual mapping* $g(\mathbf{x}) = f(\mathbf{x}) - \mathbf{x}$,
-which is how the residual block derives its name.
-If the identity mapping $f(\mathbf{x}) = \mathbf{x}$ is the desired underlying mapping,
-the residual mapping amounts to $g(\mathbf{x}) = 0$ and it is thus easier to learn:
-we only need to push the weights and biases
-of the
-upper weight layer (e.g., fully connected layer and convolutional layer)
-within the dotted-line box
-to zero.
-The right figure illustrates the *residual block* of ResNet,
-where the solid line carrying the layer input
-$\mathbf{x}$ to the addition operator
-is called a *residual connection* (or *shortcut connection*).
-With residual blocks, inputs can
-forward propagate faster through the residual connections across layers.
-In fact,
-the residual block
-can be thought of as
-a special case of the multi-branch Inception block:
-it has two branches
-one of which is the identity mapping.
+Sutelkime dėmesį į lokalią neuroninio tinklo dalį, kaip pavaizduota :numref:`fig_residual_block`. Pažymėkime įvestį $\mathbf{x}$.
+Darome prielaidą, kad $f(\mathbf{x})$ – norimas pagrindinis atvaizdavimas, kurį norime gauti mokydamiesi – bus naudojamas kaip įvestis viršuje esančiai aktyvacijos funkcijai.
+Kairėje
+punktyriniame langelyje esanti dalis
+turi tiesiogiai išmokti $f(\mathbf{x})$.
+Dešinėje
+punktyriniame langelyje esanti dalis
+turi
+išmokti *liekamąjį atvaizdavimą* $g(\mathbf{x}) = f(\mathbf{x}) - \mathbf{x}$,
+iš kurio liekamasis blokas ir gavo savo pavadinimą.
+Jei norimas pagrindinis atvaizdavimas yra tapatybės atvaizdavimas $f(\mathbf{x}) = \mathbf{x}$,
+liekamasis atvaizdavimas yra $g(\mathbf{x}) = 0$, ir jį todėl lengviau išmokti:
+tereikia nustumti svorius ir poslinkius
+viršutinio svorių sluoksnio (pvz., pilnai sujungto sluoksnio ar konvoliucinio sluoksnio)
+punktyriniame langelyje
+iki nulio.
+Dešinysis paveikslas iliustruoja ResNet *liekamąjį bloką*,
+kuriame ištisinė linija, nešanti sluoksnio įvestį
+$\mathbf{x}$ į sudėties operatorių,
+vadinama *liekamąja jungtimi* (arba *trumpiklio jungtimi*).
+Su liekamaisiais blokais įvestys gali
+greičiau sklisti tiesiogiai per liekamąsias jungtis tarp sluoksnių.
+Iš tikrųjų
+liekamąjį bloką
+galima laikyti
+daugiašakio Inception bloko ypatingu atveju:
+jis turi dvi šakas,
+iš kurių viena yra tapatybės atvaizdavimas.
 
-![In a regular block (left), the portion within the dotted-line box must directly learn the mapping $\mathit{f}(\mathbf{x})$. In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $\mathit{g}(\mathbf{x}) = \mathit{f}(\mathbf{x}) - \mathbf{x}$, making the identity mapping $\mathit{f}(\mathbf{x}) = \mathbf{x}$ easier to learn.](../img/residual-block.svg)
+![Įprastame bloke (kairėje) punktyriniame langelyje esanti dalis turi tiesiogiai išmokti atvaizdavimą $\mathit{f}(\mathbf{x})$. Liekamajame bloke (dešinėje) punktyriniame langelyje esanti dalis turi išmokti liekamąjį atvaizdavimą $\mathit{g}(\mathbf{x}) = \mathit{f}(\mathbf{x}) - \mathbf{x}$, todėl tapatybės atvaizdavimą $\mathit{f}(\mathbf{x}) = \mathbf{x}$ išmokti lengviau.](../img/residual-block.svg)
 :label:`fig_residual_block`
 
 
-ResNet has VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function.
-This kind of design requires that the output of the two convolutional layers has to be of the same shape as the input, so that they can be added together. If we want to change the number of channels, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below.
+ResNet turi VGG pilną $3\times 3$ konvoliucinio sluoksnio dizainą. Liekamasis blokas turi du $3\times 3$ konvoliucinius sluoksnius su tuo pačiu išvesties kanalų skaičiumi. Po kiekvieno konvoliucinio sluoksnio eina rinkinio normalizacijos sluoksnis ir ReLU aktyvacijos funkcija. Tada praleidžiame šias dvi konvoliucijos operacijas ir pridedame įvestį tiesiogiai prieš galutinę ReLU aktyvaciją.
+Šio tipo dizainas reikalauja, kad dviejų konvoliucinių sluoksnių išvestis turėtų tą pačią formą kaip įvestis, kad jas būtų galima sudėti. Jei norime pakeisti kanalų skaičių, turime pridėti papildomą $1\times 1$ konvoliucinį sluoksnį, kuris transformuotų įvestį į norimą formą sudėties operacijai. Pažvelkime į toliau pateiktą kodą.
 
 ```{.python .input}
 %%tab mxnet
@@ -236,12 +235,12 @@ class Residual(nn.Module):  #@save
         return nn.relu(Y)
 ```
 
-This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`; and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this.
+Šis kodas generuoja du tinklų tipus: vieną, kuriame įvestis pridedama prie išvesties prieš taikant ReLU netiesiškumą, kai `use_1x1conv=False`; ir kitą, kuriame prieš sudėdami pakoreguojame kanalus ir skyrą per $1 \times 1$ konvoliuciją. :numref:`fig_resnet_block` tai iliustruoja.
 
-![ResNet block with and without $1 \times 1$ convolution, which transforms the input into the desired shape for the addition operation.](../img/resnet-block.svg)
+![ResNet blokas su $1 \times 1$ konvoliucija ir be jos; ši konvoliucija transformuoja įvestį į norimą formą sudėties operacijai.](../img/resnet-block.svg)
 :label:`fig_resnet_block`
 
-Now let's look at [**a situation where the input and output are of the same shape**], where $1 \times 1$ convolution is not needed.
+Dabar pažvelkime į [**situaciją, kai įvestis ir išvestis yra tos pačios formos**], kai $1 \times 1$ konvoliucijos nereikia.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -269,8 +268,8 @@ X = jax.random.normal(d2l.get_key(), (4, 6, 6, 3))
 blk.init_with_output(d2l.get_key(), X)[0].shape
 ```
 
-We also have the option to [**halve the output height and width while increasing the number of output channels**].
-In this case we use $1 \times 1$ convolutions via `use_1x1conv=True`. This comes in handy at the beginning of each ResNet block to reduce the spatial dimensionality via `strides=2`.
+Taip pat turime galimybę [**perpus sumažinti išvesties aukštį ir plotį didinant išvesties kanalų skaičių**].
+Šiuo atveju per `use_1x1conv=True` naudojame $1 \times 1$ konvoliucijas. Tai patogu kiekvieno ResNet bloko pradžioje, kad per `strides=2` sumažintume erdvinę dimensiją.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -286,9 +285,9 @@ blk = Residual(6, use_1x1conv=True, strides=(2, 2))
 blk.init_with_output(d2l.get_key(), X)[0].shape
 ```
 
-## [**ResNet Model**]
+## [**ResNet modelis**]
 
-The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ max-pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
+Pirmieji du ResNet sluoksniai yra tokie patys kaip anksčiau aprašyto GoogLeNet: $7\times 7$ konvoliucinį sluoksnį su 64 išvesties kanalais ir 2 žingsniu seka $3\times 3$ sutelkimo imant maksimumą sluoksnis su 2 žingsniu. Skirtumas yra rinkinio normalizacijos sluoksnis, pridėtas po kiekvieno konvoliucinio sluoksnio ResNet.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -334,9 +333,9 @@ class ResNet(d2l.Classifier):
                                   padding='same')])
 ```
 
-GoogLeNet uses four modules made up of Inception blocks.
-However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels.
-The number of channels in the first module is the same as the number of input channels. Since a max-pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
+GoogLeNet naudoja keturis modulius, sudarytus iš Inception blokų.
+Tačiau ResNet naudoja keturis modulius, sudarytus iš liekamųjų blokų, kurių kiekvienas naudoja kelis liekamuosius blokus su tuo pačiu išvesties kanalų skaičiumi.
+Pirmojo modulio kanalų skaičius yra toks pat kaip įvesties kanalų skaičius. Kadangi jau buvo naudotas sutelkimo imant maksimumą sluoksnis su 2 žingsniu, aukščio ir pločio mažinti nebūtina. Pirmajame kiekvieno paskesnio modulio liekamajame bloke kanalų skaičius padvigubėja, palyginti su ankstesniu moduliu, o aukštis ir plotis perpus sumažėja.
 
 ```{.python .input}
 %%tab mxnet
@@ -391,7 +390,7 @@ def block(self, num_residuals, num_channels, first_block=False):
     return nn.Sequential(blk)
 ```
 
-Then, we add all the modules to ResNet. Here, two residual blocks are used for each module. Lastly, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.
+Tada pridedame visus modulius į ResNet. Čia kiekvienam moduliui naudojami du liekamieji blokai. Galiausiai, kaip ir GoogLeNet, pridedame globalaus sutelkimo vidurkinant sluoksnį, po kurio eina pilnai sujungto sluoksnio išvestis.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -439,13 +438,13 @@ def create_net(self):
     return net
 ```
 
-There are four convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
-By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. :numref:`fig_resnet18` depicts the full ResNet-18.
+Kiekviename modulyje yra keturi konvoliuciniai sluoksniai (neįskaitant $1\times 1$ konvoliucinio sluoksnio). Kartu su pirmuoju $7\times 7$ konvoliuciniu sluoksniu ir galutiniu pilnai sujungtu sluoksniu iš viso yra 18 sluoksnių. Todėl šis modelis paprastai žinomas kaip ResNet-18.
+Konfigūruodami skirtingus kanalų ir liekamųjų blokų skaičius modulyje, galime sukurti skirtingus ResNet modelius, pavyzdžiui, gilesnį 152 sluoksnių ResNet-152. Nors pagrindinė ResNet architektūra panaši į GoogLeNet, ResNet struktūra paprastesnė ir lengviau modifikuojama. Visi šie veiksniai lėmė spartų ir platų ResNet naudojimą. :numref:`fig_resnet18` pavaizduotas pilnas ResNet-18.
 
-![The ResNet-18 architecture.](../img/resnet18-90.svg)
+![ResNet-18 architektūra.](../img/resnet18-90.svg)
 :label:`fig_resnet18`
 
-Before training ResNet, let's [**observe how the input shape changes across different modules in ResNet**]. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
+Prieš apmokydami ResNet, [**stebėkime, kaip įvesties forma kinta skirtinguose ResNet moduliuose**]. Kaip ir visose ankstesnėse architektūrose, skyra mažėja, o kanalų skaičius didėja, kol globalaus sutelkimo vidurkinant sluoksnis agreguoja visus požymius.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -478,9 +477,9 @@ ResNet18().layer_summary((1, 96, 96, 1))
 ResNet18(training=False).layer_summary((1, 96, 96, 1))
 ```
 
-## [**Training**]
+## [**Mokymas**]
 
-We train ResNet on the Fashion-MNIST dataset, just like before. ResNet is quite a powerful and flexible architecture. The plot capturing training and validation loss illustrates a significant gap between both graphs, with the training loss being considerably lower. For a network of this flexibility, more training data would offer distinct benefit in closing the gap and improving accuracy.
+ResNet apmokome su Fashion-MNIST duomenų rinkiniu, kaip ir anksčiau. ResNet yra gana galinga ir lanksti architektūra. Grafikas, vaizduojantis mokymo ir validavimo nuostolius, iliustruoja reikšmingą tarpą tarp abiejų grafikų, kai mokymo nuostoliai yra gerokai mažesni. Tokio lankstumo tinklui daugiau mokymo duomenų duotų aiškią naudą mažinant tarpą ir gerinant tikslumą.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -504,26 +503,26 @@ with d2l.try_gpu():
 ## ResNeXt
 :label:`subsec_resnext`
 
-One of the challenges one encounters in the design of ResNet is the trade-off between nonlinearity and dimensionality within a given block. That is, we could add more nonlinearity by increasing the number of layers, or by increasing the width of the convolutions. An alternative strategy is to increase the number of channels that can carry information between blocks. Unfortunately, the latter comes with a quadratic penalty since the computational cost of ingesting $c_\textrm{i}$ channels and emitting $c_\textrm{o}$ channels is proportional to $\mathcal{O}(c_\textrm{i} \cdot c_\textrm{o})$ (see our discussion in :numref:`sec_channels`). 
+Vienas iš iššūkių, su kuriais susiduriama projektuojant ResNet, yra kompromisas tarp netiesiškumo ir dimensijos duotame bloke. Tai yra, galime pridėti daugiau netiesiškumo didindami sluoksnių skaičių arba konvoliucijų plotį. Alternatyvi strategija – didinti kanalų, galinčių nešti informaciją tarp blokų, skaičių. Deja, pastaroji strategija turi kvadratinę baudą, nes $c_\textrm{i}$ kanalų priėmimo ir $c_\textrm{o}$ kanalų išvedimo skaičiavimo kaina yra proporcinga $\mathcal{O}(c_\textrm{i} \cdot c_\textrm{o})$ (žr. mūsų diskusiją :numref:`sec_channels`).
 
-We can take some inspiration from the Inception block of :numref:`fig_inception` which has information flowing through the block in separate groups. Applying the idea of multiple independent groups to the ResNet block of :numref:`fig_resnet_block` led to the design of ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`.
-Different from the smorgasbord of transformations in Inception, 
-ResNeXt adopts the *same* transformation in all branches,
-thus minimizing the need for manual tuning of each branch. 
+Galime pasisemti įkvėpimo iš Inception bloko :numref:`fig_inception`, kuriame informacija teka per bloką atskirose grupėse. Pritaikius kelių nepriklausomų grupių idėją ResNet blokui :numref:`fig_resnet_block`, buvo sukurtas ResNeXt dizainas :cite:`Xie.Girshick.Dollar.ea.2017`.
+Skirtingai nei Inception transformacijų švediškas stalas,
+ResNeXt visose šakose naudoja *tą pačią* transformaciją,
+taip sumažindamas poreikį rankiniu būdu derinti kiekvieną šaką.
 
-![The ResNeXt block. The use of grouped convolution with $\mathit{g}$ groups is $\mathit{g}$ times faster than a dense convolution. It is a bottleneck residual block when the number of intermediate channels $\mathit{b}$ is less than $\mathit{c}$.](../img/resnext-block.svg)
+![ResNeXt blokas. Grupinės konvoliucijos su $\mathit{g}$ grupių naudojimas yra $\mathit{g}$ kartų greitesnis nei tankioji konvoliucija. Tai yra butelio kakliuko liekamasis blokas, kai tarpinių kanalų skaičius $\mathit{b}$ yra mažesnis už $\mathit{c}$.](../img/resnext-block.svg)
 :label:`fig_resnext_block`
 
-Breaking up a convolution from $c_\textrm{i}$ to $c_\textrm{o}$ channels into one of $g$ groups of size $c_\textrm{i}/g$ generating $g$ outputs of size $c_\textrm{o}/g$ is called, quite fittingly, a *grouped convolution*. The computational cost (proportionally) is reduced from $\mathcal{O}(c_\textrm{i} \cdot c_\textrm{o})$ to $\mathcal{O}(g \cdot (c_\textrm{i}/g) \cdot (c_\textrm{o}/g)) = \mathcal{O}(c_\textrm{i} \cdot c_\textrm{o} / g)$, i.e., it is $g$ times faster. Even better, the number of parameters needed to generate the output is also reduced from a $c_\textrm{i} \times c_\textrm{o}$ matrix to $g$ smaller matrices of size $(c_\textrm{i}/g) \times (c_\textrm{o}/g)$, again a $g$ times reduction. In what follows we assume that both $c_\textrm{i}$ and $c_\textrm{o}$ are divisible by $g$. 
+Konvoliucijos iš $c_\textrm{i}$ į $c_\textrm{o}$ kanalų suskaidymas į $g$ grupių, kurių dydis $c_\textrm{i}/g$, generuojančių $g$ išvesčių, kurių dydis $c_\textrm{o}/g$, vadinamas, gana taikliai, *grupine konvoliucija*. Skaičiavimo kaina (proporcingai) sumažėja nuo $\mathcal{O}(c_\textrm{i} \cdot c_\textrm{o})$ iki $\mathcal{O}(g \cdot (c_\textrm{i}/g) \cdot (c_\textrm{o}/g)) = \mathcal{O}(c_\textrm{i} \cdot c_\textrm{o} / g)$, t. y. ji yra $g$ kartų greitesnė. Dar geriau, išvestiai generuoti reikalingų parametrų skaičius taip pat sumažėja nuo $c_\textrm{i} \times c_\textrm{o}$ matricos iki $g$ mažesnių $(c_\textrm{i}/g) \times (c_\textrm{o}/g)$ dydžio matricų, vėlgi $g$ kartų sumažinimas. Toliau darome prielaidą, kad ir $c_\textrm{i}$, ir $c_\textrm{o}$ dalijasi iš $g$.
 
-The only challenge in this design is that no information is exchanged between the $g$ groups. The ResNeXt block of 
-:numref:`fig_resnext_block` amends this in two ways: the grouped convolution with a $3 \times 3$ kernel is sandwiched in between two $1 \times 1$ convolutions. The second one serves double duty in changing the number of channels back. The benefit is that we only pay the $\mathcal{O}(c \cdot b)$ cost for $1 \times 1$ kernels and can make do with an $\mathcal{O}(b^2 / g)$ cost for $3 \times 3$ kernels. Similar to the residual block implementation in
-:numref:`subsec_residual-blks`, the residual connection is replaced (thus generalized) by a $1 \times 1$ convolution.
+Vienintelis šio dizaino iššūkis yra tas, kad tarp $g$ grupių nesikeičiama informacija. ResNeXt blokas
+:numref:`fig_resnext_block` tai ištaiso dviem būdais: grupinė konvoliucija su $3 \times 3$ branduoliu įterpiama tarp dviejų $1 \times 1$ konvoliucijų. Antroji atlieka dvigubą darbą, grąžindama kanalų skaičių atgal. Nauda ta, kad už $1 \times 1$ branduolius mokame tik $\mathcal{O}(c \cdot b)$ kainą, o $3 \times 3$ branduoliams pakanka $\mathcal{O}(b^2 / g)$ kainos. Panašiai kaip liekamojo bloko įgyvendinime
+:numref:`subsec_residual-blks`, liekamoji jungtis pakeičiama (taigi apibendrinama) $1 \times 1$ konvoliucija.
 
-The right-hand figure in :numref:`fig_resnext_block` provides a much more concise summary of the resulting network block. It will also play a major role in the design of generic modern CNNs in :numref:`sec_cnn-design`. Note that the idea of grouped convolutions dates back to the implementation of AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. When distributing the network across two GPUs with limited memory, the implementation treated each GPU as its own channel with no ill effects. 
+Dešinysis paveikslas :numref:`fig_resnext_block` pateikia daug glaustesnę gauto tinklo bloko santrauką. Jis taip pat vaidins svarbų vaidmenį projektuojant bendrines šiuolaikines CNN :numref:`sec_cnn-design`. Atkreipkite dėmesį, kad grupinių konvoliucijų idėja siekia AlexNet įgyvendinimą :cite:`Krizhevsky.Sutskever.Hinton.2012`. Paskirstant tinklą tarp dviejų GPU su ribota atmintimi, įgyvendinime kiekvienas GPU buvo traktuojamas kaip savo paties kanalas be neigiamo poveikio.
 
-The following implementation of the `ResNeXtBlock` class takes as argument `groups` ($g$), with 
-`bot_channels` ($b$) intermediate (bottleneck) channels. Lastly, when we need to reduce the height and width of the representation, we add a stride of $2$ by setting `use_1x1conv=True, strides=2`.
+Toliau pateiktas klasės `ResNeXtBlock` įgyvendinimas kaip argumentą priima `groups` ($g$), su
+`bot_channels` ($b$) tarpiniais (butelio kakliuko) kanalais. Galiausiai, kai reikia sumažinti atvaizdo aukštį ir plotį, pridedame žingsnį $2$, nustatydami `use_1x1conv=True, strides=2`.
 
 ```{.python .input}
 %%tab mxnet
@@ -661,7 +660,7 @@ class ResNeXtBlock(nn.Module):  #@save
         return nn.relu(Y + X)
 ```
 
-Its use is entirely analogous to that of the `ResNetBlock` discussed previously. For instance, when using (`use_1x1conv=False, strides=1`), the input and output are of the same shape. Alternatively, setting `use_1x1conv=True, strides=2` halves the output height and width.
+Jo naudojimas visiškai analogiškas anksčiau aptartam `ResNetBlock`. Pavyzdžiui, naudojant (`use_1x1conv=False, strides=1`), įvestis ir išvestis yra tos pačios formos. Alternatyviai, nustačius `use_1x1conv=True, strides=2`, išvesties aukštis ir plotis perpus sumažėja.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -687,52 +686,52 @@ X = jnp.zeros((4, 96, 96, 32))
 blk.init_with_output(d2l.get_key(), X)[0].shape
 ```
 
-## Summary and Discussion
+## Santrauka ir diskusija
 
-Nested function classes are desirable since they allow us to obtain strictly *more powerful* rather than also subtly *different* function classes when adding capacity. One way of accomplishing this is by letting additional layers to simply pass through the input to the output. Residual connections allow for this. As a consequence, this changes the inductive bias from simple functions being of the form $f(\mathbf{x}) = 0$ to simple functions looking like $f(\mathbf{x}) = \mathbf{x}$. 
+Įdėtosios funkcijų klasės yra pageidautinos, nes leidžia mums, pridedant pajėgumo, gauti griežtai *galingesnes*, o ne tik subtiliai *kitokias* funkcijų klases. Vienas būdas tai pasiekti – leisti papildomiems sluoksniams tiesiog perduoti įvestį į išvestį. Liekamosios jungtys tai leidžia. Dėl to pasikeičia induktyvinis šališkumas: paprastos funkcijos iš formos $f(\mathbf{x}) = 0$ virsta paprastomis funkcijomis, atrodančiomis kaip $f(\mathbf{x}) = \mathbf{x}$.
 
 
-The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero. We can train an effective *deep* neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers. As a consequence, we can thus train much deeper networks. For instance, the original ResNet paper :cite:`He.Zhang.Ren.ea.2016` allowed for up to 152 layers. Another benefit of residual networks is that it allows us to add layers, initialized as the identity function, *during* the training process. After all, the default behavior of a layer is to let the data pass through unchanged. This can accelerate the training of very large networks in some cases. 
+Liekamasis atvaizdavimas gali lengviau išmokti tapatybės funkciją, pavyzdžiui, nustumdamas svorių sluoksnio parametrus iki nulio. Turėdami liekamuosius blokus, galime apmokyti veiksmingą *gilų* neuroninį tinklą. Įvestys gali greičiau sklisti tiesiogiai per liekamąsias jungtis tarp sluoksnių. Dėl to galime apmokyti daug gilesnius tinklus. Pavyzdžiui, originalus ResNet straipsnis :cite:`He.Zhang.Ren.ea.2016` leido iki 152 sluoksnių. Kitas liekanų tinklų privalumas yra tai, kad jie leidžia pridėti sluoksnius, inicializuotus kaip tapatybės funkciją, *apmokymo proceso metu*. Juk numatytasis sluoksnio elgesys yra leisti duomenims praeiti nepakitusiems. Tai kai kuriais atvejais gali pagreitinti labai didelių tinklų apmokymą.
 
-Prior to residual connections,
-bypassing paths with gating units were introduced
-to effectively train highway networks with over 100 layers
+Prieš liekamąsias jungtis
+buvo pristatyti apeinamieji keliai su sklendžių vienetais,
+kad būtų galima efektyviai apmokyti greitkelių tinklus, turinčius per 100 sluoksnių
 :cite:`srivastava2015highway`.
-Using identity functions as bypassing paths,
-ResNet performed remarkably well
-on multiple computer vision tasks.
-Residual connections had a major influence on the design of subsequent deep neural networks, of either convolutional or sequential nature.
-As we will introduce later,
-the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
-adopts residual connections (together with other design choices) and is pervasive
-in areas as diverse as
-language, vision, speech, and reinforcement learning.
+Naudodamas tapatybės funkcijas kaip apeinamuosius kelius,
+ResNet pasirodė nepaprastai gerai
+atliekant daugelį kompiuterinės regos užduočių.
+Liekamosios jungtys turėjo didelę įtaką vėlesnių giliųjų neuroninių tinklų, tiek konvoliucinių, tiek nuoseklių, dizainui.
+Kaip pristatysime vėliau,
+transformerių architektūra :cite:`Vaswani.Shazeer.Parmar.ea.2017`
+naudoja liekamąsias jungtis (kartu su kitais dizaino sprendimais) ir yra paplitusi
+tokiose skirtingose srityse kaip
+kalba, rega, kalbos atpažinimas ir skatinamasis mokymasis.
 
-ResNeXt is an example for how the design of convolutional neural networks has evolved over time: by being more frugal with computation and trading it off against the size of the activations (number of channels), it allows for faster and more accurate networks at lower cost. An alternative way of viewing grouped convolutions is to think of a block-diagonal matrix for the convolutional weights. Note that there are quite a few such "tricks" that lead to more efficient networks. For instance, ShiftNet :cite:`wu2018shift` mimicks the effects of a $3 \times 3$ convolution, simply by adding shifted activations to the channels, offering increased function complexity, this time without any computational cost. 
+ResNeXt yra pavyzdys, kaip laikui bėgant keitėsi konvoliucinių neuroninių tinklų dizainas: būdamas taupesnis skaičiavimams ir iškeisdamas juos į aktyvacijų dydį (kanalų skaičių), jis leidžia gauti greitesnius ir tikslesnius tinklus mažesne kaina. Alternatyvus būdas žiūrėti į grupines konvoliucijas – įsivaizduoti blokinę įstrižainės matricą konvoliuciniams svoriams. Atkreipkite dėmesį, kad yra nemažai tokių „gudrybių“, vedančių prie efektyvesnių tinklų. Pavyzdžiui, ShiftNet :cite:`wu2018shift` imituoja $3 \times 3$ konvoliucijos poveikį tiesiog pridėdamas pastumtas aktyvacijas prie kanalų, taip padidindamas funkcijų sudėtingumą, šį kartą be jokių skaičiavimo sąnaudų.
 
-A common feature of the designs we have discussed so far is that the network design is fairly manual, primarily relying on the ingenuity of the designer to find the "right" network hyperparameters. While clearly feasible, it is also very costly in terms of human time and there is no guarantee that the outcome is optimal in any sense. In :numref:`sec_cnn-design` we will discuss a number of strategies for obtaining high quality networks in a more automated fashion. In particular, we will review the notion of *network design spaces* that led to the RegNetX/Y models
+Bendra iki šiol aptartų dizainų savybė yra ta, kad tinklo dizainas yra gana rankinis ir pirmiausia remiasi dizainerio išradingumu ieškant „tinkamų“ tinklo hiperparametrų. Nors tai aiškiai įmanoma, tai taip pat labai brangu žmogaus laiko požiūriu, ir nėra garantijos, kad rezultatas yra optimalus bet kuria prasme. :numref:`sec_cnn-design` aptarsime keletą strategijų, kaip aukštos kokybės tinklus gauti automatizuotiau. Visų pirma apžvelgsime *tinklo dizaino erdvių* sampratą, kuri atvedė prie RegNetX/Y modelių
 :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
 
-## Exercises
+## Pratimai
 
-1. What are the major differences between the Inception block in :numref:`fig_inception` and the residual block? How do they compare in terms of computation, accuracy, and the classes of functions they can describe?
-1. Refer to Table 1 in the ResNet paper :cite:`He.Zhang.Ren.ea.2016` to implement different variants of the network. 
-1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce model complexity. Try to implement it.
-1. In subsequent versions of ResNet, the authors changed the "convolution, batch normalization, and activation" structure to the "batch normalization, activation, and convolution" structure. Make this improvement yourself. See Figure 1 in :citet:`He.Zhang.Ren.ea.2016*1` for details.
-1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
+1. Kokie yra pagrindiniai Inception bloko :numref:`fig_inception` ir liekamojo bloko skirtumai? Kaip jie palyginami skaičiavimo, tikslumo ir funkcijų klasių, kurias gali aprašyti, požiūriu?
+1. Remdamiesi ResNet straipsnio :cite:`He.Zhang.Ren.ea.2016` 1 lentele, įgyvendinkite skirtingus tinklo variantus.
+1. Gilesniems tinklams ResNet pristato „butelio kakliuko“ architektūrą modelio sudėtingumui sumažinti. Pabandykite ją įgyvendinti.
+1. Vėlesnėse ResNet versijose autoriai pakeitė struktūrą „konvoliucija, rinkinio normalizacija ir aktyvacija“ į struktūrą „rinkinio normalizacija, aktyvacija ir konvoliucija“. Patys atlikite šį patobulinimą. Išsamiau žr. 1 paveikslą :citet:`He.Zhang.Ren.ea.2016*1`.
+1. Kodėl negalime tiesiog neribotai didinti funkcijų sudėtingumo, net jei funkcijų klasės yra įdėtos?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/85)
+[Diskusijos](https://discuss.d2l.ai/t/85)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/86)
+[Diskusijos](https://discuss.d2l.ai/t/86)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/8737)
+[Diskusijos](https://discuss.d2l.ai/t/8737)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18006)
+[Diskusijos](https://discuss.d2l.ai/t/18006)
 :end_tab:

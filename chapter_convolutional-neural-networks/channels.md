@@ -3,25 +3,25 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Multiple Input and Multiple Output Channels
+# Keli įvesties ir keli išvesties kanalai
 :label:`sec_channels`
 
-While we described the multiple channels
-that comprise each image (e.g., color images have the standard RGB channels
-to indicate the amount of red, green and blue) and convolutional layers for multiple channels in :numref:`subsec_why-conv-channels`,
-until now, we simplified all of our numerical examples
-by working with just a single input and a single output channel.
-This allowed us to think of our inputs, convolution kernels,
-and outputs each as two-dimensional tensors.
+Nors :numref:`subsec_why-conv-channels` aprašėme kelis kanalus,
+sudarančius kiekvieną vaizdą (pvz., spalvoti vaizdai turi standartinius RGB kanalus,
+nurodančius raudonos, žalios ir mėlynos kiekį), ir konvoliucinius sluoksnius keliems kanalams,
+iki šiol supaprastinome visus savo skaitinius pavyzdžius,
+dirbdami tik su vienu įvesties ir vienu išvesties kanalu.
+Tai leido mums savo įvestis, konvoliucijos branduolius
+ir išvestis laikyti dvimačiais tenzoriais.
 
-When we add channels into the mix,
-our inputs and hidden representations
-both become three-dimensional tensors.
-For example, each RGB input image has shape $3\times h\times w$.
-We refer to this axis, with a size of 3, as the *channel* dimension. The notion of
-channels is as old as CNNs themselves: for instance LeNet-5 :cite:`LeCun.Jackel.Bottou.ea.1995` uses them. 
-In this section, we will take a deeper look
-at convolution kernels with multiple input and multiple output channels.
+Kai pridedame kanalus,
+mūsų įvestys ir paslėptieji atvaizdai
+tampa trimačiais tenzoriais.
+Pavyzdžiui, kiekvieno RGB įvesties vaizdo forma yra $3\times h\times w$.
+Šią ašį, kurios dydis 3, vadiname *kanalų* dimensija. Kanalų sąvoka
+yra tokia pat sena kaip patys CNN: pavyzdžiui, LeNet-5 :cite:`LeCun.Jackel.Bottou.ea.1995` jas naudoja.
+Šiame skyrelyje giliau pažvelgsime
+į konvoliucijos branduolius su keliais įvesties ir keliais išvesties kanalais.
 
 ```{.python .input}
 %%tab mxnet
@@ -49,45 +49,45 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Multiple Input Channels
+## Keli įvesties kanalai
 
-When the input data contains multiple channels,
-we need to construct a convolution kernel
-with the same number of input channels as the input data,
-so that it can perform cross-correlation with the input data.
-Assuming that the number of channels for the input data is $c_\textrm{i}$,
-the number of input channels of the convolution kernel also needs to be $c_\textrm{i}$. If our convolution kernel's window shape is $k_\textrm{h}\times k_\textrm{w}$,
-then, when $c_\textrm{i}=1$, we can think of our convolution kernel
-as just a two-dimensional tensor of shape $k_\textrm{h}\times k_\textrm{w}$.
+Kai įvesties duomenys turi kelis kanalus,
+turime sukonstruoti konvoliucijos branduolį
+su tokiu pat įvesties kanalų skaičiumi kaip ir įvesties duomenys,
+kad jis galėtų atlikti kryžminę koreliaciją su įvesties duomenimis.
+Tarkime, kad įvesties duomenų kanalų skaičius yra $c_\textrm{i}$,
+tada konvoliucijos branduolio įvesties kanalų skaičius taip pat turi būti $c_\textrm{i}$. Jei mūsų konvoliucijos branduolio lango forma yra $k_\textrm{h}\times k_\textrm{w}$,
+tai, kai $c_\textrm{i}=1$, savo konvoliucijos branduolį galime laikyti
+tiesiog dvimačiu tenzoriumi, kurio forma $k_\textrm{h}\times k_\textrm{w}$.
 
-However, when $c_\textrm{i}>1$, we need a kernel
-that contains a tensor of shape $k_\textrm{h}\times k_\textrm{w}$ for *every* input channel. Concatenating these $c_\textrm{i}$ tensors together
-yields a convolution kernel of shape $c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$.
-Since the input and convolution kernel each have $c_\textrm{i}$ channels,
-we can perform a cross-correlation operation
-on the two-dimensional tensor of the input
-and the two-dimensional tensor of the convolution kernel
-for each channel, adding the $c_\textrm{i}$ results together
-(summing over the channels)
-to yield a two-dimensional tensor.
-This is the result of a two-dimensional cross-correlation
-between a multi-channel input and
-a multi-input-channel convolution kernel.
+Tačiau, kai $c_\textrm{i}>1$, mums reikia branduolio,
+kuriame yra formos $k_\textrm{h}\times k_\textrm{w}$ tenzorius *kiekvienam* įvesties kanalui. Sujungus šiuos $c_\textrm{i}$ tenzorių
+gaunamas konvoliucijos branduolys, kurio forma $c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$.
+Kadangi įvestis ir konvoliucijos branduolys turi po $c_\textrm{i}$ kanalų,
+galime atlikti kryžminės koreliacijos operaciją
+su dvimačiu įvesties tenzoriumi
+ir dvimačiu konvoliucijos branduolio tenzoriumi
+kiekvienam kanalui, sudėdami $c_\textrm{i}$ rezultatus
+(sumuodami per kanalus),
+kad gautume dvimatį tenzorių.
+Tai yra dvimatės kryžminės koreliacijos rezultatas
+tarp daugiakanalės įvesties ir
+konvoliucijos branduolio su keliais įvesties kanalais.
 
-:numref:`fig_conv_multi_in` provides an example 
-of a two-dimensional cross-correlation with two input channels.
-The shaded portions are the first output element
-as well as the input and kernel tensor elements used for the output computation:
+:numref:`fig_conv_multi_in` pateiktas dvimatės kryžminės koreliacijos
+su dviem įvesties kanalais pavyzdys.
+Pažymėtos dalys yra pirmasis išvesties elementas
+ir įvesties bei branduolio tenzoriaus elementai, naudoti išvesčiai skaičiuoti:
 $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$.
 
-![Cross-correlation computation with two input channels.](../img/conv-multi-in.svg)
+![Kryžminės koreliacijos skaičiavimas su dviem įvesties kanalais.](../img/conv-multi-in.svg)
 :label:`fig_conv_multi_in`
 
 
-To make sure we really understand what is going on here,
-we can (**implement cross-correlation operations with multiple input channels**) ourselves.
-Notice that all we are doing is performing a cross-correlation operation
-per channel and then adding up the results.
+Kad įsitikintume, jog tikrai suprantame, kas čia vyksta,
+patys galime (**įgyvendinti kryžminės koreliacijos operacijas su keliais įvesties kanalais**).
+Atkreipkite dėmesį, kad viskas, ką darome, yra kryžminės koreliacijos operacija
+kiekvienam kanalui, o tada rezultatų sudėjimas.
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -103,9 +103,9 @@ def corr2d_multi_in(X, K):
     return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K`
-corresponding to the values in :numref:`fig_conv_multi_in`
-to (**validate the output**) of the cross-correlation operation.
+Galime sukonstruoti įvesties tenzorių `X` ir branduolio tenzorių `K`,
+atitinkančius reikšmes :numref:`fig_conv_multi_in`,
+kad (**patvirtintume**) kryžminės koreliacijos operacijos (**išvestį**).
 
 ```{.python .input}
 %%tab all
@@ -116,43 +116,43 @@ K = d2l.tensor([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])
 corr2d_multi_in(X, K)
 ```
 
-## Multiple Output Channels
+## Keli išvesties kanalai
 :label:`subsec_multi-output-channels`
 
-Regardless of the number of input channels,
-so far we always ended up with one output channel.
-However, as we discussed in :numref:`subsec_why-conv-channels`,
-it turns out to be essential to have multiple channels at each layer.
-In the most popular neural network architectures,
-we actually increase the channel dimension
-as we go deeper in the neural network,
-typically downsampling to trade off spatial resolution
-for greater *channel depth*.
-Intuitively, you could think of each channel
-as responding to a different set of features.
-The reality is a bit more complicated than this. A naive interpretation would suggest 
-that representations are learned independently per pixel or per channel. 
-Instead, channels are optimized to be jointly useful.
-This means that rather than mapping a single channel to an edge detector, it may simply mean 
-that some direction in channel space corresponds to detecting edges.
+Nepriklausomai nuo įvesties kanalų skaičiaus,
+iki šiol visada gaudavome vieną išvesties kanalą.
+Tačiau, kaip aptarėme :numref:`subsec_why-conv-channels`,
+paaiškėja, kad kiekviename sluoksnyje būtina turėti kelis kanalus.
+Populiariausiose neuroninių tinklų architektūrose
+iš tikrųjų didiname kanalų dimensiją,
+eidami gilyn į neuroninį tinklą,
+paprastai sumažindami diskretizavimo dažnį, kad iškeistume erdvinę skyrą
+į didesnį *kanalų gylį*.
+Intuityviai galite įsivaizduoti, kad kiekvienas kanalas
+reaguoja į skirtingą požymių rinkinį.
+Tikrovė yra šiek tiek sudėtingesnė. Naivi interpretacija leistų manyti,
+kad atvaizdai išmokstami nepriklausomai kiekvienam pikseliui ar kiekvienam kanalui.
+Vietoj to kanalai optimizuojami taip, kad būtų naudingi kartu.
+Tai reiškia, kad užuot priskyrus vieną kanalą kraštų detektoriui, gali tiesiog reikšti,
+kad tam tikra kryptis kanalų erdvėje atitinka kraštų aptikimą.
 
-Denote by $c_\textrm{i}$ and $c_\textrm{o}$ the number
-of input and output channels, respectively,
-and by $k_\textrm{h}$ and $k_\textrm{w}$ the height and width of the kernel.
-To get an output with multiple channels,
-we can create a kernel tensor
-of shape $c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$
-for *every* output channel.
-We concatenate them on the output channel dimension,
-so that the shape of the convolution kernel
-is $c_\textrm{o}\times c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$.
-In cross-correlation operations,
-the result on each output channel is calculated
-from the convolution kernel corresponding to that output channel
-and takes input from all channels in the input tensor.
+Tegul $c_\textrm{i}$ ir $c_\textrm{o}$ žymi atitinkamai įvesties ir išvesties
+kanalų skaičių,
+o $k_\textrm{h}$ ir $k_\textrm{w}$ – branduolio aukštį ir plotį.
+Kad gautume išvestį su keliais kanalais,
+galime sukurti formos $c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$
+branduolio tenzorių
+*kiekvienam* išvesties kanalui.
+Juos sujungiame išvesties kanalų dimensijoje,
+taip kad konvoliucijos branduolio forma
+būtų $c_\textrm{o}\times c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$.
+Kryžminės koreliacijos operacijose
+rezultatas kiekviename išvesties kanale apskaičiuojamas
+pagal tą išvesties kanalą atitinkantį konvoliucijos branduolį
+ir gauna įvestį iš visų įvesties tenzoriaus kanalų.
 
-We implement a cross-correlation function
-to [**calculate the output of multiple channels**] as shown below.
+Įgyvendiname kryžminės koreliacijos funkciją,
+kad [**apskaičiuotume kelių kanalų išvestį**], kaip parodyta žemiau.
 
 ```{.python .input}
 %%tab all
@@ -163,8 +163,8 @@ def corr2d_multi_in_out(X, K):
     return d2l.stack([corr2d_multi_in(X, k) for k in K], 0)
 ```
 
-We construct a trivial convolution kernel with three output channels
-by concatenating the kernel tensor for `K` with `K+1` and `K+2`.
+Sukonstruojame trivialų konvoliucijos branduolį su trimis išvesties kanalais,
+sujungdami `K` branduolio tenzorių su `K+1` ir `K+2`.
 
 ```{.python .input}
 %%tab all
@@ -172,63 +172,61 @@ K = d2l.stack((K, K + 1, K + 2), 0)
 K.shape
 ```
 
-Below, we perform cross-correlation operations
-on the input tensor `X` with the kernel tensor `K`.
-Now the output contains three channels.
-The result of the first channel is consistent
-with the result of the previous input tensor `X`
-and the multi-input channel,
-single-output channel kernel.
+Toliau atliekame kryžminės koreliacijos operacijas
+su įvesties tenzoriumi `X` ir branduolio tenzoriumi `K`.
+Dabar išvestyje yra trys kanalai.
+Pirmojo kanalo rezultatas sutampa
+su ankstesnio įvesties tenzoriaus `X`
+ir branduolio su keliais įvesties kanalais bei
+vienu išvesties kanalu rezultatu.
 
 ```{.python .input}
 %%tab all
 corr2d_multi_in_out(X, K)
 ```
 
-## $1\times 1$ Convolutional Layer
+## $1\times 1$ konvoliucinis sluoksnis
 :label:`subsec_1x1`
 
-At first, a [**$1 \times 1$ convolution**], i.e., $k_\textrm{h} = k_\textrm{w} = 1$,
-does not seem to make much sense.
-After all, a convolution correlates adjacent pixels.
-A $1 \times 1$ convolution obviously does not.
-Nonetheless, they are popular operations that are sometimes included
-in the designs of complex deep networks :cite:`Lin.Chen.Yan.2013,Szegedy.Ioffe.Vanhoucke.ea.2017`.
-Let's see in some detail what it actually does.
+Iš pirmo žvilgsnio [**$1 \times 1$ konvoliucija**], t. y. $k_\textrm{h} = k_\textrm{w} = 1$,
+neatrodo labai prasminga.
+Juk konvoliucija koreliuoja gretimus pikselius.
+$1 \times 1$ konvoliucija akivaizdžiai to nedaro.
+Vis dėlto tai populiarios operacijos, kurios kartais įtraukiamos
+į sudėtingų giliųjų tinklų dizainą :cite:`Lin.Chen.Yan.2013,Szegedy.Ioffe.Vanhoucke.ea.2017`.
+Pažiūrėkime šiek tiek išsamiau, ką ji iš tikrųjų daro.
 
-Because the minimum window is used,
-the $1\times 1$ convolution loses the ability
-of larger convolutional layers
-to recognize patterns consisting of interactions
-among adjacent elements in the height and width dimensions.
-The only computation of the $1\times 1$ convolution occurs
-on the channel dimension.
+Kadangi naudojamas mažiausias langas,
+$1\times 1$ konvoliucija praranda didesnių konvoliucinių sluoksnių gebėjimą
+atpažinti šablonus, sudarytus iš sąveikų
+tarp gretimų elementų aukščio ir pločio dimensijose.
+Vienintelis $1\times 1$ konvoliucijos skaičiavimas vyksta
+kanalų dimensijoje.
 
-:numref:`fig_conv_1x1` shows the cross-correlation computation
-using the $1\times 1$ convolution kernel
-with 3 input channels and 2 output channels.
-Note that the inputs and outputs have the same height and width.
-Each element in the output is derived
-from a linear combination of elements *at the same position*
-in the input image.
-You could think of the $1\times 1$ convolutional layer
-as constituting a fully connected layer applied at every single pixel location
-to transform the $c_\textrm{i}$ corresponding input values into $c_\textrm{o}$ output values.
-Because this is still a convolutional layer,
-the weights are tied across pixel location.
-Thus the $1\times 1$ convolutional layer requires $c_\textrm{o}\times c_\textrm{i}$ weights
-(plus the bias). Also note that convolutional layers are typically followed 
-by nonlinearities. This ensures that $1 \times 1$ convolutions cannot simply be 
-folded into other convolutions. 
+:numref:`fig_conv_1x1` parodytas kryžminės koreliacijos skaičiavimas
+naudojant $1\times 1$ konvoliucijos branduolį
+su 3 įvesties kanalais ir 2 išvesties kanalais.
+Atkreipkite dėmesį, kad įvestys ir išvestys turi tą patį aukštį ir plotį.
+Kiekvienas išvesties elementas gaunamas
+iš įvesties vaizdo elementų *toje pačioje pozicijoje* tiesinio derinio.
+$1\times 1$ konvoliucinį sluoksnį galite laikyti
+pilnai sujungtu sluoksniu, taikomu kiekvienoje pikselio vietoje,
+kad $c_\textrm{i}$ atitinkamų įvesties reikšmių transformuotų į $c_\textrm{o}$ išvesties reikšmių.
+Kadangi tai vis dar yra konvoliucinis sluoksnis,
+svoriai yra susieti per pikselių vietas.
+Taigi $1\times 1$ konvoliuciniam sluoksniui reikia $c_\textrm{o}\times c_\textrm{i}$ svorių
+(plius poslinkis). Taip pat atkreipkite dėmesį, kad po konvoliucinių sluoksnių paprastai
+eina netiesiškumai. Tai užtikrina, kad $1 \times 1$ konvoliucijų negalima tiesiog
+sulieti su kitomis konvoliucijomis.
 
-![The cross-correlation computation uses the $1\times 1$ convolution kernel with three input channels and two output channels. The input and output have the same height and width.](../img/conv-1x1.svg)
+![Kryžminės koreliacijos skaičiavimas naudoja $1\times 1$ konvoliucijos branduolį su trimis įvesties kanalais ir dviem išvesties kanalais. Įvestis ir išvestis turi tą patį aukštį ir plotį.](../img/conv-1x1.svg)
 :label:`fig_conv_1x1`
 
-Let's check whether this works in practice:
-we implement a $1 \times 1$ convolution
-using a fully connected layer.
-The only thing is that we need to make some adjustments
-to the data shape before and after the matrix multiplication.
+Patikrinkime, ar tai veikia praktikoje:
+įgyvendiname $1 \times 1$ konvoliuciją
+naudodami pilnai sujungtą sluoksnį.
+Vienintelis dalykas – turime šiek tiek pakoreguoti
+duomenų formą prieš matricų daugybą ir po jos.
 
 ```{.python .input}
 %%tab all
@@ -242,9 +240,9 @@ def corr2d_multi_in_out_1x1(X, K):
     return d2l.reshape(Y, (c_o, h, w))
 ```
 
-When performing $1\times 1$ convolutions,
-the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`.
-Let's check this with some sample data.
+Atliekant $1\times 1$ konvoliucijas,
+aukščiau pateikta funkcija yra ekvivalenti anksčiau įgyvendintai kryžminės koreliacijos funkcijai `corr2d_multi_in_out`.
+Patikrinkime tai su keliais pavyzdiniais duomenimis.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -273,50 +271,49 @@ Y2 = corr2d_multi_in_out(X, K)
 assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 ```
 
-## Discussion
+## Diskusija
 
-Channels allow us to combine the best of both worlds: MLPs that allow for significant nonlinearities and convolutions that allow for *localized* analysis of features. In particular, channels allow the CNN to reason with multiple features, such as edge and shape detectors at the same time. They also offer a practical trade-off between the drastic parameter reduction arising from translation invariance and locality, and the need for expressive and diverse models in computer vision. 
+Kanalai leidžia mums sujungti geriausias abiejų pasaulių savybes: MLP, leidžiančius reikšmingus netiesiškumus, ir konvoliucijas, leidžiančias *lokalizuotą* požymių analizę. Visų pirma kanalai leidžia CNN samprotauti su keliais požymiais, tokiais kaip kraštų ir formų detektoriai vienu metu. Jie taip pat siūlo praktišką kompromisą tarp drastiško parametrų sumažinimo, atsirandančio dėl postūmio invariantiškumo ir lokalumo, ir raiškių bei įvairių modelių poreikio kompiuteriniame matyme.
 
-Note, though, that this flexibility comes at a price. Given an image of size $(h \times w)$, the cost for computing a $k \times k$ convolution is $\mathcal{O}(h \cdot w \cdot k^2)$. For $c_\textrm{i}$ and $c_\textrm{o}$ input and output channels respectively this increases to $\mathcal{O}(h \cdot w \cdot k^2 \cdot c_\textrm{i} \cdot c_\textrm{o})$. For a $256 \times 256$ pixel image with a $5 \times 5$ kernel and $128$ input and output channels respectively this amounts to over 53 billion operations (we count multiplications and additions separately). Later on we will encounter effective strategies to cut down on the cost, e.g., by requiring the channel-wise operations to be block-diagonal, leading to architectures such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
+Tačiau atkreipkite dėmesį, kad šis lankstumas kainuoja. Turint $(h \times w)$ dydžio vaizdą, $k \times k$ konvoliucijos skaičiavimo kaina yra $\mathcal{O}(h \cdot w \cdot k^2)$. Atitinkamai $c_\textrm{i}$ įvesties ir $c_\textrm{o}$ išvesties kanalams tai padidėja iki $\mathcal{O}(h \cdot w \cdot k^2 \cdot c_\textrm{i} \cdot c_\textrm{o})$. $256 \times 256$ pikselių vaizdui su $5 \times 5$ branduoliu ir atitinkamai $128$ įvesties ir išvesties kanalų tai sudaro daugiau nei 53 milijardus operacijų (daugybą ir sudėtį skaičiuojame atskirai). Vėliau susidursime su efektyviomis strategijomis kainai sumažinti, pvz., reikalaujant, kad operacijos pagal kanalus būtų blokinės įstrižainės, o tai veda prie tokių architektūrų kaip ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`.
 
-## Exercises
+## Pratimai
 
-1. Assume that we have two convolution kernels of size $k_1$ and $k_2$, respectively 
-   (with no nonlinearity in between).
-    1. Prove that the result of the operation can be expressed by a single convolution.
-    1. What is the dimensionality of the equivalent single convolution?
-    1. Is the converse true, i.e., can you always decompose a convolution into two smaller ones?
-1. Assume an input of shape $c_\textrm{i}\times h\times w$ and a convolution kernel of shape 
-   $c_\textrm{o}\times c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$, padding of $(p_\textrm{h}, p_\textrm{w})$, and stride of $(s_\textrm{h}, s_\textrm{w})$.
-    1. What is the computational cost (multiplications and additions) for the forward propagation?
-    1. What is the memory footprint?
-    1. What is the memory footprint for the backward computation?
-    1. What is the computational cost for the backpropagation?
-1. By what factor does the number of calculations increase if we double both the number of input channels 
-   $c_\textrm{i}$ and the number of output channels $c_\textrm{o}$? What happens if we double the padding?
-1. Are the variables `Y1` and `Y2` in the final example of this section exactly the same? Why?
-1. Express convolutions as a matrix multiplication, even when the convolution window is not $1 \times 1$. 
-1. Your task is to implement fast convolutions with a $k \times k$ kernel. One of the algorithm candidates 
-   is to scan horizontally across the source, reading a $k$-wide strip and computing the $1$-wide output strip 
-   one value at a time. The alternative is to read a $k + \Delta$ wide strip and compute a $\Delta$-wide 
-   output strip. Why is the latter preferable? Is there a limit to how large you should choose $\Delta$?
-1. Assume that we have a $c \times c$ matrix. 
-    1. How much faster is it to multiply with a block-diagonal matrix if the matrix is broken up into $b$ blocks?
-    1. What is the downside of having $b$ blocks? How could you fix it, at least partly?
+1. Tarkime, kad turime du konvoliucijos branduolius, kurių dydžiai atitinkamai $k_1$ ir $k_2$
+   (be netiesiškumo tarp jų).
+    1. Įrodykite, kad operacijos rezultatą galima išreikšti viena konvoliucija.
+    1. Kokia yra ekvivalentiškos vienos konvoliucijos dimensija?
+    1. Ar teisingas atvirkštinis teiginys, t. y. ar visada galima konvoliuciją išskaidyti į dvi mažesnes?
+1. Tarkime, kad įvesties forma yra $c_\textrm{i}\times h\times w$, konvoliucijos branduolio forma –
+   $c_\textrm{o}\times c_\textrm{i}\times k_\textrm{h}\times k_\textrm{w}$, papildymas – $(p_\textrm{h}, p_\textrm{w})$, o žingsnis – $(s_\textrm{h}, s_\textrm{w})$.
+    1. Kokia yra tiesioginio sklidimo skaičiavimo kaina (daugybos ir sudėties)?
+    1. Kokia yra atminties apimtis?
+    1. Kokia yra atminties apimtis atgaliniam skaičiavimui?
+    1. Kokia yra atgalinio sklidimo skaičiavimo kaina?
+1. Kiek kartų padidėja skaičiavimų skaičius, jei padvigubiname ir įvesties kanalų skaičių
+   $c_\textrm{i}$, ir išvesties kanalų skaičių $c_\textrm{o}$? Kas nutinka, jei padvigubiname papildymą?
+1. Ar kintamieji `Y1` ir `Y2` paskutiniame šio skyrelio pavyzdyje yra visiškai vienodi? Kodėl?
+1. Išreikškite konvoliucijas kaip matricų daugybą, net kai konvoliucijos langas nėra $1 \times 1$.
+1. Jūsų užduotis – įgyvendinti greitas konvoliucijas su $k \times k$ branduoliu. Vienas iš algoritmo kandidatų
+   yra skenuoti horizontaliai per šaltinį, skaitant $k$ pločio juostą ir apskaičiuojant $1$ pločio išvesties juostą
+   po vieną reikšmę. Alternatyva yra nuskaityti $k + \Delta$ pločio juostą ir apskaičiuoti $\Delta$ pločio
+   išvesties juostą. Kodėl pastaroji yra geresnė? Ar yra riba, kokį didelį $\Delta$ turėtumėte rinktis?
+1. Tarkime, kad turime $c \times c$ matricą.
+    1. Kiek greičiau dauginti iš blokinės įstrižainės matricos, jei matrica išskaidyta į $b$ blokų?
+    1. Koks yra $b$ blokų turėjimo trūkumas? Kaip jį galėtumėte ištaisyti, bent iš dalies?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/69)
+[Diskusijos](https://discuss.d2l.ai/t/69)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/70)
+[Diskusijos](https://discuss.d2l.ai/t/70)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/273)
+[Diskusijos](https://discuss.d2l.ai/t/273)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/17998)
+[Diskusijos](https://discuss.d2l.ai/t/17998)
 :end_tab:
-

@@ -1,15 +1,15 @@
-# Recurrent Neural Network Implementation from Scratch
+# Rekurentinio neuroninio tinklo įgyvendinimas nuo nulio
 :label:`sec_rnn-scratch`
 
-We are now ready to implement an RNN from scratch.
-In particular, we will train this RNN to function
-as a character-level language model
-(see :numref:`sec_rnn`)
-and train it on a corpus consisting of 
-the entire text of H. G. Wells' *The Time Machine*,
-following the data processing steps 
-outlined in :numref:`sec_text-sequence`.
-We start by loading the dataset.
+Dabar esame pasirengę įgyvendinti RNN nuo nulio.
+Visų pirma apmokysime šį RNN veikti
+kaip simbolių lygio kalbos modelį
+(žr. :numref:`sec_rnn`)
+ir apmokysime jį tekstyne, sudarytame iš
+viso H. G. Wellso *Laiko mašinos* teksto,
+laikydamiesi duomenų apdorojimo žingsnių,
+aprašytų :numref:`sec_text-sequence`.
+Pradedame nuo duomenų rinkinio įkėlimo.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -53,13 +53,13 @@ from jax import numpy as jnp
 import math
 ```
 
-## RNN Model
+## RNN modelis
 
-We begin by defining a class 
-to implement the RNN model
+Pradedame apibrėždami klasę
+RNN modeliui įgyvendinti
 (:numref:`subsec_rnn_w_hidden_states`).
-Note that the number of hidden units `num_hiddens` 
-is a tunable hyperparameter.
+Atkreipkite dėmesį, kad paslėptųjų vienetų skaičius `num_hiddens`
+yra derinamas hiperparametras.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -103,15 +103,15 @@ class RNNScratch(nn.Module):  #@save
         self.b_h = self.param('b_h', nn.initializers.zeros, (self.num_hiddens))
 ```
 
-[**The `forward` method below defines how to compute 
-the output and hidden state at any time step,
-given the current input and the state of the model
-at the previous time step.**]
-Note that the RNN model loops through 
-the outermost dimension of `inputs`,
-updating the hidden state 
-one time step at a time.
-The model here uses a $\tanh$ activation function (:numref:`subsec_tanh`).
+[**Toliau pateiktas metodas `forward` apibrėžia, kaip apskaičiuoti
+išvestį ir paslėptąją būseną bet kuriuo laiko žingsniu,
+turint dabartinę įvestį ir modelio būseną
+ankstesniu laiko žingsniu.**]
+Atkreipkite dėmesį, kad RNN modelis eina ciklu per
+išorinę `inputs` dimensiją,
+atnaujindamas paslėptąją būseną
+po vieną laiko žingsnį.
+Čia modelis naudoja $\tanh$ aktyvacijos funkciją (:numref:`subsec_tanh`).
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -154,7 +154,7 @@ def __call__(self, inputs, state=None):
     return outputs, state
 ```
 
-We can feed a minibatch of input sequences into an RNN model as follows.
+Įvesties sekų minirinkinį į RNN modelį galime paduoti taip.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -172,10 +172,10 @@ X = d2l.ones((num_steps, batch_size, num_inputs))
 (outputs, state), _ = rnn.init_with_output(d2l.get_key(), X)
 ```
 
-Let's check whether the RNN model
-produces results of the correct shapes
-to ensure that the dimensionality 
-of the hidden state remains unchanged.
+Patikrinkime, ar RNN modelis
+duoda teisingos formos rezultatus,
+kad užtikrintume, jog paslėptosios būsenos dimensija
+išlieka nepakitusi.
 
 ```{.python .input}
 %%tab all
@@ -193,21 +193,20 @@ check_shape(outputs[0], (batch_size, num_hiddens))
 check_shape(state, (batch_size, num_hiddens))
 ```
 
-## RNN-Based Language Model
+## RNN pagrįstas kalbos modelis
 
-The following `RNNLMScratch` class defines 
-an RNN-based language model,
-where we pass in our RNN 
-via the `rnn` argument
-of the `__init__` method.
-When training language models, 
-the inputs and outputs are 
-from the same vocabulary. 
-Hence, they have the same dimension,
-which is equal to the vocabulary size.
-Note that we use perplexity to evaluate the model. 
-As discussed in :numref:`subsec_perplexity`, this ensures 
-that sequences of different length are comparable.
+Toliau pateikta klasė `RNNLMScratch` apibrėžia
+RNN pagrįstą kalbos modelį,
+kur savo RNN perduodame per
+metodo `__init__` argumentą `rnn`.
+Apmokant kalbos modelius,
+įvestys ir išvestys yra
+iš to paties žodyno.
+Todėl jos turi tą pačią dimensiją,
+lygią žodyno dydžiui.
+Atkreipkite dėmesį, kad modeliui vertinti naudojame painumą.
+Kaip aptarta :numref:`subsec_perplexity`, tai užtikrina,
+kad skirtingo ilgio sekos būtų palyginamos.
 
 ```{.python .input}
 %%tab pytorch
@@ -290,36 +289,36 @@ class RNNLMScratch(d2l.Classifier):  #@save
         self.plot('ppl', d2l.exp(l), train=False)
 ```
 
-### [**One-Hot Encoding**]
+### [**Vienkartinis kodavimas**]
 
-Recall that each token is represented 
-by a numerical index indicating the
-position in the vocabulary of the 
-corresponding word/character/word piece.
-You might be tempted to build a neural network
-with a single input node (at each time step),
-where the index could be fed in as a scalar value.
-This works when we are dealing with numerical inputs 
-like price or temperature, where any two values
-sufficiently close together
-should be treated similarly.
-But this does not quite make sense. 
-The $45^{\textrm{th}}$ and $46^{\textrm{th}}$ words 
-in our vocabulary happen to be "their" and "said",
-whose meanings are not remotely similar.
+Prisiminkite, kad kiekvienas teksto vienetas pavaizduojamas
+skaitiniu indeksu, nurodančiu
+atitinkamo žodžio / simbolio / žodžio dalies
+poziciją žodyne.
+Galite susigundyti sukurti neuroninį tinklą
+su vienu įvesties mazgu (kiekvienu laiko žingsniu),
+į kurį indeksą būtų galima paduoti kaip skaliarinę reikšmę.
+Tai veikia, kai dirbame su skaitinėmis įvestimis,
+tokiomis kaip kaina ar temperatūra, kur bet kurios dvi
+pakankamai artimos reikšmės
+turėtų būti traktuojamos panašiai.
+Tačiau tai nelabai prasminga.
+Mūsų žodyno $45$-as ir $46$-as žodžiai
+yra „their“ ir „said“,
+kurių reikšmės nė iš tolo nėra panašios.
 
-When dealing with such categorical data,
-the most common strategy is to represent
-each item by a *one-hot encoding*
-(recall from :numref:`subsec_classification-problem`).
-A one-hot encoding is a vector whose length
-is given by the size of the vocabulary $N$,
-where all entries are set to $0$,
-except for the entry corresponding 
-to our token, which is set to $1$.
-For example, if the vocabulary had five elements,
-then the one-hot vectors corresponding 
-to indices 0 and 2 would be the following.
+Dirbant su tokiais kategoriniais duomenimis,
+dažniausia strategija yra atvaizduoti
+kiekvieną elementą *vienkartiniu kodavimu*
+(prisiminkite iš :numref:`subsec_classification-problem`).
+Vienkartinis kodavimas yra vektorius, kurio ilgį
+nusako žodyno dydis $N$,
+kur visi įrašai nustatyti į $0$,
+išskyrus įrašą, atitinkantį
+mūsų teksto vienetą, kuris nustatomas į $1$.
+Pavyzdžiui, jei žodyne būtų penki elementai,
+tai vienkartiniai vektoriai, atitinkantys
+indeksus 0 ir 2, būtų tokie.
 
 ```{.python .input}
 %%tab mxnet
@@ -341,18 +340,18 @@ tf.one_hot(tf.constant([0, 2]), 5)
 jax.nn.one_hot(jnp.array([0, 2]), 5)
 ```
 
-(**The minibatches that we sample at each iteration
-will take the shape (batch size, number of time steps).
-Once representing each input as a one-hot vector,
-we can think of each minibatch as a three-dimensional tensor, 
-where the length along the third axis 
-is given by the vocabulary size (`len(vocab)`).**)
-We often transpose the input so that we will obtain an output 
-of shape (number of time steps, batch size, vocabulary size).
-This will allow us to loop more conveniently through the outermost dimension
-for updating hidden states of a minibatch,
-time step by time step
-(e.g., in the above `forward` method).
+(**Minirinkiniai, kuriuos imame kiekvienoje iteracijoje,
+turės formą (rinkinio dydis, laiko žingsnių skaičius).
+Kai kiekvieną įvestį pavaizduojame vienkartiniu vektoriumi,
+kiekvieną minirinkinį galime laikyti trimačiu tenzoriumi,
+kurio ilgį išilgai trečiosios ašies
+nusako žodyno dydis (`len(vocab)`).**)
+Dažnai transponuojame įvestį, kad gautume išvestį,
+kurios forma (laiko žingsnių skaičius, rinkinio dydis, žodyno dydis).
+Tai leis patogiau eiti ciklu per išorinę dimensiją,
+atnaujinant minirinkinio paslėptąsias būsenas,
+po vieną laiko žingsnį
+(pvz., aukščiau pateiktame metode `forward`).
 
 ```{.python .input}
 %%tab all
@@ -369,10 +368,10 @@ def one_hot(self, X):
         return jax.nn.one_hot(X.T, self.vocab_size)
 ```
 
-### Transforming RNN Outputs
+### RNN išvesčių transformavimas
 
-The language model uses a fully connected output layer
-to transform RNN outputs into token predictions at each time step.
+Kalbos modelis naudoja pilnai sujungtą išvesties sluoksnį,
+kad RNN išvestis transformuotų į teksto vienetų prognozes kiekvienu laiko žingsniu.
 
 ```{.python .input}
 %%tab all
@@ -388,8 +387,8 @@ def forward(self, X, state=None):
     return self.output_layer(rnn_outputs)
 ```
 
-Let's [**check whether the forward computation
-produces outputs with the correct shape.**]
+Pažiūrėkime, [**ar tiesioginis skaičiavimas
+duoda teisingos formos išvestis.**]
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -407,131 +406,131 @@ outputs, _ = model.init_with_output(d2l.get_key(),
 check_shape(outputs, (batch_size, num_steps, num_inputs))
 ```
 
-## [**Gradient Clipping**]
+## [**Gradientų apkarpymas**]
 
 
-While you are already used to thinking of neural networks
-as "deep" in the sense that many layers
-separate the input and output 
-even within a single time step,
-the length of the sequence introduces
-a new notion of depth.
-In addition to the passing through the network
-in the input-to-output direction,
-inputs at the first time step
-must pass through a chain of $T$ layers
-along the time steps in order 
-to influence the output of the model
-at the final time step.
-Taking the backwards view, in each iteration,
-we backpropagate gradients through time,
-resulting in a chain of matrix-products 
-of length  $\mathcal{O}(T)$.
-As mentioned in :numref:`sec_numerical_stability`, 
-this can result in numerical instability, 
-causing the gradients either to explode or vanish,
-depending on the properties of the weight matrices. 
+Nors jau pratę galvoti apie neuroninius tinklus
+kaip „gilius“ ta prasme, kad daug sluoksnių
+skiria įvestį ir išvestį
+net vieno laiko žingsnio ribose,
+sekos ilgis įveda
+naują gylio sąvoką.
+Be perėjimo per tinklą
+kryptimi nuo įvesties iki išvesties,
+įvestys pirmuoju laiko žingsniu
+turi praeiti per $T$ sluoksnių grandinę
+išilgai laiko žingsnių, kad
+paveiktų modelio išvestį
+paskutiniu laiko žingsniu.
+Žvelgiant atgaline kryptimi,
+kiekvienoje iteracijoje
+atgaline kryptimi sklidiname gradientus per laiką,
+gaudami $\mathcal{O}(T)$ ilgio
+matricų sandaugų grandinę.
+Kaip minėta :numref:`sec_numerical_stability`,
+tai gali lemti skaitinį nestabilumą,
+sukeliantį gradientų sprogimą arba išnykimą,
+priklausomai nuo svorių matricų savybių.
 
-Dealing with vanishing and exploding gradients 
-is a fundamental problem when designing RNNs
-and has inspired some of the biggest advances
-in modern neural network architectures.
-In the next chapter, we will talk about
-specialized architectures that were designed
-in hopes of mitigating the vanishing gradient problem.
-However, even modern RNNs often suffer
-from exploding gradients.
-One inelegant but ubiquitous solution
-is to simply clip the gradients 
-forcing the resulting "clipped" gradients
-to take smaller values. 
+Susidorojimas su nykstančiais ir sprogstančiais gradientais
+yra fundamentali problema projektuojant RNN
+ir paskatino kai kuriuos didžiausius
+šiuolaikinių neuroninių tinklų architektūrų pasiekimus.
+Kitame skyriuje kalbėsime apie
+specializuotas architektūras, sukurtas
+tikintis sušvelninti nykstančio gradiento problemą.
+Tačiau net šiuolaikiniai RNN dažnai kenčia
+nuo sprogstančių gradientų.
+Vienas nelabai elegantiškas, bet visuotinai paplitęs sprendimas
+yra tiesiog apkarpyti gradientus,
+priversdami gautus „apkarpytus“ gradientus
+įgyti mažesnes reikšmes.
 
 
-Generally speaking, when optimizing some objective
-by gradient descent, we iteratively update
-the parameter of interest, say a vector $\mathbf{x}$,
-but pushing it in the direction of the 
-negative gradient $\mathbf{g}$
-(in stochastic gradient descent, 
-we calculate this gradient
-on a randomly sampled minibatch).
-For example, with learning rate $\eta > 0$,
-each update takes the form 
+Apskritai, optimizuodami tam tikrą tikslą
+gradientiniu nusileidimu, iteratyviai atnaujiname
+dominantį parametrą, tarkime, vektorių $\mathbf{x}$,
+stumdami jį neigiamo gradiento $\mathbf{g}$ kryptimi
+(stochastiniame gradientiniame nusileidime
+šį gradientą skaičiuojame
+atsitiktinai atrinktame minirinkinyje).
+Pavyzdžiui, su mokymosi greičiu $\eta > 0$
+kiekvienas atnaujinimas yra pavidalo
 $\mathbf{x} \gets \mathbf{x} - \eta \mathbf{g}$.
-Let's further assume that the objective function $f$
-is sufficiently smooth. 
-Formally, we say that the objective 
-is *Lipschitz continuous* with constant $L$,
-meaning that for any $\mathbf{x}$ and $\mathbf{y}$, we have
+Toliau darykime prielaidą, kad tikslo funkcija $f$
+yra pakankamai glodi.
+Formaliai sakome, kad tikslas
+yra *Lipšico tolydus* su konstanta $L$,
+t. y. bet kuriems $\mathbf{x}$ ir $\mathbf{y}$ turime
 
 $$|f(\mathbf{x}) - f(\mathbf{y})| \leq L \|\mathbf{x} - \mathbf{y}\|.$$
 
-As you can see, when we update the parameter vector by subtracting $\eta \mathbf{g}$,
-the change in the value of the objective
-depends on the learning rate,
-the norm of the gradient and $L$ as follows:
+Kaip matote, kai atnaujiname parametrų vektorių atimdami $\eta \mathbf{g}$,
+tikslo reikšmės pokytis
+priklauso nuo mokymosi greičio,
+gradiento normos ir $L$ taip:
 
 $$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|.$$
 
-In other words, the objective cannot
-change by more than $L \eta \|\mathbf{g}\|$. 
-Having a small value for this upper bound 
-might be viewed as good or bad.
-On the downside, we are limiting the speed
-at which we can reduce the value of the objective.
-On the bright side, this limits by just how much
-we can go wrong in any one gradient step.
+Kitaip tariant, tikslas negali
+pasikeisti daugiau nei $L \eta \|\mathbf{g}\|$.
+Mažos šios viršutinės ribos reikšmės turėjimas
+gali būti vertinamas kaip gerai arba blogai.
+Neigiama pusė ta, kad ribojame greitį,
+kuriuo galime mažinti tikslo reikšmę.
+Teigiama pusė ta, kad tai riboja, kiek
+daug galime suklysti bet kuriame viename gradiento žingsnyje.
 
 
-When we say that gradients explode, 
-we mean that $\|\mathbf{g}\|$ 
-becomes excessively large.
-In this worst case, we might do so much
-damage in a single gradient step that we
-could undo all of the progress made over
-the course of thousands of training iterations.
-When gradients can be so large,
-neural network training often diverges,
-failing to reduce the value of the objective.
-At other times, training eventually converges
-but is unstable owing to massive spikes in the loss.
+Kai sakome, kad gradientai sprogsta,
+turime omenyje, kad $\|\mathbf{g}\|$
+tampa pernelyg didelis.
+Šiuo blogiausiu atveju galime padaryti tiek daug
+žalos viename gradiento žingsnyje, kad
+galime panaikinti visą pažangą, padarytą
+per tūkstančius apmokymo iteracijų.
+Kai gradientai gali būti tokie dideli,
+neuroninio tinklo apmokymas dažnai diverguoja,
+nepavykdamas sumažinti tikslo reikšmės.
+Kitais atvejais apmokymas galiausiai konverguoja,
+bet yra nestabilus dėl masyvių nuostolių šuolių.
 
 
-One way to limit the size of $L \eta \|\mathbf{g}\|$ 
-is to shrink the learning rate $\eta$ to tiny values.
-This has the advantage that we do not bias the updates.
-But what if we only *rarely* get large gradients?
-This drastic move slows down our progress at all steps,
-just to deal with the rare exploding gradient events.
-A popular alternative is to adopt a *gradient clipping* heuristic
-projecting the gradients $\mathbf{g}$ onto a ball 
-of some given radius $\theta$ as follows:
+Vienas būdas apriboti $L \eta \|\mathbf{g}\|$ dydį
+yra sumažinti mokymosi greitį $\eta$ iki mažyčių reikšmių.
+Tai turi pranašumą, kad nešaliname atnaujinimų.
+Bet ką daryti, jei dideli gradientai pasitaiko tik *retai*?
+Šis drastiškas žingsnis sulėtina mūsų pažangą visuose žingsniuose,
+tik tam, kad susidorotume su retais gradientų sprogimo atvejais.
+Populiari alternatyva yra taikyti *gradientų apkarpymo* euristiką,
+projektuojančią gradientus $\mathbf{g}$ į tam tikro
+duoto spindulio $\theta$ rutulį taip:
 
 (**$$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$**)
 
-This ensures that the gradient norm never exceeds $\theta$ 
-and that the updated gradient is entirely aligned 
-with the original direction of $\mathbf{g}$.
-It also has the desirable side-effect 
-of limiting the influence any given minibatch 
-(and within it any given sample) 
-can exert on the parameter vector. 
-This bestows a certain degree of robustness to the model. 
-To be clear, it is a hack. 
-Gradient clipping means that we are not always
-following the true gradient and it is hard 
-to reason analytically about the possible side effects.
-However, it is a very useful hack,
-and is widely adopted in RNN implementations
-in most deep learning frameworks.
+Tai užtikrina, kad gradiento norma niekada neviršys $\theta$
+ir kad atnaujintas gradientas visiškai sutaps
+su originalia $\mathbf{g}$ kryptimi.
+Tai taip pat turi pageidaujamą šalutinį poveikį –
+riboja įtaką, kurią bet kuris duotas minirinkinys
+(ir jame bet kuris duotas pavyzdys)
+gali daryti parametrų vektoriui.
+Tai suteikia modeliui tam tikrą atsparumo laipsnį.
+Kad būtų aišku, tai yra gudrybė (angl. *hack*).
+Gradientų apkarpymas reiškia, kad ne visada
+sekame tikrąjį gradientą, ir sunku
+analitiškai samprotauti apie galimus šalutinius poveikius.
+Vis dėlto tai labai naudinga gudrybė,
+plačiai taikoma RNN įgyvendinimuose
+daugumoje giliojo mokymosi karkasų.
 
 
-Below we define a method to clip gradients,
-which is invoked by the `fit_epoch` method of
-the `d2l.Trainer` class (see :numref:`sec_linear_scratch`).
-Note that when computing the gradient norm,
-we are concatenating all model parameters,
-treating them as a single giant parameter vector.
+Toliau apibrėžiame metodą gradientams apkarpyti,
+kurį iškviečia klasės `d2l.Trainer` metodas `fit_epoch`
+(žr. :numref:`sec_linear_scratch`).
+Atkreipkite dėmesį, kad skaičiuodami gradiento normą,
+sujungiame visus modelio parametrus,
+traktuodami juos kaip vieną milžinišką parametrų vektorių.
 
 ```{.python .input}
 %%tab mxnet
@@ -583,15 +582,15 @@ def clip_gradients(self, grad_clip_val, grads):
     return jax.tree_util.tree_map(clip, grads)
 ```
 
-## Training
+## Mokymas
 
-Using *The Time Machine* dataset (`data`),
-we train a character-level language model (`model`)
-based on the RNN (`rnn`) implemented from scratch.
-Note that we first calculate the gradients,
-then clip them, and finally 
-update the model parameters
-using the clipped gradients.
+Naudodami *Laiko mašinos* duomenų rinkinį (`data`),
+apmokome simbolių lygio kalbos modelį (`model`),
+pagrįstą nuo nulio įgyvendintu RNN (`rnn`).
+Atkreipkite dėmesį, kad pirmiausia apskaičiuojame gradientus,
+tada juos apkarpome, ir galiausiai
+atnaujiname modelio parametrus
+naudodami apkarpytus gradientus.
 
 ```{.python .input}
 %%tab all
@@ -608,38 +607,38 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## Decoding
+## Dekodavimas
 
-Once a language model has been learned,
-we can use it not only to predict the next token
-but to continue predicting each subsequent one,
-treating the previously predicted token as though
-it were the next in the input. 
-Sometimes we will just want to generate text
-as though we were starting at the beginning 
-of a document. 
-However, it is often useful to condition
-the language model on a user-supplied prefix.
-For example, if we were developing an
-autocomplete feature for a search engine
-or to assist users in writing emails,
-we would want to feed in what they 
-had written so far (the prefix), 
-and then generate a likely continuation.
+Kai kalbos modelis išmoktas,
+galime jį naudoti ne tik kitam teksto vienetui prognozuoti,
+bet ir toliau prognozuoti kiekvieną paskesnį,
+traktuodami anksčiau prognozuotą teksto vienetą taip, tarsi
+jis būtų kitas įvestyje.
+Kartais tiesiog norėsime generuoti tekstą,
+tarsi pradėtume nuo
+dokumento pradžios.
+Tačiau dažnai naudinga sąlygoti
+kalbos modelį pagal vartotojo pateiktą priešdėlį.
+Pavyzdžiui, jei kurtume
+automatinio užbaigimo funkciją paieškos sistemai
+arba padėtume vartotojams rašyti el. laiškus,
+norėtume paduoti tai, ką jie
+iki šiol parašė (priešdėlį),
+ir tada sugeneruoti tikėtiną tęsinį.
 
 
-[**The following `predict` method
-generates a continuation, one character at a time,
-after ingesting a user-provided `prefix`**].
-When looping through the characters in `prefix`,
-we keep passing the hidden state
-to the next time step 
-but do not generate any output.
-This is called the *warm-up* period.
-After ingesting the prefix, we are now
-ready to begin emitting the subsequent characters,
-each of which will be fed back into the model 
-as the input at the next time step.
+[**Toliau pateiktas metodas `predict`
+generuoja tęsinį po vieną simbolį,
+priėmęs vartotojo pateiktą `prefix`**].
+Einant ciklu per simbolius `prefix`,
+toliau perduodame paslėptąją būseną
+į kitą laiko žingsnį,
+bet negeneruojame jokios išvesties.
+Tai vadinama *apšilimo* periodu.
+Priėmę priešdėlį, dabar esame
+pasirengę pradėti išvesti paskesnius simbolius,
+kurių kiekvienas bus grąžinamas į modelį
+kaip įvestis kitame laiko žingsnyje.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -682,8 +681,8 @@ def predict(self, prefix, num_preds, vocab, params):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-In the following, we specify the prefix 
-and have it generate 20 additional characters.
+Toliau nurodome priešdėlį
+ir paprašome sugeneruoti 20 papildomų simbolių.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -700,52 +699,52 @@ model.predict('it has', 20, data.vocab)
 model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
-While implementing the above RNN model from scratch is instructive, it is not convenient.
-In the next section, we will see how to leverage deep learning frameworks to whip up RNNs
-using standard architectures, and to reap performance gains 
-by relying on highly optimized library functions.
+Nors aukščiau pateikto RNN modelio įgyvendinimas nuo nulio yra pamokantis, jis nėra patogus.
+Kitame skyrelyje pamatysime, kaip pasinaudoti giliojo mokymosi karkasais, kad greitai sukurtume RNN
+naudodami standartines architektūras ir gautume našumo naudos,
+pasikliaudami labai optimizuotomis bibliotekų funkcijomis.
 
 
-## Summary
+## Santrauka
 
-We can train RNN-based language models to generate text following the user-provided text prefix. 
-A simple RNN language model consists of input encoding, RNN modeling, and output generation.
-During training, gradient clipping can mitigate the problem of exploding gradients but does not address the problem of vanishing gradients. In the experiment, we implemented a simple RNN language model and trained it with gradient clipping on sequences of text, tokenized at the character level. By conditioning on a prefix, we can use a language model to generate likely continuations, which proves useful in many applications, e.g., autocomplete features.
+Galime apmokyti RNN pagrįstus kalbos modelius generuoti tekstą pagal vartotojo pateiktą teksto priešdėlį.
+Paprastą RNN kalbos modelį sudaro įvesties kodavimas, RNN modeliavimas ir išvesties generavimas.
+Apmokymo metu gradientų apkarpymas gali sušvelninti sprogstančių gradientų problemą, bet neišsprendžia nykstančių gradientų problemos. Eksperimente įgyvendinome paprastą RNN kalbos modelį ir apmokėme jį su gradientų apkarpymu tekstų sekose, suskaidytose simbolių lygiu. Sąlygodami pagal priešdėlį, galime naudoti kalbos modelį tikėtiniems tęsiniams generuoti, o tai pasirodo naudinga daugelyje taikymų, pvz., automatinio užbaigimo funkcijose.
 
 
-## Exercises
+## Pratimai
 
-1. Does the implemented language model predict the next token based on all the past tokens up to the very first token in *The Time Machine*? 
-1. Which hyperparameter controls the length of history used for prediction?
-1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
-1. Adjust the hyperparameters (e.g., number of epochs, number of hidden units, number of time steps in a minibatch, and learning rate) to improve the perplexity. How low can you go while sticking with this simple architecture?
-1. Replace one-hot encoding with learnable embeddings. Does this lead to better performance?
-1. Conduct an experiment to determine how well this language model 
-   trained on *The Time Machine* works on other books by H. G. Wells,
-   e.g., *The War of the Worlds*.
-1. Conduct another experiment to evaluate the perplexity of this model
-   on books written by other authors. 
-1. Modify the prediction method so as to use sampling 
-   rather than picking the most likely next character.
-    * What happens?
-    * Bias the model towards more likely outputs, e.g., 
-    by sampling from $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$ for $\alpha > 1$.
-1. Run the code in this section without clipping the gradient. What happens?
-1. Replace the activation function used in this section with ReLU 
-   and repeat the experiments in this section. Do we still need gradient clipping? Why?
+1. Ar įgyvendintas kalbos modelis prognozuoja kitą teksto vienetą pagal visus ankstesnius teksto vienetus iki pat pirmojo *Laiko mašinoje*?
+1. Kuris hiperparametras valdo prognozavimui naudojamos istorijos ilgį?
+1. Parodykite, kad vienkartinis kodavimas yra ekvivalentus skirtingo įterpinio parinkimui kiekvienam objektui.
+1. Pakoreguokite hiperparametrus (pvz., epochų skaičių, paslėptųjų vienetų skaičių, laiko žingsnių skaičių minirinkinyje ir mokymosi greitį), kad pagerintumėte painumą. Kiek žemai galite nusileisti, laikydamiesi šios paprastos architektūros?
+1. Pakeiskite vienkartinį kodavimą išmokstamais įterpiniais. Ar tai lemia geresnį našumą?
+1. Atlikite eksperimentą ir nustatykite, kaip gerai šis kalbos modelis,
+   apmokytas su *Laiko mašina*, veikia su kitomis H. G. Wellso knygomis,
+   pvz., *Pasaulių karas*.
+1. Atlikite kitą eksperimentą ir įvertinkite šio modelio painumą
+   su kitų autorių knygomis.
+1. Pakeiskite prognozavimo metodą taip, kad jis naudotų atranką,
+   o ne rinktųsi labiausiai tikėtiną kitą simbolį.
+    * Kas nutinka?
+    * Paslinkite modelį link labiau tikėtinų išvesčių, pvz.,
+    imdami imtis iš $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$, kai $\alpha > 1$.
+1. Paleiskite šio skyrelio kodą be gradiento apkarpymo. Kas nutinka?
+1. Pakeiskite šiame skyrelyje naudojamą aktyvacijos funkciją ReLU
+   ir pakartokite šio skyrelio eksperimentus. Ar vis dar reikia gradientų apkarpymo? Kodėl?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/336)
+[Diskusijos](https://discuss.d2l.ai/t/336)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/486)
+[Diskusijos](https://discuss.d2l.ai/t/486)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1052)
+[Diskusijos](https://discuss.d2l.ai/t/1052)
 :end_tab:
 
 :begin_tab:`jax`
-[Discussions](https://discuss.d2l.ai/t/18014)
+[Diskusijos](https://discuss.d2l.ai/t/18014)
 :end_tab:
