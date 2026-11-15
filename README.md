@@ -2,13 +2,15 @@
   <img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/static/logo-with-text.png" width="350">
 </div>
 
-# D2L.ai: Interactive Deep Learning Book with Multi-Framework Code, Math, and Discussions
+# D2L.ai lietuviškai: interaktyvi giliojo mokymosi knyga su kodu keliose bibliotekose, matematika ir diskusijomis
+
+> Tai lietuviškas vertimas. Originali knyga: [Dive into Deep Learning](https://d2l.ai/) ([d2l-ai/d2l-en](https://github.com/d2l-ai/d2l-en)). Vertimo būsena ir atsakomybė aprašyta skyriuje [Vertimas ir atsakomybė](#vertimas-ir-atsakomybė).
 
 [![Continuous Integration](https://github.com/d2l-ai/d2l-en/actions/workflows/ci.yml/badge.svg)](https://github.com/d2l-ai/d2l-en/actions/workflows/ci.yml)
 
-[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley](http://courses.d2l.ai/berkeley-stat-157/index.html)
+[Knygos svetainė (originalas)](https://d2l.ai/) | [STAT 157 kursas Berklio universitete](http://courses.d2l.ai/berkeley-stat-157/index.html)
 
-<h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
+<h5 align="center"><i>Geriausias būdas suprasti gilųjį mokymąsi – mokytis darant.</i></h5>
 
 <p align="center">
   <img width="200"  src="static/frontpage/_images/eq.jpg">
@@ -17,23 +19,23 @@
   <img width="200"  src="static/frontpage/_images/notebook.gif">
 </p>
 
-This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. The entire book is drafted in Jupyter notebooks, seamlessly integrating exposition figures, math, and interactive examples with self-contained code.
+Ši atvirojo kodo knyga yra mūsų bandymas padaryti gilųjį mokymąsi prieinamą, mokant jus sąvokų, konteksto ir kodo. Visa knyga parengta Jupyter užrašų knygutėse, sklandžiai sujungiančiose aiškinamąjį tekstą, paveikslus, matematiką ir interaktyvius pavyzdžius su savarankišku kodu.
 
-Our goal is to offer a resource that could
-1. be freely available for everyone;
-1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist;
-1. include runnable code, showing readers how to solve problems in practice;
-1. allow for rapid updates, both by us and also by the community at large;
-1. be complemented by a forum for interactive discussion of technical details and to answer questions.
+Mūsų tikslas – pasiūlyti išteklių, kuris:
+1. būtų nemokamai prieinamas visiems;
+1. suteiktų pakankamą techninį gylį, kad taptų atspirties tašku kelyje į taikomojo mašininio mokymo mokslininko profesiją;
+1. turėtų paleidžiamo kodo, rodančio skaitytojams, kaip praktiškai spręsti uždavinius;
+1. leistų greitai atnaujinti turinį, tiek mums, tiek plačiajai bendruomenei;
+1. būtų papildytas forumu interaktyviai techninių detalių diskusijai ir atsakymams į klausimus.
 
-## Universities Using D2L
+## Universitetai, naudojantys D2L
 <p align="center">
   <img width="600"  src="static/frontpage/_images/map.png">
 </p>
 
 
 
-If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
+Jei ši knyga jums naudinga, pažymėkite šią repozitoriją žvaigždute (★) arba cituokite knygą naudodami šį bibtex įrašą:
 
 ```
 @book{zhang2023dive,
@@ -46,31 +48,48 @@ If you find this book useful, please star (★) this repository or cite this boo
 ```
 
 
-## Endorsements
+## Atsiliepimai
 
-> <p>"In less than a decade, the AI revolution has swept from research labs to broad industries to every corner of our daily life.  Dive into Deep Learning is an excellent text on deep learning and deserves attention from anyone who wants to learn why deep learning has ignited the AI revolution: the most powerful technology force of our time."</p>
-> <b>&mdash; Jensen Huang, Founder and CEO, NVIDIA</b>
+> <p>„Per mažiau nei dešimtmetį dirbtinio intelekto revoliucija iš tyrimų laboratorijų išplito į plačias pramonės šakas ir visus mūsų kasdienio gyvenimo kampelius.  „Dive into Deep Learning“ yra puikus gilaus mokymosi vadovėlis, nusipelnęs kiekvieno, norinčio suprasti, kodėl gilusis mokymasis uždegė dirbtinio intelekto revoliuciją – galingiausią mūsų laikų technologinę jėgą, dėmesio.“</p>
+> <b>&mdash; Jensen Huang, NVIDIA įkūrėjas ir generalinis direktorius</b>
 
-> <p>"This is a timely, fascinating book, providing with not only a comprehensive overview of deep learning principles but also detailed algorithms with hands-on programming code, and moreover, a state-of-the-art introduction to deep learning in computer vision and natural language processing. Dive into this book if you want to dive into deep learning!"</p>
-> <b>&mdash; Jiawei Han, Michael Aiken Chair Professor, University of Illinois at Urbana-Champaign</b>
+> <p>„Tai savalaikė, žavi knyga, suteikianti ne tik išsamią giliojo mokymosi principų apžvalgą, bet ir detalius algoritmus su praktiniu programavimo kodu, be to, šiuolaikišką įvadą į gilųjį mokymąsi kompiuterinėje regoje ir natūraliosios kalbos apdorojime. Pasinerkite į šią knygą, jei norite pasinerti į gilųjį mokymąsi!“</p>
+> <b>&mdash; Jiawei Han, Michael Aiken katedros profesorius, Ilinojaus universitetas Urbana-Šampeinyje</b>
 
-> <p>"This is a highly welcome addition to the machine learning literature, with a focus on hands-on experience implemented via the integration of Jupyter notebooks. Students of deep learning should find this invaluable to become proficient in this field."</p>
-> <b>&mdash; Bernhard Schölkopf, Director, Max Planck Institute for Intelligent Systems</b>
+> <p>„Tai labai laukiamas papildymas mašininio mokymo literatūrai, orientuotas į praktinę patirtį, įgyvendinamą integruojant Jupyter užrašų knygutes. Giliojo mokymosi studentams tai turėtų būti neįkainojama, norint tapti šios srities profesionalais.“</p>
+> <b>&mdash; Bernhard Schölkopf, Maxo Plancko intelektualiųjų sistemų instituto direktorius</b>
 
-> <p>"Dive into Deep Learning strikes an excellent balance between hands-on learning and in-depth explanation. I've used it in my deep learning course and recommend it to anyone who wants to develop a thorough and practical understanding of deep learning."</p>
-> <b>&mdash; Colin Raffel, Assistant Professor, University of North Carolina, Chapel Hill</b>
+> <p>„Dive into Deep Learning puikiai subalansuoja praktinį mokymąsi ir nuodugnų aiškinimą. Naudojau ją savo giliojo mokymosi kurse ir rekomenduoju visiems, norintiems giliai ir praktiškai suprasti gilųjį mokymąsi.“</p>
+> <b>&mdash; Colin Raffel, docentas, Šiaurės Karolinos universitetas Čapel Hile</b>
 
-## Contributing ([Learn How](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html))
+## Vertimas
 
-This open source book has benefited from pedagogical suggestions, typo corrections, and other improvements from community contributors. Your help is valuable for making the book better for everyone.
+Šį lietuvišką vertimą iniciavo **Linas Petkevičius** ir **[Dirbtinio intelekto metodų laboratorija](https://aiml.lt)** (angl. *AI Methods Laboratory*, AIML), veikianti Vilniaus universiteto Matematikos ir informatikos fakulteto Informatikos institute. Laboratorija nagrinėja mašininį mokymą, nuotolinį tyrimą, didžiuosius kalbos modelius ir agentinį dirbtinį intelektą, taikomus Žemės stebėjimui, aplinkosaugai, sveikatos priežiūrai ir pramonei.
 
-**Dear [D2L contributors](https://github.com/d2l-ai/d2l-en/graphs/contributors), please email your GitHub ID and name to d2lbook.en AT gmail DOT com so your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#acknowledgments). Thanks.**
+Laboratorijos nuorodos:
+- Svetainė: <https://aiml.lt>
+- Aprašas mašinoms skaitomu formatu: <https://aiml.lt/llms.txt>
+- Fakultetas: <https://mif.vu.lt>
+- GitHub: <https://github.com/VU-AIML>
+- Hugging Face: <https://huggingface.co/AIML-VU>
+- Landscape Explorer (mokymosi įrankis): <https://landscape-explorer.aiml.lt/>
+- X: <https://twitter.com/AIML_VU>
+- Bluesky: <https://bsky.app/profile/aiml-vu.bsky.social>
+
+Turinys ruošiamas **Dirbtinio intelekto olimpiadai** (DIO): <https://www.dio.mif.vu.lt/>.
 
 
-## License Summary
+## Prisidėjimas ([Sužinokite, kaip](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html))
 
-This open source book is made available under the Creative Commons Attribution-ShareAlike 4.0 International License. See [LICENSE](LICENSE) file.
+Šią atvirojo kodo knygą pagerino bendruomenės dalyvių pedagoginiai pasiūlymai, rašybos klaidų taisymai ir kiti patobulinimai. Jūsų pagalba vertinga, nes padeda padaryti knygą geresnę visiems.
 
-The sample and reference code within this open source book is made available under a modified MIT license. See the [LICENSE-SAMPLECODE](LICENSE-SAMPLECODE) file.
+**Gerbiami [D2L dalyviai](https://github.com/d2l-ai/d2l-en/graphs/contributors), prašome el. paštu d2lbook.en AT gmail DOT com atsiųsti savo GitHub ID ir vardą, kad jūsų vardas atsirastų [padėkų](https://d2l.ai/chapter_preface/index.html#acknowledgments) skyriuje. Ačiū.**
 
-[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.d2l.ai/) | [Code of conduct](CODE_OF_CONDUCT.md)
+
+## Licencijos santrauka
+
+Ši atvirojo kodo knyga prieinama pagal Creative Commons Attribution-ShareAlike 4.0 International licenciją. Žr. [LICENSE](LICENSE) failą.
+
+Šioje atvirojo kodo knygoje esantis pavyzdinis ir nuorodinis kodas prieinamas pagal modifikuotą MIT licenciją. Žr. [LICENSE-SAMPLECODE](LICENSE-SAMPLECODE) failą.
+
+[Kinų kalbos versija](https://github.com/d2l-ai/d2l-zh) | [Diskusijos ir pranešimai apie klaidas](https://discuss.d2l.ai/) | [Elgesio kodeksas](CODE_OF_CONDUCT.md)
