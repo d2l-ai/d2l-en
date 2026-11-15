@@ -13,7 +13,7 @@ Kodėl neturėtume atsižvelgti į kontekstą abiem kryptimis,
 vertindami su duotu žodžiu susijusią kalbos dalį?
 
 Kita dažna užduotis – dažnai naudinga kaip išankstinio mokymo pratimas
-prieš modelio patikslinimą tikrajai dominančiai užduočiai –
+prieš modelio adaptaciją tikrajai dominančiai užduočiai –
 yra užmaskuoti atsitiktinius teksto dokumento teksto vienetus ir tada apmokyti
 sekų modelį prognozuoti trūkstamų teksto vienetų reikšmes.
 Atkreipkite dėmesį, kad priklausomai nuo to, kas eina po tuščios vietos,

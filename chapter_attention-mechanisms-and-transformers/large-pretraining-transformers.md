@@ -83,15 +83,15 @@ didelio masto tekstinius duomenis
 iš knygų ir „Wikipedia“.
 
 
-### BERT patikslinimas
+### BERT adaptacija
 
-Iš anksto apmokytą BERT galima *patikslinti* (angl. *fine-tune*) tolesnėms kodavimo užduotims, apimančioms pavienį tekstą ar teksto poras. Patikslinant prie BERT galima pridėti papildomų sluoksnių su atsitiktiniais parametrais: šie parametrai ir iš anksto apmokyti BERT parametrai bus *atnaujinami*, kad atitiktų tolesnių užduočių apmokymo duomenis.
+Iš anksto apmokytą BERT galima *adaptuoti* (angl. *fine-tune*) tolesnėms kodavimo užduotims, apimančioms pavienį tekstą ar teksto poras. Patikslinant prie BERT galima pridėti papildomų sluoksnių su atsitiktiniais parametrais: šie parametrai ir iš anksto apmokyti BERT parametrai bus *atnaujinami*, kad atitiktų tolesnių užduočių apmokymo duomenis.
 
-![BERT patikslinimas nuotaikų analizei.](../img/bert-finetune-classification.svg)
+![BERT adaptacija nuotaikų analizei.](../img/bert-finetune-classification.svg)
 :label:`fig_bert-finetune-classification`
 
 :numref:`fig_bert-finetune-classification` iliustruoja
-BERT patikslinimą nuotaikų analizei.
+BERT adaptaciją nuotaikų analizei.
 Transformerio kodavimo blokas yra iš anksto apmokytas BERT,
 kuris kaip įvestį priima teksto seką
 ir paduoda „&lt;cls&gt;“ vaizdą
@@ -203,27 +203,27 @@ su 1000 milijardų teksto vienetų iš C4
 kuriuos sudaro švarus anglų kalbos tekstas
 iš interneto :cite:`raffel2020exploring`.
 
-### T5 patikslinimas
+### T5 adaptacija
 
-Panašiai kaip BERT, T5 reikia patikslinti (atnaujinant T5 parametrus)
+Panašiai kaip BERT, T5 reikia adaptuoti (atnaujinant T5 parametrus)
 su konkrečiai užduočiai skirtais apmokymo duomenimis, kad ji būtų atlikta.
-Pagrindiniai skirtumai nuo BERT patikslinimo:
+Pagrindiniai skirtumai nuo BERT adaptacijos:
 (i) T5 įvestis apima užduočių aprašymus;
 (ii) T5 gali generuoti savavališko ilgio sekas
 su savo transformerio dekodavimo bloku;
 (iii) nereikia papildomų sluoksnių.
 
-![T5 patikslinimas teksto apibendrinimui. Ir užduoties aprašymas, ir straipsnio teksto vienetai paduodami į transformerio kodavimo bloką santraukai prognozuoti.](../img/t5-finetune-summarization.svg)
+![T5 adaptacija teksto apibendrinimui. Ir užduoties aprašymas, ir straipsnio teksto vienetai paduodami į transformerio kodavimo bloką santraukai prognozuoti.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
 :numref:`fig_t5-finetune-summarization`
-paaiškina T5 patikslinimą,
+paaiškina T5 adaptaciją,
 kaip pavyzdį naudojant teksto apibendrinimą.
 Šioje tolesnėje užduotyje
 užduoties aprašymo teksto vienetai „Summarize“, „:“,
 po kurių eina straipsnio teksto vienetai, paduodami į kodavimo bloką.
 
-Po patikslinimo 11 milijardų parametrų T5 (T5-11B)
+Po adaptacijos 11 milijardų parametrų T5 (T5-11B)
 pasiekė pažangiausius rezultatus keliuose kodavimo (pvz., klasifikavimo)
 ir generavimo (pvz., apibendrinimo) lyginamuosiuose testuose.
 Nuo išleidimo T5 buvo plačiai naudojamas vėlesniuose tyrimuose.
@@ -235,7 +235,7 @@ tekstas paduodamas į užšaldytą T5 kodavimo bloką (T5-XXL)
 su 4,6 milijardo parametrų :cite:`saharia2022photorealistic`.
 Fotorealistiški teksto į vaizdą pavyzdžiai :numref:`fig_imagen`
 rodo, kad vien T5 kodavimo blokas gali veiksmingai
-vaizduoti tekstą net be patikslinimo.
+vaizduoti tekstą net be adaptacijos.
 
 ![Teksto į vaizdą pavyzdžiai, sukurti „Imagen“ modelio, kurio teksto kodavimo blokas yra iš T5 (paveikslai paimti iš :citet:`saharia2022photorealistic`).](../img/imagen.png)
 :width:`700px`
@@ -278,7 +278,7 @@ užtikrina, kad kiekvienas teksto vienetas gali sutelkti dėmesį tik į savo pr
 
 
 GPT turi 100 milijonų parametrų ir turi būti
-patikslintas atskiroms tolesnėms užduotims.
+adaptuotas atskiroms tolesnėms užduotims.
 Daug didesnis transformerio dekodavimo bloko kalbos modelis,
 GPT-2, buvo pristatytas po metų :cite:`Radford.Wu.Child.ea.2019`.
 Palyginti su originaliu transformerio dekodavimo bloku GPT, GPT-2 buvo pritaikyta išankstinė normalizacija
@@ -294,7 +294,7 @@ ir daug žadančius rezultatus keliose kitose užduotyse
 
 GPT-2 parodė potencialą naudoti tą patį kalbos modelį
 kelioms užduotims be modelio atnaujinimo.
-Tai skaičiavimo požiūriu efektyviau nei patikslinimas,
+Tai skaičiavimo požiūriu efektyviau nei adaptacija,
 kuriam reikia modelio atnaujinimų per gradientų skaičiavimą.
 
 
@@ -398,15 +398,15 @@ atvirojo kodo „Llama 1“ :cite:`touvron2023llama` pranoko daug didesnius mode
 
 :citet:`wei2022emergent` aptarė didelių kalbos modelių išryškėjančias (angl. *emergent*) galimybes, esančias didesniuose modeliuose, bet nesančias mažesniuose.
 Tačiau vien modelio dydžio didinimas savaime nepadaro modelių geriau besilaikančių žmogaus nurodymų.
-:citet:`wei2021finetuned,sanh2021multitask` nustatė, kad didelių kalbos modelių patikslinimas
+:citet:`wei2021finetuned,sanh2021multitask` nustatė, kad didelių kalbos modelių adaptacija
 įvairiuose duomenų rinkiniuose, aprašytuose per *nurodymus*,
 gali pagerinti nulinio pavyzdžio našumą neregėtose užduotyse.
 Naudodami *skatinamąjį mokymąsi iš žmogaus grįžtamojo ryšio*,
-:citet:`ouyang2022training` patikslino GPT-3,
+:citet:`ouyang2022training` adaptavo GPT-3,
 kad jis laikytųsi įvairių nurodymų.
 Po gauto „InstructGPT“, kuris
 suderina kalbos modelius su žmogaus ketinimais
-per patikslinimą :cite:`ouyang2022training`,
+per adaptaciją :cite:`ouyang2022training`,
 [ChatGPT](https://chat.openai.com/)
 gali generuoti žmogiškus atsakymus (pvz., kodo derinimą ir kūrybinį rašymą)
 remdamasis pokalbiais su žmonėmis
@@ -438,7 +438,7 @@ kalbos modeliai gali atlikti daugiamodalį minčių grandinės samprotavimą did
 
 ## Santrauka ir diskusija
 
-Transformeriai buvo iš anksto apmokyti kaip tik kodavimo bloko (pvz., BERT), kodavimo ir dekodavimo bloko (pvz., T5) ir tik dekodavimo bloko (pvz., GPT serija). Iš anksto apmokyti modeliai gali būti pritaikyti skirtingoms užduotims atlikti su modelio atnaujinimu (pvz., patikslinimu) arba be jo (pvz., kelių pavyzdžių). Transformerių mastelio didinamumas rodo, kad geresnis našumas gaunamas iš didesnių modelių, daugiau apmokymo duomenų ir daugiau apmokymo skaičiavimų. Kadangi transformeriai pirmiausia buvo suprojektuoti ir iš anksto apmokyti tekstiniams duomenims, šis skyrelis šiek tiek krypsta į natūraliosios kalbos apdorojimą. Vis dėlto aukščiau aptarti modeliai dažnai randami naujesniuose modeliuose įvairiomis modalybėmis. Pavyzdžiui,
+Transformeriai buvo iš anksto apmokyti kaip tik kodavimo bloko (pvz., BERT), kodavimo ir dekodavimo bloko (pvz., T5) ir tik dekodavimo bloko (pvz., GPT serija). Iš anksto apmokyti modeliai gali būti pritaikyti skirtingoms užduotims atlikti su modelio atnaujinimu (pvz., adaptacija) arba be jo (pvz., kelių pavyzdžių). Transformerių mastelio didinamumas rodo, kad geresnis našumas gaunamas iš didesnių modelių, daugiau apmokymo duomenų ir daugiau apmokymo skaičiavimų. Kadangi transformeriai pirmiausia buvo suprojektuoti ir iš anksto apmokyti tekstiniams duomenims, šis skyrelis šiek tiek krypsta į natūraliosios kalbos apdorojimą. Vis dėlto aukščiau aptarti modeliai dažnai randami naujesniuose modeliuose įvairiomis modalybėmis. Pavyzdžiui,
 (i) „Chinchilla“ :cite:`hoffmann2022training` buvo toliau išplėstas iki „Flamingo“ :cite:`alayrac2022flamingo` – regimojo kalbos modelio mokymuisi iš kelių pavyzdžių;
 (ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` ir regimasis transformeris koduoja tekstą ir vaizdus CLIP (angl. *Contrastive Language-Image Pre-training*) :cite:`radford2021learning`, kurio vaizdų ir teksto įterpiniai vėliau buvo pritaikyti DALL-E 2 teksto į vaizdą sistemoje :cite:`ramesh2022hierarchical`. Nors sisteminių transformerių mastelio didinamumo tyrimų daugiamodaliame išankstiniame apmokyme dar nėra, vien transformerių teksto į vaizdą modelis „Parti“ :cite:`yu2022scaling` rodo mastelio didinamumo potencialą per modalybes:
 didesnis „Parti“ geriau geba generuoti didelio tikslumo vaizdus ir suprasti turiningą tekstą (:numref:`fig_parti`).
@@ -453,9 +453,9 @@ didesnis „Parti“ geriau geba generuoti didelio tikslumo vaizdus ir suprasti 
 
 ## Pratimai
 
-1. Ar įmanoma patikslinti T5 naudojant minirinkinį, sudarytą iš skirtingų užduočių? Kodėl taip arba kodėl ne? O kaip dėl GPT-2?
+1. Ar įmanoma adaptuoti T5 naudojant minirinkinį, sudarytą iš skirtingų užduočių? Kodėl taip arba kodėl ne? O kaip dėl GPT-2?
 1. Turint galingą kalbos modelį, kokius taikymus galite sugalvoti?
-1. Tarkime, kad jūsų prašoma patikslinti kalbos modelį, kad jis atliktų teksto klasifikavimą, pridedant papildomų sluoksnių. Kur juos pridėtumėte? Kodėl?
+1. Tarkime, kad jūsų prašoma adaptuoti kalbos modelį, kad jis atliktų teksto klasifikavimą, pridedant papildomų sluoksnių. Kur juos pridėtumėte? Kodėl?
 1. Apsvarstykite sekos į seką problemas (pvz., mašininį vertimą), kuriose įvesties seka visada pasiekiama viso tikslo sekos prognozavimo metu. Kokie galėtų būti modeliavimo tik dekodavimo bloko transformeriais apribojimai? Kodėl?
 
 

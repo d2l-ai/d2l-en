@@ -39,7 +39,7 @@ Turint bet kurią naują natūraliosios kalbos apdorojimo užduotį, numatytasis
 yra paimti didelį transformeriais pagrįstą iš anksto apmokytą modelį
 (pvz., BERT :cite:`Devlin.Chang.Lee.ea.2018`, ELECTRA :cite:`clark2019electra`, RoBERTa :cite:`Liu.Ott.Goyal.ea.2019` ar Longformer :cite:`beltagy2020longformer`),
 prireikus pritaikyti išvesties sluoksnius
-ir patikslinti modelį turimais
+ir adaptuoti modelį turimais
 duomenimis tolesnei užduočiai.
 Jei sekėte pastarųjų kelerių metų
 sunkiai atsikvepiančią naujienų aprėptį, sutelktą ties „OpenAI“
@@ -115,7 +115,7 @@ Be to, tuo pačiu metu dominuojanti natūraliosios kalbos apdorojimo praktika
 tapo didelio masto modelių išankstinis apmokymas
 milžiniškuose bendrojo pobūdžio fono tekstynuose
 tam tikram saviraiškiam išankstinio apmokymo tikslui optimizuoti,
-o vėliau šių modelių patikslinimas
+o vėliau šių modelių adaptacija
 naudojant turimus tolesnių užduočių duomenis.
 Atotrūkis tarp transformerių ir tradicinių architektūrų
 ypač išaugo taikant šią išankstinio apmokymo paradigmą,
