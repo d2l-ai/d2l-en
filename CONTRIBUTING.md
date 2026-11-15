@@ -1,82 +1,84 @@
-# Guidelines for contributing
+# Prisidėjimo gairės
 
-Thank you for your interest in contributing to this open source book! We greatly value feedback and contributions from our community.
+Dėkojame, kad domitės prisidėjimu prie šios atvirojo kodo knygos! Labai vertiname savo bendruomenės atsiliepimus ir indėlį.
 
-Please read through this document before you submit any pull requests or issues. It will help us work together more effectively.
+Prieš pateikdami bet kokį pull request ar issue, perskaitykite šį dokumentą. Tai padės mums efektyviau dirbti kartu.
 
-## What to expect when you contribute
+> **Lietuviško vertimo pastaba.** Šioje repozitorijoje yra lietuviškas knygos vertimas, kurį rengia ir už kurį atsako Linas Petkevičius ir [Dirbtinio intelekto metodų laboratorija](https://aiml.lt) (žr. [README](README.md)). Pastabas dėl vertimo (terminų, formuluočių, klaidų) teikite per šios repozitorijos *issues* ar *pull request*. Pastabas dėl originalaus anglų kalbos turinio teikite [d2l-ai/d2l-en](https://github.com/d2l-ai/d2l-en). Toliau pateiktos gairės išverstos iš originalo, o nuorodos veda į originalią repozitoriją.
 
-When you submit a pull request, our team is notified and will respond as quickly as we can. We'll do our best to work with you to ensure that your pull request adheres to our style and standards. If we merge your pull request, we might make additional edits later for style or clarity.
+## Ko tikėtis, kai prisidedate
 
-The source files on GitHub aren't published directly to the official website. If we merge your pull request, we'll publish your changes to the documentation website as soon as we can, but they won't appear immediately or automatically.
+Kai pateikiate pull request, mūsų komanda gauna pranešimą ir atsakys kuo greičiau. Stengsimės dirbti kartu su jumis, kad jūsų pull request atitiktų mūsų stilių ir standartus. Jei sulieksime jūsų pull request, vėliau galime atlikti papildomų stiliaus ar aiškumo pataisymų.
 
-We look forward to receiving your pull requests for:
+GitHub šaltinio failai nėra publikuojami tiesiogiai oficialioje svetainėje. Jei sulieksime jūsų pull request, jūsų pakeitimus dokumentacijos svetainėje paskelbsime kuo greičiau, tačiau jie neatsiras iš karto ar automatiškai.
 
-* New content you'd like to contribute (such as new code samples or tutorials)
-* Inaccuracies in the content
-* Information gaps in the content that need more detail to be complete
-* Typos or grammatical errors
-* Suggested rewrites that improve clarity and reduce confusion
+Lauksime jūsų pull request dėl:
 
-**Note:** We all write differently, and you might not like how we've written or organized something currently. We want that feedback. But please be sure that your request for a rewrite is supported by the previous criteria. If it isn't, we might decline to merge it.
+* Naujo turinio, kurį norite pridėti (pavyzdžiui, naujų kodo pavyzdžių ar pamokų)
+* Turinio netikslumų
+* Informacijos spragų, kurias reikia užpildyti išsamesne informacija
+* Rašybos ar gramatikos klaidų
+* Siūlomų perrašymų, gerinančių aiškumą ir mažinančių painiavą
 
-## How to contribute
+**Pastaba:** Mes visi rašome skirtingai, todėl jums gali nepatikti, kaip kažkas šiuo metu parašyta ar sutvarkyta. Mes norime to atsiliepimo. Tačiau įsitikinkite, kad jūsų prašymas perrašyti pagrįstas aukščiau išvardytais kriterijais. Jei ne, galime atsisakyti jį sulieti.
 
-To contribute, start by reading [contributing section](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html) and eventually
-send us a pull request. For small changes, such as fixing a typo or adding a link, you can use the [GitHub Edit Button](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files). For larger changes:
+## Kaip prisidėti
 
-1. [Fork the repository](https://help.github.com/articles/fork-a-repo/).
-2. In your fork, make your change in a new branch (e.g., by [`git branch`](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)) that's based on this repo's **master** branch.
-3. Commit the change to your fork, using a clear and descriptive commit message.
-4. [Create a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/), answering any questions in the pull request form.
+Norėdami prisidėti, pirmiausia perskaitykite [prisidėjimo skyrių](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html) ir galiausiai
+atsiųskite mums pull request. Nedideliems pakeitimams, pavyzdžiui, rašybos klaidos taisymui ar nuorodos pridėjimui, galite naudoti [GitHub redagavimo mygtuką](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files). Didesniems pakeitimams:
 
-Before you send us a pull request, please be sure that:
+1. [Sukurkite repozitorijos šakutę (fork)](https://help.github.com/articles/fork-a-repo/).
+2. Savo šakutėje atlikite pakeitimą naujoje šakoje (pvz., naudodami [`git branch`](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)), pagrįstoje šios repozitorijos **master** šaka.
+3. Įrašykite pakeitimą (commit) į savo šakutę su aiškiu ir aprašomu commit pranešimu.
+4. [Sukurkite pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/), atsakydami į visus pull request formos klausimus.
 
-1. You're working from the latest source on the **master** branch.
-2. You check [existing open](https://github.com/d2l-ai/d2l-en/pulls), and [recently closed](https://github.com/d2l-ai/d2l-en/pulls?q=is%3Apr+is%3Aclosed), pull requests to be sure that someone else hasn't already addressed the problem.
-3. You [create an issue](https://github.com/d2l-ai/d2l-en/issues/new) before working on a contribution that will take a significant amount of your time.
+Prieš atsiųsdami mums pull request, įsitikinkite, kad:
 
-For contributions that will take a significant amount of time, [open a new issue](https://github.com/d2l-ai/d2l-en/issues/new) to pitch your idea before you get started. Explain the problem and describe the content you want to see added to the documentation. Let us know if you'll write it yourself or if you'd like us to help. We'll discuss your proposal with you and let you know whether we're likely to accept it. We don't want you to spend a lot of time on a contribution that might be outside the scope of the documentation or that's already in the works.
+1. Dirbate su naujausiu **master** šakos šaltiniu.
+2. Patikrinote [esamus atvirus](https://github.com/d2l-ai/d2l-en/pulls) ir [neseniai uždarytus](https://github.com/d2l-ai/d2l-en/pulls?q=is%3Apr+is%3Aclosed) pull request, kad įsitikintumėte, jog kas nors kitas problemos dar neišsprendė.
+3. [Sukūrėte issue](https://github.com/d2l-ai/d2l-en/issues/new) prieš pradėdami darbą, kuris užims daug jūsų laiko.
 
-## Finding contributions to work on
+Jei prisidėjimas užims daug laiko, [atidarykite naują issue](https://github.com/d2l-ai/d2l-en/issues/new) ir pristatykite savo idėją prieš pradėdami. Paaiškinkite problemą ir aprašykite turinį, kurį norėtumėte matyti pridėtą prie dokumentacijos. Pasakykite, ar rašysite patys, ar norėtumėte mūsų pagalbos. Aptarsime jūsų pasiūlymą ir pasakysime, ar greičiausiai jį priimsime. Nenorime, kad praleistumėte daug laiko prisidėjimui, kuris gali būti už dokumentacijos aprėpties ribų arba kuris jau rengiamas.
 
-If you'd like to contribute, but don't have a project in mind, look at the [open issues](https://github.com/d2l-ai/d2l-en/issues) in this repository for some ideas. Issues with the [help wanted](https://github.com/d2l-ai/d2l-en/labels/help%20wanted), [good first issue](https://github.com/d2l-ai/d2l-en/labels/good%20first%20issue) or [enhancement](https://github.com/d2l-ai/d2l-en/labels/enhancement) labels are a great place to start.
+## Kaip rasti prisidėjimo darbų
 
-In addition to written content, we really appreciate new examples and code samples for our documentation, such as examples for different platforms or environments, and code samples in additional languages.
+Jei norite prisidėti, bet neturite projekto galvoje, pažiūrėkite į šios repozitorijos [atvirus issue](https://github.com/d2l-ai/d2l-en/issues) idėjų. Issue su žymomis [help wanted](https://github.com/d2l-ai/d2l-en/labels/help%20wanted), [good first issue](https://github.com/d2l-ai/d2l-en/labels/good%20first%20issue) ar [enhancement](https://github.com/d2l-ai/d2l-en/labels/enhancement) yra puiki vieta pradėti.
+
+Be rašytinio turinio, labai vertiname naujus pavyzdžius ir kodo fragmentus mūsų dokumentacijai, pavyzdžiui, pavyzdžius skirtingoms platformoms ar aplinkoms ir kodo pavyzdžius papildomomis kalbomis.
 
 
-## How to change code in one of the frameworks?
+## Kaip pakeisti kodą viename iš karkasų?
 
-This section describes the development environment setup and workflow
-which should be followed when modifying/porting python code and making
-changes to one of the machine learning frameworks in the book.
-We follow a set of pre-defined [style guidelines](https://github.com/d2l-ai/d2l-en/blob/master/STYLE_GUIDE.md)
-for consistent code quality throughout the book and expect the same
-from our community contributors. You may need to check other chapters
-from other contributors as well for this step.
+Šiame skyriuje aprašoma kūrimo aplinkos paruošimas ir darbo eiga,
+kurios reikia laikytis modifikuojant ar perkeliant Python kodą ir darant
+pakeitimus viename iš knygoje naudojamų mašininio mokymo karkasų.
+Laikomės iš anksto apibrėžtų [stiliaus gairių](https://github.com/d2l-ai/d2l-en/blob/master/STYLE_GUIDE.md),
+kad kodo kokybė visoje knygoje būtų vienoda, ir tikimės to paties
+iš bendruomenės dalyvių. Šiame žingsnyje gali tekti pažiūrėti ir kitus
+skyrius, kuriuos parengė kiti dalyviai.
 
-All the chapter sections are generated from markdown (.md file, not .ipynb file)
-source files. When making changes in code, for the ease of development
-and making sure it is error free, we never edit the markdown files directly.
-Instead we can read/load these markdown files as jupyter notebooks
-and then make the required changes in the notebook to edit the markdown
-file automatically (more on that below). This way, before raising the PR,
-one can easily test the changes locally in the jupyter notebook.
+Visi skyrių poskyriai generuojami iš markdown (.md failų, ne .ipynb failų)
+šaltinio failų. Keičiant kodą, kad būtų patogiau kurti
+ir užtikrinti, jog nėra klaidų, markdown failų niekada nekeičiame tiesiogiai.
+Vietoj to šiuos markdown failus galime nuskaityti/įkelti kaip jupyter užrašų knygutes
+ir atlikti reikiamus pakeitimus užrašų knygutėje, kad markdown
+failas būtų redaguojamas automatiškai (daugiau apie tai toliau). Šitaip, prieš sukuriant PR,
+pakeitimus galima lengvai išbandyti vietoje jupyter užrašų knygutėje.
 
-Start by cloning the repo.
+Pradėkite nuo repozitorijos klonavimo.
 
-* Clone your d2l-en repo fork to a local machine.
+* Nuklonuokite savo d2l-en šakutę į vietinį kompiuterį.
 ```
 git clone https://github.com/<UserName>/d2l-en.git
 ```
 
-* Setup your local environment: Create an empty conda environment
-(you may refer to our [Miniconda Installation](https://d2l.ai/chapter_installation/index.html#installing-miniconda) section in the book).
+* Paruoškite vietinę aplinką: sukurkite tuščią conda aplinką
+(galite remtis knygos skyreliu [Miniconda diegimas](https://d2l.ai/chapter_installation/index.html#installing-miniconda)).
 
-* Install the required packages after activating the environment.
-What are the required packages? This depends on the framework you wish to edit. Note that master and release branches may have different
-versions of a framework. For more details, you may refer to our [installation section](https://d2l.ai/chapter_installation/index.html).
-See example installation below:
+* Aktyvavę aplinką, įdiekite reikalingus paketus.
+Kokie paketai reikalingi? Tai priklauso nuo karkaso, kurį norite redaguoti. Atkreipkite dėmesį, kad master ir release šakos gali turėti skirtingas
+karkaso versijas. Daugiau informacijos rasite [diegimo skyriuje](https://d2l.ai/chapter_installation/index.html).
+Diegimo pavyzdys pateiktas toliau:
 
 ```bash
 conda activate d2l
@@ -88,7 +90,7 @@ pip install torch==<version> torchvision==<version>
 # MXNet
 pip install mxnet==<version>
 # pip install mxnet==1.9.1
-# or for gpu
+# arba GPU
 # pip install mxnet-cu112==1.9.1
 
 # Tensorflow
@@ -96,117 +98,116 @@ pip install tensorflow==<version> tensorflow-probability==<version>
 # pip install tensorflow==2.12.0 tensorflow-probability==0.19.0
 ```
 
-Compilation of the book is powered by the
-[`d2lbook`](https://github.com/d2l-ai/d2l-book) package.
-Simply run `pip install git+https://github.com/d2l-ai/d2l-book` in the
-d2l conda environment to install the package.
-We'll explain some of the basic `d2lbook` features below. 
+Knygos kompiliavimą užtikrina
+[`d2lbook`](https://github.com/d2l-ai/d2l-book) paketas.
+Tiesiog d2l conda aplinkoje paleiskite `pip install git+https://github.com/d2l-ai/d2l-book`,
+kad įdiegtumėte paketą.
+Toliau paaiškinsime keletą pagrindinių `d2lbook` galimybių. 
 
-NOTE: `d2l` and `d2lbook` are different packages. (avoid any confusion)
+PASTABA: `d2l` ir `d2lbook` yra skirtingi paketai (kad nekiltų painiavos).
 
-* Install the `d2l` library in development mode (only need to run once)
+* Įdiekite `d2l` biblioteką kūrimo režimu (reikia paleisti tik vieną kartą)
 
 ```bash
-# Inside root of local repo fork
+# Vietinės repozitorijos šakutės šakniniame kataloge
 cd d2l-en
 
-# Install the d2l package
+# Įdiegti d2l paketą
 python setup.py develop
 ```
 
-Now you can use `from d2l import <framework_name> as d2l` within the
-environment to access the saved functions and also edit them on the fly.
+Dabar aplinkoje galite naudoti `from d2l import <framework_name> as d2l`,
+kad pasiektumėte išsaugotas funkcijas ir taip pat jas redaguoti iš karto.
 
-When adding a code cell from a specific framework, one needs to specify
-the framework by commenting the following on top of a cell: `#@tab tensorflow`
-for example. If the code tab is exactly the same for all frameworks then
-use `#@tab all`. This information is required by the `d2lbook` package to
-build the website, pdf, etc. We recommend looking at some of the notebooks
-for reference.
+Pridedant konkretaus karkaso kodo langelį, reikia nurodyti
+karkasą užkomentuojant langelio viršuje, pavyzdžiui, `#@tab tensorflow`.
+Jei kodo skirtukas visiems karkasams yra visiškai toks pats, naudokite
+`#@tab all`. Šios informacijos reikia `d2lbook` paketui,
+kad sukurtų svetainę, PDF ir pan. Rekomenduojame pažiūrėti keletą užrašų knygučių
+kaip pavyzdžių.
 
 
-### How to open/edit markdown files using Jupyter Notebook?
+### Kaip atidaryti / redaguoti markdown failus naudojant Jupyter Notebook?
 
-Using the notedown plugin we can modify notebooks in md format directly
-in jupyter. First, install the notedown plugin, run jupyter, and
-load the plugin as shown below:
+Naudodami notedown įskiepį, md formato užrašų knygutes galime keisti tiesiogiai
+jupyter. Pirmiausia įdiekite notedown įskiepį, paleiskite jupyter ir
+įkelkite įskiepį, kaip parodyta toliau:
 
 ```bash
-pip install mu-notedown  # You may need to uninstall the original notedown.
+pip install mu-notedown  # Gali tekti pašalinti originalų notedown.
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
 
-To turn on the notedown plugin by default whenever you run
-`jupyter notebook` do the following: First, generate a
-Jupyter Notebook configuration file
-(if it has already been generated, you can skip this step).
+Kad notedown įskiepis būtų įjungtas pagal numatytuosius nustatymus kaskart paleidus
+`jupyter notebook`, atlikite šiuos veiksmus: pirmiausia sugeneruokite
+Jupyter Notebook konfigūracijos failą
+(jei jis jau sugeneruotas, šį žingsnį galite praleisti).
 
 ```bash
 jupyter notebook --generate-config
 ```
 
-Then, add the following line to the end of the Jupyter Notebook
-configuration file (for Linux/macOS, usually in the path `~/.jupyter/jupyter_notebook_config.py`):
+Tada pridėkite šią eilutę Jupyter Notebook
+konfigūracijos failo pabaigoje (Linux/macOS dažniausiai kelias `~/.jupyter/jupyter_notebook_config.py`):
 
 ```bash
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 ```
 
-After that, you only need to run the jupyter notebook
-command to turn on the notedown plugin by default.
+Po to pakanka paleisti jupyter notebook
+komandą, ir notedown įskiepis bus įjungtas pagal numatytuosius nustatymus.
 
-Please refer to the section on [markdown files in jupyter](https://d2l.ai/chapter_appendix-tools-for-deep-learning/jupyter.html#markdown-files-in-jupyter)
-for more details.
+Daugiau informacijos rasite skyrelyje apie [markdown failus jupyter](https://d2l.ai/chapter_appendix-tools-for-deep-learning/jupyter.html#markdown-files-in-jupyter).
 
 
 #### d2lbook activate
 
-Now to start working on a particular framework for a section,
-only activate the framework tab you wish to use,
-like this -> `d2lbook activate <framework_name> chapter_preliminaries/ndarray.md`,
-so the `<framework_name>` code blocks become python blocks and
-other frameworks are ignored when running the notebook.
+Norėdami pradėti dirbti su konkrečiu skyrelio karkasu,
+aktyvuokite tik norimą naudoti karkaso skirtuką,
+pavyzdžiui, -> `d2lbook activate <framework_name> chapter_preliminaries/ndarray.md`,
+tada `<framework_name>` kodo blokai tampa python blokais, o
+kiti karkasai ignoruojami vykdant užrašų knygutę.
 
-When you are done editing a notebook, please save it and
-remember to strictly clear all outputs and activate all
-tabs by using `d2lbook activate`.
+Baigę redaguoti užrašų knygutę, ją išsaugokite ir
+būtinai išvalykite visas išvestis bei aktyvuokite visus
+skirtukus naudodami `d2lbook activate`.
 
 ```bash
-# Example
+# Pavyzdys
 d2lbook activate all chapter_preliminaries/ndarray.md`
 ```
 
 #### d2lbook build lib
 
-Note: Remember to mark a function which will be reused later by
-`#save` and in the end when all the above steps are completed
-just run the following in the root directory to copy all the
-saved functions/classes into `d2l/<framework_name>.py`
+Pastaba: funkciją, kuri bus naudojama vėliau, pažymėkite
+`#save`, o kai atlikti visi aukščiau išvardyti žingsniai,
+šakniniame kataloge tiesiog paleiskite toliau pateiktą komandą, kad visos
+išsaugotos funkcijos / klasės būtų nukopijuotos į `d2l/<framework_name>.py`
 
 ```bash
 d2lbook build lib
 ```
 
-If the saved functions require some packages to be imported, you can add
-them to `chapter_preface/index.md` under the respective framework tab and
-run `d2lbook build lib`. Now the import will also be reflected in the d2l
-library after running and the saved functions can access the imported lib.
+Jei išsaugotoms funkcijoms reikia importuoti kai kuriuos paketus, galite pridėti
+juos į `chapter_preface/index.md` po atitinkamo karkaso skirtuku ir
+paleisti `d2lbook build lib`. Tada importas atsispindės ir d2l
+bibliotekoje, o išsaugotos funkcijos galės pasiekti importuotą biblioteką.
 
-NOTE: Ensure that the output/results are consistent after the change, across the frameworks, by multiple runs of the notebook locally.
+PASTABA: kelis kartus paleisdami užrašų knygutę vietoje, įsitikinkite, kad po pakeitimo išvestys / rezultatai visuose karkasuose yra nuoseklūs.
 
 
-Finally send in a PR, if all checks succeed, with a review of the PR from the authors, your contributions shall be merged. :)
+Galiausiai atsiųskite PR; jei visos patikros sėkmingos ir autoriai peržiūrės PR, jūsų indėlis bus sulietas. :)
 
-Hope this is comprehensive enough to get you started. Feel free to ask the authors and other contributors in case of any doubt. We always welcome feedback.
+Tikimės, kad tai pakankamai išsamu, jog galėtumėte pradėti. Nedvejodami klauskite autorių ir kitų dalyvių, jei kiltų abejonių. Visada džiaugiamės atsiliepimais.
 
-## Code of conduct
+## Elgesio kodeksas
 
-This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct). For more information, see the [Code of Conduct FAQ](https://aws.github.io/code-of-conduct-faq) or contact [opensource-codeofconduct@amazon.com](mailto:opensource-codeofconduct@amazon.com) with any additional questions or comments.
+Šiame projekte priimtas [Amazon atvirojo kodo elgesio kodeksas](https://aws.github.io/code-of-conduct). Daugiau informacijos rasite [Elgesio kodekso DUK](https://aws.github.io/code-of-conduct-faq) arba kreipkitės el. paštu [opensource-codeofconduct@amazon.com](mailto:opensource-codeofconduct@amazon.com) su papildomais klausimais ar pastabomis.
 
-## Security issue notifications
+## Pranešimai apie saugumo problemas
 
-If you discover a potential security issue, please notify AWS Security via our [vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/). Please do **not** create a public issue on GitHub.
+Jei aptikote galimą saugumo problemą, praneškite AWS saugumo komandai per [pažeidžiamumų pranešimo puslapį](http://aws.amazon.com/security/vulnerability-reporting/). Prašome **nekurti** viešo issue GitHub.
 
-## Licensing
+## Licencijavimas
 
-See the [LICENSE](https://github.com/d2l-ai/d2l-en/blob/master/LICENSE) file for this project's licensing. We will ask you to confirm the licensing of your contribution. We may ask you to sign a [Contributor License Agreement (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for larger changes.
+Šio projekto licencijavimo informacijos ieškokite [LICENSE](https://github.com/d2l-ai/d2l-en/blob/master/LICENSE) faile. Paprašysime patvirtinti jūsų indėlio licencijavimą. Didesniems pakeitimams galime paprašyti pasirašyti [Dalyvio licencijos sutartį (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement).

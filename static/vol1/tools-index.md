@@ -1,13 +1,11 @@
-# Appendix: Tools for Deep Learning
+# Priedas: giliojo mokymosi įrankiai
 :label:`chap_appendix_tools`
 
 
-To get the most out of *Dive into Deep Learning*,
-we will talk you through different tools
-in this appendix,
-such as
-for running and contributing to this
-interactive open-source book.
+Kad iš knygos *Pasinerkime į gilųjį mokymąsi* išgautume kuo daugiau naudos,
+šiame priede supažindinsime su įvairiais įrankiais,
+skirtais šiai interaktyviai atvirojo kodo knygai
+vykdyti ir prie jos prisidėti.
 
 ```toc
 :maxdepth: 2

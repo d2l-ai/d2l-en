@@ -1,4 +1,4 @@
-## Code of Conduct
-This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct). 
-For more information see the [Code of Conduct FAQ](https://aws.github.io/code-of-conduct-faq) or contact 
-opensource-codeofconduct@amazon.com with any additional questions or comments.
+## Elgesio kodeksas
+Šiame projekte priimtas [Amazon atvirojo kodo elgesio kodeksas](https://aws.github.io/code-of-conduct). 
+Daugiau informacijos rasite [Elgesio kodekso DUK](https://aws.github.io/code-of-conduct-faq) arba 
+kreipkitės el. paštu opensource-codeofconduct@amazon.com su papildomais klausimais ar pastabomis.

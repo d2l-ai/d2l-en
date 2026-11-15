@@ -1,13 +1,13 @@
-# Building
+# Kūrimas (build)
 
-## Installation for Developers
+## Diegimas kūrėjams
 
 ```
-wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh  # For py3.8, wget  https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
-sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b  # For py3.8: sh Miniconda3-py38_4.12.0-Linux-x86_64.sh -b
+wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh  # Py3.8 atveju: wget  https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b  # Py3.8 atveju: sh Miniconda3-py38_4.12.0-Linux-x86_64.sh -b
 ~/miniconda3/bin/conda init
 . ~/.bashrc
-conda create --name d2l python=3.9 -y  # For py3.8: conda create --name d2l python=3.8 -y
+conda create --name d2l python=3.9 -y  # Py3.8 atveju: conda create --name d2l python=3.8 -y
 conda activate d2l
 pip install torch torchvision
 pip install d2lbook
@@ -15,11 +15,11 @@ git clone https://github.com/d2l-ai/d2l-en.git
 jupyter notebook --generate-config
 echo "c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'" >> ~/.jupyter/jupyter_notebook_config.py
 cd d2l-en
-pip install -e .  # Install the d2l library from source
+pip install -e .  # Įdiegti d2l biblioteką iš šaltinio
 jupyter notebook
 ```
 
-Optional: using `jupyter_contrib_nbextensions`
+Pasirinktinai: naudojant `jupyter_contrib_nbextensions`
 
 ```
 pip install jupyter_contrib_nbextensions
@@ -29,30 +29,30 @@ jupyter contrib nbextension install --user
 
 
 
-## Building without Evaluation
+## Kūrimas be vykdymo (evaluation)
 
-Change `eval_notebook = True` to `eval_notebook = False` in `config.ini`.
+Faile `config.ini` pakeiskite `eval_notebook = True` į `eval_notebook = False`.
 
 
-## Building PDF
+## PDF kūrimas
 
 ```
-# Install d2lbook
+# Įdiegti d2lbook
 pip install git+https://github.com/d2l-ai/d2l-book
 
 sudo apt-get install texlive-full
 sudo apt-get install librsvg2-bin
-sudo apt-get install pandoc  # If not working, conda install pandoc
+sudo apt-get install pandoc  # Jei neveikia, conda install pandoc
 
-# To import d2l
+# Kad būtų galima importuoti d2l
 cd d2l-en
 pip install -e .
 
-# Build PDF
+# Sukurti PDF
 d2lbook build pdf
 ```
 
-### Fonts for PDF
+### PDF šriftai
 
 ```
 wget https://raw.githubusercontent.com/d2l-ai/utils/master/install_fonts.sh
@@ -60,13 +60,13 @@ sudo bash install_fonts.sh
 ```
 
 
-## Building HTML
+## HTML kūrimas
 
 ```
 bash static/build_html.sh
 ```
 
-## Install Fonts
+## Šriftų diegimas
 
 ```
 wget -O source-serif-pro.zip https://www.fontsquirrel.com/fonts/download/source-serif-pro
@@ -89,20 +89,20 @@ sudo fc-cache -f -v
 
 ```
 
-## Release checklist
+## Išleidimo kontrolinis sąrašas
 
 ### d2l-en
 
-- release d2lbook
-- [optional, only for hardcopy books or partner products]
-    - fix versions of libs in [setup.py](http://setup.py) → requirements and static/build.yml (including d2lbook)
-    - re-evaluate
-    - fix d2l version (to appear on pypi below) in installation
-- add docstring for d2l.xxx
-- update frontpage announcement
-- (only major) wa 0.8.0 to see if anything needs to be fixed in the main text
+- išleisti d2lbook
+- [pasirinktinai, tik spausdintoms knygoms ar partnerių produktams]
+    - užfiksuoti bibliotekų versijas [setup.py](http://setup.py) → requirements ir static/build.yml (įskaitant d2lbook)
+    - iš naujo įvertinti (re-evaluate)
+    - diegime užfiksuoti d2l versiją (kuri toliau atsiras pypi)
+- pridėti docstring d2l.xxx
+- atnaujinti pradinio puslapio skelbimą
+- (tik didesniam leidimui) wa 0.8.0, kad patikrintume, ar pagrindiniame tekste ką nors reikia taisyti
 - d2lbook build lib
-- test a random colab
+- išbandyti atsitiktinį colab'ą
 - http://ci.d2l.ai/computer/d2l-worker/script
 
 ```python
@@ -113,30 +113,30 @@ sudo fc-cache -f -v
 "ls /home/d2l-worker/workspace/".execute().text
 ```
 
-- Evaluate release PR
-- ensure fixed attention randomness in badahnau and transformer
-- ensure libs (e.g., under sagemaker) version consistent between config.ini and build.yml
-- modify version number in config.ini & d2l/__init__.py, and d2l version in installation.md
-- merge master to release by keeping individual commits (create a merge commit)
+- Įvertinti išleidimo PR
+- užtikrinti fiksuotą dėmesio atsitiktinumą Badahnau ir transformerio skyriuose
+- užtikrinti, kad bibliotekų (pvz., sagemaker) versijos sutaptų `config.ini` ir `build.yml`
+- pakeisti versijos numerį `config.ini` ir `d2l/__init__.py`, o d2l versiją – `installation.md`
+- sulieti master į release išsaugant atskirus commit'us (sukurti merge commit)
 - git checkout master
 - rr -rf d2l.egg-info dist
-- upload d2l to pypi (team account)
-- re-test colab and d2l
-- git tag on the release branch
+- įkelti d2l į pypi (komandos paskyra)
+- iš naujo išbandyti colab ir d2l
+- git tag release šakoje
 - git checkout master
-- update README latest version in a branch, then squash and merge to restore
-- [optional] Invalidate CloudFront cache
-- [optional, only for hardcopy books]
+- atnaujinti naujausią versiją README atskiroje šakoje, tada squash ir merge
+- [pasirinktinai] panaikinti CloudFront talpyklą
+- [pasirinktinai, tik spausdintoms knygoms]
     - config.ini: other_file_s3urls
-- [optional, only for hardcopy books or partner products]
-    - restore versions of libs in [setup.py](http://setup.py) → requirements
+- [pasirinktinai, tik spausdintoms knygoms ar partnerių produktams]
+    - atkurti bibliotekų versijas [setup.py](http://setup.py) → requirements
  
 ### d2l-zh
 
-- update frontpage announcement
-- (need or not?) d2lbook build lib
-- test a random colab
-- upgrade static/build.yml to that in d2l-en
+- atnaujinti pradinio puslapio skelbimą
+- (ar reikia?) d2lbook build lib
+- išbandyti atsitiktinį colab'ą
+- atnaujinti static/build.yml iki d2l-en versijos
 - [http://ci.d2l.ai/computer/(master)/script](http://ci.d2l.ai/computer/(master)/script)
 - http://ci.d2l.ai/computer/d2l-worker/script
 
@@ -148,18 +148,18 @@ sudo fc-cache -f -v
 "ls /home/d2l-worker/workspace/".execute().text
 ```
 
-- Evaluate release PR (fix attention randomness in badahnau and transformer)
-- ensure libs (e.g., under sagemaker)version consistent between config.ini and build.yml
-- modify version number in config.ini & d2l/__init__.py
-- merge master to release by keeping individual commits (create a merge commit)
-- re-test colab
-- git tag on the release branch
+- Įvertinti išleidimo PR (sutvarkyti dėmesio atsitiktinumą Badahnau ir transformerio skyriuose)
+- užtikrinti, kad bibliotekų (pvz., sagemaker) versijos sutaptų `config.ini` ir `build.yml`
+- pakeisti versijos numerį `config.ini` ir `d2l/__init__.py`
+- sulieti master į release išsaugant atskirus commit'us (sukurti merge commit)
+- iš naujo išbandyti colab
+- git tag release šakoje
 - git checkout master
-- update README latest version in a branch, then squash and merge to restore
-- 2.0.0 release additional
-    - on s3 console
-        - copy [zh-v2.d2l.ai](http://zh-v2.d2l.ai) bucket/d2l-zh.zip to d2l-webdata bucket/d2l-zh.zip
-        - rename d2l-webdata bucket/d2l-zh.zip to d2l-webdata bucket/d2l-zh-2.0.0.zip
-        - run CI for d2l-zh/release to trigger other_file_s3urls in config
-        - Invalidate cloudfront cache to test installation
-    - test install
+- atnaujinti naujausią versiją README atskiroje šakoje, tada squash ir merge
+- papildomai 2.0.0 išleidimui
+    - s3 konsolėje
+        - nukopijuoti [zh-v2.d2l.ai](http://zh-v2.d2l.ai) bucket/d2l-zh.zip į d2l-webdata bucket/d2l-zh.zip
+        - pervadinti d2l-webdata bucket/d2l-zh.zip į d2l-webdata bucket/d2l-zh-2.0.0.zip
+        - paleisti CI d2l-zh/release, kad suveiktų other_file_s3urls konfigūracijoje
+        - panaikinti cloudfront talpyklą, kad būtų galima išbandyti diegimą
+    - išbandyti diegimą

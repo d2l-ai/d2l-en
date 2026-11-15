@@ -1,12 +1,11 @@
-# Pretraining fastText
+# fastText išankstinis apmokymas
 :label:`sec_word2vec_gluon`
 
-In this section, we will
-train a skip-gram model defined in
-:numref:`sec_word2vec`.
+Šiame skyriuje
+apmokysime :numref:`sec_word2vec` apibrėžtą skip-gram modelį.
 
-First, import the
-packages and modules required for the experiment, and load the PTB dataset.
+Pirmiausia importuokime
+eksperimentui reikalingus paketus ir modulius ir įkelkime PTB duomenų rinkinį.
 
 ```{.python .input  n=1}
 #@tab mxnet
@@ -108,19 +107,19 @@ for batch in data_iter:
     break
 ```
 
-## The Skip-Gram Model
+## Skip-gram modelis
 
-We will implement the skip-gram model by using embedding
-layers and minibatch multiplication. These methods are also often used to
-implement other natural language processing applications.
+Skip-gram modelį realizuosime naudodami įterpimo
+sluoksnius ir mažų imčių (angl. *minibatch*) daugybą. Šie metodai taip pat dažnai naudojami
+kitoms natūraliosios kalbos apdorojimo taikymo sritims realizuoti.
 
-### Embedding Layer
-The layer in which the obtained word is embedded is called the embedding layer,
-which can be obtained by creating an `nn.Embedding` instance in Gluon. The
-weight of the embedding layer is a matrix whose number of rows is the dictionary
-size (`input_dim`) and whose number of columns is the dimension of each word
-vector (`output_dim`). We set the dictionary size to $20$ and the word vector
-dimension to $4$.
+### Įterpimo sluoksnis
+Sluoksnis, kuriame gautas žodis įterpiamas, vadinamas įterpimo sluoksniu;
+jį galima gauti sukūrus `nn.Embedding` objektą Gluon. Įterpimo sluoksnio
+svoris yra matrica, kurios eilučių skaičius lygus žodyno
+dydžiui (`input_dim`), o stulpelių skaičius – kiekvieno žodžio
+vektoriaus dimensijai (`output_dim`). Žodyno dydį nustatome $20$, o žodžio vektoriaus
+dimensiją – $4$.
 
 ```{.python .input  n=9}
 #@tab mxnet
@@ -129,18 +128,16 @@ embed.initialize()
 embed.weight
 ```
 
-### Skip-gram Model Forward Calculation
+### Skip-gram modelio tiesioginis skaičiavimas
 
-In forward calculation, the input of
-the skip-gram model contains the central target word index `center` and the
-concatenated context and noise word index `contexts_and_negatives`. In which,
-the `center` variable has the shape (batch size, 1), while the
-`contexts_and_negatives` variable has the shape (batch size, `max_len`). These
-two variables are first transformed from word indexes to word vectors by the
-word embedding layer, and then the output of shape (batch size, 1, `max_len`) is
-obtained by minibatch multiplication. Each element in the output is the inner
-product of the central target word vector and the context word vector or noise
-word vector.
+Tiesioginio skaičiavimo metu skip-gram modelio įvestį sudaro centrinio tikslinio žodžio indeksas `center` ir
+sujungti konteksto bei triukšmo žodžių indeksai `contexts_and_negatives`. Čia
+kintamojo `center` forma yra (mažos imties dydis, 1), o
+kintamojo `contexts_and_negatives` forma yra (mažos imties dydis, `max_len`). Šie
+du kintamieji pirmiausia žodžių įterpimo sluoksniu paverčiami iš žodžių indeksų į žodžių vektorius, o tada
+mažų imčių daugyba gaunama (mažos imties dydis, 1, `max_len`) formos išvestis. Kiekvienas išvesties elementas yra
+centrinio tikslinio žodžio vektoriaus ir konteksto žodžio vektoriaus arba triukšmo
+žodžio vektoriaus skaliarinė sandauga.
 
 ```{.python .input  n=10}
 #@tab mxnet
@@ -155,40 +152,39 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u, padding):
     return pred
 ```
 
-Verify that the output shape should be (batch size, 1, `max_len`).
+Patikrinkime, kad išvesties forma turėtų būti (mažos imties dydis, 1, `max_len`).
 
 ```{.python .input  n=12}
 #@tab mxnet
 skip_gram(np.ones((2, 1, 64)), np.ones((2, 6, 64)), embed, embed, vocab['<pad>']).shape
 ```
 
-## Training
+## Mokymas
 
-Before training the word embedding model, we need to define the
-loss function of the model.
+Prieš apmokydami žodžių įterpimo modelį, turime apibrėžti modelio
+nuostolių funkciją.
 
-### Binary Cross Entropy Loss Function
+### Dvejetainės kryžminės entropijos nuostolių funkcija
 
-According
-to the definition of the loss function in negative sampling, we can directly use
-Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
+Pagal
+nuostolių funkcijos apibrėžimą neigiamame atrinkime, galime tiesiogiai naudoti
+Gluon dvejetainės kryžminės entropijos nuostolių funkciją `SigmoidBinaryCrossEntropyLoss`.
 
 ```{.python .input  n=13}
 #@tab mxnet
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
-It is worth mentioning that we can use the mask variable to specify the partial
-predicted value and label that participate in loss function calculation in the
-minibatch: when the mask is 1, the predicted value and label of the
-corresponding position will participate in the calculation of the loss function;
-When the mask is 0, the predicted value and label of the corresponding position
-do not participate in the calculation of the loss function. As we mentioned
-earlier, mask variables can be used to avoid the effect of padding on loss
-function calculations.
+Verta paminėti, kad kaukės kintamąjį galime naudoti, norėdami nurodyti, kuri dalis
+prognozuojamų reikšmių ir žymių dalyvauja skaičiuojant nuostolių funkciją mažoje imtyje: kai kaukė lygi 1, atitinkamos pozicijos
+prognozuojama reikšmė ir žymė dalyvauja skaičiuojant nuostolių funkciją;
+kai kaukė lygi 0, atitinkamos pozicijos prognozuojama reikšmė ir žymė
+nedalyvauja skaičiuojant nuostolių funkciją. Kaip minėjome
+anksčiau, kaukės kintamuosius galima naudoti siekiant išvengti užpildymo (angl. *padding*) įtakos nuostolių
+funkcijos skaičiavimams.
 
-Given two identical examples, different masks lead to
-different loss values.
+Turint du identiškus pavyzdžius, skirtingos kaukės lemia
+skirtingas nuostolių reikšmes.
 
 ```{.python .input  n=14}
 #@tab mxnet
@@ -198,19 +194,17 @@ mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask)
 ```
 
-We can normalize the loss in each example due to various lengths in each
-example.
+Kadangi pavyzdžių ilgiai skiriasi, kiekvieno pavyzdžio nuostolius galime normalizuoti.
 
 ```{.python .input  n=15}
 #@tab mxnet
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
-### Initializing Model Parameters
+### Modelio parametrų inicializavimas
 
-We construct the embedding layers of the
-central and context words, respectively, and set the hyperparameter word vector
-dimension `embed_size` to 100.
+Atitinkamai sukonstruojame centrinių ir konteksto žodžių įterpimo sluoksnius ir hiperparametrą – žodžio vektoriaus
+dimensiją `embed_size` – nustatome 100.
 
 ```{.python .input  n=16}
 #@tab mxnet
@@ -220,11 +214,11 @@ net.add(nn.Embedding(input_dim=len(subword_to_idx), output_dim=embed_size),
         nn.Embedding(input_dim=len(subword_to_idx), output_dim=embed_size))
 ```
 
-### Training
+### Mokymas
 
-The training function is defined below. Because of the existence
-of padding, the calculation of the loss function is slightly different compared
-to the previous training functions.
+Mokymo funkcija apibrėžta toliau. Dėl užpildymo
+nuostolių funkcijos skaičiavimas šiek tiek skiriasi nuo
+ankstesnių mokymo funkcijų.
 
 ```{.python .input  n=17}
 #@tab mxnet
@@ -255,7 +249,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
 
-Now, we can train a skip-gram model using negative sampling.
+Dabar galime apmokyti skip-gram modelį naudodami neigiamą atrinkimą.
 
 ```{.python .input  n=20}
 #@tab mxnet

@@ -1,17 +1,17 @@
-#  Sequence to Sequence
+#  Seka į seką
 :label:`sec_seq2seq`
 
-The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input, as demonstrated in :numref:`fig_seq2seq`. Both the encoder and the decoder use recurrent neural networks (RNNs) to handle sequence inputs of variable length. The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
+Sekos į seką (angl. *sequence to sequence*, seq2seq) modelis remiasi kodavimo ir dekodavimo architektūra, kad sugeneruotų sekos išvestį sekos įvesčiai, kaip parodyta :numref:`fig_seq2seq`. Ir kodavimo, ir dekodavimo blokas naudoja rekurentinius neuroninius tinklus (RNT) kintamo ilgio sekų įvestims apdoroti. Kodavimo bloko paslėptoji būsena tiesiogiai naudojama dekodavimo bloko paslėptajai būsenai inicializuoti, kad informacija būtų perduota iš kodavimo bloko į dekodavimo bloką.
 
-![The sequence to sequence model architecture.](../img/seq2seq.svg)
+![Sekos į seką modelio architektūra.](../img/seq2seq.svg)
 :label:`fig_seq2seq`
 
-The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2seq_details`.
+Kodavimo ir dekodavimo blokų sluoksniai iliustruoti :numref:`fig_seq2seq_details`.
 
-![Layers in the encoder and the decoder.](../img/seq2seq-details.svg)
+![Kodavimo ir dekodavimo blokų sluoksniai.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
 
-In this section we will explain and implement the seq2seq model to train on the machine translation dataset.
+Šiame skyriuje paaiškinsime ir realizuosime seq2seq modelį, apmokomą mašininio vertimo duomenų rinkinyje.
 
 ```{.python .input  n=1}
 #@tab mxnet
@@ -23,26 +23,26 @@ from queue import PriorityQueue
 npx.set_np()
 ```
 
-## Encoder
+## Kodavimo blokas
 
-Recall that the encoder of seq2seq can transform the inputs of variable length to a fixed-length context vector $\mathbf{c}$ by encoding the sequence information into $\mathbf{c}$. We usually use RNN layers within the encoder.
-Suppose that we have an input sequence $x_1, \ldots, x_T$, where $x_t$ is the $t^\mathrm{th}$ word. At timestep $t$, the RNN will have two vectors as the input: the feature vector $\mathbf{x}_t$ of $x_t$ and the hidden state of the last timestep $\mathbf{h}_{t-1}$. Let us denote the transformation of the RNN's hidden states by a function $f$:
+Prisiminkite, kad seq2seq kodavimo blokas gali transformuoti kintamo ilgio įvestis į fiksuoto ilgio konteksto vektorių $\mathbf{c}$, užkoduodamas sekos informaciją į $\mathbf{c}$. Kodavimo bloke dažniausiai naudojame RNT sluoksnius.
+Tarkime, turime įvesties seką $x_1, \ldots, x_T$, kur $x_t$ yra $t$-asis žodis. Laiko žingsniu $t$ RNT turės du įvesties vektorius: $x_t$ požymių vektorių $\mathbf{x}_t$ ir ankstesnio laiko žingsnio paslėptąją būseną $\mathbf{h}_{t-1}$. RNT paslėptųjų būsenų transformaciją žymėkime funkcija $f$:
 
 $$\mathbf{h}_t = f (\mathbf{x}_t, \mathbf{h}_{t-1}).$$
 
-Next, the encoder captures information of all the hidden states and encodes it into the context vector $\mathbf{c}$ with a function $q$:
+Toliau kodavimo blokas surenka visų paslėptųjų būsenų informaciją ir užkoduoja ją į konteksto vektorių $\mathbf{c}$ funkcija $q$:
 
 $$\mathbf{c} = q (\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
-For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, then the context vector will be the final hidden state $\mathbf{h}_T$.
+Pavyzdžiui, jei $q$ pasirinksime kaip $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, tada konteksto vektorius bus paskutinė paslėptoji būsena $\mathbf{h}_T$.
 
-So far what we describe above is a unidirectional RNN, where each timestep's hidden state depends only on the previous timesteps'. We can also use other forms of RNNs such as GRUs, LSTMs, and bidirectional RNNs to encode the sequential input.
+Kol kas aprašėme vienkryptį RNT, kurio kiekvieno laiko žingsnio paslėptoji būsena priklauso tik nuo ankstesnių laiko žingsnių būsenų. Sekos įvesčiai užkoduoti taip pat galime naudoti kitas RNT formas, pavyzdžiui, GRU, LSTM ir dvikryptį RNT.
 
-Now let us implement the seq2seq's encoder.
-Here we use the word embedding layer to obtain the feature vector
-according to the word index of the input language.
-Those feature vectors will be fed to a multi-layer LSTM.
-The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the LSTM outputs, i.e., hidden states of all the timesteps, as well as the hidden state and the memory cell of the final timestep.
+Dabar realizuokime seq2seq kodavimo bloką.
+Čia naudojame žodžių įterpimo sluoksnį, kad gautume požymių vektorių
+pagal įvesties kalbos žodžio indeksą.
+Šie požymių vektoriai bus paduodami į daugiasluoksnį LSTM.
+Kodavimo bloko įvestis yra sekų paketas, t. y. 2-D tenzorius, kurio forma (paketo dydis, sekos ilgis). Kodavimo blokas grąžina ir LSTM išvestis, t. y. visų laiko žingsnių paslėptąsias būsenas, ir paskutinio laiko žingsnio paslėptąją būseną bei atminties ląstelę.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -66,7 +66,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 ```
 
-Next, we will create a minibatch sequence input with a batch size of 4 and 7 timesteps. We assume the number of hidden layers of the LSTM unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of timesteps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final timestep is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
+Toliau sukursime mažos imties sekos įvestį su paketo dydžiu 4 ir 7 laiko žingsniais. Tarkime, kad LSTM vieneto paslėptųjų sluoksnių skaičius yra 2, o paslėptųjų vienetų skaičius – 16. Kodavimo bloko, atlikus tiesioginį skaičiavimą su įvestimi, grąžinama išvesties forma yra (laiko žingsnių skaičius, paketo dydis, paslėptųjų vienetų skaičius). Valdomojo rekurentinio vieneto daugiasluoksnės paslėptosios būsenos forma paskutiniame laiko žingsnyje yra (paslėptųjų sluoksnių skaičius, paketo dydis, paslėptųjų vienetų skaičius). Valdomajam rekurentiniam vienetui sąraše `state` yra tik vienas elementas – paslėptoji būsena. Jei naudojama ilgoji trumpalaikė atmintis, sąraše `state` bus ir kitas elementas – atminties ląstelė.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -78,27 +78,27 @@ output, state = encoder(X)
 output.shape
 ```
 
-Since an LSTM is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if a GRU is used, the `state` list will contain only one element---the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
+Kadangi naudojamas LSTM, sąraše `state` bus ir paslėptoji būsena, ir atminties ląstelė su ta pačia forma (paslėptųjų sluoksnių skaičius, paketo dydis, paslėptųjų vienetų skaičius). Tačiau jei naudojamas GRU, sąraše `state` bus tik vienas elementas – paslėptoji būsena paskutiniame laiko žingsnyje su forma (paslėptųjų sluoksnių skaičius, paketo dydis, paslėptųjų vienetų skaičius).
 
 ```{.python .input  n=4}
 #@tab mxnet
 len(state), state[0].shape, state[1].shape
 ```
 
-## Decoder
+## Dekodavimo blokas
 :label:`sec_seq2seq_decoder`
 
-As we just introduced, the context vector $\mathbf{c}$ encodes the information from the whole input sequence $x_1, \ldots, x_T$. Suppose that the given outputs in the training set are $y_1, \ldots, y_{T'}$. At each timestep $t'$, the conditional probability of output $y_{t'}$ will depend on the previous output sequence $y_1, \ldots, y_{t'-1}$ and the context vector $\mathbf{c}$, i.e.,
+Kaip ką tik pristatėme, konteksto vektorius $\mathbf{c}$ užkoduoja informaciją iš visos įvesties sekos $x_1, \ldots, x_T$. Tarkime, kad mokymo rinkinyje duotos išvestys yra $y_1, \ldots, y_{T'}$. Kiekvienu laiko žingsniu $t'$ išvesties $y_{t'}$ sąlyginė tikimybė priklausys nuo ankstesnės išvesties sekos $y_1, \ldots, y_{t'-1}$ ir konteksto vektoriaus $\mathbf{c}$, t. y.,
 
 $$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
 
-Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ using three inputs: the feature vector $\mathbf{y}_{t'-1}$ of $y_{t'-1}$, the context vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s}_{t'-1}$. Let us denote the transformation of the RNN's hidden states within the decoder by a function $g$:
+Todėl kaip dekodavimo bloką galime naudoti kitą RNT. Laiko žingsniu $t'$ dekodavimo blokas atnaujins savo paslėptąją būseną $\mathbf{s}_{t'}$ naudodamas tris įvestis: $y_{t'-1}$ požymių vektorių $\mathbf{y}_{t'-1}$, konteksto vektorių $\mathbf{c}$ ir ankstesnio laiko žingsnio paslėptąją būseną $\mathbf{s}_{t'-1}$. RNT paslėptųjų būsenų transformaciją dekodavimo bloke žymėkime funkcija $g$:
 
 $$\mathbf{s}_{t'} = g(\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
 
 
-When implementing the decoder, we directly use the hidden state of the encoder in the final timestep as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
-The LSTM forward calculation of the decoder is similar to that of the encoder. The only difference is that we add a dense layer after the LSTM layers, where the hidden size is the vocabulary size. The dense layer will predict the confidence score for each word.
+Realizuodami dekodavimo bloką, kaip pradinę dekodavimo bloko paslėptąją būseną tiesiogiai naudojame kodavimo bloko paskutinio laiko žingsnio paslėptąją būseną. Tam reikia, kad kodavimo ir dekodavimo blokų RNT turėtų tiek pat sluoksnių ir paslėptųjų vienetų.
+Dekodavimo bloko LSTM tiesioginis skaičiavimas panašus į kodavimo bloko. Vienintelis skirtumas yra tai, kad po LSTM sluoksnių pridedame tankųjį sluoksnį, kurio paslėptasis dydis yra žodyno dydis. Tankusis sluoksnis prognozuos kiekvieno žodžio pasitikėjimo įvertį.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -123,7 +123,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 ```
 
-We create a decoder with the same hyper-parameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
+Sukuriame dekodavimo bloką su tais pačiais hiperparametrais kaip kodavimo bloko. Kaip matome, išvesties forma pasikeičia į (paketo dydis, sekos ilgis, žodyno dydis).
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -135,11 +135,11 @@ out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, state[1].shape
 ```
 
-## The Loss Function
+## Nuostolių funkcija
 
-For each timestep, the decoder outputs a vocabulary-size confidence score vector to predict words. Similar to language modeling, we can apply softmax to obtain the probabilities and then use cross-entropy loss to calculate the loss. Note that we padded the target sentences to make them have the same length, but we do not need to compute the loss on the padding symbols.
+Kiekvienu laiko žingsniu dekodavimo blokas išveda žodyno dydžio pasitikėjimo įverčių vektorių žodžiams prognozuoti. Panašiai kaip kalbos modeliavime, galime taikyti softmax, kad gautume tikimybes, o tada nuostoliams apskaičiuoti naudoti kryžminės entropijos nuostolius. Atkreipkite dėmesį, kad tikslinius sakinius užpildėme (angl. *padding*), kad jų ilgiai būtų vienodi, tačiau nuostolių užpildymo simboliams skaičiuoti nereikia.
 
-To implement the loss function that filters out some entries, we will use an operator called `SequenceMask`. It can specify to mask the first dimension (`axis=0`) or the second one (`axis=1`). If the second one is chosen, given a valid length vector `len` and 2-dim input `X`, this operator sets `X[i, len[i]:] = 0` for all $i$'s.
+Kad realizuotume nuostolių funkciją, kuri atfiltruoja kai kuriuos elementus, naudosime operatorių `SequenceMask`. Jis gali nurodyti kaukuoti pirmąją dimensiją (`axis=0`) arba antrąją (`axis=1`). Pasirinkus antrąją, turint galiojančio ilgio vektorių `len` ir 2 dimensijų įvestį `X`, šis operatorius visiems $i$ nustato `X[i, len[i]:] = 0`.
 
 ```{.python .input  n=7}
 #@tab mxnet
@@ -147,7 +147,7 @@ X = np.array([[1, 2, 3], [4, 5, 6]])
 npx.sequence_mask(X, np.array([1, 2]), True, axis=1)
 ```
 
-Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value such as $-1$ as shown below.
+Taikant $n$ dimensijų tenzoriui $X$, nustatoma `X[i, len[i]:, :, ..., :] = 0`. Be to, galime nurodyti užpildymo reikšmę, pavyzdžiui, $-1$, kaip parodyta toliau.
 
 ```{.python .input  n=8}
 #@tab mxnet
@@ -155,7 +155,7 @@ X = np.ones((2, 3, 4))
 npx.sequence_mask(X, np.array([1, 2]), True, value=-1, axis=1)
 ```
 
-Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_len` argument to ignore some failing elements in each sequence.
+Dabar galime realizuoti kaukuotą softmax kryžminės entropijos nuostolių versiją. Atkreipkite dėmesį, kad kiekviena Gluon nuostolių funkcija leidžia nurodyti kiekvieno pavyzdžio svorius, pagal nutylėjimą jie yra vienetai. Tada galime tiesiog naudoti nulinį svorį kiekvienam pavyzdžiui, kurį norime pašalinti. Todėl mūsų pritaikyta nuostolių funkcija priima papildomą argumentą `valid_len`, kad būtų ignoruojami kai kurie netinkami kiekvienos sekos elementai.
 
 ```{.python .input  n=9}
 #@tab mxnet
@@ -171,7 +171,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
 
-For a sanity check, we create identical three sequences, keep 4 elements for the first sequence, 2 elements for the second sequence, and none for the last one. Then the first example loss should be 2 times larger than the second one, and the last loss should be 0.
+Patikrinimui sukuriame tris identiškas sekas: pirmoje sekoje paliekame 4 elementus, antroje – 2 elementus, o paskutinėje – nė vieno. Tada pirmojo pavyzdžio nuostoliai turėtų būti 2 kartus didesni nei antrojo, o paskutinio – 0.
 
 ```{.python .input  n=10}
 #@tab mxnet
@@ -179,10 +179,10 @@ loss = MaskedSoftmaxCELoss()
 loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 ```
 
-## Training
+## Mokymas
 :label:`sec_seq2seq_training`
 
-During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
+Mokymo metu, jei tikslinės sekos ilgis yra $n$, pirmąsias $n-1$ leksemų paduodame į dekodavimo bloką kaip įvestis, o paskutinės $n-1$ leksemos naudojamos kaip etaloninės žymės.
 
 ```{.python .input  n=11}
 #@tab mxnet
@@ -214,7 +214,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
 
-Next, we create a model instance and set hyper-parameters. Then, we can train the model.
+Toliau sukuriame modelio objektą ir nustatome hiperparametrus. Tada galime apmokyti modelį.
 
 ```{.python .input  n=12}
 #@tab mxnet
@@ -231,12 +231,12 @@ model = d2l.EncoderDecoder(encoder, decoder)
 train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
-## Predicting
+## Prognozavimas
 
-Here we implement the simplest method, greedy search, to generate an output
-sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at timestep 0. But the input token for a later timestep is the predicted token from the previous timestep.
+Čia realizuojame paprasčiausią metodą – godžiąją paiešką – išvesties
+sekai generuoti. Kaip iliustruota :numref:`fig_seq2seq_predict`, prognozuojant 0 laiko žingsniu į dekodavimo bloką paduodame tą pačią „&lt;bos&gt;“ leksemą kaip ir mokant. Tačiau vėlesnio laiko žingsnio įvesties leksema yra ankstesnio laiko žingsnio prognozuota leksema.
 
-![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
+![Sekos į seką modelio prognozavimas godžiąja paieška](../img/seq2seq_predict.svg)
 :label:`fig_seq2seq_predict`
 
 ```{.python .input  n=16}
@@ -307,7 +307,7 @@ def predict_s2s_ch9_beam(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
 ```
 
-Try several examples:
+Išbandykite keletą pavyzdžių:
 
 ```{.python .input  n=204}
 #@tab mxnet
@@ -316,19 +316,19 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
         model, sentence, src_vocab, tgt_vocab, num_steps, 3, ctx))
 ```
 
-## Summary
+## Santrauka
 
-* The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output from a sequence input.
-* We use multiple LSTM layers for both the encoder and the decoder.
-
-
-## Exercises
-
-1. Can you think of other use cases of seq2seq besides neural machine translation?
-1. What if the input sequence in the example of this section is longer?
-1. If we do not use the `SequenceMask` in the loss function, what may happen?
+* Sekos į seką (seq2seq) modelis remiasi kodavimo ir dekodavimo architektūra, kad iš sekos įvesties sugeneruotų sekos išvestį.
+* Ir kodavimo, ir dekodavimo blokui naudojame kelis LSTM sluoksnius.
 
 
-## [Discussions](https://discuss.mxnet.io/t/4357)
+## Pratimai
+
+1. Ar galite sugalvoti kitų seq2seq panaudojimo atvejų, be neuroninio mašininio vertimo?
+1. Kas nutiktų, jei šio skyriaus pavyzdyje įvesties seka būtų ilgesnė?
+1. Kas gali nutikti, jei nuostolių funkcijoje nenaudotume `SequenceMask`?
+
+
+## [Diskusijos](https://discuss.mxnet.io/t/4357)
 
 ![](../img/qr_seq2seq.svg)

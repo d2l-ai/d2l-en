@@ -1,13 +1,13 @@
-# Pretraining GloVe
+# GloVe išankstinis apmokymas
 :label:`sec_GloVe_gluon`
 
-In this section, we will train a
-GloVe model defined in
-:numref:`sec_glove`.
+Šiame skyriuje apmokysime
+:numref:`sec_glove` apibrėžtą
+GloVe modelį.
 
-First, import the
-packages and
-modules required for the experiment.
+Pirmiausia importuokime
+eksperimentui
+reikalingus paketus ir modulius.
 
 ```{.python .input  n=1}
 #@tab mxnet
@@ -20,12 +20,12 @@ import random
 npx.set_np()
 ```
 
-## Preprocessing Dataset
-We will train GloVe model on PTB dataset.
+## Duomenų rinkinio parengimas
+GloVe modelį apmokysime PTB duomenų rinkinyje.
 
-First, we
-read the PTB dataset, build a vocabulary with words and map each token into an
-index to construct the corpus.
+Pirmiausia
+nuskaitome PTB duomenų rinkinį, sudarome žodžių žodyną ir kiekvieną leksemą susiejame su
+indeksu, kad sukonstruotume tekstyną.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -34,17 +34,17 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 corpus = [vocab[line] for line in sentences]
 ```
 
-### Construct Cooccurrence Counts
-Let the word-word cooccurrence counts be
-denoted by $X$, whose entries $x_{ij}$ tabulate the number of times word $j$
-occurs in the context of word $i$.
+### Bendro pasitaikymo skaičių sudarymas
+Tegu žodžių poros bendro pasitaikymo skaičiai
+žymimi $X$, kurios elementai $x_{ij}$ lentelėje pateikia, kiek kartų žodis $j$
+pasitaiko žodžio $i$ kontekste.
 
-Next, we define following function to
-extracts all the central target words and their context words. It use a
-decreasing weighting function, so that word pairs that are $d$ words apart
-contribute $1/d$ to the total count. This is one way to account for the fact
-that very distant word pairs are expected to contain less relevant information
-about the words’ relationship to one another.
+Toliau apibrėžiame šią funkciją,
+kuri išskiria visus centrinius tikslinius žodžius ir jų konteksto žodžius. Ji naudoja
+mažėjančią svorio funkciją, kad žodžių poros, esančios $d$ žodžių atstumu,
+prie bendro skaičiaus prisidėtų $1/d$. Tai vienas iš būdų atsižvelgti į tai,
+kad labai nutolusių žodžių porose tikimasi mažiau svarbios informacijos
+apie žodžių tarpusavio ryšį.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -72,9 +72,10 @@ def get_coocurrence_counts(corpus, window_size):
     return cooccurence_counts
 ```
 
-We create an artificial dataset containing two sentences of 5 and 2 words,
-respectively. Assume the maximum context window is 4. Then, we print the
-cooccurrence counts of all the central target words and context words.
+Sukuriame dirbtinį duomenų rinkinį su dviem sakiniais, kuriuose atitinkamai yra 5 ir 2 žodžiai.
+Tarkime, kad didžiausias konteksto langas yra 4. Tada išspausdiname
+visų centrinių tikslinių žodžių ir konteksto žodžių
+bendro pasitaikymo skaičius.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -85,9 +86,9 @@ for center, context, coocurrence in get_coocurrence_counts(tiny_dataset, 4):
           (center, context, coocurrence))
 ```
 
-We set the maximum context window size to 5. The following extracts all the
-central target words and their context words in the dataset, and calculate their
-cooccurrence counts
+Didžiausią konteksto lango dydį nustatome 5. Toliau išskiriami visi
+duomenų rinkinio centriniai tiksliniai žodžiai ir jų konteksto žodžiai bei apskaičiuojami jų
+bendro pasitaikymo skaičiai
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -95,10 +96,10 @@ coocurrence_matrix = get_coocurrence_counts(corpus, 5)
 '# center-context pairs: %d' % len(coocurrence_matrix)
 ```
 
-### Putting All Things Together
+### Viskas kartu
 
-Last, We define the load_data_ptb_glove
-function that read the PTB dataset and return the data loader.
+Galiausiai apibrėžiame funkciją load_data_ptb_glove,
+kuri nuskaito PTB duomenų rinkinį ir grąžina duomenų įkroviklį.
 
 ```{.python .input  n=16}
 #@tab mxnet
@@ -117,7 +118,7 @@ batch_size, window_size = 1024, 10
 data_iter, vocab = load_data_ptb_glove(batch_size, window_size)
 ```
 
-Let’s print the first minibatch of the data iterator.
+Išspausdinkime pirmąją duomenų iteratoriaus mažą imtį.
 
 ```{.python .input  n=17}
 #@tab mxnet
@@ -128,22 +129,22 @@ for batch in data_iter:
     break
 ```
 
-## The GloVe Model
+## GloVe modelis
 
-In section 15.1, we introduced the goal of GloVe is to
-minimize the loss function.
+15.1 skyrelyje pristatėme, kad GloVe tikslas yra
+minimizuoti nuostolių funkciją.
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}}
 h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j -
 \log\,x_{ij}\right)^2.$$
 
-We will implement the GloVe model by implementing each
-part of the loss function.
+GloVe modelį realizuosime realizuodami kiekvieną
+nuostolių funkcijos dalį.
 
-### Weight function
+### Svorio funkcija
 
-GloVe introduced a weighting
-function $h(x_{ij})$ into the loss function.
+GloVe į nuostolių funkciją įvedė svorio
+funkciją $h(x_{ij})$.
 
 $$h(x_{ij})=\begin{cases}
 (\frac{x}{x_{max}})^\alpha & x_{ij}<x_{max}\\
@@ -151,10 +152,10 @@ $$h(x_{ij})=\begin{cases}
 \end{cases}$$
 
 
-We
-implement the weighting function $h(x_{ij})$. Since $x_{ij}<x_{max}$is
-equivalent to $(\frac{x}{x_{max}})^\alpha < 1$, we can give the following
-implementation.
+Realizuojame
+svorio funkciją $h(x_{ij})$. Kadangi $x_{ij}<x_{max}$
+ekvivalentu $(\frac{x}{x_{max}})^\alpha < 1$, galime pateikti šią
+realizaciją.
 
 ```{.python .input  n=18}
 #@tab mxnet
@@ -163,8 +164,8 @@ def compute_weight(x, x_max = 30, alpha = 0.75):
     return np.minimum(w, 1)
 ```
 
-The following prints the weight of the cooccurrence counts of all the central
-target words and context words when the $x_{max}$ set to 2 and $\alpha$ to 0.75
+Toliau išspausdinami visų centrinių tikslinių žodžių ir konteksto žodžių bendro pasitaikymo skaičių svoriai,
+kai $x_{max}$ nustatytas 2, o $\alpha$ – 0,75
 
 ```{.python .input  n=19}
 #@tab mxnet
@@ -173,15 +174,15 @@ for center, context, coocurrence in get_coocurrence_counts(tiny_dataset, 4)[:5]:
           (center, context, coocurrence, compute_weight(coocurrence, x_max = 2, alpha = 0.75)))
 ```
 
-### Bias Term
+### Poslinkio narys
 
-GloVe has two scalar model parameters for each word $w_i$ : the
-bias terms $b_i$ (for central target words) and  $c_i$ (for context words).
-Bias term can be realized by embedding layer. The weight of the embedding layer
-is a matrix whose number of rows is the dictionary size (input_dim) and whose
-number of columns is one.
+GloVe kiekvienam žodžiui $w_i$ turi du skaliarinius modelio parametrus:
+poslinkio narius $b_i$ (centriniams tiksliniams žodžiams) ir $c_i$ (konteksto žodžiams).
+Poslinkio narį galima realizuoti įterpimo sluoksniu. Įterpimo sluoksnio svoris
+yra matrica, kurios eilučių skaičius lygus žodyno dydžiui (input_dim), o
+stulpelių skaičius – vienas.
 
-We set the dictionary size to  20.
+Žodyno dydį nustatome 20.
 
 ```{.python .input}
 #@tab mxnet
@@ -190,9 +191,9 @@ embed_bias.initialize()
 embed_bias.weight
 ```
 
-The input of the embedding layer is the index of the word. When we enter the
-index $i$ of a word, the embedding layer returns the $i$ th row of the weight
-value as its bias term.
+Įterpimo sluoksnio įvestis yra žodžio indeksas. Kai įvedame
+žodžio indeksą $i$, įterpimo sluoksnis grąžina $i$-ąją svorio
+reikšmių eilutę kaip jo poslinkio narį.
 
 ```{.python .input}
 #@tab mxnet
@@ -200,24 +201,21 @@ x = np.array([1, 2, 3])
 embed_bias(x)
 ```
 
-### GloVe Model Forward Calculation
+### GloVe modelio tiesioginis skaičiavimas
 
-In forward calculation, the input of
-the
-GloVe model contains the central
-target word index `center` and the context word
-index
-`context`. In which,
-the `center` variable has the shape (batch
-size, 1),
-while the
-`context` variable has the shape (batch size,
-1). These
-two variables
-are first transformed from word indexes to word
-vectors by the
-word embedding
-layer.
+Tiesioginio skaičiavimo metu GloVe modelio įvestį sudaro centrinio
+tikslinio žodžio indeksas `center` ir konteksto žodžio
+indeksas
+`context`. Čia
+kintamojo `center` forma yra (mažos imties
+dydis, 1),
+o kintamojo
+`context` forma yra (mažos imties dydis,
+1). Šie
+du kintamieji
+pirmiausia žodžių įterpimo
+sluoksniu paverčiami iš žodžių indeksų į žodžių
+vektorius.
 
 ```{.python .input  n=20}
 #@tab mxnet
@@ -242,7 +240,7 @@ def GloVe(center, context, coocurrence, embed_v, embed_u,
     return weight * distance_expr
 ```
 
-Verify that the output shape should be (batch size, ).
+Patikrinkime, kad išvesties forma turėtų būti (mažos imties dydis, ).
 
 ```{.python .input  n=21}
 #@tab mxnet
@@ -252,20 +250,19 @@ GloVe(np.ones((2)), np.ones((2)), np.ones((2)), embed_word, embed_word,
       embed_bias, embed_bias, x_max = 2, alpha = 0.75).shape
 ```
 
-## Training
+## Mokymas
 
-Before training the word embedding model, we need to define the
-loss function of
-the model.
+Prieš apmokydami žodžių įterpimo modelį, turime apibrėžti
+modelio nuostolių funkciją.
 
-### Initializing Model Parameters
-We construct the
-embedding layers of words and
-additional biases,
-and set the hyperparameter word
-vector
-dimension `embed_size`
-to
+### Modelio parametrų inicializavimas
+Sukonstruojame
+žodžių įterpimo sluoksnius ir
+papildomus poslinkius,
+o hiperparametrą – žodžio
+vektoriaus
+dimensiją `embed_size` –
+nustatome
 100.
 
 ```{.python .input  n=22}
@@ -278,9 +275,9 @@ net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
         nn.Embedding(input_dim=len(vocab), output_dim=1))
 ```
 
-### Training
+### Mokymas
 
-The training function is defined below.
+Mokymo funkcija apibrėžta toliau.
 
 ```{.python .input  n=23}
 #@tab mxnet
@@ -309,7 +306,7 @@ def train(net, data_iter, lr, num_epochs, x_max, alpha, ctx=d2l.try_gpu()):
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
 
-Now, we can train a GloVe model.
+Dabar galime apmokyti GloVe modelį.
 
 ```{.python .input  n=12}
 #@tab mxnet
@@ -318,19 +315,18 @@ x_max, alpha = 100, 0.75
 train(net, data_iter, lr, num_epochs, x_max, alpha)
 ```
 
-## Applying the GloVe Model
+## GloVe modelio taikymas
 
-GloVe model generates two sets of word vectors,
-`embed_v` and `embed_u` . `embed_v` and `embed_u` are
-equivalent and differ only
-as a result of their random initializations; the two sets of vectors should
-perform equivalently.Generally, we choose to use the sum `embed_v`+`embed_u` as
-our word vectors.
+GloVe modelis sukuria du žodžių vektorių rinkinius,
+`embed_v` ir `embed_u`. `embed_v` ir `embed_u` yra
+ekvivalentūs ir skiriasi tik
+dėl atsitiktinės inicializacijos; abu vektorių rinkiniai turėtų
+veikti vienodai. Paprastai kaip
+žodžių vektorius naudojame sumą `embed_v`+`embed_u`.
 
 
-After training the GloVe model, we can still represent
-similarity in meaning between words based on the cosine similarity of two word
-vectors.
+Apmokę GloVe modelį, žodžių reikšmių panašumą vis tiek galime išreikšti
+pagal dviejų žodžių vektorių kosinusinį panašumą.
 
 ```{.python .input  n=13}
 #@tab mxnet
@@ -346,13 +342,13 @@ def get_similar_tokens(query_token, k, embed_v, embed_u):
 get_similar_tokens('chip', 3, net[0], net[1])
 ```
 
-## Summary
+## Santrauka
 
-* We can pretrain a GloVe model.
-
-
-## Exercises
+* Galime iš anksto apmokyti GloVe modelį.
 
 
+## Pratimai
 
-## Discussions
+
+
+## Diskusijos

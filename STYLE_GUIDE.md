@@ -1,147 +1,149 @@
-# STYLE GUIDE
+# STILIAUS GAIRĖS
 
-## In General
+> Pastaba: šios gairės išverstos iš originalo. Kodo identifikatoriai, funkcijų ir karkasų pavadinimai paliekami angliški.
 
-* Be precise, clear, engaging, pragmatic, and consistent
+## Bendrai
 
-## Text
+* Būkite tikslūs, aiškūs, įtraukiantys, pragmatiški ir nuoseklūs
 
-* Chapters and Sections
-    * Provide an overview at the beginning of each chapter
-    * Be consistent in the structure of each section
-        * Summary
-        * Exercises
-* Quotes
-    * Use double quotes
-* Symbol Descriptions
-    * timestep t（not t timestep）
-* Tools, Class, and Functions
+## Tekstas
+
+* Skyriai ir poskyriai
+    * Kiekvieno skyriaus pradžioje pateikite apžvalgą
+    * Laikykitės nuoseklios kiekvieno poskyrio struktūros
+        * Santrauka
+        * Pratimai
+* Citatos
+    * Naudokite dvigubas kabutes
+* Simbolių aprašymai
+    * laiko žingsnis t（ne t laiko žingsnis）
+* Įrankiai, klasės ir funkcijos
     * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18, Fashion-MNIST, matplotlib
-        * Consider these as words without accents (``)
-    * Sequential class/instance, HybridSequential class/instance
-        * Without accents (``)
-    * `backward` function
-        * not `backward()` function
-    * "for-loop" not "for loop"
-* Terminologies
-    * Consistently use
-        * function (not method)
-        * instance (not object)
-        * weight, bias, label
-        * model training, model prediction (model inference)
-        * training/testing/validation dataset
-        * prefer using "data/training/testing example" over "data instance" or "data point"
-    * Distinguish：
-        * hyperparameter vs parameter
-        * minibatch stochastic gradient descent vs stochastic gradient descent
-* Use numerals when they are explaining or part of code or math.
-* Acceptable abbreviations
-    * AI, MLP, CNN, RNN, GRU, LSTM, model names (e.g., ELMo, GPT, BERT)
-    * We spell out full names in most cases to be clear (e.g., NLP -> natural language processing)
+        * Laikykite juos žodžiais be kabučių (``)
+    * Sequential klasė / objektas, HybridSequential klasė / objektas
+        * Be kabučių (``)
+    * `backward` funkcija
+        * ne `backward()` funkcija
+    * „for-loop“, ne „for loop“
+* Terminai
+    * Nuosekliai naudokite
+        * funkcija (ne metodas)
+        * objektas (angl. *instance*, ne *object*)
+        * svoris, poslinkis, žymė
+        * modelio mokymas, modelio prognozavimas (modelio inferencija)
+        * mokymo / testavimo / validavimo duomenų rinkinys
+        * vietoj „duomenų objektas“ ar „duomenų taškas“ pirmenybę teikite „duomenų / mokymo / testavimo pavyzdys“
+    * Skirkite：
+        * hiperparametras ir parametras
+        * mažos imties stochastinis gradientinis nusileidimas ir stochastinis gradientinis nusileidimas
+* Skaitmenis naudokite, kai jie paaiškina kodą arba yra kodo ar matematikos dalis.
+* Priimtinos santrumpos
+    * DI, DBP (MLP), KNT (CNN), RNT (RNN), GRU, LSTM, modelių pavadinimai (pvz., ELMo, GPT, BERT)
+    * Daugeliu atvejų, kad būtų aiškiau, rašome pilnus pavadinimus (pvz., NLP -> natūraliosios kalbos apdorojimas)
 
-## Math
+## Matematika
 
-* Be consistent in [math notation](chapter_notation/index.md)
-* Place punctuations within equations if necessary
-    * e.g., comma and period
-* Assignment symbol
+* Laikykitės nuoseklaus [matematinio žymėjimo](chapter_notation/index.md)
+* Jei reikia, skyrybos ženklus dėkite lygčių viduje
+    * pvz., kablelį ir tašką
+* Priskyrimo simbolis
     * \leftarrow
-* Use mathematical numerals only when they are part of math: "$x$ is either $1$ or $-1$", "the greatest common divisor of $12$ and $18$ is $6$".
-* We do not use "thousands separator" (since different publishing houses have different styles). E.g., 10,000 should be written as 10000 in the source markdown files.
+* Matematinius skaitmenis naudokite tik kai jie yra matematikos dalis: „$x$ yra arba $1$, arba $-1$“, „skaičių $12$ ir $18$ didžiausias bendrasis daliklis yra $6$“.
+* Netaikome „tūkstančių skyriklio“ (nes skirtingos leidyklos laikosi skirtingų stilių). Pvz., 10,000 šaltiniuose markdown failuose rašoma kaip 10000.
 
-## Figure
+## Paveikslai
 
-* Software
-    * Use OmniGraffle to make figures.
-      * Export pdf (infinite canvas) in 100%, then use pdf2svg to convert to svg
+* Programinė įranga
+    * Paveikslams kurti naudokite OmniGraffle.
+      * Eksportuokite pdf (begalinė drobė) 100 %, tada pdf2svg konvertuokite į svg
         * `ls *.pdf | while read f; do pdf2svg $f ${f%.pdf}.svg; done`
-      * Do not export svg directly from Omnigraffle (font size may slightly change)
-* Style
-    * Size：
-        * Horizontal：<= 400 pixels  (limited by page width)
-        * Vertical：<= 200 pixels (exceptions may be made)
-    * Thickness：
+      * Neeksportuokite svg tiesiai iš Omnigraffle (šrifto dydis gali šiek tiek pasikeisti)
+* Stilius
+    * Dydis：
+        * Horizontaliai：<= 400 pikselių  (riboja puslapio plotis)
+        * Vertikaliai：<= 200 pikselių (galimos išimtys)
+    * Storis：
         * StickArrow
         * 1pt
-        * arrow head size: 50%
-    * Font：
-        * Arial (for text), STIXGeneral (for math), 9pt（subscripts/superscripts：6pt）
-        * Do not italicize numbers or parentheses in subscripts or superscripts
-    * Color：
-        * Blue as background (text is black)
-            * (Try to avoid) Extra Dark：3FA3FD
-            * Dark：66BFFF
-            * Light：B2D9FF
-            * (Try to avoid) Extra Light: CFF4FF
-* Be careful about copyright
+        * rodyklės galvutės dydis: 50 %
+    * Šriftas：
+        * Arial (tekstui), STIXGeneral (matematikai), 9pt（apatiniai / viršutiniai indeksai：6pt）
+        * Nekursyvinkite skaičių ar skliaustų apatiniuose ar viršutiniuose indeksuose
+    * Spalva：
+        * Mėlyna kaip fonas (tekstas juodas)
+            * (Stenkitės vengti) Ypač tamsi：3FA3FD
+            * Tamsi：66BFFF
+            * Šviesi：B2D9FF
+            * (Stenkitės vengti) Ypač šviesi: CFF4FF
+* Būkite atidūs dėl autorių teisių
 
 
-## Code
+## Kodas
 
-* Each line must have <=78 characters (limited by page width). For [the cambridge style](https://github.com/d2l-ai/d2l-en/pull/2187), each line must have <=79 characters.
+* Kiekviena eilutė turi turėti <=78 simbolius (riboja puslapio plotis). [Cambridge stiliui](https://github.com/d2l-ai/d2l-en/pull/2187) kiekviena eilutė turi turėti <=79 simbolius.
 * Python
     * PEP8
-        * e.g., (https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator)
-* To save space, put several assignments on the same line
-  * e.g, `num_epochs, lr = 5, 0.1`
-* Be consistent in variable names
+        * pvz., (https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator)
+* Kad sutaupytumėte vietos, kelis priskyrimus dėkite toje pačioje eilutėje
+  * pvz., `num_epochs, lr = 5, 0.1`
+* Būkite nuoseklūs kintamųjų pavadinimuose
     * `num_epochs`
-        * number of epochs
+        * epochų skaičius
     * `num_hiddens`
-        * number of hidden units
+        * paslėptųjų vienetų skaičius
     * `num_inputs`
-        * number of inputs
+        * įvesčių skaičius
     * `num_outputs`
-        * number of outputs
+        * išvesčių skaičius
     * `net`
-        * model
+        * modelis
     * `lr`
-        * learning rate
+        * mokymosi sparta
     * `acc`
-        * accuracy
-    * During iterations
-        * features：`X`
-        * labels：`y`, `y_hat` or `Y`, `Y_hat`
+        * tikslumas
+    * Iteracijų metu
+        * požymiai：`X`
+        * žymės：`y`, `y_hat` arba `Y`, `Y_hat`
         * `for X, y in data_iter`
-    * Data sets：
-        * features：`features` or `images`
-        * labels：`labels`
-        * DataLoader instance：`train_iter`, `test_iter`, `data_iter`
-* Comments
-    * No period at the end of comments.
-    * For clarity, surround variable names with accents, e.g.,  # shape of `X`
-* imports
-    * import alphabetically
-* Print variables
-    * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
-* String
-    * Use single quotes
-    * Use f-strings. To break a long f-string into multi-lines, just use one f-string per line.
-* Other items
+    * Duomenų rinkiniai：
+        * požymiai：`features` arba `images`
+        * žymės：`labels`
+        * DataLoader objektas：`train_iter`, `test_iter`, `data_iter`
+* Komentarai
+    * Komentarų gale taško nededame.
+    * Kad būtų aiškiau, kintamųjų pavadinimus apskliauskite kabutėmis, pvz.,  # `X` forma
+* Importai
+    * importuokite abėcėlės tvarka
+* Kintamųjų spausdinimas
+    * jei įmanoma, kodo bloko pabaigoje naudokite `x, y` vietoj `print('x:', x, 'y:', y)`
+* Eilutės
+    * Naudokite viengubas kabutes
+    * Naudokite f-eilutes. Norėdami ilgą f-eilutę suskaidyti į kelias eilutes, naudokite po vieną f-eilutę eilutėje.
+* Kita
     * `nd.f(x)` → `x.nd`
     * `.1` → `1.0`
     * 1. → `1.0`
 
 
-## References
+## Nuorodos
 
-* Refer to [d2lbook](https://book.d2l.ai/user/markdown.html#cross-references) on how to add references for figure, table and equations.
+* Kaip pridėti nuorodas į paveikslus, lenteles ir lygtis, žr. [d2lbook](https://book.d2l.ai/user/markdown.html#cross-references).
 
 
 ## URL
 
-When setting `style = cambridge`, URLs will be converted into QR code, which requires replacing special characters with [URL encoding](https://www.urlencoder.io/learn/). For example:
+Nustačius `style = cambridge`, URL bus paversti QR kodais, todėl specialiuosius simbolius reikia pakeisti [URL kodavimu](https://www.urlencoder.io/learn/). Pavyzdžiui:
 
 `Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)`
 ->
 `Stanford's [large movie review dataset](https://ai.stanford.edu/%7Eamaas/data/sentiment/)`
 
 
-## Citations
+## Citavimas
 
-1. Run `pip install git+https://github.com/d2l-ai/d2l-book`
-1. Use bibtool to generate consistent keys for bibtex entries. Install it by `brew install bib-tool`
-1. Add an bibtex entry to `d2l.bib` on the root directory. Say the original entry is
+1. Paleiskite `pip install git+https://github.com/d2l-ai/d2l-book`
+1. Naudokite bibtool nuosekliems bibtex įrašų raktams generuoti. Įdiekite: `brew install bib-tool`
+1. Pridėkite bibtex įrašą į `d2l.bib` šakniniame kataloge. Tarkime, originalus įrašas yra
 ```
 @article{wood2011sequence,
   title={The sequence memoizer},
@@ -154,7 +156,7 @@ When setting `style = cambridge`, URLs will be converted into QR code, which req
   publisher={ACM}
 }
 ```
-4. Run `bibtool -s -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys. And as a side-effect, it'll appear in alphabetically sorted order relative to all other papers in the file:
+4. Paleiskite `bibtool -s -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Dabar pridėtas įrašas turės nuoseklius raktus, o kaip šalutinis efektas, jis atsiras abėcėlės tvarka kitų failo darbų atžvilgiu:
 ```
 @Article{	  Wood.Gasthaus.Archambeau.ea.2011,
   title		= {The sequence memoizer},
@@ -168,16 +170,16 @@ When setting `style = cambridge`, URLs will be converted into QR code, which req
   publisher	= {ACM}
 }
 ```
-5. In the text, use the following to cite the added paper:
+5. Tekste pridėtam darbui cituoti naudokite:
 ```
 :cite:`Wood.Gasthaus.Archambeau.ea.2011`
 ```
 
 
-## Edit and Test Code in One Framework
+## Kodo redagavimas ir testavimas viename karkase
 
-1. Say we want to edit and test MXNet code in xx.md, run `d2lbook activate default xx.md`. Then code of other frameworks is deactivated in xx.md.
-2. Open xx.md using Jupyter notebook, edit code and use "Kernel -> Restart & Run All" to test code.
-3. Run `d2lbook activate all xx.md` to re-activate code of all the frameworks. Then git push.
+1. Tarkime, norime redaguoti ir testuoti MXNet kodą xx.md: paleiskite `d2lbook activate default xx.md`. Tada kitų karkasų kodas xx.md faile deaktyvuojamas.
+2. Atidarykite xx.md naudodami Jupyter notebook, redaguokite kodą ir kodui testuoti naudokite „Kernel -> Restart & Run All“.
+3. Paleiskite `d2lbook activate all xx.md`, kad iš naujo aktyvuotumėte visų karkasų kodą. Tada git push.
 
-Likewise, `d2lbook activate pytorch/tensorflow xx.md` will only activate PyTorch/TensorFlow code in xx.md.
+Panašiai `d2lbook activate pytorch/tensorflow xx.md` aktyvuos tik PyTorch/TensorFlow kodą xx.md faile.

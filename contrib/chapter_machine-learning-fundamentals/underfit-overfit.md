@@ -3,10 +3,10 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Underfitting and Overfitting 
+# Nepakankamas mokymasis ir persimokymas 
 :label:`sec_polynomial`
 
-In this section we test out some of the concepts that we saw previously. To keep matters simple, we use polynomial regression as our toy example.
+Šiame skyriuje išbandome kai kurias anksčiau matytas sąvokas. Kad viskas būtų paprasta, kaip žaislinį pavyzdį naudojame polinominę regresiją.
 
 ```{.python .input  n=3}
 %%tab mxnet
@@ -32,21 +32,21 @@ import tensorflow as tf
 import math
 ```
 
-### Generating the Dataset
+### Duomenų rinkinio generavimas
 
-First we need data. Given $x$, we will [**use the following cubic polynomial to generate the labels**] on training and test data:
+Pirmiausia mums reikia duomenų. Turėdami $x$, mokymo ir testavimo duomenų [**žymėms generuoti naudosime šį kubinį polinomą**]:
 
 (**$$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.1^2).$$**)
 
-The noise term $\epsilon$ obeys a normal distribution
-with a mean of 0 and a standard deviation of 0.1.
-For optimization, we typically want to avoid
-very large values of gradients or losses.
-This is why the *features*
-are rescaled from $x^i$ to $\frac{x^i}{i!}$.
-It allows us to avoid very large values for large exponents $i$.
-We will synthesize 100 samples each for the training set and test set.
+Triukšmo narys $\epsilon$ paklūsta normaliajam skirstiniui
+su vidurkiu 0 ir standartiniu nuokrypiu 0,1.
+Optimizuojant paprastai norime vengti
+labai didelių gradientų ar nuostolių reikšmių.
+Todėl *požymiai*
+perskalėjami iš $x^i$ į $\frac{x^i}{i!}$.
+Tai leidžia išvengti labai didelių reikšmių didelėms laipsnio rodiklio reikšmėms $i$.
+Sugeneruosime po 100 pavyzdžių mokymo ir testavimo rinkiniui.
 
 ```{.python .input  n=6}
 %%tab all
@@ -70,19 +70,18 @@ class Data(d2l.DataModule):
         return self.get_tensorloader([self.X, self.y], train, i)
 ```
 
-Again, monomials stored in `poly_features`
-are rescaled by the gamma function,
-where $\Gamma(n)=(n-1)!$.
-[**Take a look at the first 2 samples**] from the generated dataset.
-The value 1 is technically a feature,
-namely the constant feature corresponding to the bias.
+Dar kartą primename, kad `poly_features` saugomi vienanariai
+perskalėjami gama funkcija,
+kur $\Gamma(n)=(n-1)!$.
+[**Pažiūrėkite į pirmuosius 2 pavyzdžius**] iš sugeneruoto duomenų rinkinio.
+Reikšmė 1 techniškai yra požymis,
+būtent pastovusis požymis, atitinkantis poslinkį.
 
-### [**Third-Order Polynomial Function Fitting (Normal)**]
+### [**Trečios eilės polinominės funkcijos pritaikymas (normalus atvejis)**]
 
-We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
-The results show that this model's training and test losses can be both effectively reduced.
-The learned model parameters are also close
-to the true values $w = [1.2, -3.4, 5.6], b=5$.
+Pradėsime naudodami trečios eilės polinominę funkciją, kuri yra tokios pat eilės kaip duomenų generavimo funkcija.
+Rezultatai rodo, kad šio modelio mokymo ir testavimo nuostolius galima efektyviai sumažinti.
+Išmoktieji modelio parametrai taip pat yra artimi tikrosioms reikšmėms $w = [1{,}2; -3{,}4; 5{,}6], b=5$.
 
 ```{.python .input  n=7}
 %%tab all
@@ -100,74 +99,74 @@ def train(p):
 train(p=3)
 ```
 
-### [**Linear Function Fitting (Underfitting)**]
+### [**Tiesinės funkcijos pritaikymas (nepakankamas mokymasis)**]
 
-Let's take another look at linear function fitting.
-After the decline in early epochs,
-it becomes difficult to further decrease
-this model's training loss.
-After the last epoch iteration has been completed,
-the training loss is still high.
-When used to fit nonlinear patterns
-(like the third-order polynomial function here)
-linear models are liable to underfit.
+Dar kartą pažiūrėkime į tiesinės funkcijos pritaikymą.
+Po sumažėjimo ankstyvosiose epochose
+sunku toliau mažinti
+šio modelio mokymo nuostolius.
+Kai baigiama paskutinė epochos iteracija,
+mokymo nuostoliai vis dar dideli.
+Kai tiesiniai modeliai naudojami netiesiniams dėsningumams
+(kaip čia trečios eilės polinominė funkcija) pritaikyti,
+jie linkę nepakankamai išmokti.
 
 ```{.python .input  n=8}
 %%tab all
 train(p=1)
 ```
 
-### [**Higher-Order Polynomial Function Fitting  (Overfitting)**]
+### [**Aukštesnės eilės polinominės funkcijos pritaikymas (persimokymas)**]
 
-Now let's try to train the model
-using a polynomial of too high degree.
-Here, there is insufficient data to learn that
-the higher-degree coefficients should have values close to zero.
-As a result, our overly-complex model
-is so susceptible that it is being influenced
-by noise in the training data.
-Though the training loss can be effectively reduced,
-the test loss is still much higher.
-It shows that
-the complex model overfits the data.
+Dabar pabandykime apmokyti modelį
+naudodami per aukšto laipsnio polinomą.
+Čia nepakanka duomenų, kad būtų išmokta, jog
+aukštesnio laipsnio koeficientai turėtų būti artimi nuliui.
+Todėl mūsų pernelyg sudėtingas modelis
+yra toks jautrus, kad jį veikia
+mokymo duomenų triukšmas.
+Nors mokymo nuostolius galima efektyviai sumažinti,
+testavimo nuostoliai vis tiek yra gerokai didesni.
+Tai rodo, kad
+sudėtingas modelis persimoko duomenims.
 
 ```{.python .input  n=9}
 %%tab all
 train(p=10)
 ```
 
-In the subsequent sections, we will continue
-to discuss overfitting problems
-and methods for dealing with them,
-such as weight decay and dropout.
+Tolesniuose skyriuose toliau
+aptarsime persimokymo problemas
+ir jų sprendimo būdus,
+pavyzdžiui, svorių nykimą ir atsitiktinį praretinimą.
 
 
-## Summary
+## Santrauka
 
-* Since the generalization error cannot be estimated based on the training error, simply minimizing the training error will not necessarily mean a reduction in the generalization error. Machine learning models need to be careful to safeguard against overfitting so as to minimize the generalization error.
-* A validation set can be used for model selection, provided that it is not used too liberally.
-* Underfitting means that a model is not able to reduce the training error. When training error is much lower than validation error, there is overfitting.
-* We should choose an appropriately complex model and avoid using insufficient training samples.
+* Kadangi generalizacijos paklaidos negalima įvertinti pagal mokymo paklaidą, vien mokymo paklaidos minimizavimas nebūtinai reiškia generalizacijos paklaidos sumažėjimą. Mašininio mokymo modeliai turi būti atsargūs ir saugotis persimokymo, kad generalizacijos paklaida būtų kuo mažesnė.
+* Validavimo aibę galima naudoti modelio parinkimui, jei ji nenaudojama pernelyg laisvai.
+* Nepakankamas mokymasis reiškia, kad modelis negali sumažinti mokymo paklaidos. Kai mokymo paklaida yra daug mažesnė už validavimo paklaidą, vyksta persimokymas.
+* Turėtume pasirinkti tinkamai sudėtingą modelį ir vengti nepakankamo mokymo pavyzdžių skaičiaus.
 
 
-## Exercises
+## Pratimai
 
-1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
-1. Consider model selection for polynomials:
-    1. Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
-    1. Plot the test loss in this case.
-    1. Generate the same plot as a function of the amount of data.
-1. What happens if you drop the normalization ($1/i!$) of the polynomial features $x^i$? Can you fix this in some other way?
-1. Can you ever expect to see zero generalization error?
+1. Ar galite tiksliai išspręsti polinominės regresijos uždavinį? Užuomina: naudokite tiesinę algebrą.
+1. Panagrinėkite polinomų modelio parinkimą:
+    1. Nubraižykite mokymo nuostolius, priklausomai nuo modelio sudėtingumo (polinomo laipsnio). Ką pastebite? Kokio laipsnio polinomo reikia, kad mokymo nuostoliai sumažėtų iki 0?
+    1. Šiuo atveju nubraižykite testavimo nuostolius.
+    1. Sugeneruokite tą patį grafiką kaip duomenų kiekio funkciją.
+1. Kas nutinka, jei atsisakote polinominių požymių $x^i$ normalizavimo ($1/i!$)? Ar galite tai ištaisyti kitu būdu?
+1. Ar kada nors galite tikėtis nulinės generalizacijos paklaidos?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/96)
+[Diskusijos](https://discuss.d2l.ai/t/96)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/97)
+[Diskusijos](https://discuss.d2l.ai/t/97)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/234)
+[Diskusijos](https://discuss.d2l.ai/t/234)
 :end_tab:

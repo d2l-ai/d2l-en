@@ -1,10 +1,10 @@
-# Distributed Key-Value Store
+# Paskirstytoji raktų ir reikšmių saugykla
 :label:`sec_key_value`
 
-KVStore is a place for data sharing. Think of it as a single object shared across different devices (GPUs and computers), where each device can push data in and pull data out.
+KVStore yra vieta duomenims dalytis. Įsivaizduokite ją kaip vieną objektą, bendrą skirtingiems įrenginiams (GPU ir kompiuteriams), kai kiekvienas įrenginys gali įrašyti duomenis (angl. *push*) ir juos nuskaityti (angl. *pull*).
 
-## Initialization
-Let us consider a simple example: initializing a (int, NDArray) pair into the store, and then pulling the value out:
+## Inicializavimas
+Panagrinėkime paprastą pavyzdį: į saugyklą inicializuojame (int, NDArray) porą, o tada reikšmę nuskaitome:
 
 ```{.python .input  n=1}
 #@tab mxnet
@@ -32,9 +32,9 @@ kv.pull(3, out = a)
 print(a)
 ```
 
-## Push, Aggregate, and Update
+## Įrašymas, agregavimas ir atnaujinimas
 
-For any key that has been initialized, you can push a new value with the same shape to the key:
+Bet kuriam inicializuotam raktui galite įrašyti naują tokios pat formos reikšmę:
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -43,7 +43,7 @@ kv.pull(3, out = a)  # Pull out the value
 print(a.asnumpy())
 ```
 
-The data for pushing can be stored on any device. Furthermore, you can push multiple values into the same key, where KVStore will first sum all of these values and then push the aggregated value. Here we will just demonstrate pushing a list of values on CPU. Please note summation only happens if the value list is longer than one
+Įrašomi duomenys gali būti saugomi bet kuriame įrenginyje. Be to, į tą patį raktą galite įrašyti kelias reikšmes: tada KVStore pirmiausia susumuos visas šias reikšmes ir įrašys agreguotą reikšmę. Čia tik pademonstruosime reikšmių sąrašo įrašymą CPU. Atkreipkite dėmesį, kad sumavimas vyksta tik tada, kai reikšmių sąrašas ilgesnis nei vienas elementas
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -54,7 +54,7 @@ kv.pull(3, out = a)
 print(a)
 ```
 
-For each push, KVStore combines the pushed value with the value stored using an updater. The default updater is ASSIGN. You can replace the default to control how data is merged:
+Kiekvieno įrašymo metu KVStore sujungia įrašomą reikšmę su saugoma reikšme naudodama atnaujintuvą (angl. *updater*). Numatytasis atnaujintuvas yra ASSIGN. Galite pakeisti numatytąjį, kad valdytumėte, kaip duomenys sujungiami:
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -73,9 +73,9 @@ kv.pull(3, out=a)
 print(a)
 ```
 
-## Pull
+## Nuskaitymas
 
-You have already seen how to pull a single key-value pair. Similarly, to push, you can pull the value onto several devices with a single call:
+Jau matėte, kaip nuskaityti vieną rakto ir reikšmės porą. Panašiai kaip įrašant, reikšmę į kelis įrenginius galite nuskaityti vienu kreipiniu:
 
 ```{.python .input  n=8}
 #@tab mxnet
@@ -84,11 +84,11 @@ kv.pull(3, out = b)
 print(b[1])
 ```
 
-## Handle a List of Key-Value Pairs
+## Raktų ir reikšmių porų sąrašo apdorojimas
 
-All operations introduced so far involve a single key. KVStore also provides an interface for a list of key-value pairs.
+Visos iki šiol pristatytos operacijos naudojo vieną raktą. KVStore taip pat turi sąsają raktų ir reikšmių porų sąrašui.
 
-For a single device:
+Vienam įrenginiui:
 
 ```{.python .input  n=9}
 #@tab mxnet
@@ -100,7 +100,7 @@ kv.pull(keys, out = b)
 print(b[1])
 ```
 
-For multiple devices:
+Keliems įrenginiams:
 
 ```{.python .input  n=10}
 #@tab mxnet

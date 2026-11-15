@@ -1,71 +1,70 @@
+# Uždavinių rinkinys 
 
-# Problem Set 
+„Ko turime išmokti, prieš tai darydami, to išmokstame darydami.“ – Aristotelis
 
-"For the things we have to learn before we can do them, we learn by doing them." - Aristotle
+Nieko nėra geriau už darbą su nauju įrankiu, kad jį iš tikrųjų suprastume, todėl šioje knygoje sudarėme keletą pratimų, kad turėtumėte progą pritaikyti tai, ką išmokote ankstesnėse pamokose. 
 
-There's nothing quite like working with a new tool to really understand it, so we have put together some exercises through this book to give you a chance to put into practice what you learned in the previous lesson(s). 
-
-## Problems using NDarray [(Official Documentation)](https://mxnet.incubator.apache.org/api/python/ndarray/ndarray.html) 
+## Uždaviniai su NDarray [(Oficiali dokumentacija)](https://mxnet.incubator.apache.org/api/python/ndarray/ndarray.html) 
 
 
-Problem 1: Initialize an ndarray of dimension 1x256 on the GPU without overwriting its memory. Then, find the index corresponding to the maximum value in the array (argmax)
+1 uždavinys: Inicializuokite 1x256 dimensijos ndarray GPU neperrašydami jo atminties. Tada raskite didžiausią reikšmę atitinkantį masyvo indeksą (argmax)
 
 
 ```python
 # Problem 1 Work Area
 ```
 
-## Problems from Linear Algebra
+## Tiesinės algebros uždaviniai
 
-Problem 2: Create a 4x4 matrix of random values (where values are uniformly random on the interval [0, 1]. Then create an 4x4 identity matrix (an identity of size n is the n × n square matrix with ones on the main diagonal and zeros elsewhere). Multiply the two together and verify that you get the original matrix back.
+2 uždavinys: Sukurkite 4x4 atsitiktinių reikšmių matricą (kur reikšmės tolygiai atsitiktinės intervale [0, 1]). Tada sukurkite 4x4 vienetinę matricą (n dydžio vienetinė matrica yra n × n kvadratinė matrica su vienetais pagrindinėje įstrižainėje ir nuliais kitur). Sudauginkite abi ir patikrinkite, ar atgausite pradinę matricą.
 
 
 ```python
 # Problem 2 Work Area
 ```
 
-Problem 3: Create a 3x3x20 tensor such that at every x, y coordinate, moving through the z coordinate lists the [Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number). So, at a z position of 0, the 3x3 matrix will be all 1s. At z-position 1, the 3x3 matrix will be all 1s. At z-position 2, the 3x3 matrix will be all 2s, at z-position 3, the 3x3 matrix will be all 3s and so forth.
+3 uždavinys: Sukurkite 3x3x20 tenzorių taip, kad kiekvienoje x, y koordinatėje, judant per z koordinatę, būtų išvardyta [Fibonačio seka](https://en.wikipedia.org/wiki/Fibonacci_number). Taigi, kai z pozicija yra 0, 3x3 matrica bus vien vienetai. Kai z pozicija yra 1, 3x3 matrica bus vien vienetai. Kai z pozicija yra 2, 3x3 matrica bus vien dvejetai, kai z pozicija yra 3, 3x3 matrica bus vien trejetai ir taip toliau.
 
-Hint: Create the first 2 matrices by hand and then use elementwise operations in a loop to construct the rest of the tensor. 
+Užuomina: Pirmąsias 2 matricas sukurkite ranka, o likusiai tenzoriaus daliai sudaryti naudokite elementų operacijas cikle. 
 
 
 ```python
 # Problem 3 Work Area
 ```
 
-Problem 4: What is the sum of the vector you created? What is the mean?
+4 uždavinys: Kokia yra jūsų sukurto vektoriaus suma? Koks vidurkis?
 
 
 ```python
 # Problem 4 Work Area
 ```
 
-Problem 5: Create a vector [0, 1], and another vector [1, 0], and use mxnet to calculate the angle between them. Remember that the dot product of two vectors is equal to the cosine of the angle between the vectors, and that the arccos function is the inverse of cosine.
+5 uždavinys: Sukurkite vektorių [0, 1] ir kitą vektorių [1, 0] ir naudodami mxnet apskaičiuokite kampą tarp jų. Prisiminkite, kad dviejų vektorių skaliarinė sandauga lygi kampo tarp vektorių kosinusui, o arccos funkcija yra atvirkštinė kosinuso funkcija.
 
 
 ```python
 # Problem 5 Work Area
 ```
 
-## Problems from Probability
+## Tikimybių uždaviniai
 
-Problem 6: In the classic game of Risk, the attacker can roll a maximum of three dice, while the defender can roll a maximum of two dice. Simulate the attacking and defending dice using `sample_multinomial` to try to estimate the odds that an attacker will win against a defender when both are rolling the maximum number of dice.
+6 uždavinys: Klasikiniame žaidime „Risk“ puolėjas gali mesti daugiausia tris kauliukus, o gynėjas – daugiausia du. Simuliuokite puolančius ir ginančius kauliukus naudodami `sample_multinomial`, kad bandytumėte įvertinti tikimybę, jog puolėjas nugalės gynėją, kai abu meta daugiausia kauliukų.
 
 
 ```python
 # Problem 6 Work Area
 ```
 
-## Problems from Automatic differentiation with ``autograd`` 
+## Automatinio diferencijavimo su ``autograd`` uždaviniai 
 
-Problem 7: The formula for a parabola is y=ax^2+bx+c. If a=5 and b = 13, what is the slope of y when x=0.  How about when x=7? 
+7 uždavinys: Parabolės formulė yra y=ax^2+bx+c. Jei a=5 ir b = 13, koks yra y nuolydis, kai x=0.  O kai x=7? 
 
 
 ```python
 # Problem 7 Work Area
 ```
 
-Problem 8: Graph the parabola described in Problem 6 and inspect the slope of y when x = 0 and x = 7. Does it match up with your answer from Problem 6?
+8 uždavinys: Nubraižykite 6 uždavinyje aprašytą parabolę ir patikrinkite y nuolydį, kai x = 0 ir x = 7. Ar jis sutampa su jūsų atsakymu iš 6 uždavinio?
 
 
 
@@ -73,10 +72,10 @@ Problem 8: Graph the parabola described in Problem 6 and inspect the slope of y 
 # Problem 8 Work Area
 ```
 
-## Next
-[Chapter 2: Linear regression from scratch](../chapter02_supervised-learning/linear-regression-scratch.ipynb)
+## Toliau
+[2 skyrius: Tiesinė regresija nuo nulio](../chapter02_supervised-learning/linear-regression-scratch.ipynb)
 
-For whinges or inquiries, [open an issue on  GitHub.](https://github.com/zackchase/mxnet-the-straight-dope)
+Dėl skundų ar užklausų [atidarykite issue GitHub.](https://github.com/zackchase/mxnet-the-straight-dope)
 
 
 ```python
