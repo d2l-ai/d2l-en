@@ -8,7 +8,7 @@
 Šiame skyrelyje nagrinėsime veiksmingesnius optimizavimo algoritmus, ypač tam tikriems optimizavimo uždavinių tipams, kurie įprasti praktikoje.
 
 
-### Nuotėkio vidurkiai
+### Nutekėję vidurkiai
 
 Ankstesniame skyrelyje aptarėme minirinkinių SGD kaip skaičiavimo spartinimo priemonę. Tai taip pat turėjo malonų šalutinį poveikį: gradientų vidurkinimas sumažino dispersiją. Minirinkinio stochastinį gradientinį nusileidimą galima apskaičiuoti pagal:
 
@@ -16,7 +16,7 @@ $$\mathbf{g}_{t, t-1} = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i 
 $$
 
 Kad žymėjimas būtų paprastas, čia naudojome $\mathbf{h}_{i, t-1} = \partial_{\mathbf{w}} f(\mathbf{x}_i, \mathbf{w}_{t-1})$ kaip stochastinį gradientinį nusileidimą pavyzdžiui $i$, naudojant svorius, atnaujintus laiko momentu $t-1$.
-Būtų gerai, jei dispersijos mažinimo poveikiu galėtume pasinaudoti ir už gradientų vidurkinimo minirinkinyje ribų. Vienas būdas tai pasiekti yra gradiento skaičiavimą pakeisti „nuotėkio vidurkiu“:
+Būtų gerai, jei dispersijos mažinimo poveikiu galėtume pasinaudoti ir už gradientų vidurkinimo minirinkinyje ribų. Vienas būdas tai pasiekti yra gradiento skaičiavimą pakeisti „nutekėjusiu vidurkiu“:
 
 $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$
 
@@ -128,7 +128,7 @@ eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-Atkreipkite dėmesį, kad momentą galime derinti su stochastiniu gradientiniu nusileidimu ir ypač su minirinkinių stochastiniu gradientiniu nusileidimu. Vienintelis pokytis yra tas, kad tuomet gradientus $\mathbf{g}_{t, t-1}$ pakeičiame $\mathbf{g}_t$. Galiausiai patogumui inicializuojame $\mathbf{v}_0 = 0$ laiko momentu $t=0$. Pažiūrėkime, ką nuotėkio vidurkinimas iš tikrųjų daro atnaujinimams.
+Atkreipkite dėmesį, kad momentą galime derinti su stochastiniu gradientiniu nusileidimu ir ypač su minirinkinių stochastiniu gradientiniu nusileidimu. Vienintelis pokytis yra tas, kad tuomet gradientus $\mathbf{g}_{t, t-1}$ pakeičiame $\mathbf{g}_t$. Galiausiai patogumui inicializuojame $\mathbf{v}_0 = 0$ laiko momentu $t=0$. Pažiūrėkime, ką nutekėjęs vidurkinimas iš tikrųjų daro atnaujinimams.
 
 ### Efektyvus pavyzdžio svoris
 
@@ -311,7 +311,7 @@ Konvergavimo elgesį lemiančiai $2 \times 2$ matricai žymėti naudojome $\math
 
 ## Santrauka
 
-* Momentas pakeičia gradientus nuotėkio vidurkiu iš praeities gradientų. Tai gerokai pagreitina konvergavimą.
+* Momentas pakeičia gradientus nutekėjusiu vidurkiu iš praeities gradientų. Tai gerokai pagreitina konvergavimą.
 * Jis pageidautinas tiek be triukšmo gradientiniam nusileidimui, tiek (triukšmingam) stochastiniam gradientiniam nusileidimui.
 * Momentas apsaugo nuo optimizavimo proceso sustojimo, kuris daug labiau tikėtinas stochastiniam gradientiniam nusileidimui.
 * Efektyvus gradientų skaičius yra $\frac{1}{1-\beta}$ dėl eksponentinio praeities duomenų svorio mažinimo.

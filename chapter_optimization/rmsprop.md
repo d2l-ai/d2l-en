@@ -2,11 +2,11 @@
 :label:`sec_rmsprop`
 
 
-Viena pagrindinių :numref:`sec_adagrad` problemų yra ta, kad mokymosi greitis mažėja pagal iš anksto nustatytą grafiką, efektyviai $\mathcal{O}(t^{-\frac{1}{2}})$. Nors tai paprastai tinka iškiliosioms problemoms, neiškiliosioms, tokioms kaip sutinkamos giliajame mokymesi, tai gali būti neidealu. Vis dėlto koordinatėms specifinis Adagrad prisitaikymas yra labai pageidautinas kaip prekondicionuotojas.
+Viena pagrindinių :numref:`sec_adagrad` problemų yra ta, kad mokymosi greitis mažėja pagal iš anksto nustatytą grafiką, efektyviai $\mathcal{O}(t^{-\frac{1}{2}})$. Nors tai paprastai tinka iškiliosioms problemoms, neiškiliosioms, tokioms kaip sutinkamos giliajame mokymesi, tai gali būti neidealu. Vis dėlto koordinatėms specifinis Adagrad prisitaikymas yra labai pageidautinas kaip pradinių sąlygų tikrinimas.
 
 :citet:`Tieleman.Hinton.2012` pasiūlė RMSProp algoritmą kaip paprastą sprendimą, atskiriantį greičio planavimą nuo koordinatėms adaptyvių mokymosi greičių. Problema ta, kad Adagrad kaupia gradiento $\mathbf{g}_t$ kvadratus būsenos vektoriuje $\mathbf{s}_t = \mathbf{s}_{t-1} + \mathbf{g}_t^2$. Dėl to $\mathbf{s}_t$ be paliovos auga be ribų dėl normalizavimo nebuvimo, iš esmės tiesiškai, algoritmui konverguojant.
 
-Vienas būdas ištaisyti šią problemą būtų naudoti $\mathbf{s}_t / t$. Pagrįstiems $\mathbf{g}_t$ skirstiniams tai konverguos. Deja, gali užtrukti labai ilgai, kol ribinis elgesys pradės turėti reikšmės, nes procedūra prisimena visą reikšmių trajektoriją. Alternatyva yra naudoti nuotėkio vidurkį taip pat, kaip naudojome momentų metode, t. y. $\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1-\gamma) \mathbf{g}_t^2$ su tam tikru parametru $\gamma > 0$. Palikus visas kitas dalis nepakeistas, gaunamas RMSProp.
+Vienas būdas ištaisyti šią problemą būtų naudoti $\mathbf{s}_t / t$. Pagrįstiems $\mathbf{g}_t$ skirstiniams tai konverguos. Deja, gali užtrukti labai ilgai, kol ribinis elgesys pradės turėti reikšmės, nes procedūra prisimena visą reikšmių trajektoriją. Alternatyva yra naudoti nutekėjusį vidurkį taip pat, kaip naudojome momentų metode, t. y. $\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1-\gamma) \mathbf{g}_t^2$ su tam tikru parametru $\gamma > 0$. Palikus visas kitas dalis nepakeistas, gaunamas RMSProp.
 
 ## Algoritmas
 
@@ -17,7 +17,7 @@ $$\begin{aligned}
     \mathbf{x}_t & \leftarrow \mathbf{x}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \mathbf{g}_t.
 \end{aligned}$$
 
-Konstanta $\epsilon > 0$ paprastai nustatoma $10^{-6}$, kad išvengtume dalybos iš nulio ar pernelyg didelių žingsnių dydžių. Turėdami šį išplėtimą, galime laisvai valdyti mokymosi greitį $\eta$ nepriklausomai nuo mastelio keitimo, taikomo kiekvienai koordinatei atskirai. Nuotėkio vidurkių atžvilgiu galime taikyti tą pačią logiką, kaip anksčiau taikėme momentų metode. Išplėtus $\mathbf{s}_t$ apibrėžimą, gauname
+Konstanta $\epsilon > 0$ paprastai nustatoma $10^{-6}$, kad išvengtume dalybos iš nulio ar pernelyg didelių žingsnių dydžių. Turėdami šį išplėtimą, galime laisvai valdyti mokymosi greitį $\eta$ nepriklausomai nuo mastelio keitimo, taikomo kiekvienai koordinatei atskirai. Nutekėjusių vidurkių atžvilgiu galime taikyti tą pačią logiką, kaip anksčiau taikėme momentų metode. Išplėtus $\mathbf{s}_t$ apibrėžimą, gauname
 
 $$
 \begin{aligned}
@@ -166,7 +166,7 @@ d2l.train_concise_ch11(trainer, {'learning_rate': 0.01, 'rho': 0.9},
 ## Santrauka
 
 * RMSProp labai panašus į Adagrad tuo, kad abu naudoja gradiento kvadratą koeficientams mastelio keitimui.
-* RMSProp su momentų metodu dalijasi nuotėkio vidurkinimu. Tačiau RMSProp šį metodą naudoja koeficientams specifiniam prekondicionuotojui koreguoti.
+* RMSProp su momentų metodu dalijasi nutekėjusiu vidurkinimu. Tačiau RMSProp šį metodą naudoja koeficientams specifiniam pradinių sąlygų tikrinimui koreguoti.
 * Praktikoje mokymosi greitį turi suplanuoti eksperimentuotojas.
 * Koeficientas $\gamma$ nustato, kokia ilga yra istorija koreguojant kiekvienos koordinatės mastelį.
 

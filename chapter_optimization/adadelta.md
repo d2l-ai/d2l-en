@@ -5,9 +5,9 @@ Adadelta yra dar vienas AdaGrad (:numref:`sec_adagrad`) variantas. Pagrindinis s
 
 ## Algoritmas
 
-Trumpai tariant, Adadelta naudoja du būsenos kintamuosius: $\mathbf{s}_t$ gradiento antrojo momento nuotėkio vidurkiui saugoti ir $\Delta\mathbf{x}_t$ paties modelio parametrų pokyčio antrojo momento nuotėkio vidurkiui saugoti. Atkreipkite dėmesį, kad naudojame originalius autorių žymėjimus ir pavadinimus suderinamumui su kitomis publikacijomis ir įgyvendinimais (nėra jokios kitos tikros priežasties, kodėl reikėtų naudoti skirtingus graikiškus kintamuosius tą patį tikslą atliekančiam parametrui žymėti momentų, Adagrad, RMSProp ir Adadelta metoduose).
+Trumpai tariant, Adadelta naudoja du būsenos kintamuosius: $\mathbf{s}_t$ gradiento antrojo momento nutekėjusiam vidurkiui saugoti ir $\Delta\mathbf{x}_t$ paties modelio parametrų pokyčio antrojo momento nutekėjusiam vidurkiui saugoti. Atkreipkite dėmesį, kad naudojame originalius autorių žymėjimus ir pavadinimus suderinamumui su kitomis publikacijomis ir įgyvendinimais (nėra jokios kitos tikros priežasties, kodėl reikėtų naudoti skirtingus graikiškus kintamuosius tą patį tikslą atliekančiam parametrui žymėti momentų, Adagrad, RMSProp ir Adadelta metoduose).
 
-Štai techninės Adadelta detalės. Tarkime, kad dienos parametras yra $\rho$; gauname šiuos nuotėkio atnaujinimus, panašiai kaip :numref:`sec_rmsprop`:
+Štai techninės Adadelta detalės. Tarkime, kad dienos parametras yra $\rho$; gauname šiuos nutekėjusius atnaujinimus, panašiai kaip :numref:`sec_rmsprop`:
 
 $$\begin{aligned}
     \mathbf{s}_t & = \rho \mathbf{s}_{t-1} + (1 - \rho) \mathbf{g}_t^2.
@@ -25,7 +25,7 @@ $$\begin{aligned}
     \mathbf{g}_t' & = \frac{\sqrt{\Delta\mathbf{x}_{t-1} + \epsilon}}{\sqrt{{\mathbf{s}_t + \epsilon}}} \odot \mathbf{g}_t, \\
 \end{aligned}$$
 
-kur $\Delta \mathbf{x}_{t-1}$ yra pakartotinai sumastelintų gradientų $\mathbf{g}_t'$ kvadratų nuotėkio vidurkis. $\Delta \mathbf{x}_{0}$ inicializuojame $0$ ir atnaujiname jį kiekviename žingsnyje su $\mathbf{g}_t'$, t. y.
+kur $\Delta \mathbf{x}_{t-1}$ yra pakartotinai sumastelintų gradientų $\mathbf{g}_t'$ kvadratų nutekėjęs vidurkis. $\Delta \mathbf{x}_{0}$ inicializuojame $0$ ir atnaujiname jį kiekviename žingsnyje su $\mathbf{g}_t'$, t. y.
 
 $$\begin{aligned}
     \Delta \mathbf{x}_t & = \rho \Delta\mathbf{x}_{t-1} + (1 - \rho) {\mathbf{g}_t'}^2,
@@ -140,7 +140,7 @@ d2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)
 
 * Adadelta neturi mokymosi greičio parametro. Vietoj to mokymosi greičiui adaptuoti jis naudoja paties parametrų pokyčio spartą.
 * Adadelta reikia dviejų būsenos kintamųjų gradiento antriesiems momentams ir parametrų pokyčiui saugoti.
-* Adadelta naudoja nuotėkio vidurkius, kad palaikytų einamąjį atitinkamos statistikos įvertį.
+* Adadelta naudoja nutekėjusiu vidurkius, kad palaikytų einamąjį atitinkamos statistikos įvertį.
 
 ## Pratimai
 

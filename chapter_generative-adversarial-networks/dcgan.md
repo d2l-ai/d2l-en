@@ -312,11 +312,11 @@ net_G(x).shape
 
 ## Diskriminatorius
 
-Diskriminatorius yra įprastas konvoliucinis tinklas, išskyrus tai, kad aktyvacijos funkcijai jis naudoja nuotėkio ReLU (angl. *leaky ReLU*). Esant $\alpha \in[0, 1]$, jos apibrėžimas yra
+Diskriminatorius yra įprastas konvoliucinis tinklas, išskyrus tai, kad aktyvacijos funkcijai jis naudoja nutekėjusį ReLU (angl. *leaky ReLU*). Esant $\alpha \in[0, 1]$, jos apibrėžimas yra
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \textrm{if}\ x > 0\\ \alpha x &\textrm{otherwise}\end{cases}.$$
 
-Kaip matome, tai įprasta ReLU, jei $\alpha=0$, ir tapatumo funkcija, jei $\alpha=1$. Kai $\alpha \in (0, 1)$, nuotėkio ReLU yra netiesinė funkcija, kuri neigiamai įvesčiai grąžina nenulinę išvestį. Ja siekiama ištaisyti „mirštančios ReLU“ problemą, kai neuronas gali visada išvesti neigiamą reikšmę ir todėl negali daryti pažangos, nes ReLU gradientas yra 0.
+Kaip matome, tai įprasta ReLU, jei $\alpha=0$, ir tapatumo funkcija, jei $\alpha=1$. Kai $\alpha \in (0, 1)$, nutekėjęs ReLU yra netiesinė funkcija, kuri neigiamai įvesčiai grąžina nenulinę išvestį. Ja siekiama ištaisyti „mirštančios ReLU“ problemą, kai neuronas gali visada išvesti neigiamą reikšmę ir todėl negali daryti pažangos, nes ReLU gradientas yra 0.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -334,7 +334,7 @@ Y = [tf.keras.layers.LeakyReLU(alpha)(x).numpy() for alpha in alphas]
 d2l.plot(x.numpy(), Y, 'x', 'y', alphas)
 ```
 
-Pagrindinį diskriminatoriaus bloką sudaro konvoliucinis sluoksnis, po kurio eina paketinės normalizacijos sluoksnis ir nuotėkio ReLU aktyvacija. Konvoliucinio sluoksnio hiperparametrai panašūs į transponuotosios konvoliucijos sluoksnio generatoriaus bloke.
+Pagrindinį diskriminatoriaus bloką sudaro konvoliucinis sluoksnis, po kurio eina paketinės normalizacijos sluoksnis ir nutekėjusio ReLU aktyvacija. Konvoliucinio sluoksnio hiperparametrai panašūs į transponuotosios konvoliucijos sluoksnio generatoriaus bloke.
 
 ```{.python .input}
 #@tab mxnet
@@ -630,13 +630,13 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ## Santrauka
 
 * DCGAN architektūroje yra keturi konvoliuciniai diskriminatoriaus sluoksniai ir keturi „trupmeninio žingsnio“ konvoliuciniai generatoriaus sluoksniai.
-* Diskriminatorius yra 4 sluoksnių žingsninių konvoliucijų tinklas su paketine normalizacija (išskyrus jo įvesties sluoksnį) ir nuotėkio ReLU aktyvacijomis.
-* Nuotėkio ReLU yra netiesinė funkcija, kuri neigiamai įvesčiai grąžina nenulinę išvestį. Ja siekiama ištaisyti „mirštančios ReLU“ problemą ir padėti gradientams lengviau tekėti per architektūrą.
+* Diskriminatorius yra 4 sluoksnių žingsninių konvoliucijų tinklas su paketine normalizacija (išskyrus jo įvesties sluoksnį) ir nutekėjusio ReLU aktyvacijomis.
+* Nutekėjęs ReLU yra netiesinė funkcija, kuri neigiamai įvesčiai grąžina nenulinę išvestį. Ja siekiama ištaisyti „mirštančios ReLU“ problemą ir padėti gradientams lengviau tekėti per architektūrą.
 
 
 ## Pratimai
 
-1. Kas atsitiks, jei vietoj nuotėkio ReLU naudosime standartinę ReLU aktyvaciją?
+1. Kas atsitiks, jei vietoj nutekėjusio ReLU naudosime standartinę ReLU aktyvaciją?
 1. Pritaikykite DCGAN Fashion-MNIST duomenims ir pažiūrėkite, kurios kategorijos veikia gerai, o kurios – ne.
 
 :begin_tab:`mxnet`

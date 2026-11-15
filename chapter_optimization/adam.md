@@ -6,14 +6,14 @@ Diskusijose, vedusiose į šį skyrelį, susidūrėme su nemažai efektyvaus opt
 * Matėme, kad :numref:`sec_sgd` yra veiksmingesnis nei gradientinis nusileidimas sprendžiant optimizavimo uždavinius, pavyzdžiui, dėl savaiminio atsparumo perteklinei duomenų informacijai.
 * Matėme, kad :numref:`sec_minibatch_sgd` suteikia reikšmingą papildomą efektyvumą dėl vektorizavimo, kai viename minirinkinyje naudojamos didesnės stebėjimų aibės. Tai yra esminis efektyvaus daugiamašinio, daugelio GPU ir apskritai lygiagretaus apdorojimo veiksnys.
 * :numref:`sec_momentum` pridėjo mechanizmą praeities gradientų istorijai agreguoti, kad paspartintų konvergavimą.
-* :numref:`sec_adagrad` naudojo koordinatėms specifinį mastelio keitimą, kad būtų galima gauti skaičiavimo požiūriu efektyvų prekondicionuotoją.
+* :numref:`sec_adagrad` naudojo koordinatėms specifinį mastelio keitimą, kad būtų galima gauti skaičiavimo požiūriu efektyvų pradinių sąlygų tikrinimą.
 * :numref:`sec_rmsprop` atskyrė koordinatėms specifinį mastelio keitimą nuo mokymosi greičio koregavimo.
 
 Adam :cite:`Kingma.Ba.2014` sujungia visus šiuos metodus į vieną efektyvų mokymosi algoritmą. Kaip ir tikėtasi, tai algoritmas, kuris tapo gana populiarus kaip vienas tvirčiausių ir veiksmingiausių giliajame mokymesi naudojamų optimizavimo algoritmų. Tačiau jis nėra be trūkumų. Visų pirma :cite:`Reddi.Kale.Kumar.2019` parodo, kad yra situacijų, kai Adam gali diverguoti dėl prastos dispersijos kontrolės. Tolesniame darbe :citet:`Zaheer.Reddi.Sachan.ea.2018` pasiūlė Adam skubų pataisymą, vadinamą Yogi, kuris sprendžia šias problemas. Apie tai vėliau. Kol kas apžvelkime Adam algoritmą.
 
 ## Algoritmas
 
-Vienas pagrindinių Adam komponentų yra tas, kad jis naudoja eksponentiškai svertinius slankiuosius vidurkius (dar žinomus kaip nuotėkio vidurkinimas), kad gautų ir momento, ir gradiento antrojo momento įverčius. Tai yra, jis naudoja būsenos kintamuosius
+Vienas pagrindinių Adam komponentų yra tas, kad jis naudoja eksponentiškai svertinius slankiuosius vidurkius (dar žinomus kaip nutekėjęs vidurkinimas), kad gautų ir momento, ir gradiento antrojo momento įverčius. Tai yra, jis naudoja būsenos kintamuosius
 
 $$\begin{aligned}
     \mathbf{v}_t & \leftarrow \beta_1 \mathbf{v}_{t-1} + (1 - \beta_1) \mathbf{g}_t, \\

@@ -3,7 +3,7 @@
 
 Šiame skyrelyje pristatysime pagrindines *gradientinio nusileidimo* sąvokas.
 Nors giliajame mokymesi jis naudojamas retai tiesiogiai, gradientinio nusileidimo supratimas yra raktas į stochastinio gradientinio nusileidimo algoritmų supratimą.
-Pavyzdžiui, optimizavimo uždavinys gali diverguoti dėl pernelyg didelio mokymosi greičio. Šį reiškinį galima pastebėti jau gradientiniame nusileidime. Panašiai prekondicionavimas yra įprastas gradientinio nusileidimo metodas ir perkeliamas į pažangesnius algoritmus.
+Pavyzdžiui, optimizavimo uždavinys gali diverguoti dėl pernelyg didelio mokymosi greičio. Šį reiškinį galima pastebėti jau gradientiniame nusileidime. Panašiai pradinių sąlygų tikrinimas yra įprastas gradientinio nusileidimo metodas ir perkeliamas į pažangesnius algoritmus.
 Pradėkime nuo paprasto ypatingo atvejo.
 
 
@@ -335,16 +335,16 @@ Pirma, iš tikrųjų neturime didelės garantijos, kada pasieksime greito konver
 
 
 
-### Prekondicionavimas
+### Pradinių sąlygų tikrinimas
 
-Visai nenuostabu, kad pilnos Hesės matricos skaičiavimas ir saugojimas yra labai brangus. Todėl pageidautina rasti alternatyvų. Vienas būdas pagerinti padėtį yra *prekondicionavimas*. Jis vengia skaičiuoti visą Hesės matricą ir apskaičiuoja tik *įstrižainės* elementus. Tai veda prie tokios formos atnaujinimo algoritmų:
+Visai nenuostabu, kad pilnos Hesės matricos skaičiavimas ir saugojimas yra labai brangus. Todėl pageidautina rasti alternatyvų. Vienas būdas pagerinti padėtį yra *pradinių sąlygų tikrinimas*. Jis vengia skaičiuoti visą Hesės matricą ir apskaičiuoja tik *įstrižainės* elementus. Tai veda prie tokios formos atnaujinimo algoritmų:
 
 $$\mathbf{x} \leftarrow \mathbf{x} - \eta \textrm{diag}(\mathbf{H})^{-1} \nabla f(\mathbf{x}).$$
 
 
 Nors tai nėra visai taip gerai kaip pilnas Niutono metodas, vis tiek tai daug geriau nei jo nenaudoti.
-Kad pamatytume, kodėl tai gali būti gera idėja, panagrinėkime situaciją, kai vienas kintamasis žymi aukštį milimetrais, o kitas – aukštį kilometrais. Darant prielaidą, kad abiem natūralus mastelis yra metrai, turime baisų parametrizacijų neatitikimą. Laimė, prekondicionavimas tai pašalina. Efektyviai prekondicionavimas su gradientiniu nusileidimu reiškia skirtingo mokymosi greičio pasirinkimą kiekvienam kintamajam (vektoriaus $\mathbf{x}$ koordinatei).
-Kaip pamatysime vėliau, prekondicionavimas lemia dalį naujovių stochastinio gradientinio nusileidimo optimizavimo algoritmuose.
+Kad pamatytume, kodėl tai gali būti gera idėja, panagrinėkime situaciją, kai vienas kintamasis žymi aukštį milimetrais, o kitas – aukštį kilometrais. Darant prielaidą, kad abiem natūralus mastelis yra metrai, turime baisų parametrizacijų neatitikimą. Laimė, pradinių sąlygų tikrinimas tai pašalina. Efektyviai pradinių sąlygų tikrinimas su gradientiniu nusileidimu reiškia skirtingo mokymosi greičio pasirinkimą kiekvienam kintamajam (vektoriaus $\mathbf{x}$ koordinatei).
+Kaip pamatysime vėliau, pradinių sąlygų tikrinimas lemia dalį naujovių stochastinio gradientinio nusileidimo optimizavimo algoritmuose.
 
 
 ### Gradientinis nusileidimas su tiesine paieška
@@ -358,7 +358,7 @@ Viena pagrindinių gradientinio nusileidimo problemų yra ta, kad galime peršok
 * Mokymosi greičiai svarbūs. Per dideli – diverguojame, per maži – nedarome pažangos.
 * Gradientinis nusileidimas gali įstrigti lokaliuosiuose minimumuose.
 * Didelėse dimensijose mokymosi greičio koregavimas yra sudėtingas.
-* Prekondicionavimas gali padėti koreguoti mastelį.
+* Pradinių sąlygų tikrinimas gali padėti koreguoti mastelį.
 * Niutono metodas yra daug greitesnis, kai jis pradeda tinkamai veikti iškiliuosiuose uždaviniuose.
 * Būkite atsargūs naudodami Niutono metodą be jokių koregavimų neiškiliesiems uždaviniams.
 
@@ -370,8 +370,8 @@ Viena pagrindinių gradientinio nusileidimo problemų yra ta, kad galime peršok
     1. Kokia sparti yra algoritmo konvergavimo sparta?
     1. Įgyvendinkite algoritmą ir pritaikykite jį $\log (\exp(x) + \exp(-2x -3))$ minimizavimui.
 1. Suprojektuokite tikslo funkciją, apibrėžtą $\mathbb{R}^2$, kuriai gradientinis nusileidimas yra nepaprastai lėtas. Užuomina: skirtingas koordinates keiskite skirtingu masteliu.
-1. Įgyvendinkite lengvą Niutono metodo versiją naudodami prekondicionavimą:
-    1. Kaip prekondicionuotoją naudokite įstrižainės Hesės matricą.
+1. Įgyvendinkite lengvą Niutono metodo versiją naudodami pradinių sąlygų tikrinimą:
+    1. Kaip pradinių sąlygų tikrinimą naudokite įstrižainės Hesės matricą.
     1. Naudokite jos absoliutines reikšmes, o ne tikrąsias (galbūt su ženklu) reikšmes.
     1. Pritaikykite tai aukščiau pateiktam uždaviniui.
 1. Pritaikykite aukščiau pateiktą algoritmą daugeliui tikslo funkcijų (iškiliųjų ar ne). Kas nutinka, jei pasukate koordinates $45$ laipsniais?
