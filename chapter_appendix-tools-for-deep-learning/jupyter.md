@@ -1,97 +1,97 @@
-# Using Jupyter Notebooks
+# Jupyter Notebook naudojimas
 :label:`sec_jupyter`
 
 
-This section describes how to edit and run the code
-in each section of this book
-using the Jupyter Notebook. Make sure you have
-installed Jupyter and downloaded the
-code as described in
+Šiame skyriuje aprašoma, kaip redaguoti ir vykdyti
+kiekvieno šios knygos skyriaus kodą
+naudojant Jupyter Notebook. Įsitikinkite, kad
+įdiegėte Jupyter ir atsisiuntėte
+kodą, kaip aprašyta
 :ref:`chap_installation`.
-If you want to know more about Jupyter see the excellent tutorial in
-their [documentation](https://jupyter.readthedocs.io/en/latest/).
+Jei norite daugiau sužinoti apie Jupyter, žr. puikią pamoką
+jo [dokumentacijoje](https://jupyter.readthedocs.io/en/latest/).
 
 
-## Editing and Running the Code Locally
+## Kodo redagavimas ir vykdymas vietoje
 
-Suppose that the local path of the book's code is `xx/yy/d2l-en/`. Use the shell to change the directory to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser does not do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing the code of the book, as shown in :numref:`fig_jupyter00`.
+Tarkime, vietinis knygos kodo kelias yra `xx/yy/d2l-en/`. Komandinėje eilutėje pereikite į šį katalogą (`cd xx/yy/d2l-en`) ir vykdykite komandą `jupyter notebook`. Jei naršyklė neatsidaro automatiškai, atverkite http://localhost:8888 – pamatysite Jupyter sąsają ir visus aplankus su knygos kodu, kaip parodyta :numref:`fig_jupyter00`.
 
-![The folders containing the code of this book.](../img/jupyter00.png)
+![Aplankai su šios knygos kodu.](../img/jupyter00.png)
 :width:`600px`
 :label:`fig_jupyter00`
 
 
-You can access the notebook files by clicking on the folder displayed on the webpage.
-They usually have the suffix ".ipynb".
-For the sake of brevity, we create a temporary "test.ipynb" file.
-The content displayed after you click it is
-shown in :numref:`fig_jupyter01`.
-This notebook includes a markdown cell and a code cell. The content in the markdown cell includes "This Is a Title" and "This is text.".
-The code cell contains two lines of Python code.
+Užrašų knygutės failus galite atverti spustelėdami tinklalapyje rodomą aplanką.
+Paprastai jų galūnė yra „.ipynb“.
+Trumpumo dėlei sukuriame laikiną failą „test.ipynb“.
+Spustelėjus rodomas turinys
+pavaizduotas :numref:`fig_jupyter01`.
+Šioje užrašų knygutėje yra vienas Markdown langelis ir vienas kodo langelis. Markdown langelio turinį sudaro „This Is a Title“ ir „This is text.“.
+Kodo langelyje yra dvi Python kodo eilutės.
 
-![Markdown and code cells in the "text.ipynb" file.](../img/jupyter01.png)
+![Markdown ir kodo langeliai faile „text.ipynb“.](../img/jupyter01.png)
 :width:`600px`
 :label:`fig_jupyter01`
 
 
-Double click on the markdown cell to enter edit mode.
-Add a new text string "Hello world." at the end of the cell, as shown in :numref:`fig_jupyter02`.
+Dukart spustelėkite Markdown langelį, kad įjungtumėte redagavimo režimą.
+Langelio gale pridėkite naują eilutę „Hello world.“, kaip parodyta :numref:`fig_jupyter02`.
 
-![Edit the markdown cell.](../img/jupyter02.png)
+![Markdown langelio redagavimas.](../img/jupyter02.png)
 :width:`600px`
 :label:`fig_jupyter02`
 
 
-As demonstrated in :numref:`fig_jupyter03`,
-click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
+Kaip parodyta :numref:`fig_jupyter03`,
+meniu juostoje pasirinkite „Cell“ $\rightarrow$ „Run Cells“, kad paleistumėte redaguotą langelį.
 
-![Run the cell.](../img/jupyter03.png)
+![Langelio vykdymas.](../img/jupyter03.png)
 :width:`600px`
 :label:`fig_jupyter03`
 
-After running, the markdown cell is shown in :numref:`fig_jupyter04`.
+Po paleidimo Markdown langelis atrodo kaip :numref:`fig_jupyter04`.
 
-![The markdown cell after running.](../img/jupyter04.png)
+![Markdown langelis po paleidimo.](../img/jupyter04.png)
 :width:`600px`
 :label:`fig_jupyter04`
 
 
-Next, click on the code cell. Multiply the elements by 2 after the last line of code, as shown in :numref:`fig_jupyter05`.
+Toliau spustelėkite kodo langelį. Po paskutinės kodo eilutės padauginkite elementus iš 2, kaip parodyta :numref:`fig_jupyter05`.
 
-![Edit the code cell.](../img/jupyter05.png)
+![Kodo langelio redagavimas.](../img/jupyter05.png)
 :width:`600px`
 :label:`fig_jupyter05`
 
 
-You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from :numref:`fig_jupyter06`.
+Langelį taip pat galite paleisti spartiuoju klavišu (pagal numatytuosius nustatymus „Ctrl + Enter“) ir gauti išvestį, parodytą :numref:`fig_jupyter06`.
 
-![Run the code cell to obtain the output.](../img/jupyter06.png)
+![Kodo langelio vykdymas išvesčiai gauti.](../img/jupyter06.png)
 :width:`600px`
 :label:`fig_jupyter06`
 
 
-When a notebook contains more cells, we can click "Kernel" $\rightarrow$ "Restart & Run All" in the menu bar to run all the cells in the entire notebook. By clicking "Help" $\rightarrow$ "Edit Keyboard Shortcuts" in the menu bar, you can edit the shortcuts according to your preferences.
+Kai užrašų knygutėje daugiau langelių, galime meniu juostoje spustelėti „Kernel“ $\rightarrow$ „Restart & Run All“ ir paleisti visus visos užrašų knygutės langelius. Pasirinkę „Help“ $\rightarrow$ „Edit Keyboard Shortcuts“, galite pakeisti sparčiuosius klavišus pagal savo pageidavimus.
 
-## Advanced Options
+## Papildomos galimybės
 
-Beyond local editing two things are quite important: editing the notebooks in the markdown format and running Jupyter remotely.
-The latter matters when we want to run the code on a faster server.
-The former matters since Jupyter's native ipynb format stores a lot of auxiliary data that is
-irrelevant to the content,
-mostly related to how and where the code is run.
-This is confusing for Git, making
-reviewing contributions very difficult.
-Fortunately there is an alternative---native editing in the markdown format.
+Be redagavimo vietoje, svarbūs dar du dalykai: užrašų knygučių redagavimas Markdown formatu ir Jupyter vykdymas nuotoliniu būdu.
+Pastarasis svarbus, kai kodą norime vykdyti greitesniame serveryje.
+Pirmasis svarbus todėl, kad vietinis Jupyter ipynb formatas saugo daug pagalbinių duomenų,
+nesusijusių su turiniu,
+dažniausiai susijusių su tuo, kaip ir kur kodas vykdomas.
+Tai klaidina Git ir
+labai apsunkina indėlių peržiūrą.
+Laimei, yra alternatyva – tiesioginis redagavimas Markdown formatu.
 
-### Markdown Files in Jupyter
+### Markdown failai Jupyter aplinkoje
 
-If you wish to contribute to the content of this book, you need to modify the
-source file (md file, not ipynb file) on GitHub.
-Using the notedown plugin we
-can modify notebooks in the md format directly in Jupyter.
+Jei norite prisidėti prie šios knygos turinio, turite keisti
+šaltinio failą (md, o ne ipynb) GitHub saugykloje.
+Naudodami notedown papildinį,
+užrašų knygutes md formatu galime redaguoti tiesiai Jupyter aplinkoje.
 
 
-First, install the notedown plugin, run the Jupyter Notebook, and load the plugin:
+Pirmiausia įdiekite notedown papildinį, paleiskite Jupyter Notebook ir įkelkite papildinį:
 
 ```
 pip install d2l-notedown  # You may need to uninstall the original notedown.
@@ -99,40 +99,40 @@ jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContents
 ```
 
 
-You may also turn on the notedown plugin by default whenever you run the Jupyter Notebook.
-First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
+Taip pat galite nustatyti, kad notedown papildinys būtų įjungiamas pagal numatytuosius nustatymus kiekvieną kartą paleidus Jupyter Notebook.
+Pirmiausia sugeneruokite Jupyter Notebook konfigūracijos failą (jei jis jau sugeneruotas, šį žingsnį galite praleisti).
 
 ```
 jupyter notebook --generate-config
 ```
 
 
-Then, add the following line to the end of the Jupyter Notebook configuration file (for Linux or macOS, usually in the path `~/.jupyter/jupyter_notebook_config.py`):
+Tada Jupyter Notebook konfigūracijos failo pabaigoje pridėkite šią eilutę („Linux“ ar macOS sistemose jis paprastai yra `~/.jupyter/jupyter_notebook_config.py`):
 
 ```
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 ```
 
 
-After that, you only need to run the `jupyter notebook` command to turn on the notedown plugin by default.
+Po to pakanka vykdyti komandą `jupyter notebook`, ir notedown papildinys bus įjungtas pagal numatytuosius nustatymus.
 
-### Running Jupyter Notebooks on a Remote Server
+### Jupyter užrašų knygučių vykdymas nuotoliniame serveryje
 
-Sometimes, you may want to run Jupyter notebooks on a remote server and access it through a browser on your local computer. If Linux or macOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
+Kartais gali prireikti vykdyti Jupyter užrašų knygutes nuotoliniame serveryje ir pasiekti jas vietinio kompiuterio naršykle. Jei vietiniame kompiuteryje įdiegta „Linux“ ar macOS (Windows šią funkciją taip pat gali palaikyti per trečiųjų šalių programas, pvz., PuTTY), galite naudoti prievadų persiuntimą:
 
 ```
 ssh myserver -L 8888:localhost:8888
 ```
 
 
-The above string `myserver` is the address of the remote server.
-Then we can use http://localhost:8888 to access the remote server `myserver` that runs Jupyter notebooks. We will detail on how to run Jupyter notebooks on AWS instances
-later in this appendix.
+Aukščiau esanti eilutė `myserver` yra nuotolinio serverio adresas.
+Tada galime naudoti http://localhost:8888 ir pasiekti nuotolinį serverį `myserver`, kuriame veikia Jupyter užrašų knygutės. Kaip vykdyti Jupyter užrašų knygutes AWS egzemplioriuose, išsamiai aprašysime
+vėliau šiame priede.
 
-### Timing
+### Vykdymo trukmės matavimas
 
-We can use the `ExecuteTime` plugin to time the execution of each code cell in Jupyter notebooks.
-Use the following commands to install the plugin:
+Naudodami papildinį `ExecuteTime`, galime matuoti kiekvieno Jupyter užrašų knygutės kodo langelio vykdymo trukmę.
+Papildinį įdiekite šiomis komandomis:
 
 ```
 pip install jupyter_contrib_nbextensions
@@ -141,17 +141,17 @@ jupyter nbextension enable execute_time/ExecuteTime
 ```
 
 
-## Summary
+## Santrauka
 
-* Using the Jupyter Notebook tool, we can edit, run, and contribute to each section of the book.
-* We can run Jupyter notebooks on remote servers using port forwarding.
-
-
-## Exercises
-
-1. Edit and run the code in this book with the Jupyter Notebook on your local machine.
-1. Edit and run the code in this book with the Jupyter Notebook *remotely* via port forwarding.
-1. Compare the running time of the operations $\mathbf{A}^\top \mathbf{B}$ and $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
+* Naudodami Jupyter Notebook įrankį, galime redaguoti, vykdyti ir papildyti kiekvieną knygos skyrių.
+* Jupyter užrašų knygutes nuotoliniuose serveriuose galime vykdyti naudodami prievadų persiuntimą.
 
 
-[Discussions](https://discuss.d2l.ai/t/421)
+## Pratimai
+
+1. Redaguokite ir vykdykite šios knygos kodą vietiniame kompiuteryje naudodami Jupyter Notebook.
+1. Redaguokite ir vykdykite šios knygos kodą naudodami Jupyter Notebook *nuotoliniu būdu* per prievadų persiuntimą.
+1. Palyginkite operacijų $\mathbf{A}^\top \mathbf{B}$ ir $\mathbf{A} \mathbf{B}$ vykdymo laiką dviem kvadratinėms matricoms iš $\mathbb{R}^{1024 \times 1024}$. Kuri operacija greitesnė?
+
+
+[Diskusijos](https://discuss.d2l.ai/t/421)

@@ -1,29 +1,29 @@
-# Statistics
+# Statistika
 :label:`sec_statistics`
 
-Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial.  However, it is often unclear when improvements are significant, or only the result of random fluctuations in the training process.  To be able to discuss uncertainty in estimated values, we must learn some statistics.
+Neabejotinai, kad norint tapti aukščiausio lygio giliojo mokymosi praktiku, būtina gebėti apmokyti pažangiausius ir labai tikslius modelius.  Tačiau dažnai neaišku, kada patobulinimai yra reikšmingi, o kada tėra atsitiktinių mokymo proceso svyravimų rezultatas.  Kad galėtume aptarti įvertintų reikšmių neapibrėžtumą, turime išmokti šiek tiek statistikos.
 
 
-The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the $9^{\textrm{th}}$-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. After 800 years, the modern statistics arose from Germany in 1700s, when the researchers focused on the demographic and economic data collection and analysis. Today, statistics is the science subject that concerns the collection, processing, analysis, interpretation and visualization of data. What is more, the core theory of statistics has been widely used in the research within academia, industry, and government.
+Seniausia *statistikos* paminėjimą galima atsekti iki arabų mokslininko Al Kindžio (Al-Kindi) $9$ a., kuris išsamiai aprašė, kaip naudoti statistiką ir dažnių analizę užšifruotiems pranešimams iššifruoti. Po 800 metų šiuolaikinė statistika atsirado Vokietijoje XVIII a., kai tyrėjai susitelkė į demografinių ir ekonominių duomenų rinkimą ir analizę. Šiandien statistika yra mokslo šaka, nagrinėjanti duomenų rinkimą, apdorojimą, analizę, interpretavimą ir vizualizavimą. Be to, pagrindinė statistikos teorija plačiai naudojama akademiniuose, pramonės ir vyriausybiniuose tyrimuose.
 
 
-More specifically, statistics can be divided to *descriptive statistics* and *statistical inference*. The former focus on summarizing and illustrating the features of a collection of observed data, which is referred to as a *sample*. The sample is drawn from a *population*, denotes the total set of similar individuals, items, or events of our experiment interests. Contrary to descriptive statistics, *statistical inference* further deduces the characteristics of a population from the given *samples*, based on the assumptions that the sample distribution can replicate the population distribution at some degree.
+Konkrečiau, statistiką galima skirstyti į *aprašomąją statistiką* ir *statistinę inferenciją*. Pirmoji orientuota į stebimų duomenų rinkinio, vadinamo *imtimi*, savybių apibendrinimą ir iliustravimą. Imtis ištraukiama iš *populiacijos*, žyminčios visą panašių individų, objektų ar įvykių, kuriuos domina mūsų eksperimentas, aibę. Skirtingai nei aprašomoji statistika, *statistinė inferencija* iš duotų *imčių* toliau daro išvadas apie populiacijos charakteristikas, remdamasi prielaidomis, kad imties skirstinys tam tikru laipsniu gali atkartoti populiacijos skirstinį.
 
 
-You may wonder: “What is the essential difference between machine learning and statistics?” Fundamentally speaking, statistics focuses on the inference problem. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. In contrast, machine learning emphasizes on making accurate predictions, without explicitly programming and understanding each parameter's functionality.
+Galite paklausti: „Koks esminis skirtumas tarp mašininio mokymo ir statistikos?“ Iš esmės statistika orientuota į išvadų darymo problemą. Tokio tipo problemos apima ryšio tarp kintamųjų modeliavimą, pavyzdžiui, priežastingumo analizę, ir modelio parametrų statistinio reikšmingumo tikrinimą, pavyzdžiui, A/B testavimą. Priešingai, mašininis mokymas pabrėžia tikslių prognozių darymą, aiškiai neprogramuojant ir nesuprantant kiekvieno parametro funkcijos.
 
 
-In this section, we will introduce three types of statistics inference methods: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. These methods can help us infer the characteristics of a given population, i.e., the true parameter $\theta$. For brevity, we assume that the true parameter $\theta$ of a given population is a scalar value. It is straightforward to extend to the case where $\theta$ is a vector or a tensor, thus we omit it in our discussion.
+Šiame skyriuje pristatysime tris statistinės inferencijos metodų tipus: įvertinių vertinimą ir palyginimą, hipotezių tikrinimą ir pasikliautinųjų intervalų sudarymą. Šie metodai gali padėti mums spręsti apie duotos populiacijos charakteristikas, t. y. tikrąjį parametrą $\theta$. Trumpumo dėlei darome prielaidą, kad duotos populiacijos tikrasis parametras $\theta$ yra skaliaras. Atvejį, kai $\theta$ yra vektorius ar tenzorius, išplėsti nesunku, todėl jo savo diskusijoje nenagrinėjame.
 
 
 
-## Evaluating and Comparing Estimators
+## Įvertinių vertinimas ir palyginimas
 
-In statistics, an *estimator* is a function of given samples used to estimate the true parameter $\theta$. We will write $\hat{\theta}_n = \hat{f}(x_1, \ldots, x_n)$ for the estimate of $\theta$ after observing the samples {$x_1, x_2, \ldots, x_n$}.
+Statistikoje *įvertinys* yra duotų imčių funkcija, naudojama tikrajam parametrui $\theta$ įvertinti. Žymėsime $\hat{\theta}_n = \hat{f}(x_1, \ldots, x_n)$ – $\theta$ įvertį po to, kai stebėjome imtis {$x_1, x_2, \ldots, x_n$}.
 
-We have seen simple examples of estimators before in section :numref:`sec_maximum_likelihood`.  If you have a number of samples from a Bernoulli random variable, then the maximum likelihood estimate for the probability the random variable is one can be obtained by counting the number of ones observed and dividing by the total number of samples.  Similarly, an exercise asked you to show that the maximum likelihood estimate of the mean of a Gaussian given a number of samples is given by the average value of all the samples.  These estimators will almost never give the true value of the parameter, but ideally for a large number of samples the estimate will be close.
+Paprastų įvertinių pavyzdžių matėme anksčiau, :numref:`sec_maximum_likelihood` skyriuje.  Jei turite keletą Bernulio atsitiktinio dydžio imčių, tai didžiausio tikėtinumo įvertį tikimybei, kad atsitiktinis dydis lygus vienam, galima gauti suskaičiavus stebėtų vienetų skaičių ir padalijus iš bendro imčių skaičiaus.  Panašiai pratime buvo prašoma parodyti, kad Gauso skirstinio vidurkio didžiausio tikėtinumo įvertis, turint tam tikrą imčių skaičių, yra visų imčių vidutinė reikšmė.  Šie įvertiniai beveik niekada nepateiks tikrosios parametro reikšmės, tačiau idealiu atveju, esant dideliam imčių skaičiui, įvertis bus artimas.
 
-As an example, we show below the true density of a Gaussian random variable with mean zero and variance one, along with a collection samples from that Gaussian.  We constructed the $y$ coordinate so every point is visible and the relationship to the original density is clearer.
+Pavyzdžiui, toliau parodome tikrąjį Gauso atsitiktinio dydžio su vidurkiu nuliu ir dispersija vienas tankį kartu su šio Gauso imčių rinkiniu.  $y$ koordinatę sukonstravome taip, kad kiekvienas taškas būtų matomas, o ryšys su pradiniu tankiu būtų aiškesnis.
 
 ```{.python .input}
 #@tab mxnet
@@ -113,47 +113,47 @@ d2l.plt.title(f'sample mean: {float(tf.reduce_mean(xs).numpy()):.2f}')
 d2l.plt.show()
 ```
 
-There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias.
+Parametro įvertinį $\hat{\theta}_n$ galima apskaičiuoti daugeliu būdų.  Šiame skyriuje pristatome tris įprastus metodus įvertiniams vertinti ir palyginti: vidutinę kvadratinę paklaidą, standartinį nuokrypį ir statistinį paslinkimą.
 
-### Mean Squared Error
+### Vidutinė kvadratinė paklaida
 
-Perhaps the simplest metric used to evaluate estimators is the *mean squared error (MSE)* (or $l_2$ loss) estimator which can be defined as
+Galbūt paprasčiausias įvertiniams vertinti naudojamas matas yra *vidutinės kvadratinės paklaidos (VKP)* (arba $l_2$ nuostolių) įvertinys, kuris gali būti apibrėžtas kaip
 
 $$\textrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$
 :eqlabel:`eq_mse_est`
 
-This allows us to quantify the average squared deviation from the true value.  MSE is always non-negative. If you have read :numref:`sec_linear_regression`, you will recognize it as the most commonly used regression loss function. As a measure to evaluate an estimator, the closer its value is to zero, the closer the estimator is to the true parameter $\theta$.
+Tai leidžia kiekybiškai įvertinti vidutinį kvadratinį nuokrypį nuo tikrosios reikšmės.  VKP visada neneigiama. Jei skaitėte :numref:`sec_linear_regression`, atpažinsite ją kaip dažniausiai naudojamą regresijos nuostolių funkciją. Kaip įvertinio vertinimo matas, kuo jo reikšmė artimesnė nuliui, tuo įvertinys artimesnis tikrajam parametrui $\theta$.
 
 
-### Statistical Bias
+### Statistinis paslinkimas
 
-The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two fundamentally important are fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.
+VKP suteikia natūralų matą, tačiau lengva įsivaizduoti keletą skirtingų reiškinių, galinčių ją padidinti.  Du iš esmės svarbūs yra įvertinio svyravimas dėl duomenų rinkinio atsitiktinumo ir sistemingoji įvertinio paklaida dėl įvertinimo procedūros.
 
 
-First, let's measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
+Pirmiausia išmatuokime sistemingąją paklaidą. Įvertiniui $\hat{\theta}_n$ matematinė *statistinio paslinkimo* išraiška gali būti apibrėžta kaip
 
 $$\textrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$
 :eqlabel:`eq_bias`
 
-Note that when $\textrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is better than a biased estimator since its expectation is the same as the true parameter.
+Atkreipkite dėmesį, kad kai $\textrm{bias}(\hat{\theta}_n) = 0$, įvertinio $\hat{\theta}_n$ vidurkis yra lygus tikrajai parametro reikšmei.  Šiuo atveju sakome, kad $\hat{\theta}_n$ yra nepaslinktas įvertinys.  Apskritai nepaslinktas įvertinys yra geresnis už paslinktąjį, nes jo vidurkis yra toks pat kaip tikrojo parametro.
 
 
-It is worth being aware, however, that biased estimators are frequently used in practice.  There are cases where unbiased estimators do not exist without further assumptions, or are intractable to compute.  This may seem like a significant flaw in an estimator, however the majority of estimators encountered in practice are at least asymptotically unbiased in the sense that the bias tends to zero as the number of available samples tends to infinity: $\lim_{n \rightarrow \infty} \textrm{bias}(\hat{\theta}_n) = 0$.
+Vis dėlto verta žinoti, kad paslinkti įvertiniai praktikoje naudojami dažnai.  Yra atvejų, kai nepaslinktų įvertinių be papildomų prielaidų nėra arba jų neįmanoma apskaičiuoti.  Tai gali atrodyti didelis įvertinio trūkumas, tačiau dauguma praktikoje sutinkamų įvertinių yra bent asimptotiškai nepaslinkti tuo požiūriu, kad paslinkimas artėja prie nulio, kai turimų imčių skaičius artėja prie begalybės: $\lim_{n \rightarrow \infty} \textrm{bias}(\hat{\theta}_n) = 0$.
 
 
-### Variance and Standard Deviation
+### Dispersija ir standartinis nuokrypis
 
-Second, let's measure the randomness in the estimator.  Recall from :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance.  We may measure the degree of fluctuation of an estimator by measuring the standard deviation or variance of that estimator.
+Antra, išmatuokime įvertinio atsitiktinumą.  Prisiminkite iš :numref:`sec_random_variables`, kad *standartinis nuokrypis* (arba *standartinė paklaida*) apibrėžiamas kaip dispersijos kvadratinė šaknis.  Įvertinio svyravimo laipsnį galime išmatuoti matuodami to įvertinio standartinį nuokrypį arba dispersiją.
 
 $$\sigma_{\hat{\theta}_n} = \sqrt{\textrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 :eqlabel:`eq_var_est`
 
-It is important to compare :eqref:`eq_var_est` to :eqref:`eq_mse_est`.  In this equation we do not compare to the true population value $\theta$, but instead to $E(\hat{\theta}_n)$, the expected sample mean.  Thus we are not measuring how far the estimator tends to be from the true value, but instead we are measuring the fluctuation of the estimator itself.
+Svarbu palyginti :eqref:`eq_var_est` su :eqref:`eq_mse_est`.  Šioje lygtyje nelyginame su tikrąja populiacijos reikšme $\theta$, o su $E(\hat{\theta}_n)$ – tikėtinu imties vidurkiu.  Taigi nematuojame, kiek įvertinys linkęs nutolti nuo tikrosios reikšmės, o matuojame paties įvertinio svyravimą.
 
 
-### The Bias-Variance Trade-off
+### Paslinkimo ir dispersijos kompromisas
 
-It is intuitively clear that these two main components contribute to the mean squared error.  What is somewhat shocking is that we can show that this is actually a *decomposition* of the mean squared error into these two contributions plus a third one. That is to say that we can write the mean squared error as the sum of the square of the bias, the variance and the irreducible error.
+Intuityviai aišku, kad šie du pagrindiniai komponentai prisideda prie vidutinės kvadratinės paklaidos.  Kiek šokiruojantis dalykas yra tai, kad galime parodyti, jog tai iš tiesų yra vidutinės kvadratinės paklaidos *skaida* į šiuos du indėlius plius trečią.  Tai reiškia, kad vidutinę kvadratinę paklaidą galime užrašyti kaip paslinkimo kvadrato, dispersijos ir nepašalinamosios paklaidos sumą.
 
 $$
 \begin{aligned}
@@ -166,12 +166,12 @@ $$
 \end{aligned}
 $$
 
-We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into three sources of error: the error from high bias, the error from high variance and the irreducible error. The bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *flexibility* as introduced in (:numref:`sec_generalization_basics`). The high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *generalization* as introduced in (:numref:`sec_generalization_basics`). The irreducible error is the result from noise in the $\theta$ itself.
+Šią formulę vadiname *paslinkimo ir dispersijos kompromisu* (angl. *bias-variance trade-off*). Vidutinę kvadratinę paklaidą galima padalyti į tris paklaidos šaltinius: paklaidą dėl didelio paslinkimo, paklaidą dėl didelės dispersijos ir nepašalinamąją paklaidą. Paslinkimo paklaida dažnai matoma paprastame modelyje (pavyzdžiui, tiesinės regresijos modelyje), kuris negali išgauti aukštos dimensijos ryšių tarp požymių ir išvesčių. Jei modelis kenčia nuo didelės paslinkimo paklaidos, dažnai sakome, kad jis *nepakankamai prisitaikęs* (angl. *underfitting*) arba jam trūksta *lankstumo*, kaip pristatyta (:numref:`sec_generalization_basics`). Didelė dispersija paprastai atsiranda dėl per sudėtingo modelio, kuris persimoko mokymo duomenims. Dėl to *persimokęs* modelis yra jautrus nedideliems duomenų svyravimams. Jei modelis kenčia nuo didelės dispersijos, dažnai sakome, kad jis *persimokęs* (angl. *overfitting*) ir jam trūksta *generalizacijos*, kaip pristatyta (:numref:`sec_generalization_basics`). Nepašalinamoji paklaida atsiranda dėl paties $\theta$ triukšmo.
 
 
-### Evaluating Estimators in Code
+### Įvertinių vertinimas kode
 
-Since the standard deviation of an estimator has been implementing by simply calling `a.std()` for a tensor `a`, we will skip it but implement the statistical bias and the mean squared error.
+Kadangi įvertinio standartinis nuokrypis realizuojamas tiesiog iškviečiant `a.std()` tenzoriui `a`, jį praleisime, bet realizuosime statistinį paslinkimą ir vidutinę kvadratinę paklaidą.
 
 ```{.python .input}
 #@tab mxnet
@@ -206,7 +206,7 @@ def mse(data, true_theta):
     return(tf.reduce_mean(tf.square(data - true_theta)))
 ```
 
-To illustrate the equation of the bias-variance trade-off, let's simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
+Kad iliustruotume paslinkimo ir dispersijos kompromiso lygtį, simuliuokime normalųjį skirstinį $\mathcal{N}(\theta, \sigma^2)$ su $10\,000$ imčių. Čia naudojame $\theta = 1$ ir $\sigma = 4$. Kadangi įvertinys yra duotų imčių funkcija, čia imčių vidurkį naudojame kaip tikrojo $\theta$ įvertinį šiame normaliajame skirstinyje $\mathcal{N}(\theta, \sigma^2)$ .
 
 ```{.python .input}
 #@tab mxnet
@@ -238,14 +238,14 @@ theta_est = tf.reduce_mean(samples)
 theta_est
 ```
 
-Let's validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
+Patikrinkime kompromiso lygtį apskaičiuodami savo įvertinio paslinkimo kvadrato ir dispersijos sumą. Pirmiausia apskaičiuokime savo įvertinio VKP.
 
 ```{.python .input}
 #@tab all
 mse(samples, theta_true)
 ```
 
-Next, we calculate $\textrm{Var} (\hat{\theta}_n) + [\textrm{bias} (\hat{\theta}_n)]^2$ as below. As you can see, the two values agree to numerical precision.
+Toliau apskaičiuojame $\textrm{Var} (\hat{\theta}_n) + [\textrm{bias} (\hat{\theta}_n)]^2$, kaip parodyta toliau. Kaip matote, abi reikšmės sutampa skaitinio tikslumo ribose.
 
 ```{.python .input}
 #@tab mxnet
@@ -265,156 +265,156 @@ bias = stat_bias(theta_true, theta_est)
 tf.square(tf.math.reduce_std(samples)) + tf.square(bias)
 ```
 
-## Conducting Hypothesis Tests
+## Hipotezių tikrinimas
 
 
-The most commonly encountered topic in statistical inference is hypothesis testing. While hypothesis testing was popularized in the early $20^{th}$ century, the first use can be traced back to John Arbuthnot in the 1700s. John tracked 80-year birth records in London and concluded that more men were born than women each year. Following that, the modern significance testing is the intelligence heritage by Karl Pearson who invented $p$-value and Pearson's chi-squared test, William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test.
+Dažniausiai sutinkama statistinės inferencijos tema yra hipotezių tikrinimas. Nors hipotezių tikrinimas išpopuliarėjo $\textrm{XX}$ a. pradžioje, pirmasis jo panaudojimas atsekamas iki Džono Arbutnoto (John Arbuthnot) XVIII a. Džonas sekė 80 metų gimimų Londone įrašus ir padarė išvadą, kad kasmet gimsta daugiau vyrų nei moterų. Po to šiuolaikinis reikšmingumo tikrinimas yra intelektinis Karlo Pirsono (Karl Pearson), išradusio $p$ reikšmę ir Pirsono chi kvadrato testą, Viljamo Gosseto (William Gosset), Stjudento t skirstinio tėvo, ir Ronaldo Fišerio (Ronald Fisher), įvedusio nulinę hipotezę ir reikšmingumo testą, paveldas.
 
-A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject using the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory.
+*Hipotezės tikrinimas* yra būdas įvertinti tam tikrus įrodymus prieš numatytąjį teiginį apie populiaciją. Numatytąjį teiginį vadiname *nuline hipoteze* $H_0$, kurią bandome atmesti naudodami stebimus duomenis. Čia $H_0$ naudojame kaip statistinio reikšmingumo tikrinimo atspirties tašką. *Alternatyvioji hipotezė* $H_A$ (arba $H_1$) yra teiginys, priešingas nulinei hipotezei. Nulinė hipotezė dažnai formuluojama tvirtinamąja forma, teigiančia ryšį tarp kintamųjų. Ji turėtų atspindėti nuostatą kuo aiškiau ir būti patikrinama statistikos teorija.
 
-Imagine you are a chemist. After spending thousands of hours in the lab, you develop a new medicine which can dramatically improve one's ability to understand math. To show its magic power, you need to test it. Naturally, you may need some volunteers to take the medicine and see whether it can help them learn mathematics better. How do you get started?
+Įsivaizduokite, kad esate chemikas. Praleidę tūkstančius valandų laboratorijoje, sukuriate naują vaistą, kuris gali iš esmės pagerinti žmogaus gebėjimą suprasti matematiką. Kad parodytumėte jo stebuklingą galią, turite jį išbandyti. Natūralu, kad jums gali prireikti keleto savanorių, kurie vartotų vaistą, ir pamatyti, ar jis gali padėti jiems geriau mokytis matematikos. Kaip pradėti?
 
-First, you will need carefully random selected two groups of volunteers, so that there is no difference between their mathematical understanding ability measured by some metrics. The two groups are commonly referred to as the test group and the control group. The *test group* (or *treatment group*) is a group of individuals who will experience the medicine, while the *control group* represents the group of users who are set aside as a benchmark, i.e., identical environment setups except taking this medicine. In this way, the influence of all the variables are minimized, except the impact of the independent variable in the treatment.
+Pirmiausia turėsite atidžiai atsitiktinai atrinkti dvi savanorių grupes, kad nebūtų skirtumo tarp jų matematinio supratimo gebėjimų, išmatuotų pagal tam tikras metrikas. Šios dvi grupės paprastai vadinamos tiriamąja ir kontroline grupe. *Tiriamoji grupė* (arba *gydymo grupė*) yra asmenų grupė, kuri vartos vaistą, o *kontrolinė grupė* atstovauja naudotojų grupę, atidėtą kaip lyginamasis etalonas, t. y. identiškos aplinkos sąlygos, išskyrus šio vaisto vartojimą. Šitaip sumažinama visų kintamųjų įtaka, išskyrus nepriklausomo kintamojo poveikį gydymui.
 
-Second, after a period of taking the medicine, you will need to measure the two groups' mathematical understanding by the same metrics, such as letting the volunteers do the same tests after learning a new mathematical formula. Then, you can collect their performance and compare the results.  In this case, our null hypothesis will be that there is no difference between the two groups, and our alternate will be that there is.
+Antra, po tam tikro vaisto vartojimo laikotarpio turėsite išmatuoti abiejų grupių matematinį supratimą tomis pačiomis metrikomis, pavyzdžiui, leisdami savanoriams atlikti tuos pačius testus išmokus naują matematinę formulę. Tada galite surinkti jų rezultatus ir palyginti.  Šiuo atveju mūsų nulinė hipotezė bus, kad tarp dviejų grupių nėra skirtumo, o alternatyvioji – kad skirtumas yra.
 
-This is still not fully formal.  There are many details you have to think of carefully. For example, what is the suitable metrics to test their mathematical understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? How do you decide if there is a difference between the two groups?  Do you care about the average performance only, or also the range of variation of the scores? And so on.
+Tai vis dar nėra visiškai formalu.  Yra daug detalių, apie kurias turite atidžiai pagalvoti. Pavyzdžiui, kokios yra tinkamos metrikos jų matematinio supratimo gebėjimui patikrinti? Kiek savanorių reikia jūsų testui, kad galėtumėte užtikrintai teigti apie vaisto veiksmingumą? Kiek laiko turėtų trukti testas? Kaip nuspręsti, ar yra skirtumas tarp dviejų grupių?  Ar rūpi tik vidutinis rezultatas, ar ir rezultatų kitimo diapazonas?  Ir t. t.
 
-In this way, hypothesis testing provides a framework for experimental design and reasoning about certainty in observed results.  If we can now show that the null hypothesis is very unlikely to be true, we may reject it with confidence.
+Šitaip hipotezių tikrinimas suteikia pagrindą eksperimentų planavimui ir samprotavimui apie stebimų rezultatų patikimumą.  Jei dabar galime parodyti, kad nulinė hipotezė labai mažai tikėtina, galime ją užtikrintai atmesti.
 
-To complete the story of how to work with hypothesis testing, we need to now introduce some additional terminology and make some of our concepts above formal.
+Kad užbaigtume pasakojimą apie darbą su hipotezių tikrinimu, dabar turime pristatyti šiek tiek papildomos terminijos ir kai kurias aukščiau pateiktas sąvokas paversti formaliomis.
 
 
-### Statistical Significance
+### Statistinis reikšmingumas
 
-The *statistical significance* measures the probability of erroneously rejecting the null hypothesis, $H_0$, when it should not be rejected, i.e.,
+*Statistinis reikšmingumas* matuoja tikimybę klaidingai atmesti nulinę hipotezę $H_0$, kai jos atmesti nereikėtų, t. y.,
 
 $$ \textrm{statistical significance }= 1 - \alpha = 1 - P(\textrm{reject } H_0 \mid H_0 \textrm{ is true} ).$$
 
-It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis.
+Tai taip pat vadinama *I rūšies klaida* arba *klaidingai teigiamu rezultatu*. $\alpha$ vadinamas *reikšmingumo lygmeniu*, o dažniausiai naudojama jo reikšmė yra $5\%$, t. y. $1-\alpha = 95\%$. Reikšmingumo lygmenį galima paaiškinti kaip rizikos lygį, kurį esame pasirengę prisiimti atmesdami teisingą nulinę hipotezę.
 
-:numref:`fig_statistical_significance` shows the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data example is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it.
+:numref:`fig_statistical_significance` rodo stebinių reikšmes ir duoto normaliojo skirstinio tikimybę dviejų imčių hipotezės testavime. Jei stebimas duomenų pavyzdys yra už $95\%$ slenksčio ribų, pagal nulinės hipotezės prielaidą tai būtų labai mažai tikėtinas stebinys. Vadinasi, galbūt kažkas negerai su nuline hipoteze ir mes ją atmesime.
 
-![Statistical significance.](../img/statistical-significance.svg)
+![Statistinis reikšmingumas.](../img/statistical-significance.svg)
 :label:`fig_statistical_significance`
 
 
-### Statistical Power
+### Statistinė galia
 
-The *statistical power* (or *sensitivity*) measures the probability of reject the null hypothesis, $H_0$, when it should be rejected, i.e.,
+*Statistinė galia* (arba *jautrumas*) matuoja tikimybę atmesti nulinę hipotezę $H_0$, kai ją reikia atmesti, t. y.,
 
 $$ \textrm{statistical power }= 1 - \beta = 1 - P(\textrm{ fail to reject } H_0  \mid H_0 \textrm{ is false} ).$$
 
-Recall that a *type I error* is error caused by rejecting the null hypothesis when it is true, whereas a *type II error* is resulted from failing to reject the null hypothesis when it is false. A type II error is usually denoted as $\beta$, and hence the corresponding statistical power is $1-\beta$.
+Prisiminkite, kad *I rūšies klaida* yra klaida, atsirandanti atmetus nulinę hipotezę, kai ji teisinga, o *II rūšies klaida* atsiranda neatmetus nulinės hipotezės, kai ji klaidinga. II rūšies klaida paprastai žymima $\beta$, taigi atitinkama statistinė galia yra $1-\beta$.
 
 
-Intuitively, statistical power can be interpreted as how likely our test will detect a real discrepancy of some minimum magnitude at a desired statistical significance level. $80\%$ is a commonly used statistical power threshold. The higher the statistical power, the more likely we are to detect true differences.
+Intuityviai statistinę galią galima interpretuoti kaip tai, kokia tikėtina, kad mūsų testas aptiks tikrą bent minimalaus dydžio neatitikimą pageidaujamu statistinio reikšmingumo lygmeniu. $80\%$ yra dažnai naudojamas statistinės galios slenkstis. Kuo didesnė statistinė galia, tuo tikėtiniau, kad aptiksime tikrus skirtumus.
 
-One of the most common uses of statistical power is in determining the number of samples needed.  The probability you reject the null hypothesis when it is false depends on the degree to which it is false (known as the *effect size*) and the number of samples you have.  As you might expect, small effect sizes will require a very large number of samples to be detectable with high probability.  While beyond the scope of this brief appendix to derive in detail, as an example, want to be able to reject a null hypothesis that our sample came from a mean zero variance one Gaussian, and we believe that our sample's mean is actually close to one, we can do so with acceptable error rates with a sample size of only $8$.  However, if we think our sample population true mean is close to $0.01$, then we'd need a sample size of nearly $80000$ to detect the difference.
+Vienas dažniausių statistinės galios taikymų yra reikalingo imčių skaičiaus nustatymas.  Tikimybė atmesti nulinę hipotezę, kai ji klaidinga, priklauso nuo to, kiek ji klaidinga (tai žinoma kaip *efekto dydis*), ir nuo turimų imčių skaičiaus.  Kaip galite tikėtis, mažiems efekto dydžiams aptikti dideliu tikimybe reikės labai didelio imčių skaičiaus.  Nors išsamiai išvesti tai viršija šio trumpo priedo aprėptį, pavyzdžiui, jei norime galėti atmesti nulinę hipotezę, kad mūsų imtis yra iš Gauso skirstinio su vidurkiu nuliu ir dispersija vienas, o manome, kad mūsų imties vidurkis iš tiesų artimas vienam, galime tai padaryti su priimtinomis klaidų dažnėmis turėdami tik $8$ imties dydį.  Tačiau jei manome, kad mūsų imties populiacijos tikrasis vidurkis yra artimas $0{,}01$, tada skirtumui aptikti prireiktų beveik $80000$ imties dydžio.
 
-We can imagine the power as a water filter. In this analogy, a high power hypothesis test is like a high quality water filtration system that will reduce harmful substances in the water as much as possible. On the other hand, a smaller discrepancy is like a low quality water filter, where some relative small substances may easily escape from the gaps. Similarly, if the statistical power is not of enough high power, then the test may not catch the smaller discrepancy.
-
-
-### Test Statistic
-
-A *test statistic* $T(x)$ is a scalar which summarizes some characteristic of the sample data.  The goal of defining such a statistic is that it should allow us to distinguish between different distributions and conduct our hypothesis test.  Thinking back to our chemist example, if we wish to show that one population performs better than the other, it could be reasonable to take the mean as the test statistic.  Different choices of test statistic can lead to statistical test with drastically different statistical power.
-
-Often, $T(X)$ (the distribution of the test statistic under our null hypothesis) will follow, at least approximately, a common probability distribution such as a normal distribution when considered under the null hypothesis. If we can derive explicitly such a distribution, and then measure our test statistic on our dataset, we can safely reject the null hypothesis if our statistic is far outside the range that we would expect.  Making this quantitative leads us to the notion of $p$-values.
+Galią galime įsivaizduoti kaip vandens filtrą. Šioje analogijoje didelės galios hipotezės testas yra tarsi aukštos kokybės vandens filtravimo sistema, kuri kiek įmanoma sumažins žalingų medžiagų kiekį vandenyje. Kita vertus, mažesnis neatitikimas yra tarsi žemos kokybės vandens filtras, kuriame kai kurios palyginti mažos medžiagos gali lengvai pralįsti pro tarpus. Panašiai, jei statistinė galia nepakankamai didelė, testas gali neaptikti mažesnio neatitikimo.
 
 
-### $p$-value
+### Kriterijaus statistika
 
-The $p$-value (or the *probability value*) is the probability that $T(X)$ is at least as extreme as the observed test statistic $T(x)$ assuming that the null hypothesis is *true*, i.e.,
+*Kriterijaus statistika* $T(x)$ yra skaliaras, apibendrinantis kokią nors imties duomenų charakteristiką.  Tokios statistikos apibrėžimo tikslas yra tas, kad ji turėtų leisti atskirti skirtingus skirstinius ir atlikti hipotezės tikrinimą.  Prisiminus mūsų chemiko pavyzdį, jei norime parodyti, kad viena populiacija veikia geriau už kitą, pagrįsta būtų kaip kriterijaus statistiką imti vidurkį.  Skirtingi kriterijaus statistikos pasirinkimai gali lemti statistinius testus su smarkiai skirtinga statistine galia.
+
+Dažnai $T(X)$ (kriterijaus statistikos skirstinys pagal mūsų nulinę hipotezę) nulinės hipotezės sąlygomis sekė, bent apytiksliai, kokį nors įprastą tikimybių skirstinį, pavyzdžiui, normalųjį.  Jei galime aiškiai išvesti tokį skirstinį, o tada išmatuoti savo kriterijaus statistiką savo duomenų rinkinyje, galime užtikrintai atmesti nulinę hipotezę, jei mūsų statistika yra toli už diapazono, kurio tikėtumėmės.  Tai kiekybiškai išreiškus, prieinama prie $p$ reikšmių sampratos.
+
+
+### $p$ reikšmė
+
+$p$ reikšmė (arba *tikimybės reikšmė*) yra tikimybė, kad $T(X)$ yra bent jau tokia pat kraštutinė kaip stebėta kriterijaus statistika $T(x)$, darant prielaidą, kad nulinė hipotezė yra *teisinga*, t. y.,
 
 $$ p\textrm{-value} = P_{H_0}(T(X) \geq T(x)).$$
 
-If the $p$-value is smaller than or equal to a predefined and fixed statistical significance level $\alpha$, we may reject the null hypothesis. Otherwise, we will conclude that we are lack of evidence to reject the null hypothesis. For a given population distribution, the *region of rejection* will be the interval contained of all the points which has a $p$-value smaller than the statistical significance level $\alpha$.
+Jei $p$ reikšmė yra mažesnė arba lygi iš anksto apibrėžtam ir fiksuotam statistinio reikšmingumo lygmeniui $\alpha$, galime atmesti nulinę hipotezę. Kitu atveju darysime išvadą, kad trūksta įrodymų nulinei hipotezei atmesti. Duotam populiacijos skirstiniui *atmetimo sritis* bus intervalas, sudarytas iš visų taškų, kurių $p$ reikšmė yra mažesnė už statistinio reikšmingumo lygmenį $\alpha$.
 
 
-### One-side Test and Two-sided Test
+### Vienpusis ir dvipusis testas
 
-Normally there are two kinds of significance test: the one-sided test and the two-sided test. The *one-sided test* (or *one-tailed test*) is applicable when the null hypothesis and the alternative hypothesis only have one direction. For example, the null hypothesis may state that the true parameter $\theta$ is less than or equal to a value $c$. The alternative hypothesis would be that $\theta$ is greater than $c$. That is, the region of rejection is on only one side of the sampling distribution.  Contrary to the one-sided test, the *two-sided test* (or *two-tailed test*) is applicable when the region of rejection is on both sides of the sampling distribution. An example in this case may have a null hypothesis state that the true parameter $\theta$ is equal to a value $c$. The alternative hypothesis would be that $\theta$ is not equal to $c$.
-
-
-### General Steps of Hypothesis Testing
-
-After getting familiar with the above concepts, let's go through the general steps of hypothesis testing.
-
-1. State the question and establish a null hypotheses $H_0$.
-2. Set the statistical significance level $\alpha$ and a statistical power ($1 - \beta$).
-3. Obtain samples through experiments.  The number of samples needed will depend on the statistical power, and the expected effect size.
-4. Calculate the test statistic and the $p$-value.
-5. Make the decision to keep or reject the null hypothesis based on the $p$-value and the statistical significance level $\alpha$.
-
-To conduct a hypothesis test, we start by defining a null hypothesis and a level of risk that we are willing to take. Then we calculate the test statistic of the sample, taking an extreme value of the test statistic as evidence against the null hypothesis. If the test statistic falls within the reject region, we may reject the null hypothesis in favor of the alternative.
-
-Hypothesis testing is applicable in a variety of scenarios such as the clinical trails and A/B testing.
+Paprastai yra dviejų rūšių reikšmingumo testai: vienpusis ir dvipusis. *Vienpusis testas* (arba *vienuodegis testas*) taikomas, kai nulinė ir alternatyvioji hipotezės turi tik vieną kryptį. Pavyzdžiui, nulinė hipotezė gali teigti, kad tikrasis parametras $\theta$ yra mažesnis arba lygus reikšmei $c$. Alternatyvioji hipotezė būtų, kad $\theta$ yra didesnis už $c$. Tai yra, atmetimo sritis yra tik vienoje imties skirstinio pusėje.  Priešingai nei vienpusis testas, *dvipusis testas* (arba *dviuodegis testas*) taikomas, kai atmetimo sritis yra abiejose imties skirstinio pusėse. Šiuo atveju pavyzdyje nulinė hipotezė gali teigti, kad tikrasis parametras $\theta$ lygus reikšmei $c$. Alternatyvioji hipotezė būtų, kad $\theta$ nelygus $c$.
 
 
-## Constructing Confidence Intervals
+### Bendri hipotezės tikrinimo žingsniai
+
+Susipažinę su aukščiau pateiktomis sąvokomis, peržiūrėkime bendrus hipotezės tikrinimo žingsnius.
+
+1. Suformuluokite klausimą ir nustatykite nulinę hipotezę $H_0$.
+2. Nustatykite statistinio reikšmingumo lygmenį $\alpha$ ir statistinę galią ($1 - \beta$).
+3. Gaukite imtis atlikdami eksperimentus.  Reikalingas imčių skaičius priklausys nuo statistinės galios ir tikėtino efekto dydžio.
+4. Apskaičiuokite kriterijaus statistiką ir $p$ reikšmę.
+5. Priimkite sprendimą palikti ar atmesti nulinę hipotezę pagal $p$ reikšmę ir statistinio reikšmingumo lygmenį $\alpha$.
+
+Norėdami atlikti hipotezės tikrinimą, pradedame nuo nulinės hipotezės apibrėžimo ir rizikos lygio, kurį esame pasirengę prisiimti. Tada apskaičiuojame imties kriterijaus statistiką, kraštutinę kriterijaus statistikos reikšmę laikydami įrodymu prieš nulinę hipotezę. Jei kriterijaus statistika patenka į atmetimo sritį, galime atmesti nulinę hipotezę alternatyviosios naudai.
+
+Hipotezių tikrinimas taikomas įvairiuose scenarijuose, pavyzdžiui, klinikiniuose tyrimuose ir A/B testavime.
 
 
-When estimating the value of a parameter $\theta$, point estimators like $\hat \theta$ are of limited utility since they contain no notion of uncertainty. Rather, it would be far better if we could produce an interval that would contain the true parameter $\theta$ with high probability.  If you were interested in such ideas a century ago, then you would have been excited to read "Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability" by Jerzy Neyman :cite:`Neyman.1937`, who first introduced the concept of confidence interval in 1937.
-
-To be useful, a confidence interval should be as small as possible for a given degree of certainty. Let's see how to derive it.
+## Pasikliautinųjų intervalų sudarymas
 
 
-### Definition
+Įvertinant parametro $\theta$ reikšmę, taškiniai įvertiniai, tokie kaip $\hat \theta$, turi ribotą naudą, nes juose nėra neapibrėžtumo sampratos. Veikiau būtų daug geriau, jei galėtume sudaryti intervalą, kuriame tikrasis parametras $\theta$ būtų su didele tikimybe.  Jei prieš šimtmetį jus būtų domiusios tokios idėjos, būtumėte džiaugsmingai skaitę Jerzy Neyman straipsnį „Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability“ :cite:`Neyman.1937`, kuris 1937 m. pirmasis pristatė pasikliautinojo intervalo sampratą.
 
-Mathematically, a *confidence interval* for the true parameter $\theta$ is an interval $C_n$ that computed from the sample data such that
+Kad būtų naudingas, pasikliautinasis intervalas turėtų būti kuo mažesnis esant duotam užtikrintumo laipsniui. Pažiūrėkime, kaip jį išvesti.
+
+
+### Apibrėžimas
+
+Matematiškai tikrojo parametro $\theta$ *pasikliautinasis intervalas* yra intervalas $C_n$, apskaičiuotas iš imties duomenų taip, kad
 
 $$P_{\theta} (C_n \ni \theta) \geq 1 - \alpha, \forall \theta.$$
 :eqlabel:`eq_confidence`
 
-Here $\alpha \in (0, 1)$, and $1 - \alpha$ is called the *confidence level* or *coverage* of the interval. This is the same $\alpha$ as the significance level as we discussed about above.
+Čia $\alpha \in (0, 1)$, o $1 - \alpha$ vadinamas intervalo *pasikliovimo lygmeniu* arba *padengimu*. Tai yra tas pats $\alpha$ kaip ir reikšmingumo lygmuo, apie kurį kalbėjome aukščiau.
 
-Note that :eqref:`eq_confidence` is about variable $C_n$, not about the fixed $\theta$. To emphasize this, we write $P_{\theta} (C_n \ni \theta)$ rather than $P_{\theta} (\theta \in C_n)$.
+Atkreipkite dėmesį, kad :eqref:`eq_confidence` yra apie kintamąjį $C_n$, o ne apie fiksuotą $\theta$. Kad tai pabrėžtume, rašome $P_{\theta} (C_n \ni \theta)$, o ne $P_{\theta} (\theta \in C_n)$.
 
-### Interpretation
+### Interpretacija
 
-It is very tempting to interpret a $95\%$ confidence interval as an interval where you can be $95\%$ sure the true parameter lies, however this is sadly not true.  The true parameter is fixed, and it is the interval that is random.  Thus a better interpretation would be to say that if you generated a large number of confidence intervals by this procedure, $95\%$ of the generated intervals would contain the true parameter.
+Labai viliojanti $95\%$ pasikliautinąjį intervalą interpretuoti kaip intervalą, kuriame galite būti $95\%$ tikri, kad yra tikrasis parametras, tačiau, deja, taip nėra.  Tikrasis parametras yra fiksuotas, o atsitiktinis yra intervalas.  Taigi geresnė interpretacija būtų sakyti, kad jei šia procedūra sugeneruotumėte didelį skaičių pasikliautinųjų intervalų, $95\%$ sugeneruotų intervalų turėtų tikrąjį parametrą.
 
-This may seem pedantic, but it can have real implications for the interpretation of the results.  In particular, we may satisfy :eqref:`eq_confidence` by constructing intervals that we are *almost certain* do not contain the true value, as long as we only do so rarely enough.  We close this section by providing three tempting but false statements.  An in-depth discussion of these points can be found in :citet:`Morey.Hoekstra.Rouder.ea.2016`.
+Tai gali atrodyti pedantiška, bet tai gali turėti realių pasekmių rezultatų interpretavimui.  Visų pirma galime patenkinti :eqref:`eq_confidence` sudarydami intervalus, apie kuriuos esame *beveik tikri*, kad jie neturi tikrosios reikšmės, jei tik tai darome pakankamai retai.  Šį skyrių užbaigiame pateikdami tris viliojančius, bet klaidingus teiginius.  Išsamią šių punktų diskusiją galima rasti :citet:`Morey.Hoekstra.Rouder.ea.2016`.
 
-* **Fallacy 1**. Narrow confidence intervals mean we can estimate the parameter precisely.
-* **Fallacy 2**. The values inside the confidence interval are more likely to be the true value than those outside the interval.
-* **Fallacy 3**. The probability that a particular observed $95\%$ confidence interval contains the true value is $95\%$.
+* **Klaidingas teiginys 1**. Siauri pasikliautinieji intervalai reiškia, kad galime tiksliai įvertinti parametrą.
+* **Klaidingas teiginys 2**. Reikšmės pasikliautinojo intervalo viduje yra labiau tikėtinos tikrosios reikšmės nei esančios už intervalo.
+* **Klaidingas teiginys 3**. Tikimybė, kad konkretus stebėtas $95\%$ pasikliautinasis intervalas turi tikrąją reikšmę, yra $95\%$.
 
-Sufficed to say, confidence intervals are subtle objects.  However, if you keep the interpretation clear, they can be powerful tools.
+Pakanka pasakyti, kad pasikliautinieji intervalai yra subtilūs objektai.  Tačiau jei interpretaciją išlaikysite aiškią, jie gali būti galingos priemonės.
 
-### A Gaussian Example
+### Gauso pavyzdys
 
-Let's discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu, \sigma^2)$.  We can compute estimators for the mean and variance by taking
+Aptarkime klasikiausią pavyzdį – Gauso skirstinio su nežinomu vidurkiu ir dispersija vidurkio pasikliautinąjį intervalą.  Tarkime, surenkame $n$ imčių $\{x_i\}_{i=1}^n$ iš savo Gauso skirstinio $\mathcal{N}(\mu, \sigma^2)$.  Vidurkio ir dispersijos įvertinius galime apskaičiuoti paėmę
 
 $$\hat\mu_n = \frac{1}{n}\sum_{i=1}^n x_i \;\textrm{and}\; \hat\sigma^2_n = \frac{1}{n-1}\sum_{i=1}^n (x_i - \hat\mu)^2.$$
 
-If we now consider the random variable
+Jei dabar nagrinėsime atsitiktinį dydį
 
 $$
 T = \frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}},
 $$
 
-we obtain a random variable following a well-known distribution called the *Student's t-distribution on* $n-1$ *degrees of freedom*.
+gausime atsitiktinį dydį, sekantį gerai žinomą skirstinį, vadinamą *Stjudento t skirstiniu su* $n-1$ *laisvės laipsnių*.
 
-This distribution is very well studied, and it is known, for instance, that as $n\rightarrow \infty$, it is approximately a standard Gaussian, and thus by looking up values of the Gaussian c.d.f. in a table, we may conclude that the value of $T$ is in the interval $[-1.96, 1.96]$ at least $95\%$ of the time.  For finite values of $n$, the interval needs to be somewhat larger, but are well known and precomputed in tables.
+Šis skirstinys labai gerai ištirtas, ir, pavyzdžiui, žinoma, kad kai $n\rightarrow \infty$, jis yra apytiksliai standartinis Gauso, todėl pasižiūrėję Gauso pasiskirstymo funkcijos reikšmes lentelėje galime daryti išvadą, kad $T$ reikšmė yra intervale $[-1{,}96; 1{,}96]$ bent $95\%$ laiko.  Baigtinėms $n$ reikšmėms intervalas turi būti šiek tiek didesnis, bet jie gerai žinomi ir iš anksto apskaičiuoti lentelėse.
 
-Thus, we may conclude that for large $n$,
+Taigi galime daryti išvadą, kad dideliam $n$
 
 $$
 P\left(\frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}} \in [-1.96, 1.96]\right) \ge 0.95.
 $$
 
-Rearranging this by multiplying both sides by $\hat\sigma_n/\sqrt{n}$ and then adding $\hat\mu_n$, we obtain
+Pertvarkę tai abi puses padauginę iš $\hat\sigma_n/\sqrt{n}$ ir pridėję $\hat\mu_n$, gauname
 
 $$
 P\left(\mu \in \left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right]\right) \ge 0.95.
 $$
 
-Thus we know that we have found our $95\%$ confidence interval:
+Taigi žinome, kad radome savo $95\%$ pasikliautinąjį intervalą:
 $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
 :eqlabel:`eq_gauss_confidence`
 
-It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let's close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.
+Galima drąsiai sakyti, kad :eqref:`eq_gauss_confidence` yra viena dažniausiai naudojamų statistikos formulių.  Užbaikime savo statistikos diskusiją ją realizuodami.  Paprastumo dėlei darome prielaidą, kad esame asimptotiniame režime.  Mažoms $N$ reikšmėms reikėtų įtraukti teisingą `t_star` reikšmę, gautą programiškai arba iš $t$ lentelės.
 
 ```{.python .input}
 #@tab mxnet
@@ -473,34 +473,34 @@ sigma_hat = tf.math.reduce_std(samples)
  mu_hat + t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)))
 ```
 
-## Summary
+## Santrauka
 
-* Statistics focuses on inference problems, whereas deep learning emphasizes on making accurate predictions without explicitly programming and understanding.
-* There are three common statistics inference methods: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals.
-* There are three most common estimators: statistical bias, standard deviation, and mean square error.
-* A confidence interval is an estimated range of a true population parameter that we can construct by given the samples.
-* Hypothesis testing is a way of evaluating some evidence against the default statement about a population.
+* Statistika orientuota į išvadų darymo problemas, o gilusis mokymasis pabrėžia tikslių prognozių darymą aiškiai neprogramuojant ir nesuprantant.
+* Yra trys įprasti statistinės inferencijos metodai: įvertinių vertinimas ir palyginimas, hipotezių tikrinimas ir pasikliautinųjų intervalų sudarymas.
+* Yra trys dažniausi įvertinių matai: statistinis paslinkimas, standartinis nuokrypis ir vidutinė kvadratinė paklaida.
+* Pasikliautinasis intervalas yra apytikslis tikrojo populiacijos parametro intervalas, kurį galime sudaryti iš duotų imčių.
+* Hipotezių tikrinimas yra būdas įvertinti tam tikrus įrodymus prieš numatytąjį teiginį apie populiaciją.
 
 
-## Exercises
+## Pratimai
 
-1. Let $X_1, X_2, \ldots, X_n \overset{\textrm{iid}}{\sim} \textrm{Unif}(0, \theta)$, where "iid" stands for *independent and identically distributed*. Consider the following estimators of $\theta$:
+1. Tegu $X_1, X_2, \ldots, X_n \overset{\textrm{iid}}{\sim} \textrm{Unif}(0, \theta)$, kur „iid“ reiškia *nepriklausomi ir vienodai pasiskirstę* (angl. *independent and identically distributed*). Panagrinėkite šiuos $\theta$ įvertinius:
 $$\hat{\theta} = \max \{X_1, X_2, \ldots, X_n \};$$
 $$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$
-    * Find the statistical bias, standard deviation, and mean square error of $\hat{\theta}.$
-    * Find the statistical bias, standard deviation, and mean square error of $\tilde{\theta}.$
-    * Which estimator is better?
-1. For our chemist example in introduction, can you derive the 5 steps to conduct a two-sided hypothesis testing? Given the statistical significance level $\alpha = 0.05$ and the statistical power $1 - \beta = 0.8$.
-1. Run the confidence interval code with $N=2$ and $\alpha = 0.5$ for $100$ independently generated dataset, and plot the resulting intervals (in this case `t_star = 1.0`).  You will see several very short intervals which are very far from containing the true mean $0$.  Does this contradict the interpretation of the confidence interval?  Do you feel comfortable using short intervals to indicate high precision estimates?
+    * Raskite $\hat{\theta}$ statistinį paslinkimą, standartinį nuokrypį ir vidutinę kvadratinę paklaidą.
+    * Raskite $\tilde{\theta}$ statistinį paslinkimą, standartinį nuokrypį ir vidutinę kvadratinę paklaidą.
+    * Kuris įvertinys geresnis?
+1. Ar galite mūsų įvade pateiktam chemiko pavyzdžiui išvesti 5 dvipusio hipotezės tikrinimo žingsnius? Duotas statistinio reikšmingumo lygmuo $\alpha = 0{,}05$ ir statistinė galia $1 - \beta = 0{,}8$.
+1. Vykdykite pasikliautinojo intervalo kodą su $N=2$ ir $\alpha = 0{,}5$ $100$ nepriklausomai sugeneruotų duomenų rinkinių ir nubraižykite gautus intervalus (šiuo atveju `t_star = 1.0`).  Pamatysite keletą labai trumpų intervalų, kurie yra labai toli nuo to, kad turėtų tikrąjį vidurkį $0$.  Ar tai prieštarauja pasikliautinojo intervalo interpretacijai?  Ar jaučiatės patogiai naudodami trumpus intervalus aukšto tikslumo įverčiams nurodyti?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/419)
+[Diskusijos](https://discuss.d2l.ai/t/419)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1102)
+[Diskusijos](https://discuss.d2l.ai/t/1102)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1103)
+[Diskusijos](https://discuss.d2l.ai/t/1103)
 :end_tab:

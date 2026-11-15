@@ -1,17 +1,17 @@
-# Multivariable Calculus
+# Daugelio kintamųjų matematinė analizė
 :label:`sec_multivariable_calculus`
 
-Now that we have a fairly strong understanding of derivatives of a function of a single variable, let's return to our original question where we were considering a loss function of potentially billions of weights.
+Dabar, kai gana gerai suprantame vieno kintamojo funkcijos išvestines, grįžkime prie pradinio klausimo, kuriame nagrinėjome nuostolių funkciją, priklausančią nuo galbūt milijardų parametrų.
 
-## Higher-Dimensional Differentiation
-What :numref:`sec_single_variable_calculus` tells us is that if we change a single one of these billions of weights leaving every other one fixed, we know what will happen!  This is nothing more than a function of a single variable, so we can write
+## Aukštesnių dimensijų diferencijavimas
+:numref:`sec_single_variable_calculus` mums sako, kad jei pakeisime vieną iš šių milijardų parametrų, visų kitų nekeisdami, žinome, kas nutiks!  Tai yra ne kas kita, kaip vieno kintamojo funkcija, todėl galime užrašyti
 
 $$L(w_1+\epsilon_1, w_2, \ldots, w_N) \approx L(w_1, w_2, \ldots, w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1, w_2, \ldots, w_N).$$
 :eqlabel:`eq_part_der`
 
-We will call the derivative in one variable while fixing the other variables the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`eq_part_der`.
+Išvestinę pagal vieną kintamąjį, kitus kintamuosius fiksuodami, vadinsime *daline išvestine*, o išvestinei :eqref:`eq_part_der` žymėti naudosime žymenį $\frac{\partial}{\partial w_1}$.
 
-Now, let's take this and change $w_2$ a little bit to $w_2 + \epsilon_2$:
+Dabar paimkime tai ir šiek tiek pakeiskime $w_2$ į $w_2 + \epsilon_2$:
 
 $$
 \begin{aligned}
@@ -26,47 +26,47 @@ L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N) & \approx L(w_1, w_2+\epsilon_2, 
 \end{aligned}
 $$
 
-We have again used the idea that $\epsilon_1\epsilon_2$ is a higher order term that we can discard in the same way we could discard $\epsilon^{2}$ in the previous section, along with what we saw in :eqref:`eq_part_der`.  By continuing in this manner, we may write that
+Vėl pasinaudojome idėja, kad $\epsilon_1\epsilon_2$ yra aukštesnės eilės narys, kurį galime atmesti taip pat, kaip atmetėme $\epsilon^{2}$ ankstesniame skyriuje, kartu su tuo, ką matėme :eqref:`eq_part_der`.  Tęsdami šitaip, galime užrašyti, kad
 
 $$
 L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N+\epsilon_N) \approx L(w_1, w_2, \ldots, w_N) + \sum_i \epsilon_i \frac{\partial}{\partial w_i} L(w_1, w_2, \ldots, w_N).
 $$
 
-This may look like a mess, but we can make this more familiar by noting that the sum on the right looks exactly like a dot product, so if we let
+Tai gali atrodyti kaip netvarka, bet galime tai padaryti pažįstamesnį pastebėję, kad dešinėje esanti suma atrodo lygiai kaip skaliarinė sandauga, taigi jei pažymėsime
 
 $$
 \boldsymbol{\epsilon} = [\epsilon_1, \ldots, \epsilon_N]^\top \; \textrm{and} \;
 \nabla_{\mathbf{x}} L = \left[\frac{\partial L}{\partial x_1}, \ldots, \frac{\partial L}{\partial x_N}\right]^\top,
 $$
 
-then
+tada
 
 $$L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).$$
 :eqlabel:`eq_nabla_use`
 
-We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
+Vektorių $\nabla_{\mathbf{w}} L$ vadinsime $L$ *gradientu*.
 
-Equation :eqref:`eq_nabla_use` is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
+Lygtį :eqref:`eq_nabla_use` verta akimirką apmąstyti.  Ji turi būtent tokį formatą, su kokiu susidūrėme vienoje dimensijoje, tik viską pavertėme vektoriais ir skaliarinėmis sandaugomis.  Ji leidžia apytiksliai pasakyti, kaip pasikeis funkcija $L$ esant bet kokiam įvesties trikdžiui.  Kaip pamatysime kitame skyrelyje, tai suteiks svarbią priemonę geometriškai suprasti, kaip galime mokytis naudodami gradiente esančią informaciją.
 
-But first, let's see this approximation at work with an example.  Suppose that we are working with the function
+Bet pirmiausia pažiūrėkime šią aproksimaciją veikiant su pavyzdžiu.  Tarkime, dirbame su funkcija
 
 $$
 f(x, y) = \log(e^x + e^y) \textrm{ with gradient } \nabla f (x, y) = \left[\frac{e^x}{e^x+e^y}, \frac{e^y}{e^x+e^y}\right].
 $$
 
-If we look at a point like $(0, \log(2))$, we see that
+Jei pažiūrėsime į tašką, pavyzdžiui, $(0, \log(2))$, matome, kad
 
 $$
 f(x, y) = \log(3) \textrm{ with gradient } \nabla f (x, y) = \left[\frac{1}{3}, \frac{2}{3}\right].
 $$
 
-Thus, if we want to approximate $f$ at $(\epsilon_1, \log(2) + \epsilon_2)$,  we see that we should have the specific instance of :eqref:`eq_nabla_use`:
+Taigi, jei norime aproksimuoti $f$ taške $(\epsilon_1, \log(2) + \epsilon_2)$, matome, kad turėtume turėti tokį konkretų :eqref:`eq_nabla_use` atvejį:
 
 $$
 f(\epsilon_1, \log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.
 $$
 
-We can test this in code to see how good the approximation is.
+Tai galime patikrinti kode ir pamatyti, kiek gera aproksimacija.
 
 ```{.python .input}
 #@tab mxnet
@@ -137,65 +137,65 @@ true_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(
 f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
-## Geometry of Gradients and Gradient Descent
-Consider the expression from :eqref:`eq_nabla_use` again:
+## Gradientų geometrija ir gradientinis nusileidimas
+Dar kartą panagrinėkime išraišką iš :eqref:`eq_nabla_use`:
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
 
-Let's suppose that I want to use this to help minimize our loss $L$.  Let's understand geometrically the algorithm of gradient descent first described in  :numref:`sec_autograd`. What we will do is the following:
+Tarkime, noriu tai panaudoti, kad padėčiau minimizuoti savo nuostolius $L$.  Pirmiausia geometriškai suprasime gradientinio nusileidimo algoritmą, pirmą kartą aprašytą :numref:`sec_autograd`. Darysime štai ką:
 
-1. Start with a random choice for the initial parameters $\mathbf{w}$.
-2. Find the direction $\mathbf{v}$ that makes $L$ decrease the most rapidly at $\mathbf{w}$.
-3. Take a small step in that direction: $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
-4. Repeat.
+1. Pradėti nuo atsitiktinai pasirinktų pradinių parametrų $\mathbf{w}$.
+2. Rasti kryptį $\mathbf{v}$, kuria $L$ taške $\mathbf{w}$ mažėja greičiausiai.
+3. Žengti mažą žingsnį ta kryptimi: $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
+4. Kartoti.
 
-The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_geometry-linear-algebraic-ops`, we see that we can rewrite :eqref:`eq_nabla_use` as
+Vienintelis dalykas, kurį tiksliai nežinome, kaip padaryti, yra vektoriaus $\mathbf{v}$ apskaičiavimas antrame žingsnyje.  Tokią kryptį vadinsime *stačiausio nusileidimo kryptimi*.  Naudodami geometrinį skaliarinių sandaugų supratimą iš :numref:`sec_geometry-linear-algebraic-ops`, matome, kad :eqref:`eq_nabla_use` galime perrašyti kaip
 
 $$
 L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = L(\mathbf{w}) + \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
 $$
 
-Note that we have taken our direction to have length one for convenience, and used $\theta$ for the angle between $\mathbf{v}$ and $\nabla_{\mathbf{w}} L(\mathbf{w})$.  If we want to find the direction that decreases $L$ as rapidly as possible, we want to make this expression as negative as possible.  The only way the direction we pick enters into this equation is through $\cos(\theta)$, and thus we wish to make this cosine as negative as possible.  Now, recalling the shape of cosine, we can make this as negative as possible by making $\cos(\theta) = -1$ or equivalently making the angle between the gradient and our chosen direction to be $\pi$ radians, or equivalently $180$ degrees.  The only way to achieve this is to head in the exact opposite direction:  pick $\mathbf{v}$ to point in the exact opposite direction to $\nabla_{\mathbf{w}} L(\mathbf{w})$!
+Atkreipkite dėmesį, kad patogumo dėlei kryptį paėmėme vienetinio ilgio ir $\theta$ naudojome kampui tarp $\mathbf{v}$ ir $\nabla_{\mathbf{w}} L(\mathbf{w})$ žymėti.  Jei norime rasti kryptį, kuria $L$ mažėja kuo greičiau, norime, kad ši išraiška būtų kuo neigiamesnė.  Vienintelis būdas, kuriuo mūsų pasirinkta kryptis patenka į šią lygtį, yra per $\cos(\theta)$, todėl norime, kad šis kosinusas būtų kuo neigiamesnis.  Dabar, prisiminę kosinuso formą, galime tai padaryti kuo neigiamesnį padarę $\cos(\theta) = -1$, arba, ekvivalenčiai, kad kampas tarp gradiento ir mūsų pasirinktos krypties būtų $\pi$ radianų, arba $180$ laipsnių.  Vienintelis būdas tai pasiekti – judėti tiksliai priešinga kryptimi: pasirinkti $\mathbf{v}$, nukreiptą tiksliai priešinga kryptimi nei $\nabla_{\mathbf{w}} L(\mathbf{w})$!
 
-This brings us to one of the most important mathematical concepts in machine learning: the direction of steepest decent points in the direction of $-\nabla_{\mathbf{w}}L(\mathbf{w})$.  Thus our informal algorithm can be rewritten as follows.
+Tai mus atveda prie vienos svarbiausių mašininio mokymo matematinių sąvokų: stačiausio nusileidimo kryptis yra $-\nabla_{\mathbf{w}}L(\mathbf{w})$ kryptis.  Taigi mūsų neformalų algoritmą galima perrašyti taip.
 
-1. Start with a random choice for the initial parameters $\mathbf{w}$.
-2. Compute $\nabla_{\mathbf{w}} L(\mathbf{w})$.
-3. Take a small step in the opposite of that direction: $\mathbf{w} \leftarrow \mathbf{w} - \epsilon\nabla_{\mathbf{w}} L(\mathbf{w})$.
-4. Repeat.
+1. Pradėti nuo atsitiktinai pasirinktų pradinių parametrų $\mathbf{w}$.
+2. Apskaičiuoti $\nabla_{\mathbf{w}} L(\mathbf{w})$.
+3. Žengti mažą žingsnį priešinga tai krypčiai: $\mathbf{w} \leftarrow \mathbf{w} - \epsilon\nabla_{\mathbf{w}} L(\mathbf{w})$.
+4. Kartoti.
 
 
-This basic algorithm has been modified and adapted many ways by many researchers, but the core concept remains the same in all of them.  Use the gradient to find the direction that decreases the loss as rapidly as possible, and update the parameters to take a step in that direction.
+Šį pagrindinį algoritmą daugelis tyrėjų įvairiais būdais modifikavo ir pritaikė, tačiau visų jų pagrindinė idėja išlieka ta pati.  Naudoti gradientą, kad rastume kryptį, kuria nuostoliai mažėja kuo greičiau, ir atnaujinti parametrus žengiant žingsnį ta kryptimi.
 
-## A Note on Mathematical Optimization
-Throughout this book, we focus squarely on numerical optimization techniques for the practical reason that all functions we encounter in the deep learning setting are too complex to minimize explicitly.
+## Pastaba apie matematinį optimizavimą
+Visoje šioje knygoje daugiausia dėmesio skiriame skaitiniams optimizavimo metodams dėl praktinės priežasties: visos giliojo mokymosi aplinkoje sutinkamos funkcijos yra per sudėtingos, kad jas būtų galima minimizuoti aiškiai.
 
-However, it is a useful exercise to consider what the geometric understanding we obtained above tells us about optimizing functions directly.
+Vis dėlto naudinga pagalvoti, ką aukščiau gautas geometrinis supratimas mums sako apie funkcijų optimizavimą tiesiogiai.
 
-Suppose that we wish to find the value of $\mathbf{x}_0$ which minimizes some function $L(\mathbf{x})$.  Let's suppose that moreover someone gives us a value and tells us that it is the value that minimizes $L$.  Is there anything we can check to see if their answer is even plausible?
+Tarkime, norime rasti reikšmę $\mathbf{x}_0$, kuri minimizuoja kokią nors funkciją $L(\mathbf{x})$.  Tarkime, be to, kad kažkas mums pateikia reikšmę ir sako, kad tai reikšmė, minimizuojanti $L$.  Ar galime ką nors patikrinti, kad pamatytume, ar jų atsakymas bent jau įtikėtinas?
 
-Again consider :eqref:`eq_nabla_use`:
+Vėl panagrinėkime :eqref:`eq_nabla_use`:
 $$
 L(\mathbf{x}_0 + \boldsymbol{\epsilon}) \approx L(\mathbf{x}_0) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{x}} L(\mathbf{x}_0).
 $$
 
-If the gradient is not zero, we know that we can take a step in the direction $-\epsilon \nabla_{\mathbf{x}} L(\mathbf{x}_0)$ to find a value of $L$ that is smaller.  Thus, if we truly are at a minimum, this cannot be the case!  We can conclude that if $\mathbf{x}_0$ is a minimum, then $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$.  We call points with $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$ *critical points*.
+Jei gradientas nėra nulinis, žinome, kad galime žengti žingsnį kryptimi $-\epsilon \nabla_{\mathbf{x}} L(\mathbf{x}_0)$ ir rasti mažesnę $L$ reikšmę.  Taigi, jei tikrai esame minimume, to būti negali!  Galime daryti išvadą, kad jei $\mathbf{x}_0$ yra minimumas, tai $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$.  Taškus, kuriuose $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$, vadiname *kritiniais taškais*.
 
-This is nice, because in some rare settings, we *can* explicitly find all the points where the gradient is zero, and find the one with the smallest value.
+Tai gražu, nes kai kuriais retais atvejais *galime* aiškiai rasti visus taškus, kuriuose gradientas lygus nuliui, ir išsirinkti tą, kurio reikšmė mažiausia.
 
-For a concrete example, consider the function
+Konkrečiam pavyzdžiui panagrinėkime funkciją
 $$
 f(x) = 3x^4 - 4x^3 -12x^2.
 $$
 
-This function has derivative
+Ši funkcija turi išvestinę
 $$
 \frac{df}{dx} = 12x^3 - 12x^2 -24x = 12x(x-2)(x+1).
 $$
 
-The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5,0, -32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
+Vienintelės galimos minimumų vietos yra $x = -1, 0, 2$, kuriose funkcija įgyja atitinkamai reikšmes $-5,0, -32$, todėl galime daryti išvadą, kad funkciją minimizuojame, kai $x = 2$.  Tai patvirtina greitas grafikas.
 
 ```{.python .input}
 #@tab mxnet
@@ -221,26 +221,26 @@ f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 d2l.plot(x, f, 'x', 'f(x)')
 ```
 
-This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the true *global* minimum (or maximum).
+Tai pabrėžia svarbų faktą, kurį verta žinoti dirbant tiek teoriškai, tiek skaitiškai: vieninteliai galimi taškai, kuriuose galime minimizuoti (ar maksimizuoti) funkciją, turės nulinį gradientą, tačiau ne kiekvienas taškas su nuliniu gradientu yra tikrasis *globalusis* minimumas (ar maksimumas).
 
-## Multivariate Chain Rule
-Let's suppose that we have a function of four variables ($w, x, y$, and $z$) which we can make by composing many terms:
+## Daugelio kintamųjų grandinės taisyklė
+Tarkime, turime keturių kintamųjų ($w, x, y$ ir $z$) funkciją, kurią galime gauti sukomponavę daug narių:
 
 $$\begin{aligned}f(u, v) & = (u+v)^{2} \\u(a, b) & = (a+b)^{2}, \qquad v(a, b) = (a-b)^{2}, \\a(w, x, y, z) & = (w+x+y+z)^{2}, \qquad b(w, x, y, z) = (w+x-y-z)^2.\end{aligned}$$
 :eqlabel:`eq_multi_func_def`
 
-Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
+Tokios lygčių grandinės yra įprastos dirbant su neuroniniais tinklais, todėl esminis dalykas yra suprasti, kaip apskaičiuoti tokių funkcijų gradientus.  Vizualių užuominų apie šį ryšį galime pradėti matyti :numref:`fig_chain-1`, jei pažiūrėsime, kurie kintamieji tiesiogiai susiję vienas su kitu.
 
-![The function relations above where nodes represent values and edges show functional dependence.](../img/chain-net1.svg)
+![Aukščiau pateikti funkciniai ryšiai, kur mazgai žymi reikšmes, o briaunos rodo funkcinę priklausomybę.](../img/chain-net1.svg)
 :label:`fig_chain-1`
 
-Nothing stops us from just composing everything from :eqref:`eq_multi_func_def` and writing out that
+Niekas netrukdo tiesiog sukomponuoti viską iš :eqref:`eq_multi_func_def` ir užrašyti, kad
 
 $$
 f(w, x, y, z) = \left(\left((w+x+y+z)^2+(w+x-y-z)^2\right)^2+\left((w+x+y+z)^2-(w+x-y-z)^2\right)^2\right)^2.
 $$
 
-We may then take the derivative by just using single variable derivatives, but if we did that we would quickly find ourself swamped with terms, many of which are repeats!  Indeed, one can see that, for instance:
+Tada išvestinę galėtume paimti tiesiog naudodami vieno kintamojo išvestines, bet tai daryti greitai atsidurtume paskendę narių, iš kurių daugelis kartojasi!  Iš tiesų galima pamatyti, kad, pavyzdžiui:
 
 $$
 \begin{aligned}
@@ -250,10 +250,10 @@ $$
 \end{aligned}
 $$
 
-If we then also wanted to compute $\frac{\partial f}{\partial x}$, we would end up with a similar equation again with many repeated terms, and many *shared* repeated terms between the two derivatives.  This represents a massive quantity of wasted work, and if we needed to compute derivatives this way, the whole deep learning revolution would have stalled out before it began!
+Jei po to taip pat norėtume apskaičiuoti $\frac{\partial f}{\partial x}$, vėl gautume panašią lygtį su daug pasikartojančių narių ir daug *bendrų* pasikartojančių narių tarp šių dviejų išvestinių.  Tai reiškia didžiulį švaistomo darbo kiekį, ir jei išvestines reikėtų skaičiuoti šitaip, visa giliojo mokymosi revoliucija būtų sustojusi dar neprasidėjusi!
 
 
-Let's break up the problem.  We will start by trying to understand how $f$ changes when we change $a$, essentially assuming that $w, x, y$, and $z$ all do not exist.  We will reason as we did back when we worked with the gradient for the first time.  Let's take $a$ and add a small amount $\epsilon$ to it.
+Išskaidykime uždavinį.  Pradėsime bandydami suprasti, kaip $f$ pasikeičia, kai keičiame $a$, iš esmės darydami prielaidą, kad $w, x, y$ ir $z$ visai neegzistuoja.  Samprotausime taip pat, kaip tada, kai pirmą kartą dirbome su gradientu.  Paimkime $a$ ir pridėkime prie jo mažą dydį $\epsilon$.
 
 $$
 \begin{aligned}
@@ -263,30 +263,30 @@ $$
 \end{aligned}
 $$
 
-The first line follows from the definition of partial derivative, and the second follows from the definition of gradient.  It is notationally burdensome to track exactly where we evaluate every derivative, as in the expression $\frac{\partial f}{\partial u}(u(a, b), v(a, b))$, so we often abbreviate this to the much more memorable
+Pirma eilutė išplaukia iš dalinės išvestinės apibrėžimo, o antra – iš gradiento apibrėžimo.  Žymėjimo požiūriu sunku sekti, kur tiksliai įvertiname kiekvieną išvestinę, kaip išraiškoje $\frac{\partial f}{\partial u}(u(a, b), v(a, b))$, todėl dažnai tai sutrumpiname iki daug lengviau įsimenamos
 
 $$
 \frac{\partial f}{\partial a} = \frac{\partial f}{\partial u}\frac{\partial u}{\partial a}+\frac{\partial f}{\partial v}\frac{\partial v}{\partial a}.
 $$
 
-It is useful to think about the meaning of the process. We are trying to understand how a function of the form $f(u(a, b), v(a, b))$ changes its value with a change in $a$.  There are two pathways this can occur: there is the pathway where $a \rightarrow u \rightarrow f$ and where $a \rightarrow v \rightarrow f$.  We can compute both of these contributions via the chain rule: $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ and $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectively, and added up.
+Naudinga pagalvoti apie proceso prasmę. Bandome suprasti, kaip formos $f(u(a, b), v(a, b))$ funkcija keičia savo reikšmę keičiantis $a$.  Tai gali vykti dviem keliais: yra kelias $a \rightarrow u \rightarrow f$ ir kelias $a \rightarrow v \rightarrow f$.  Abu šiuos indėlius galime apskaičiuoti pagal grandinės taisyklę: atitinkamai $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ ir $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$, ir sudėti.
 
-Imagine we have a different network of functions where the functions on the right depend on those that are connected to on the left as is shown in :numref:`fig_chain-2`.
+Įsivaizduokite, kad turime kitą funkcijų tinklą, kuriame dešinėje esančios funkcijos priklauso nuo kairėje esančių, su kuriomis jos sujungtos, kaip parodyta :numref:`fig_chain-2`.
 
-![Another more subtle example of the chain rule.](../img/chain-net2.svg)
+![Dar vienas subtilesnis grandinės taisyklės pavyzdys.](../img/chain-net2.svg)
 :label:`fig_chain-2`
 
-To compute something like $\frac{\partial f}{\partial y}$, we need to sum over all (in this case $3$) paths from $y$ to $f$ giving
+Norėdami apskaičiuoti ką nors panašaus į $\frac{\partial f}{\partial y}$, turime susumuoti per visus (šiuo atveju $3$) kelius nuo $y$ iki $f$, gaudami
 
 $$
 \frac{\partial f}{\partial y} = \frac{\partial f}{\partial a} \frac{\partial a}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial b} \frac{\partial b}{\partial v} \frac{\partial v}{\partial y}.
 $$
 
-Understanding the chain rule in this way will pay great dividends when trying to understand how gradients flow through networks, and why various architectural choices like those in LSTMs (:numref:`sec_lstm`) or residual layers (:numref:`sec_resnet`) can help shape the learning process by controlling gradient flow.
+Šitaip suprasta grandinės taisyklė atneš didelę naudą bandant suprasti, kaip gradientai teka per tinklus ir kodėl įvairūs architektūros sprendimai, tokie kaip LSTM (:numref:`sec_lstm`) ar liekanų sluoksniai (:numref:`sec_resnet`), gali padėti formuoti mokymosi procesą valdydami gradientų tekėjimą.
 
-## The Backpropagation Algorithm
+## Atgalinio sklidimo algoritmas
 
-Let's return to the example of :eqref:`eq_multi_func_def` the previous section where
+Grįžkime prie ankstesnio skyrelio pavyzdžio :eqref:`eq_multi_func_def`, kuriame
 
 $$
 \begin{aligned}
@@ -296,7 +296,7 @@ a(w, x, y, z) & = (w+x+y+z)^{2}, \qquad b(w, x, y, z) = (w+x-y-z)^2.
 \end{aligned}
 $$
 
-If we want to compute say $\frac{\partial f}{\partial w}$ we may apply the multi-variate chain rule to see:
+Jei norime apskaičiuoti, tarkime, $\frac{\partial f}{\partial w}$, galime pritaikyti daugelio kintamųjų grandinės taisyklę ir gauti:
 
 $$
 \begin{aligned}
@@ -306,7 +306,7 @@ $$
 \end{aligned}
 $$
 
-Let's try using this decomposition to compute $\frac{\partial f}{\partial w}$.  Notice that all we need here are the various single step partials:
+Pabandykime naudoti šią skaidą $\frac{\partial f}{\partial w}$ apskaičiuoti.  Atkreipkite dėmesį, kad čia mums reikia tik įvairių vieno žingsnio dalinių išvestinių:
 
 $$
 \begin{aligned}
@@ -317,7 +317,7 @@ $$
 \end{aligned}
 $$
 
-If we write this out into code this becomes a fairly manageable expression.
+Jei tai užrašysime kodu, ši išraiška tampa gana valdoma.
 
 ```{.python .input}
 #@tab all
@@ -339,9 +339,9 @@ df_dw = df_du*du_dw + df_dv*dv_dw
 print(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')
 ```
 
-However, note that this still does not make it easy to compute something like $\frac{\partial f}{\partial x}$.  The reason for that is the *way* we chose to apply the chain rule.  If we look at what we did above, we always kept $\partial w$ in the denominator when we could.  In this way, we chose to apply the chain rule seeing how $w$ changed every other variable.  If that is what we wanted, this would be a good idea.  However, think back to our motivation from deep learning: we want to see how every parameter changes the *loss*.  In essence, we want to apply the chain rule keeping $\partial f$ in the numerator whenever we can!
+Tačiau atkreipkite dėmesį, kad tai vis tiek nepadaro lengvu apskaičiuoti ko nors panašaus į $\frac{\partial f}{\partial x}$.  To priežastis yra *būdas*, kuriuo pasirinkome taikyti grandinės taisyklę.  Jei pažiūrėsime, ką darėme aukščiau, kai tik galėjome, visada palikdavome $\partial w$ vardiklyje.  Šitaip pasirinkome taikyti grandinės taisyklę žiūrėdami, kaip $w$ keičia kiekvieną kitą kintamąjį.  Jei to ir norėtume, tai būtų gera idėja.  Tačiau prisiminkite savo motyvaciją iš giliojo mokymosi: norime pamatyti, kaip kiekvienas parametras keičia *nuostolius*.  Iš esmės norime taikyti grandinės taisyklę, kai tik galime, palikdami $\partial f$ skaitiklyje!
 
-To be more explicit, note that we can write
+Aiškiau tariant, atkreipkite dėmesį, kad galime užrašyti
 
 $$
 \begin{aligned}
@@ -351,7 +351,7 @@ $$
 \end{aligned}
 $$
 
-Note that this application of the chain rule has us explicitly compute $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial v}, \frac{\partial f}{\partial a}, \frac{\partial f}{\partial b}, \; \textrm{and} \; \frac{\partial f}{\partial w}$.  Nothing stops us from also including the equations:
+Atkreipkite dėmesį, kad taikant grandinės taisyklę šitaip, aiškiai apskaičiuojame $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial v}, \frac{\partial f}{\partial a}, \frac{\partial f}{\partial b}, \; \textrm{ir} \; \frac{\partial f}{\partial w}$.  Niekas netrukdo įtraukti ir lygčių:
 
 $$
 \begin{aligned}
@@ -361,7 +361,7 @@ $$
 \end{aligned}
 $$
 
-and then keeping track of how $f$ changes when we change *any* node in the entire network.  Let's implement it.
+ir tada sekti, kaip $f$ keičiasi, keičiant *bet kurį* viso tinklo mazgą.  Realizuokime tai.
 
 ```{.python .input}
 #@tab all
@@ -392,13 +392,13 @@ print(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')
 print(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')
 ```
 
-The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
-1. Compute the value of the function, and the single step partials from front to back.  While not done above, this can be combined into a single *forward pass*.
-2. Compute the gradient of $f$ from back to front.  We call this the *backwards pass*.
+Tai, kad išvestines skaičiuojame nuo $f$ atgal link įvesčių, o ne nuo įvesčių pirmyn link išvesčių (kaip darėme pirmajame aukščiau pateiktame kodo fragmente), ir suteikia šiam algoritmui pavadinimą: *atgalinis sklidimas*.  Atkreipkite dėmesį, kad yra du žingsniai:
+1. Apskaičiuoti funkcijos reikšmę ir vieno žingsnio daliniais išvestines iš priekio į galą.  Nors aukščiau to nedarėme, tai galima sujungti į vieną *tiesioginį perėjimą* (angl. *forward pass*).
+2. Apskaičiuoti $f$ gradientą iš galo į priekį.  Tai vadiname *atgaliniu perėjimu* (angl. *backwards pass*).
 
-This is precisely what every deep learning algorithm implements to allow the computation of the gradient of the loss with respect to every weight in the network at one pass.  It is an astonishing fact that we have such a decomposition.
+Būtent tai įgyvendina kiekvienas giliojo mokymosi algoritmas, kad vienu perėjimu būtų galima apskaičiuoti nuostolių gradientą pagal kiekvieną tinklo parametrą.  Stulbinantis faktas, kad turime tokią skaidą.
 
-To see how to encapsulated this, let's take a quick look at this example.
+Kad pamatytume, kaip tai įkapsuliuoti, greitai pažvelkime į šį pavyzdį.
 
 ```{.python .input}
 #@tab mxnet
@@ -479,34 +479,34 @@ print(f'df/dz at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
       f'{z.numpy()} is {z_grad}')
 ```
 
-All of what we did above can be done automatically by calling `f.backwards()`.
+Viską, ką darėme aukščiau, galima atlikti automatiškai iškvietus `f.backwards()`.
 
 
-## Hessians
-As with single variable calculus, it is useful to consider higher-order derivatives in order to get a handle on how we can obtain a better approximation to a function than using the gradient alone.
+## Heso matricos
+Kaip ir vieno kintamojo matematinėje analizėje, naudinga nagrinėti aukštesnės eilės išvestines, kad suprastume, kaip galime gauti geresnę funkcijos aproksimaciją nei vien naudojant gradientą.
 
-There is one immediate problem one encounters when working with higher order derivatives of functions of several variables, and that is there are a large number of them.  If we have a function $f(x_1, \ldots, x_n)$ of $n$ variables, then we can take $n^{2}$ many second derivatives, namely for any choice of $i$ and $j$:
+Dirbant su kelių kintamųjų funkcijų aukštesnės eilės išvestinėmis iškart susiduriama su viena problema: jų yra labai daug.  Jei turime $n$ kintamųjų funkciją $f(x_1, \ldots, x_n)$, galime imti $n^{2}$ antrųjų išvestinių, būtent bet kuriam $i$ ir $j$ pasirinkimui:
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d}{dx_i}\left(\frac{d}{dx_j}f\right).
 $$
 
-This is traditionally assembled into a matrix called the *Hessian*:
+Tradiciškai jos surenkamos į matricą, vadinamą *Heso matrica*:
 
 $$\mathbf{H}_f = \begin{bmatrix} \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\ \vdots & \ddots & \vdots \\ \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\ \end{bmatrix}.$$
 :eqlabel:`eq_hess_def`
 
-Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$,
+Ne kiekvienas šios matricos elementas yra nepriklausomas.  Iš tiesų galime parodyti, kad kol egzistuoja ir yra tolydžios abi *mišriosios išvestinės* (dalinės išvestinės pagal daugiau nei vieną kintamąjį), galime sakyti, kad bet kuriems $i$ ir $j$
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d^2f}{dx_jdx_i}.
 $$
 
-This follows by considering first perturbing a function in the direction of $x_i$, and then perturbing it in $x_j$ and then comparing the result of that with what happens if we perturb first $x_j$ and then $x_i$, with the knowledge that both of these orders lead to the same final change in the output of $f$.
+Tai išplaukia iš to, kad pirmiausia sutrikdome funkciją $x_i$ kryptimi, o tada $x_j$ kryptimi, ir palyginame rezultatą su tuo, kas nutinka, kai pirmiausia sutrikdome $x_j$, o tada $x_i$, žinodami, kad abi šios tvarkos lemia tą patį galutinį $f$ išvesties pokytį.
 
-As with single variables, we can use these derivatives to get a far better idea of how the function behaves near a point.  In particular, we can use it to find the best fitting quadratic near a point $\mathbf{x}_0$, as we saw in a single variable.
+Kaip ir su vienu kintamuoju, šias išvestines galime naudoti, kad gautume gerokai geresnį supratimą apie tai, kaip funkcija elgiasi šalia taško.  Visų pirma galime jas naudoti geriausiai tinkančiai kvadratinei funkcijai šalia taško $\mathbf{x}_0$ rasti, kaip matėme vieno kintamojo atveju.
 
-Let's see an example.  Suppose that $f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  This is the general form for a quadratic in two variables.  If we look at the value of the function, its gradient, and its Hessian :eqref:`eq_hess_def`, all at the point zero:
+Pažiūrėkime pavyzdį.  Tarkime, $f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  Tai bendroji dviejų kintamųjų kvadratinės funkcijos forma.  Jei pažiūrėsime į funkcijos reikšmę, jos gradientą ir Heso matricą :eqref:`eq_hess_def`, visus taške nulis:
 
 $$
 \begin{aligned}
@@ -516,30 +516,30 @@ f(0,0) & = a, \\
 \end{aligned}
 $$
 
-we can get our original polynomial back by saying
+galime atgauti savo pradinį daugianarį pasakę, kad
 
 $$
 f(\mathbf{x}) = f(0) + \nabla f (0) \cdot \mathbf{x} + \frac{1}{2}\mathbf{x}^\top \mathbf{H} f (0) \mathbf{x}.
 $$
 
-In general, if we computed this expansion any point $\mathbf{x}_0$, we see that
+Bendru atveju, jei šį skleidinį apskaičiuotume bet kuriame taške $\mathbf{x}_0$, matome, kad
 
 $$
 f(\mathbf{x}) = f(\mathbf{x}_0) + \nabla f (\mathbf{x}_0) \cdot (\mathbf{x}-\mathbf{x}_0) + \frac{1}{2}(\mathbf{x}-\mathbf{x}_0)^\top \mathbf{H} f (\mathbf{x}_0) (\mathbf{x}-\mathbf{x}_0).
 $$
 
-This works for any dimensional input, and provides the best approximating quadratic to any function at a point.  To give an example, let's plot the function
+Tai veikia bet kokios dimensijos įvesčiai ir suteikia geriausią aproksimuojančią kvadratinę funkciją bet kuriai funkcijai taške.  Kad pateiktume pavyzdį, nubraižykime funkciją
 
 $$
 f(x, y) = xe^{-x^2-y^2}.
 $$
 
-One can compute that the gradient and Hessian are
+Galima apskaičiuoti, kad gradientas ir Heso matrica yra
 $$
 \nabla f(x, y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \; \textrm{and} \; \mathbf{H}f(x, y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}.
 $$
 
-And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
+Taigi, pritaikę šiek tiek algebros, matome, kad aproksimuojanti kvadratinė funkcija taške $[-1,0]^\top$ yra
 
 $$
 f(x, y) \approx e^{-1}\left(-1 - (x+1) +(x+1)^2+y^2\right).
@@ -622,14 +622,14 @@ ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
 
-This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
+Tai sudaro pagrindą Niutono algoritmui, aptartam :numref:`sec_gd`, kur atliekame skaitinį optimizavimą iteratyviai randame geriausiai tinkančią kvadratinę funkciją, o tada tiksliai minimizuojame tą kvadratinę funkciją.
 
-## A Little Matrix Calculus
-Derivatives of functions involving matrices turn out to be particularly nice.  This section can become notationally heavy, so may be skipped in a first reading, but it is useful to know how derivatives of functions involving common matrix operations are often much cleaner than one might initially anticipate, particularly given how central matrix operations are to deep learning applications.
+## Šiek tiek matricų matematinės analizės
+Funkcijų, apimančių matricas, išvestinės pasirodo esančios ypač gražios.  Šis skyrelis gali tapti žymėjimo požiūriu sunkus, todėl pirmą kartą skaitant gali būti praleistas, tačiau naudinga žinoti, kad funkcijų, apimančių įprastas matricų operacijas, išvestinės dažnai yra gerokai tvarkingesnės, nei galima iš pradžių tikėtis, ypač turint omenyje, kokios svarbios matricų operacijos yra giliojo mokymosi taikymuose.
 
-Let's begin with an example.  Suppose that we have some fixed column vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.
+Pradėkime nuo pavyzdžio.  Tarkime, turime kokį nors fiksuotą stulpelio vektorių $\boldsymbol{\beta}$ ir norime paimti sandaugos funkciją $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ ir suprasti, kaip pasikeičia skaliarinė sandauga, kai keičiame $\mathbf{x}$.
 
-A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
+Šiek tiek žymėjimo, kuris bus naudingas dirbant su matricų išvestinėmis MM srityje, vadinama *vardiklio išdėstymo matricos išvestine* (angl. *denominator layout*), kai savo dalines išvestines surenkame į tokios formos vektorių, matricą ar tenzorių, koks yra diferencialo vardiklyje.  Šiuo atveju rašysime
 
 $$
 \frac{df}{d\mathbf{x}} = \begin{bmatrix}
@@ -639,27 +639,27 @@ $$
 \end{bmatrix},
 $$
 
-where we matched the shape of the column vector $\mathbf{x}$.
+kur atitikome stulpelio vektoriaus $\mathbf{x}$ formą.
 
-If we write out our function into components this is
+Jei savo funkciją išskleisime komponentėmis, tai yra
 
 $$
 f(\mathbf{x}) = \sum_{i = 1}^{n} \beta_ix_i = \beta_1x_1 + \cdots + \beta_nx_n.
 $$
 
-If we now take the partial derivative with respect to say $\beta_1$, note that everything is zero but the first term, which is just $x_1$ multiplied by $\beta_1$, so we obtain that
+Jei dabar imsime dalinę išvestinę pagal, tarkime, $\beta_1$, atkreipkite dėmesį, kad viskas lygu nuliui, išskyrus pirmąjį narį, kuris yra tiesiog $x_1$, padaugintas iš $\beta_1$, taigi gauname, kad
 
 $$
 \frac{df}{dx_1} = \beta_1,
 $$
 
-or more generally that
+arba bendriau, kad
 
 $$
 \frac{df}{dx_i} = \beta_i.
 $$
 
-We can now reassemble this into a matrix to see
+Dabar tai galime vėl surinkti į matricą ir pamatyti
 
 $$
 \frac{df}{d\mathbf{x}} = \begin{bmatrix}
@@ -673,193 +673,193 @@ $$
 \end{bmatrix} = \boldsymbol{\beta}.
 $$
 
-This illustrates a few factors about matrix calculus that we will often counter throughout this section:
+Tai iliustruoja keletą dalykų apie matricų matematinę analizę, su kuriais dažnai susidursime visame šiame skyrelyje:
 
-* First, The computations will get rather involved.
-* Second, The final results are much cleaner than the intermediate process, and will always look similar to the single variable case.  In this case, note that $\frac{d}{dx}(bx) = b$ and $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}^\top\mathbf{x}) = \boldsymbol{\beta}$ are both similar.
-* Third, transposes can often appear seemingly from nowhere.  The core reason for this is the convention that we match the shape of the denominator, thus when we multiply matrices, we will need to take transposes to match back to the shape of the original term.
+* Pirma, skaičiavimai taps gana sudėtingi.
+* Antra, galutiniai rezultatai yra daug tvarkingesni nei tarpinis procesas ir visada atrodys panašiai kaip vieno kintamojo atveju.  Šiuo atveju atkreipkite dėmesį, kad $\frac{d}{dx}(bx) = b$ ir $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}^\top\mathbf{x}) = \boldsymbol{\beta}$ yra panašūs.
+* Trečia, transponavimai dažnai gali atsirasti tarsi iš niekur.  Pagrindinė to priežastis yra susitarimas, kad atitinkame vardiklio formą, todėl dauginant matricas, reikės transponuoti, kad grįžtume prie pradinio nario formos.
 
-To keep building intuition, let's try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute
+Kad toliau kurtume intuiciją, pabandykime šiek tiek sudėtingesnį skaičiavimą.  Tarkime, turime stulpelio vektorių $\mathbf{x}$ ir kvadratinę matricą $A$ ir norime apskaičiuoti
 
 $$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$
 :eqlabel:`eq_mat_goal_1`
 
-To drive towards easier to manipulate notation, let's consider this problem using Einstein notation.  In this case we can write the function as
+Kad judėtume link lengviau manipuliuojamo žymėjimo, panagrinėkime šį uždavinį naudodami Einšteino žymėjimą.  Šiuo atveju funkciją galime užrašyti kaip
 
 $$
 \mathbf{x}^\top A \mathbf{x} = x_ia_{ij}x_j.
 $$
 
-To compute our derivative, we need to understand for every $k$, what is the value of
+Kad apskaičiuotume išvestinę, turime suprasti, kam kiekvienam $k$ lygi
 
 $$
 \frac{d}{dx_k}(\mathbf{x}^\top A \mathbf{x}) = \frac{d}{dx_k}x_ia_{ij}x_j.
 $$
 
-By the product rule, this is
+Pagal sandaugos taisyklę tai yra
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = \frac{dx_i}{dx_k}a_{ij}x_j + x_ia_{ij}\frac{dx_j}{dx_k}.
 $$
 
-For a term like $\frac{dx_i}{dx_k}$, it is not hard to see that this is one when $i=k$ and zero otherwise.  This means that every term where $i$ and $k$ are different vanish from this sum, so the only terms that remain in that first sum are the ones where $i=k$.  The same reasoning holds for the second term where we need $j=k$.  This gives
+Nariui, pavyzdžiui, $\frac{dx_i}{dx_k}$, nesunku pamatyti, kad jis lygus vienam, kai $i=k$, ir nuliui kitais atvejais.  Tai reiškia, kad kiekvienas narys, kuriame $i$ ir $k$ skiriasi, šioje sumoje išnyksta, todėl toje pirmoje sumoje lieka tik nariai, kur $i=k$.  Tas pats samprotavimas galioja antram nariui, kuriame reikia $j=k$.  Tai duoda
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = a_{kj}x_j + x_ia_{ik}.
 $$
 
-Now, the names of the indices in Einstein notation are arbitrary---the fact that $i$ and $j$ are different is immaterial to this computation at this point, so we can re-index so that they both use $i$ to see that
+Dabar indeksų pavadinimai Einšteino žymėjime yra savavališki – tai, kad $i$ ir $j$ skiriasi, šiuo metu šiam skaičiavimui nesvarbu, todėl galime iš naujo sužymėti indeksus, kad abu naudotų $i$, ir pamatyti, kad
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = a_{ki}x_i + x_ia_{ik} = (a_{ki} + a_{ik})x_i.
 $$
 
-Now, here is where we start to need some practice to go further.  Let's try and identify this outcome in terms of matrix operations.  $a_{ki} + a_{ik}$ is the $k, i$-th component of $\mathbf{A} + \mathbf{A}^\top$.  This gives
+Dabar čia pradeda reikėti šiek tiek praktikos, kad pasistūmėtume toliau.  Pabandykime atpažinti šį rezultatą matricų operacijų terminais.  $a_{ki} + a_{ik}$ yra $k, i$-oji matricos $\mathbf{A} + \mathbf{A}^\top$ komponentė.  Tai duoda
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = [\mathbf{A} + \mathbf{A}^\top]_{ki}x_i.
 $$
 
-Similarly, this term is now the product of the matrix $\mathbf{A} + \mathbf{A}^\top$ by the vector $\mathbf{x}$, so we see that
+Panašiai šis narys dabar yra matricos $\mathbf{A} + \mathbf{A}^\top$ ir vektoriaus $\mathbf{x}$ sandauga, taigi matome, kad
 
 $$
 \left[\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x})\right]_k = \frac{d}{dx_k}x_ia_{ij}x_j = [(\mathbf{A} + \mathbf{A}^\top)\mathbf{x}]_k.
 $$
 
-Thus, we see that the $k$-th entry of the desired derivative from :eqref:`eq_mat_goal_1` is just the $k$-th entry of the vector on the right, and thus the two are the same.  Thus yields
+Taigi matome, kad $k$-asis ieškomos išvestinės iš :eqref:`eq_mat_goal_1` elementas yra tiesiog $k$-asis dešinėje esančio vektoriaus elementas, todėl abu yra tie patys.  Taigi gauname
 
 $$
 \frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}) = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}.
 $$
 
-This required significantly more work than our last one, but the final result is small.  More than that, consider the following computation for traditional single variable derivatives:
+Tam prireikė gerokai daugiau darbo nei ankstesniam, bet galutinis rezultatas trumpas.  Be to, panagrinėkime tokį tradicinių vieno kintamojo išvestinių skaičiavimą:
 
 $$
 \frac{d}{dx}(xax) = \frac{dx}{dx}ax + xa\frac{dx}{dx} = (a+a)x.
 $$
 
-Equivalently $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Again, we get a result that looks rather like the single variable result but with a transpose tossed in.
+Ekvivalenčiai $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Vėl gauname rezultatą, kuris gana panašus į vieno kintamojo rezultatą, tik su įmesta transponavimo operacija.
 
-At this point, the pattern should be looking rather suspicious, so let's try to figure out why.  When we take matrix derivatives like this, let's first assume that the expression we get will be another matrix expression: an expression we can write it in terms of products and sums of matrices and their transposes.  If such an expression exists, it will need to be true for all matrices.  In particular, it will need to be true of $1 \times 1$ matrices, in which case the matrix product is just the product of the numbers, the matrix sum is just the sum, and the transpose does nothing at all!  In other words, whatever expression we get *must* match the single variable expression.  This means that, with some practice, one can often guess matrix derivatives just by knowing what the associated single variable expression must look like!
+Šiuo metu dėsningumas turėtų atrodyti gana įtartinai, todėl pabandykime išsiaiškinti kodėl.  Kai imame tokias matricų išvestines, pirmiausia darykime prielaidą, kad gauta išraiška bus kita matricų išraiška: išraiška, kurią galime užrašyti per matricų ir jų transponuotųjų sandaugas bei sumas.  Jei tokia išraiška egzistuoja, ji turės būti teisinga visoms matricoms.  Visų pirma ji turės būti teisinga $1 \times 1$ matricoms, kuriuo atveju matricų sandauga yra tiesiog skaičių sandauga, matricų suma yra tiesiog suma, o transponavimas visai nieko nedaro!  Kitaip tariant, kad ir kokią išraišką gautume, ji *privalo* atitikti vieno kintamojo išraišką.  Tai reiškia, kad šiek tiek pasipraktikavus matricų išvestines dažnai galima atspėti tiesiog žinant, kaip turi atrodyti atitinkama vieno kintamojo išraiška!
 
-Let's try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let's try to compute
+Išbandykime tai.  Tarkime, $\mathbf{X}$ yra $n \times m$ matrica, $\mathbf{U}$ yra $n \times r$, o $\mathbf{V}$ yra $r \times m$.  Pabandykime apskaičiuoti
 
 $$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
 :eqlabel:`eq_mat_goal_2`
 
-This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let's try to imagine what this would be for $1\times1$ matrices.  In that case, we get the expression
+Šis skaičiavimas svarbus srityje, vadinamoje matricų faktorizacija.  Tačiau mums tai tiesiog išvestinė, kurią reikia apskaičiuoti.  Pabandykime įsivaizduoti, kokia ji būtų $1\times1$ matricoms.  Tuo atveju gauname išraišką
 
 $$
 \frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,
 $$
 
-where, the derivative is rather standard.  If we try to convert this back into a matrix expression we get
+kur išvestinė yra gana standartinė.  Jei bandysime tai paversti atgal į matricų išraišką, gausime
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2(\mathbf{X} - \mathbf{U}\mathbf{V})\mathbf{U}.
 $$
 
-However, if we look at this it does not quite work.  Recall that $\mathbf{X}$ is $n \times m$, as is $\mathbf{U}\mathbf{V}$, so the matrix $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ is $n \times m$.  On the other hand $\mathbf{U}$ is $n \times r$, and we cannot multiply a $n \times m$ and a $n \times r$ matrix since the dimensions do not match!
+Tačiau jei pažiūrėsime, tai visai neveikia.  Prisiminkite, kad $\mathbf{X}$ yra $n \times m$, kaip ir $\mathbf{U}\mathbf{V}$, todėl matrica $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ yra $n \times m$.  Kita vertus, $\mathbf{U}$ yra $n \times r$, o negalime padauginti $n \times m$ ir $n \times r$ matricų, nes dimensijos nesutampa!
 
-We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape as $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess the solution to :eqref:`eq_mat_goal_2` is
+Norime gauti $\frac{d}{d\mathbf{V}}$, kuri yra tokios pat formos kaip $\mathbf{V}$, t. y. $r \times m$.  Taigi kažkaip turime paimti $n \times m$ matricą ir $n \times r$ matricą, jas sudauginti (galbūt su transponavimais) ir gauti $r \times m$. Tai galime padaryti dauginant $U^\top$ iš $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Taigi galime atspėti, kad :eqref:`eq_mat_goal_2` sprendinys yra
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
-To show that this works, we would be remiss to not provide a detailed computation.  If we already believe that this rule-of-thumb works, feel free to skip past this derivation.  To compute
+Kad parodytume, jog tai veikia, nepateikti išsamaus skaičiavimo būtų neatsargu.  Jei jau tikime, kad ši praktinė taisyklė veikia, galite praleisti šį išvedimą.  Kad apskaičiuotume
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^2,
 $$
 
-we must find for every $a$, and $b$
+turime rasti kiekvienam $a$ ir $b$
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \frac{d}{dv_{ab}} \sum_{i, j}\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)^2.
 $$
 
-Recalling that all entries of $\mathbf{X}$ and $\mathbf{U}$ are constants as far as $\frac{d}{dv_{ab}}$ is concerned, we may push the derivative inside the sum, and apply the chain rule to the square to get
+Prisiminę, kad visi $\mathbf{X}$ ir $\mathbf{U}$ elementai yra konstantos $\frac{d}{dv_{ab}}$ atžvilgiu, galime išvestinę perkelti į sumos vidų ir pritaikyti grandinės taisyklę kvadratui, gaudami
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \sum_{i, j}2\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)\left(-\sum_k u_{ik}\frac{dv_{kj}}{dv_{ab}} \right).
 $$
 
-As in the previous derivation, we may note that $\frac{dv_{kj}}{dv_{ab}}$ is only non-zero if the $k=a$ and $j=b$.  If either of those conditions do not hold, the term in the sum is zero, and we may freely discard it.  We see that
+Kaip ir ankstesniame išvedime, galime pastebėti, kad $\frac{dv_{kj}}{dv_{ab}}$ yra nenulinė tik jei $k=a$ ir $j=b$.  Jei kuri nors iš tų sąlygų negalioja, narys sumoje lygus nuliui ir jį galime laisvai atmesti.  Matome, kad
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i}\left(x_{ib} - \sum_k u_{ik}v_{kb}\right)u_{ia}.
 $$
 
-An important subtlety here is that the requirement that $k=a$ does not occur inside the inner sum since that $k$ is a dummy variable which we are summing over inside the inner term.  For a notationally cleaner example, consider why
+Svarbi subtilybė čia ta, kad reikalavimas $k=a$ nepasireiškia vidinėje sumoje, nes tas $k$ yra fiktyvusis kintamasis, pagal kurį sumuojame vidiniame naryje.  Žymėjimo požiūriu tvarkingesnis pavyzdys: panagrinėkite, kodėl
 
 $$
 \frac{d}{dx_1} \left(\sum_i x_i \right)^{2}= 2\left(\sum_i x_i \right).
 $$
 
-From this point, we may start identifying components of the sum.  First,
+Nuo šio taško galime pradėti atpažinti sumos komponentes.  Pirma,
 
 $$
 \sum_k u_{ik}v_{kb} = [\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
-So the entire expression in the inside of the sum is
+Taigi visa išraiška sumos viduje yra
 
 $$
 x_{ib} - \sum_k u_{ik}v_{kb} = [\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
-This means we may now write our derivative as
+Tai reiškia, kad savo išvestinę dabar galime užrašyti kaip
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}u_{ia}.
 $$
 
-We want this to look like the $a, b$ element of a matrix so we can use the technique as in the previous example to arrive at a matrix expression, which means that we need to exchange the order of the indices on $u_{ia}$.  If we notice that $u_{ia} = [\mathbf{U}^\top]_{ai}$, we can then write
+Norime, kad tai atrodytų kaip matricos $a, b$ elementas, kad galėtume naudoti tą patį metodą kaip ankstesniame pavyzdyje ir gauti matricų išraišką, o tai reiškia, kad turime sukeisti $u_{ia}$ indeksų tvarką.  Jei pastebėsime, kad $u_{ia} = [\mathbf{U}^\top]_{ai}$, tada galime užrašyti
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i} [\mathbf{U}^\top]_{ai}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
-This is a matrix product, and thus we can conclude that
+Tai yra matricų sandauga, todėl galime daryti išvadą, kad
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2[\mathbf{U}^\top(\mathbf{X}-\mathbf{U}\mathbf{V})]_{ab}.
 $$
 
-and thus we may write the solution to :eqref:`eq_mat_goal_2`
+taigi :eqref:`eq_mat_goal_2` sprendinį galime užrašyti
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
-This matches the solution we guessed above!
+Tai atitinka sprendinį, kurį atspėjome aukščiau!
 
-It is reasonable to ask at this point, "Why can I not just write down matrix versions of all the calculus rules I have learned?  It is clear this is still mechanical.  Why do we not just get it over with!"  And indeed there are such rules and :cite:`Petersen.Pedersen.ea.2008` provides an excellent summary.  However, due to the plethora of ways matrix operations can be combined compared to single values, there are many more matrix derivative rules than single variable ones.  It is often the case that it is best to work with the indices, or leave it up to automatic differentiation when appropriate.
+Šiuo metu pagrįsta klausti: „Kodėl negaliu tiesiog užrašyti visų išmoktų matematinės analizės taisyklių matricinių versijų?  Aišku, kad tai vis tiek mechaniška.  Kodėl tiesiog to neatlikus!“  Iš tiesų tokių taisyklių yra, o :cite:`Petersen.Pedersen.ea.2008` pateikia puikią santrauką.  Tačiau dėl begalės būdų, kuriais galima derinti matricų operacijas, palyginti su pavieniais skaičiais, matricų išvestinių taisyklių yra gerokai daugiau nei vieno kintamojo.  Dažnai geriausia dirbti su indeksais arba, kai tinka, palikti automatiniam diferencijavimui.
 
-## Summary
+## Santrauka
 
-* In higher dimensions, we can define gradients which serve the same purpose as derivatives in one dimension.  These allow us to see how a multi-variable function changes when we make an arbitrary small change to the inputs.
-* The backpropagation algorithm can be seen to be a method of organizing the multi-variable chain rule to allow for the efficient computation of many partial derivatives.
-* Matrix calculus allows us to write the derivatives of matrix expressions in concise ways.
+* Aukštesnėse dimensijose galime apibrėžti gradientus, kurie atlieka tą patį vaidmenį kaip išvestinės vienoje dimensijoje.  Jie leidžia pamatyti, kaip daugelio kintamųjų funkcija keičiasi, kai savavališkai mažai pakeičiame įvestis.
+* Atgalinio sklidimo algoritmą galima laikyti daugelio kintamųjų grandinės taisyklės organizavimo metodu, leidžiančiu efektyviai apskaičiuoti daug dalinių išvestinių.
+* Matricų matematinė analizė leidžia glaustai užrašyti matricinių išraiškų išvestines.
 
-## Exercises
-1. Given a column vector $\boldsymbol{\beta}$, compute the derivatives of both $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ and $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$.  Why do you get the same answer?
-2. Let $\mathbf{v}$ be an $n$ dimension vector. What is $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
-3. Let $L(x, y) = \log(e^x + e^y)$.  Compute the gradient.  What is the sum of the components of the gradient?
-4. Let $f(x, y) = x^2y + xy^2$. Show that the only critical point is $(0,0)$. By considering $f(x, x)$, determine if $(0,0)$ is a maximum, minimum, or neither.
-5. Suppose that we are minimizing a function $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  How can we geometrically interpret the condition of $\nabla f = 0$ in terms of $g$ and $h$?
+## Pratimai
+1. Turėdami stulpelio vektorių $\boldsymbol{\beta}$, apskaičiuokite ir $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$, ir $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$ išvestines.  Kodėl gaunate tą patį atsakymą?
+2. Tegu $\mathbf{v}$ yra $n$ dimensijų vektorius. Kam lygu $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
+3. Tegu $L(x, y) = \log(e^x + e^y)$.  Apskaičiuokite gradientą.  Kokia yra gradiento komponenčių suma?
+4. Tegu $f(x, y) = x^2y + xy^2$. Parodykite, kad vienintelis kritinis taškas yra $(0,0)$. Nagrinėdami $f(x, x)$, nustatykite, ar $(0,0)$ yra maksimumas, minimumas, ar nei vienas, nei kitas.
+5. Tarkime, minimizuojame funkciją $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  Kaip geometriškai galime interpretuoti sąlygą $\nabla f = 0$ per $g$ ir $h$?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/413)
+[Diskusijos](https://discuss.d2l.ai/t/413)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1090)
+[Diskusijos](https://discuss.d2l.ai/t/1090)
 :end_tab:
 
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1091)
+[Diskusijos](https://discuss.d2l.ai/t/1091)
 :end_tab:

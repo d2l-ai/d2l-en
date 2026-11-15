@@ -1,48 +1,48 @@
-# Maximum Likelihood
+# Didžiausias tikėtinumas
 :label:`sec_maximum_likelihood`
 
-One of the most commonly encountered way of thinking in machine learning is the maximum likelihood point of view.  This is the concept that when working with a probabilistic model with unknown parameters, the parameters which make the data have the highest probability are the most likely ones.
+Vienas dažniausiai mašininiame mokyme sutinkamų mąstymo būdų yra didžiausio tikėtinumo požiūris.  Tai samprata, kad dirbant su tikimybiniu modeliu su nežinomais parametrais, tikriausi yra tie parametrai, kurie duomenims suteikia didžiausią tikimybę.
 
-## The Maximum Likelihood Principle
+## Didžiausio tikėtinumo principas
 
-This has a Bayesian interpretation which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data examples $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
+Tai turi Bajeso interpretaciją, apie kurią naudinga pagalvoti.  Tarkime, turime modelį su parametrais $\boldsymbol{\theta}$ ir duomenų pavyzdžių rinkinį $X$.  Konkretumo dėlei galime įsivaizduoti, kad $\boldsymbol{\theta}$ yra viena reikšmė, nusakanti tikimybę, kad metant monetą iškris herbas, o $X$ yra nepriklausomų monetos metimų seka.  Šį pavyzdį išsamiai nagrinėsime vėliau.
 
-If we want to find the most likely value for the parameters of our model, that means we want to find
+Jei norime rasti tikriausią savo modelio parametrų reikšmę, tai reiškia, kad norime rasti
 
 $$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
 :eqlabel:`eq_max_like`
 
-By Bayes' rule, this is the same thing as
+Pagal Bajeso taisyklę tai yra tas pats, kas
 
 $$
 \mathop{\mathrm{argmax}} \frac{P(X \mid \boldsymbol{\theta})P(\boldsymbol{\theta})}{P(X)}.
 $$
 
-The expression $P(X)$, a parameter agnostic probability of generating the data, does not depend on $\boldsymbol{\theta}$ at all, and so can be dropped without changing the best choice of $\boldsymbol{\theta}$.  Similarly, we may now posit that we have no prior assumption on which set of parameters are better than any others, so we may declare that $P(\boldsymbol{\theta})$ does not depend on theta either!  This, for instance, makes sense in our coin flipping example where the probability it comes up heads could be any value in $[0,1]$ without any prior belief it is fair or not (often referred to as an *uninformative prior*).  Thus we see that our application of Bayes' rule shows that our best choice of $\boldsymbol{\theta}$ is the maximum likelihood estimate for $\boldsymbol{\theta}$:
+Išraiška $P(X)$ – nuo parametrų nepriklausanti duomenų sugeneravimo tikimybė – visai nepriklauso nuo $\boldsymbol{\theta}$, todėl ją galima praleisti nekeičiant geriausio $\boldsymbol{\theta}$ pasirinkimo.  Panašiai galime daryti prielaidą, kad neturime jokios apriorinės nuostatos, kuri parametrų aibė yra geresnė už kitas, todėl galime teigti, kad $P(\boldsymbol{\theta})$ taip pat nepriklauso nuo teta!  Tai, pavyzdžiui, prasminga mūsų monetos metimo pavyzdyje, kur tikimybė, kad iškris herbas, gali būti bet kuri reikšmė iš $[0,1]$ be jokio išankstinio įsitikinimo, ar moneta sąžininga, ar ne (dažnai vadinama *neinformatyviuoju apriorinių skirstiniu*).  Taigi matome, kad pritaikę Bajeso taisyklę gauname, kad geriausias $\boldsymbol{\theta}$ pasirinkimas yra $\boldsymbol{\theta}$ didžiausio tikėtinumo įvertinys:
 
 $$
 \hat{\boldsymbol{\theta}} = \mathop{\mathrm{argmax}} _ {\boldsymbol{\theta}} P(X \mid \boldsymbol{\theta}).
 $$
 
-As a matter of common terminology, the probability of the data given the parameters ($P(X \mid \boldsymbol{\theta})$) is referred to as the *likelihood*.
+Pagal įprastą terminologiją duomenų tikimybė, kai duoti parametrai ($P(X \mid \boldsymbol{\theta})$), vadinama *tikėtinumu* (angl. *likelihood*).
 
-### A Concrete Example
+### Konkretus pavyzdys
 
-Let's see how this works in a concrete example.  Suppose that we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
+Pažiūrėkime, kaip tai veikia konkrečiame pavyzdyje.  Tarkime, turime vieną parametrą $\theta$, nusakantį tikimybę, kad metant monetą iškris herbas.  Tada tikimybė, kad iškris skaičius, yra $1-\theta$, todėl jei mūsų stebimi duomenys $X$ yra seka su $n_H$ herbų ir $n_T$ skaičių, galime pasinaudoti tuo, kad nepriklausomos tikimybės dauginamos, ir gauti, kad
 
 $$
 P(X \mid \theta) = \theta^{n_H}(1-\theta)^{n_T}.
 $$
 
-If we flip $13$ coins and get the sequence "HHHTHTTHHHHHT", which has $n_H = 9$ and $n_T = 4$, we see that this is
+Jei metame $13$ monetų ir gauname seką „HHHTHTTHHHHHT“, kurioje $n_H = 9$ ir $n_T = 4$, matome, kad tai yra
 
 $$
 P(X \mid \theta) = \theta^9(1-\theta)^4.
 $$
 
-One nice thing about this example will be that we know the answer going in.  Indeed, if we said verbally, "I flipped 13 coins, and 9 came up heads, what is our best guess for the probability that the coin comes us heads?, " everyone would correctly guess $9/13$.  What this maximum likelihood method will give us is a way to get that number from first principals in a way that will generalize to vastly more complex situations.
+Vienas gražus šio pavyzdžio dalykas tas, kad atsakymą žinome iš anksto.  Iš tiesų, jei žodžiu sakytume: „Metiau 13 monetų ir 9 iškrito herbu, koks geriausias spėjimas apie tikimybę, kad moneta iškris herbu?“, kiekvienas teisingai atspėtų $9/13$.  Didžiausio tikėtinumo metodas suteiks mums būdą šį skaičių gauti iš pirmųjų principų taip, kad jis apibendrintų daug sudėtingesnes situacijas.
 
-For our example, the plot of $P(X \mid \theta)$ is as follows:
+Mūsų pavyzdyje $P(X \mid \theta)$ grafikas yra toks:
 
 ```{.python .input}
 #@tab mxnet
@@ -81,7 +81,7 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
-This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the gradient of the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
+Jo didžiausia reikšmė yra kažkur netoli mūsų tikėtos $9/13 \approx 0{,}7\ldots$.  Norėdami pamatyti, ar tai tiksliai ten, galime pasitelkti matematinę analizę.  Atkreipkite dėmesį, kad maksimume funkcijos gradientas yra lygus nuliui.  Taigi didžiausio tikėtinumo įvertinį :eqref:`eq_max_like` galime rasti suradę $\theta$ reikšmes, kuriose išvestinė lygi nuliui, ir išsirinkę tą, kuri duoda didžiausią tikimybę.  Skaičiuojame:
 
 $$
 \begin{aligned}
@@ -92,37 +92,37 @@ $$
 \end{aligned}
 $$
 
-This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima, not maxima as they assign probability $0$ to our sequence.  The final value does *not* assign zero probability to our sequence, and thus must be the maximum likelihood estimate $\hat \theta = 9/13$.
+Tai turi tris sprendinius: $0$, $1$ ir $9/13$.  Pirmieji du akivaizdžiai yra minimumai, o ne maksimumai, nes mūsų sekai suteikia tikimybę $0$.  Paskutinė reikšmė *nesuteikia* mūsų sekai nulinės tikimybės, todėl turi būti didžiausio tikėtinumo įvertinys $\hat \theta = 9/13$.
 
-## Numerical Optimization and the Negative Log-Likelihood
+## Skaitinis optimizavimas ir neigiamas logaritminis tikėtinumas
 
-The previous example is nice, but what if we have billions of parameters and data examples?
+Ankstesnis pavyzdys gražus, bet kas, jei turime milijardus parametrų ir duomenų pavyzdžių?
 
-First, notice that if we make the assumption that all the data examples are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
+Pirmiausia pastebėkime, kad jei darome prielaidą, jog visi duomenų pavyzdžiai yra nepriklausomi, paties tikėtinumo praktiškai nebegalime nagrinėti, nes jis yra daugelio tikimybių sandauga.  Iš tiesų kiekviena tikimybė yra iš $[0,1]$, tarkime, paprastai apie $1/2$, o sandauga $(1/2)^{1000000000}$ yra gerokai žemiau mašininio tikslumo.  Tiesiogiai su tuo dirbti negalime.  
 
-However, recall that the logarithm turns products to sums, in which case 
+Tačiau prisiminkite, kad logaritmas sandaugas paverčia sumomis, tada
 
 $$
 \log((1/2)^{1000000000}) = 1000000000\cdot\log(1/2) \approx -301029995.6\ldots
 $$
 
-This number fits perfectly within even a single precision $32$-bit float.  Thus, we should consider the *log-likelihood*, which is
+Šis skaičius puikiai telpa net į vieno tikslumo $32$ bitų slankiojo kablelio skaičių.  Taigi turėtume nagrinėti *logaritminį tikėtinumą*, kuris yra
 
 $$
 \log(P(X \mid \boldsymbol{\theta})).
 $$
 
-Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the log-likelihood.  Indeed in :numref:`sec_naive_bayes` we will see this reasoning applied when working with the specific example of the naive Bayes classifier.
+Kadangi funkcija $x \mapsto \log(x)$ yra didėjanti, tikėtinumo maksimizavimas yra tas pats, kas logaritminio tikėtinumo maksimizavimas.  Iš tiesų :numref:`sec_naive_bayes` pamatysime šį samprotavimą taikomą dirbant su konkrečiu naiviojo Bajeso klasifikatoriaus pavyzdžiu.
 
-We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimization of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the *negative log-likelihood*.
+Dažnai dirbame su nuostolių funkcijomis, kurias norime minimizuoti.  Didžiausią tikėtinumą galime paversti nuostolių minimizavimu paėmę $-\log(P(X \mid \boldsymbol{\theta}))$, tai yra *neigiamą logaritminį tikėtinumą*.
 
-To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  We may compute that
+Tai iliustruodami panagrinėkime ankstesnį monetos metimo uždavinį ir apsimeskime, kad nežinome uždaros formos sprendinio.  Galime apskaičiuoti, kad
 
 $$
 -\log(P(X \mid \boldsymbol{\theta})) = -\log(\theta^{n_H}(1-\theta)^{n_T}) = -(n_H\log(\theta) + n_T\log(1-\theta)).
 $$
 
-This can be written into code, and freely optimized even for billions of coin flips.
+Tai galima užrašyti kodu ir laisvai optimizuoti net milijardams monetos metimų.
 
 ```{.python .input}
 #@tab mxnet
@@ -188,17 +188,17 @@ for iter in range(100):
 theta, n_H / (n_H + n_T)
 ```
 
-Numerical convenience is not the only reason why people like to use negative log-likelihoods. There are several other reasons why it is preferable.
+Skaitinis patogumas nėra vienintelė priežastis, kodėl žmonės mėgsta naudoti neigiamą logaritminį tikėtinumą. Yra dar keletas priežasčių, kodėl jis yra labiau tinkamas.
 
 
 
-The second reason we consider the log-likelihood is the simplified application of calculus rules. As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
+Antra priežastis, kodėl nagrinėjame logaritminį tikėtinumą, – supaprastintas matematinės analizės taisyklių taikymas. Kaip aptarta aukščiau, dėl nepriklausomumo prielaidų dauguma mašininiame mokyme sutinkamų tikimybių yra pavienių tikimybių sandaugos.
 
 $$
 P(X\mid\boldsymbol{\theta}) = p(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta})\cdots p(x_n\mid\boldsymbol{\theta}).
 $$
 
-This means that if we directly apply the product rule to compute a derivative we get
+Tai reiškia, kad jei tiesiogiai taikytume sandaugos taisyklę išvestinei apskaičiuoti, gautume
 
 $$
 \begin{aligned}
@@ -209,43 +209,43 @@ $$
 \end{aligned}
 $$
 
-This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is proportional to quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the negative log-likelihood we have instead
+Tam reikia $n(n-1)$ daugybų ir $(n-1)$ sudėčių, todėl laikas yra proporcingas įvesties kvadratui!  Pakankamai išradingai sugrupavus narius tai galima sumažinti iki tiesinio laiko, bet tam reikia pamąstyti.  Neigiamam logaritminiam tikėtinumui turime kitaip
 
 $$
 -\log\left(P(X\mid\boldsymbol{\theta})\right) = -\log(P(x_1\mid\boldsymbol{\theta})) - \log(P(x_2\mid\boldsymbol{\theta})) \cdots - \log(P(x_n\mid\boldsymbol{\theta})),
 $$
 
-which then gives
+kas duoda
 
 $$
 - \frac{\partial}{\partial \boldsymbol{\theta}} \log\left(P(X\mid\boldsymbol{\theta})\right) = \frac{1}{P(x_1\mid\boldsymbol{\theta})}\left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_1\mid\boldsymbol{\theta})\right) + \cdots + \frac{1}{P(x_n\mid\boldsymbol{\theta})}\left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_n\mid\boldsymbol{\theta})\right).
 $$
 
-This requires only $n$ divides and $n-1$ sums, and thus is linear time in the inputs.
+Tam reikia tik $n$ dalybų ir $n-1$ sudėčių, todėl laikas yra tiesinis įvesties atžvilgiu.
 
-The third and final reason to consider the negative log-likelihood is the relationship to information theory, which we will discuss in detail in :numref:`sec_information_theory`.  This is a rigorous mathematical theory which gives a way to measure the degree of information or randomness in a random variable.  The key object of study in that field is the entropy which is 
+Trečia ir paskutinė priežastis nagrinėti neigiamą logaritminį tikėtinumą yra ryšys su informacijos teorija, kurią išsamiai aptarsime :numref:`sec_information_theory`.  Tai griežta matematinė teorija, suteikianti būdą matuoti informacijos kiekį arba atsitiktinumą atsitiktiniame dydyje.  Pagrindinis tos srities tyrimo objektas yra entropija, kuri yra
 
 $$
 H(p) = -\sum_{i} p_i \log_2(p_i),
 $$
 
-which measures the randomness of a source. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data examples, we get a relative of entropy known as cross-entropy.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
+ir matuoja šaltinio atsitiktinumą. Atkreipkite dėmesį, kad tai yra ne kas kita, kaip vidutinė $-\log$ tikimybė, todėl jei imame savo neigiamą logaritminį tikėtinumą ir padalijame iš duomenų pavyzdžių skaičiaus, gauname entropijos giminaitį, žinomą kaip kryžminė entropija.  Vien šios teorinės interpretacijos pakaktų, kad būtų verta pateikti vidutinį neigiamą logaritminį tikėtinumą duomenų rinkinyje kaip modelio našumo matą.
 
-## Maximum Likelihood for Continuous Variables
+## Didžiausias tikėtinumas tolydiesiems kintamiesiems
 
-Everything that we have done so far assumes we are working with discrete random variables, but what if we want to work with continuous ones?
+Viskas, ką iki šiol darėme, darė prielaidą, kad dirbame su diskrečiaisiais atsitiktiniais dydžiais, bet kas, jei norime dirbti su tolydžiaisiais?
 
-The short summary is that nothing at all changes, except we replace all the instances of the probability with the probability density.  Recalling that we write densities with lower case $p$, this means that for example we now say
+Trumpai tariant, nieko nesikeičia, tik visas tikimybes pakeičiame tikimybės tankiu.  Prisimindami, kad tankius žymime mažąja raide $p$, tai reiškia, kad, pavyzdžiui, dabar sakome
 
 $$
 -\log\left(p(X\mid\boldsymbol{\theta})\right) = -\log(p(x_1\mid\boldsymbol{\theta})) - \log(p(x_2\mid\boldsymbol{\theta})) \cdots - \log(p(x_n\mid\boldsymbol{\theta})) = -\sum_i \log(p(x_i \mid \theta)).
 $$
 
-The question becomes, "Why is this OK?"  After all, the reason we introduced densities was because probabilities of getting specific outcomes themselves was zero, and thus is not the probability of generating our data for any set of parameters zero?
+Kyla klausimas: „Kodėl tai leistina?“  Juk tankius įvedėme todėl, kad tikimybės gauti konkrečius rezultatus buvo lygios nuliui, tad ar duomenų sugeneravimo tikimybė, esant bet kokiems parametrams, nėra lygi nuliui?
 
-Indeed, this is the case, and understanding why we can shift to densities is an exercise in tracing what happens to the epsilons.
+Iš tiesų taip ir yra, o suprasti, kodėl galime pereiti prie tankių, reiškia išsiaiškinti, kas nutinka su epsilonais.
 
-Let's first re-define our goal.  Suppose that for continuous random variables we no longer want to compute the probability of getting exactly the right value, but instead matching to within some range $\epsilon$.  For simplicity, we assume our data is repeated observations $x_1, \ldots, x_N$ of identically distributed random variables $X_1, \ldots, X_N$.  As we have seen previously, this can be written as
+Pirmiausia iš naujo apibrėžkime savo tikslą.  Tarkime, kad tolydiesiems atsitiktiniams dydžiams nebenorime skaičiuoti tikimybės gauti tiksliai tinkamą reikšmę, o tik atitikti iki kokio nors intervalo $\epsilon$.  Supaprastinimo dėlei darome prielaidą, kad mūsų duomenys yra pakartotiniai vienodai pasiskirsčiusių atsitiktinių dydžių $X_1, \ldots, X_N$ stebiniai $x_1, \ldots, x_N$.  Kaip matėme anksčiau, tai galima užrašyti kaip
 
 $$
 \begin{aligned}
@@ -254,7 +254,7 @@ $$
 \end{aligned}
 $$
 
-Thus, if we take negative logarithms of this we obtain
+Taigi, jei iš to imsime neigiamus logaritmus, gausime
 
 $$
 \begin{aligned}
@@ -263,32 +263,32 @@ $$
 \end{aligned}
 $$
 
-If we examine this expression, the only place that the $\epsilon$ occurs is in the additive constant $-N\log(\epsilon)$.  This does not depend on the parameters $\boldsymbol{\theta}$ at all, so the optimal choice of $\boldsymbol{\theta}$ does not depend on our choice of $\epsilon$!  If we demand four digits or four-hundred, the best choice of $\boldsymbol{\theta}$ remains the same, thus we may freely drop the epsilon to see that what we want to optimize is
+Jei nagrinėsime šią išraišką, vienintelė vieta, kur pasirodo $\epsilon$, yra adityvioji konstanta $-N\log(\epsilon)$.  Ji visai nepriklauso nuo parametrų $\boldsymbol{\theta}$, todėl optimalus $\boldsymbol{\theta}$ pasirinkimas nepriklauso nuo mūsų $\epsilon$ pasirinkimo!  Ar reikalautume keturių skaitmenų, ar keturių šimtų, geriausias $\boldsymbol{\theta}$ pasirinkimas išlieka tas pats, todėl epsilon galime laisvai atmesti ir matyti, kad optimizuoti norime
 
 $$
 - \sum_{i} \log(p(x_i\mid\boldsymbol{\theta})).
 $$
 
-Thus, we see that the maximum likelihood point of view can operate with continuous random variables as easily as with discrete ones by replacing the probabilities with probability densities.
+Taigi matome, kad didžiausio tikėtinumo požiūris gali veikti su tolydžiaisiais atsitiktiniais dydžiais taip pat lengvai kaip su diskrečiaisiais, tikimybes pakeitus tikimybių tankiais.
 
-## Summary
-* The maximum likelihood principle tells us that the best fit model for a given dataset is the one that generates the data with the highest probability.
-* Often people work with the negative log-likelihood instead for a variety of reasons: numerical stability, conversion of products to sums (and the resulting simplification of gradient computations), and theoretical ties to information theory.
-* While simplest to motivate in the discrete setting, it may be freely generalized to the continuous setting as well by maximizing the probability density assigned to the datapoints.
+## Santrauka
+* Didžiausio tikėtinumo principas teigia, kad geriausiai duotą duomenų rinkinį atitinkantis modelis yra tas, kuris duomenis sugeneruoja su didžiausia tikimybe.
+* Dažnai žmonės vietoj to dirba su neigiamu logaritminiu tikėtinumu dėl įvairių priežasčių: skaitinio stabilumo, sandaugų pavertimo sumomis (ir dėl to supaprastėjančių gradientų skaičiavimų) bei teorinių ryšių su informacijos teorija.
+* Nors paprasčiausia tai pagrįsti diskrečiuoju atveju, tai galima laisvai apibendrinti ir tolydžiajam atvejui maksimizuojant duomenų taškams priskirtą tikimybės tankį.
 
-## Exercises
-1. Suppose that you know that a non-negative random variable has density $\alpha e^{-\alpha x}$ for some value $\alpha>0$.  You obtain a single observation from the random variable which is the number $3$.  What is the maximum likelihood estimate for $\alpha$?
-2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
+## Pratimai
+1. Tarkime, žinote, kad neneigiamas atsitiktinis dydis turi tankį $\alpha e^{-\alpha x}$ kažkokiai reikšmei $\alpha>0$.  Gaunate vieną atsitiktinio dydžio stebinį – skaičių $3$.  Koks yra $\alpha$ didžiausio tikėtinumo įvertinys?
+2. Tarkime, turite duomenų rinkinį imčių $\{x_i\}_{i=1}^N$, ištrauktų iš Gauso skirstinio su nežinomu vidurkiu, bet dispersija $1$.  Koks yra vidurkio didžiausio tikėtinumo įvertinys?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/416)
+[Diskusijos](https://discuss.d2l.ai/t/416)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1096)
+[Diskusijos](https://discuss.d2l.ai/t/1096)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1097)
+[Diskusijos](https://discuss.d2l.ai/t/1097)
 :end_tab:

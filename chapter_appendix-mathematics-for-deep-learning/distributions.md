@@ -1,7 +1,7 @@
-# Distributions
+# Skirstiniai
 :label:`sec_distributions`
 
-Now that we have learned how to work with probability in both the discrete and the continuous setting, let's get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let's first import some common libraries.
+Dabar, kai išmokome dirbti su tikimybėmis tiek diskrečiuoju, tiek tolydžiuoju atveju, susipažinkime su keliais dažnai sutinkamais skirstiniais.  Priklausomai nuo mašininio mokymo srities, gali prireikti išmanyti daug daugiau jų, o kai kuriose giliojo mokymosi srityse galbūt apskritai nė vieno.  Vis dėlto tai gera pagrindinė žinotina sąrašo dalis.  Pirmiausia importuokime keletą įprastų bibliotekų.
 
 ```{.python .input}
 #@tab mxnet
@@ -35,20 +35,20 @@ import tensorflow_probability as tfp
 tf.pi = tf.acos(tf.zeros(1)) * 2  # Define pi in TensorFlow
 ```
 
-## Bernoulli
+## Bernulio skirstinys
 
-This is the simplest random variable usually encountered.  This random variable encodes a coin flip which comes up $1$ with probability $p$ and $0$ with probability $1-p$.  If we have a random variable $X$ with this distribution, we will write
+Tai paprasčiausias paprastai sutinkamas atsitiktinis dydis.  Šis atsitiktinis dydis užkoduoja monetos metimą, kuris duoda $1$ su tikimybe $p$ ir $0$ su tikimybe $1-p$.  Jei turime atsitiktinį dydį $X$ su šiuo skirstiniu, rašysime
 
 $$
 X \sim \textrm{Bernoulli}(p).
 $$
 
-The cumulative distribution function is 
+Pasiskirstymo funkcija yra 
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cases}$$
 :eqlabel:`eq_bernoulli_cdf`
 
-The probability mass function is plotted below.
+Tikimybių masės funkcija pavaizduota toliau.
 
 ```{.python .input}
 #@tab all
@@ -61,7 +61,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
+Dabar nubraižykime pasiskirstymo funkciją :eqref:`eq_bernoulli_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -93,12 +93,12 @@ def F(x):
 d2l.plot(x, tf.constant([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \textrm{Bernoulli}(p)$, then:
+Jei $X \sim \textrm{Bernoulli}(p)$, tai:
 
 * $\mu_X = p$,
 * $\sigma_X^2 = p(1-p)$.
 
-We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
+Bet kokios formos masyvą iš Bernulio atsitiktinio dydžio galime generuoti taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -115,20 +115,20 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 tf.cast(tf.random.uniform((10, 10)) < p, dtype=tf.float32)
 ```
 
-## Discrete Uniform
+## Diskretusis tolygusis skirstinys
 
-The next commonly encountered random variable is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
+Kitas dažnai sutinkamas atsitiktinis dydis yra diskretusis tolygusis.  Šioje diskusijoje darysime prielaidą, kad jis apibrėžtas sveikuosiuose skaičiuose $\{1, 2, \ldots, n\}$, tačiau galima laisvai pasirinkti bet kurią kitą reikšmių aibę.  Žodžio *tolygus* prasmė šiame kontekste yra ta, kad kiekviena galima reikšmė yra vienodai tikėtina.  Kiekvienos reikšmės $i \in \{1, 2, 3, \ldots, n\}$ tikimybė yra $p_i = \frac{1}{n}$.  Atsitiktinį dydį $X$ su šiuo skirstiniu žymėsime
 
 $$
 X \sim U(n).
 $$
 
-The cumulative distribution function is 
+Pasiskirstymo funkcija yra 
 
 $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \textrm{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_discrete_uniform_cdf`
 
-Let's first plot the probability mass function.
+Pirmiausia nubraižykime tikimybių masės funkciją.
 
 ```{.python .input}
 #@tab all
@@ -140,7 +140,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
+Dabar nubraižykime pasiskirstymo funkciją :eqref:`eq_discrete_uniform_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -172,12 +172,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
 ```
 
-If $X \sim U(n)$, then:
+Jei $X \sim U(n)$, tai:
 
 * $\mu_X = \frac{1+n}{2}$,
 * $\sigma_X^2 = \frac{n^2-1}{12}$.
 
-We can sample an array of arbitrary shape from a discrete uniform random variable as follows.
+Bet kokios formos masyvą iš diskrečiojo tolygaus atsitiktinio dydžio galime generuoti taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -194,25 +194,25 @@ torch.randint(1, n, size=(10, 10))
 tf.random.uniform((10, 10), 1, n, dtype=tf.int32)
 ```
 
-## Continuous Uniform
+## Tolydusis tolygusis skirstinys
 
-Next, let's discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
+Toliau aptarkime tolydųjį tolygųjį skirstinį. Šio atsitiktinio dydžio idėja yra ta, kad jei diskrečiajame tolygiajame skirstinyje didiname $n$, o tada jį perskalėjame, kad tilptų į intervalą $[a, b]$, artėsime prie tolydaus atsitiktinio dydžio, kuris tiesiog parenka savavališką reikšmę iš $[a, b]$, visas su vienoda tikimybe.  Šį skirstinį žymėsime
 
 $$
 X \sim U(a, b).
 $$
 
-The probability density function is 
+Tikimybės tankio funkcija yra 
 
 $$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a, b], \\ 0 & x \not\in [a, b].\end{cases}$$
 :eqlabel:`eq_cont_uniform_pdf`
 
-The cumulative distribution function is 
+Pasiskirstymo funkcija yra 
 
 $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >= b . \end{cases}$$
 :eqlabel:`eq_cont_uniform_cdf`
 
-Let's first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
+Pirmiausia nubraižykime tikimybės tankio funkciją :eqref:`eq_cont_uniform_pdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -242,7 +242,7 @@ p = tf.cast(x > a, tf.float32) * tf.cast(x < b, tf.float32) / (b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
+Dabar nubraižykime pasiskirstymo funkciją :eqref:`eq_cont_uniform_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -268,12 +268,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
 ```
 
-If $X \sim U(a, b)$, then:
+Jei $X \sim U(a, b)$, tai:
 
 * $\mu_X = \frac{a+b}{2}$,
 * $\sigma_X^2 = \frac{(b-a)^2}{12}$.
 
-We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $U(0,1)$, so if we want a different range we need to scale it.
+Bet kokios formos masyvą iš tolygaus atsitiktinio dydžio galime generuoti taip.  Atkreipkite dėmesį, kad pagal numatytuosius nustatymus generuojama iš $U(0,1)$, todėl jei norime kito intervalo, turime perskalėti.
 
 ```{.python .input}
 #@tab mxnet
@@ -290,28 +290,28 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 (b - a) * tf.random.uniform((10, 10)) + a
 ```
 
-## Binomial
+## Binominis skirstinys
 
-Let's make things a little more complex and examine the *binomial* random variable.  This random variable originates from performing a sequence of $n$ independent experiments, each of which has probability $p$ of succeeding, and asking how many successes we expect to see.
+Šiek tiek pasunkinkime ir panagrinėkime *binominį* atsitiktinį dydį.  Šis atsitiktinis dydis atsiranda atlikus $n$ nepriklausomų eksperimentų, kurių kiekvienas pavyksta su tikimybe $p$, ir paklausus, kiek sėkmių tikimės pamatyti.
 
-Let's express this mathematically.  Each experiment is an independent random variable $X_i$ where we will use $1$ to encode success, and $0$ to encode failure.  Since each is an independent coin flip which is successful with probability $p$, we can say that $X_i \sim \textrm{Bernoulli}(p)$.  Then, the binomial random variable is
+Išreikškime tai matematiškai.  Kiekvienas eksperimentas yra nepriklausomas atsitiktinis dydis $X_i$, kuriame $1$ koduosime sėkmę, o $0$ – nesėkmę.  Kadangi kiekvienas yra nepriklausomas monetos metimas, sėkmingas su tikimybe $p$, galime sakyti, kad $X_i \sim \textrm{Bernoulli}(p)$.  Tada binominis atsitiktinis dydis yra
 
 $$
 X = \sum_{i=1}^n X_i.
 $$
 
-In this case, we will write
+Šiuo atveju rašysime
 
 $$
 X \sim \textrm{Binomial}(n, p).
 $$
 
-To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^k(1-p)^{n-k}$ of occurring.  Thus the cumulative distribution function is
+Kad gautume pasiskirstymo funkciją, turime pastebėti, kad tiksliai $k$ sėkmių gali įvykti $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ būdais, kurių kiekvieno tikimybė yra $p^k(1-p)^{n-k}$.  Taigi pasiskirstymo funkcija yra
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \textrm{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_binomial_cdf`
 
-Let's first plot the probability mass function.
+Pirmiausia nubraižykime tikimybių masės funkciją.
 
 ```{.python .input}
 #@tab mxnet
@@ -370,7 +370,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
+Dabar nubraižykime pasiskirstymo funkciją :eqref:`eq_binomial_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -405,12 +405,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-If $X \sim \textrm{Binomial}(n, p)$, then:
+Jei $X \sim \textrm{Binomial}(n, p)$, tai:
 
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
 
-This follows from the linearity of expected value over the sum of $n$ Bernoulli random variables, and the fact that the variance of the sum of independent random variables is the sum of the variances. This can be sampled as follows.
+Tai išplaukia iš vidurkio tiesiškumo $n$ Bernulio atsitiktinių dydžių sumai ir fakto, kad nepriklausomų atsitiktinių dydžių sumos dispersija yra dispersijų suma. Tai galima generuoti taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -429,39 +429,39 @@ m = tfp.distributions.Binomial(n, p)
 m.sample(sample_shape=(10, 10))
 ```
 
-## Poisson
-Let's now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let's start by considering $X^{(1)} \sim \textrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
+## Puasono skirstinys
+Dabar atlikime minties eksperimentą.  Stovime autobusų stotelėje ir norime sužinoti, kiek autobusų atvyks per kitą minutę.  Pradėkime nuo $X^{(1)} \sim \textrm{Bernoulli}(p)$, kuris yra tiesiog tikimybė, kad autobusas atvyks per vienos minutės langą.  Stotelėms toli nuo miesto centro tai gali būti gana gera aproksimacija.  Galbūt niekada nepamatysime daugiau nei vieno autobuso per minutę.
 
-However, if we are in a busy area, it is possible or even likely that two buses will arrive.  We can model this by splitting our random variable into two parts for the first 30 seconds, or the second 30 seconds.  In this case we can write
+Tačiau jei esame judrioje vietoje, galima ar net tikėtina, kad atvyks du autobusai.  Tai galime modeliuoti padalydami savo atsitiktinį dydį į dvi dalis – pirmąsias 30 sekundžių arba antrąsias 30 sekundžių.  Šiuo atveju galime rašyti
 
 $$
 X^{(2)} \sim X^{(2)}_1 + X^{(2)}_2,
 $$
 
-where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \textrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \textrm{Binomial}(2, p/2)$.
+kur $X^{(2)}$ yra visa suma, o $X^{(2)}_i \sim \textrm{Bernoulli}(p/2)$.  Tada visas skirstinys yra $X^{(2)} \sim \textrm{Binomial}(2, p/2)$.
 
-Why stop here?  Let's continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
+Kodėl čia sustoti?  Toliau skaidykime tą minutę į $n$ dalių.  Pagal tą patį samprotavimą kaip aukščiau matome, kad
 
 $$X^{(n)} \sim \textrm{Binomial}(n, p/n).$$
 :eqlabel:`eq_eq_poisson_approx`
 
-Consider these random variables.  By the previous section, we know that :eqref:`eq_eq_poisson_approx` has mean $\mu_{X^{(n)}} = n(p/n) = p$, and variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  If we take $n \rightarrow \infty$, we can see that these numbers stabilize to $\mu_{X^{(\infty)}} = p$, and variance $\sigma_{X^{(\infty)}}^2 = p$.  This indicates that there *could be* some random variable we can define in this infinite subdivision limit.  
+Panagrinėkime šiuos atsitiktinius dydžius.  Iš ankstesnio skyriaus žinome, kad :eqref:`eq_eq_poisson_approx` turi vidurkį $\mu_{X^{(n)}} = n(p/n) = p$ ir dispersiją $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  Jei $n \rightarrow \infty$, matome, kad šie skaičiai stabilizuojasi iki $\mu_{X^{(\infty)}} = p$ ir dispersijos $\sigma_{X^{(\infty)}}^2 = p$.  Tai rodo, kad *galėtų būti* koks nors atsitiktinis dydis, kurį galime apibrėžti šioje begalinio skaidymo riboje.  
 
-This should not come as too much of a surprise, since in the real world we can just count the number of bus arrivals, however it is nice to see that our mathematical model is well defined.  This discussion can be made formal as the *law of rare events*.
+Tai neturėtų pernelyg stebinti, nes realiame pasaulyje galime tiesiog suskaičiuoti autobusų atvykimus, tačiau gera matyti, kad mūsų matematinis modelis yra gerai apibrėžtas.  Šią diskusiją galima formalizuoti kaip *retų įvykių dėsnį*.
 
-Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \textrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2, \ldots\}$ with probability
+Atidžiai sekdami šį samprotavimą, galime prieiti prie tokio modelio.  Sakysime, kad $X \sim \textrm{Poisson}(\lambda)$, jei tai atsitiktinis dydis, įgyjantis reikšmes $\{0,1,2, \ldots\}$ su tikimybe
 
 $$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
 :eqlabel:`eq_poisson_mass`
 
-The value $\lambda > 0$ is known as the *rate* (or the *shape* parameter), and denotes the average number of arrivals we expect in one unit of time.  
+Reikšmė $\lambda > 0$ žinoma kaip *intensyvumas* (arba *formos* parametras) ir žymi vidutinį atvykimų skaičių, kurio tikimės per vieną laiko vienetą.  
 
-We may sum this probability mass function to get the cumulative distribution function.
+Susumavę šią tikimybių masės funkciją, galime gauti pasiskirstymo funkciją.
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \textrm{ with } 0 \le k. \end{cases}$$
 :eqlabel:`eq_poisson_cdf`
 
-Let's first plot the probability mass function :eqref:`eq_poisson_mass`.
+Pirmiausia nubraižykime tikimybių masės funkciją :eqref:`eq_poisson_mass`.
 
 ```{.python .input}
 #@tab mxnet
@@ -504,7 +504,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
+Dabar nubraižykime pasiskirstymo funkciją :eqref:`eq_poisson_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -536,12 +536,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-As we saw above, the means and variances are particularly concise.  If $X \sim \textrm{Poisson}(\lambda)$, then:
+Kaip matėme aukščiau, vidurkiai ir dispersijos yra ypač glaustos.  Jei $X \sim \textrm{Poisson}(\lambda)$, tai:
 
 * $\mu_X = \lambda$,
 * $\sigma_X^2 = \lambda$.
 
-This can be sampled as follows.
+Tai galima generuoti taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -560,16 +560,16 @@ m = tfp.distributions.Poisson(lam)
 m.sample((10, 10))
 ```
 
-## Gaussian
-Now Let's try a different, but related experiment.  Let's say we again are performing $n$ independent $\textrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \textrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let's fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
+## Gauso skirstinys
+Dabar išbandykime kitokį, bet susijusį eksperimentą.  Tarkime, vėl atliekame $n$ nepriklausomų $\textrm{Bernoulli}(p)$ matavimų $X_i$.  Šių suma pasiskirsčiusi kaip $X^{(n)} \sim \textrm{Binomial}(n, p)$.  Užuot ėmę ribą, kai $n$ didėja, o $p$ mažėja, fiksuokime $p$ ir leiskime $n \rightarrow \infty$.  Šiuo atveju $\mu_{X^{(n)}} = np \rightarrow \infty$ ir $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, todėl nėra pagrindo manyti, kad ši riba būtų gerai apibrėžta.
 
-However, not all hope is lost!  Let's just make the mean and variance be well behaved by defining
+Tačiau ne viskas prarasta!  Tiesiog padarykime, kad vidurkis ir dispersija būtų tvarkingi, apibrėždami
 
 $$
 Y^{(n)} = \frac{X^{(n)} - \mu_{X^{(n)}}}{\sigma_{X^{(n)}}}.
 $$
 
-This can be seen to have mean zero and variance one, and so it is plausible to believe that it will converge to some limiting distribution.  If we plot what these distributions look like, we will become even more convinced that it will work.
+Galima pamatyti, kad tai turi vidurkį nulį ir dispersiją vienas, todėl galima pagrįstai tikėti, kad jis konverguos į kokį nors ribinį skirstinį.  Jei nubraižysime, kaip šie skirstiniai atrodo, dar labiau įsitikinsime, kad tai veiks.
 
 ```{.python .input}
 #@tab mxnet
@@ -629,20 +629,20 @@ for i in range(4):
 d2l.plt.show()
 ```
 
-One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather continuous.
+Vienas pastebėjimas: palyginti su Puasono atveju, dabar dalijame iš standartinio nuokrypio, o tai reiškia, kad galimus rezultatus spaudžiame į vis mažesnes sritis.  Tai rodo, kad mūsų riba nebebus diskreti, o tolydi.
 
-A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a, b$:
+Išvedimas, kas čia vyksta, nepatenka į šio dokumento aprėptį, tačiau *centrinė ribinė teorema* teigia, kad kai $n \rightarrow \infty$, tai duos Gauso skirstinį (arba kartais normalųjį skirstinį).  Aiškiau, bet kuriems $a, b$:
 
 $$
 \lim_{n \rightarrow \infty} P(Y^{(n)} \in [a, b]) = P(\mathcal{N}(0,1) \in [a, b]),
 $$
 
-where we say a random variable is normally distributed with given mean $\mu$ and variance $\sigma^2$, written $X \sim \mathcal{N}(\mu, \sigma^2)$ if $X$ has density
+kur sakome, kad atsitiktinis dydis pasiskirstęs normaliai su duotu vidurkiu $\mu$ ir dispersija $\sigma^2$, rašoma $X \sim \mathcal{N}(\mu, \sigma^2)$, jei $X$ turi tankį
 
 $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 :eqlabel:`eq_gaussian_pdf`
 
-Let's first plot the probability density function :eqref:`eq_gaussian_pdf`.
+Pirmiausia nubraižykime tikimybės tankio funkciją :eqref:`eq_gaussian_pdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -676,7 +676,7 @@ p = 1 / tf.sqrt(2 * tf.pi * sigma**2) * tf.exp(
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let's plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
+Dabar nubraižykime pasiskirstymo funkciją.  Tai nepatenka į šio priedo aprėptį, tačiau Gauso pasiskirstymo funkcija neturi uždaros formos formulės per elementaresnes funkcijas.  Naudosime `erf`, kuri suteikia būdą šį integralą apskaičiuoti skaitiškai.
 
 ```{.python .input}
 #@tab mxnet
@@ -702,32 +702,32 @@ def phi(x):
 d2l.plot(x, [phi(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-Keen-eyed readers will recognize some of these terms.  Indeed, we encountered this integral in :numref:`sec_integral_calculus`.  Indeed we need exactly that computation to see that this $p_X(x)$ has total area one and is thus a valid density.
+Budrūs skaitytojai atpažins kai kuriuos šiuos narius.  Iš tiesų su šiuo integralu susidūrėme :numref:`sec_integral_calculus`.  Iš tiesų mums reikia būtent to skaičiavimo, kad pamatytume, jog šio $p_X(x)$ pilnasis plotas lygus vienam, taigi tai tinkamas tankis.
 
-Our choice of working with coin flips made computations shorter, but nothing about that choice was fundamental.  Indeed, if we take any collection of independent identically distributed random variables $X_i$, and form
+Mūsų pasirinkimas dirbti su monetos metimais padarė skaičiavimus trumpesnius, tačiau nieko iš esmės nepriklausė nuo šio pasirinkimo.  Iš tiesų, jei imsime bet kokį nepriklausomų vienodai pasiskirsčiusių atsitiktinių dydžių $X_i$ rinkinį ir sudarysime
 
 $$
 X^{(N)} = \sum_{i=1}^N X_i.
 $$
 
-Then
+Tada
 
 $$
 \frac{X^{(N)} - \mu_{X^{(N)}}}{\sigma_{X^{(N)}}}
 $$
 
-will be approximately Gaussian.  There are additional requirements needed to make it work, most commonly $E[X^4] < \infty$, but the philosophy is clear.
+bus apytiksliai Gauso.  Kad tai veiktų, reikia papildomų sąlygų, dažniausiai $E[X^4] < \infty$, tačiau filosofija aiški.
 
-The central limit theorem is the reason why the Gaussian is fundamental to probability, statistics, and machine learning.  Whenever we can say that something we measured is a sum of many small independent contributions, we can assume that the thing being measured will be close to Gaussian.  
+Centrinė ribinė teorema yra priežastis, kodėl Gauso skirstinys yra esminis tikimybių teorijoje, statistikoje ir mašininiame mokyme.  Kai tik galime pasakyti, kad kažkas, ką išmatavome, yra daugelio mažų nepriklausomų indėlių suma, galime daryti prielaidą, kad matuojamas dydis bus artimas Gauso.  
 
-There are many more fascinating properties of Gaussians, and we would like to discuss one more here.  The Gaussian is what is known as a *maximum entropy distribution*.  We will get into entropy more deeply in :numref:`sec_information_theory`, however all we need to know at this point is that it is a measure of randomness.  In a rigorous mathematical sense, we can think of the Gaussian as the *most* random choice of random variable with fixed mean and variance.  Thus, if we know that our random variable has some mean and variance, the Gaussian is in a sense the most conservative choice of distribution we can make.
+Gauso skirstinys turi daugybę žavių savybių, ir norėtume aptarti dar vieną.  Gauso skirstinys yra vadinamasis *didžiausios entropijos skirstinys*.  Entropiją išsamiau nagrinėsime :numref:`sec_information_theory`, tačiau šiuo metu pakanka žinoti, kad tai atsitiktinumo matas.  Griežtai matematiniu požiūriu Gauso skirstinį galime laikyti *atsitiktiniausiu* atsitiktinio dydžio pasirinkimu su fiksuotu vidurkiu ir dispersija.  Taigi, jei žinome, kad mūsų atsitiktinis dydis turi tam tikrą vidurkį ir dispersiją, Gauso skirstinys yra tam tikra prasme konservatyviausias skirstinio pasirinkimas, kurį galime padaryti.
 
-To close the section, let's recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
+Užbaigdami skyrių prisiminkime, kad jei $X \sim \mathcal{N}(\mu, \sigma^2)$, tai:
 
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
 
-We can sample from the Gaussian (or standard normal) distribution as shown below.
+Iš Gauso (arba standartinio normaliojo) skirstinio galime generuoti, kaip parodyta toliau.
 
 ```{.python .input}
 #@tab mxnet
@@ -744,44 +744,44 @@ torch.normal(mu, sigma, size=(10, 10))
 tf.random.normal((10, 10), mu, sigma)
 ```
 
-## Exponential Family
+## Eksponentinė šeima
 :label:`subsec_exponential_family`
 
-One shared property for all the distributions listed above is that they all 
-belong to which is known as the *exponential family*. The exponential family 
-is a set of distributions whose density can be expressed in the following 
-form:
+Viena visiems aukščiau išvardytiems skirstiniams bendra savybė yra ta, kad jie visi 
+priklauso vadinamajai *eksponentinei šeimai*. Eksponentinė šeima 
+yra skirstinių aibė, kurių tankį galima išreikšti tokia 
+forma:
 
 $$p(\mathbf{x} \mid \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \exp \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
-As this definition can be a little subtle, let's examine it closely.  
+Kadangi šis apibrėžimas gali būti šiek tiek subtilus, panagrinėkime jį atidžiai.  
 
-First, $h(\mathbf{x})$ is known as the *underlying measure* or the 
-*base measure*.  This can be viewed as an original choice of measure we are 
-modifying with our exponential weight.  
+Pirma, $h(\mathbf{x})$ žinoma kaip *pagrindinis matas* arba 
+*bazinis matas*.  Tai galima laikyti pradiniu mato pasirinkimu, kurį 
+modifikuojame savo eksponentiniu svoriu.  
 
-Second, we have the vector $\boldsymbol{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in
-\mathbb{R}^l$ called the *natural parameters* or *canonical parameters*.  These
-define how the base measure will be modified.  The natural parameters enter 
-into the new measure by taking the dot product of these parameters against 
-some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in
-\mathbb{R}^n$ and exponentiated. The vector $T(\mathbf{x})= (T_1(\mathbf{x}),
+Antra, turime vektorių $\boldsymbol{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in
+\mathbb{R}^l$, vadinamą *natūraliaisiais parametrais* arba *kanoniniais parametrais*.  Jie
+apibrėžia, kaip bus modifikuotas bazinis matas.  Natūralieji parametrai patenka
+į naują matą imant šių parametrų skaliarinę sandaugą su
+kokia nors funkcija $T(\cdot)$ nuo $\mathbf{x}= (x_1, x_2, ..., x_n) \in
+\mathbb{R}^n$ ir keliant eksponente. Vektorius $T(\mathbf{x})= (T_1(\mathbf{x}),
 T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
-is called the *sufficient statistics* for $\boldsymbol{\eta}$. This name is used since the 
-information represented by $T(\mathbf{x})$ is sufficient to calculate the 
-probability density and no other information from the sample $\mathbf{x}$'s 
-are required.
+vadinamas $\boldsymbol{\eta}$ *pakankamosiomis statistikomis*. Šis pavadinimas naudojamas todėl, kad 
+informacija, atvaizduojama $T(\mathbf{x})$, yra pakankama tikimybės tankiui 
+apskaičiuoti ir jokios kitos informacijos iš imties $\mathbf{x}$ 
+nereikia.
 
-Third, we have $A(\boldsymbol{\eta})$, which is referred to as the *cumulant 
-function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
-integrates to one, i.e.,
+Trečia, turime $A(\boldsymbol{\eta})$, vadinamą *kumuliantų 
+funkcija*, kuri užtikrina, kad aukščiau pateiktas skirstinys :eqref:`eq_exp_pdf` 
+integruojasi į vienetą, t. y.,
 
 $$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \exp
 \left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
 
-To be concrete, let's consider the Gaussian. Assuming that $\mathbf{x}$ is 
-an univariate variable, we saw that it had a density of
+Kad būtų konkretu, panagrinėkime Gauso skirstinį. Darydami prielaidą, kad $\mathbf{x}$ yra 
+vienmatis kintamasis, matėme, kad jo tankis yra
 
 $$
 \begin{aligned}
@@ -793,50 +793,50 @@ p(x \mid \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \exp
 \end{aligned}
 $$
 
-This matches the definition of the exponential family with:
+Tai atitinka eksponentinės šeimos apibrėžimą su:
 
-* *underlying measure*: $h(x) = \frac{1}{\sqrt{2 \pi}}$,
-* *natural parameters*: $\boldsymbol{\eta} = \begin{bmatrix} \eta_1 \\ \eta_2
+* *pagrindiniu matu*: $h(x) = \frac{1}{\sqrt{2 \pi}}$,
+* *natūraliaisiais parametrais*: $\boldsymbol{\eta} = \begin{bmatrix} \eta_1 \\ \eta_2
 \end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\
 \frac{1}{2 \sigma^2} \end{bmatrix}$,
-* *sufficient statistics*: $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, and
-* *cumulant function*: $A({\boldsymbol\eta}) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)
+* *pakankamosiomis statistikomis*: $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, ir
+* *kumuliantų funkcija*: $A({\boldsymbol\eta}) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)
 = \frac{\eta_1^2}{4 \eta_2} - \frac{1}{2}\log(2 \eta_2)$.
 
-It is worth noting that the exact choice of each of above terms is somewhat 
-arbitrary.  Indeed, the important feature is that the distribution can be 
-expressed in this form, not the exact form itself.
+Verta pažymėti, kad tikslus kiekvieno iš aukščiau pateiktų narių pasirinkimas yra 
+šiek tiek savavališkas.  Iš tiesų svarbu, kad skirstinį būtų galima 
+išreikšti šia forma, o ne pati tiksli forma.
 
-As we allude to in :numref:`subsec_softmax_and_derivatives`, a widely used 
-technique is to assume that the  final output $\mathbf{y}$ follows an 
-exponential family distribution. The exponential family is a common and 
-powerful family of distributions encountered frequently in machine learning.
+Kaip užsiminėme :numref:`subsec_softmax_and_derivatives`, plačiai naudojamas 
+metodas yra daryti prielaidą, kad galutinė išvestis $\mathbf{y}$ seka 
+eksponentinės šeimos skirstinį. Eksponentinė šeima yra dažna ir 
+galinga skirstinių šeima, dažnai sutinkama mašininiame mokyme.
 
 
-## Summary
-* Bernoulli random variables can be used to model events with a yes/no outcome.
-* Discrete uniform distributions model selects from a finite set of possibilities.
-* Continuous uniform distributions select from an interval.
-* Binomial distributions model a series of Bernoulli random variables, and count the number of successes.
-* Poisson random variables model the arrival of rare events.
-* Gaussian random variables model the result of adding a large number of independent random variables together.
-* All the above distributions belong to exponential family.
+## Santrauka
+* Bernulio atsitiktiniais dydžiais galima modeliuoti įvykius su rezultatu taip/ne.
+* Diskretieji tolygieji skirstiniai modeliuoja pasirinkimą iš baigtinės galimybių aibės.
+* Tolydieji tolygieji skirstiniai renkasi iš intervalo.
+* Binominiai skirstiniai modeliuoja Bernulio atsitiktinių dydžių seriją ir skaičiuoja sėkmių skaičių.
+* Puasono atsitiktiniai dydžiai modeliuoja retų įvykių atsiradimą.
+* Gauso atsitiktiniai dydžiai modeliuoja didelio skaičiaus nepriklausomų atsitiktinių dydžių sudėjimo rezultatą.
+* Visi aukščiau išvardyti skirstiniai priklauso eksponentinei šeimai.
 
-## Exercises
+## Pratimai
 
-1. What is the standard deviation of a random variable that is the difference $X-Y$ of two independent binomial random variables $X, Y \sim \textrm{Binomial}(16, 1/2)$.
-2. If we take a Poisson random variable $X \sim \textrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
-3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
+1. Koks yra atsitiktinio dydžio, kuris yra dviejų nepriklausomų binominių atsitiktinių dydžių $X, Y \sim \textrm{Binomial}(16, 1/2)$ skirtumas $X-Y$, standartinis nuokrypis?
+2. Jei paimsime Puasono atsitiktinį dydį $X \sim \textrm{Poisson}(\lambda)$ ir nagrinėsime $(X - \lambda)/\sqrt{\lambda}$, kai $\lambda \rightarrow \infty$, galime parodyti, kad jis tampa apytiksliai Gauso.  Kodėl tai prasminga?
+3. Kokia yra dviejų diskrečiųjų tolygiųjų atsitiktinių dydžių su $n$ elementų sumos tikimybių masės funkcija?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/417)
+[Diskusijos](https://discuss.d2l.ai/t/417)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1098)
+[Diskusijos](https://discuss.d2l.ai/t/1098)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1099)
+[Diskusijos](https://discuss.d2l.ai/t/1099)
 :end_tab:

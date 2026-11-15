@@ -1,45 +1,45 @@
-# Information Theory
+# Informacijos teorija
 :label:`sec_information_theory`
 
-The universe is overflowing with information. Information provides a common language across disciplinary rifts: from Shakespeare's Sonnet to researchers' paper on Cornell ArXiv, from Van Gogh's printing Starry Night to Beethoven's music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. Everything must follow the rules of information theory, no matter the format. With information theory, we can measure and compare how much information is present in different signals. In this section, we will investigate the fundamental concepts of information theory and applications of information theory in machine learning.
+Visata perpildyta informacijos. Informacija suteikia bendrą kalbą per disciplinų plyšius: nuo Šekspyro sonetų iki mokslininkų straipsnių Kornelio arXiv, nuo Van Gogo paveikslo „Žvaigždėta naktis“ iki Bethoveno Simfonijos Nr. 5, nuo pirmosios programavimo kalbos Plankalkül iki pažangiausių mašininio mokymo algoritmų. Viskas, nepaisant formato, turi paklusti informacijos teorijos taisyklėms. Pasitelkę informacijos teoriją, galime išmatuoti ir palyginti, kiek informacijos yra skirtinguose signaluose. Šiame skyriuje išnagrinėsime pagrindines informacijos teorijos sąvokas ir jos taikymą mašininiame mokyme.
 
-Before we get started, let's outline the relationship between machine learning and information theory. Machine learning aims to extract interesting signals from data and make critical predictions.  On the other hand, information theory studies encoding, decoding, transmitting, and manipulating information. As a result, information theory provides fundamental language for discussing the information processing in machine learned systems. For example, many machine learning applications use the cross-entropy loss as described in :numref:`sec_softmax`.  This loss can be directly derived from information theoretic considerations.
-
-
-## Information
-
-Let's start with the "soul" of information theory: information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be our starting point?
-
-Consider the following thought experiment.  We have a friend with a deck of cards.  They will shuffle the deck, flip over some cards, and tell us statements about the cards.  We will try to assess the information content of each statement.
-
-First, they flip over a card and tell us, "I see a card."  This provides us with no information at all.  We were already certain that this was the case so we hope the information should be zero.
-
-Next, they flip over a card and say, "I see a heart."  This provides us some information, but in reality there are only $4$ different suits that were possible, each equally likely, so we are not surprised by this outcome.  We hope that whatever the measure of information, this event should have low information content.
-
-Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and our friend told us which one it was.  This should be a medium amount of information.
-
-Let's take this to the logical extreme.  Suppose that finally they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
-
-Any notion of information we develop must conform to this intuition.  Indeed, in the next sections we will learn how to compute that these events have $0\textrm{ bits}$, $2\textrm{ bits}$, $~5.7\textrm{ bits}$, and $~225.6\textrm{ bits}$ of information respectively.
-
-If we read through these thought experiments, we see a natural idea.  As a starting point, rather than caring about the knowledge, we may build off the idea that information represents the degree of surprise or the abstract possibility of the event. For example, if we want to describe an unusual event, we need a lot information. For a common event, we may not need much information.
-
-In 1948, Claude E. Shannon published *A Mathematical Theory of Communication* :cite:`Shannon.1948` establishing the theory of information.  In his article, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
+Prieš pradėdami apžvelkime ryšį tarp mašininio mokymo ir informacijos teorijos. Mašininis mokymas siekia iš duomenų išgauti įdomius signalus ir daryti svarbias prognozes.  Informacijos teorija savo ruožtu nagrinėja informacijos kodavimą, dekodavimą, perdavimą ir manipuliavimą ja. Todėl informacijos teorija suteikia pagrindinę kalbą informacijos apdorojimui mašinomis išmoktose sistemose aptarti. Pavyzdžiui, daugelis mašininio mokymo taikymų naudoja kryžminės entropijos nuostolius, aprašytus :numref:`sec_softmax`.  Šiuos nuostolius galima tiesiogiai išvesti iš informacijos teorijos svarstymų.
 
 
-### Self-information
+## Informacija
 
-Since information embodies the abstract possibility of an event, how do we map the possibility to the number of bits? Shannon introduced the terminology *bit* as the unit of information, which was originally created by John Tukey. So what is a "bit" and why do we use it to measure information? Historically, an antique transmitter can only send or receive two types of code: $0$ and $1$.  Indeed, binary encoding is still in common use on all modern digital computers. In this way, any information is encoded by a series of $0$ and $1$. And hence, a series of binary digits of length $n$ contains $n$ bits of information.
+Pradėkime nuo informacijos teorijos „sielos“ – informacijos. *Informaciją* galima užkoduoti bet kuo, turinčiu tam tikrą vieno ar kelių kodavimo formatų seką. Tarkime, kad užsibrėžiame apibrėžti informacijos sąvoką.  Kas galėtų būti mūsų atspirties taškas?
 
-Now, suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$ with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, as we mentioned before, this series contains $n$ bits of information. So, can we generalize to a mathematical function which can transfer the probability $p$ to the number of bits? Shannon gave the answer by defining *self-information*
+Panagrinėkime tokį minties eksperimentą.  Turime draugą su kortų kaladę.  Jis ją sumaišys, apvers kelias korteles ir pasakys mums teiginius apie jas.  Pabandysime įvertinti kiekvieno teiginio informacijos kiekį.
+
+Pirmiausia jis apverčia kortelę ir sako: „Matau kortą.“  Tai nesuteikia mums jokios informacijos.  Jau buvome tuo tikri, todėl tikimės, kad informacija turėtų būti nulinė.
+
+Toliau jis apverčia kortelę ir sako: „Matau širdį.“  Tai suteikia šiek tiek informacijos, bet iš tikrųjų buvo galimos tik $4$ skirtingos rūšys, kiekviena vienodai tikėtina, todėl šis rezultatas mūsų nenustebina.  Tikimės, kad kad ir koks būtų informacijos matas, šis įvykis turėtų turėti mažą informacijos kiekį.
+
+Toliau jis apverčia kortelę ir sako: „Tai pikų $3$.“  Tai daugiau informacijos.  Iš tiesų buvo $52$ vienodai tikėtini galimi rezultatai, ir draugas mums pasakė, kuris iš jų.  Tai turėtų būti vidutinis informacijos kiekis.
+
+Pasiekime loginį kraštutinumą.  Tarkime, kad galiausiai jis apverčia kiekvieną kaladės kortelę ir nuskaito visą sumaišytos kaladės seką.  Kaladė gali būti išdėstyta $52!$ skirtingų tvarkų, vėlgi visos vienodai tikėtinos, todėl mums reikia daug informacijos, kad žinotume, kuri iš jų.
+
+Bet kuri mūsų kuriama informacijos sąvoka turi atitikti šią intuiciją.  Iš tiesų kituose skyreliuose išmoksime apskaičiuoti, kad šie įvykiai turi atitinkamai $0\textrm{ bitų}$, $2\textrm{ bitus}$, $~5{,}7\textrm{ bito}$ ir $~225{,}6\textrm{ bito}$ informacijos.
+
+Perskaitę šiuos minties eksperimentus, matome natūralią idėją.  Kaip atspirties tašką, užuot rūpinęsi žiniomis, galime remtis idėja, kad informacija atspindi nuostabos laipsnį arba abstraktų įvykio galimybę. Pavyzdžiui, jei norime apibūdinti neįprastą įvykį, mums reikia daug informacijos. Įprastam įvykiui informacijos gali prireikti nedaug.
+
+1948 m. Claude'as E. Shannonas paskelbė *A Mathematical Theory of Communication* :cite:`Shannon.1948`, įtvirtinusį informacijos teoriją.  Savo straipsnyje Shannonas pirmą kartą pristatė informacijos entropijos sąvoką. Nuo čia ir pradėsime savo kelionę.
+
+
+### Savaiminė informacija
+
+Kadangi informacija įkūnija abstrakčią įvykio galimybę, kaip atvaizduoti galimybę į bitų skaičių? Shannonas pristatė terminą *bitas* kaip informacijos vienetą, kurį iš pradžių sukūrė Johnas Tukey. Taigi kas yra „bitas“ ir kodėl juo matuojame informaciją? Istoriškai senovinis siųstuvas galėjo siųsti ar priimti tik du kodo tipus: $0$ ir $1$.  Iš tiesų dvejetainis kodavimas vis dar plačiai naudojamas visuose šiuolaikiniuose skaitmeniniuose kompiuteriuose. Šitaip bet kuri informacija užkoduojama $0$ ir $1$ eilute. Todėl $n$ ilgio dvejetainių skaitmenų eilutė turi $n$ bitų informacijos.
+
+Dabar tarkime, kad bet kokioje kodų eilutėje kiekvienas $0$ ar $1$ pasirodo su tikimybe $\frac{1}{2}$. Taigi įvykis $X$ su $n$ ilgio kodų eilute įvyksta su tikimybe $\frac{1}{2^n}$. Kartu, kaip minėjome, ši eilutė turi $n$ bitų informacijos. Ar galime tai apibendrinti iki matematinės funkcijos, kuri tikimybę $p$ paverčia bitų skaičiumi? Shannonas atsakė apibrėždamas *savaiminę informaciją*
 
 $$I(X) = - \log_2 (p),$$
 
-as the *bits* of information we have received for this event $X$. Note that we will always use base-2 logarithms in this section. For the sake of simplicity, the rest of this section will omit the subscript 2 in the logarithm notation, i.e., $\log(.)$ always refers to $\log_2(.)$. For example, the code "0010" has a self-information
+kaip *bitus* informacijos, kurią gavome apie šį įvykį $X$. Atkreipkite dėmesį, kad šiame skyriuje visada naudosime dvejetainius logaritmus. Paprastumo dėlei likusioje skyriaus dalyje praleisime apatinį indeksą 2 logaritmo žymėjime, t. y. $\log(.)$ visada reiškia $\log_2(.)$. Pavyzdžiui, kodas „0010“ turi savaiminę informaciją
 
 $$I(\textrm{"0010"}) = - \log (p(\textrm{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \textrm{ bits}.$$
 
-We can calculate self information as shown below. Before that, let's first import all the necessary packages in this section.
+Savaiminę informaciją galime apskaičiuoti, kaip parodyta toliau. Prieš tai importuokime visus šiame skyriuje reikalingus paketus.
 
 ```{.python .input}
 #@tab mxnet
@@ -86,35 +86,35 @@ def self_information(p):
 self_information(1 / 64)
 ```
 
-## Entropy
+## Entropija
 
-As self-information only measures the information of a single discrete event, we need a more generalized measure for any random variable of either discrete or continuous distribution.
+Kadangi savaiminė informacija matuoja tik vieno diskretaus įvykio informaciją, mums reikia bendresnio mato bet kuriam atsitiktiniam dydžiui, turinčiam diskretų ar tolydų skirstinį.
 
 
-### Motivating Entropy
+### Entropijos motyvacija
 
-Let's try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :citet:`Csiszar.2008`.
+Pabandykime konkrečiai apibrėžti, ko norime.  Tai bus neformalus teiginys apie vadinamąsias *Shannono entropijos aksiomas*.  Paaiškės, kad šis sveiko proto teiginių rinkinys priverčia mus prie vienintelio informacijos apibrėžimo.  Formalią šių aksiomų versiją kartu su keletu kitų galima rasti :citet:`Csiszar.2008`.
 
-1.  The information we gain by observing a random variable does not depend on what we call the elements, or the presence of additional elements which have probability zero.
-2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
-3.  The information gained when observing (nearly) certain events is (nearly) zero.
+1.  Informacija, kurią gauname stebėdami atsitiktinį dydį, nepriklauso nuo to, kaip vadiname elementus, ar nuo papildomų elementų, kurių tikimybė lygi nuliui, buvimo.
+2.  Informacija, kurią gauname stebėdami du atsitiktinius dydžius, yra ne didesnė nei informacijos, gaunamos stebint juos atskirai, suma.  Jei jie nepriklausomi, tai tiksliai suma.
+3.  Informacija, gaunama stebint (beveik) tikrus įvykius, yra (beveik) nulinė.
 
-While proving this fact is beyond the scope of our text, it is important to know that this uniquely determines the form that entropy must take.  The only ambiguity that these allow is in the choice of fundamental units, which is most often normalized by making the choice we saw before that the information provided by a single fair coin flip is one bit.
+Nors šio fakto įrodymas viršija mūsų teksto aprėptį, svarbu žinoti, kad tai vienareikšmiškai nulemia formą, kurią turi turėti entropija.  Vienintelis šių aksiomų paliekamas dviprasmiškumas yra pagrindinių vienetų pasirinkimas, kuris dažniausiai normuojamas pasirenkant, kaip matėme anksčiau, kad informacija, kurią suteikia vienas sąžiningos monetos metimas, yra vienas bitas.
 
-### Definition
+### Apibrėžimas
 
-For any random variable $X$ that follows a probability distribution $P$ with a probability density function (p.d.f.) or a probability mass function (p.m.f.) $p(x)$, we measure the expected amount of information through *entropy* (or *Shannon entropy*)
+Bet kuriam atsitiktiniam dydžiui $X$, sekančiam tikimybių skirstinį $P$ su tikimybės tankio funkcija (t. f.) arba tikimybių masės funkcija (t. m. f.) $p(x)$, tikėtiną informacijos kiekį matuojame per *entropiją* (arba *Shannono entropiją*)
 
 $$H(X) = - E_{x \sim P} [\log p(x)].$$
 :eqlabel:`eq_ent_def`
 
-To be specific, if $X$ is discrete, $$H(X) = - \sum_i p_i \log p_i \textrm{, where } p_i = P(X_i).$$
+Konkrečiai, jei $X$ yra diskretus, $$H(X) = - \sum_i p_i \log p_i \textrm{, where } p_i = P(X_i).$$
 
-Otherwise, if $X$ is continuous, we also refer entropy as *differential entropy*
+Priešingu atveju, jei $X$ yra tolydus, entropiją vadiname ir *diferencialine entropija*
 
 $$H(X) = - \int_x p(x) \log p(x) \; dx.$$
 
-We can define entropy as below.
+Entropiją galime apibrėžti taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -146,60 +146,60 @@ def entropy(p):
 entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
 ```
 
-### Interpretations
+### Interpretacijos
 
-You may be curious: in the entropy definition :eqref:`eq_ent_def`, why do we use an expectation of a negative logarithm? Here are some intuitions.
+Galbūt jums įdomu: kodėl entropijos apibrėžime :eqref:`eq_ent_def` naudojame neigiamo logaritmo vidurkį? Štai keletas intuicijų.
 
-First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As discussed above, we want the entropy formula to be additive over independent random variables. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of the individual terms.
+Pirma, kodėl naudojame *logaritmo* funkciją $\log$? Tarkime, kad $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, kur kiekviena komponentinė funkcija $f_i(x)$ yra nepriklausoma nuo kitų. Tai reiškia, kad kiekviena $f_i(x)$ nepriklausomai prisideda prie bendros informacijos, gaunamos iš $p(x)$. Kaip aptarta aukščiau, norime, kad entropijos formulė būtų adityvi nepriklausomų atsitiktinių dydžių atžvilgiu. Laimei, $\log$ natūraliai paverčia tikimybių skirstinių sandaugą atskirų narių suma.
 
-Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from an ordinary one. However, $\log$ is monotonically increasing with the probabilities, and indeed negative for all values in $[0, 1]$.  We need to construct a monotonically decreasing relationship between the probability of events and their entropy, which will ideally be always positive (for nothing we observe should force us to forget what we have known). Hence, we add a negative sign in front of $\log$ function.
+Toliau, kodėl naudojame *neigiamą* $\log$? Intuityviai dažnesni įvykiai turėtų turėti mažiau informacijos nei retesni, nes dažnai daugiau informacijos gauname iš neįprasto atvejo nei iš įprasto. Tačiau $\log$ monotoniškai auga didėjant tikimybėms ir iš tiesų yra neigiamas visoms reikšmėms intervale $[0, 1]$.  Turime sukonstruoti monotoniškai mažėjantį ryšį tarp įvykių tikimybės ir jų entropijos, kuri idealiu atveju visada bus teigiama (nes nieko, ką stebime, neturėtų priversti mūsų pamiršti tai, ką žinojome). Todėl prieš $\log$ funkciją pridedame minuso ženklą.
 
-Last, where does the *expectation* function come from? Consider a random variable $X$. We can interpret the self-information ($-\log(p)$) as the amount of *surprise* we have at seeing a particular outcome.  Indeed, as the probability approaches zero, the surprise becomes infinite.  Similarly, we can interpret the entropy as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
+Galiausiai, iš kur atsiranda *vidurkio* funkcija? Panagrinėkime atsitiktinį dydį $X$. Savaiminę informaciją ($-\log(p)$) galime interpretuoti kaip *nuostabos* kiekį, kurį jaučiame pamatę tam tikrą rezultatą.  Iš tiesų tikimybei artėjant prie nulio, nuostaba tampa begalinė.  Panašiai entropiją galime interpretuoti kaip vidutinį nuostabos kiekį stebint $X$. Pavyzdžiui, įsivaizduokite, kad lošimo automatų sistema statistiškai nepriklausomai išduoda simbolius ${s_1, \ldots, s_k}$ atitinkamai su tikimybėmis ${p_1, \ldots, p_k}$. Tada šios sistemos entropija lygi vidutinei savaiminei informacijai stebint kiekvieną išvestį, t. y.,
 
 $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
 
 
-### Properties of Entropy
+### Entropijos savybės
 
-By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to $X$ as an event and $P$ as the probability distribution of $X$.
+Iš aukščiau pateiktų pavyzdžių ir interpretacijų galime išvesti šias entropijos :eqref:`eq_ent_def` savybes. Čia $X$ vadiname įvykiu, o $P$ – $X$ tikimybių skirstiniu.
 
-* $H(X) \geq 0$ for all discrete $X$ (entropy can be negative for continuous $X$).
+* $H(X) \geq 0$ visiems diskretiems $X$ (tolydiems $X$ entropija gali būti neigiama).
 
-* If $X \sim P$ with a p.d.f. or a p.m.f. $p(x)$, and we try to estimate $P$ by a new probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$, then $$H(X) = - E_{x \sim P} [\log p(x)] \leq  - E_{x \sim P} [\log q(x)], \textrm{ with equality if and only if } P = Q.$$  Alternatively, $H(X)$ gives a lower bound of the average number of bits needed to encode symbols drawn from $P$.
+* Jei $X \sim P$ su t. f. arba t. m. f. $p(x)$ ir bandome įvertinti $P$ nauju tikimybių skirstiniu $Q$ su t. f. arba t. m. f. $q(x)$, tada $$H(X) = - E_{x \sim P} [\log p(x)] \leq  - E_{x \sim P} [\log q(x)], \textrm{ with equality if and only if } P = Q.$$  Kitaip tariant, $H(X)$ duoda apatinę ribą vidutiniam bitų skaičiui, reikalingam simboliams, ištrauktiems iš $P$, užkoduoti.
 
-* If $X \sim P$, then $x$ conveys the maximum amount of information if it spreads evenly among all possible outcomes. Specifically, if the probability distribution $P$ is discrete with $k$-class $\{p_1, \ldots, p_k \}$, then $$H(X) \leq \log(k), \textrm{ with equality if and only if } p_i = \frac{1}{k}, \forall i.$$ If $P$ is a continuous random variable, then the story becomes much more complicated.  However, if we additionally impose that $P$ is supported on a finite interval (with all values between $0$ and $1$), then $P$ has the highest entropy if it is the uniform distribution on that interval.
-
-
-## Mutual Information
-
-Previously we defined entropy of a single random variable $X$, how about the entropy of a pair random variables $(X, Y)$?  We can think of these techniques as trying to answer the following type of question, "What information is contained in $X$ and $Y$ together compared to each separately?  Is there redundant information, or is it all unique?"
-
-For the following discussion, we always use $(X, Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p_{X, Y}(x, y)$, while $X$ and $Y$ follow probability distribution $p_X(x)$ and $p_Y(y)$, respectively.
+* Jei $X \sim P$, tada $x$ perduoda didžiausią informacijos kiekį, jei pasiskirsto tolygiai tarp visų galimų rezultatų. Konkrečiai, jei tikimybių skirstinys $P$ yra diskretus su $k$ klasių $\{p_1, \ldots, p_k \}$, tada $$H(X) \leq \log(k), \textrm{ with equality if and only if } p_i = \frac{1}{k}, \forall i.$$ Jei $P$ yra tolydus atsitiktinis dydis, istorija tampa daug sudėtingesnė.  Tačiau jei papildomai reikalaujame, kad $P$ būtų apibrėžtas baigtiniame intervale (su visomis reikšmėmis tarp $0$ ir $1$), tada $P$ turi didžiausią entropiją, jei yra tolygusis skirstinys tame intervale.
 
 
-### Joint Entropy
+## Abipusė informacija
 
-Similar to entropy of a single random variable :eqref:`eq_ent_def`, we define the *joint entropy* $H(X, Y)$ of a pair random variables $(X, Y)$ as
+Anksčiau apibrėžėme vieno atsitiktinio dydžio $X$ entropiją, o kaip dėl atsitiktinių dydžių poros $(X, Y)$ entropijos?  Šiuos metodus galime laikyti bandymu atsakyti į tokio tipo klausimą: „Kokia informacija yra $X$ ir $Y$ kartu, palyginti su kiekvienu atskirai?  Ar yra perteklinės informacijos, ar visa ji unikali?“
+
+Tolesnėje diskusijoje visada naudosime $(X, Y)$ kaip atsitiktinių dydžių porą, sekančią jungtinį tikimybių skirstinį $P$ su t. f. arba t. m. f. $p_{X, Y}(x, y)$, o $X$ ir $Y$ seka tikimybių skirstinius atitinkamai $p_X(x)$ ir $p_Y(y)$.
+
+
+### Jungtinė entropija
+
+Panašiai kaip vieno atsitiktinio dydžio entropiją :eqref:`eq_ent_def`, atsitiktinių dydžių poros $(X, Y)$ *jungtinę entropiją* $H(X, Y)$ apibrėžiame kaip
 
 $$H(X, Y) = -E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
 :eqlabel:`eq_joint_ent_def`
 
-Precisely, on the one hand, if $(X, Y)$ is a pair of discrete random variables, then
+Tiksliau, viena vertus, jei $(X, Y)$ yra diskrečiųjų atsitiktinių dydžių pora, tada
 
 $$H(X, Y) = - \sum_{x} \sum_{y} p_{X, Y}(x, y) \log p_{X, Y}(x, y).$$
 
-On the other hand, if $(X, Y)$ is a pair of continuous random variables, then we define the *differential joint entropy* as
+Kita vertus, jei $(X, Y)$ yra tolydžiųjų atsitiktinių dydžių pora, *diferencialinę jungtinę entropiją* apibrėžiame kaip
 
 $$H(X, Y) = - \int_{x, y} p_{X, Y}(x, y) \ \log p_{X, Y}(x, y) \;dx \;dy.$$
 
-We can think of :eqref:`eq_joint_ent_def` as telling us the total randomness in the pair of random variables.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X, Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X, Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
+:eqref:`eq_joint_ent_def` galime laikyti pasakančia mums visą atsitiktinumą atsitiktinių dydžių poroje.  Kaip kraštutinumų porą paminėsime: jei $X = Y$ yra du identiški atsitiktiniai dydžiai, tada informacija poroje yra tiksliai vieno informacija ir turime $H(X, Y) = H(X) = H(Y)$.  Kitame kraštutinume, jei $X$ ir $Y$ yra nepriklausomi, tada $H(X, Y) = H(X) + H(Y)$.  Iš tiesų visada turėsime, kad informacija, esanti atsitiktinių dydžių poroje, yra ne mažesnė už bet kurio iš atsitiktinių dydžių entropiją ir ne didesnė už abiejų sumą.
 
 $$
 H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
 $$
 
-Let's implement joint entropy from scratch.
+Realizuokime jungtinę entropiją nuo nulio.
 
 ```{.python .input}
 #@tab mxnet
@@ -234,34 +234,34 @@ def joint_entropy(p_xy):
 joint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
-Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
+Atkreipkite dėmesį, kad tai tas pats *kodas* kaip anksčiau, tačiau dabar jį interpretuojame kitaip – kaip veikiantį su dviejų atsitiktinių dydžių jungtiniu skirstiniu.
 
 
-### Conditional Entropy
+### Sąlyginė entropija
 
-The joint entropy defined above the amount of information contained in a pair of random variables.  This is useful, but oftentimes it is not what we care about.  Consider the setting of machine learning.  Let's take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a complex thing.  However, the information contained in $Y$ once the image has been show should be low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
+Aukščiau apibrėžta jungtinė entropija yra informacijos kiekis, esantis atsitiktinių dydžių poroje.  Tai naudinga, tačiau dažnai ne tai mums rūpi.  Panagrinėkime mašininio mokymo aplinką.  Tegu $X$ yra atsitiktinis dydis (arba atsitiktinių dydžių vektorius), aprašantis paveikslėlio pikselių reikšmes, o $Y$ – atsitiktinis dydis, kuris yra klasės žymė.  $X$ turėtų turėti daug informacijos – natūralus paveikslėlis yra sudėtingas dalykas.  Tačiau informacija, esanti $Y$, parodžius paveikslėlį, turėtų būti maža.  Iš tiesų skaitmens paveikslėlis jau turėtų turėti informacijos apie tai, koks tai skaitmuo, nebent skaitmuo neįskaitomas.  Todėl, norėdami toliau plėsti savo informacijos teorijos žodyną, turime gebėti samprotauti apie informacijos kiekį atsitiktiniame dydyje, sąlygojamame kito.
 
-In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as
+Tikimybių teorijoje matėme *sąlyginės tikimybės* apibrėžimą, skirtą ryšiui tarp kintamųjų matuoti. Dabar norime analogiškai apibrėžti *sąlyginę entropiją* $H(Y \mid X)$.  Ją galime užrašyti kaip
 
 $$ H(Y \mid X) = - E_{(x, y) \sim P} [\log p(y \mid x)],$$
 :eqlabel:`eq_cond_ent_def`
 
-where $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ is the conditional probability. Specifically, if $(X, Y)$ is a pair of discrete random variables, then
+kur $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ yra sąlyginė tikimybė. Konkrečiai, jei $(X, Y)$ yra diskrečiųjų atsitiktinių dydžių pora, tada
 
 $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$
 
-If $(X, Y)$ is a pair of continuous random variables, then the *differential conditional entropy* is similarly defined as
+Jei $(X, Y)$ yra tolydžiųjų atsitiktinių dydžių pora, *diferencialinė sąlyginė entropija* apibrėžiama panašiai:
 
 $$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$
 
 
-It is now natural to ask, how does the *conditional entropy* $H(Y \mid X)$ relate to the entropy $H(X)$ and the joint entropy $H(X, Y)$?  Using the definitions above, we can express this cleanly:
+Dabar natūralu paklausti, kaip *sąlyginė entropija* $H(Y \mid X)$ susijusi su entropija $H(X)$ ir jungtine entropija $H(X, Y)$?  Naudodami aukščiau pateiktus apibrėžimus, galime tai išreikšti aiškiai:
 
 $$H(Y \mid X) = H(X, Y) - H(X).$$
 
-This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.
+Tai turi intuityvią interpretaciją: informacija $Y$, žinant $X$ ($H(Y \mid X)$), yra tokia pati kaip informacija abiejuose $X$ ir $Y$ kartu ($H(X, Y)$), atėmus informaciją, jau esančią $X$.  Tai duoda mums informaciją $Y$, kuri nėra atvaizduota ir $X$.
 
-Now, let's implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
+Dabar realizuokime sąlyginę entropiją :eqref:`eq_cond_ent_def` nuo nulio.
 
 ```{.python .input}
 #@tab mxnet
@@ -301,35 +301,35 @@ conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
                     tf.constant([0.2, 0.8]))
 ```
 
-### Mutual Information
+### Abipusė informacija
 
-Given the previous setting of random variables $(X, Y)$, you may wonder: "Now that we know how much information is contained in $Y$ but not in $X$, can we similarly ask how much information is shared between $X$ and $Y$?" The answer will be the *mutual information* of $(X, Y)$, which we will write as $I(X, Y)$.
+Turėdami ankstesnę atsitiktinių dydžių $(X, Y)$ aplinką, galbūt klausiate: „Dabar, kai žinome, kiek informacijos yra $Y$, bet nėra $X$, ar galime panašiai paklausti, kiek informacijos yra bendros tarp $X$ ir $Y$?“ Atsakymas bus $(X, Y)$ *abipusė informacija*, kurią žymėsime $I(X, Y)$.
 
-Rather than diving straight into the formal definition, let's practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X, Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
+Užuot šokę tiesiai į formalų apibrėžimą, pasitreniruokime intuiciją pirmiausia bandydami išvesti abipusės informacijos išraišką vien iš anksčiau sukonstruotų narių.  Norime rasti informaciją, bendrą dviem atsitiktiniams dydžiams.  Vienas būdas tai padaryti – pradėti nuo visos informacijos, esančios ir $X$, ir $Y$ kartu, o tada atimti dalis, kurios nėra bendros.  Informacija, esanti ir $X$, ir $Y$ kartu, užrašoma $H(X, Y)$.  Iš jos norime atimti informaciją, esančią $X$, bet ne $Y$, ir informaciją, esančią $Y$, bet ne $X$.  Kaip matėme ankstesniame skyrelyje, tai atitinkamai duoda $H(X \mid Y)$ ir $H(Y \mid X)$.  Taigi abipusė informacija turėtų būti
 
 $$
 I(X, Y) = H(X, Y) - H(Y \mid X) - H(X \mid Y).
 $$
 
-Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
+Iš tiesų tai yra tinkamas abipusės informacijos apibrėžimas.  Išskleidę šių narių apibrėžimus ir juos sujungę, šiek tiek algebros parodo, kad tai tas pats, kas
 
 $$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
 :eqlabel:`eq_mut_ent_def`
 
 
-We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X, Y)$.
+Visus šiuos ryšius galime apibendrinti paveikslėliu :numref:`fig_mutual_information`.  Tai puikus intuicijos testas – pamatyti, kodėl visi šie teiginiai taip pat yra ekvivalentūs $I(X, Y)$.
 
 * $H(X) - H(X \mid Y)$
 * $H(Y) - H(Y \mid X)$
 * $H(X) + H(Y) - H(X, Y)$
 
-![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg)
+![Abipusės informacijos ryšys su jungtine entropija ir sąlygine entropija.](../img/mutual-information.svg)
 :label:`fig_mutual_information`
 
 
-In many ways we can think of the mutual information :eqref:`eq_mut_ent_def` as principled extension of correlation coefficient we saw in :numref:`sec_random_variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum information shared between the two random variables of any kind.
+Daugeliu atžvilgių abipusę informaciją :eqref:`eq_mut_ent_def` galime laikyti principingu koreliacijos koeficiento, matyto :numref:`sec_random_variables`, išplėtimu.  Tai leidžia klausti ne tik apie tiesinius ryšius tarp kintamųjų, bet ir apie didžiausią bet kokios rūšies informaciją, bendrą dviem atsitiktiniams dydžiams.
 
-Now, let's implement mutual information from scratch.
+Dabar realizuokime abipusę informaciją nuo nulio.
 
 ```{.python .input}
 #@tab mxnet
@@ -370,48 +370,48 @@ mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
                    tf.constant([0.2, 0.8]), tf.constant([[0.75, 0.25]]))
 ```
 
-### Properties of Mutual Information
+### Abipusės informacijos savybės
 
-Rather than memorizing the definition of mutual information :eqref:`eq_mut_ent_def`, you only need to keep in mind its notable properties:
+Užuot įsimenant abipusės informacijos apibrėžimą :eqref:`eq_mut_ent_def`, pakanka prisiminti jos svarbiausias savybes:
 
-* Mutual information is symmetric, i.e., $I(X, Y) = I(Y, X)$.
-* Mutual information is non-negative, i.e., $I(X, Y) \geq 0$.
-* $I(X, Y) = 0$ if and only if $X$ and $Y$ are independent. For example, if $X$ and $Y$ are independent, then knowing $Y$ does not give any information about $X$ and vice versa, so their mutual information is zero.
-* Alternatively, if $X$ is an invertible function of $Y$, then $Y$ and $X$ share all information and $$I(X, Y) = H(Y) = H(X).$$
+* Abipusė informacija yra simetriška, t. y. $I(X, Y) = I(Y, X)$.
+* Abipusė informacija yra neneigiama, t. y. $I(X, Y) \geq 0$.
+* $I(X, Y) = 0$ tada ir tik tada, kai $X$ ir $Y$ yra nepriklausomi. Pavyzdžiui, jei $X$ ir $Y$ yra nepriklausomi, tai žinojimas $Y$ nesuteikia jokios informacijos apie $X$ ir atvirkščiai, todėl jų abipusė informacija lygi nuliui.
+* Kita vertus, jei $X$ yra apverčiama $Y$ funkcija, tada $Y$ ir $X$ dalijasi visa informacija ir $$I(X, Y) = H(Y) = H(X).$$
 
-### Pointwise Mutual Information
+### Taškinė abipusė informacija
 
-When we worked with entropy at the beginning of this chapter, we were able to provide an interpretation of $-\log(p_X(x))$ as how *surprised* we were with the particular outcome.  We may give a similar interpretation to the logarithmic term in the mutual information, which is often referred to as the *pointwise mutual information*:
+Kai šio skyriaus pradžioje dirbome su entropija, galėjome pateikti $-\log(p_X(x))$ interpretaciją kaip tai, kiek *nustebome* konkrečiu rezultatu.  Panašią interpretaciją galime suteikti ir logaritminiam abipusės informacijos nariui, kuris dažnai vadinamas *taškine abipuse informacija*:
 
 $$\textrm{pmi}(x, y) = \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)}.$$
 :eqlabel:`eq_pmi_def`
 
-We can think of :eqref:`eq_pmi_def` as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.
+:eqref:`eq_pmi_def` galime laikyti matuojančia, kiek labiau ar mažiau tikėtina konkreti rezultatų $x$ ir $y$ kombinacija, palyginti su tuo, ko tikėtumėmės iš nepriklausomų atsitiktinių rezultatų.  Jei ji didelė ir teigiama, šie du konkretūs rezultatai pasitaiko daug dažniau, nei būtų atsitiktinai (*pastaba*: vardiklis yra $p_X(x) p_Y(y)$ – tikimybė, jei abu rezultatai būtų nepriklausomi), o jei didelė ir neigiama, tai rodo, kad abu rezultatai įvyksta gerokai rečiau, nei tikėtumėmės atsitiktinai.
 
-This allows us to interpret the mutual information :eqref:`eq_mut_ent_def` as the average amount that we were surprised to see two outcomes occurring together compared to what we would expect if they were independent.
+Tai leidžia mums abipusę informaciją :eqref:`eq_mut_ent_def` interpretuoti kaip vidutinį nuostabos kiekį, kurį jaučiame matydami du rezultatus įvykstant kartu, palyginti su tuo, ko tikėtumėmės, jei jie būtų nepriklausomi.
 
-### Applications of Mutual Information
+### Abipusės informacijos taikymai
 
-Mutual information may be a little abstract in it pure definition, so how does it related to machine learning? In natural language processing, one of the most difficult problems is the *ambiguity resolution*, or the issue of the meaning of a word being unclear from context. For example, recently a headline in the news reported that "Amazon is on fire". You may wonder whether the company Amazon has a building on fire, or the Amazon rain forest is on fire.
+Abipusė informacija gali būti šiek tiek abstrakti gryname apibrėžime, tad kaip ji susijusi su mašininiu mokymu? Natūraliosios kalbos apdorojime viena sunkiausių problemų yra *daugiareikšmiškumo išsprendimas*, arba problema, kai žodžio reikšmė iš konteksto neaiški. Pavyzdžiui, neseniai naujienų antraštė pranešė, kad „Amazon dega“. Galite svarstyti, ar kompanijos „Amazon“ pastatas dega, ar dega Amazonės lietaus miškas.
 
-In this case, mutual information can help us resolve this ambiguity. We first find the group of words that each has a relatively large mutual information with the company Amazon, such as e-commerce, technology, and online. Second, we find another group of words that each has a relatively large mutual information with the Amazon rain forest, such as rain, forest, and tropical. When we need to disambiguate "Amazon", we can compare which group has more occurrence in the context of the word Amazon.  In this case the article would go on to describe the forest, and make the context clear.
-
-
-## Kullback–Leibler Divergence
-
-As what we have discussed in :numref:`sec_linear-algebra`, we can use norms to measure distance between two points in space of any dimensionality.  We would like to be able to do a similar task with probability distributions.  There are many ways to go about this, but information theory provides one of the nicest.  We now explore the *Kullback–Leibler (KL) divergence*, which provides a way to measure if two distributions are close together or not.
+Šiuo atveju abipusė informacija gali padėti išspręsti šį daugiareikšmiškumą. Pirmiausia randame žodžių grupę, kurių kiekvienas turi santykinai didelę abipusę informaciją su kompanija „Amazon“, pavyzdžiui, e. prekyba, technologijos ir internetas. Antra, randame kitą žodžių grupę, kurių kiekvienas turi santykinai didelę abipusę informaciją su Amazonės lietaus mišku, pavyzdžiui, lietus, miškas ir tropinis. Kai reikia išsklaidyti žodžio „Amazon“ daugiareikšmiškumą, galime palyginti, kuri grupė dažniau pasitaiko žodžio „Amazon“ kontekste.  Šiuo atveju straipsnis toliau aprašytų mišką ir kontekstas taptų aiškus.
 
 
-### Definition
+## Kulbako–Leiblerio divergencija
 
-Given a random variable $X$ that follows the probability distribution $P$ with a p.d.f. or a p.m.f. $p(x)$, and we estimate $P$ by another probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$. Then the *Kullback–Leibler (KL) divergence* (or *relative entropy*) between $P$ and $Q$ is
+Kaip aptarėme :numref:`sec_linear-algebra`, normas galime naudoti atstumui tarp dviejų bet kokios dimensijos erdvės taškų matuoti.  Norėtume gebėti atlikti panašią užduotį su tikimybių skirstiniais.  Tai galima daryti įvairiais būdais, tačiau informacijos teorija siūlo vieną iš gražiausių.  Dabar nagrinėjame *Kulbako–Leiblerio (KL) divergenciją*, kuri suteikia būdą išmatuoti, ar du skirstiniai yra artimi, ar ne.
+
+
+### Apibrėžimas
+
+Tarkime, atsitiktinis dydis $X$ seka tikimybių skirstinį $P$ su t. f. arba t. m. f. $p(x)$, o $P$ įvertiname kitu tikimybių skirstiniu $Q$ su t. f. arba t. m. f. $q(x)$. Tada *Kulbako–Leiblerio (KL) divergencija* (arba *santykinė entropija*) tarp $P$ ir $Q$ yra
 
 $$D_{\textrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
 :eqlabel:`eq_kl_def`
 
-As with the pointwise mutual information :eqref:`eq_pmi_def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large and positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
+Kaip ir su taškine abipuse informacija :eqref:`eq_pmi_def`, vėl galime pateikti logaritminio nario interpretaciją:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ bus didelis ir teigiamas, jei $x$ matome daug dažniau pagal $P$, nei tikėtumėmės pagal $Q$, ir didelis ir neigiamas, jei rezultatą matome daug rečiau, nei tikėtasi.  Šitaip galime ją interpretuoti kaip mūsų *santykinę* nuostabą stebint rezultatą, palyginti su tuo, kiek nustebtume jį stebėdami iš savo atskaitos skirstinio.
 
-Let's implement the KL divergence from Scratch.
+Realizuokime KL divergenciją nuo nulio.
 
 ```{.python .input}
 #@tab mxnet
@@ -437,26 +437,26 @@ def kl_divergence(p, q):
     return tf.abs(out).numpy()
 ```
 
-### KL Divergence Properties
+### KL divergencijos savybės
 
-Let's take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
+Pažvelkime į kai kurias KL divergencijos :eqref:`eq_kl_def` savybes.
 
-* KL divergence is non-symmetric, i.e., there are $P,Q$ such that $$D_{\textrm{KL}}(P\|Q) \neq D_{\textrm{KL}}(Q\|P).$$
-* KL divergence is non-negative, i.e., $$D_{\textrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
-* If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\textrm{KL}}(P\|Q) = \infty$.
-* There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X, Y)$ is also numerically equivalent with the following terms:
+* KL divergencija yra nesimetrinė, t. y. egzistuoja $P,Q$, kad $$D_{\textrm{KL}}(P\|Q) \neq D_{\textrm{KL}}(Q\|P).$$
+* KL divergencija yra neneigiama, t. y. $$D_{\textrm{KL}}(P\|Q) \geq 0.$$ Atkreipkite dėmesį, kad lygybė galioja tik kai $P = Q$.
+* Jei egzistuoja toks $x$, kad $p(x) > 0$ ir $q(x) = 0$, tada $D_{\textrm{KL}}(P\|Q) = \infty$.
+* Tarp KL divergencijos ir abipusės informacijos yra glaudus ryšys. Be ryšio, parodyto :numref:`fig_mutual_information`, $I(X, Y)$ skaitine verte taip pat lygus šiems dydžiams:
     1. $D_{\textrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
     1. $E_Y \{ D_{\textrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
     1. $E_X \{ D_{\textrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
 
-  For the first term, we interpret mutual information as the KL divergence between $P(X, Y)$ and the product of $P(X)$ and $P(Y)$, and thus is a measure of how different the joint distribution is from the distribution if they were independent. For the second term, mutual information tells us the average reduction in uncertainty about $Y$ that results from learning the value of the $X$'s distribution. Similarly to the third term.
+  Pirmajame naryje abipusę informaciją interpretuojame kaip KL divergenciją tarp $P(X, Y)$ ir $P(X)$ bei $P(Y)$ sandaugos, todėl tai yra matas, kiek jungtinis skirstinys skiriasi nuo skirstinio, kuris būtų, jei jie būtų nepriklausomi. Antrajame naryje abipusė informacija mums pasako vidutinį neapibrėžtumo apie $Y$ sumažėjimą, atsirandantį sužinojus $X$ skirstinio reikšmę. Panašiai ir trečiajame naryje.
 
 
-### Example
+### Pavyzdys
 
-Let's go through a toy example to see the non-symmetry explicitly.
+Išnagrinėkime žaislinį pavyzdį, kad aiškiai pamatytume nesimetriškumą.
 
-First, let's generate and sort three tensors of length $10,000$: an objective tensor $p$ which follows a normal distribution $N(0, 1)$, and two candidate tensors $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
+Pirmiausia sugeneruokime ir surikiuokime tris $10\,000$ ilgio tenzorius: tikslinį tenzorių $p$, sekantį normalųjį skirstinį $N(0, 1)$, ir du kandidatinius tenzorius $q_1$ ir $q_2$, atitinkamai sekančius normaliuosius skirstinius $N(-1, 1)$ ir $N(1, 1)$.
 
 ```{.python .input}
 #@tab mxnet
@@ -498,7 +498,7 @@ q1 = tf.sort(q1)
 q2 = tf.sort(q2)
 ```
 
-Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\textrm{KL}}(p\|q_1)$ and $D_{\textrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\textrm{KL}}(p\|q_1)$ and $D_{\textrm{KL}}(p\|q_2)$.
+Kadangi $q_1$ ir $q_2$ yra simetriški y ašies atžvilgiu (t. y. $x=0$), tikimės panašios KL divergencijos reikšmės tarp $D_{\textrm{KL}}(p\|q_1)$ ir $D_{\textrm{KL}}(p\|q_2)$. Kaip matote toliau, tarp $D_{\textrm{KL}}(p\|q_1)$ ir $D_{\textrm{KL}}(p\|q_2)$ skirtumas yra mažesnis nei 3 %.
 
 ```{.python .input}
 #@tab all
@@ -509,7 +509,7 @@ similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
 kl_pq1, kl_pq2, similar_percentage
 ```
 
-In contrast, you may find that $D_{\textrm{KL}}(q_2 \|p)$ and $D_{\textrm{KL}}(p \| q_2)$ are off a lot, with around 40% off as shown below.
+Priešingai, galite pastebėti, kad $D_{\textrm{KL}}(q_2 \|p)$ ir $D_{\textrm{KL}}(p \| q_2)$ labai skiriasi – apie 40 %, kaip parodyta toliau.
 
 ```{.python .input}
 #@tab all
@@ -519,11 +519,11 @@ differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
 kl_q2p, differ_percentage
 ```
 
-## Cross-Entropy
+## Kryžminė entropija
 
-If you are curious about applications of information theory in deep learning, here is a quick example. We define the true distribution $P$ with probability distribution $p(x)$, and the estimated distribution $Q$ with probability distribution $q(x)$, and we will use them in the rest of this section.
+Jei domina informacijos teorijos taikymai giliajame mokyme, štai trumpas pavyzdys. Tikrąjį skirstinį $P$ apibrėžiame su tikimybių skirstiniu $p(x)$, o įvertintąjį skirstinį $Q$ – su tikimybių skirstiniu $q(x)$, ir juos naudosime likusioje šio skyriaus dalyje.
 
-Say we need to solve a binary classification problem based on given $n$ data examples {$x_1, \ldots, x_n$}. Assume that we encode $1$ and $0$ as the positive and negative class label $y_i$ respectively, and our neural network is parametrized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, it is natural to apply the maximum log-likelihood approach as was seen in :numref:`sec_maximum_likelihood`. To be specific, for true labels $y_i$ and predictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the log-likelihood function would be
+Tarkime, reikia išspręsti dvejetainio klasifikavimo uždavinį pagal duotus $n$ duomenų pavyzdžių {$x_1, \ldots, x_n$}. Tarkime, kad $1$ ir $0$ užkoduojame kaip atitinkamai teigiamą ir neigiamą klasės žymę $y_i$, o mūsų neuroninis tinklas parametrizuotas $\theta$. Jei siekiame rasti geriausią $\theta$, kad $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, natūralu taikyti didžiausio logaritminio tikėtinumo metodą, kaip matėme :numref:`sec_maximum_likelihood`. Konkrečiai, tikroms žymėms $y_i$ ir prognozėms $\hat{y}_i= p_{\theta}(y_i \mid x_i)$ tikimybė būti klasifikuotam kaip teigiamam yra $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Todėl logaritminio tikėtinumo funkcija būtų
 
 $$
 \begin{aligned}
@@ -533,24 +533,24 @@ l(\theta) &= \log L(\theta) \\
 \end{aligned}
 $$
 
-Maximizing the log-likelihood function $l(\theta)$ is identical to minimizing $- l(\theta)$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-l(\theta)$ the *cross-entropy loss* $\textrm{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimated distribution $Q$.
+Logaritminio tikėtinumo funkcijos $l(\theta)$ maksimizavimas yra tapatus $- l(\theta)$ minimizavimui, taigi iš čia galime rasti geriausią $\theta$. Kad aukščiau pateiktus nuostolius apibendrintume bet kuriems skirstiniams, $-l(\theta)$ taip pat pavadinome *kryžminės entropijos nuostoliais* $\textrm{CE}(y, \hat{y})$, kur $y$ seka tikrąjį skirstinį $P$, o $\hat{y}$ – įvertintąjį skirstinį $Q$.
 
-This was all derived by working from the maximum likelihood point of view.  However, if we look closely we can see that terms like $\log(\pi_i)$ have entered into our computation which is a solid indication that we can understand the expression from an information theoretic point of view.
+Visa tai buvo išvesta dirbant iš didžiausio tikėtinumo požiūrio taško.  Tačiau jei atidžiai pažiūrėsime, pamatysime, kad į mūsų skaičiavimą pateko tokie nariai kaip $\log(\pi_i)$, o tai tvirtas ženklas, kad išraišką galime suprasti ir iš informacijos teorijos požiūrio.
 
 
-### Formal Definition
+### Formalus apibrėžimas
 
-Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross-entropy*,
+Kaip ir KL divergenciją, atsitiktiniam dydžiui $X$ divergenciją tarp įvertinančiojo skirstinio $Q$ ir tikrojo skirstinio $P$ galime matuoti ir per *kryžminę entropiją*,
 
 $$\textrm{CE}(P, Q) = - E_{x \sim P} [\log(q(x))].$$
 :eqlabel:`eq_ce_def`
 
-By using properties of entropy discussed above, we can also interpret it as the summation of the entropy $H(P)$ and the KL divergence between $P$ and $Q$, i.e.,
+Naudodami aukščiau aptartas entropijos savybes, ją taip pat galime interpretuoti kaip entropijos $H(P)$ ir KL divergencijos tarp $P$ ir $Q$ sumą, t. y.,
 
 $$\textrm{CE} (P, Q) = H(P) + D_{\textrm{KL}}(P\|Q).$$
 
 
-We can implement the cross-entropy loss as below.
+Kryžminės entropijos nuostolius galime realizuoti taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -575,7 +575,7 @@ def cross_entropy(y_hat, y):
     return tf.reduce_mean(ce).numpy()
 ```
 
-Now define two tensors for the labels and predictions, and calculate the cross-entropy loss of them.
+Dabar apibrėžkime du tenzorius žymėms ir prognozėms ir apskaičiuokime jų kryžminės entropijos nuostolius.
 
 ```{.python .input}
 #@tab mxnet
@@ -601,44 +601,44 @@ preds = tf.constant([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 cross_entropy(preds, labels)
 ```
 
-### Properties
+### Savybės
 
-As alluded in the beginning of this section, cross-entropy :eqref:`eq_ce_def` can be used to define a loss function in the optimization problem. It turns out that the following are equivalent:
+Kaip užsiminta šio skyriaus pradžioje, kryžminė entropija :eqref:`eq_ce_def` gali būti naudojama nuostolių funkcijai optimizavimo uždavinyje apibrėžti. Paaiškėja, kad šie dalykai yra ekvivalentūs:
 
-1. Maximizing predictive probability of $Q$ for distribution $P$, (i.e., $E_{x
+1. $Q$ prognozinės tikimybės skirstiniui $P$ maksimizavimas (t. y. $E_{x
 \sim P} [\log (q(x))]$);
-1. Minimizing cross-entropy $\textrm{CE} (P, Q)$;
-1. Minimizing the KL divergence $D_{\textrm{KL}}(P\|Q)$.
+1. Kryžminės entropijos $\textrm{CE} (P, Q)$ minimizavimas;
+1. KL divergencijos $D_{\textrm{KL}}(P\|Q)$ minimizavimas.
 
-The definition of cross-entropy indirectly proves the equivalent relationship between objective 2 and objective 3, as long as the entropy of true data $H(P)$ is constant.
+Kryžminės entropijos apibrėžimas netiesiogiai įrodo ekvivalentų ryšį tarp 2 ir 3 tikslo, kol tikrųjų duomenų entropija $H(P)$ yra pastovi.
 
 
-### Cross-Entropy as An Objective Function of Multi-class Classification
+### Kryžminė entropija kaip daugiaklasio klasifikavimo tikslo funkcija
 
-If we dive deep into the classification objective function with cross-entropy loss $\textrm{CE}$, we will find minimizing $\textrm{CE}$ is equivalent to maximizing the log-likelihood function $L$.
+Jei pasigilinsime į klasifikavimo tikslo funkciją su kryžminės entropijos nuostoliais $\textrm{CE}$, pamatysime, kad $\textrm{CE}$ minimizavimas yra ekvivalentus logaritminio tikėtinumo funkcijos $L$ maksimizavimui.
 
-To begin with, suppose that we are given a dataset with $n$ examples, and it can be classified into $k$-classes. For each data example $i$, we represent any $k$-class label $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ by *one-hot encoding*. To be specific, if the  example $i$ belongs to class $j$, then we set the $j$-th entry to $1$, and all other components to $0$, i.e.,
+Pradžiai tarkime, kad turime duomenų rinkinį su $n$ pavyzdžių, kuriuos galima klasifikuoti į $k$ klasių. Kiekvienam duomenų pavyzdžiui $i$ bet kurią $k$ klasių žymę $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ vaizduojame *fiktyvių kintamųjų kodavimu*. Konkrečiai, jei pavyzdys $i$ priklauso klasei $j$, tada $j$-ąjį elementą nustatome į $1$, o visas kitas komponentes – į $0$, t. y.,
 
 $$ y_{ij} = \begin{cases}1 & j \in J; \\ 0 &\textrm{otherwise.}\end{cases}$$
 
-For instance, if a multi-class classification problem contains three classes $A$, $B$, and $C$, then the labels $\mathbf{y}_i$ can be encoded in {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
+Pavyzdžiui, jei daugiaklasio klasifikavimo uždavinys turi tris klases $A$, $B$ ir $C$, tada žymės $\mathbf{y}_i$ gali būti užkoduotos kaip {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
 
 
-Assume that our neural network is parametrized by $\theta$. For true label vectors $\mathbf{y}_i$ and predictions $$\hat{\mathbf{y}}_i= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i) = \sum_{j=1}^k y_{ij} p_{\theta} (y_{ij}  \mid  \mathbf{x}_i).$$
+Tarkime, kad mūsų neuroninis tinklas parametrizuotas $\theta$. Tikriems žymių vektoriams $\mathbf{y}_i$ ir prognozėms $$\hat{\mathbf{y}}_i= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i) = \sum_{j=1}^k y_{ij} p_{\theta} (y_{ij}  \mid  \mathbf{x}_i).$$
 
-Hence, the *cross-entropy loss* would be
+Todėl *kryžminės entropijos nuostoliai* būtų
 
 $$
 \textrm{CE}(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{i=1}^n \mathbf{y}_i \log \hat{\mathbf{y}}_i
  = - \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
 $$
 
-On the other side, we can also approach the problem through maximum likelihood estimation. To begin with, let's quickly introduce a $k$-class multinoulli distribution. It is an extension of the Bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{z} = (z_{1}, \ldots, z_{k})$ follows a $k$-class *multinoulli distribution* with probabilities $\mathbf{p} =$ ($p_{1}, \ldots, p_{k}$), i.e., $$p(\mathbf{z}) = p(z_1, \ldots, z_k) = \textrm{Multi} (p_1, \ldots, p_k), \textrm{ where } \sum_{i=1}^k p_i = 1,$$ then the joint probability mass function(p.m.f.) of $\mathbf{z}$ is
+Kita vertus, į problemą galime žiūrėti ir per didžiausio tikėtinumo įvertinimą. Pradžiai trumpai pristatykime $k$ klasių multinulio skirstinį. Tai Bernulio skirstinio išplėtimas nuo dvejetainės iki daugiaklasės. Jei atsitiktinis vektorius $\mathbf{z} = (z_{1}, \ldots, z_{k})$ seka $k$ klasių *multinulio skirstinį* su tikimybėmis $\mathbf{p} =$ ($p_{1}, \ldots, p_{k}$), t. y. $$p(\mathbf{z}) = p(z_1, \ldots, z_k) = \textrm{Multi} (p_1, \ldots, p_k), \textrm{ where } \sum_{i=1}^k p_i = 1,$$ tada $\mathbf{z}$ jungtinė tikimybių masės funkcija (t. m. f.) yra
 $$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$
 
 
-It can be seen that the label of each data example, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data example $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
-Hence, the log-likelihood function would be
+Matyti, kad kiekvieno duomenų pavyzdžio žymė $\mathbf{y}_i$ seka $k$ klasių multinulio skirstinį su tikimybėmis $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Todėl kiekvieno duomenų pavyzdžio $\mathbf{y}_i$ jungtinė t. m. f. yra  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+Todėl logaritminio tikėtinumo funkcija būtų
 
 $$
 \begin{aligned}
@@ -650,10 +650,10 @@ l(\theta)
 \end{aligned}
 $$
 
-Since in maximum likelihood estimation, we maximizing the objective function $l(\theta)$ by having $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$. Therefore, for any multi-class classification, maximizing the above log-likelihood function $l(\theta)$ is equivalent to minimizing the CE loss $\textrm{CE}(y, \hat{y})$.
+Kadangi didžiausio tikėtinumo įvertinime maksimizuojame tikslo funkciją $l(\theta)$ imdami $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$, bet kuriam daugiaklasiam klasifikavimui aukščiau pateiktos logaritminio tikėtinumo funkcijos $l(\theta)$ maksimizavimas yra ekvivalentus kryžminės entropijos nuostolių $\textrm{CE}(y, \hat{y})$ minimizavimui.
 
 
-To test the above proof, let's apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
+Kad patikrintume aukščiau pateiktą įrodymą, pritaikykime įtaisytą matą `NegativeLogLikelihood`. Naudodami tuos pačius `labels` ir `preds` kaip ankstesniame pavyzdyje, gausime tokius pačius skaitinius nuostolius kaip ankstesniame pavyzdyje iki 5-ojo ženklo po kablelio.
 
 ```{.python .input}
 #@tab mxnet
@@ -687,33 +687,33 @@ loss = nll_loss(tf.math.log(preds), labels)
 loss
 ```
 
-## Summary
+## Santrauka
 
-* Information theory is a field of study about encoding, decoding, transmitting, and manipulating information.
-* Entropy is the unit to measure how much information is presented in different signals.
-* KL divergence can also measure the divergence between two distributions.
-* Cross-entropy can be viewed as an objective function of multi-class classification. Minimizing cross-entropy loss is equivalent to maximizing the log-likelihood function.
+* Informacijos teorija yra tyrimų sritis, nagrinėjanti informacijos kodavimą, dekodavimą, perdavimą ir manipuliavimą ja.
+* Entropija yra vienetas, matuojantis, kiek informacijos yra skirtinguose signaluose.
+* KL divergencija taip pat gali matuoti divergenciją tarp dviejų skirstinių.
+* Kryžminę entropiją galima laikyti daugiaklasio klasifikavimo tikslo funkcija. Kryžminės entropijos nuostolių minimizavimas yra ekvivalentus logaritminio tikėtinumo funkcijos maksimizavimui.
 
 
-## Exercises
+## Pratimai
 
-1. Verify that the card examples from the first section indeed have the claimed entropy.
-1. Show that the KL divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint: use Jensen's inequality, i.e., use the fact that $-\log x$ is a convex function.
-1. Let's compute the entropy from a few data sources:
-    * Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
-    * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Let's assume that the average length of a word is $4.5$ letters in English. How many bits of randomness per character do you observe now?
-    * Still being unhappy with the result, you replace the typesetter by a high quality language model. The language model can currently obtain a perplexity as low as $15$ points per word. The character *perplexity* of a language model is defined as the inverse of the geometric mean of a set of probabilities, each probability is corresponding to a character in the word. To be specific, if the length of a given word is $l$, then  $\textrm{PPL}(\textrm{word}) = \left[\prod_i p(\textrm{character}_i)\right]^{ -\frac{1}{l}} = \exp \left[ - \frac{1}{l} \sum_i{\log p(\textrm{character}_i)} \right].$  Assume that the test word has 4.5 letters, how many bits of randomness per character do you observe now?
-1. Explain intuitively why $I(X, Y) = H(X) - H(X \mid Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
-1. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$?
+1. Patikrinkite, kad pirmajame skyriuje pateikti kortų pavyzdžiai iš tiesų turi nurodytą entropiją.
+1. Parodykite, kad KL divergencija $D(p\|q)$ yra neneigiama visiems skirstiniams $p$ ir $q$. Užuomina: naudokite Jenseno nelygybę, t. y. faktą, kad $-\log x$ yra iškilioji funkcija.
+1. Apskaičiuokime entropiją iš kelių duomenų šaltinių:
+    * Tarkime, kad stebite beždžionės, spausdinančios rašomąja mašinėle, sugeneruotą išvestį. Beždžionė atsitiktinai paspaudžia bet kurį iš $44$ rašomosios mašinėlės klavišų (galite laikyti, kad ji dar neatrado jokių specialiųjų klavišų ar „shift“ klavišo). Kiek atsitiktinumo bitų vienam simboliui stebite?
+    * Nepatenkinti beždžione, ją pakeičiate girtu rinkėju. Jis geba generuoti žodžius, nors ir nenuosekliai. Vietoj to jis atsitiktinai pasirenka žodį iš $2\,000$ žodžių žodyno. Tarkime, kad vidutinis žodžio ilgis anglų kalboje yra $4{,}5$ raidės. Kiek atsitiktinumo bitų vienam simboliui stebite dabar?
+    * Vis dar nepatenkinti rezultatu, rinkėją pakeičiate aukštos kokybės kalbos modeliu. Kalbos modelis šiuo metu gali pasiekti net $15$ punktų painiavą (angl. *perplexity*) vienam žodžiui. Kalbos modelio simbolio *painiava* apibrėžiama kaip tikimybių rinkinio geometrinio vidurkio atvirkštinis dydis, kai kiekviena tikimybė atitinka žodžio simbolį. Konkrečiai, jei duoto žodžio ilgis yra $l$, tada  $\textrm{PPL}(\textrm{word}) = \left[\prod_i p(\textrm{character}_i)\right]^{ -\frac{1}{l}} = \exp \left[ - \frac{1}{l} \sum_i{\log p(\textrm{character}_i)} \right].$  Tarkime, kad testinis žodis turi 4,5 raidės. Kiek atsitiktinumo bitų vienam simboliui stebite dabar?
+1. Intuityviai paaiškinkite, kodėl $I(X, Y) = H(X) - H(X \mid Y)$.  Tada parodykite, kad tai tiesa, išreikšdami abi puses kaip vidurkį jungtinio skirstinio atžvilgiu.
+1. Kokia yra KL divergencija tarp dviejų Gauso skirstinių $\mathcal{N}(\mu_1, \sigma_1^2)$ ir $\mathcal{N}(\mu_2, \sigma_2^2)$?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/420)
+[Diskusijos](https://discuss.d2l.ai/t/420)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1104)
+[Diskusijos](https://discuss.d2l.ai/t/1104)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1105)
+[Diskusijos](https://discuss.d2l.ai/t/1105)
 :end_tab:

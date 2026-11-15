@@ -1,26 +1,26 @@
-# Appendix: Mathematics for Deep Learning
+# Priedas: giliojo mokymosi matematika
 :label:`chap_appendix_math`
 
-**Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), and authors of this book
+**Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*) ir šios knygos autoriai
 
 
-One of the wonderful parts of modern deep learning is the fact that much of it can be understood and used without a full understanding of the mathematics below it.  This is a sign that the field is maturing.  Just as most software developers no longer need to worry about the theory of computable functions, neither should deep learning practitioners need to worry about the theoretical foundations of maximum likelihood learning.
+Vienas nuostabiausių šiuolaikinio giliojo mokymosi bruožų – tai, kad didelę jo dalį galima suprasti ir naudoti iki galo nesuvokiant po juo slypinčios matematikos. Tai požymis, kad sritis bręsta. Kaip dauguma programinės įrangos kūrėjų nebeturi rūpintis skaičiuojamųjų funkcijų teorija, taip ir giliojo mokymosi praktikams nebereikia rūpintis didžiausio tikėtinumo mokymosi teoriniais pagrindais.
 
-But, we are not quite there yet.
+Tačiau dar nesame to pasiekę.
 
-In practice, you will sometimes need to understand how architectural choices influence gradient flow, or the implicit assumptions you make by training with a certain loss function.  You might need to know what in the world entropy measures, and how it can help you understand exactly what bits-per-character means in your model.  These all require deeper mathematical understanding.
+Praktikoje kartais reikės suprasti, kaip architektūros sprendimai veikia gradientų sklidimą arba kokias numanomas prielaidas darome mokydami su tam tikra nuostolių funkcija. Gali prireikti žinoti, ką iš tiesų matuoja entropija ir kaip ji gali padėti tiksliai suprasti, ką jūsų modelyje reiškia bitai vienam simboliui. Visa tai reikalauja gilesnio matematinio supratimo.
 
-This appendix aims to provide you the mathematical background you need to understand the core theory of modern deep learning, but it is not exhaustive.  We will begin with examining linear algebra in greater depth.  We develop a geometric understanding of all the common linear algebraic objects and operations that will enable us to visualize the effects of various transformations on our data.  A key element is the development of the basics of eigen-decompositions.
+Šiuo priedu siekiama suteikti matematinį pagrindą, reikalingą šiuolaikinio giliojo mokymosi pagrindinei teorijai suprasti, tačiau jis nėra išsamus. Pradėsime nuo gilesnės tiesinės algebros analizės. Išugdysime geometrinį supratimą apie visus įprastus tiesinės algebros objektus ir operacijas, kuris leis pavaizduoti įvairių transformacijų poveikį mūsų duomenims. Svarbus elementas – tikrinių skaidų pagrindai.
 
-We next develop the theory of differential calculus to the point that we can fully understand why the gradient is the direction of steepest descent, and why back-propagation takes the form it does.  Integral calculus is then discussed to the degree needed to support our next topic, probability theory.
+Toliau išplėtosime diferencialinio skaičiavimo teoriją tiek, kad galėtume visiškai suprasti, kodėl gradientas rodo stačiausio nusileidimo kryptį ir kodėl atgalinis sklidimas yra būtent tokios formos. Integralinis skaičiavimas aptariamas tiek, kiek reikia kitai temai – tikimybių teorijai – paremti.
 
-Problems encountered in practice frequently are not certain, and thus we need a language to speak about uncertain things.  We review the theory of random variables and the most commonly encountered distributions so we may discuss models probabilistically.  This provides the foundation for the naive Bayes classifier, a probabilistic classification technique.
+Praktikoje sutinkamos problemos dažnai nėra tikros, todėl mums reikia kalbos, kuria galėtume kalbėti apie neapibrėžtus dalykus. Apžvelgsime atsitiktinių dydžių teoriją ir dažniausiai sutinkamus skirstinius, kad galėtume aptarti modelius tikimybiniu požiūriu. Tai sudaro pagrindą naiviajam Bajeso klasifikatoriui – tikimybiniam klasifikavimo metodui.
 
-Closely related to probability theory is the study of statistics.  While statistics is far too large a field to do justice in a short section, we will introduce fundamental concepts that all machine learning practitioners should be aware of, in particular: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals.
+Su tikimybių teorija glaudžiai susijusi statistika. Nors statistika yra per didelė sritis, kad ją būtų galima deramai apžvelgti trumpame skyriuje, pristatysime pagrindines sąvokas, kurias turėtų žinoti visi mašininio mokymosi praktikai, ypač: įvertinių vertinimą ir palyginimą, hipotezių tikrinimą ir pasikliautinųjų intervalų sudarymą.
 
-Last, we turn to the topic of information theory, which is the mathematical study of information storage and transmission.  This provides the core language by which we may discuss quantitatively how much information a model holds on a domain of discourse.
+Galiausiai pereisime prie informacijos teorijos – matematinio informacijos saugojimo ir perdavimo tyrimo. Ji suteikia pagrindinę kalbą, kuria galime kiekybiškai aptarti, kiek informacijos modelis turi apie nagrinėjamą sritį.
 
-Taken together, these form the core of the mathematical concepts needed to begin down the path towards a deep understanding of deep learning.
+Kartu paėmus, tai sudaro pagrindinių matematinių sąvokų, reikalingų žengiant giluminio giliojo mokymosi supratimo keliu, branduolį.
 
 ```toc
 :maxdepth: 2
@@ -37,4 +37,3 @@ naive-bayes
 statistics
 information-theory
 ```
-

@@ -1,12 +1,12 @@
-# Integral Calculus
+# Integralinis skaičiavimas
 :label:`sec_integral_calculus`
 
-Differentiation only makes up half of the content of a traditional calculus education.  The other pillar, integration, starts out seeming a rather disjoint question, "What is the area underneath this curve?"  While seemingly unrelated, integration is tightly intertwined with the differentiation via what is known as the *fundamental theorem of calculus*.
+Diferencijavimas sudaro tik pusę tradicinio matematinės analizės kurso turinio.  Kita atrama – integravimas – iš pradžių atrodo gana nesusijęs klausimas: „Koks plotas po šia kreive?“  Nors atrodo nesusiję, integravimas glaudžiai susijęs su diferencijavimu per tai, kas vadinama *pagrindine matematinės analizės teorema*.
 
-At the level of machine learning we discuss in this book, we will not need a deep understanding of integration. However, we will provide a brief introduction to lay the groundwork for any further applications we will encounter later on.
+Mašininio mokymo lygmeniu, apie kurį kalbame šioje knygoje, mums nereikės gilaus integravimo supratimo. Tačiau pateiksime trumpą įvadą, kad paruoštume pagrindą tolesniems taikymams, su kuriais susidursime vėliau.
 
-## Geometric Interpretation
-Suppose that we have a function $f(x)$.  For simplicity, let's assume that $f(x)$ is non-negative (never takes a value less than zero).  What we want to try and understand is: what is the area contained between $f(x)$ and the $x$-axis?
+## Geometrinė interpretacija
+Tarkime, turime funkciją $f(x)$.  Paprastumo dėlei darykime prielaidą, kad $f(x)$ yra neneigiama (niekada neįgyja reikšmės, mažesnės už nulį).  Norime pabandyti suprasti: koks plotas yra tarp $f(x)$ ir $x$ ašies?
 
 ```{.python .input}
 #@tab mxnet
@@ -60,7 +60,7 @@ d2l.plt.fill_between(x.numpy(), f.numpy())
 d2l.plt.show()
 ```
 
-In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
+Dažniausiai šis plotas bus begalinis arba neapibrėžtas (panagrinėkite plotą po $f(x) = x^{2}$), todėl žmonės dažnai kalba apie plotą tarp dviejų ribų, tarkime, $a$ ir $b$.
 
 ```{.python .input}
 #@tab mxnet
@@ -95,19 +95,19 @@ d2l.plt.fill_between(x.numpy()[50:250], f.numpy()[50:250])
 d2l.plt.show()
 ```
 
-We will denote this area by the integral symbol below:
+Šį plotą žymėsime toliau pateiktu integralo simboliu:
 
 $$
 \textrm{Area}(\mathcal{A}) = \int_a^b f(x) \;dx.
 $$
 
-The inner variable is a dummy variable, much like the index of a sum in a $\sum$, and so this can be equivalently written with any inner value we like:
+Vidinis kintamasis yra fiktyvusis kintamasis, labai panašus į sumos indeksą $\sum$, todėl tai galima ekvivalenčiai užrašyti su bet kokiu mums patinkančiu vidiniu žymeniu:
 
 $$
 \int_a^b f(x) \;dx = \int_a^b f(z) \;dz.
 $$
 
-There is a traditional way to try and understand how we might try to approximate such integrals: we can imagine taking the region in-between $a$ and $b$ and chopping it into $N$ vertical slices.  If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let's take a look at an example doing this in code.  We will see how to get the true value in a later section.
+Yra tradicinis būdas suprasti, kaip galėtume bandyti aproksimuoti tokius integralus: galime įsivaizduoti, kad sritį tarp $a$ ir $b$ supjaustome į $N$ vertikalių juostelių.  Jei $N$ didelis, kiekvienos juostelės plotą galime aproksimuoti stačiakampiu, o tada sudėti plotus ir gauti visą plotą po kreive.  Pažiūrėkime pavyzdį, kaip tai daroma kode.  Kaip gauti tikrąją reikšmę, pamatysime vėlesniame skyriuje.
 
 ```{.python .input}
 #@tab mxnet
@@ -172,180 +172,180 @@ d2l.plt.show()
 f'approximation: {approx}, truth: {true}'
 ```
 
-The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like
+Problema ta, kad nors tai galima padaryti skaitiškai, analitiškai šį metodą galime taikyti tik paprasčiausioms funkcijoms, tokioms kaip
 
 $$
 \int_a^b x \;dx.
 $$
 
-Anything somewhat more complex like our example from the code above
+Bet kas šiek tiek sudėtingesnio, kaip mūsų pavyzdys iš aukščiau pateikto kodo
 
 $$
 \int_a^b \frac{x}{1+x^{2}} \;dx.
 $$
 
-is beyond what we can solve with such a direct method.
+yra už to, ką galime išspręsti tokiu tiesioginiu metodu.
 
-We will instead take a different approach.  We will work intuitively with the notion of the area, and learn the main computational tool used to find integrals: the *fundamental theorem of calculus*.   This will be the basis for our study of integration.
+Vietoj to pasirinksime kitą požiūrį.  Dirbsime intuityviai su ploto sąvoka ir išmoksime pagrindinę skaičiavimo priemonę, naudojamą integralams rasti: *pagrindinę matematinės analizės teoremą*.   Tai bus mūsų integravimo studijų pagrindas.
 
-## The Fundamental Theorem of Calculus
+## Pagrindinė matematinės analizės teorema
 
-To dive deeper into the theory of integration, let's introduce a function
+Kad giliau įsigilintume į integravimo teoriją, įveskime funkciją
 
 $$
 F(x) = \int_0^x f(y) dy.
 $$
 
-This function measures the area between $0$ and $x$ depending on how we change $x$.  Notice that this is everything we need since
+Ši funkcija matuoja plotą tarp $0$ ir $x$, priklausomai nuo to, kaip keičiame $x$.  Atkreipkite dėmesį, kad tai yra viskas, ko mums reikia, nes
 
 $$
 \int_a^b f(x) \;dx = F(b) - F(a).
 $$
 
-This is a mathematical encoding of the fact that we can measure the area out to the far end-point and then subtract off the area to the near end point as indicated in :numref:`fig_area-subtract`.
+Tai yra matematinis užkodavimas fakto, kad galime išmatuoti plotą iki tolimesnio galo, o tada atimti plotą iki artimesnio galo, kaip parodyta :numref:`fig_area-subtract`.
 
-![Visualizing why we may reduce the problem of computing the area under a curve between two points to computing the area to the left of a point.](../img/sub-area.svg)
+![Vizualizacija, kodėl ploto po kreive tarp dviejų taškų skaičiavimo uždavinį galime suvesti į ploto į kairę nuo taško skaičiavimą.](../img/sub-area.svg)
 :label:`fig_area-subtract`
 
-Thus, we can figure out what the integral over any interval is by figuring out what $F(x)$ is.
+Taigi bet kurio intervalo integralą galime rasti išsiaiškinę, kas yra $F(x)$.
 
-To do so, let's consider an experiment.  As we often do in calculus, let's imagine what happens when we shift the value by a tiny bit.  From the comment above, we know that
+Tam apsvarstykime eksperimentą.  Kaip dažnai darome matematinėje analizėje, įsivaizduokime, kas nutinka, kai reikšmę šiek tiek pastumiame.  Iš aukščiau pateiktos pastabos žinome, kad
 
 $$
 F(x+\epsilon) - F(x) = \int_x^{x+\epsilon} f(y) \; dy.
 $$
 
-This tells us that the function changes by the area under a tiny sliver of a function.
+Tai mums sako, kad funkcija pasikeičia dydžiu, lygiu plotui po mažyte funkcijos juostele.
 
-This is the point at which we make an approximation.  If we look at a tiny sliver of area like this, it looks like this area is close to the rectangular area with height the value of $f(x)$ and the base width $\epsilon$.  Indeed, one can show that as $\epsilon \rightarrow 0$ this approximation becomes better and better.  Thus we can conclude:
+Čia daroma aproksimacija.  Jei žiūrime į tokią mažytę ploto juostelę, atrodo, kad šis plotas yra artimas stačiakampio plotui, kurio aukštis lygus $f(x)$ reikšmei, o pagrindo plotis yra $\epsilon$.  Iš tiesų galima parodyti, kad kai $\epsilon \rightarrow 0$, ši aproksimacija tampa vis geresnė.  Taigi galime daryti išvadą:
 
 $$
 F(x+\epsilon) - F(x) \approx \epsilon f(x).
 $$
 
-However, we can now notice: this is exactly the pattern we expect if we were computing the derivative of $F$!  Thus we see the following rather surprising fact:
+Tačiau dabar galime pastebėti: tai yra būtent tas dėsningumas, kurio tikėtumėmės skaičiuodami $F$ išvestinę!  Taigi matome tokį gana stulbinantį faktą:
 
 $$
 \frac{dF}{dx}(x) = f(x).
 $$
 
-This is the *fundamental theorem of calculus*.  We may write it in expanded form as
+Tai yra *pagrindinė matematinės analizės teorema*.  Ją galime užrašyti išplėsta forma
 $$\frac{d}{dx}\int_0^x  f(y) \; dy = f(x).$$
 :eqlabel:`eq_ftc`
 
-It takes the concept of finding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell us exactly what $F(x)$ is.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
+Ji ploto radimo sąvoką (*a priori* gana sunkią) suveda į teiginį apie išvestines (kažką daug geriau suprantama).  Paskutinė pastaba, kurią turime padaryti: tai mums nepasako, kokia tiksliai yra $F(x)$.  Iš tiesų $F(x) + C$ su bet kuria $C$ turi tą pačią išvestinę.  Tai integravimo teorijos gyvenimiška tiesa.  Laimei, atkreipkite dėmesį, kad dirbant su apibrėžtiniais integralais konstantos išnyksta, todėl rezultatui nėra svarbios.
 
 $$
 \int_a^b f(x) \; dx = (F(b) + C) - (F(a) + C) = F(b) - F(a).
 $$
 
-This may seem like abstract non-sense, but let's take a moment to appreciate that it has given us a whole new perspective on computing integrals.  Our goal is no-longer to do some sort of chop-and-sum process to try and recover the area, rather we need only find a function whose derivative is the function we have!  This is incredible since we can now list many rather difficult integrals by just reversing the table from :numref:`sec_derivative_table`.  For instance, we know that the derivative of $x^{n}$ is $nx^{n-1}$.  Thus, we can say using the fundamental theorem :eqref:`eq_ftc` that
+Tai gali atrodyti kaip abstraktus niekas, bet akimirkai įvertinkime, kad tai mums suteikė visiškai naują požiūrį į integralų skaičiavimą.  Mūsų tikslas nebėra atlikti kažkokį pjaustymo ir sumavimo procesą ploto atkūrimui, o tereikia rasti funkciją, kurios išvestinė yra turima funkcija!  Tai neįtikėtina, nes dabar galime išvardyti daugybę gana sunkių integralų tiesiog apverčiant lentelę iš :numref:`sec_derivative_table`.  Pavyzdžiui, žinome, kad $x^{n}$ išvestinė yra $nx^{n-1}$.  Taigi pagal pagrindinę teoremą :eqref:`eq_ftc` galime sakyti, kad
 
 $$
 \int_0^{x} ny^{n-1} \; dy = x^n - 0^n = x^n.
 $$
 
-Similarly, we know that the derivative of $e^{x}$ is itself, so that means
+Panašiai žinome, kad $e^{x}$ išvestinė yra ji pati, taigi tai reiškia
 
 $$
 \int_0^{x} e^{x} \; dx = e^{x} - e^{0} = e^x - 1.
 $$
 
-In this way, we can develop the entire theory of integration leveraging ideas from differential calculus freely.  Every integration rule derives from this one fact.
+Šitaip galime plėtoti visą integravimo teoriją laisvai pasitelkdami diferencialinio skaičiavimo idėjas.  Kiekviena integravimo taisyklė išplaukia iš šio vieno fakto.
 
-## Change of Variables
+## Kintamųjų keitimas
 :label:`subsec_integral_example`
 
-Just as with differentiation, there are a number of rules which make the computation of integrals more tractable.  In fact, every rule of differential calculus (like the product rule, sum rule, and chain rule) has a corresponding rule for integral calculus (integration by parts, linearity of integration, and the change of variables formula respectively).  In this section, we will dive into what is arguably the most important from the list: the change of variables formula.
+Kaip ir su diferencijavimu, yra keletas taisyklių, kurios padaro integralų skaičiavimą lengvesnį.  Iš tiesų kiekviena diferencialinio skaičiavimo taisyklė (kaip sandaugos, sumos ir grandinės taisyklės) turi atitinkamą integralinio skaičiavimo taisyklę (integravimas dalimis, integravimo tiesiškumas ir kintamųjų keitimo formulė atitinkamai).  Šiame skyrelyje pasinersime į, galima sakyti, svarbiausią iš sąrašo: kintamųjų keitimo formulę.
 
-First, suppose that we have a function which is itself an integral:
+Pirmiausia tarkime, turime funkciją, kuri pati yra integralas:
 
 $$
 F(x) = \int_0^x f(y) \; dy.
 $$
 
-Let's suppose that we want to know how this function looks when we compose it with another to obtain $F(u(x))$.  By the chain rule, we know
+Tarkime, norime sužinoti, kaip ši funkcija atrodo, kai ją sukomponuojame su kita ir gauname $F(u(x))$.  Pagal grandinės taisyklę žinome
 
 $$
 \frac{d}{dx}F(u(x)) = \frac{dF}{du}(u(x))\cdot \frac{du}{dx}.
 $$
 
-We can turn this into a statement about integration by using the fundamental theorem :eqref:`eq_ftc` as above.  This gives
+Tai galime paversti teiginiu apie integravimą naudodami pagrindinę teoremą :eqref:`eq_ftc`, kaip aukščiau.  Gauname
 
 $$
 F(u(x)) - F(u(0)) = \int_0^x \frac{dF}{du}(u(y))\cdot \frac{du}{dy} \;dy.
 $$
 
-Recalling that $F$ is itself an integral gives that the left hand side may be rewritten to be
+Prisiminę, kad $F$ pati yra integralas, gauname, kad kairiąją pusę galima perrašyti kaip
 
 $$
 \int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x \frac{dF}{du}(u(y))\cdot \frac{du}{dy} \;dy.
 $$
 
-Similarly, recalling that $F$ is an integral allows us to recognize that $\frac{dF}{dx} = f$ using the fundamental theorem :eqref:`eq_ftc`, and thus we may conclude
+Panašiai, prisiminę, kad $F$ yra integralas, galime atpažinti, kad $\frac{dF}{dx} = f$ pagal pagrindinę teoremą :eqref:`eq_ftc`, todėl galime daryti išvadą
 
 $$\int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x f(u(y))\cdot \frac{du}{dy} \;dy.$$
 :eqlabel:`eq_change_var`
 
-This is the *change of variables* formula.
+Tai yra *kintamųjų keitimo* formulė.
 
-For a more intuitive derivation, consider what happens when we take an integral of $f(u(x))$ between $x$ and $x+\epsilon$. For a small $\epsilon$, this integral is approximately $\epsilon f(u(x))$, the area of the associated rectangle.  Now, let's compare this with the integral of $f(y)$ from $u(x)$ to $u(x+\epsilon)$.  We know that $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, so the area of this rectangle is approximately $\epsilon \frac{du}{dx}(x)f(u(x))$.  Thus, to make the area of these two rectangles to agree, we need to multiply the first one by $\frac{du}{dx}(x)$ as is illustrated in :numref:`fig_rect-transform`.
+Intuityvesniam išvedimui panagrinėkime, kas nutinka imant $f(u(x))$ integralą tarp $x$ ir $x+\epsilon$. Mažam $\epsilon$ šis integralas yra apytiksliai $\epsilon f(u(x))$ – atitinkamo stačiakampio plotas.  Dabar palyginkime tai su $f(y)$ integralu nuo $u(x)$ iki $u(x+\epsilon)$.  Žinome, kad $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, todėl šio stačiakampio plotas yra apytiksliai $\epsilon \frac{du}{dx}(x)f(u(x))$.  Taigi, kad šių dviejų stačiakampių plotai sutaptų, pirmąjį turime padauginti iš $\frac{du}{dx}(x)$, kaip pavaizduota :numref:`fig_rect-transform`.
 
-![Visualizing the transformation of a single thin rectangle under the change of variables.](../img/rect-trans.svg)
+![Vieno plono stačiakampio transformacijos keičiant kintamuosius vizualizacija.](../img/rect-trans.svg)
 :label:`fig_rect-transform`
 
-This tells us that
+Tai mums sako, kad
 
 $$
 \int_x^{x+\epsilon} f(u(y))\frac{du}{dy}(y)\;dy = \int_{u(x)}^{u(x+\epsilon)} f(y) \; dy.
 $$
 
-This is the change of variables formula expressed for a single small rectangle.
+Tai yra kintamųjų keitimo formulė, išreikšta vienam mažam stačiakampiui.
 
-If $u(x)$ and $f(x)$ are properly chosen, this can allow for the computation of incredibly complex integrals.  For instance, if we even chose $f(y) = 1$ and $u(x) = e^{-x^{2}}$ (which means $\frac{du}{dx}(x) = -2xe^{-x^{2}}$), this can show for instance that
+Jei $u(x)$ ir $f(x)$ tinkamai pasirinktos, tai gali leisti apskaičiuoti neįtikėtinai sudėtingus integralus.  Pavyzdžiui, jei pasirinktume $f(y) = 1$ ir $u(x) = e^{-x^{2}}$ (tai reiškia $\frac{du}{dx}(x) = -2xe^{-x^{2}}$), galime parodyti, kad
 
 $$
 e^{-1} - 1 = \int_{e^{-0}}^{e^{-1}} 1 \; dy = -2\int_0^{1} ye^{-y^2}\;dy,
 $$
 
-and thus by rearranging that
+taigi pertvarkę gauname, kad
 
 $$
 \int_0^{1} ye^{-y^2}\; dy = \frac{1-e^{-1}}{2}.
 $$
 
-## A Comment on Sign Conventions
+## Pastaba dėl ženklų susitarimų
 
-Keen-eyed readers will observe something strange about the computations above.  Namely, computations like
+Budrūs skaitytojai pastebės kai ką keisto aukščiau pateiktuose skaičiavimuose.  Būtent tokie skaičiavimai kaip
 
 $$
 \int_{e^{-0}}^{e^{-1}} 1 \; dy = e^{-1} -1 < 0,
 $$
 
-can produce negative numbers.  When thinking about areas, it can be strange to see a negative value, and so it is worth digging into what the convention is.
+gali duoti neigiamus skaičius.  Galvojant apie plotus, gali atrodyti keista matyti neigiamą reikšmę, todėl verta išsiaiškinti, koks yra susitarimas.
 
-Mathematicians take the notion of signed areas.  This manifests itself in two ways.  First, if we consider a function $f(x)$ which is sometimes less than zero, then the area will also be negative.  So for instance
+Matematikai naudoja ženklinio ploto sąvoką.  Ji pasireiškia dviem būdais.  Pirma, jei nagrinėjame funkciją $f(x)$, kuri kartais yra mažesnė už nulį, tai plotas taip pat bus neigiamas.  Pavyzdžiui
 
 $$
 \int_0^{1} (-1)\;dx = -1.
 $$
 
-Similarly, integrals which progress from right to left, rather than left to right are also taken to be negative areas
+Panašiai integralai, einantys iš dešinės į kairę, o ne iš kairės į dešinę, taip pat laikomi neigiamais plotais
 
 $$
 \int_0^{-1} 1\; dx = -1.
 $$
 
-The standard area (from left to right of a positive function) is always positive.  Anything obtained by flipping it (say flipping over the $x$-axis to get the integral of a negative number, or flipping over the $y$-axis to get an integral in the wrong order) will produce a negative area.  And indeed, flipping twice will give a pair of negative signs that cancel out to have positive area
+Standartinis plotas (iš kairės į dešinę teigiamos funkcijos) visada teigiamas.  Viskas, kas gaunama jį apvertus (tarkime, apvertus per $x$ ašį ir gavus neigiamo skaičiaus integralą arba apvertus per $y$ ašį ir gavus integralą neteisinga tvarka), duos neigiamą plotą.  Ir iš tiesų, apvertus du kartus, gauname dvi neigiamas ženklų poras, kurios viena kitą panaikina, ir plotas teigiamas
 
 $$
 \int_0^{-1} (-1)\;dx =  1.
 $$
 
-If this discussion sounds familiar, it is!  In :numref:`sec_geometry-linear-algebraic-ops` we discussed how the determinant represented the signed area in much the same way.
+Jei ši diskusija skamba pažįstamai – taip ir yra!  :numref:`sec_geometry-linear-algebraic-ops` aptarėme, kaip determinantas panašiai atspindi ženklinį plotą.
 
-## Multiple Integrals
-In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x, y)$ and we want to know the volume under $f$ when $x$ ranges over $[a, b]$ and $y$ ranges over $[c, d]$.
+## Daugialypiai integralai
+Kai kuriais atvejais mums reikės dirbti aukštesnėse dimensijose.  Pavyzdžiui, tarkime, turime dviejų kintamųjų funkciją, pvz., $f(x, y)$, ir norime sužinoti tūrį po $f$, kai $x$ kinta intervale $[a, b]$, o $y$ – intervale $[c, d]$.
 
 ```{.python .input}
 #@tab mxnet
@@ -408,79 +408,79 @@ ax.set_zlim(0, 1)
 ax.dist = 12
 ```
 
-We write this as
+Tai užrašome kaip
 
 $$
 \int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy.
 $$
 
-Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in $x$ and then shifting to the integral in $y$, that is to say
+Tarkime, norime apskaičiuoti šį integralą.  Teigiu, kad tai galime padaryti iteratyviai apskaičiuodami pirmiausia integralą pagal $x$, o tada pereidami prie integralo pagal $y$, t. y.
 
 $$
 \int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int_c^{d} \left(\int_a^{b} f(x, y) \;dx\right) \; dy.
 $$
 
-Let's see why this is.
+Pažiūrėkime, kodėl taip yra.
 
-Consider the figure above where we have split the function into $\epsilon \times \epsilon$ squares which we will index with integer coordinates $i, j$.  In this case, our integral is approximately
+Panagrinėkime aukščiau pateiktą paveikslą, kuriame funkciją padalijome į $\epsilon \times \epsilon$ kvadratus, kuriuos indeksuosime sveikaisiais koordinatėmis $i, j$.  Šiuo atveju mūsų integralas yra apytiksliai
 
 $$
 \sum_{i, j} \epsilon^{2} f(\epsilon i, \epsilon j).
 $$
 
-Once we discretize the problem, we may add up the values on these squares in whatever order we like, and not worry about changing the values.  This is illustrated in :numref:`fig_sum-order`.  In particular, we can say that
+Kai uždavinį diskretizuojame, galime sudėti reikšmes šiuose kvadratuose bet kokia tvarka ir nesijaudinti, kad reikšmės pasikeis.  Tai iliustruota :numref:`fig_sum-order`.  Visų pirma galime sakyti, kad
 
 $$
  \sum _ {j} \epsilon \left(\sum_{i} \epsilon f(\epsilon i, \epsilon j)\right).
 $$
 
-![Illustrating how to decompose a sum over many squares as a sum over first the columns (1), then adding the column sums together (2).](../img/sum-order.svg)
+![Iliustracija, kaip sumą per daugelį kvadratų išskaidyti į sumą pirmiausia per stulpelius (1), o tada sudėti stulpelių sumas (2).](../img/sum-order.svg)
 :label:`fig_sum-order`
 
-The sum on the inside is precisely the discretization of the integral
+Vidinė suma yra būtent integralo diskretizacija
 
 $$
 G(\epsilon j) = \int _a^{b} f(x, \epsilon j) \; dx.
 $$
 
-Finally, notice that if we combine these two expressions we get
+Galiausiai atkreipkite dėmesį, kad jei sujungsime šias dvi išraiškas, gausime
 
 $$
 \sum _ {j} \epsilon G(\epsilon j) \approx \int _ {c}^{d} G(y) \; dy = \int _ {[a, b]\times[c, d]} f(x, y)\;dx\;dy.
 $$
 
-Thus putting it all together, we have that
+Taigi viską sudėję gauname, kad
 
 $$
 \int _ {[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int _ c^{d} \left(\int _ a^{b} f(x, y) \;dx\right) \; dy.
 $$
 
-Notice that, once discretized, all we did was rearrange the order in which we added a list of numbers.  This may make it seem like it is nothing, however this result (called *Fubini's Theorem*) is not always true!  For the type of mathematics encountered when doing machine learning (continuous functions), there is no concern, however it is possible to create examples where it fails (for example the function $f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3$ over the rectangle $[0,2]\times[0,1]$).
+Atkreipkite dėmesį, kad po diskretizavimo viskas, ką padarėme, buvo tiesiog pakeista skaičių sąrašo sudėjimo tvarka.  Dėl to gali atrodyti, kad tai niekis, tačiau šis rezultatas (vadinamas *Fubini teorema*) ne visada teisingas!  Mašininiame mokyme sutinkamai matematikai (tolydžioms funkcijoms) nėra ko nerimauti, tačiau galima sukurti pavyzdžių, kur jis neteisingas (pavyzdžiui, funkcija $f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3$ stačiakampyje $[0,2]\times[0,1]$).
 
-Note that the choice to do the integral in $x$ first, and then the integral in $y$ was arbitrary.  We could have equally well chosen to do $y$ first and then $x$ to see
+Atkreipkite dėmesį, kad pasirinkimas pirmiausia integruoti pagal $x$, o tada pagal $y$ buvo savavališkas.  Lygiai taip pat galėjome pasirinkti pirmiausia $y$, o tada $x$ ir pamatyti, kad
 
 $$
 \int _ {[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int _ a^{b} \left(\int _ c^{d} f(x, y) \;dy\right) \; dx.
 $$
 
-Often times, we will condense down to vector notation, and say that for $U = [a, b]\times [c, d]$ this is
+Dažnai suglaudinsime į vektorinį žymėjimą ir sakysime, kad $U = [a, b]\times [c, d]$ atveju tai yra
 
 $$
 \int _ U f(\mathbf{x})\;d\mathbf{x}.
 $$
 
-## Change of Variables in Multiple Integrals
-As with single variables in :eqref:`eq_change_var`, the ability to change variables inside a higher dimensional integral is a key tool.  Let's summarize the result without derivation.
+## Kintamųjų keitimas daugialypiuose integraluose
+Kaip su vienu kintamuoju :eqref:`eq_change_var`, galimybė keisti kintamuosius aukštesnės dimensijos integrale yra svarbi priemonė.  Apibendrinkime rezultatą be išvedimo.
 
-We need a function that reparametrizes our domain of integration.  We can take this to be $\phi : \mathbb{R}^n \rightarrow \mathbb{R}^n$, that is any function which takes in $n$ real variables and returns another $n$.  To keep the expressions clean, we will assume that $\phi$ is *injective* which is to say it never folds over itself ($\phi(\mathbf{x}) = \phi(\mathbf{y}) \implies \mathbf{x} = \mathbf{y}$).
+Mums reikia funkcijos, kuri pakeičia mūsų integravimo srities parametrizavimą.  Galime paimti $\phi : \mathbb{R}^n \rightarrow \mathbb{R}^n$, t. y. bet kurią funkciją, priimančią $n$ realiųjų kintamųjų ir grąžinančią kitus $n$.  Kad išraiškos būtų tvarkingos, darysime prielaidą, kad $\phi$ yra *injekcinė*, t. y. niekada nesusilanksto pati su savimi ($\phi(\mathbf{x}) = \phi(\mathbf{y}) \implies \mathbf{x} = \mathbf{y}$).
 
-In this case, we can say that
+Šiuo atveju galime sakyti, kad
 
 $$
 \int _ {\phi(U)} f(\mathbf{x})\;d\mathbf{x} = \int _ {U} f(\phi(\mathbf{x})) \left|\det(D\phi(\mathbf{x}))\right|\;d\mathbf{x}.
 $$
 
-where $D\phi$ is the *Jacobian* of $\phi$, which is the matrix of partial derivatives of $\boldsymbol{\phi} = (\phi_1(x_1, \ldots, x_n), \ldots, \phi_n(x_1, \ldots, x_n))$,
+kur $D\phi$ yra $\phi$ *Jakobio matrica*, t. y. dalinių išvestinių matrica funkcijos $\boldsymbol{\phi} = (\phi_1(x_1, \ldots, x_n), \ldots, \phi_n(x_1, \ldots, x_n))$,
 
 $$
 D\boldsymbol{\phi} = \begin{bmatrix}
@@ -490,23 +490,23 @@ D\boldsymbol{\phi} = \begin{bmatrix}
 \end{bmatrix}.
 $$
 
-Looking closely, we see that this is similar to the single variable chain rule :eqref:`eq_change_var`, except we have replaced the term $\frac{du}{dx}(x)$ with $\left|\det(D\phi(\mathbf{x}))\right|$.  Let's see how we can to interpret this term.  Recall that the $\frac{du}{dx}(x)$ term existed to say how much we stretched our $x$-axis by applying $u$.  The same process in higher dimensions is to determine how much we stretch the area (or volume, or hyper-volume) of a little square (or little *hyper-cube*) by applying $\boldsymbol{\phi}$.  If $\boldsymbol{\phi}$ was the multiplication by a matrix, then we know how the determinant already gives the answer.
+Atidžiai pažiūrėję matome, kad tai panašu į vieno kintamojo grandinės taisyklę :eqref:`eq_change_var`, tik narį $\frac{du}{dx}(x)$ pakeitėme nariu $\left|\det(D\phi(\mathbf{x}))\right|$.  Pažiūrėkime, kaip galime interpretuoti šį narį.  Prisiminkite, kad narys $\frac{du}{dx}(x)$ buvo skirtas pasakyti, kiek pritaikę $u$ ištempėme savo $x$ ašį.  Tas pats procesas aukštesnėse dimensijose yra nustatyti, kiek pritaikę $\boldsymbol{\phi}$ ištempiame mažo kvadrato (arba mažo *hiperkubo*) plotą (arba tūrį, arba hipertūrį).  Jei $\boldsymbol{\phi}$ būtų daugyba iš matricos, jau žinome, kad atsakymą duoda determinantas.
 
-With some work, one can show that the *Jacobian* provides the best approximation to a multivariable function $\boldsymbol{\phi}$ at a point by a matrix in the same way we could approximate by lines or planes with derivatives and gradients. Thus the determinant of the Jacobian exactly mirrors the scaling factor we identified in one dimension.
+Šiek tiek padirbėjus galima parodyti, kad *Jakobio matrica* suteikia geriausią daugelio kintamųjų funkcijos $\boldsymbol{\phi}$ aproksimaciją taške matrica, panašiai kaip galėjome aproksimuoti tiesėmis ar plokštumomis naudodami išvestines ir gradientus. Taigi Jakobio matricos determinantas tiksliai atspindi mastelio koeficientą, kurį nustatėme vienoje dimensijoje.
 
-It takes some work to fill in the details to this, so do not worry if they are not clear now.  Let's see at least one example we will make use of later on.  Consider the integral
+Reikia šiek tiek darbo, kad šias detales užpildytume, todėl nesijaudinkite, jei dabar jos neaiškios.  Pažiūrėkime bent vieną pavyzdį, kurį panaudosime vėliau.  Panagrinėkime integralą
 
 $$
 \int _ {-\infty}^{\infty} \int _ {-\infty}^{\infty} e^{-x^{2}-y^{2}} \;dx\;dy.
 $$
 
-Playing with this integral directly will get us no-where, but if we change variables, we can make significant progress.  If we let $\boldsymbol{\phi}(r, \theta) = (r \cos(\theta),  r\sin(\theta))$ (which is to say that $x = r \cos(\theta)$, $y = r \sin(\theta)$), then we can apply the change of variable formula to see that this is the same thing as
+Žaidžiant su šiuo integralu tiesiogiai niekur nenueisime, tačiau pakeitę kintamuosius galime gerokai pasistūmėti.  Jei imsime $\boldsymbol{\phi}(r, \theta) = (r \cos(\theta),  r\sin(\theta))$ (t. y. $x = r \cos(\theta)$, $y = r \sin(\theta)$), tada galime pritaikyti kintamųjų keitimo formulę ir pamatyti, kad tai yra tas pats, kas
 
 $$
 \int _ 0^\infty \int_0 ^ {2\pi} e^{-r^{2}} \left|\det(D\mathbf{\phi}(\mathbf{x}))\right|\;d\theta\;dr,
 $$
 
-where
+kur
 
 $$
 \left|\det(D\mathbf{\phi}(\mathbf{x}))\right| = \left|\det\begin{bmatrix}
@@ -515,37 +515,37 @@ $$
 \end{bmatrix}\right| = r(\cos^{2}(\theta) + \sin^{2}(\theta)) = r.
 $$
 
-Thus, the integral is
+Taigi integralas yra
 
 $$
 \int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi,
 $$
 
-where the final equality follows by the same computation that we used in section :numref:`subsec_integral_example`.
+kur paskutinė lygybė išplaukia iš to paties skaičiavimo, kurį naudojome :numref:`subsec_integral_example` skyrelyje.
 
-We will meet this integral again when we study continuous random variables in :numref:`sec_random_variables`.
+Šį integralą sutiksime vėl, kai :numref:`sec_random_variables` nagrinėsime tolydžiuosius atsitiktinius dydžius.
 
-## Summary
+## Santrauka
 
-* The theory of integration allows us to answer questions about areas or volumes.
-* The fundamental theorem of calculus allows us to leverage knowledge about derivatives to compute areas via the observation that the derivative of the area up to some point is given by the value of the function being integrated.
-* Integrals in higher dimensions can be computed by iterating single variable integrals.
+* Integravimo teorija leidžia atsakyti į klausimus apie plotus ar tūrius.
+* Pagrindinė matematinės analizės teorema leidžia pasinaudoti žiniomis apie išvestines plotams skaičiuoti, remiantis pastebėjimu, kad ploto iki tam tikro taško išvestinę duoda integruojamos funkcijos reikšmė.
+* Aukštesnių dimensijų integralus galima apskaičiuoti iteruojant vieno kintamojo integralus.
 
-## Exercises
-1. What is $\int_1^2 \frac{1}{x} \;dx$?
-2. Use the change of variables formula to integrate $\int_0^{\sqrt{\pi}}x\sin(x^2)\;dx$.
-3. What is $\int_{[0,1]^2} xy \;dx\;dy$?
-4. Use the change of variables formula to compute $\int_0^2\int_0^1xy(x^2-y^2)/(x^2+y^2)^3\;dy\;dx$ and $\int_0^1\int_0^2f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3\;dx\;dy$ to see they are different.
+## Pratimai
+1. Kam lygus $\int_1^2 \frac{1}{x} \;dx$?
+2. Naudodami kintamųjų keitimo formulę, suintegruokite $\int_0^{\sqrt{\pi}}x\sin(x^2)\;dx$.
+3. Kam lygus $\int_{[0,1]^2} xy \;dx\;dy$?
+4. Naudodami kintamųjų keitimo formulę, apskaičiuokite $\int_0^2\int_0^1xy(x^2-y^2)/(x^2+y^2)^3\;dy\;dx$ ir $\int_0^1\int_0^2f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3\;dx\;dy$ ir pamatykite, kad jie skiriasi.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/414)
+[Diskusijos](https://discuss.d2l.ai/t/414)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1092)
+[Diskusijos](https://discuss.d2l.ai/t/1092)
 :end_tab:
 
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1093)
+[Diskusijos](https://discuss.d2l.ai/t/1093)
 :end_tab:

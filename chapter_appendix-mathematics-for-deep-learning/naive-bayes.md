@@ -1,9 +1,9 @@
-# Naive Bayes
+# Naivusis Bajesas
 :label:`sec_naive_bayes`
 
-Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let's introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals to allow us to perform classification of digits.
+Ankstesniuose skyriuose susipažinome su tikimybių teorija ir atsitiktiniais dydžiais.  Kad šią teoriją pritaikytume praktikoje, pristatykime *naivųjį Bajeso* klasifikatorių.  Jis naudoja vien tikimybinius pagrindus ir leidžia klasifikuoti skaitmenis.
 
-Learning is all about making assumptions. If we want to classify a new data example that we have never seen before we have to make some assumptions about which data examples are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
+Mokymasis – tai visų pirma prielaidų darymas. Jei norime klasifikuoti naują, anksčiau nematytą duomenų pavyzdį, turime daryti tam tikras prielaidas apie tai, kurie duomenų pavyzdžiai yra panašūs vienas į kitą. Naivusis Bajeso klasifikatorius – populiarus ir stebėtinai aiškus algoritmas – skaičiavimams supaprastinti daro prielaidą, kad visi požymiai yra nepriklausomi vienas nuo kito. Šiame skyriuje šį modelį pritaikysime simboliams paveikslėliuose atpažinti.
 
 ```{.python .input}
 #@tab mxnet
@@ -34,16 +34,16 @@ import tensorflow as tf
 d2l.use_svg_display()
 ```
 
-## Optical Character Recognition
+## Optinis simbolių atpažinimas
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` yra vienas plačiai naudojamų duomenų rinkinių. Jame yra 60 000 mokymo paveikslėlių ir 10 000 validavimo paveikslėlių. Kiekviename paveikslėlyje pavaizduotas ranka rašytas skaitmuo nuo 0 iki 9. Uždavinys – kiekvieną paveikslėlį priskirti atitinkamam skaitmeniui.
 
-Gluon provides a `MNIST` class in the `data.vision` module to
-automatically retrieve the dataset from the Internet.
-Subsequently, Gluon will use the already-downloaded local copy.
-We specify whether we are requesting the training set or the test set
-by setting the value of the parameter `train` to `True` or `False`, respectively.
-Each image is a grayscale image with both width and height of $28$ with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by an unsigned $8$-bit integer.  We quantize them into binary features to simplify the problem.
+Gluon modulyje `data.vision` yra klasė `MNIST`, kuri
+automatiškai gauna duomenų rinkinį iš interneto.
+Vėliau Gluon naudos jau atsisiųstą vietinę kopiją.
+Nurodome, ar prašome mokymo, ar testavimo rinkinio,
+parametrui `train` atitinkamai priskirdami reikšmę `True` arba `False`.
+Kiekvienas paveikslėlis yra pilkų atspalvių, kurio plotis ir aukštis yra $28$, o forma ($28$,$28$,$1$). Naudojame pritaikytą transformaciją, kad pašalintume paskutinę kanalo dimensiją. Be to, duomenų rinkinyje kiekvienas pikselis pavaizduotas $8$ bitų sveikuoju skaičiumi be ženklo.  Problemai supaprastinti juos kvantizuojame į dvejetainius požymius.
 
 ```{.python .input}
 #@tab mxnet
@@ -83,7 +83,7 @@ train_labels = tf.constant(train_labels, dtype = tf.int32)
 test_labels = tf.constant(test_labels, dtype = tf.int32)
 ```
 
-We can access a particular example, which contains the image and the corresponding label.
+Galime pasiekti konkretų pavyzdį, kuriame yra paveikslėlis ir atitinkama žymė.
 
 ```{.python .input}
 #@tab mxnet
@@ -103,14 +103,14 @@ image, label = train_images[2], train_labels[2]
 image.shape, label.numpy()
 ```
 
-Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
+Mūsų pavyzdys, čia saugomas kintamajame `image`, atitinka paveikslėlį, kurio aukštis ir plotis yra $28$ pikseliai.
 
 ```{.python .input}
 #@tab all
 image.shape, image.dtype
 ```
 
-Our code stores the label of each image as a scalar. Its type is a $32$-bit integer.
+Mūsų kodas kiekvieno paveikslėlio žymę saugo kaip skaliarą. Jo tipas yra $32$ bitų sveikasis skaičius.
 
 ```{.python .input}
 #@tab mxnet
@@ -127,7 +127,7 @@ label, type(label)
 label.numpy(), label.dtype
 ```
 
-We can also access multiple examples at the same time.
+Taip pat galime vienu metu pasiekti kelis pavyzdžius.
 
 ```{.python .input}
 #@tab mxnet
@@ -149,42 +149,42 @@ labels = tf.constant([train_labels[i].numpy() for i in range(10, 38)])
 images.shape, labels.shape
 ```
 
-Let's visualize these examples.
+Pavaizduokime šiuos pavyzdžius.
 
 ```{.python .input}
 #@tab all
 d2l.show_images(images, 2, 9);
 ```
 
-## The Probabilistic Model for Classification
+## Tikimybinis klasifikavimo modelis
 
-In a classification task, we map an example into a category. Here an example is a grayscale $28\times 28$ image, and a category is a digit. (Refer to :numref:`sec_softmax` for a more detailed explanation.)
-One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e., image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a $2$-dimensional image to a vector so that $d=28^2=784$, and labels are digits.
-The probability of the label given the features is $p(y  \mid  \mathbf{x})$. If we are able to compute these probabilities, which are $p(y  \mid  \mathbf{x})$ for $y=0, \ldots,9$ in our example, then the classifier will output the prediction $\hat{y}$ given by the expression:
+Klasifikavimo užduotyje pavyzdį atvaizduojame į kategoriją. Čia pavyzdys yra pilkų atspalvių $28\times 28$ paveikslėlis, o kategorija – skaitmuo. (Išsamesnį paaiškinimą žr. :numref:`sec_softmax`.)
+Vienas natūralus būdas išreikšti klasifikavimo užduotį yra tikimybinis klausimas: kokia yra tikriausia žymė, žinant požymius (t. y. paveikslėlio pikselius)? Pažymėkime $\mathbf x\in\mathbb R^d$ pavyzdžio požymius, o $y\in\mathbb R$ – žymę. Čia požymiai yra paveikslėlio pikseliai, o $2$ dimensijų paveikslėlį galime pakeisti vektoriumi, kad $d=28^2=784$, o žymės yra skaitmenys.
+Žymės tikimybė, žinant požymius, yra $p(y  \mid  \mathbf{x})$. Jei galime apskaičiuoti šias tikimybes, mūsų pavyzdyje tai $p(y  \mid  \mathbf{x})$, kai $y=0, \ldots,9$, tada klasifikatorius pateiks prognozę $\hat{y}$, pateikiamą išraiška:
 
 $$\hat{y} = \mathrm{argmax} \> p(y  \mid  \mathbf{x}).$$
 
-Unfortunately, this requires that we estimate $p(y  \mid  \mathbf{x})$ for every value of $\mathbf{x} = x_1, ..., x_d$. Imagine that each feature could take one of $2$ values. For example, the feature $x_1 = 1$ might signify that the word apple appears in a given document and $x_1 = 0$ would signify that it does not. If we had $30$ such binary features, that would mean that we need to be prepared to classify any of $2^{30}$ (over 1 billion!) possible values of the input vector $\mathbf{x}$.
+Deja, tam reikia įvertinti $p(y  \mid  \mathbf{x})$ kiekvienai $\mathbf{x} = x_1, ..., x_d$ reikšmei. Įsivaizduokite, kad kiekvienas požymis gali įgyti vieną iš $2$ reikšmių. Pavyzdžiui, požymis $x_1 = 1$ gali reikšti, kad tam tikrame dokumente yra žodis „obuolys“, o $x_1 = 0$ – kad jo nėra. Jei turėtume $30$ tokių dvejetainių požymių, tai reikštų, kad turime būti pasirengę klasifikuoti bet kurią iš $2^{30}$ (daugiau nei 1 milijardo!) galimų įvesties vektoriaus $\mathbf{x}$ reikšmių.
 
-Moreover, where is the learning? If we need to see every single possible example in order to predict the corresponding label then we are not really learning a pattern but just memorizing the dataset.
+Be to, kur čia mokymasis? Jei norėdami prognozuoti atitinkamą žymę turime pamatyti kiekvieną įmanomą pavyzdį, tai iš tiesų nesimokome dėsningumo, o tik įsimename duomenų rinkinį.
 
-## The Naive Bayes Classifier
+## Naivusis Bajeso klasifikatorius
 
-Fortunately, by making some assumptions about conditional independence, we can introduce some inductive bias and build a model capable of generalizing from a comparatively modest selection of training examples. To begin, let's use Bayes theorem, to express the classifier as
+Laimei, padarę keletą sąlyginio nepriklausomumo prielaidų, galime įvesti tam tikrą induktyvųjį šališkumą ir sukurti modelį, gebantį apibendrinti iš palyginti kuklaus mokymo pavyzdžių rinkinio. Pradėkime nuo Bajeso teoremos ir klasifikatorių išreikškime kaip
 
 $$\hat{y} = \mathrm{argmax}_y \> p(y  \mid  \mathbf{x}) = \mathrm{argmax}_y \> \frac{p( \mathbf{x}  \mid  y) p(y)}{p(\mathbf{x})}.$$
 
-Note that the denominator is the normalizing term $p(\mathbf{x})$ which does not depend on the value of the label $y$. As a result, we only need to worry about comparing the numerator across different values of $y$. Even if calculating the denominator turned out to be intractable, we could get away with ignoring it, so long as we could evaluate the numerator. Fortunately, even if we wanted to recover the normalizing constant, we could.  We can always recover the normalization term since $\sum_y p(y  \mid  \mathbf{x}) = 1$.
+Atkreipkite dėmesį, kad vardiklis yra normalizuojantis narys $p(\mathbf{x})$, kuris nepriklauso nuo žymės $y$ reikšmės. Todėl turime rūpintis tik skaitiklio palyginimu esant skirtingoms $y$ reikšmėms. Net jei vardiklio apskaičiavimas pasirodytų neįveikiamas, galėtume jo nepaisyti, jei tik galėtume apskaičiuoti skaitiklį. Laimei, net jei norėtume atkurti normalizavimo konstantą, galėtume. Normalizavimo narį visada galime atkurti, nes $\sum_y p(y  \mid  \mathbf{x}) = 1$.
 
-Now, let's focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
+Dabar susitelkime į $p( \mathbf{x}  \mid  y)$. Naudodami tikimybės grandinės taisyklę, narį $p( \mathbf{x}  \mid  y)$ galime išreikšti kaip
 
 $$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$
 
-By itself, this expression does not get us any further. We still must estimate roughly $2^d$ parameters. However, if we assume that *the features are conditionally independent of each other, given the label*, then suddenly we are in much better shape, as this term simplifies to $\prod_i p(x_i  \mid  y)$, giving us the predictor
+Pati savaime ši išraiška toliau mūsų neveda. Vis dar turime įvertinti maždaug $2^d$ parametrų. Tačiau jei darome prielaidą, kad *požymiai yra sąlygiškai nepriklausomi vienas nuo kito, žinant žymę*, tada staiga esame daug geresnėje padėtyje, nes šis narys supaprastėja iki $\prod_i p(x_i  \mid  y)$, ir gauname prognozuoklį
 
 $$\hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
 
-If we can estimate $p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$, then we can also use this to estimate $p(x_i = 0 \mid y)$, i.e.,
+Jei kiekvienam $i$ ir $y$ galime įvertinti $p(x_i=1  \mid  y)$ ir jos reikšmę išsaugoti $P_{xy}[i, y]$, čia $P_{xy}$ yra $d\times n$ matrica, kurioje $n$ yra klasių skaičius, o $y\in\{1, \ldots, n\}$, tada galime tai panaudoti ir $p(x_i = 0 \mid y)$ įvertinti, t. y.
 
 $$
 p(x_i = t_i \mid y) =
@@ -194,17 +194,17 @@ p(x_i = t_i \mid y) =
 \end{cases}
 $$
 
-In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then, for any new example $\mathbf t = (t_1, t_2, \ldots, t_d)$, we could compute
+Be to, kiekvienam $y$ įvertiname $p(y)$ ir išsaugome $P_y[y]$, kur $P_y$ yra $n$ ilgio vektorius. Tada bet kuriam naujam pavyzdžiui $\mathbf t = (t_1, t_2, \ldots, t_d)$ galėtume apskaičiuoti
 
 $$\begin{aligned}\hat{y} &= \mathrm{argmax}_ y \ p(y)\prod_{i=1}^d   p(x_t = t_i \mid y) \\ &= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i}\end{aligned}$$
 :eqlabel:`eq_naive_bayes_estimation`
 
-for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $\mathcal{O}(2^dn)$ to a linear dependence, which is $\mathcal{O}(dn)$.
+bet kuriam $y$. Taigi mūsų sąlyginio nepriklausomumo prielaida modelio sudėtingumą pakeitė iš eksponentinės priklausomybės nuo požymių skaičiaus $\mathcal{O}(2^dn)$ į tiesinę, kuri yra $\mathcal{O}(dn)$.
 
 
-## Training
+## Mokymas
 
-The problem now is that we do not know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, we may count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
+Dabar problema ta, kad nežinome $P_{xy}$ ir $P_y$. Todėl pirmiausia turime įvertinti jų reikšmes iš tam tikrų mokymo duomenų. Tai yra modelio *mokymas*. Įvertinti $P_y$ nėra labai sunku. Kadangi turime tik $10$ klasių, galime suskaičiuoti pasikartojimų skaičių $n_y$ kiekvienam skaitmeniui ir padalyti iš bendro duomenų kiekio $n$. Pavyzdžiui, jei skaitmuo 8 pasitaiko $n_8 = 5\,800$ kartų, o iš viso turime $n = 60\,000$ paveikslėlių, tikimybės įvertis yra $p(y=8) = 0{,}0967$.
 
 ```{.python .input}
 #@tab mxnet
@@ -241,7 +241,7 @@ P_y = n_y / tf.reduce_sum(n_y)
 P_y
 ```
 
-Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g., for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y}+2$ (since there are two possible values pixel $i$ can take - it can either be black or white). This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it can be motivated from a Bayesian point-of-view by a Beta-binomial model.
+Dabar pereikime prie šiek tiek sudėtingesnio dalyko – $P_{xy}$. Kadangi pasirinkome nespalvotus paveikslėlius, $p(x_i  \mid  y)$ žymi tikimybę, kad $i$-asis pikselis klasėje $y$ yra įjungtas. Kaip ir anksčiau, galime suskaičiuoti, kiek kartų $n_{iy}$ įvyksta įvykis, ir padalyti iš bendro $y$ pasikartojimų skaičiaus, t. y. $n_y$. Tačiau yra kai kas šiek tiek nerimą keliančio: tam tikri pikseliai gali niekada nebūti juodi (pvz., gerai apkarpytuose paveikslėliuose kampiniai pikseliai gali visada būti balti). Patogus statistikų būdas su šia problema tvarkytis – prie visų pasikartojimų pridėti pseudoskaičius. Taigi vietoj $n_{iy}$ naudojame $n_{iy}+1$, o vietoj $n_y$ – $n_{y}+2$ (nes $i$-asis pikselis gali įgyti dvi reikšmes – būti juodas arba baltas). Tai dar vadinama *Laplaso glotninimu* (angl. *Laplace smoothing*).  Tai gali atrodyti ad hoc, tačiau ją galima pagrįsti Bajeso požiūriu Beta-binominiu modeliu.
 
 ```{.python .input}
 #@tab mxnet
@@ -274,9 +274,9 @@ P_xy = (n_x + 1) / tf.reshape((n_y + 2), (10, 1, 1))
 d2l.show_images(P_xy, 2, 5);
 ```
 
-By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.
+Pavaizdavę šias $10\times 28\times 28$ tikimybes (kiekvienam pikseliui kiekvienoje klasėje) galėtume gauti gana niūriai atrodančius skaitmenis.
 
-Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x \mid y)p(y)$ for every $y$.
+Dabar galime naudoti :eqref:`eq_naive_bayes_estimation` naujam paveikslėliui prognozuoti. Duotam $\mathbf x$ šios funkcijos apskaičiuoja $p(\mathbf x \mid y)p(y)$ kiekvienam $y$.
 
 ```{.python .input}
 #@tab mxnet
@@ -314,10 +314,10 @@ image, label = train_images[0], train_labels[0]
 bayes_pred(image)
 ```
 
-This went horribly wrong! To find out why, let's look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
+Tai baigėsi siaubingai prastai! Norėdami išsiaiškinti kodėl, pažiūrėkime į tikimybes pikseliams. Paprastai jos yra skaičiai tarp $0{,}001$ ir $1$. Mes dauginame $784$ iš jų. Čia verta paminėti, kad šiuos skaičius skaičiuojame kompiuteriu, taigi su fiksuotu eksponentės intervalu. Įvyksta *skaitinis nepakankamumas* (angl. *numerical underflow*), t. y. dauginant visus mažus skaičius gaunamas dar mažesnis, kol jis suapvalinamas žemyn iki nulio.  Tai aptarėme kaip teorinę problemą :numref:`sec_maximum_likelihood`, bet čia šį reiškinį aiškiai matome praktikoje.
 
-As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
-Even if both $a$ and $b$ are small numbers, the logarithm values should be in a proper range.
+Kaip aptarta tame skyriuje, tai išsprendžiame pasinaudoję tuo, kad $\log a b = \log a + \log b$, t. y. pereiname prie logaritmų sumavimo.
+Net jei tiek $a$, tiek $b$ yra maži skaičiai, logaritmų reikšmės turėtų būti tinkamame intervale.
 
 ```{.python .input}
 #@tab mxnet
@@ -340,11 +340,11 @@ print('underflow:', a**784)
 print('logarithm is normal:', 784*tf.math.log(a).numpy())
 ```
 
-Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
+Kadangi logaritmas yra didėjanti funkcija, :eqref:`eq_naive_bayes_estimation` galime perrašyti kaip
 
 $$ \hat{y} = \mathrm{argmax}_y \ \log P_y[y] + \sum_{i=1}^d \Big[t_i\log P_{xy}[x_i, y] + (1-t_i) \log (1 - P_{xy}[x_i, y]) \Big].$$
 
-We can implement the following stable version:
+Galime realizuoti šią stabilią versiją:
 
 ```{.python .input}
 #@tab mxnet
@@ -394,7 +394,7 @@ py = bayes_pred_stable(image)
 py
 ```
 
-We may now check if the prediction is correct.
+Dabar galime patikrinti, ar prognozė teisinga.
 
 ```{.python .input}
 #@tab mxnet
@@ -413,8 +413,8 @@ py.argmax(dim=0) == label
 tf.argmax(py, axis=0, output_type = tf.int32) == label
 ```
 
-If we now predict a few validation examples, we can see the Bayes
-classifier works pretty well.
+Jei dabar prognozuosime kelis validavimo pavyzdžius, pamatysime, kad Bajeso
+klasifikatorius veikia gana gerai.
 
 ```{.python .input}
 #@tab mxnet
@@ -451,7 +451,7 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
-Finally, let's compute the overall accuracy of the classifier.
+Galiausiai apskaičiuokime bendrą klasifikatoriaus tikslumą.
 
 ```{.python .input}
 #@tab mxnet
@@ -477,26 +477,26 @@ preds = tf.constant(predict(X), dtype=tf.int32)
 tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)
 ```
 
-Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
+Šiuolaikiniai giluminiai tinklai pasiekia mažesnes nei $0{,}01$ klaidų dažnis. Palyginti prastą našumą lemia neteisingos statistinės prielaidos, kurias padarėme savo modelyje: darėme prielaidą, kad kiekvienas pikselis generuojamas *nepriklausomai*, priklausomai tik nuo žymės. Akivaizdu, kad žmonės skaitmenų taip nerašo, ir ši klaidinga prielaida lėmė mūsų pernelyg naivaus (Bajeso) klasifikatoriaus žlugimą.
 
-## Summary
-* Using Bayes' rule, a classifier can be made by assuming all observed features are independent.
-* This classifier can be trained on a dataset by counting the number of occurrences of combinations of labels and pixel values.
-* This classifier was the gold standard for decades for tasks such as spam detection.
+## Santrauka
+* Naudojant Bajeso taisyklę, klasifikatorių galima sukurti darant prielaidą, kad visi stebimi požymiai yra nepriklausomi.
+* Šį klasifikatorių galima apmokyti duomenų rinkinyje skaičiuojant žymių ir pikselių reikšmių derinių pasikartojimus.
+* Šis klasifikatorius dešimtmečius buvo aukso standartas tokioms užduotims kaip šlamšto aptikimas.
 
-## Exercises
-1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
-1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data example arrived at testing time which contained a value never observed in training.  What would the model output?
-1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :citet:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
+## Pratimai
+1. Panagrinėkite duomenų rinkinį $[[0,0], [0,1], [1,0], [1,1]]$ su žymėmis, gaunamomis kaip dviejų elementų XOR: $[0,1,1,0]$.  Kokios yra naiviojo Bajeso klasifikatoriaus, sukurto šiame duomenų rinkinyje, tikimybės?  Ar jis sėkmingai klasifikuoja mūsų taškus?  Jei ne, kokios prielaidos pažeidžiamos?
+1. Tarkime, kad įvertindami tikimybes nenaudojome Laplaso glotninimo, o testavimo metu atkeliavo duomenų pavyzdys, kuriame buvo reikšmė, niekada nematyta mokymo metu.  Ką pateiktų modelis?
+1. Naivusis Bajeso klasifikatorius yra konkretus Bajeso tinklo pavyzdys, kuriame atsitiktinių dydžių priklausomybė užkoduojama grafo struktūra.  Nors pilna teorija neįeina į šio skyriaus aprėptį (išsamiai žr. :citet:`Koller.Friedman.2009`), paaiškinkite, kodėl leidus aiškią priklausomybę tarp dviejų XOR modelio įvesties kintamųjų, galima sukurti sėkmingą klasifikatorių.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/418)
+[Diskusijos](https://discuss.d2l.ai/t/418)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1100)
+[Diskusijos](https://discuss.d2l.ai/t/1100)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1101)
+[Diskusijos](https://discuss.d2l.ai/t/1101)
 :end_tab:

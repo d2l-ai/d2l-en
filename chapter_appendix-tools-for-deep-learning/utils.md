@@ -3,11 +3,11 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
-# Utility Functions and Classes
+# Pagalbinės funkcijos ir klasės
 :label:`sec_utils`
 
 
-This section contains the implementations of utility functions and classes used in this book.
+Šiame skyriuje pateikiamos šioje knygoje naudojamų pagalbinių funkcijų ir klasių realizacijos.
 
 ```{.python .input}
 %%tab mxnet
@@ -48,7 +48,7 @@ from d2l import jax as d2l
 import jax
 ```
 
-Hyperparameters.
+Hiperparametrai.
 
 ```{.python .input}
 %%tab all
@@ -63,7 +63,7 @@ def save_hyperparameters(self, ignore=[]):
         setattr(self, k, v)
 ```
 
-Progress bar.
+Eigos juosta.
 
 ```{.python .input  n=22}
 %%tab all
@@ -108,7 +108,7 @@ def draw(self, x, y, label, every_n=1):
     display.clear_output(wait=True)
 ```
 
-Add FrozenLake enviroment
+Pridedama FrozenLake aplinka
 ```{.python .input}
 %%tab pytorch
 
@@ -145,7 +145,7 @@ def frozen_lake(seed): #@save
 
 ```
 
-Create enviroment
+Aplinkos kūrimas
 ```{.python .input}
 %%tab pytorch
 
@@ -161,7 +161,7 @@ def make_env(name ='', seed=0): #@save
 
 ```
 
-Show value function
+Reikšmių funkcijos rodymas
 ```{.python .input}
 %%tab pytorch
 
@@ -220,7 +220,7 @@ def show_value_function_progress(env_desc, V, pi): #@save
     plt.show()
 
 ```
-Show Q function
+Q funkcijos rodymas
 ```{.python .input}
 %%tab pytorch
 
@@ -292,9 +292,9 @@ def show_Q_function_progress(env_desc, V_all, pi_all): #@save
 
 ```
 
-Trainer
+Treneris
 
-A bunch of functions that will be deprecated:
+Funkcijos, kurios bus pašalintos kaip pasenusios:
 
 ```{.python .input}
 %%tab mxnet
@@ -829,7 +829,7 @@ def grad_clipping(grads, theta):  #@save
     return new_grad
 ```
 
-More for the attention chapter.
+Daugiau dėmesio skyriui.
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow

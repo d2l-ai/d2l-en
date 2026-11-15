@@ -2,7 +2,7 @@
 
 .. only:: html
 
-   References
+   Literatūra
    ==========
 
 ```

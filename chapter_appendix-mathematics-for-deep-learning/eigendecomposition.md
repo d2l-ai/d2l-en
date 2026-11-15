@@ -1,13 +1,13 @@
-# Eigendecompositions
+# Tikrinės skaidos
 :label:`sec_eigendecompositions`
 
-Eigenvalues are often one of the most useful notions
-we will encounter when studying linear algebra,
-however, as a beginner, it is easy to overlook their importance.
-Below, we introduce eigendecomposition and
-try to convey some sense of just why it is so important.
+Tikrinės reikšmės dažnai yra viena naudingiausių sąvokų,
+su kuriomis susidursime studijuodami tiesinę algebrą,
+tačiau pradedančiajam lengva nepastebėti jų svarbos.
+Toliau pristatome tikrinę skaidą ir
+bandome perteikti, kodėl ji tokia svarbi.
 
-Suppose that we have a matrix $A$ with the following entries:
+Tarkime, turime matricą $A$ su šiais elementais:
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -16,49 +16,49 @@ $$
 \end{bmatrix}.
 $$
 
-If we apply $A$ to any vector $\mathbf{v} = [x, y]^\top$,
-we obtain a vector $\mathbf{A}\mathbf{v} = [2x, -y]^\top$.
-This has an intuitive interpretation:
-stretch the vector to be twice as wide in the $x$-direction,
-and then flip it in the $y$-direction.
+Jei $A$ pritaikome bet kuriam vektoriui $\mathbf{v} = [x, y]^\top$,
+gauname vektorių $\mathbf{A}\mathbf{v} = [2x, -y]^\top$.
+Tai turi intuityvų aiškinimą:
+ištempti vektorių dvigubai $x$ kryptimi,
+o tada apversti jį $y$ kryptimi.
 
-However, there are *some* vectors for which something remains unchanged.
-Namely $[1, 0]^\top$ gets sent to $[2, 0]^\top$
-and $[0, 1]^\top$ gets sent to $[0, -1]^\top$.
-These vectors are still in the same line,
-and the only modification is that the matrix stretches them
-by a factor of $2$ and $-1$ respectively.
-We call such vectors *eigenvectors*
-and the factor they are stretched by *eigenvalues*.
+Vis dėlto yra *kai kurių* vektorių, kuriems kai kas išlieka nepakitę.
+Būtent $[1, 0]^\top$ pereina į $[2, 0]^\top$,
+o $[0, 1]^\top$ – į $[0, -1]^\top$.
+Šie vektoriai lieka toje pačioje tiesėje,
+o vienintelis pokytis – matrica juos ištempia
+atitinkamai $2$ ir $-1$ kartus.
+Tokius vektorius vadiname *tikriniais vektoriais*,
+o koeficientą, kiek jie ištempiami, – *tikrinėmis reikšmėmis*.
 
-In general, if we can find a number $\lambda$
-and a vector $\mathbf{v}$ such that
+Bendru atveju, jei galime rasti skaičių $\lambda$
+ir vektorių $\mathbf{v}$, kad
 
 $$
 \mathbf{A}\mathbf{v} = \lambda \mathbf{v}.
 $$
 
-We say that $\mathbf{v}$ is an eigenvector for $A$ and $\lambda$ is an eigenvalue.
+sakome, kad $\mathbf{v}$ yra matricos $A$ tikrinis vektorius, o $\lambda$ – tikrinė reikšmė.
 
-## Finding Eigenvalues
-Let's figure out how to find them. By subtracting off the $\lambda \mathbf{v}$ from both sides,
-and then factoring out the vector,
-we see the above is equivalent to:
+## Tikrinių reikšmių radimas
+Išsiaiškinkime, kaip jas rasti. Iš abiejų pusių atėmę $\lambda \mathbf{v}$
+ir iškėlę vektorių prieš skliaustus,
+matome, kad aukščiau pateikta lygybė yra ekvivalenti:
 
 $$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$
 :eqlabel:`eq_eigvalue_der`
 
-For :eqref:`eq_eigvalue_der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$
-must compress some direction down to zero,
-hence it is not invertible, and thus the determinant is zero.
-Thus, we can find the *eigenvalues*
-by finding for what $\lambda$ is $\det(\mathbf{A}-\lambda \mathbf{I}) = 0$.
-Once we find the eigenvalues, we can solve
+Kad galiotų :eqref:`eq_eigvalue_der`, matome, kad $(\mathbf{A} - \lambda \mathbf{I})$
+turi kurią nors kryptį suspausti iki nulio,
+todėl ji nėra apverčiama, taigi determinantas lygus nuliui.
+Taigi *tikrines reikšmes* galime rasti
+išsiaiškinę, su kuriuo $\lambda$ yra $\det(\mathbf{A}-\lambda \mathbf{I}) = 0$.
+Radę tikrines reikšmes, galime išspręsti
 $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$
-to find the associated *eigenvector(s)*.
+ir rasti atitinkamus *tikrinius vektorius*.
 
-### An Example
-Let's see this with a more challenging matrix
+### Pavyzdys
+Pažiūrėkime tai su sudėtingesne matrica
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -67,11 +67,11 @@ $$
 \end{bmatrix}.
 $$
 
-If we consider $\det(\mathbf{A}-\lambda \mathbf{I}) = 0$,
-we see this is equivalent to the polynomial equation
+Jei nagrinėtume $\det(\mathbf{A}-\lambda \mathbf{I}) = 0$,
+matytume, kad tai ekvivalentu daugianario lygčiai
 $0 = (2-\lambda)(3-\lambda)-2 = (4-\lambda)(1-\lambda)$.
-Thus, two eigenvalues are $4$ and $1$.
-To find the associated vectors, we then need to solve
+Taigi dvi tikrinės reikšmės yra $4$ ir $1$.
+Norėdami rasti atitinkamus vektorius, turime išspręsti
 
 $$
 \begin{bmatrix}
@@ -84,9 +84,9 @@ $$
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}  = \begin{bmatrix}4x \\ 4y\end{bmatrix} .
 $$
 
-We can solve this with the vectors $[1, -1]^\top$ and $[1, 2]^\top$ respectively.
+Tai galime išspręsti su vektoriais atitinkamai $[1, -1]^\top$ ir $[1, 2]^\top$.
 
-We can check this in code using the built-in `numpy.linalg.eig` routine.
+Tai galime patikrinti kodu naudodami įtaisytąją `numpy.linalg.eig` procedūrą.
 
 ```{.python .input}
 #@tab mxnet
@@ -118,14 +118,14 @@ import tensorflow as tf
 tf.linalg.eig(tf.constant([[2, 1], [2, 3]], dtype=tf.float64))
 ```
 
-Note that `numpy` normalizes the eigenvectors to be of length one,
-whereas we took ours to be of arbitrary length.
-Additionally, the choice of sign is arbitrary.
-However, the vectors computed are parallel
-to the ones we found by hand with the same eigenvalues.
+Atkreipkite dėmesį, kad `numpy` normalizuoja tikrinius vektorius iki vienetinio ilgio,
+o mes savuosius ėmėme bet kokio ilgio.
+Be to, ženklas parenkamas laisvai.
+Vis dėlto apskaičiuoti vektoriai yra lygiagretūs
+tiems, kuriuos radome ranka su tomis pačiomis tikrinėmis reikšmėmis.
 
-## Decomposing Matrices
-Let's continue the previous example one step further.  Let
+## Matricų skaida
+Pratęskime ankstesnį pavyzdį dar vienu žingsniu.  Tegu
 
 $$
 \mathbf{W} = \begin{bmatrix}
@@ -134,7 +134,7 @@ $$
 \end{bmatrix},
 $$
 
-be the matrix where the columns are the eigenvectors of the matrix $\mathbf{A}$. Let
+yra matrica, kurios stulpeliai yra matricos $\mathbf{A}$ tikriniai vektoriai. Tegu
 
 $$
 \boldsymbol{\Sigma} = \begin{bmatrix}
@@ -143,73 +143,73 @@ $$
 \end{bmatrix},
 $$
 
-be the matrix with the associated eigenvalues on the diagonal.
-Then the definition of eigenvalues and eigenvectors tells us that
+yra matrica, kurios įstrižainėje yra atitinkamos tikrinės reikšmės.
+Tada tikrinių reikšmių ir tikrinių vektorių apibrėžimas mums sako, kad
 
 $$
 \mathbf{A}\mathbf{W} =\mathbf{W} \boldsymbol{\Sigma} .
 $$
 
-The matrix $W$ is invertible, so we may multiply both sides by $W^{-1}$ on the right,
-we see that we may write
+Matrica $W$ yra apverčiama, todėl abi puses galime dešinėje padauginti iš $W^{-1}$
+ir gauti, kad galime užrašyti
 
 $$\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.$$
 :eqlabel:`eq_eig_decomp`
 
-In the next section we will see some nice consequences of this,
-but for now we need only know that such a decomposition
-will exist as long as we can find a full collection
-of linearly independent eigenvectors (so that $W$ is invertible).
+Kitame skyriuje pamatysime keletą gražių tokios skaidos pasekmių,
+bet kol kas pakanka žinoti, kad tokia skaida
+egzistuos tol, kol galime rasti pilną
+tiesiškai nepriklausomų tikrinių vektorių rinkinį (kad $W$ būtų apverčiama).
 
-## Operations on Eigendecompositions
-One nice thing about eigendecompositions :eqref:`eq_eig_decomp` is that
-we can write many operations we usually encounter cleanly
-in terms of the eigendecomposition. As a first example, consider:
+## Veiksmai su tikrinėmis skaidomis
+Viena gera tikrinių skaidų :eqref:`eq_eig_decomp` savybė yra ta, kad
+daugelį įprastų veiksmų galime aiškiai užrašyti
+per tikrinę skaidą. Pirmas pavyzdys:
 
 $$
 \mathbf{A}^n = \overbrace{\mathbf{A}\cdots \mathbf{A}}^{\textrm{$n$ times}} = \overbrace{(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})\cdots(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})}^{\textrm{$n$ times}} =  \mathbf{W}\overbrace{\boldsymbol{\Sigma}\cdots\boldsymbol{\Sigma}}^{\textrm{$n$ times}}\mathbf{W}^{-1} = \mathbf{W}\boldsymbol{\Sigma}^n \mathbf{W}^{-1}.
 $$
 
-This tells us that for any positive power of a matrix,
-the eigendecomposition is obtained by just raising the eigenvalues to the same power.
-The same can be shown for negative powers,
-so if we want to invert a matrix we need only consider
+Tai rodo, kad bet kuriam teigiamam matricos laipsniui
+tikrinė skaida gaunama tiesiog pakėlus tikrines reikšmes tuo pačiu laipsniu.
+Tą patį galima parodyti ir neigiamiems laipsniams,
+todėl jei norime matricą apversti, pakanka nagrinėti
 
 $$
 \mathbf{A}^{-1} = \mathbf{W}\boldsymbol{\Sigma}^{-1} \mathbf{W}^{-1},
 $$
 
-or in other words, just invert each eigenvalue.
-This will work as long as each eigenvalue is non-zero,
-so we see that invertible is the same as having no zero eigenvalues.
+arba, kitaip tariant, tiesiog apversti kiekvieną tikrinę reikšmę.
+Tai veiks tol, kol kiekviena tikrinė reikšmė nelygi nuliui,
+taigi matome, kad apverčiamumas yra tas pats, kas nebuvimas nulinių tikrinių reikšmių.
 
-Indeed, additional work can show that if $\lambda_1, \ldots, \lambda_n$
-are the eigenvalues of a matrix, then the determinant of that matrix is
+Iš tiesų, papildomas darbas gali parodyti, kad jei $\lambda_1, \ldots, \lambda_n$
+yra matricos tikrinės reikšmės, tai tos matricos determinantas yra
 
 $$
 \det(\mathbf{A}) = \lambda_1 \cdots \lambda_n,
 $$
 
-or the product of all the eigenvalues.
-This makes sense intuitively because whatever stretching $\mathbf{W}$ does,
-$W^{-1}$ undoes it, so in the end the only stretching that happens is
-by multiplication by the diagonal matrix $\boldsymbol{\Sigma}$,
-which stretches volumes by the product of the diagonal elements.
+t. y. visų tikrinių reikšmių sandauga.
+Tai intuityviai suprantama, nes kad ir kaip $\mathbf{W}$ tempia,
+$W^{-1}$ tai atšaukia, todėl galiausiai vienintelis tempimas vyksta
+dauginant iš įstrižaininės matricos $\boldsymbol{\Sigma}$,
+kuri tūrius ištempia įstrižainės elementų sandauga.
 
-Finally, recall that the rank was the maximum number
-of linearly independent columns of your matrix.
-By examining the eigendecomposition closely,
-we can see that the rank is the same
-as the number of non-zero eigenvalues of $\mathbf{A}$.
+Galiausiai prisiminkite, kad rangas buvo didžiausias
+tiesiškai nepriklausomų matricos stulpelių skaičius.
+Atidžiai išnagrinėję tikrinę skaidą,
+matome, kad rangas yra lygus
+nenulinių matricos $\mathbf{A}$ tikrinių reikšmių skaičiui.
 
-The examples could continue, but hopefully the point is clear:
-eigendecomposition can simplify many linear-algebraic computations
-and is a fundamental operation underlying many numerical algorithms
-and much of the analysis that we do in linear algebra.
+Pavyzdžių galėtų būti ir daugiau, tačiau, tikėkimės, mintis aiški:
+tikrinė skaida gali supaprastinti daugelį tiesinės algebros skaičiavimų
+ir yra pagrindinė operacija, slypinti už daugelio skaitinių algoritmų
+ir didelės dalies analizės, kurią atliekame tiesinėje algebroje.
 
-## Eigendecompositions of Symmetric Matrices
-It is not always possible to find enough linearly independent eigenvectors
-for the above process to work. For instance the matrix
+## Simetrinių matricų tikrinės skaidos
+Ne visada įmanoma rasti pakankamai tiesiškai nepriklausomų tikrinių vektorių,
+kad aukščiau aprašytas procesas veiktų. Pavyzdžiui, matrica
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -218,37 +218,37 @@ $$
 \end{bmatrix},
 $$
 
-has only a single eigenvector, namely $(1, 0)^\top$.
-To handle such matrices, we require more advanced techniques
-than we can cover (such as the Jordan Normal Form, or Singular Value Decomposition).
-We will often need to restrict our attention to those matrices
-where we can guarantee the existence of a full set of eigenvectors.
+turi tik vieną tikrinį vektorių – $(1, 0)^\top$.
+Tokioms matricoms nagrinėti reikia sudėtingesnių metodų,
+nei galime aprėpti (pavyzdžiui, Žordano normaliosios formos ar singuliarinių reikšmių skaidos).
+Dažnai turėsime susiaurinti dėmesį iki matricų,
+kurioms galime garantuoti pilno tikrinių vektorių rinkinio egzistavimą.
 
-The most commonly encountered family are the *symmetric matrices*,
-which are those matrices where $\mathbf{A} = \mathbf{A}^\top$.
-In this case, we may take $W$ to be an *orthogonal matrix*—a matrix whose columns are all length one vectors that are at right angles to one another, where
-$\mathbf{W}^\top = \mathbf{W}^{-1}$—and all the eigenvalues will be real.
-Thus, in this special case, we can write :eqref:`eq_eig_decomp` as
+Dažniausiai sutinkama šeima – *simetrinės matricos*,
+t. y. matricos, kurioms $\mathbf{A} = \mathbf{A}^\top$.
+Šiuo atveju galime imti $W$ kaip *ortogonaliąją matricą* – matricą, kurios stulpeliai yra vienetinio ilgio vektoriai, statmeni vienas kitam, ir kuriai
+$\mathbf{W}^\top = \mathbf{W}^{-1}$ – o visos tikrinės reikšmės bus realios.
+Taigi šiuo ypatingu atveju :eqref:`eq_eig_decomp` galime užrašyti kaip
 
 $$
 \mathbf{A} = \mathbf{W}\boldsymbol{\Sigma}\mathbf{W}^\top .
 $$
 
-## Gershgorin Circle Theorem
-Eigenvalues are often difficult to reason with intuitively.
-If presented an arbitrary matrix, there is little that can be said
-about what the eigenvalues are without computing them.
-There is, however, one theorem that can make it easy to approximate well
-if the largest values are on the diagonal.
+## Geršgorino skritulių teorema
+Apie tikrines reikšmes dažnai sunku samprotauti intuityviai.
+Pateikus savavališką matricą, mažai ką galima pasakyti
+apie jos tikrines reikšmes jų neskaičiuojant.
+Vis dėlto yra viena teorema, kuri leidžia lengvai gerai įvertinti,
+jei didžiausios reikšmės yra įstrižainėje.
 
-Let $\mathbf{A} = (a_{ij})$ be any square matrix ($n\times n$).
-We will define $r_i = \sum_{j \neq i} |a_{ij}|$.
-Let $\mathcal{D}_i$ represent the disc in the complex plane
-with center $a_{ii}$ radius $r_i$.
-Then, every eigenvalue of $\mathbf{A}$ is contained in one of the $\mathcal{D}_i$.
+Tegu $\mathbf{A} = (a_{ij})$ yra bet kuri kvadratinė matrica ($n\times n$).
+Apibrėšime $r_i = \sum_{j \neq i} |a_{ij}|$.
+Tegu $\mathcal{D}_i$ žymi skritulį kompleksinėje plokštumoje
+su centru $a_{ii}$ ir spinduliu $r_i$.
+Tada kiekviena $\mathbf{A}$ tikrinė reikšmė yra viename iš $\mathcal{D}_i$.
 
-This can be a bit to unpack, so let's look at an example.
-Consider the matrix:
+Tai gali būti sunku iškart suvokti, todėl pažiūrėkime pavyzdį.
+Nagrinėkime matricą:
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -259,9 +259,9 @@ $$
 \end{bmatrix}.
 $$
 
-We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.
-The matrix is symmetric, so all eigenvalues are real.
-This means that all of our eigenvalues will be in one of the ranges of
+Turime $r_1 = 0{,}3$, $r_2 = 0{,}6$, $r_3 = 0{,}8$ ir $r_4 = 0{,}9$.
+Matrica simetrinė, todėl visos tikrinės reikšmės yra realios.
+Tai reiškia, kad visos mūsų tikrinės reikšmės bus kuriame nors iš intervalų
 
 $$[a_{11}-r_1, a_{11}+r_1] = [0.7, 1.3], $$
 
@@ -272,9 +272,9 @@ $$[a_{33}-r_3, a_{33}+r_3] = [4.2, 5.8], $$
 $$[a_{44}-r_4, a_{44}+r_4] = [8.1, 9.9]. $$
 
 
-Performing the numerical computation shows
-that the eigenvalues are approximately $0.99$, $2.97$, $4.95$, $9.08$,
-all comfortably inside the ranges provided.
+Skaitinis skaičiavimas rodo,
+kad tikrinės reikšmės yra apytiksliai $0{,}99$, $2{,}97$, $4{,}95$, $9{,}08$,
+visos patogiai tilpusios pateiktuose intervaluose.
 
 ```{.python .input}
 #@tab mxnet
@@ -309,40 +309,40 @@ v, _ = tf.linalg.eigh(A)
 v
 ```
 
-In this way, eigenvalues can be approximated,
-and the approximations will be fairly accurate
-in the case that the diagonal is
-significantly larger than all the other elements.
+Šitaip tikrines reikšmes galima apytiksliai įvertinti,
+ir įverčiai bus gana tikslūs tuo atveju,
+kai įstrižainė yra
+gerokai didesnė už visus kitus elementus.
 
-It is a small thing, but with a complex
-and subtle topic like eigendecomposition,
-it is good to get any intuitive grasp we can.
+Tai smulkmena, bet tokioje sudėtingoje
+ir subtilioje temoje kaip tikrinė skaida
+gera įgyti bet kokį intuityvų supratimą.
 
-## A Useful Application: The Growth of Iterated Maps
+## Naudingas taikymas: iteruotų atvaizdžių augimas
 
-Now that we understand what eigenvectors are in principle,
-let's see how they can be used to provide a deep understanding
-of a problem central to neural network behavior: proper weight initialization.
+Dabar, kai iš principo suprantame, kas yra tikriniai vektoriai,
+pažiūrėkime, kaip jie gali padėti giliai suprasti
+problemą, esminę neuroninių tinklų elgsenai: tinkamą svorių inicializavimą.
 
-### Eigenvectors as Long Term Behavior
+### Tikriniai vektoriai kaip ilgalaikė elgsena
 
-The full mathematical investigation of the initialization
-of deep neural networks is beyond the scope of the text,
-but we can see a toy version here to understand
-how eigenvalues can help us see how these models work.
-As we know, neural networks operate by interspersing layers
-of linear transformations with non-linear operations.
-For simplicity here, we will assume that there is no non-linearity,
-and that the transformation is a single repeated matrix operation $A$,
-so that the output of our model is
+Visapusiškas giliųjų neuroninių tinklų
+inicializavimo matematinis tyrimas nepatenka į šio teksto aprėptį,
+tačiau čia galime pamatyti supaprastintą versiją ir suprasti,
+kaip tikrinės reikšmės gali padėti suprasti, kaip šie modeliai veikia.
+Kaip žinome, neuroniniai tinklai veikia pereidami
+tarp tiesinių transformacijų sluoksnių ir netiesinių operacijų.
+Supaprastinimo dėlei čia darysime prielaidą, kad netiesiškumo nėra
+ir kad transformacija yra viena kartojama matricos operacija $A$,
+todėl mūsų modelio išvestis yra
 
 $$
 \mathbf{v}_{out} = \mathbf{A}\cdot \mathbf{A}\cdots \mathbf{A} \mathbf{v}_{in} = \mathbf{A}^N \mathbf{v}_{in}.
 $$
 
-When these models are initialized, $A$ is taken to be
-a random matrix with Gaussian entries, so let's make one of those.
-To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
+Kai šie modeliai inicializuojami, $A$ imama kaip
+atsitiktinė matrica su Gauso elementais, taigi sukurkime tokią.
+Konkrečiai, pradedame nuo $5 \times 5$ matricos su Gauso skirstiniu, kurio vidurkis nulis, o dispersija vienas.
 
 ```{.python .input}
 #@tab mxnet
@@ -369,30 +369,30 @@ A = tf.random.normal((k, k), dtype=tf.float64)
 A
 ```
 
-### Behavior on Random Data
-For simplicity in our toy model,
-we will assume that the data vector we feed in $\mathbf{v}_{in}$
-is a random five dimensional Gaussian vector.
-Let's think about what we want to have happen.
-For context, lets think of a generic ML problem,
-where we are trying to turn input data, like an image, into a prediction,
-like the probability the image is a picture of a cat.
-If repeated application of $\mathbf{A}$
-stretches a random vector out to be very long,
-then small changes in input will be amplified
-into large changes in output---tiny modifications of the input image
-would lead to vastly different predictions.
-This does not seem right!
+### Elgsena su atsitiktiniais duomenimis
+Supaprastinimo dėlei savo žaisliniame modelyje
+darysime prielaidą, kad duomenų vektorius, kurį paduodame, $\mathbf{v}_{in}$,
+yra atsitiktinis penkiamatis Gauso vektorius.
+Pagalvokime, ko norime, kad įvyktų.
+Kontekstui pagalvokime apie bendrą MM uždavinį,
+kuriame bandome įvesties duomenis, pavyzdžiui, paveikslėlį, paversti prognoze,
+pavyzdžiui, tikimybe, kad paveikslėlyje yra katė.
+Jei pakartotinis $\mathbf{A}$ taikymas
+atsitiktinį vektorių ištempia iki labai didelio ilgio,
+tai nedideli įvesties pokyčiai bus sustiprinti
+iki didelių išvesties pokyčių – menki įvesties paveikslėlio pakeitimai
+lemtų labai skirtingas prognozes.
+Tai neatrodo teisinga!
 
-On the flip side, if $\mathbf{A}$ shrinks random vectors to be shorter,
-then after running through many layers, the vector will essentially shrink to nothing,
-and the output will not depend on the input. This is also clearly not right either!
+Kita vertus, jei $\mathbf{A}$ atsitiktinius vektorius sutrumpina,
+tai pereinant daugelį sluoksnių vektorius iš esmės susitrauks iki nieko,
+ir išvestis nebepriklausys nuo įvesties. Tai taip pat akivaizdžiai neteisinga!
 
-We need to walk the narrow line between growth and decay
-to make sure that our output changes depending on our input, but not much!
+Turime eiti siaura riba tarp augimo ir slopimo,
+kad užtikrintume, jog išvestis keičiasi priklausomai nuo įvesties, bet nedaug!
 
-Let's see what happens when we repeatedly multiply our matrix $\mathbf{A}$
-against a random input vector, and keep track of the norm.
+Pažiūrėkime, kas įvyksta, kai savo matricą $\mathbf{A}$ pakartotinai dauginame
+iš atsitiktinio įvesties vektoriaus ir stebime normą.
 
 ```{.python .input}
 #@tab mxnet
@@ -433,8 +433,8 @@ for i in range(1, 100):
 d2l.plot(tf.range(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-The norm is growing uncontrollably!
-Indeed if we take the list of quotients, we will see a pattern.
+Norma auga nevaldomai!
+Iš tiesų, jei paimsime dalmenų sąrašą, pamatysime dėsningumą.
 
 ```{.python .input}
 #@tab mxnet
@@ -466,23 +466,23 @@ for i in range(1, 100):
 d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
-If we look at the last portion of the above computation,
-we see that the random vector is stretched by a factor of `1.974459321485[...]`,
-where the portion at the end shifts a little,
-but the stretching factor is stable.
+Pažiūrėję į paskutinę aukščiau pateikto skaičiavimo dalį,
+matome, kad atsitiktinis vektorius ištempiamas `1.974459321485[...]` kartų,
+kur galinė dalis šiek tiek kinta,
+tačiau tempimo koeficientas yra stabilus.
 
-### Relating Back to Eigenvectors
+### Ryšys su tikriniais vektoriais
 
-We have seen that eigenvectors and eigenvalues correspond
-to the amount something is stretched,
-but that was for specific vectors, and specific stretches.
-Let's take a look at what they are for $\mathbf{A}$.
-A bit of a caveat here: it turns out that to see them all,
-we will need to go to complex numbers.
-You can think of these as stretches and rotations.
-By taking the norm of the complex number
-(square root of the sums of squares of real and imaginary parts)
-we can measure that stretching factor. Let's also sort them.
+Matėme, kad tikriniai vektoriai ir tikrinės reikšmės atitinka
+tai, kiek kažkas ištempiama,
+tačiau tai buvo konkretiems vektoriams ir konkrečiam tempimui.
+Pažiūrėkime, kokie jie yra $\mathbf{A}$.
+Nedidelė išlyga: pasirodo, kad norint juos pamatyti visus,
+reikės pereiti prie kompleksinių skaičių.
+Galite į juos žiūrėti kaip į tempimus ir sukimus.
+Paėmę kompleksinio skaičiaus normą
+(realiosios ir menamosios dalių kvadratų sumos kvadratinę šaknį),
+galime išmatuoti tempimo koeficientą. Taip pat juos surikiuokime.
 
 ```{.python .input}
 #@tab mxnet
@@ -511,48 +511,47 @@ norm_eigs.sort()
 print(f'norms of eigenvalues: {norm_eigs}')
 ```
 
-### An Observation
+### Pastebėjimas
 
-We see something a bit unexpected happening here:
-that number we identified before for the
-long term stretching of our matrix $\mathbf{A}$
-applied to a random vector is *exactly*
-(accurate to thirteen decimal places!)
-the largest eigenvalue of $\mathbf{A}$.
-This is clearly not a coincidence!
+Čia matome kai ką netikėto:
+tas skaičius, kurį anksčiau nustatėme kaip
+mūsų matricos $\mathbf{A}$, pritaikytos atsitiktiniam vektoriui,
+ilgalaikį tempimą, yra *tiksliai*
+(tikslumu iki trylikos skaitmenų po kablelio!)
+didžiausia $\mathbf{A}$ tikrinė reikšmė.
+Tai akivaizdžiai nėra sutapimas!
 
-But, if we now think about what is happening geometrically,
-this starts to make sense. Consider a random vector.
-This random vector points a little in every direction,
-so in particular, it points at least a little bit
-in the same direction as the eigenvector of $\mathbf{A}$
-associated with the largest eigenvalue.
-This is so important that it is called
-the *principle eigenvalue* and *principle eigenvector*.
-After applying $\mathbf{A}$, our random vector
-gets stretched in every possible direction,
-as is associated with every possible eigenvector,
-but it is stretched most of all in the direction
-associated with this principle eigenvector.
-What this means is that after apply in $A$,
-our random vector is longer, and points in a direction
-closer to being aligned with the principle eigenvector.
-After applying the matrix many times,
-the alignment with the principle eigenvector becomes closer and closer until,
-for all practical purposes, our random vector has been transformed
-into the principle eigenvector!
-Indeed this algorithm is the basis
-for what is known as the *power iteration*
-for finding the largest eigenvalue and eigenvector of a matrix. For details see, for example, :cite:`Golub.Van-Loan.1996`.
+Tačiau jei dabar pagalvosime, kas vyksta geometriškai,
+tai pradeda atrodyti prasminga. Panagrinėkime atsitiktinį vektorių.
+Šis atsitiktinis vektorius šiek tiek rodo į visas puses,
+taigi, visų pirma, jis bent kiek rodo
+ta pačia kryptimi kaip ir $\mathbf{A}$ tikrinis vektorius,
+atitinkantis didžiausią tikrinę reikšmę.
+Tai tiek svarbu, kad jie vadinami
+*pagrindine tikrine reikšme* ir *pagrindiniu tikriniu vektoriumi*.
+Pritaikius $\mathbf{A}$, mūsų atsitiktinis vektorius
+ištempiamas visomis įmanomomis kryptimis,
+atitinkančiomis visus įmanomus tikrinius vektorius,
+tačiau labiausiai jis ištempiamas
+šio pagrindinio tikrinio vektoriaus kryptimi.
+Tai reiškia, kad pritaikius $A$,
+mūsų atsitiktinis vektorius tampa ilgesnis ir rodo kryptimi,
+artimesne pagrindiniam tikriniam vektoriui.
+Matricą taikant daug kartų, sutapimas su pagrindiniu tikriniu vektoriumi vis didėja, kol
+praktiškai mūsų atsitiktinis vektorius yra paverčiamas
+pagrindiniu tikriniu vektoriumi!
+Iš tiesų šis algoritmas yra pagrindas
+to, kas vadinama *laipsnių iteracija* (angl. *power iteration*),
+skirta didžiausiai matricos tikrinei reikšmei ir tikriniam vektoriui rasti. Išsamiau žr., pavyzdžiui, :cite:`Golub.Van-Loan.1996`.
 
-### Fixing the Normalization
+### Normalizavimo taisymas
 
-Now, from above discussions, we concluded
-that we do not want a random vector to be stretched or squished at all,
-we would like random vectors to stay about the same size throughout the entire process.
-To do so, we now rescale our matrix by this principle eigenvalue
-so that the largest eigenvalue is instead now just one.
-Let's see what happens in this case.
+Iš aukščiau pateiktų svarstymų padarėme išvadą,
+kad nenorime, jog atsitiktinis vektorius būtų ištempiamas ar suspaudžiamas,
+norime, kad atsitiktiniai vektoriai viso proceso metu išliktų maždaug to paties dydžio.
+Tam dabar perskalėjame savo matricą šia pagrindine tikrine reikšme,
+kad didžiausia tikrinė reikšmė dabar būtų tiesiog vienas.
+Pažiūrėkime, kas šiuo atveju įvyksta.
 
 ```{.python .input}
 #@tab mxnet
@@ -602,7 +601,7 @@ for i in range(1, 100):
 d2l.plot(tf.range(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ratio between consecutive norms as before and see that indeed it stabilizes.
+Taip pat galime kaip anksčiau nubraižyti santykį tarp iš eilės einančių normų ir pamatyti, kad jis iš tiesų stabilizuojasi.
 
 ```{.python .input}
 #@tab mxnet
@@ -634,44 +633,45 @@ for i in range(1, 100):
 d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
-## Discussion
+## Diskusija
 
-We now see exactly what we hoped for!
-After normalizing the matrices by the principal eigenvalue,
-we see that the random data does not explode as before,
-but rather eventually equilibrates to a specific value.
-It would be nice to be able to do these things from first principles,
-and it turns out that if we look deeply at the mathematics of it,
-we can see that the largest eigenvalue
-of a large random matrix with independent mean zero,
-variance one Gaussian entries is on average about $\sqrt{n}$,
-or in our case $\sqrt{5} \approx 2.2$,
-due to a fascinating fact known as the *circular law* :cite:`Ginibre.1965`.
-The relationship between the eigenvalues (and a related object called singular values) of random matrices has been shown to have deep connections to proper initialization of neural networks as was discussed in :citet:`Pennington.Schoenholz.Ganguli.2017` and subsequent works.
+Dabar matome būtent tai, ko tikėjomės!
+Matricas normalizavę pagrindine tikrine reikšme,
+matome, kad atsitiktiniai duomenys nebesprogsta kaip anksčiau,
+o galiausiai nusistovi ties tam tikra reikšme.
+Būtų gerai tokius dalykus galėti padaryti iš pirmųjų principų,
+ir pasirodo, kad jei gilinsimės į jų matematiką,
+galime pamatyti, kad didžiausia didelės atsitiktinės matricos
+su nepriklausomais elementais (Gauso skirstinys, vidurkis nulis,
+dispersija vienas) tikrinė reikšmė vidutiniškai yra maždaug $\sqrt{n}$,
+arba mūsų atveju $\sqrt{5} \approx 2{,}2$,
+dėl žavaus fakto, žinomo kaip *apskritimo dėsnis* :cite:`Ginibre.1965`.
+Parodyta, kad atsitiktinių matricų tikrinių reikšmių (ir susijusio objekto, vadinamo singuliarinėmis reikšmėmis) ryšys
+yra glaudžiai susijęs su tinkamu neuroninių tinklų inicializavimu, kaip aptarta :citet:`Pennington.Schoenholz.Ganguli.2017` ir vėlesniuose darbuose.
 
-## Summary
-* Eigenvectors are vectors which are stretched by a matrix without changing direction.
-* Eigenvalues are the amount that the eigenvectors are stretched by the application of the matrix.
-* The eigendecomposition of a matrix can allow for many operations to be reduced to operations on the eigenvalues.
-* The Gershgorin Circle Theorem can provide approximate values for the eigenvalues of a matrix.
-* The behavior of iterated matrix powers depends primarily on the size of the largest eigenvalue.  This understanding has many applications in the theory of neural network initialization.
+## Santrauka
+* Tikriniai vektoriai yra vektoriai, kuriuos matrica ištempia nekeisdama krypties.
+* Tikrinės reikšmės yra dydis, kuriuo tikriniai vektoriai ištempiami pritaikius matricą.
+* Matricos tikrinė skaida leidžia daugelį veiksmų suvesti į veiksmus su tikrinėmis reikšmėmis.
+* Geršgorino skritulių teorema gali pateikti apytikres matricos tikrinių reikšmių vertes.
+* Iteruotų matricos laipsnių elgsena pirmiausia priklauso nuo didžiausios tikrinės reikšmės dydžio.  Šis supratimas turi daug taikymų neuroninių tinklų inicializavimo teorijoje.
 
-## Exercises
-1. What are the eigenvalues and eigenvectors of
+## Pratimai
+1. Kokios yra šios matricos tikrinės reikšmės ir tikriniai vektoriai?
 $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 1 & 2
 \end{bmatrix}?
 $$
-1.  What are the eigenvalues and eigenvectors of the following matrix, and what is strange about this example compared to the previous one?
+1.  Kokios yra šios matricos tikrinės reikšmės ir tikriniai vektoriai ir kas šiame pavyzdyje keista, palyginti su ankstesniu?
 $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
 \end{bmatrix}.
 $$
-1. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
+1. Neskaičiuodami tikrinių reikšmių, pasakykite, ar įmanoma, kad mažiausia šios matricos tikrinė reikšmė būtų mažesnė nei $0{,}5$? *Pastaba*: šį uždavinį galima išspręsti mintimis.
 $$
 \mathbf{A} = \begin{bmatrix}
 3.0 & 0.1 & 0.3 & 1.0 \\
@@ -682,14 +682,14 @@ $$
 $$
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/411)
+[Diskusijos](https://discuss.d2l.ai/t/411)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1086)
+[Diskusijos](https://discuss.d2l.ai/t/1086)
 :end_tab:
 
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1087)
+[Diskusijos](https://discuss.d2l.ai/t/1087)
 :end_tab:

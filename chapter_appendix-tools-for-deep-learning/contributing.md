@@ -1,61 +1,61 @@
-# Contributing to This Book
+# Prisidėjimas prie šios knygos
 :label:`sec_how_to_contribute`
 
-Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code does not look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration (CI) testing. To do so you need to submit a [pull request](https://github.com/d2l-ai/d2l-en/pulls) to the GitHub repository. When your pull request is merged into the code repository by the authors, you will become a contributor.
+[Skaitytojų](https://github.com/d2l-ai/d2l-en/graphs/contributors) indėlis padeda mums tobulinti šią knygą. Jei pastebėjote rašybos klaidą, pasenusią nuorodą, vietą, kur, jūsų manymu, praleidome citatą, kodą, kuris atrodo neelegantiškai, ar neaiškų paaiškinimą, prisidėkite ir padėkite mums padėti skaitytojams. Nors įprastose knygose laikas tarp spaudinių tiražų (taigi ir tarp rašybos klaidų ištaisymo) gali trukti metus, šioje knygoje patobulinimas paprastai įtraukiamas per valandas ar dienas. Tai įmanoma dėl versijų kontrolės ir nuolatinės integracijos (angl. *continuous integration*, CI) testavimo. Norėdami prisidėti, turite pateikti [pull request](https://github.com/d2l-ai/d2l-en/pulls) GitHub saugyklai. Kai autoriai jūsų pull request sulies su kodo saugykla, tapsite bendraautoriumi.
 
-## Submitting Minor Changes
+## Nedidelių pakeitimų teikimas
 
-The most common contributions are editing one sentence or fixing typos. We recommend that you find the source file in the [GitHub repository](https://github.com/d2l-ai/d2l-en) and edit the file directly. For example, you can search the file through the [Find file](https://github.com/d2l-ai/d2l-en/find/master) button (:numref:`fig_edit_file`) to locate the source file (a markdown file). Then you click the "Edit this file" button on the upper-right corner to make your changes in the markdown file.
+Dažniausi indėliai – vieno sakinio redagavimas arba rašybos klaidų taisymas. Rekomenduojame rasti šaltinio failą [GitHub saugykloje](https://github.com/d2l-ai/d2l-en) ir redaguoti jį tiesiogiai. Pavyzdžiui, failą galite rasti mygtuku [Find file](https://github.com/d2l-ai/d2l-en/find/master) (:numref:`fig_edit_file`) ir taip surasti šaltinio failą (Markdown failą). Tada viršutiniame dešiniajame kampe spustelėkite mygtuką „Edit this file“ ir atlikite pakeitimus Markdown faile.
 
-![Edit the file on Github.](../img/edit-file.png)
+![Failo redagavimas GitHub.](../img/edit-file.png)
 :width:`300px`
 :label:`fig_edit_file`
 
-After you are done, fill in your change descriptions in the "Propose file change" panel on the page bottom and then click the "Propose file change" button. It will redirect you to a new page to review your changes (:numref:`fig_git_createpr`). If everything is good, you can submit a pull request by clicking the "Create pull request" button.
+Baigę puslapio apačioje esančiame skydelyje „Propose file change“ įrašykite pakeitimų aprašymą ir spustelėkite mygtuką „Propose file change“. Būsite nukreipti į naują puslapį pakeitimams peržiūrėti (:numref:`fig_git_createpr`). Jei viskas gerai, galite pateikti pull request spustelėję mygtuką „Create pull request“.
 
-## Proposing Major Changes
+## Didelių pakeitimų siūlymas
 
-If you plan to update a large portion of text or code, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through the [D2L-Book](http://book.d2l.ai/user/markdown.html) package such as referring to equations, images, chapters, and citations. You can use any markdown editors to open these files and make your changes.
+Jei planuojate atnaujinti didelę teksto ar kodo dalį, reikia šiek tiek daugiau žinoti apie šios knygos naudojamą formatą. Šaltinio failas pagrįstas [Markdown formatu](https://daringfireball.net/projects/markdown/syntax) su plėtiniais, pateikiamais per paketą [D2L-Book](http://book.d2l.ai/user/markdown.html), pavyzdžiui, nuorodomis į lygtis, paveikslus, skyrius ir citatas. Šiems failams atverti ir pakeitimams atlikti galite naudoti bet kokį Markdown redaktorių.
 
-If you would like to change the code, we recommend that you use the Jupyter Notebook to open these markdown files as described in :numref:`sec_jupyter`, so that you can run and test your changes. Please remember to clear all outputs before submitting your changes since our CI system will execute the sections you updated to generate outputs.
+Jei norite keisti kodą, rekomenduojame šiuos Markdown failus atverti naudojant Jupyter Notebook, kaip aprašyta :numref:`sec_jupyter`, kad galėtumėte paleisti ir išbandyti savo pakeitimus. Prieš pateikdami pakeitimus, nepamirškite išvalyti visų išvesčių, nes mūsų CI sistema vykdys jūsų atnaujintus skyrius ir sugeneruos išvestis.
 
-Some sections may support multiple framework implementations.
-If you add a new code block, please use `%%tab` to mark this block on the beginning line. For example,
-`%%tab pytorch` for a PyTorch code block, `%%tab tensorflow` for a TensorFlow code block, or `%%tab all` a shared code block for all implementations. You may refer to the `d2lbook` package for more information.
+Kai kurie skyriai gali palaikyti kelių karkasų realizacijas.
+Jei pridedate naują kodo bloką, pirmoje eilutėje jį pažymėkite `%%tab`. Pavyzdžiui,
+`%%tab pytorch` – PyTorch kodo blokui, `%%tab tensorflow` – TensorFlow kodo blokui arba `%%tab all` – bendram visų realizacijų kodo blokui. Daugiau informacijos rasite paketo `d2lbook` dokumentacijoje.
 
-## Submitting Major Changes
+## Didelių pakeitimų pateikimas
 
-We suggest you to use the standard Git process to submit a major change. In a nutshell the process works as described in :numref:`fig_contribute`.
+Dideliam pakeitimui pateikti siūlome naudoti standartinį Git procesą. Trumpai proceso eiga pavaizduota :numref:`fig_contribute`.
 
-![Contributing to the book.](../img/contribute.svg)
+![Prisidėjimas prie knygos.](../img/contribute.svg)
 :label:`fig_contribute`
 
-We will walk you through the steps in detail. If you are already familiar with Git you can skip this section. For concreteness we assume that the contributor's user name is "astonzhang".
+Žingsnius aprašysime išsamiai. Jei jau išmanote Git, šį skyrių galite praleisti. Konkretumo dėlei darome prielaidą, kad bendraautoriaus naudotojo vardas yra „astonzhang“.
 
-### Installing Git
+### Git diegimas
 
-The Git open-source book describes [how to install Git](https://git-scm.com/book/en/v2). This typically works via `apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you do not have a GitHub account, you need to sign up for one.
+Atvirojo kodo knygoje apie Git aprašyta, [kaip įdiegti Git](https://git-scm.com/book/en/v2). Paprastai tai atliekama komanda `apt install git` Ubuntu Linux sistemoje, įdiegiant Xcode kūrėjo įrankius macOS sistemoje arba naudojant GitHub [darbalaukio klientą](https://desktop.github.com). Jei neturite GitHub paskyros, turite ją susikurti.
 
-### Logging in to GitHub
+### Prisijungimas prie GitHub
 
-Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code repository in your browser. Click on the `Fork` button in the red box at the upper-right of :numref:`fig_git_fork`, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
+Naršyklėje įveskite knygos kodo saugyklos [adresą](https://github.com/d2l-ai/d2l-en/). Spustelėkite mygtuką `Fork` raudname langelyje :numref:`fig_git_fork` viršutiniame dešiniajame kampe, kad sukurtumėte šios knygos saugyklos kopiją. Dabar tai *jūsų kopija* ir galite ją keisti kaip tik norite.
 
-![The code repository page.](../img/git-fork.png)
+![Kodo saugyklos puslapis.](../img/git-fork.png)
 :width:`700px`
 :label:`fig_git_fork`
 
 
-Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the upper-left of :numref:`fig_git_forked`.
+Dabar šios knygos kodo saugykla bus išskaidyta (angl. *forked*, t. y. nukopijuota) į jūsų naudotojo vardą, pavyzdžiui, `astonzhang/d2l-en`, parodytą :numref:`fig_git_forked` viršutiniame kairiajame kampe.
 
-![The forked code repository.](../img/git-forked.png)
+![Išskaidyta kodo saugykla.](../img/git-forked.png)
 :width:`700px`
 :label:`fig_git_forked`
 
-### Cloning the Repository
+### Saugyklos klonavimas
 
-To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button in :numref:`fig_git_clone` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :ref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
+Norint klonuoti saugyklą (t. y. sukurti vietinę kopiją), reikia gauti jos adresą. Jį rodo žalias mygtukas :numref:`fig_git_clone`. Jei nusprendėte šį išskaidytą variantą laikyti ilgiau, įsitikinkite, kad vietinė kopija atnaujinta pagal pagrindinę saugyklą. Kol kas tiesiog laikykitės :ref:`chap_installation` pateiktų instrukcijų. Pagrindinis skirtumas tas, kad dabar atsisiunčiate *savo paties išskaidytą* saugyklos variantą.
 
-![Cloning the repository.](../img/git-clone.png)
+![Saugyklos klonavimas.](../img/git-clone.png)
 :width:`700px`
 :label:`fig_git_clone`
 
@@ -65,12 +65,12 @@ git clone https://github.com/your_github_username/d2l-en.git
 ```
 
 
-### Editing and Pushing
+### Redagavimas ir išsiuntimas
 
-Now it is time to edit the book. It is best to edit it in the Jupyter Notebook following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume that we have modified a typo in the file `~/d2l-en/chapter_appendix-tools-for-deep-learning/contributing.md`.
-You can then check which files you have changed.
+Dabar metas redaguoti knygą. Geriausia tai daryti Jupyter Notebook, laikantis :numref:`sec_jupyter` instrukcijų. Atlikite pakeitimus ir patikrinkite, ar jie tinkami. Tarkime, kad ištaisėme rašybos klaidą faile `~/d2l-en/chapter_appendix-tools-for-deep-learning/contributing.md`.
+Tada galite patikrinti, kuriuos failus pakeitėte.
 
-At this point Git will prompt that the `chapter_appendix-tools-for-deep-learning/contributing.md` file has been modified.
+Šiuo metu Git praneš, kad failas `chapter_appendix-tools-for-deep-learning/contributing.md` buvo pakeistas.
 
 ```
 mylaptop:d2l-en me$ git status
@@ -85,7 +85,7 @@ Changes not staged for commit:
 ```
 
 
-After confirming that this is what you want, execute the following command:
+Įsitikinę, kad to ir norite, vykdykite šią komandą:
 
 ```
 git add chapter_appendix-tools-for-deep-learning/contributing.md
@@ -94,37 +94,37 @@ git push
 ```
 
 
-The changed code will then be in your personal fork of the repository. To request the addition of your change, you have to create a pull request for the official repository of the book.
+Pakeistas kodas atsidurs jūsų asmeninėje saugyklos kopijoje. Norėdami paprašyti pridėti savo pakeitimą, turite sukurti pull request oficialiai knygos saugyklai.
 
-### Submitting Pull Requests
+### Pull request pateikimas
 
-As shown in :numref:`fig_git_newpr`, go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
+Kaip parodyta :numref:`fig_git_newpr`, eikite į savo saugyklos kopiją GitHub ir pasirinkite „New pull request“. Atsidarys ekranas, rodantis jūsų pakeitimų ir dabartinės pagrindinės knygos saugyklos būsenos skirtumus.
 
-![New pull request.](../img/git-newpr.png)
+![Naujas pull request.](../img/git-newpr.png)
 :width:`700px`
 :label:`fig_git_newpr`
 
 
-Finally, submit a pull request by clicking the button as shown in :numref:`fig_git_createpr`. Make sure to describe the changes you have made in the pull request.
-This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
+Galiausiai pateikite pull request spustelėdami mygtuką, kaip parodyta :numref:`fig_git_createpr`. Būtinai apibūdinkite savo atliktus pakeitimus.
+Taip autoriams bus lengviau juos peržiūrėti ir sulieti su knyga. Priklausomai nuo pakeitimų, jie gali būti priimti iš karto, atmesti arba, dažniausiai, gausite pastabų dėl pakeitimų. Kai jas įtrauksite, viskas bus tvarkoje.
 
-![Create pull request.](../img/git-createpr.png)
+![Pull request kūrimas.](../img/git-createpr.png)
 :width:`700px`
 :label:`fig_git_createpr`
 
 
-## Summary
+## Santrauka
 
-* You can use GitHub to contribute to this book.
-* You can edit the file on GitHub directly for minor changes.
-* For a major change, please fork the repository, edit things locally, and only contribute back once you are ready.
-* Pull requests are how contributions are being bundled up. Try not to submit huge pull requests since this makes them hard to understand and incorporate. Better send several smaller ones.
+* Prie šios knygos galite prisidėti naudodami GitHub.
+* Nedideliems pakeitimams failą galite redaguoti tiesiogiai GitHub.
+* Dideliam pakeitimui išskaidykite saugyklą, redaguokite vietoje ir atsiųskite pakeitimus tik tada, kai būsite pasiruošę.
+* Pull request yra būdas sujungti indėlius. Stenkitės nepateikti milžiniškų pull request, nes juos sunku suprasti ir įtraukti. Geriau siųskite kelis mažesnius.
 
 
-## Exercises
+## Pratimai
 
-1. Star and fork the `d2l-ai/d2l-en` repository.
-1. If you spot anything that needs improvement (e.g., missing a reference), submit a pull request. 
-1. It is usually a better practice to create a pull request using a new branch. Learn how to do it with [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
+1. Pažymėkite žvaigždute (angl. *star*) ir išskaidykite saugyklą `d2l-ai/d2l-en`.
+1. Jei pastebėjote ką nors, ką reikėtų patobulinti (pvz., trūksta nuorodos), pateikite pull request. 
+1. Paprastai geresnė praktika yra kurti pull request naudojant naują šaką. Sužinokite, kaip tai padaryti, skaitydami apie [Git šakojimą](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
 
-[Discussions](https://discuss.d2l.ai/t/426)
+[Diskusijos](https://discuss.d2l.ai/t/426)

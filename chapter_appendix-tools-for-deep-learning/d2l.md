@@ -1,8 +1,8 @@
-# The `d2l` API Document
+# `d2l` API dokumentacija
 :label:`sec_d2l`
 
-This section displays classes and functions (sorted alphabetically) in the `d2l` package, showing where they are defined in the book so you can find more detailed implementations and explanations. 
-See also the source code on the [GitHub repository](https://github.com/d2l-ai/d2l-en/tree/master/d2l).
+Šiame skyriuje pateikiamos `d2l` paketo klasės ir funkcijos (surikiuotos abėcėlės tvarka) ir nurodoma, kur jos apibrėžtos knygoje, kad rastumėte išsamesnes realizacijas ir paaiškinimus.
+Taip pat žr. šaltinio kodą [GitHub saugykloje](https://github.com/d2l-ai/d2l-en/tree/master/d2l).
 
 :begin_tab:`pytorch`
 
@@ -34,7 +34,7 @@ See also the source code on the [GitHub repository](https://github.com/d2l-ai/d2
 
 :end_tab:
 
-## Classes
+## Klasės
 
 ```eval_rst 
 
@@ -151,7 +151,7 @@ See also the source code on the [GitHub repository](https://github.com/d2l-ai/d2
 ```
 
 
-## Functions
+## Funkcijos
 
 ```eval_rst 
 
@@ -194,4 +194,3 @@ See also the source code on the [GitHub repository](https://github.com/d2l-ai/d2
 .. autofunction:: use_svg_display
 
 ```
-
