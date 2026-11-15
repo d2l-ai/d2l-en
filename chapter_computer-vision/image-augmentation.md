@@ -1,27 +1,26 @@
-# Image Augmentation
+# Vaizdų augmentacija
 :label:`sec_image_augmentation`
 
-In :numref:`sec_alexnet`, 
-we mentioned that large datasets 
-are a prerequisite
-for the success of
-deep neural networks
-in various applications.
-*Image augmentation* 
-generates similar but distinct training examples
-after a series of random changes to the training images, thereby expanding the size of the training set.
-Alternatively,
-image augmentation can be motivated
-by the fact that 
-random tweaks of training examples 
-allow models to rely less on
-certain attributes, thereby improving their generalization ability.
-For example, we can crop an image in different ways to make the object of interest appear in different positions, thereby reducing the dependence of a model on the position of the object. 
-We can also adjust factors such as brightness and color to reduce a model's sensitivity to color.
-It is probably true
-that image augmentation was indispensable
-for the success of AlexNet at that time.
-In this section we will discuss this widely used technique in computer vision.
+:numref:`sec_alexnet`
+minėjome, kad dideli duomenų rinkiniai
+yra būtina sąlyga
+giliųjų neuroninių tinklų sėkmei
+įvairiuose taikymuose.
+*Vaizdų augmentacija*
+sukuria panašius, bet skirtingus apmokymo pavyzdžius
+po eilės atsitiktinių apmokymo vaizdų pakeitimų, taip padidindama apmokymo aibės dydį.
+Alternatyviai,
+vaizdų augmentaciją galima motyvuoti tuo,
+kad
+atsitiktiniai apmokymo pavyzdžių pakeitimai
+leidžia modeliams mažiau pasikliauti
+tam tikrais požymiais, taip pagerindami jų apibendrinimo gebą.
+Pavyzdžiui, galime apkarpyti vaizdą skirtingais būdais, kad dominantis objektas atsirastų skirtingose vietose, taip sumažindami modelio priklausomybę nuo objekto padėties.
+Taip pat galime reguliuoti tokius veiksnius kaip ryškumas ir spalva, kad sumažintume modelio jautrumą spalvai.
+Tikriausiai tiesa,
+kad vaizdų augmentacija buvo nepakeičiama
+AlexNet sėkmei tuo metu.
+Šiame skyrelyje aptarsime šią plačiai kompiuterinėje regoje naudojamą techniką.
 
 ```{.python .input}
 #@tab mxnet
@@ -42,9 +41,9 @@ import torchvision
 from torch import nn
 ```
 
-## Common Image Augmentation Methods
+## Įprasti vaizdų augmentacijos metodai
 
-In our investigation of common image augmentation methods, we will use the following $400\times 500$ image an example.
+Nagrinėdami įprastus vaizdų augmentacijos metodus, kaip pavyzdį naudosime šį $400\times 500$ dydžio vaizdą.
 
 ```{.python .input}
 #@tab mxnet
@@ -60,7 +59,7 @@ img = d2l.Image.open('../img/cat1.jpg')
 d2l.plt.imshow(img);
 ```
 
-Most image augmentation methods have a certain degree of randomness. To make it easier for us to observe the effect of image augmentation, next we define an auxiliary function `apply`. This function runs the image augmentation method `aug` multiple times on the input image `img` and shows all the results.
+Dauguma vaizdų augmentacijos metodų turi tam tikrą atsitiktinumo laipsnį. Kad būtų lengviau stebėti vaizdų augmentacijos poveikį, toliau apibrėžiame pagalbinę funkciją `apply`. Ši funkcija kelis kartus paleidžia vaizdų augmentacijos metodą `aug` įvesties vaizdui `img` ir parodo visus rezultatus.
 
 ```{.python .input}
 #@tab all
@@ -69,20 +68,20 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
     d2l.show_images(Y, num_rows, num_cols, scale=scale)
 ```
 
-### Flipping and Cropping
+### Apvertimas ir apkarpymas
 
 :begin_tab:`mxnet`
-[**Flipping the image left and right**] usually does not change the category of the object. 
-This is one of the earliest and most widely used methods of image augmentation.
-Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which flips
-an image left and right with a 50% chance.
+[**Vaizdo apvertimas kairėn ir dešinėn**] paprastai nekeičia objekto kategorijos.
+Tai vienas ankstyviausių ir plačiausiai naudojamų vaizdų augmentacijos metodų.
+Toliau naudojame modulį `transforms`, kad sukurtume `RandomFlipLeftRight` egzempliorių, kuris
+apverčia vaizdą kairėn ir dešinėn su 50 % tikimybe.
 :end_tab:
 
 :begin_tab:`pytorch`
-[**Flipping the image left and right**] usually does not change the category of the object. 
-This is one of the earliest and most widely used methods of image augmentation.
-Next, we use the `transforms` module to create the `RandomHorizontalFlip` instance, which flips
-an image left and right with a 50% chance.
+[**Vaizdo apvertimas kairėn ir dešinėn**] paprastai nekeičia objekto kategorijos.
+Tai vienas ankstyviausių ir plačiausiai naudojamų vaizdų augmentacijos metodų.
+Toliau naudojame modulį `transforms`, kad sukurtume `RandomHorizontalFlip` egzempliorių, kuris
+apverčia vaizdą kairėn ir dešinėn su 50 % tikimybe.
 :end_tab:
 
 ```{.python .input}
@@ -96,15 +95,15 @@ apply(img, torchvision.transforms.RandomHorizontalFlip())
 ```
 
 :begin_tab:`mxnet`
-[**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
-Next, we create a `RandomFlipTopBottom` instance to flip
-an image up and down with a 50% chance.
+[**Apvertimas aukštyn ir žemyn**] nėra toks įprastas kaip apvertimas kairėn ir dešinėn. Tačiau bent jau šiam pavyzdiniam vaizdui apvertimas aukštyn ir žemyn netrukdo atpažinimui.
+Toliau sukuriame `RandomFlipTopBottom` egzempliorių, kuris apverčia
+vaizdą aukštyn ir žemyn su 50 % tikimybe.
 :end_tab:
 
 :begin_tab:`pytorch`
-[**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
-Next, we create a `RandomVerticalFlip` instance to flip
-an image up and down with a 50% chance.
+[**Apvertimas aukštyn ir žemyn**] nėra toks įprastas kaip apvertimas kairėn ir dešinėn. Tačiau bent jau šiam pavyzdiniam vaizdui apvertimas aukštyn ir žemyn netrukdo atpažinimui.
+Toliau sukuriame `RandomVerticalFlip` egzempliorių, kuris apverčia
+vaizdą aukštyn ir žemyn su 50 % tikimybe.
 :end_tab:
 
 ```{.python .input}
@@ -117,12 +116,12 @@ apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())
 apply(img, torchvision.transforms.RandomVerticalFlip())
 ```
 
-In the example image we used, the cat is in the middle of the image, but this may not be the case in general. 
-In :numref:`sec_pooling`, we explained that the pooling layer can reduce the sensitivity of a convolutional layer to the target position.
-In addition, we can also randomly crop the image to make objects appear in different positions in the image at different scales, which can also reduce the sensitivity of a model to the target position.
+Mūsų naudotame pavyzdiniame vaizde katė yra vaizdo viduryje, tačiau apskritai taip gali nebūti.
+:numref:`sec_pooling` paaiškinome, kad sutelkimo sluoksnis gali sumažinti konvoliucinio sluoksnio jautrumą tikslo padėčiai.
+Be to, galime atsitiktinai apkarpyti vaizdą, kad objektai skirtingose vaizdo vietose atsirastų skirtingais masteliais, o tai taip pat gali sumažinti modelio jautrumą tikslo padėčiai.
 
-In the code below, we [**randomly crop**] an area with an area of $10\% \sim 100\%$ of the original area each time, and the ratio of width to height of this area is randomly selected from $0.5 \sim 2$. Then, the width and height of the region are both scaled to 200 pixels. 
-Unless otherwise specified, the random number between $a$ and $b$ in this section refers to a continuous value obtained by random and uniform sampling from the interval $[a, b]$.
+Toliau pateiktame kode [**atsitiktinai apkerpame**] kiekvieną kartą $10\% \sim 100\%$ originalaus ploto sritį, o šios srities pločio ir aukščio santykis atsitiktinai parenkamas iš $0{,}5 \sim 2$. Tada srities plotis ir aukštis abu pakeičiami iki 200 pikselių.
+Jei nenurodyta kitaip, atsitiktinis skaičius tarp $a$ ir $b$ šiame skyrelyje reiškia tolydžią reikšmę, gautą atsitiktinai ir tolygiai imant imtį iš intervalo $[a, b]$.
 
 ```{.python .input}
 #@tab mxnet
@@ -138,9 +137,9 @@ shape_aug = torchvision.transforms.RandomResizedCrop(
 apply(img, shape_aug)
 ```
 
-### Changing Colors
+### Spalvų keitimas
 
-Another augmentation method is changing colors. We can change four aspects of the image color: brightness, contrast, saturation, and hue. In the example below, we [**randomly change the brightness**] of the image to a value between 50% ($1-0.5$) and 150% ($1+0.5$) of the original image.
+Dar vienas augmentacijos metodas yra spalvų keitimas. Galime keisti keturis vaizdo spalvos aspektus: ryškumą, kontrastą, sodrumą ir atspalvį. Toliau pateiktame pavyzdyje [**atsitiktinai keičiame vaizdo ryškumą**] iki reikšmės tarp 50 % ($1-0{,}5$) ir 150 % ($1+0{,}5$) originalaus vaizdo.
 
 ```{.python .input}
 #@tab mxnet
@@ -153,7 +152,7 @@ apply(img, torchvision.transforms.ColorJitter(
     brightness=0.5, contrast=0, saturation=0, hue=0))
 ```
 
-Similarly, we can [**randomly change the hue**] of the image.
+Panašiai galime [**atsitiktinai keisti vaizdo atspalvį**].
 
 ```{.python .input}
 #@tab mxnet
@@ -166,7 +165,7 @@ apply(img, torchvision.transforms.ColorJitter(
     brightness=0, contrast=0, saturation=0, hue=0.5))
 ```
 
-We can also create a `RandomColorJitter` instance and set how to [**randomly change the `brightness`, `contrast`, `saturation`, and `hue` of the image at the same time**].
+Taip pat galime sukurti `RandomColorJitter` egzempliorių ir nurodyti, kaip [**vienu metu atsitiktinai keisti vaizdo `brightness`, `contrast`, `saturation` ir `hue`**].
 
 ```{.python .input}
 #@tab mxnet
@@ -182,11 +181,11 @@ color_aug = torchvision.transforms.ColorJitter(
 apply(img, color_aug)
 ```
 
-### Combining Multiple Image Augmentation Methods
+### Kelių vaizdų augmentacijos metodų derinimas
 
-In practice, we will [**combine multiple image augmentation methods**]. 
-For example,
-we can combine the different image augmentation methods defined above and apply them to each image via a `Compose` instance.
+Praktikoje [**derinsime kelis vaizdų augmentacijos metodus**].
+Pavyzdžiui,
+galime derinti aukščiau apibrėžtus skirtingus vaizdų augmentacijos metodus ir taikyti juos kiekvienam vaizdui per `Compose` egzempliorių.
 
 ```{.python .input}
 #@tab mxnet
@@ -202,12 +201,12 @@ augs = torchvision.transforms.Compose([
 apply(img, augs)
 ```
 
-## [**Training with Image Augmentation**]
+## [**Mokymas su vaizdų augmentacija**]
 
-Let's train a model with image augmentation.
-Here we use the CIFAR-10 dataset instead of the Fashion-MNIST dataset that we used before. 
-This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, while the color and size of the objects in the CIFAR-10 dataset have more significant differences. 
-The first 32 training images in the CIFAR-10 dataset are shown below.
+Apmokykime modelį su vaizdų augmentacija.
+Čia naudojame CIFAR-10 duomenų rinkinį vietoj anksčiau naudoto Fashion-MNIST duomenų rinkinio.
+Taip yra todėl, kad objektų padėtis ir dydis Fashion-MNIST duomenų rinkinyje yra normalizuoti, o objektų spalva ir dydis CIFAR-10 duomenų rinkinyje skiriasi žymiai labiau.
+Toliau parodomi pirmieji 32 CIFAR-10 duomenų rinkinio apmokymo vaizdai.
 
 ```{.python .input}
 #@tab mxnet
@@ -222,9 +221,9 @@ all_images = torchvision.datasets.CIFAR10(train=True, root="../data",
 d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 ```
 
-In order to obtain definitive results during prediction, we usually only apply image augmentation to training examples, and do not use image augmentation with random operations during prediction. 
-[**Here we only use the simplest random left-right flipping method**]. In addition, we use a `ToTensor` instance to convert a minibatch of images into the format required by the deep learning framework, i.e., 
-32-bit floating point numbers between 0 and 1 with the shape of (batch size, number of channels, height, width).
+Kad prognozavimo metu gautume apibrėžtus rezultatus, vaizdų augmentaciją paprastai taikome tik apmokymo pavyzdžiams, o prognozavimo metu nenaudojame vaizdų augmentacijos su atsitiktinėmis operacijomis.
+[**Čia naudojame tik paprasčiausią atsitiktinio apvertimo kairėn ir dešinėn metodą**]. Be to, naudojame `ToTensor` egzempliorių, kad vaizdų minirinkinį paverstume formatu, kurio reikalauja giliojo mokymosi karkasas, t. y.
+32 bitų slankiojo kablelio skaičiais tarp 0 ir 1 su forma (rinkinio dydis, kanalų skaičius, aukštis, plotis).
 
 ```{.python .input}
 #@tab mxnet
@@ -247,22 +246,18 @@ test_augs = torchvision.transforms.Compose([
 ```
 
 :begin_tab:`mxnet`
-Next, we define an auxiliary function to facilitate reading the image and
-applying image augmentation. 
-The `transform_first` function provided by Gluon's
-datasets applies image augmentation to the first element of each training
-example (image and label), i.e., the image. 
-For
-a detailed introduction to `DataLoader`, please refer to :numref:`sec_fashion_mnist`.
+Toliau apibrėžiame pagalbinę funkciją, kad palengvintume vaizdo skaitymą ir
+vaizdų augmentacijos taikymą.
+Gluon duomenų rinkinių pateikiama funkcija `transform_first` taiko vaizdų augmentaciją pirmajam kiekvieno apmokymo
+pavyzdžio elementui (vaizdui ir žymeniui), t. y. vaizdui.
+Išsamų `DataLoader` pristatymą žr. :numref:`sec_fashion_mnist`.
 :end_tab:
 
 :begin_tab:`pytorch`
-Next, we [**define an auxiliary function to facilitate reading the image and
-applying image augmentation**]. 
-The `transform` argument provided by PyTorch's
-dataset applies augmentation to transform the images.
-For
-a detailed introduction to `DataLoader`, please refer to :numref:`sec_fashion_mnist`.
+Toliau [**apibrėžiame pagalbinę funkciją, kad palengvintume vaizdo skaitymą ir
+vaizdų augmentacijos taikymą**].
+PyTorch duomenų rinkinio pateikiamas argumentas `transform` taiko augmentaciją vaizdams transformuoti.
+Išsamų `DataLoader` pristatymą žr. :numref:`sec_fashion_mnist`.
 :end_tab:
 
 ```{.python .input}
@@ -284,15 +279,15 @@ def load_cifar10(is_train, augs, batch_size):
     return dataloader
 ```
 
-### Multi-GPU Training
+### Mokymas keliais GPU
 
-We train the ResNet-18 model from
-:numref:`sec_resnet` on the
-CIFAR-10 dataset.
-Recall the introduction to
-multi-GPU training in :numref:`sec_multi_gpu_concise`.
-In the following,
-[**we define a function to train and evaluate the model using multiple GPUs**].
+Apmokome ResNet-18 modelį iš
+:numref:`sec_resnet`
+CIFAR-10 duomenų rinkinyje.
+Prisiminkite kelių GPU apmokymo pristatymą
+:numref:`sec_multi_gpu_concise`.
+Toliau
+[**apibrėžiame funkciją modeliui apmokyti ir įvertinti naudojant kelis GPU**].
 
 ```{.python .input}
 #@tab mxnet
@@ -401,11 +396,11 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
           f'{str(devices)}')
 ```
 
-Now we can [**define the `train_with_data_aug` function to train the model with image augmentation**].
-This function gets all available GPUs, 
-uses Adam as the optimization algorithm,
-applies image augmentation to the training dataset,
-and finally calls the `train_ch13` function just defined to train and evaluate the model.
+Dabar galime [**apibrėžti funkciją `train_with_data_aug` modeliui apmokyti su vaizdų augmentacija**].
+Ši funkcija gauna visus prieinamus GPU,
+naudoja Adam kaip optimizavimo algoritmą,
+taiko vaizdų augmentaciją apmokymo duomenų rinkiniui
+ir galiausiai iškviečia ką tik apibrėžtą funkciją `train_ch13` modeliui apmokyti ir įvertinti.
 
 ```{.python .input}
 #@tab mxnet
@@ -435,30 +430,30 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)
 ```
 
-Let's [**train the model**] using image augmentation based on random left-right flipping.
+[**Apmokykime modelį**] naudodami vaizdų augmentaciją, pagrįstą atsitiktiniu apvertimu kairėn ir dešinėn.
 
 ```{.python .input}
 #@tab all
 train_with_data_aug(train_augs, test_augs, net)
 ```
 
-## Summary
+## Santrauka
 
-* Image augmentation generates random images based on existing training data to improve the generalization ability of models.
-* In order to obtain definitive results during prediction, we usually only apply image augmentation to training examples, and do not use image augmentation with random operations during prediction.
-* Deep learning frameworks provide many different image augmentation methods, which can be applied simultaneously.
+* Vaizdų augmentacija sukuria atsitiktinius vaizdus remdamasi esamais apmokymo duomenimis, kad pagerintų modelių apibendrinimo gebą.
+* Kad prognozavimo metu gautume apibrėžtus rezultatus, vaizdų augmentaciją paprastai taikome tik apmokymo pavyzdžiams, o prognozavimo metu nenaudojame vaizdų augmentacijos su atsitiktinėmis operacijomis.
+* Giliojo mokymosi karkasai pateikia daug skirtingų vaizdų augmentacijos metodų, kuriuos galima taikyti vienu metu.
 
 
-## Exercises
+## Pratimai
 
-1. Train the model without using image augmentation: `train_with_data_aug(test_augs, test_augs)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
-1. Combine multiple different image augmentation methods in model training on the CIFAR-10 dataset. Does it improve test accuracy? 
-1. Refer to the online documentation of the deep learning framework. What other image augmentation methods does it also provide?
+1. Apmokykite modelį nenaudodami vaizdų augmentacijos: `train_with_data_aug(test_augs, test_augs)`. Palyginkite apmokymo ir testavimo tikslumą naudojant vaizdų augmentaciją ir jos nenaudojant. Ar šis lyginamasis eksperimentas gali pagrįsti teiginį, kad vaizdų augmentacija gali sušvelninti persimokymą? Kodėl?
+1. Derinkite kelis skirtingus vaizdų augmentacijos metodus apmokydami modelį CIFAR-10 duomenų rinkinyje. Ar tai pagerina testavimo tikslumą?
+1. Peržiūrėkite giliojo mokymosi karkaso internetinę dokumentaciją. Kokių dar vaizdų augmentacijos metodų jis pateikia?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/367)
+[Diskusijos](https://discuss.d2l.ai/t/367)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1404)
+[Diskusijos](https://discuss.d2l.ai/t/1404)
 :end_tab:

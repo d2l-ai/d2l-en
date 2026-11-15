@@ -1,28 +1,26 @@
-# Image Classification (CIFAR-10) on Kaggle
+# Vaizdų klasifikavimas (CIFAR-10) Kaggle platformoje
 :label:`sec_kaggle_cifar10`
 
-So far, we have been using high-level APIs of deep learning frameworks to directly obtain image datasets in tensor format.
-However, custom image datasets
-often come in the form of image files.
-In this section, we will start from
-raw image files,
-and organize, read, then transform them
-into tensor format step by step.
+Iki šiol naudojome giliojo mokymosi karkasų aukšto lygio API, kad tiesiogiai gautume vaizdų duomenų rinkinius tenzorių formatu.
+Tačiau pritaikyti vaizdų duomenų rinkiniai
+dažnai būna vaizdų failų pavidalu.
+Šiame skyrelyje pradėsime nuo
+neapdorotų vaizdų failų
+ir žingsnis po žingsnio juos sutvarkysime, nuskaitysime ir paversime
+tenzorių formatu.
 
-We experimented with the CIFAR-10 dataset in :numref:`sec_image_augmentation`,
-which is an important dataset in computer vision.
-In this section,
-we will apply the knowledge we learned
-in previous sections
-to practice the Kaggle competition of
-CIFAR-10 image classification.
-(**The web address of the competition is https://www.kaggle.com/c/cifar-10**)
+CIFAR-10 duomenų rinkinį, kuris yra svarbus kompiuterinės regos duomenų rinkinys, išbandėme :numref:`sec_image_augmentation`.
+Šiame skyrelyje
+ankstesniuose skyreliuose išmoktas žinias pritaikysime
+praktikai – Kaggle CIFAR-10 vaizdų klasifikavimo
+konkursui.
+(**Konkurso interneto adresas yra https://www.kaggle.com/c/cifar-10**)
 
-:numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
-In order to submit the results,
-you need to register a Kaggle account.
+:numref:`fig_kaggle_cifar10` parodyta informacija konkurso tinklalapyje.
+Kad galėtumėte pateikti rezultatus,
+turite užsiregistruoti Kaggle paskyrą.
 
-![CIFAR-10 image classification competition webpage information. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-cifar10.png)
+![CIFAR-10 vaizdų klasifikavimo konkurso tinklalapio informacija. Konkurso duomenų rinkinį galima gauti spustelėjus skirtuką „Data“.](../img/kaggle-cifar10.png)
 :width:`600px`
 :label:`fig_kaggle_cifar10`
 
@@ -53,41 +51,40 @@ import pandas as pd
 import shutil
 ```
 
-## Obtaining and Organizing the Dataset
+## Duomenų rinkinio gavimas ir tvarkymas
 
-The competition dataset is divided into
-a training set and a test set,
-which contain 50000 and 300000 images, respectively.
-In the test set,
-10000 images will be used for evaluation,
-while the remaining 290000 images will not
-be evaluated:
-they are included just
-to make it hard
-to cheat with
-*manually* labeled results of the test set.
-The images in this dataset
-are all png color (RGB channels) image files,
-whose height and width are both 32 pixels.
-The images cover a total of 10 categories, namely airplanes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks.
-The upper-left corner of :numref:`fig_kaggle_cifar10` shows some images of airplanes, cars, and birds in the dataset.
+Konkurso duomenų rinkinys padalytas į
+apmokymo ir testavimo aibes,
+kuriose atitinkamai yra 50000 ir 300000 vaizdų.
+Testavimo aibėje
+10000 vaizdų bus naudojami vertinimui,
+o likę 290000 vaizdų
+nebus vertinami:
+jie įtraukti tik tam,
+kad būtų sunku apgauti
+*rankiniu būdu* pažymėtais testavimo aibės rezultatais.
+Visi šio duomenų rinkinio vaizdai
+yra png spalvoti (RGB kanalų) vaizdų failai,
+kurių aukštis ir plotis yra po 32 pikselius.
+Vaizdai apima iš viso 10 kategorijų, būtent lėktuvus, automobilius, paukščius, kates, elnius, šunis, varles, arklius, laivus ir sunkvežimius.
+:numref:`fig_kaggle_cifar10` viršutiniame kairiajame kampe parodyta keletas duomenų rinkinio lėktuvų, automobilių ir paukščių vaizdų.
 
 
-### Downloading the Dataset
+### Duomenų rinkinio atsisiuntimas
 
-After logging in to Kaggle, we can click the "Data" tab on the CIFAR-10 image classification competition webpage shown in :numref:`fig_kaggle_cifar10` and download the dataset by clicking the "Download All" button.
-After unzipping the downloaded file in `../data`, and unzipping `train.7z` and `test.7z` inside it, you will find the entire dataset in the following paths:
+Prisijungę prie Kaggle, galime spustelėti skirtuką „Data“ CIFAR-10 vaizdų klasifikavimo konkurso tinklalapyje, parodytame :numref:`fig_kaggle_cifar10`, ir atsisiųsti duomenų rinkinį spustelėję mygtuką „Download All“.
+Išpakavę atsisiųstą failą aplanke `../data` ir išpakavę jame esančius `train.7z` ir `test.7z`, visą duomenų rinkinį rasite šiuose keliuose:
 
 * `../data/cifar-10/train/[1-50000].png`
 * `../data/cifar-10/test/[1-300000].png`
 * `../data/cifar-10/trainLabels.csv`
 * `../data/cifar-10/sampleSubmission.csv`
 
-where the `train` and `test` directories contain the training and testing images, respectively, `trainLabels.csv` provides labels for the training images, and `sample_submission.csv` is a sample submission file.
+kur katalogai `train` ir `test` atitinkamai talpina apmokymo ir testavimo vaizdus, `trainLabels.csv` pateikia apmokymo vaizdų žymenis, o `sample_submission.csv` yra pateikimo failo pavyzdys.
 
-To make it easier to get started, [**we provide a small-scale sample of the dataset that
-contains the first 1000 training images and 5 random testing images.**]
-To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
+Kad būtų lengviau pradėti, [**pateikiame mažo masto duomenų rinkinio pavyzdį,
+kuriame yra pirmieji 1000 apmokymo vaizdų ir 5 atsitiktiniai testavimo vaizdai.**]
+Kad naudotumėte pilną Kaggle konkurso duomenų rinkinį, toliau pateiktą kintamąjį `demo` turite nustatyti į `False`.
 
 ```{.python .input}
 #@tab all
@@ -105,12 +102,12 @@ else:
     data_dir = '../data/cifar-10/'
 ```
 
-### [**Organizing the Dataset**]
+### [**Duomenų rinkinio tvarkymas**]
 
-We need to organize datasets to facilitate model training and testing.
-Let's first read the labels from the csv file.
-The following function returns a dictionary that maps
-the non-extension part of the filename to its label.
+Duomenų rinkinius turime sutvarkyti, kad būtų lengviau apmokyti ir testuoti modelį.
+Pirmiausia nuskaitykime žymenis iš csv failo.
+Toliau pateikta funkcija grąžina žodyną, kuris atvaizduoja
+failo pavadinimo dalį be plėtinio į jo žymenį.
 
 ```{.python .input}
 #@tab all
@@ -128,16 +125,16 @@ print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
 
-Next, we define the `reorg_train_valid` function to [**split the validation set out of the original training set.**]
-The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
-More concretely,
-let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
-The validation set will split out
-$\max(\lfloor nr\rfloor,1)$ images for each class.
-Let's use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
-there will be 45000 images used for training in the path `train_valid_test/train`,
-while the other 5000 images will be split out
-as validation set in the path `train_valid_test/valid`. After organizing the dataset, images of the same class will be placed under the same folder.
+Toliau apibrėžiame funkciją `reorg_train_valid`, kad [**iš pradinės apmokymo aibės išskirtume patikros aibę.**]
+Šios funkcijos argumentas `valid_ratio` yra patikros aibės pavyzdžių skaičiaus ir pradinės apmokymo aibės pavyzdžių skaičiaus santykis.
+Konkrečiau,
+tegul $n$ yra klasės, turinčios mažiausiai pavyzdžių, vaizdų skaičius, o $r$ – santykis.
+Patikros aibei bus išskirta
+$\max(\lfloor nr\rfloor,1)$ vaizdų kiekvienai klasei.
+Paimkime `valid_ratio=0.1` kaip pavyzdį. Kadangi pradinėje apmokymo aibėje yra 50000 vaizdų,
+apmokymui bus naudojama 45000 vaizdų kelyje `train_valid_test/train`,
+o kiti 5000 vaizdų bus išskirti
+kaip patikros aibė kelyje `train_valid_test/valid`. Sutvarkius duomenų rinkinį, tos pačios klasės vaizdai bus patalpinti tame pačiame aplanke.
 
 ```{.python .input}
 #@tab all
@@ -171,7 +168,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     return n_valid_per_label
 ```
 
-The `reorg_test` function below [**organizes the testing set for data loading during prediction.**]
+Toliau pateikta funkcija `reorg_test` [**sutvarko testavimo aibę duomenų įkėlimui prognozavimo metu.**]
 
 ```{.python .input}
 #@tab all
@@ -184,8 +181,8 @@ def reorg_test(data_dir):
                               'unknown'))
 ```
 
-Finally, we use a function to [**invoke**]
-the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` (**functions defined above.**)
+Galiausiai naudojame funkciją, kad [**iškviestume**]
+(**aukščiau apibrėžtas funkcijas**) `read_csv_labels`, `reorg_train_valid` ir `reorg_test`.
 
 ```{.python .input}
 #@tab all
@@ -195,11 +192,11 @@ def reorg_cifar10_data(data_dir, valid_ratio):
     reorg_test(data_dir)
 ```
 
-Here we only set the batch size to 32 for the small-scale sample of the dataset.
-When training and testing
-the complete dataset of the Kaggle competition,
-`batch_size` should be set to a larger integer, such as 128.
-We split out 10% of the training examples as the validation set for tuning hyperparameters.
+Čia rinkinio dydį nustatome į 32 tik mažo masto duomenų rinkinio pavyzdžiui.
+Apmokant ir testuojant
+pilną Kaggle konkurso duomenų rinkinį,
+`batch_size` turėtų būti nustatytas didesnis sveikasis skaičius, pavyzdžiui, 128.
+Išskiriame 10 % apmokymo pavyzdžių kaip patikros aibę hiperparametrams derinti.
 
 ```{.python .input}
 #@tab all
@@ -208,11 +205,11 @@ valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
 ```
 
-## [**Image Augmentation**]
+## [**Vaizdų augmentacija**]
 
-We use image augmentation to address overfitting.
-For example, images can be flipped horizontally at random during training.
-We can also perform standardization for the three RGB channels of color images. Below lists some of these operations that you can tweak.
+Persimokymui įveikti naudojame vaizdų augmentaciją.
+Pavyzdžiui, apmokymo metu vaizdai gali būti atsitiktinai apverčiami horizontaliai.
+Taip pat galime atlikti spalvotų vaizdų trijų RGB kanalų standartizavimą. Toliau išvardytos kelios iš šių operacijų, kurias galite keisti.
 
 ```{.python .input}
 #@tab mxnet
@@ -250,10 +247,10 @@ transform_train = torchvision.transforms.Compose([
                                      [0.2023, 0.1994, 0.2010])])
 ```
 
-During testing,
-we only perform standardization on images
-so as to
-remove randomness in the evaluation results.
+Testavimo metu
+vaizdams atliekame tik standartizavimą,
+kad
+pašalintume atsitiktinumą vertinimo rezultatuose.
 
 ```{.python .input}
 #@tab mxnet
@@ -271,9 +268,9 @@ transform_test = torchvision.transforms.Compose([
                                      [0.2023, 0.1994, 0.2010])])
 ```
 
-## Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-Next, we [**read the organized dataset consisting of raw image files**]. Each example includes an image and a label.
+Toliau [**nuskaitome sutvarkytą duomenų rinkinį, sudarytą iš neapdorotų vaizdų failų**]. Kiekvieną pavyzdį sudaro vaizdas ir žymuo.
 
 ```{.python .input}
 #@tab mxnet
@@ -294,13 +291,13 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
     transform=transform_test) for folder in ['valid', 'test']]
 ```
 
-During training,
-we need to [**specify all the image augmentation operations defined above**].
-When the validation set
-is used for model evaluation during hyperparameter tuning,
-no randomness from image augmentation should be introduced.
-Before final prediction,
-we train the model on the combined training set and validation set to make full use of all the labeled data.
+Apmokymo metu
+turime [**nurodyti visas aukščiau apibrėžtas vaizdų augmentacijos operacijas**].
+Kai patikros aibė
+naudojama modelio vertinimui derinant hiperparametrus,
+neturėtų būti įvedama atsitiktinumo iš vaizdų augmentacijos.
+Prieš galutinį prognozavimą
+modelį apmokome kartu sujungtoje apmokymo ir patikros aibėje, kad visapusiškai išnaudotume visus pažymėtus duomenis.
 
 ```{.python .input}
 #@tab mxnet
@@ -330,13 +327,13 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## Defining the [**Model**]
+## [**Modelio**] apibrėžimas
 
 :begin_tab:`mxnet`
-Here, we build the residual blocks based on the `HybridBlock` class, which is
-slightly different from the implementation described in
+Čia liekamuosius blokus sukuriame remdamiesi klase `HybridBlock`, kuri
+šiek tiek skiriasi nuo įgyvendinimo, aprašyto
 :numref:`sec_resnet`.
-This is for improving computational efficiency.
+Tai daroma skaičiavimo efektyvumui pagerinti.
 :end_tab:
 
 ```{.python .input}
@@ -364,7 +361,7 @@ class Residual(nn.HybridBlock):
 ```
 
 :begin_tab:`mxnet`
-Next, we define the ResNet-18 model.
+Toliau apibrėžiame ResNet-18 modelį.
 :end_tab:
 
 ```{.python .input}
@@ -392,11 +389,11 @@ def resnet18(num_classes):
 ```
 
 :begin_tab:`mxnet`
-We use Xavier initialization described in :numref:`subsec_xavier` before training begins.
+Prieš pradedant apmokymą naudojame Xavier inicializavimą, aprašytą :numref:`subsec_xavier`.
 :end_tab:
 
 :begin_tab:`pytorch`
-We define the ResNet-18 model described in
+Apibrėžiame ResNet-18 modelį, aprašytą
 :numref:`sec_resnet`.
 :end_tab:
 
@@ -421,10 +418,10 @@ def get_net():
 loss = nn.CrossEntropyLoss(reduction="none")
 ```
 
-## Defining the [**Training Function**]
+## [**Apmokymo funkcijos**] apibrėžimas
 
-We will select models and tune hyperparameters according to the model's performance on the validation set.
-In the following, we define the model training function `train`.
+Modelius rinksimės ir hiperparametrus derinsime pagal modelio našumą patikros aibėje.
+Toliau apibrėžiame modelio apmokymo funkciją `train`.
 
 ```{.python .input}
 #@tab mxnet
@@ -504,13 +501,13 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f' examples/sec on {str(devices)}')
 ```
 
-## [**Training and Validating the Model**]
+## [**Modelio apmokymas ir patikra**]
 
-Now, we can train and validate the model.
-All the following hyperparameters can be tuned.
-For example, we can increase the number of epochs.
-When `lr_period` and `lr_decay` are set to 4 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 4 epochs. Just for ease of demonstration,
-we only train 20 epochs here.
+Dabar galime apmokyti ir patikrinti modelį.
+Visus toliau pateiktus hiperparametrus galima derinti.
+Pavyzdžiui, galime padidinti epochų skaičių.
+Kai `lr_period` ir `lr_decay` nustatyti atitinkamai į 4 ir 0,9, optimizavimo algoritmo mokymosi greitis bus padaugintas iš 0,9 po kiekvienų 4 epochų. Tik demonstravimo patogumui
+čia apmokome tik 20 epochų.
 
 ```{.python .input}
 #@tab mxnet
@@ -530,10 +527,10 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## [**Classifying the Testing Set**] and Submitting Results on Kaggle
+## [**Testavimo aibės klasifikavimas**] ir rezultatų pateikimas Kaggle platformoje
 
-After obtaining a promising model with hyperparameters,
-we use all the labeled data (including the validation set) to retrain the model and classify the testing set.
+Gavę perspektyvų modelį su hiperparametrais,
+naudojame visus pažymėtus duomenis (įskaitant patikros aibę), kad iš naujo apmokytume modelį ir suklasifikuotume testavimo aibę.
 
 ```{.python .input}
 #@tab mxnet
@@ -569,35 +566,34 @@ df['label'] = df['label'].apply(lambda x: train_valid_ds.classes[x])
 df.to_csv('submission.csv', index=False)
 ```
 
-The above code
-will generate a `submission.csv` file,
-whose format
-meets the requirement of the Kaggle competition.
-The method
-for submitting results to Kaggle
-is similar to that in :numref:`sec_kaggle_house`.
+Aukščiau pateiktas kodas
+sugeneruos failą `submission.csv`,
+kurio formatas
+atitinka Kaggle konkurso reikalavimus.
+Rezultatų pateikimo Kaggle būdas
+panašus į aprašytą :numref:`sec_kaggle_house`.
 
-## Summary
+## Santrauka
 
-* We can read datasets containing raw image files after organizing them into the required format.
+* Duomenų rinkinius, kuriuose yra neapdorotų vaizdų failų, galime nuskaityti sutvarkę juos į reikiamą formatą.
 
 :begin_tab:`mxnet`
-* We can use convolutional neural networks, image augmentation, and hybrid programing in an image classification competition.
+* Vaizdų klasifikavimo konkurse galime naudoti konvoliucinius neuroninius tinklus, vaizdų augmentaciją ir hibridinį programavimą.
 :end_tab:
 
 :begin_tab:`pytorch`
-* We can use convolutional neural networks and image augmentation in an image classification competition.
+* Vaizdų klasifikavimo konkurse galime naudoti konvoliucinius neuroninius tinklus ir vaizdų augmentaciją.
 :end_tab:
 
-## Exercises
+## Pratimai
 
-1. Use the complete CIFAR-10 dataset for this Kaggle competition. Set hyperparameters as `batch_size = 128`, `num_epochs = 100`, `lr = 0.1`, `lr_period = 50`, and `lr_decay = 0.1`.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
-1. What accuracy can you get when not using image augmentation?
+1. Šiam Kaggle konkursui naudokite pilną CIFAR-10 duomenų rinkinį. Nustatykite hiperparametrus `batch_size = 128`, `num_epochs = 100`, `lr = 0.1`, `lr_period = 50` ir `lr_decay = 0.1`. Pažiūrėkite, kokį tikslumą ir vietą šiame konkurse galite pasiekti. Ar galite juos dar pagerinti?
+1. Kokį tikslumą galite gauti nenaudodami vaizdų augmentacijos?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/379)
+[Diskusijos](https://discuss.d2l.ai/t/379)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1479)
+[Diskusijos](https://discuss.d2l.ai/t/1479)
 :end_tab:

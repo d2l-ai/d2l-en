@@ -1,27 +1,27 @@
-# Computer Vision
+# Kompiuterinė rega
 :label:`chap_cv`
 
-Whether it is medical diagnosis, self-driving vehicles, camera monitoring, or smart filters, many applications in the field of computer vision are closely related to our current and future lives. 
-In recent years, deep learning has been
-the transformative power for advancing the performance of computer vision systems.
-It can be said that the most advanced computer vision applications are almost inseparable from deep learning.
-In view of this, this chapter will focus on the field of computer vision, and investigate methods and applications that have recently been influential in academia and industry.
+Nesvarbu, ar tai medicininė diagnostika, savaeigės transporto priemonės, kamerų stebėjimas ar išmanieji filtrai, daugelis kompiuterinės regos taikymų yra glaudžiai susiję su dabartiniu ir būsimu mūsų gyvenimu.
+Pastaraisiais metais gilusis mokymasis buvo
+transformuojanti jėga, tobulinanti kompiuterinės regos sistemų našumą.
+Galima sakyti, kad pažangiausi kompiuterinės regos taikymai beveik neatskiriami nuo giliojo mokymosi.
+Atsižvelgiant į tai, šiame skyriuje susitelksime į kompiuterinės regos sritį ir panagrinėsime metodus bei taikymus, kurie pastaruoju metu buvo įtakingi akademinėje bendruomenėje ir pramonėje.
 
 
-In :numref:`chap_cnn` and :numref:`chap_modern_cnn`, we studied various convolutional neural networks that are
-commonly used in computer vision, and applied them
-to simple image classification tasks. 
-At the beginning of this chapter, we will describe
-two methods that 
-may improve model generalization, namely *image augmentation* and *fine-tuning*,
-and apply them to image classification. 
-Since deep neural networks can effectively represent images in multiple levels, 
-such layerwise representations have been successfully 
-used in various computer vision tasks such as *object detection*, *semantic segmentation*, and *style transfer*. 
-Following the key idea of leveraging layerwise representations in computer vision,
-we will begin with major components and techniques for object detection. Next, we will show how to use *fully convolutional networks* for semantic segmentation of images. Then we will explain how to use style transfer techniques to generate images like the cover of this book.
-In the end, we conclude this chapter
-by applying the materials of this chapter and several previous chapters on two popular computer vision benchmark datasets.
+:numref:`chap_cnn` ir :numref:`chap_modern_cnn` nagrinėjome įvairius konvoliucinius neuroninius tinklus,
+dažnai naudojamus kompiuterinėje regoje, ir pritaikėme juos
+paprastoms vaizdų klasifikavimo užduotims.
+Šio skyriaus pradžioje aprašysime
+du metodus,
+kurie gali pagerinti modelio apibendrinimą, būtent *vaizdų augmentaciją* ir *patikslinimą*,
+ir pritaikysime juos vaizdų klasifikavimui.
+Kadangi gilieji neuroniniai tinklai gali veiksmingai vaizduoti vaizdus keliais lygiais,
+tokie sluoksniniai vaizdai sėkmingai
+naudojami įvairiose kompiuterinės regos užduotyse, tokiose kaip *objektų aptikimas*, *semantinis segmentavimas* ir *stiliaus perkėlimas*.
+Laikydamiesi pagrindinės idėjos – kompiuterinėje regoje išnaudoti sluoksninius vaizdus,
+pradėsime nuo pagrindinių objektų aptikimo komponentų ir technikų. Toliau parodysime, kaip naudoti *pilnai konvoliucinius tinklus* vaizdų semantiniam segmentavimui. Tada paaiškinsime, kaip naudoti stiliaus perkėlimo technikas vaizdams, tokiems kaip šios knygos viršelis, generuoti.
+Galiausiai skyrių užbaigsime
+pritaikydami šio ir kelių ankstesnių skyrių medžiagą dviem populiariems kompiuterinės regos lyginamiesiems duomenų rinkiniams.
 
 ```toc
 :maxdepth: 2

@@ -1,194 +1,195 @@
-# Fine-Tuning BERT for Sequence-Level and Token-Level Applications
+
+# BERT patikslinimas sekos lygmens ir teksto vieneto lygmens taikymams
 :label:`sec_finetuning-bert`
 
 
-In the previous sections of this chapter,
-we have designed different models for natural language processing applications,
-such as based on RNNs, CNNs, attention, and MLPs.
-These models are helpful when there is space or time constraint,
-however,
-crafting a specific model for every natural language processing task
-is practically infeasible.
-In :numref:`sec_bert`,
-we introduced a pretraining model, BERT,
-that requires minimal architecture changes
-for a wide range of natural language processing tasks.
-On the one hand,
-at the time of its proposal,
-BERT improved the state of the art on various natural language processing tasks.
-On the other hand,
-as noted in :numref:`sec_bert-pretraining`,
-the two versions of the original BERT model
-come with 110 million and 340 million parameters.
-Thus, when there are sufficient computational resources,
-we may consider
-fine-tuning BERT for downstream natural language processing applications.
+Ankstesniuose šio skyriaus skyreliuose
+suprojektavome skirtingus modelius natūraliosios kalbos apdorojimo taikymams,
+pavyzdžiui, pagrįstus RNN, CNN, dėmesio sutelkimu ir MLP.
+Šie modeliai naudingi, kai yra vietos ar laiko apribojimų,
+tačiau
+praktiškai neįmanoma sukurti specifinį modelį kiekvienai natūraliosios kalbos apdorojimo užduočiai.
+:numref:`sec_bert`
+pristatėme išankstinio apmokymo modelį BERT,
+kuriam reikia minimalių architektūros pakeitimų
+plačiam natūraliosios kalbos apdorojimo užduočių spektrui.
+Viena vertus,
+jo pasiūlymo metu
+BERT pagerino pažangiausius rezultatus įvairiose natūraliosios kalbos apdorojimo užduotyse.
+Kita vertus,
+kaip pažymėta :numref:`sec_bert-pretraining`,
+dvi originalaus BERT modelio versijos
+turi 110 milijonų ir 340 milijonų parametrų.
+Todėl, kai yra pakankamai skaičiavimo išteklių,
+galime apsvarstyti
+BERT patikslinimą tolesniems natūraliosios kalbos apdorojimo taikymams.
 
-In the following,
-we generalize a subset of natural language processing applications
-as sequence-level and token-level.
-On the sequence level,
-we introduce how to transform the BERT representation of the text input
-to the output label
-in single text classification
-and text pair classification or regression.
-On the token level, we will briefly introduce new applications
-such as text tagging and question answering
-and shed light on how BERT can represent their inputs and get transformed into output labels.
-During fine-tuning,
-the "minimal architecture changes" required by BERT across different applications
-are the extra fully connected layers.
-During supervised learning of a downstream application,
-parameters of the extra layers are learned from scratch while
-all the parameters in the pretrained BERT model are fine-tuned.
+Toliau
+apibendriname natūraliosios kalbos apdorojimo taikymų poaibį
+kaip sekos lygmens ir teksto vieneto lygmens.
+Sekos lygmeniu
+pristatome, kaip paversti teksto įvesties BERT vaizdavimą
+išvesties žymeniu
+vieno teksto klasifikavime
+ir tekstų porų klasifikavime ar regresijoje.
+Teksto vieneto lygmeniu trumpai pristatysime naujus taikymus,
+tokius kaip teksto žymėjimas ir atsakymas į klausimus,
+ir paaiškinsime, kaip BERT gali vaizduoti jų įvestis ir būti paverstas išvesties žymenimis.
+Patikslinimo metu
+„minimalūs architektūros pakeitimai“, kurių BERT reikalauja skirtinguose taikymuose,
+yra papildomi pilnai sujungti sluoksniai.
+Prižiūrimo tolesnio taikymo mokymosi metu
+papildomų sluoksnių parametrai išmokstami nuo nulio, o
+visi iš anksto apmokyto BERT modelio parametrai yra patikslinami.
 
 
-## Single Text Classification
+## Vieno teksto klasifikavimas
 
-*Single text classification* takes a single text sequence as input and outputs its classification result.
-Besides sentiment analysis that we have studied in this chapter,
-the Corpus of Linguistic Acceptability (CoLA)
-is also a dataset for single text classification,
-judging whether a given sentence is grammatically acceptable or not :cite:`Warstadt.Singh.Bowman.2019`.
-For instance, "I should study." is acceptable but "I should studying." is not.
+*Vieno teksto klasifikavimas* kaip įvestį priima vieną teksto seką ir išveda jos klasifikavimo rezultatą.
+Be nuotaikų analizės, kurią nagrinėjome šiame skyriuje,
+Kalbinio priimtinumo tekstynas (angl. *Corpus of Linguistic Acceptability*, CoLA)
+taip pat yra vieno teksto klasifikavimo duomenų rinkinys,
+kuriame vertinama, ar duotas sakinys yra gramatiškai priimtinas, ar ne :cite:`Warstadt.Singh.Bowman.2019`.
+Pavyzdžiui, „I should study.“ yra priimtinas, bet „I should studying.“ – ne.
 
-![Fine-tuning BERT for single text classification applications, such as sentiment analysis and testing linguistic acceptability. Suppose that the input single text has six tokens.](../img/bert-one-seq.svg)
+![BERT patikslinimas vieno teksto klasifikavimo taikymams, tokiems kaip nuotaikų analizė ir kalbinio priimtinumo tikrinimas. Tarkime, kad įvesties vienas tekstas turi šešis teksto vienetus.](../img/bert-one-seq.svg)
 :label:`fig_bert-one-seq`
 
-:numref:`sec_bert` describes the input representation of BERT.
-The BERT input sequence unambiguously represents both single text and text pairs,
-where the special classification token 
-“&lt;cls&gt;” is used for sequence classification and 
-the special classification token 
-“&lt;sep&gt;” marks the end of single text or separates a pair of text.
-As shown in :numref:`fig_bert-one-seq`,
-in single text classification applications,
-the BERT representation of the special classification token 
-“&lt;cls&gt;” encodes the information of the entire input text sequence.
-As the representation of the input single text,
-it will be fed into a small MLP consisting of fully connected (dense) layers
-to output the distribution of all the discrete label values.
+:numref:`sec_bert` aprašytas BERT įvesties vaizdavimas.
+BERT įvesties seka vienareikšmiškai vaizduoja ir vieną tekstą, ir tekstų poras,
+kur specialus klasifikavimo teksto vienetas
+„&lt;cls&gt;“ naudojamas sekos klasifikavimui, o
+specialus klasifikavimo teksto vienetas
+„&lt;sep&gt;“ žymi vieno teksto pabaigą arba atskiria tekstų porą.
+Kaip parodyta :numref:`fig_bert-one-seq`,
+vieno teksto klasifikavimo taikymuose
+specialaus klasifikavimo teksto vieneto
+„&lt;cls&gt;“ BERT vaizdavimas užkoduoja visos įvesties teksto sekos informaciją.
+Kaip įvesties vieno teksto vaizdavimas,
+jis bus paduotas į mažą MLP, sudarytą iš pilnai sujungtų (tankiųjų) sluoksnių,
+kad išvestų visų diskrečių žymenų reikšmių pasiskirstymą.
 
 
-## Text Pair Classification or Regression
+## Tekstų porų klasifikavimas arba regresija
 
-We have also examined natural language inference in this chapter.
-It belongs to *text pair classification*,
-a type of application classifying a pair of text.
+Šiame skyriuje taip pat nagrinėjome natūraliosios kalbos išvadų darymą.
+Jis priklauso *tekstų porų klasifikavimui* –
+taikymo tipui, klasifikuojančiam tekstų porą.
 
-Taking a pair of text as input but outputting a continuous value,
-*semantic textual similarity* is a popular *text pair regression* task.
-This task measures semantic similarity of sentences.
-For instance, in the Semantic Textual Similarity Benchmark dataset,
-the similarity score of a pair of sentences
-is an ordinal scale ranging from 0 (no meaning overlap) to 5 (meaning equivalence) :cite:`Cer.Diab.Agirre.ea.2017`.
-The goal is to predict these scores.
-Examples from the Semantic Textual Similarity Benchmark dataset include (sentence 1, sentence 2, similarity score):
+Kaip įvestį priimdamas tekstų porą, bet išvesdamas tolydžią reikšmę,
+*semantinis teksto panašumas* yra populiari *tekstų porų regresijos* užduotis.
+Ši užduotis matuoja sakinių semantinį panašumą.
+Pavyzdžiui, Semantinio teksto panašumo lyginamajame duomenų rinkinyje
+sakinių poros panašumo balas
+yra tvarkos skalė nuo 0 (reikšmės nepersidengia) iki 5 (reikšmės ekvivalentiškos) :cite:`Cer.Diab.Agirre.ea.2017`.
+Tikslas yra prognozuoti šiuos balus.
+Pavyzdžiai iš Semantinio teksto panašumo lyginamojo duomenų rinkinio apima (1 sakinys, 2 sakinys, panašumo balas):
 
-* "A plane is taking off.", "An air plane is taking off.", 5.000;
-* "A woman is eating something.", "A woman is eating meat.", 3.000;
-* "A woman is dancing.", "A man is talking.", 0.000.
+* „A plane is taking off.“, „An air plane is taking off.“, 5.000;
+* „A woman is eating something.“, „A woman is eating meat.“, 3.000;
+* „A woman is dancing.“, „A man is talking.“, 0.000.
 
 
-![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg)
+![BERT patikslinimas tekstų porų klasifikavimo ar regresijos taikymams, tokiems kaip natūraliosios kalbos išvadų darymas ir semantinis teksto panašumas. Tarkime, kad įvesties tekstų pora turi du ir tris teksto vienetus.](../img/bert-two-seqs.svg)
 :label:`fig_bert-two-seqs`
 
-Comparing with single text classification in :numref:`fig_bert-one-seq`,
-fine-tuning BERT for text pair classification in :numref:`fig_bert-two-seqs` 
-is different in the input representation.
-For text pair regression tasks such as semantic textual similarity,
-trivial changes can be applied such as outputting a continuous label value
-and using the mean squared loss: they are common for regression.
+Palyginti su vieno teksto klasifikavimu :numref:`fig_bert-one-seq`,
+BERT patikslinimas tekstų porų klasifikavimui :numref:`fig_bert-two-seqs`
+skiriasi įvesties vaizdavimu.
+Tekstų porų regresijos užduotims, tokioms kaip semantinis teksto panašumas,
+galima taikyti nesudėtingus pakeitimus, pavyzdžiui, išvesti tolydžią žymens reikšmę
+ir naudoti vidutinį kvadratinį nuostolį: jie įprasti regresijai.
 
 
-## Text Tagging
+## Teksto žymėjimas
 
-Now let's consider token-level tasks, such as *text tagging*,
-where each token is assigned a label.
-Among text tagging tasks,
-*part-of-speech tagging* assigns each word a part-of-speech tag (e.g., adjective and determiner)
-according to the role of the word in the sentence.
-For example,
-according to the Penn Treebank II tag set,
-the sentence "John Smith 's car is new"
-should be tagged as
-"NNP (noun, proper singular) NNP POS (possessive ending) NN (noun, singular or mass) VB (verb, base form) JJ (adjective)".
+Dabar panagrinėkime teksto vieneto lygmens užduotis, tokias kaip *teksto žymėjimas*,
+kur kiekvienam teksto vienetui priskiriamas žymuo.
+Tarp teksto žymėjimo užduočių
+*kalbos dalių žymėjimas* priskiria kiekvienam žodžiui kalbos dalies žymą (pvz., būdvardis ir determinantas)
+pagal žodžio vaidmenį sakinyje.
+Pavyzdžiui,
+pagal Penn Treebank II žymų rinkinį
+sakinys „John Smith 's car is new“
+turėtų būti pažymėtas kaip
+„NNP (daiktavardis, tikrinis vienaskaitos) NNP POS (priklausomybės galūnė) NN (daiktavardis, vienaskaitos arba bendrinis) VB (veiksmažodis, bazinė forma) JJ (būdvardis)“.
 
-![Fine-tuning BERT for text tagging applications, such as part-of-speech tagging. Suppose that the input single text has six tokens.](../img/bert-tagging.svg)
+![BERT patikslinimas teksto žymėjimo taikymams, tokiems kaip kalbos dalių žymėjimas. Tarkime, kad įvesties vienas tekstas turi šešis teksto vienetus.](../img/bert-tagging.svg)
 :label:`fig_bert-tagging`
 
-Fine-tuning BERT for text tagging applications
-is illustrated in :numref:`fig_bert-tagging`.
-Comparing with :numref:`fig_bert-one-seq`,
-the only distinction lies in that
-in text tagging, the BERT representation of *every token* of the input text
-is fed into the same extra fully connected layers to output the label of the token,
-such as a part-of-speech tag.
+BERT patikslinimas teksto žymėjimo taikymams
+iliustruotas :numref:`fig_bert-tagging`.
+Palyginti su :numref:`fig_bert-one-seq`,
+vienintelis skirtumas yra tas, kad
+teksto žymėjime *kiekvieno įvesties teksto teksto vieneto* BERT vaizdavimas
+paduodamas į tuos pačius papildomus pilnai sujungtus sluoksnius, kad išvestų teksto vieneto žymenį,
+pavyzdžiui, kalbos dalies žymą.
 
 
 
-## Question Answering
+## Atsakymas į klausimus
 
-As another token-level application,
-*question answering* reflects capabilities of reading comprehension.
-For example,
-the Stanford Question Answering Dataset (SQuAD v1.1)
-consists of reading passages and questions,
-where the answer to every question
-is just a segment of text (text span) from the passage that the question is about :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016`.
-To explain,
-consider a passage
-"Some experts report that a mask's efficacy is inconclusive. However, mask makers insist that their products, such as N95 respirator masks, can guard against the virus."
-and a question "Who say that N95 respirator masks can guard against the virus?".
-The answer should be the text span "mask makers" in the passage.
-Thus, the goal in SQuAD v1.1 is to predict the start and end of the text span in the passage given a pair of question and passage.
+Kaip kitas teksto vieneto lygmens taikymas,
+*atsakymas į klausimus* atspindi skaitymo supratimo gebėjimus.
+Pavyzdžiui,
+Stanfordo klausimų atsakymo duomenų rinkinį (SQuAD v1.1)
+sudaro skaitymo ištraukos ir klausimai,
+kur atsakymas į kiekvieną klausimą
+yra tiesiog teksto segmentas (teksto intervalas) iš ištraukos, apie kurią klausiama :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016`.
+Kad paaiškintume,
+panagrinėkime ištrauką
+„Some experts report that a mask's efficacy is inconclusive. However, mask makers insist that their products, such as N95 respirator masks, can guard against the virus.“
+(Kai kurie ekspertai praneša, kad kaukės veiksmingumas neįrodytas. Tačiau kaukių gamintojai tvirtina, kad jų produktai, tokie kaip N95 respiratoriai, gali apsaugoti nuo viruso.)
+ir klausimą „Who say that N95 respirator masks can guard against the virus?“ (Kas sako, kad N95 respiratoriai gali apsaugoti nuo viruso?).
+Atsakymas turėtų būti teksto intervalas „mask makers“ ištraukoje.
+Taigi SQuAD v1.1 tikslas yra prognozuoti teksto intervalo pradžią ir pabaigą ištraukoje, turint klausimo ir ištraukos porą.
 
-![Fine-tuning BERT for question answering. Suppose that the input text pair has two and three tokens.](../img/bert-qa.svg)
+![BERT patikslinimas atsakymui į klausimus. Tarkime, kad įvesties tekstų pora turi du ir tris teksto vienetus.](../img/bert-qa.svg)
 :label:`fig_bert-qa`
 
-To fine-tune BERT for question answering,
-the question and passage are packed as
-the first and second text sequence, respectively,
-in the input of BERT.
-To predict the position of the start of the text span,
-the same additional fully connected layer will transform
-the BERT representation of any token from the passage of position $i$
-into a scalar score $s_i$.
-Such scores of all the passage tokens
-are further transformed by the softmax operation
-into a probability distribution,
-so that each token position $i$ in the passage is assigned
-a probability $p_i$ of being the start of the text span.
-Predicting the end of the text span
-is the same as above, except that
-parameters in its additional fully connected layer
-are independent from those for predicting the start.
-When predicting the end,
-any passage token of position $i$
-is transformed by the same fully connected layer
-into a scalar score $e_i$.
+Kad patikslintume BERT atsakymui į klausimus,
+klausimas ir ištrauka supakuojami kaip
+atitinkamai pirmoji ir antroji teksto sekos
+BERT įvestyje.
+Kad prognozuotume teksto intervalo pradžios padėtį,
+tas pats papildomas pilnai sujungtas sluoksnis paverčia
+bet kurio ištraukos teksto vieneto, esančio padėtyje $i$, BERT vaizdavimą
+skaliariniu balu $s_i$.
+Tokie visų ištraukos teksto vienetų balai
+toliau paverčiami softmax operacija
+į tikimybinį pasiskirstymą,
+kad kiekvienai teksto vieneto padėčiai $i$ ištraukoje būtų priskirta
+tikimybė $p_i$ būti teksto intervalo pradžia.
+Teksto intervalo pabaigos prognozavimas
+yra toks pat kaip aukščiau, tik
+jo papildomo pilnai sujungto sluoksnio parametrai
+yra nepriklausomi nuo pradžios prognozavimo parametrų.
+Prognozuojant pabaigą,
+bet kuris ištraukos teksto vienetas padėtyje $i$
+tuo pačiu pilnai sujungtu sluoksniu paverčiamas
+skaliariniu balu $e_i$.
 :numref:`fig_bert-qa`
-depicts fine-tuning BERT for question answering.
+pavaizduotas BERT patikslinimas atsakymui į klausimus.
 
-For question answering,
-the supervised learning's training objective is as straightforward as
-maximizing the log-likelihoods of the ground-truth start and end positions.
-When predicting the span,
-we can compute the score $s_i + e_j$ for a valid span
-from position $i$ to position $j$ ($i \leq j$),
-and output the span with the highest score.
-
-
-## Summary
-
-* BERT requires minimal architecture changes (extra fully connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
-* During supervised learning of a downstream application, parameters of the extra layers are learned from scratch while all the parameters in the pretrained BERT model are fine-tuned.
+Atsakymui į klausimus
+prižiūrimo mokymosi apmokymo tikslas yra toks pat paprastas, kaip
+maksimizuoti tikrųjų pradžios ir pabaigos padėčių logaritminius tikėtinumus.
+Prognozuojant intervalą,
+galime apskaičiuoti balą $s_i + e_j$ galiojančiam intervalui
+nuo padėties $i$ iki padėties $j$ ($i \leq j$)
+ir išvesti intervalą su didžiausiu balu.
 
 
-## Exercises
+## Santrauka
 
-1. Let's design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
-1. How can we leverage BERT in training language models?
-1. Can we leverage BERT in machine translation?
+* BERT reikalauja minimalių architektūros pakeitimų (papildomų pilnai sujungtų sluoksnių) sekos lygmens ir teksto vieneto lygmens natūraliosios kalbos apdorojimo taikymams, tokiems kaip vieno teksto klasifikavimas (pvz., nuotaikų analizė ir kalbinio priimtinumo tikrinimas), tekstų porų klasifikavimas ar regresija (pvz., natūraliosios kalbos išvadų darymas ir semantinis teksto panašumas), teksto žymėjimas (pvz., kalbos dalių žymėjimas) ir atsakymas į klausimus.
+* Prižiūrimo tolesnio taikymo mokymosi metu papildomų sluoksnių parametrai išmokstami nuo nulio, o visi iš anksto apmokyto BERT modelio parametrai yra patikslinami.
 
-[Discussions](https://discuss.d2l.ai/t/396)
+
+## Pratimai
+
+1. Suprojektuokime paieškos sistemos algoritmą naujienų straipsniams. Kai sistema gauna užklausą (pvz., „naftos pramonė koronaviruso protrūkio metu“), ji turėtų grąžinti surikiuotą naujienų straipsnių sąrašą, labiausiai atitinkantį užklausą. Tarkime, kad turime milžinišką naujienų straipsnių rinkinį ir didelį užklausų skaičių. Kad supaprastintume problemą, tarkime, kad kiekvienai užklausai pažymėtas labiausiai tinkamas straipsnis. Kaip galime taikyti neigiamų pavyzdžių atranką (žr. :numref:`subsec_negative-sampling`) ir BERT algoritmo dizaine?
+1. Kaip galime pasinaudoti BERT apmokant kalbos modelius?
+1. Ar galime pasinaudoti BERT mašininiame vertime?
+
+[Diskusijos](https://discuss.d2l.ai/t/396)

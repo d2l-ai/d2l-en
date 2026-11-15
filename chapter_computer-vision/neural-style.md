@@ -1,87 +1,86 @@
-# Neural Style Transfer
+# Neuroninis stiliaus perkėlimas
 
-If you are a photography enthusiast,
-you may be familiar with the filter.
-It can change the color style of photos
-so that landscape photos become sharper
-or portrait photos have whitened skins.
-However,
-one filter usually only changes
-one aspect of the photo.
-To apply an ideal style
-to a photo,
-you probably need to
-try many different filter combinations.
-This process is
-as complex as tuning the hyperparameters of a model.
-
+Jei esate fotografijos entuziastas,
+tikriausiai pažįstate filtrą.
+Jis gali pakeisti nuotraukų spalvų stilių,
+kad kraštovaizdžio nuotraukos taptų ryškesnės
+arba portretų oda atrodytų šviesesnė.
+Tačiau
+vienas filtras paprastai keičia tik
+vieną nuotraukos aspektą.
+Kad nuotraukai pritaikytumėte idealų stilių,
+tikriausiai
+teks išbandyti daug skirtingų filtrų derinių.
+Šis procesas yra
+tiek pat sudėtingas, kiek modelio hiperparametrų derinimas.
 
 
-In this section, we will
-leverage layerwise representations of a CNN
-to automatically apply the style of one image
-to another image, i.e., *style transfer* :cite:`Gatys.Ecker.Bethge.2016`.
-This task needs two input images:
-one is the *content image* and
-the other is the *style image*.
-We will use neural networks
-to modify the content image
-to make it close to the style image in style.
-For example,
-the content image in :numref:`fig_style_transfer` is a landscape photo taken by us
-in Mount Rainier National Park in the suburbs of Seattle, while the style image is an oil painting
-with the theme of autumn oak trees.
-In the output synthesized image,
-the oil brush strokes of the style image
-are applied, leading to more vivid colors,
-while preserving the main shape of the objects
-in the content image.
 
-![Given content and style images, style transfer outputs a synthesized image.](../img/style-transfer.svg)
+Šiame skyrelyje
+pasinaudosime CNN sluoksniniais vaizdavimais,
+kad automatiškai pritaikytume vieno vaizdo stilių
+kitam vaizdui, t. y. atliktume *stiliaus perkėlimą* :cite:`Gatys.Ecker.Bethge.2016`.
+Šiai užduočiai reikia dviejų įvesties vaizdų:
+vienas yra *turinio vaizdas*, o
+kitas – *stiliaus vaizdas*.
+Naudosime neuroninius tinklus,
+kad pakeistume turinio vaizdą ir
+priartintume jį prie stiliaus vaizdo stiliumi.
+Pavyzdžiui,
+:numref:`fig_style_transfer` turinio vaizdas yra kraštovaizdžio nuotrauka, kurią padarėme
+Reinjero kalno nacionaliniame parke Sijetlo apylinkėse, o stiliaus vaizdas yra aliejinė tapyba
+rudens ąžuolų tema.
+Išvesties sintezuotame vaizde
+pritaikomi stiliaus vaizdo
+aliejinio teptuko brūkšniai, todėl spalvos tampa gyvesnės,
+o pagrindinė objektų forma
+turinio vaizde išsaugoma.
+
+![Turint turinio ir stiliaus vaizdus, stiliaus perkėlimas išveda sintezuotą vaizdą.](../img/style-transfer.svg)
 :label:`fig_style_transfer`
 
-## Method
+## Metodas
 
-:numref:`fig_style_transfer_model` illustrates
-the CNN-based style transfer method with a simplified example.
-First, we initialize the synthesized image,
-for example, into the content image.
-This synthesized image is the only variable that needs to be updated during the style transfer process,
-i.e., the model parameters to be updated during training.
-Then we choose a pretrained CNN
-to extract image features and freeze its
-model parameters during training.
-This deep CNN uses multiple layers
-to extract
-hierarchical features for images.
-We can choose the output of some of these layers as content features or style features.
-Take :numref:`fig_style_transfer_model` as an example.
-The pretrained neural network here has 3 convolutional layers,
-where the second layer outputs the content features,
-and the first and third layers output the style features.
+:numref:`fig_style_transfer_model` iliustruoja
+CNN pagrįstą stiliaus perkėlimo metodą supaprastintu pavyzdžiu.
+Pirmiausia inicializuojame sintezuotą vaizdą,
+pavyzdžiui, į turinio vaizdą.
+Šis sintezuotas vaizdas yra vienintelis kintamasis, kurį reikia atnaujinti stiliaus perkėlimo proceso metu,
+t. y. modelio parametrai, atnaujinami apmokymo metu.
+Tada pasirenkame iš anksto apmokytą CNN
+vaizdo požymiams išgauti ir užšaldome jo
+modelio parametrus apmokymo metu.
+Šis gilusis CNN naudoja kelis sluoksnius
+hierarchiniams vaizdų požymiams
+išgauti.
+Kai kurių iš šių sluoksnių išvestis galime pasirinkti kaip turinio požymius arba stiliaus požymius.
+Paimkime :numref:`fig_style_transfer_model` kaip pavyzdį.
+Čia esantis iš anksto apmokytas neuroninis tinklas turi 3 konvoliucinius sluoksnius,
+kur antrasis sluoksnis išveda turinio požymius,
+o pirmasis ir trečiasis sluoksniai išveda stiliaus požymius.
 
-![CNN-based style transfer process. Solid lines show the direction of forward propagation and dotted lines show backward propagation. ](../img/neural-style.svg)
+![CNN pagrįstas stiliaus perkėlimo procesas. Ištisinės linijos rodo tiesioginio sklidimo kryptį, o punktyrinės – atgalinio sklidimo.](../img/neural-style.svg)
 :label:`fig_style_transfer_model`
 
-Next, we calculate the loss function of style transfer through forward propagation (direction of solid arrows), and update the model parameters (the synthesized image for output) through backpropagation (direction of dashed arrows).
-The loss function commonly used in style transfer consists of three parts:
-(i) *content loss* makes the synthesized image and the content image close in content features;
-(ii) *style loss* makes the synthesized image and style image close in style features;
-and (iii) *total variation loss* helps to reduce the noise in the synthesized image.
-Finally, when the model training is over, we output the model parameters of the style transfer to generate
-the final synthesized image.
+Toliau apskaičiuojame stiliaus perkėlimo nuostolių funkciją per tiesioginį sklidimą (ištisinių rodyklių kryptis) ir atnaujiname modelio parametrus (sintezuotą išvesties vaizdą) per atgalinį sklidimą (punktyrinių rodyklių kryptis).
+Stiliaus perkėlime dažniausiai naudojamą nuostolių funkciją sudaro trys dalys:
+(i) *turinio nuostolis* priartina sintezuotą vaizdą ir turinio vaizdą turinio požymiais;
+(ii) *stiliaus nuostolis* priartina sintezuotą vaizdą ir stiliaus vaizdą stiliaus požymiais;
+ir (iii) *pilnosios variacijos nuostolis* padeda sumažinti triukšmą sintezuotame vaizde.
+Galiausiai, pasibaigus modelio apmokymui, išvedame stiliaus perkėlimo modelio parametrus, kad sugeneruotume
+galutinį sintezuotą vaizdą.
 
 
 
-In the following,
-we will explain the technical details of style transfer via a concrete experiment.
+Toliau
+paaiškinsime stiliaus perkėlimo technines detales konkrečiu eksperimentu.
 
 
-## [**Reading the Content and Style Images**]
+## [**Turinio ir stiliaus vaizdų skaitymas**]
 
-First, we read the content and style images.
-From their printed coordinate axes,
-we can tell that these images have different sizes.
+Pirmiausia nuskaitome turinio ir stiliaus vaizdus.
+Iš jų atspausdintų koordinačių ašių
+galime pasakyti, kad šie vaizdai skirtingų dydžių.
 
 ```{.python .input}
 #@tab mxnet
@@ -122,14 +121,14 @@ style_img = d2l.Image.open('../img/autumn-oak.jpg')
 d2l.plt.imshow(style_img);
 ```
 
-## [**Preprocessing and Postprocessing**]
+## [**Išankstinis ir paskesnis apdorojimas**]
 
-Below, we define two functions for preprocessing and postprocessing images.
-The `preprocess` function standardizes
-each of the three RGB channels of the input image and transforms the results into the CNN input format.
-The `postprocess` function restores the pixel values in the output image to their original values before standardization.
-Since the image printing function requires that each pixel has a floating point value from 0 to 1,
-we replace any value smaller than 0 or greater than 1 with 0 or 1, respectively.
+Toliau apibrėžiame dvi funkcijas vaizdams iš anksto ir po to apdoroti.
+Funkcija `preprocess` standartizuoja
+kiekvieną iš trijų įvesties vaizdo RGB kanalų ir paverčia rezultatus į CNN įvesties formatą.
+Funkcija `postprocess` atkuria išvesties vaizdo pikselių reikšmes į pradines reikšmes prieš standartizavimą.
+Kadangi vaizdų spausdinimo funkcija reikalauja, kad kiekvieno pikselio slankiojo kablelio reikšmė būtų nuo 0 iki 1,
+bet kurią reikšmę, mažesnę už 0 arba didesnę už 1, pakeičiame atitinkamai 0 arba 1.
 
 ```{.python .input}
 #@tab mxnet
@@ -164,9 +163,9 @@ def postprocess(img):
     return torchvision.transforms.ToPILImage()(img.permute(2, 0, 1))
 ```
 
-## [**Extracting Features**]
+## [**Požymių išgavimas**]
 
-We use the VGG-19 model pretrained on the ImageNet dataset to extract image features :cite:`Gatys.Ecker.Bethge.2016`.
+Vaizdo požymiams išgauti naudojame VGG-19 modelį, iš anksto apmokytą ImageNet duomenų rinkinyje :cite:`Gatys.Ecker.Bethge.2016`.
 
 ```{.python .input}
 #@tab mxnet
@@ -178,27 +177,28 @@ pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 pretrained_net = torchvision.models.vgg19(pretrained=True)
 ```
 
-In order to extract the content features and style features of the image, we can select the output of certain layers in the VGG network.
-Generally speaking, the closer to the input layer, the easier to extract details of the image, and vice versa, the easier to extract the global information of the image. In order to avoid excessively
-retaining the details of the content image in the synthesized image,
-we choose a VGG layer that is closer to the output as the *content layer* to output the content features of the image.
-We also select the output of different VGG layers for extracting local and global style features.
-These layers are also called *style layers*.
-As mentioned in :numref:`sec_vgg`,
-the VGG network uses 5 convolutional blocks.
-In the experiment, we choose the last convolutional layer of the fourth convolutional block as the content layer, and the first convolutional layer of each convolutional block as the style layer.
-The indices of these layers can be obtained by printing the `pretrained_net` instance.
+Kad išgautume vaizdo turinio ir stiliaus požymius, galime pasirinkti tam tikrų VGG tinklo sluoksnių išvestis.
+Paprastai kalbant, kuo arčiau įvesties sluoksnio, tuo lengviau išgauti vaizdo detales, ir atvirkščiai – tuo lengviau išgauti globalią vaizdo informaciją. Kad sintezuotame vaizde
+pernelyg neišsaugotume turinio vaizdo detalių,
+kaip *turinio sluoksnį* vaizdo turinio požymiams išvesti pasirenkame VGG sluoksnį, esantį arčiau išvesties.
+Taip pat pasirenkame skirtingų VGG sluoksnių išvestis lokaliems ir globaliems stiliaus požymiams išgauti.
+Šie sluoksniai taip pat vadinami *stiliaus sluoksniais*.
+Kaip minėta :numref:`sec_vgg`,
+VGG tinklas naudoja 5 konvoliucinius blokus.
+Eksperimente kaip turinio sluoksnį pasirenkame paskutinį ketvirtojo konvoliucinio bloko konvoliucinį sluoksnį, o kaip stiliaus sluoksnį – pirmąjį kiekvieno konvoliucinio bloko konvoliucinį sluoksnį.
+Šių sluoksnių indeksus galima gauti atspausdinus `pretrained_net` egzempliorių.
 
 ```{.python .input}
 #@tab all
 style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 ```
 
-When extracting features using VGG layers,
-we only need to use all those
-from the input layer to the content layer or style layer that is closest to the output layer.
-Let's construct a new network instance `net`, which only retains all the VGG layers to be
-used for feature extraction.
+Išgaudami požymius VGG sluoksniais,
+turime naudoti tik visus tuos sluoksnius
+nuo įvesties sluoksnio iki arčiausiai išvesties esančio turinio arba stiliaus sluoksnio.
+Sukonstruokime naują tinklo egzempliorių `net`, kuriame paliekami tik visi VGG sluoksniai,
+reikalingi
+požymiams išgauti.
 
 ```{.python .input}
 #@tab mxnet
@@ -213,11 +213,11 @@ net = nn.Sequential(*[pretrained_net.features[i] for i in
                       range(max(content_layers + style_layers) + 1)])
 ```
 
-Given the input `X`, if we simply invoke
-the forward propagation `net(X)`, we can only get the output of the last layer.
-Since we also need the outputs of intermediate layers,
-we need to perform layer-by-layer computation and keep
-the content and style layer outputs.
+Turint įvestį `X`, jei tiesiog iškviesime
+tiesioginį sklidimą `net(X)`, galime gauti tik paskutinio sluoksnio išvestį.
+Kadangi mums taip pat reikia tarpinių sluoksnių išvesčių,
+turime atlikti skaičiavimą sluoksnis po sluoksnio ir išsaugoti
+turinio ir stiliaus sluoksnių išvestis.
 
 ```{.python .input}
 #@tab all
@@ -233,16 +233,16 @@ def extract_features(X, content_layers, style_layers):
     return contents, styles
 ```
 
-Two functions are defined below:
-the `get_contents` function extracts content features from the content image,
-and the `get_styles` function extracts style features from the style image.
-Since there is no need to update the model parameters of the pretrained VGG during training,
-we can extract the content and the style features
-even before the training starts.
-Since the synthesized image
-is a set of model parameters to be updated
-for style transfer,
-we can only extract the content and style features of the synthesized image by calling the `extract_features` function during training.
+Toliau apibrėžiamos dvi funkcijos:
+funkcija `get_contents` išgauna turinio požymius iš turinio vaizdo,
+o funkcija `get_styles` išgauna stiliaus požymius iš stiliaus vaizdo.
+Kadangi apmokymo metu iš anksto apmokyto VGG modelio parametrų atnaujinti nereikia,
+turinio ir stiliaus požymius galime išgauti
+dar prieš prasidedant apmokymui.
+Kadangi sintezuotas vaizdas
+yra modelio parametrų rinkinys, kurį reikia atnaujinti
+stiliaus perkėlimui,
+sintezuoto vaizdo turinio ir stiliaus požymius galime išgauti tik apmokymo metu iškviesdami funkciją `extract_features`.
 
 ```{.python .input}
 #@tab mxnet
@@ -270,21 +270,20 @@ def get_styles(image_shape, device):
     return style_X, styles_Y
 ```
 
-## [**Defining the Loss Function**]
+## [**Nuostolių funkcijos apibrėžimas**]
 
-Now we will describe the loss function for style transfer. The loss function consists of
-the content loss, style loss, and total variation loss.
+Dabar aprašysime stiliaus perkėlimo nuostolių funkciją. Nuostolių funkciją sudaro
+turinio nuostolis, stiliaus nuostolis ir pilnosios variacijos nuostolis.
 
-### Content Loss
+### Turinio nuostolis
 
-Similar to the loss function in linear regression,
-the content loss measures the difference
-in content features
-between the synthesized image and the content image via
-the squared loss function.
-The two inputs of the squared loss function
-are both
-outputs of the content layer computed by the `extract_features` function.
+Panašiai kaip tiesinės regresijos nuostolių funkcija,
+turinio nuostolis matuoja sintezuoto vaizdo ir turinio vaizdo
+turinio požymių skirtumą
+per kvadratinio nuostolio funkciją.
+Abi kvadratinio nuostolio funkcijos įvestys
+yra
+turinio sluoksnio išvestys, apskaičiuotos funkcija `extract_features`.
 
 ```{.python .input}
 #@tab mxnet
@@ -301,34 +300,34 @@ def content_loss(Y_hat, Y):
     return torch.square(Y_hat - Y.detach()).mean()
 ```
 
-### Style Loss
+### Stiliaus nuostolis
 
-Style loss, similar to content loss,
-also uses the squared loss function to measure the difference in style between the synthesized image and the style image.
-To express the style output of any style layer,
-we first use the `extract_features` function to
-compute the style layer output.
-Suppose that the output has
-1 example, $c$ channels,
-height $h$, and width $w$,
-we can transform this output into
-matrix $\mathbf{X}$ with $c$ rows and $hw$ columns.
-This matrix can be thought of as
-the concatenation of
-$c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$,
-each of which has a length of $hw$.
-Here, vector $\mathbf{x}_i$ represents the style feature of channel $i$.
+Stiliaus nuostolis, panašiai kaip turinio nuostolis,
+taip pat naudoja kvadratinio nuostolio funkciją sintezuoto vaizdo ir stiliaus vaizdo stiliaus skirtumui matuoti.
+Kad išreikštume bet kurio stiliaus sluoksnio stiliaus išvestį,
+pirmiausia naudojame funkciją `extract_features`
+stiliaus sluoksnio išvesčiai apskaičiuoti.
+Tarkime, kad išvestis turi
+1 pavyzdį, $c$ kanalų,
+aukštį $h$ ir plotį $w$;
+šią išvestį galime paversti
+matrica $\mathbf{X}$ su $c$ eilučių ir $hw$ stulpelių.
+Šią matricą galima laikyti
+$c$ vektorių $\mathbf{x}_1, \ldots, \mathbf{x}_c$
+konkatenacija,
+kurių kiekvieno ilgis yra $hw$.
+Čia vektorius $\mathbf{x}_i$ vaizduoja kanalo $i$ stiliaus požymį.
 
-In the *Gram matrix* of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ and column $j$ is the dot product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$.
-It represents the correlation of the style features of channels $i$ and $j$.
-We use this Gram matrix to represent the style output of any style layer.
-Note that when the value of $hw$ is larger,
-it likely leads to larger values in the Gram matrix.
-Note also that the height and width of the Gram matrix are both the number of channels $c$.
-To allow style loss not to be affected
-by these values,
-the `gram` function below divides
-the Gram matrix by the number of its elements, i.e., $chw$.
+Šių vektorių *Gramo matricoje* $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$ elementas $x_{ij}$, esantis $i$ eilutėje ir $j$ stulpelyje, yra vektorių $\mathbf{x}_i$ ir $\mathbf{x}_j$ skaliarinė sandauga.
+Ji vaizduoja kanalų $i$ ir $j$ stiliaus požymių koreliaciją.
+Šią Gramo matricą naudojame bet kurio stiliaus sluoksnio stiliaus išvesčiai vaizduoti.
+Atkreipkite dėmesį, kad kai $hw$ reikšmė yra didesnė,
+tai tikėtina lemia didesnes Gramo matricos reikšmes.
+Taip pat atkreipkite dėmesį, kad Gramo matricos aukštis ir plotis yra lygūs kanalų skaičiui $c$.
+Kad šios reikšmės
+neturėtų įtakos stiliaus nuostoliui,
+toliau pateikta funkcija `gram` padalija
+Gramo matricą iš jos elementų skaičiaus, t. y. $chw$.
 
 ```{.python .input}
 #@tab all
@@ -338,11 +337,11 @@ def gram(X):
     return d2l.matmul(X, X.T) / (num_channels * n)
 ```
 
-Obviously,
-the two Gram matrix inputs of the squared loss function for style loss are based on
-the style layer outputs for
-the synthesized image and the style image.
-It is assumed here that the Gram matrix `gram_Y` based on the style image has been precomputed.
+Akivaizdu,
+kad dvi Gramo matricų įvestys stiliaus nuostolio kvadratinio nuostolio funkcijai yra pagrįstos
+sintezuoto vaizdo ir stiliaus vaizdo
+stiliaus sluoksnių išvestimis.
+Čia daroma prielaida, kad Gramo matrica `gram_Y`, pagrįsta stiliaus vaizdu, buvo apskaičiuota iš anksto.
 
 ```{.python .input}
 #@tab mxnet
@@ -356,19 +355,19 @@ def style_loss(Y_hat, gram_Y):
     return torch.square(gram(Y_hat) - gram_Y.detach()).mean()
 ```
 
-### Total Variation Loss
+### Pilnosios variacijos nuostolis
 
-Sometimes, the learned synthesized image
-has a lot of high-frequency noise,
-i.e., particularly bright or dark pixels.
-One common noise reduction method is
-*total variation denoising*.
-Denote by $x_{i, j}$ the pixel value at coordinate $(i, j)$.
-Reducing total variation loss
+Kartais išmoktas sintezuotas vaizdas
+turi daug aukštadažnio triukšmo,
+t. y. ypač šviesių ar tamsių pikselių.
+Vienas įprastas triukšmo mažinimo metodas yra
+*pilnosios variacijos triukšmo šalinimas*.
+Pažymėkime $x_{i, j}$ pikselio reikšmę koordinatėje $(i, j)$.
+Mažinant pilnosios variacijos nuostolį
 
 $$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$
 
-makes values of neighboring pixels on the synthesized image closer.
+kaimyninių sintezuoto vaizdo pikselių reikšmės tampa artimesnės.
 
 ```{.python .input}
 #@tab all
@@ -377,14 +376,14 @@ def tv_loss(Y_hat):
                   d2l.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())
 ```
 
-### Loss Function
+### Nuostolių funkcija
 
-[**The loss function of style transfer is the weighted sum of content loss, style loss, and total variation loss**].
-By adjusting these weight hyperparameters,
-we can balance among
-content retention,
-style transfer,
-and noise reduction on the synthesized image.
+[**Stiliaus perkėlimo nuostolių funkcija yra turinio nuostolio, stiliaus nuostolio ir pilnosios variacijos nuostolio svertinė suma**].
+Koreguodami šiuos svorio hiperparametrus,
+galime išlaikyti pusiausvyrą tarp
+turinio išsaugojimo,
+stiliaus perkėlimo
+ir triukšmo mažinimo sintezuotame vaizde.
 
 ```{.python .input}
 #@tab all
@@ -402,12 +401,12 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
     return contents_l, styles_l, tv_l, l
 ```
 
-## [**Initializing the Synthesized Image**]
+## [**Sintezuoto vaizdo inicializavimas**]
 
-In style transfer,
-the synthesized image is the only variable that needs to be updated during training.
-Thus, we can define a simple model, `SynthesizedImage`, and treat the synthesized image as the model parameters.
-In this model, forward propagation just returns the model parameters.
+Stiliaus perkėlime
+sintezuotas vaizdas yra vienintelis kintamasis, kurį reikia atnaujinti apmokymo metu.
+Taigi galime apibrėžti paprastą modelį `SynthesizedImage` ir sintezuotą vaizdą laikyti modelio parametrais.
+Šiame modelyje tiesioginis sklidimas tiesiog grąžina modelio parametrus.
 
 ```{.python .input}
 #@tab mxnet
@@ -431,9 +430,9 @@ class SynthesizedImage(nn.Module):
         return self.weight
 ```
 
-Next, we define the `get_inits` function.
-This function creates a synthesized image model instance and initializes it to the image `X`.
-Gram matrices for the style image at various style layers, `styles_Y_gram`, are computed prior to training.
+Toliau apibrėžiame funkciją `get_inits`.
+Ši funkcija sukuria sintezuoto vaizdo modelio egzempliorių ir inicializuoja jį vaizdu `X`.
+Stiliaus vaizdo Gramo matricos įvairiuose stiliaus sluoksniuose, `styles_Y_gram`, apskaičiuojamos prieš apmokymą.
 
 ```{.python .input}
 #@tab mxnet
@@ -456,13 +455,13 @@ def get_inits(X, device, lr, styles_Y):
     return gen_img(), styles_Y_gram, trainer
 ```
 
-## [**Training**]
+## [**Apmokymas**]
 
 
-When training the model for style transfer,
-we continuously extract
-content features and style features of the synthesized image, and calculate the loss function.
-Below defines the training loop.
+Apmokydami stiliaus perkėlimo modelį,
+nuolat išgauname
+sintezuoto vaizdo turinio ir stiliaus požymius ir apskaičiuojame nuostolių funkciją.
+Toliau apibrėžiamas apmokymo ciklas.
 
 ```{.python .input}
 #@tab mxnet
@@ -514,9 +513,9 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     return X
 ```
 
-Now we [**start to train the model**].
-We rescale the height and width of the content and style images to 300 by 450 pixels.
-We use the content image to initialize the synthesized image.
+Dabar [**pradedame apmokyti modelį**].
+Turinio ir stiliaus vaizdų aukštį ir plotį pakeičiame į 300 × 450 pikselių.
+Sintezuotam vaizdui inicializuoti naudojame turinio vaizdą.
 
 ```{.python .input}
 #@tab mxnet
@@ -536,36 +535,35 @@ _, styles_Y = get_styles(image_shape, device)
 output = train(content_X, contents_Y, styles_Y, device, 0.3, 500, 50)
 ```
 
-We can see that the synthesized image
-retains the scenery and objects of the content image,
-and transfers the color of the style image
-at the same time.
-For example,
-the synthesized image has blocks of color like
-those in the style image.
-Some of these blocks even have the subtle texture of brush strokes.
+Matome, kad sintezuotas vaizdas
+išsaugo turinio vaizdo peizažą ir objektus
+ir tuo pat metu perkelia stiliaus vaizdo spalvas.
+Pavyzdžiui,
+sintezuotame vaizde yra spalvų blokų,
+panašių į stiliaus vaizde.
+Kai kurie iš šių blokų net turi subtilią teptuko brūkšnių tekstūrą.
 
 
 
 
-## Summary
+## Santrauka
 
-* The loss function commonly used in style transfer consists of three parts: (i) content loss makes the synthesized image and the content image close in content features; (ii) style loss makes the synthesized image and style image close in style features; and (iii) total variation loss helps to reduce the noise in the synthesized image.
-* We can use a pretrained CNN to extract image features and minimize the loss function to continuously update the synthesized image as model parameters during training.
-* We use Gram matrices to represent the style outputs from the style layers.
+* Stiliaus perkėlime dažniausiai naudojamą nuostolių funkciją sudaro trys dalys: (i) turinio nuostolis priartina sintezuotą vaizdą ir turinio vaizdą turinio požymiais; (ii) stiliaus nuostolis priartina sintezuotą vaizdą ir stiliaus vaizdą stiliaus požymiais; ir (iii) pilnosios variacijos nuostolis padeda sumažinti triukšmą sintezuotame vaizde.
+* Galime naudoti iš anksto apmokytą CNN vaizdo požymiams išgauti ir minimizuoti nuostolių funkciją, kad apmokymo metu nuolat atnaujintume sintezuotą vaizdą kaip modelio parametrus.
+* Stiliaus sluoksnių stiliaus išvestims vaizduoti naudojame Gramo matricas.
 
 
-## Exercises
+## Pratimai
 
-1. How does the output change when you select different content and style layers?
-1. Adjust the weight hyperparameters in the loss function. Does the output retain more content or have less noise?
-1. Use different content and style images. Can you create more interesting synthesized images?
-1. Can we apply style transfer for text? Hint: you may refer to the survey paper by :citet:`10.1145/3544903.3544906`.
+1. Kaip keičiasi išvestis, kai pasirenkate skirtingus turinio ir stiliaus sluoksnius?
+1. Koreguokite nuostolių funkcijos svorio hiperparametrus. Ar išvestyje išlieka daugiau turinio arba mažiau triukšmo?
+1. Naudokite skirtingus turinio ir stiliaus vaizdus. Ar galite sukurti įdomesnių sintezuotų vaizdų?
+1. Ar galime taikyti stiliaus perkėlimą tekstui? Užuomina: galite remtis :citet:`10.1145/3544903.3544906` apžvalginiu straipsniu.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/378)
+[Diskusijos](https://discuss.d2l.ai/t/378)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1476)
+[Diskusijos](https://discuss.d2l.ai/t/1476)
 :end_tab:

@@ -1,22 +1,22 @@
-# Factorization Machines
+# Faktorizavimo mašinos
 
-Factorization machines (FM), proposed by :citet:`Rendle.2010`, is a supervised algorithm that can be used for classification, regression, and ranking tasks. It quickly took notice and became a popular and impactful method for making predictions and recommendations. Particularly, it is a generalization of the linear regression model and the matrix factorization model. Moreover, it is reminiscent of support vector machines with a polynomial kernel. The strengths of factorization machines over the linear regression and matrix factorization are: (1) it can model $\chi$-way variable interactions, where $\chi$ is the number of polynomial order and is usually set to two. (2) A fast optimization algorithm associated with factorization machines can reduce the polynomial computation time to linear complexity, making it extremely efficient especially for high dimensional sparse inputs.  For these reasons, factorization machines are widely employed in modern advertisement and products recommendations. The technical details and implementations are described below.
+Faktorizavimo mašinos (angl. *factorization machines*, FM), pasiūlytos :citet:`Rendle.2010`, yra prižiūrimo mokymosi algoritmas, kurį galima naudoti klasifikavimo, regresijos ir rikiavimo užduotims. Jis greitai atkreipė dėmesį ir tapo populiariu bei įtakingu metodu prognozėms ir rekomendacijoms daryti. Ypač tai yra tiesinės regresijos modelio ir matricos faktorizavimo modelio apibendrinimas. Be to, jis primena atraminių vektorių mašinas su polinominiu branduoliu. Faktorizavimo mašinų pranašumai prieš tiesinę regresiją ir matricos faktorizavimą yra tokie: (1) jos gali modeliuoti $\chi$-krypčias kintamųjų sąveikas, kur $\chi$ yra polinomo eilė ir paprastai nustatoma lygi dviem; (2) greitas su faktorizavimo mašinomis susijęs optimizavimo algoritmas gali sumažinti polinominį skaičiavimo laiką iki tiesinio sudėtingumo, todėl jos yra itin efektyvios, ypač didelės dimensijos retoms įvestims. Dėl šių priežasčių faktorizavimo mašinos plačiai naudojamos šiuolaikinėje reklamoje ir produktų rekomendavime. Techninės detalės ir įgyvendinimai aprašyti žemiau.
 
 
-## 2-Way Factorization Machines
+## Dvikryptės faktorizavimo mašinos
 
-Formally, let $x \in \mathbb{R}^d$ denote the feature vectors of one sample, and $y$ denote the corresponding label which can be real-valued label or class label such as binary class "click/non-click". The model for a factorization machine of degree two is defined as:
+Formaliai tegul $x \in \mathbb{R}^d$ žymi vieno pavyzdžio požymių vektorių, o $y$ – atitinkamą žymenį, kuris gali būti realioji reikšmė arba klasės žymuo, pavyzdžiui, dvejetainė klasė „paspaudė / nepaspaudė“. Antrojo laipsnio faktorizavimo mašinos modelis apibrėžiamas taip:
 
 $$
 \hat{y}(x) = \mathbf{w}_0 + \sum_{i=1}^d \mathbf{w}_i x_i + \sum_{i=1}^d\sum_{j=i+1}^d \langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j
 $$
 
-where $\mathbf{w}_0 \in \mathbb{R}$ is the global bias; $\mathbf{w} \in \mathbb{R}^d$ denotes the weights of the i-th variable; $\mathbf{V} \in \mathbb{R}^{d\times k}$ represents the feature embeddings; $\mathbf{v}_i$ represents the $i^\textrm{th}$ row of $\mathbf{V}$; $k$ is the dimensionality of latent factors; $\langle\cdot, \cdot \rangle$ is the dot product of two vectors.  $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ model the interaction between the $i^\textrm{th}$ and $j^\textrm{th}$ feature. Some feature interactions can be easily understood so they can be designed by experts. However, most other feature interactions are hidden in data and difficult to identify. So modeling feature interactions automatically can greatly reduce the efforts in feature engineering. It is obvious that the first two terms correspond to the linear regression model and the last term is an extension of the matrix factorization model. If the feature $i$ represents an item and the feature $j$ represents a user, the third term is exactly the dot product between user and item embeddings. It is worth noting that FM can also generalize to higher orders (degree > 2). Nevertheless, the numerical stability might weaken the generalization.
+kur $\mathbf{w}_0 \in \mathbb{R}$ yra globalus poslinkis; $\mathbf{w} \in \mathbb{R}^d$ žymi i-ojo kintamojo svorius; $\mathbf{V} \in \mathbb{R}^{d\times k}$ atitinka požymių įterpinius; $\mathbf{v}_i$ žymi $i$-ąją $\mathbf{V}$ eilutę; $k$ yra latentinių veiksnių dimensija; $\langle\cdot, \cdot \rangle$ yra dviejų vektorių skaliarinė sandauga. $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ modeliuoja $i$-ojo ir $j$-ojo požymių sąveiką. Kai kurias požymių sąveikas lengva suprasti, todėl jas gali suprojektuoti ekspertai. Tačiau dauguma kitų požymių sąveikų yra paslėptos duomenyse ir sunkiai nustatomos. Todėl automatinis požymių sąveikų modeliavimas gali gerokai sumažinti požymių inžinerijos pastangas. Akivaizdu, kad pirmieji du nariai atitinka tiesinės regresijos modelį, o paskutinis narys yra matricos faktorizavimo modelio plėtinys. Jei požymis $i$ vaizduoja elementą, o požymis $j$ – naudotoją, trečiasis narys yra būtent naudotojų ir elementų įterpinių skaliarinė sandauga. Verta pažymėti, kad FM taip pat gali būti apibendrintos aukštesnėms eilėms (laipsnis > 2). Vis dėlto skaitinis stabilumas gali susilpninti apibendrinimą.
 
 
-## An Efficient Optimization Criterion
+## Efektyvus optimizavimo kriterijus
 
-Optimizing the factorization machines in a  straight forward method leads to a complexity of $\mathcal{O}(kd^2)$ as all pairwise interactions require to be computed. To solve this inefficiency problem, we can reorganize the third term of FM which could greatly reduce the computation cost, leading to a linear time complexity ($\mathcal{O}(kd)$).  The reformulation of the pairwise interaction term is as follows:
+Optimizuojant faktorizavimo mašinas tiesmuku būdu, gaunamas $\mathcal{O}(kd^2)$ sudėtingumas, nes reikia apskaičiuoti visas porų sąveikas. Kad išspręstume šią neefektyvumo problemą, galime pertvarkyti trečiąjį FM narį, o tai gali gerokai sumažinti skaičiavimo sąnaudas ir lemti tiesinį laiko sudėtingumą ($\mathcal{O}(kd)$). Porų sąveikos nario pertvarkymas yra toks:
 
 $$
 \begin{aligned}
@@ -28,9 +28,9 @@ $$
  \end{aligned}
 $$
 
-With this reformulation, the model complexity are decreased greatly. Moreover, for sparse features, only non-zero elements needs to be computed so that the overall complexity is linear to the number of non-zero features.
+Taikant šį pertvarkymą, modelio sudėtingumas gerokai sumažėja. Be to, retiems požymiams reikia apskaičiuoti tik nenulinius elementus, todėl bendras sudėtingumas yra tiesinis nenulinių požymių skaičiaus atžvilgiu.
 
-To learn the FM model, we can use the MSE loss for regression task, the cross-entropy loss for classification tasks, and the BPR loss for ranking task. Standard optimizers such as stochastic gradient descent and Adam are viable for optimization.
+FM modeliui mokyti galime naudoti MSE nuostolį regresijos užduočiai, kryžminės entropijos nuostolį klasifikavimo užduotims ir BPR nuostolį rikiavimo užduočiai. Optimizavimui tinka standartiniai optimizatoriai, tokie kaip stochastinis gradientinis nusileidimas ir Adam.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -42,8 +42,8 @@ import os
 npx.set_np()
 ```
 
-## Model Implementation
-The following code implement the factorization machines. It is clear to see that FM consists a linear regression block and an efficient feature interaction block. We apply a sigmoid function over the final score since we treat the CTR prediction as a classification task.
+## Modelio įgyvendinimas
+Toliau pateiktas kodas įgyvendina faktorizavimo mašinas. Aiškiai matyti, kad FM sudaro tiesinės regresijos blokas ir efektyvus požymių sąveikos blokas. Galutiniam balui taikome sigmoidinę funkciją, nes CTR prognozavimą laikome klasifikavimo užduotimi.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -64,8 +64,8 @@ class FM(nn.Block):
         return x
 ```
 
-## Load the Advertising Dataset
-We use the CTR data wrapper from the last section to load the online advertising dataset.
+## Reklamos duomenų rinkinio įkėlimas
+Internetinės reklamos duomenų rinkiniui įkelti naudojame CTR duomenų apvalkalą iš ankstesnio skyrelio.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -83,8 +83,8 @@ test_iter = gluon.data.DataLoader(
     num_workers=d2l.get_dataloader_workers())
 ```
 
-## Train the Model
-Afterwards, we train the model. The learning rate is set to 0.02 and the embedding size is set to 20 by default. The `Adam` optimizer and the `SigmoidBinaryCrossEntropyLoss` loss are used for model training.
+## Modelio apmokymas
+Po to apmokome modelį. Mokymosi greitis pagal numatytuosius nustatymus yra 0,02, o įterpinių dydis – 20. Modeliui apmokyti naudojamas `Adam` optimizatorius ir nuostolis `SigmoidBinaryCrossEntropyLoss`.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -98,16 +98,16 @@ loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-## Summary
+## Santrauka
 
-* FM is a general framework that can be applied on a variety of tasks such as regression, classification, and ranking.
-* Feature interaction/crossing is important for prediction tasks and the 2-way interaction can be efficiently modeled with FM.
+* FM yra bendra sistema, kurią galima taikyti įvairioms užduotims, tokioms kaip regresija, klasifikavimas ir rikiavimas.
+* Požymių sąveika (kryžminimas) svarbi prognozavimo užduotims, o dvikryptę sąveiką galima efektyviai modeliuoti naudojant FM.
 
-## Exercises
+## Pratimai
 
-* Can you test FM on other dataset such as Avazu, MovieLens, and Criteo datasets?
-* Vary the embedding size to check its impact on performance, can you observe a similar pattern as that of matrix factorization?
+* Ar galite išbandyti FM kituose duomenų rinkiniuose, tokiuose kaip Avazu, MovieLens ir Criteo?
+* Keiskite įterpinių dydį, kad patikrintumėte poveikį našumui. Ar pastebite panašų dėsningumą kaip matricos faktorizavime?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/406)
+[Diskusijos](https://discuss.d2l.ai/t/406)
 :end_tab:

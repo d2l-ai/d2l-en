@@ -1,31 +1,31 @@
-# AutoRec: Rating Prediction with Autoencoders
+# AutoRec: įvertinimų prognozavimas su autokoduotuvais
 
-Although the matrix factorization model achieves decent performance on the rating prediction task, it is essentially a linear model. Thus, such models are not capable of capturing complex nonlinear and intricate relationships that may be predictive of users' preferences. In this section, we introduce a nonlinear neural network collaborative filtering model, AutoRec :cite:`Sedhain.Menon.Sanner.ea.2015`. It identifies collaborative filtering (CF) with an autoencoder architecture and aims to integrate nonlinear transformations into CF on the basis of explicit feedback. Neural networks have been proven to be capable of approximating any continuous function, making it suitable to address the limitation of matrix factorization and enrich the expressiveness of matrix factorization.
+Nors matricos faktorizavimo modelis pasiekia gerą našumą įvertinimų prognozavimo užduotyje, iš esmės jis yra tiesinis modelis. Todėl tokie modeliai negali užfiksuoti sudėtingų netiesinių ir painių sąryšių, kurie gali padėti prognozuoti naudotojų pageidavimus. Šiame skyrelyje pristatome netiesinį neuroninio tinklo kolaboratyviojo filtravimo modelį AutoRec :cite:`Sedhain.Menon.Sanner.ea.2015`. Jis kolaboratyvųjį filtravimą (CF) sieja su autokoduotuvo architektūra ir siekia integruoti netiesines transformacijas į CF aiškiosios grįžtamosios informacijos pagrindu. Įrodyta, kad neuroniniai tinklai gali aproksimuoti bet kurią tolydžiąją funkciją, todėl jie tinka matricos faktorizavimo apribojimui įveikti ir jo išraiškingumui praturtinti.
 
-On the one hand, AutoRec has the same structure as an autoencoder which consists of an input layer, a hidden layer, and a reconstruction (output) layer.  An autoencoder is a neural network that learns to copy its input to its output in order to code the inputs into the hidden (and usually low-dimensional) representations. In AutoRec, instead of explicitly embedding users/items into low-dimensional space, it uses the column/row of the interaction matrix as input, then reconstructs the interaction matrix in the output layer.
+Viena vertus, AutoRec turi tokią pačią struktūrą kaip autokoduotuvas, kurį sudaro įvesties sluoksnis, paslėptasis sluoksnis ir rekonstrukcijos (išvesties) sluoksnis. Autokoduotuvas yra neuroninis tinklas, kuris mokosi nukopijuoti savo įvestį į išvestį, kad užkoduotų įvestis į paslėptuosius (ir paprastai mažesnės dimensijos) vaizdavimus. AutoRec vietoj to, kad aiškiai įterptų naudotojus ar elementus į mažesnės dimensijos erdvę, kaip įvestį naudoja sąveikų matricos stulpelį ar eilutę, o tada išvesties sluoksnyje rekonstruoja sąveikų matricą.
 
-On the other hand, AutoRec differs from a traditional autoencoder: rather than learning the hidden representations, AutoRec focuses on learning/reconstructing the output layer. It uses a partially observed interaction matrix as input, aiming to reconstruct a completed rating matrix. In the meantime, the missing entries of the input are filled in the output layer via reconstruction for the purpose of recommendation.
+Kita vertus, AutoRec skiriasi nuo tradicinio autokoduotuvo: užuot mokęsis paslėptųjų vaizdavimų, AutoRec daugiausia dėmesio skiria išvesties sluoksnio mokymuisi ir rekonstravimui. Jis kaip įvestį naudoja iš dalies stebėtą sąveikų matricą, siekdamas rekonstruoti užbaigtą įvertinimų matricą. Tuo pat metu trūkstami įvesties elementai užpildomi išvesties sluoksnyje rekonstrukcijos būdu rekomendavimo tikslais.
 
-There are two variants of AutoRec: user-based and item-based. For brevity, here we only introduce the item-based AutoRec. User-based AutoRec can be derived accordingly.
+Yra du AutoRec variantai: naudotojais pagrįstas ir elementais pagrįstas. Trumpumo dėlei čia pristatome tik elementais pagrįstą AutoRec. Naudotojais pagrįstą AutoRec galima išvesti analogiškai.
 
 
-## Model
+## Modelis
 
-Let $\mathbf{R}_{*i}$ denote the $i^\textrm{th}$ column of the rating matrix, where unknown ratings are set to zeros by default. The neural architecture is defined as:
+Tegul $\mathbf{R}_{*i}$ žymi $i$-ąjį įvertinimų matricos stulpelį, kuriame nežinomi įvertinimai pagal numatytuosius nustatymus yra nuliai. Neuroninė architektūra apibrėžiama taip:
 
 $$
 h(\mathbf{R}_{*i}) = f(\mathbf{W} \cdot g(\mathbf{V} \mathbf{R}_{*i} + \mu) + b)
 $$
 
-where $f(\cdot)$ and $g(\cdot)$ represent activation functions, $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. Let $h( \cdot )$ denote the whole network of AutoRec. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^\textrm{th}$ column of the rating matrix.
+kur $f(\cdot)$ ir $g(\cdot)$ yra aktyvinimo funkcijos, $\mathbf{W}$ ir $\mathbf{V}$ yra svorių matricos, o $\mu$ ir $b$ – poslinkiai. Tegul $h( \cdot )$ žymi visą AutoRec tinklą. Išvestis $h(\mathbf{R}_{*i})$ yra $i$-ojo įvertinimų matricos stulpelio rekonstrukcija.
 
-The following objective function aims to minimize the reconstruction error:
+Šia tikslo funkcija siekiama minimizuoti rekonstrukcijos paklaidą:
 
 $$
 \underset{\mathbf{W},\mathbf{V},\mu, b}{\mathrm{argmin}} \sum_{i=1}^M{\parallel \mathbf{R}_{*i} - h(\mathbf{R}_{*i})\parallel_{\mathcal{O}}^2} +\lambda(\| \mathbf{W} \|_F^2 + \| \mathbf{V}\|_F^2)
 $$
 
-where $\| \cdot \|_{\mathcal{O}}$ means only the contribution of observed ratings are considered, that is, only weights that are associated with observed inputs are updated during back-propagation.
+kur $\| \cdot \|_{\mathcal{O}}$ reiškia, kad atsižvelgiama tik į stebėtų įvertinimų indėlį, t. y. atgalinio sklidimo metu atnaujinami tik svoriai, susiję su stebėtomis įvestimis.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -37,9 +37,9 @@ import mxnet as mx
 npx.set_np()
 ```
 
-## Implementing the Model
+## Modelio įgyvendinimas
 
-A typical autoencoder consists of an encoder and a decoder. The encoder projects the input to hidden representations and the decoder maps the hidden layer to the reconstruction layer. We follow this practice and create the encoder and decoder with fully connected layers. The activation of encoder is set to `sigmoid` by default and no activation is applied for decoder. Dropout is included after the encoding transformation to reduce over-fitting. The gradients of unobserved inputs are masked out to ensure that only observed ratings contribute to the model learning process.
+Tipinį autokoduotuvą sudaro koduotuvas ir dekoduotuvas. Koduotuvas projektuoja įvestį į paslėptuosius vaizdavimus, o dekoduotuvas atvaizduoja paslėptąjį sluoksnį į rekonstrukcijos sluoksnį. Laikomės šios praktikos ir koduotuvą bei dekoduotuvą kuriame iš pilnai sujungtų sluoksnių. Koduotuvo aktyvinimas pagal numatytuosius nustatymus yra `sigmoid`, o dekoduotuvui aktyvinimas netaikomas. Po kodavimo transformacijos įtrauktas dropout, kad sumažėtų persimokymas. Nestebėtų įvesčių gradientai užmaskuojami, kad tik stebėti įvertinimai prisidėtų prie modelio mokymosi proceso.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -60,9 +60,9 @@ class AutoRec(nn.Block):
             return pred
 ```
 
-## Reimplementing the Evaluator
+## Vertintojo įgyvendinimas iš naujo
 
-Since the input and output have been changed, we need to reimplement the evaluation function, while we still use RMSE as the accuracy measure.
+Kadangi įvestis ir išvestis pasikeitė, reikia iš naujo įgyvendinti vertinimo funkciją, o kaip tikslumo matą ir toliau naudojame RMSE.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -78,9 +78,9 @@ def evaluator(network, inter_matrix, test_data, devices):
     return float(rmse)
 ```
 
-## Training and Evaluating the Model
+## Modelio apmokymas ir vertinimas
 
-Now, let's train and evaluate AutoRec on the MovieLens dataset. We can clearly see that the test RMSE is lower than the matrix factorization model, confirming the effectiveness of neural networks in the rating prediction task.
+Dabar apmokykime ir įvertinkime AutoRec MovieLens duomenų rinkinyje. Aiškiai matome, kad testavimo RMSE yra mažesnis nei matricos faktorizavimo modelio, o tai patvirtina neuroninių tinklų veiksmingumą įvertinimų prognozavimo užduotyje.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -109,19 +109,19 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         devices, evaluator, inter_mat=test_inter_mat)
 ```
 
-## Summary
+## Santrauka
 
-* We can frame the matrix factorization algorithm with autoencoders, while integrating non-linear layers and dropout regularization.
-* Experiments on the MovieLens 100K dataset show that AutoRec achieves superior performance than matrix factorization.
+* Matricos faktorizavimo algoritmą galime perkelti į autokoduotuvų rėmus, kartu integruodami netiesinius sluoksnius ir dropout reguliarizavimą.
+* Eksperimentai su MovieLens 100K duomenų rinkiniu rodo, kad AutoRec pasiekia geresnį našumą nei matricos faktorizavimas.
 
 
 
-## Exercises
+## Pratimai
 
-* Vary the hidden dimension of AutoRec to see its impact on the model performance.
-* Try to add more hidden layers. Is it helpful to improve the model performance?
-* Can you find a better combination of decoder and encoder activation functions?
+* Keiskite AutoRec paslėptąją dimensiją, kad pamatytumėte jos poveikį modelio našumui.
+* Pabandykite pridėti daugiau paslėptųjų sluoksnių. Ar tai padeda pagerinti modelio našumą?
+* Ar galite rasti geresnį dekoduotuvo ir koduotuvo aktyvinimo funkcijų derinį?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/401)
+[Diskusijos](https://discuss.d2l.ai/t/401)
 :end_tab:

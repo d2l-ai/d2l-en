@@ -1,23 +1,22 @@
-# Anchor Boxes
+# Inkariniai stačiakampiai
 :label:`sec_anchor`
 
 
-Object detection algorithms usually
-sample a large number of regions in the input image, determine whether these regions contain
-objects of interest, and adjust the boundaries
-of the regions so as to predict the
-*ground-truth bounding boxes*
-of the objects more accurately.
-Different models may adopt
-different region sampling schemes. 
-Here we introduce one of such methods:
-it generates multiple bounding boxes with varying scales and aspect ratios centered on each pixel. 
-These bounding boxes are called *anchor boxes*.
-We will design an object detection model
-based on anchor boxes in :numref:`sec_ssd`.
+Objektų aptikimo algoritmai paprastai
+atrenka daug sričių įvesties vaizde, nustato, ar šios sritys turi
+dominančių objektų, ir koreguoja sričių ribas,
+kad tiksliau prognozuotų
+objektų *tikruosius apibrėžiamuosius stačiakampius*.
+Skirtingi modeliai gali taikyti
+skirtingas sričių atrankos schemas.
+Čia pristatome vieną iš tokių metodų:
+jis generuoja kelis apibrėžiamuosius stačiakampius su skirtingais masteliais ir kraštinių santykiais, kurių centras yra kiekvienas pikselis.
+Šie apibrėžiamieji stačiakampiai vadinami *inkariniais stačiakampiais* (angl. *anchor boxes*).
+Objektų aptikimo modelį, pagrįstą inkariniais stačiakampiais, suprojektuosime
+:numref:`sec_ssd`.
 
-First, let's modify the printing accuracy
-just for more concise outputs.
+Pirmiausia pakeiskime spausdinimo tikslumą,
+kad išvestys būtų glaustesnės.
 
 ```{.python .input}
 #@tab mxnet
@@ -38,31 +37,31 @@ import torch
 torch.set_printoptions(2)  # Simplify printing accuracy
 ```
 
-## Generating Multiple Anchor Boxes
+## Kelių inkarinių stačiakampių generavimas
 
-Suppose that the input image has a height of $h$ and width of $w$. 
-We generate anchor boxes with different shapes centered on each pixel of the image.
-Let the *scale* be $s\in (0, 1]$ and
-the *aspect ratio* (ratio of width to height) is $r > 0$. 
-Then [**the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively.**]
-Note that when the center position is given, an anchor box with known width and height is determined.
+Tarkime, kad įvesties vaizdo aukštis yra $h$, o plotis – $w$.
+Generuojame skirtingos formos inkarinius stačiakampius, kurių centras yra kiekvienas vaizdo pikselis.
+Tegul *mastelis* yra $s\in (0, 1]$,
+o *kraštinių santykis* (pločio ir aukščio santykis) yra $r > 0$.
+Tada [**inkarinio stačiakampio plotis ir aukštis yra atitinkamai $ws\sqrt{r}$ ir $hs/\sqrt{r}$.**]
+Atkreipkite dėmesį, kad kai pateikta centro padėtis, nustatomas inkarinis stačiakampis su žinomu pločiu ir aukščiu.
 
-To generate multiple anchor boxes with different shapes,
-let's set a series of scales
-$s_1,\ldots, s_n$ and 
-a series of aspect ratios $r_1,\ldots, r_m$.
-When using all the combinations of these scales and aspect ratios with each pixel as the center,
-the input image will have a total of $whnm$ anchor boxes. Although these anchor boxes may cover all the
-ground-truth bounding boxes, the computational complexity is easily too high.
-In practice,
-we can only (**consider those combinations
-containing**) $s_1$ or $r_1$:
+Kad sugeneruotume kelis skirtingos formos inkarinius stačiakampius,
+nustatykime masteliu seką
+$s_1,\ldots, s_n$ ir
+kraštinių santykių seką $r_1,\ldots, r_m$.
+Naudojant visus šių mastelių ir kraštinių santykių derinius, kai centras yra kiekvienas pikselis,
+įvesties vaizdas turės iš viso $whnm$ inkarinių stačiakampių. Nors šie inkariniai stačiakampiai gali apimti visus
+tikruosius apibrėžiamuosius stačiakampius, skaičiavimo sudėtingumas lengvai tampa per didelis.
+Praktikoje
+galime (**atsižvelgti tik į tuos derinius,
+kuriuose yra**) $s_1$ arba $r_1$:
 
 (**$$(s_1, r_1), (s_1, r_2), \ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \ldots, (s_n, r_1).$$**)
 
-That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
+Tai reiškia, kad to paties pikselio centre esančių inkarinių stačiakampių skaičius yra $n+m-1$. Visam įvesties vaizdui sugeneruosime iš viso $wh(n+m-1)$ inkarinių stačiakampių.
 
-The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of scales, and a list of aspect ratios, then this function will return all the anchor boxes.
+Aukščiau aprašytas inkarinių stačiakampių generavimo metodas įgyvendintas toliau pateiktoje funkcijoje `multibox_prior`. Nurodome įvesties vaizdą, mastelių sąrašą ir kraštinių santykių sąrašą, o ši funkcija grąžins visus inkarinius stačiakampius.
 
 ```{.python .input}
 #@tab mxnet
@@ -146,8 +145,8 @@ def multibox_prior(data, sizes, ratios):
     return output.unsqueeze(0)
 ```
 
-We can see that [**the shape of the returned anchor box variable `Y`**] is
-(batch size, number of anchor boxes, 4).
+Matome, kad [**grąžinto inkarinių stačiakampių kintamojo `Y` forma**] yra
+(rinkinio dydis, inkarinių stačiakampių skaičius, 4).
 
 ```{.python .input}
 #@tab mxnet
@@ -171,12 +170,12 @@ Y = multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
 
-After changing the shape of the anchor box variable `Y` to (image height, image width, number of anchor boxes centered on the same pixel, 4),
-we can obtain all the anchor boxes centered on a specified pixel position.
-In the following,
-we [**access the first anchor box centered on (250, 250)**]. It has four elements: the $(x, y)$-axis coordinates at the upper-left corner and the $(x, y)$-axis coordinates at the lower-right corner of the anchor box.
-The coordinate values of both axes
-are divided by the width and height of the image, respectively.
+Pakeitę inkarinių stačiakampių kintamojo `Y` formą į (vaizdo aukštis, vaizdo plotis, to paties pikselio centre esančių inkarinių stačiakampių skaičius, 4),
+galime gauti visus inkarinius stačiakampius, kurių centras yra nurodytoje pikselio padėtyje.
+Toliau
+[**pasiekiame pirmąjį inkarinį stačiakampį, kurio centras yra (250, 250)**]. Jis turi keturis elementus: inkarinio stačiakampio viršutinio kairiojo kampo $(x, y)$ ašių koordinates ir apatinio dešiniojo kampo $(x, y)$ ašių koordinates.
+Abiejų ašių koordinačių reikšmės
+padalytos atitinkamai iš vaizdo pločio ir aukščio.
 
 ```{.python .input}
 #@tab all
@@ -184,8 +183,8 @@ boxes = Y.reshape(h, w, 5, 4)
 boxes[250, 250, 0, :]
 ```
 
-In order to [**show all the anchor boxes centered on one pixel in the image**],
-we define the following `show_bboxes` function to draw multiple bounding boxes on the image.
+Kad [**parodytume visus inkarinius stačiakampius, kurių centras yra vienas vaizdo pikselis**],
+apibrėžiame šią funkciją `show_bboxes`, kuri vaizde nubraižo kelis apibrėžiamuosius stačiakampius.
 
 ```{.python .input}
 #@tab all
@@ -213,13 +212,13 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 ```
 
-As we just saw, the coordinate values of the $x$ and $y$ axes in the variable `boxes` have been divided by the width and height of the image, respectively.
-When drawing anchor boxes,
-we need to restore their original coordinate values;
-thus, we define variable `bbox_scale` below. 
-Now, we can draw all the anchor boxes centered on (250, 250) in the image.
-As you can see, the blue anchor box with a scale of 0.75 and an aspect ratio of 1 well
-surrounds the dog in the image.
+Kaip ką tik matėme, kintamajame `boxes` esančios $x$ ir $y$ ašių koordinačių reikšmės buvo padalytos atitinkamai iš vaizdo pločio ir aukščio.
+Braižydami inkarinius stačiakampius,
+turime atkurti jų pradines koordinačių reikšmes;
+todėl toliau apibrėžiame kintamąjį `bbox_scale`.
+Dabar galime nubraižyti visus inkarinius stačiakampius, kurių centras yra (250, 250), vaizde.
+Kaip matote, mėlynas inkarinis stačiakampis, kurio mastelis 0,75, o kraštinių santykis 1, gerai
+apjuosia vaizde esantį šunį.
 
 ```{.python .input}
 #@tab all
@@ -231,30 +230,30 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
              's=0.75, r=0.5'])
 ```
 
-## [**Intersection over Union (IoU)**]
+## [**Sankirtos ir sąjungos santykis (IoU)**]
 
-We just mentioned that an anchor box "well" surrounds the dog in the image.
-If the ground-truth bounding box of the object is known, how can "well" here be quantified?
-Intuitively, we can measure the similarity between
-the anchor box and the ground-truth bounding box.
-We know that the *Jaccard index* can measure the similarity between two sets. Given sets $\mathcal{A}$ and $\mathcal{B}$, their Jaccard index is the size of their intersection divided by the size of their union:
+Ką tik minėjome, kad inkarinis stačiakampis „gerai“ apjuosia vaizde esantį šunį.
+Jei žinomas objekto tikrasis apibrėžiamasis stačiakampis, kaip galima kiekybiškai įvertinti, kas čia yra „gerai“?
+Intuityviai galime matuoti
+inkarinio stačiakampio ir tikrojo apibrėžiamojo stačiakampio panašumą.
+Žinome, kad *Žakaro indeksas* (angl. *Jaccard index*) gali matuoti dviejų aibių panašumą. Turint aibes $\mathcal{A}$ ir $\mathcal{B}$, jų Žakaro indeksas yra jų sankirtos dydis, padalytas iš jų sąjungos dydžio:
 
 $$J(\mathcal{A},\mathcal{B}) = \frac{\left|\mathcal{A} \cap \mathcal{B}\right|}{\left| \mathcal{A} \cup \mathcal{B}\right|}.$$
 
 
-In fact, we can consider the pixel area of any bounding box as a set of pixels. 
-In this way, we can measure the similarity of the two bounding boxes by the Jaccard index of their pixel sets. For two bounding boxes, we usually refer their Jaccard index as *intersection over union* (*IoU*), which is the ratio of their intersection area to their union area, as shown in :numref:`fig_iou`.
-The range of an IoU is between 0 and 1:
-0 means that two bounding boxes do not overlap at all,
-while 1 indicates that the two bounding boxes are equal.
+Iš tikrųjų bet kurio apibrėžiamojo stačiakampio pikselių plotą galime laikyti pikselių aibe.
+Taip dviejų apibrėžiamųjų stačiakampių panašumą galime matuoti jų pikselių aibių Žakaro indeksu. Dviejų apibrėžiamųjų stačiakampių Žakaro indeksą paprastai vadiname *sankirtos ir sąjungos santykiu* (angl. *intersection over union*, *IoU*), t. y. jų sankirtos ploto ir sąjungos ploto santykiu, kaip parodyta :numref:`fig_iou`.
+IoU reikšmė yra tarp 0 ir 1:
+0 reiškia, kad du apibrėžiamieji stačiakampiai visiškai nepersidengia,
+o 1 rodo, kad abu apibrėžiamieji stačiakampiai sutampa.
 
-![IoU is the ratio of the intersection area to the union area of two bounding boxes.](../img/iou.svg)
+![IoU yra dviejų apibrėžiamųjų stačiakampių sankirtos ploto ir sąjungos ploto santykis.](../img/iou.svg)
 :label:`fig_iou`
 
-For the remainder of this section, we will use IoU to measure the similarity between anchor boxes and ground-truth bounding boxes, and between different anchor boxes.
-Given two lists of anchor or bounding boxes,
-the following `box_iou` computes their pairwise IoU
-across these two lists.
+Likusioje šio skyrelio dalyje naudosime IoU, kad išmatuotume inkarinių stačiakampių ir tikrųjų apibrėžiamųjų stačiakampių bei skirtingų inkarinių stačiakampių panašumą.
+Turint du inkarinių arba apibrėžiamųjų stačiakampių sąrašus,
+toliau pateikta funkcija `box_iou` apskaičiuoja jų poromis IoU
+tarp šių dviejų sąrašų.
 
 ```{.python .input}
 #@tab mxnet
@@ -300,62 +299,62 @@ def box_iou(boxes1, boxes2):
     return inter_areas / union_areas
 ```
 
-## Labeling Anchor Boxes in Training Data
+## Inkarinių stačiakampių žymėjimas apmokymo duomenyse
 :label:`subsec_labeling-anchor-boxes`
 
 
-In a training dataset,
-we consider each anchor box as a training example.
-In order to train an object detection model,
-we need *class* and *offset* labels for each anchor box,
-where the former is
-the class of the object relevant to the anchor box
-and the latter is the offset
-of the ground-truth bounding box relative to the anchor box.
-During the prediction,
-for each image
-we generate multiple anchor boxes,
-predict classes and offsets for all the anchor boxes,
-adjust their positions according to the predicted offsets to obtain the predicted bounding boxes,
-and finally only output those 
-predicted bounding boxes that satisfy certain criteria.
+Apmokymo duomenų rinkinyje
+kiekvieną inkarinį stačiakampį laikome apmokymo pavyzdžiu.
+Kad apmokytume objektų aptikimo modelį,
+kiekvienam inkariniam stačiakampiui reikia *klasės* ir *poslinkio* žymenų,
+kur pirmasis yra
+su inkariniu stačiakampiu susijusio objekto klasė,
+o antrasis – tikrojo apibrėžiamojo stačiakampio
+poslinkis inkarinio stačiakampio atžvilgiu.
+Prognozavimo metu
+kiekvienam vaizdui
+generuojame kelis inkarinius stačiakampius,
+prognozuojame visų inkarinių stačiakampių klases ir poslinkius,
+koreguojame jų padėtis pagal prognozuotus poslinkius, kad gautume prognozuojamus apibrėžiamuosius stačiakampius,
+ir galiausiai išvedame tik tuos
+prognozuojamus apibrėžiamuosius stačiakampius, kurie tenkina tam tikrus kriterijus.
 
 
-As we know, an object detection training set
-comes with labels for
-locations of *ground-truth bounding boxes*
-and classes of their surrounded objects.
-To label any generated *anchor box*,
-we refer to the labeled
-location and class of its *assigned* ground-truth bounding box that is closest to the anchor box.
-In the following,
-we describe an algorithm for assigning
-closest ground-truth bounding boxes to anchor boxes. 
+Kaip žinome, objektų aptikimo apmokymo aibėje
+yra žymenų, nurodančių
+*tikrųjų apibrėžiamųjų stačiakampių* vietas
+ir jų apjuostų objektų klases.
+Kad pažymėtume bet kurį sugeneruotą *inkarinį stačiakampį*,
+remiamės pažymėta
+vieta ir klase to *priskirto* tikrojo apibrėžiamojo stačiakampio, kuris yra artimiausias inkariniam stačiakampiui.
+Toliau
+aprašome algoritmą, skirtą priskirti
+artimiausius tikruosius apibrėžiamuosius stačiakampius inkariniams stačiakampiams.
 
-### [**Assigning Ground-Truth Bounding Boxes to Anchor Boxes**]
+### [**Tikrųjų apibrėžiamųjų stačiakampių priskyrimas inkariniams stačiakampiams**]
 
-Given an image,
-suppose that the anchor boxes are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$, where $n_a \geq n_b$.
-Let's define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\textrm{th}$ row and $j^\textrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$. The algorithm consists of the following steps:
+Tarkime, kad duotame vaizde
+inkariniai stačiakampiai yra $A_1, A_2, \ldots, A_{n_a}$, o tikrieji apibrėžiamieji stačiakampiai yra $B_1, B_2, \ldots, B_{n_b}$, kur $n_a \geq n_b$.
+Apibrėžkime matricą $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, kurios elementas $x_{ij}$, esantis $i$-ojoje eilutėje ir $j$-ajame stulpelyje, yra inkarinio stačiakampio $A_i$ ir tikrojo apibrėžiamojo stačiakampio $B_j$ IoU. Algoritmą sudaro šie žingsniai:
 
-1. Find the largest element in matrix $\mathbf{X}$ and denote its row and column indices as $i_1$ and $j_1$, respectively. Then the ground-truth bounding box $B_{j_1}$ is assigned to the anchor box $A_{i_1}$. This is quite intuitive because $A_{i_1}$ and $B_{j_1}$ are the closest among all the pairs of anchor boxes and ground-truth bounding boxes. After the first assignment, discard all the elements in the ${i_1}^\textrm{th}$ row and the ${j_1}^\textrm{th}$ column in matrix $\mathbf{X}$. 
-1. Find the largest of the remaining elements in matrix $\mathbf{X}$ and denote its row and column indices as $i_2$ and $j_2$, respectively. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and discard all the elements in the ${i_2}^\textrm{th}$ row and the ${j_2}^\textrm{th}$ column in matrix $\mathbf{X}$.
-1. At this point, elements in two rows and two columns in  matrix $\mathbf{X}$ have been discarded. We proceed until all elements in $n_b$ columns in matrix $\mathbf{X}$ are discarded. At this time, we have assigned a ground-truth bounding box to each of $n_b$ anchor boxes.
-1. Only traverse through the remaining $n_a - n_b$ anchor boxes. For example, given any anchor box $A_i$, find the ground-truth bounding box $B_j$ with the largest IoU with $A_i$ throughout the $i^\textrm{th}$ row of matrix $\mathbf{X}$, and assign $B_j$ to $A_i$ only if this IoU is greater than a predefined threshold.
+1. Raskite didžiausią matricos $\mathbf{X}$ elementą ir pažymėkite jo eilutės ir stulpelio indeksus atitinkamai $i_1$ ir $j_1$. Tada tikrasis apibrėžiamasis stačiakampis $B_{j_1}$ priskiriamas inkariniam stačiakampiui $A_{i_1}$. Tai gana intuityvu, nes $A_{i_1}$ ir $B_{j_1}$ yra artimiausi tarp visų inkarinių stačiakampių ir tikrųjų apibrėžiamųjų stačiakampių porų. Po pirmojo priskyrimo atmeskite visus matricos $\mathbf{X}$ elementus ${i_1}$-ojoje eilutėje ir ${j_1}$-ajame stulpelyje.
+1. Raskite didžiausią iš likusių matricos $\mathbf{X}$ elementų ir pažymėkite jo eilutės ir stulpelio indeksus atitinkamai $i_2$ ir $j_2$. Tikrąjį apibrėžiamąjį stačiakampį $B_{j_2}$ priskiriame inkariniam stačiakampiui $A_{i_2}$ ir atmetame visus matricos $\mathbf{X}$ elementus ${i_2}$-ojoje eilutėje ir ${j_2}$-ajame stulpelyje.
+1. Šiuo metu dviejų eilučių ir dviejų stulpelių elementai matricoje $\mathbf{X}$ jau atmesti. Tęsiame, kol bus atmesti visi $n_b$ matricos $\mathbf{X}$ stulpelių elementai. Tuomet tikrasis apibrėžiamasis stačiakampis bus priskirtas kiekvienam iš $n_b$ inkarinių stačiakampių.
+1. Pereikite tik per likusius $n_a - n_b$ inkarinių stačiakampių. Pavyzdžiui, turint bet kurį inkarinį stačiakampį $A_i$, per visą matricos $\mathbf{X}$ $i$-ąją eilutę raskite tikrąjį apibrėžiamąjį stačiakampį $B_j$, kurio IoU su $A_i$ didžiausias, ir priskirkite $B_j$ stačiakampiui $A_i$ tik tuo atveju, jei šis IoU yra didesnis už iš anksto nustatytą slenkstį.
 
-Let's illustrate the above algorithm using a concrete
-example.
-As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value in matrix $\mathbf{X}$ is $x_{23}$, we assign the ground-truth bounding box $B_3$ to the anchor box $A_2$.
-Then, we discard all the elements in row 2 and column 3 of the matrix, find the largest $x_{71}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_1$ to the anchor box $A_7$. 
-Next, as shown in :numref:`fig_anchor_label` (middle), discard all the elements in row 7 and column 1 of the matrix, find the largest $x_{54}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_4$ to the anchor box $A_5$. 
-Finally, as shown in :numref:`fig_anchor_label` (right), discard all the elements in row 5 and column 4 of the matrix, find the largest $x_{92}$ in the remaining elements (shaded area), and assign the ground-truth bounding box $B_2$ to the anchor box $A_9$.
-After that, we only need to traverse through
-the remaining anchor boxes $A_1, A_3, A_4, A_6, A_8$ and determine whether to assign them ground-truth bounding boxes according to the threshold.
+Iliustruokime aukščiau aprašytą algoritmą konkrečiu
+pavyzdžiu.
+Kaip parodyta :numref:`fig_anchor_label` (kairėje), darant prielaidą, kad didžiausia matricos $\mathbf{X}$ reikšmė yra $x_{23}$, tikrąjį apibrėžiamąjį stačiakampį $B_3$ priskiriame inkariniam stačiakampiui $A_2$.
+Tada atmetame visus matricos elementus 2 eilutėje ir 3 stulpelyje, tarp likusių elementų (užtamsinta sritis) randame didžiausią $x_{71}$ ir tikrąjį apibrėžiamąjį stačiakampį $B_1$ priskiriame inkariniam stačiakampiui $A_7$.
+Toliau, kaip parodyta :numref:`fig_anchor_label` (viduryje), atmetame visus matricos elementus 7 eilutėje ir 1 stulpelyje, tarp likusių elementų (užtamsinta sritis) randame didžiausią $x_{54}$ ir tikrąjį apibrėžiamąjį stačiakampį $B_4$ priskiriame inkariniam stačiakampiui $A_5$.
+Galiausiai, kaip parodyta :numref:`fig_anchor_label` (dešinėje), atmetame visus matricos elementus 5 eilutėje ir 4 stulpelyje, tarp likusių elementų (užtamsinta sritis) randame didžiausią $x_{92}$ ir tikrąjį apibrėžiamąjį stačiakampį $B_2$ priskiriame inkariniam stačiakampiui $A_9$.
+Po to mums tereikia pereiti per
+likusius inkarinius stačiakampius $A_1, A_3, A_4, A_6, A_8$ ir pagal slenkstį nuspręsti, ar jiems priskirti tikruosius apibrėžiamuosius stačiakampius.
 
-![Assigning ground-truth bounding boxes to anchor boxes.](../img/anchor-label.svg)
+![Tikrųjų apibrėžiamųjų stačiakampių priskyrimas inkariniams stačiakampiams.](../img/anchor-label.svg)
 :label:`fig_anchor_label`
 
-This algorithm is implemented in the following `assign_anchor_to_bbox` function.
+Šis algoritmas įgyvendintas toliau pateiktoje funkcijoje `assign_anchor_to_bbox`.
 
 ```{.python .input}
 #@tab mxnet
@@ -416,40 +415,38 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     return anchors_bbox_map
 ```
 
-### Labeling Classes and Offsets
+### Klasių ir poslinkių žymėjimas
 
-Now we can label the class and offset for each anchor box. Suppose that an anchor box $A$ is assigned
-a ground-truth bounding box $B$. 
-On the one hand,
-the class of the anchor box $A$ will be
-labeled as that of $B$.
-On the other hand,
-the offset of the anchor box $A$ 
-will be labeled according to the 
-relative position between
-the central coordinates of $B$ and $A$
-together with the relative size between
-these two boxes.
-Given varying
-positions and sizes of different boxes in the dataset,
-we can apply transformations
-to those relative positions and sizes
-that may lead to 
-more uniformly distributed offsets
-that are easier to fit.
-Here we describe a common transformation.
-[**Given the central coordinates of $A$ and $B$ as $(x_a, y_a)$ and $(x_b, y_b)$, 
-their widths as $w_a$ and $w_b$, 
-and their heights as $h_a$ and $h_b$, respectively. 
-We may label the offset of $A$ as
+Dabar galime pažymėti kiekvieno inkarinio stačiakampio klasę ir poslinkį. Tarkime, kad inkariniam stačiakampiui $A$ priskirtas
+tikrasis apibrėžiamasis stačiakampis $B$.
+Viena vertus,
+inkarinio stačiakampio $A$ klasė bus
+pažymėta kaip $B$ klasė.
+Kita vertus,
+inkarinio stačiakampio $A$ poslinkis
+bus pažymėtas pagal
+santykinę $B$ ir $A$ centrų koordinačių padėtį
+kartu su santykiniu šių
+dviejų stačiakampių dydžiu.
+Atsižvelgiant į skirtingas
+skirtingų stačiakampių padėtis ir dydžius duomenų rinkinyje,
+tiems santykiniams padėtims ir dydžiams galime taikyti transformacijas,
+kurios gali lemti
+tolygiau pasiskirsčiusius poslinkius,
+kuriuos lengviau pritaikyti.
+Čia aprašome įprastą transformaciją.
+[**Tegul $A$ ir $B$ centrų koordinatės yra $(x_a, y_a)$ ir $(x_b, y_b)$,
+jų pločiai – $w_a$ ir $w_b$,
+o aukščiai – atitinkamai $h_a$ ir $h_b$.
+Galime pažymėti $A$ poslinkį kaip
 
 $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 \frac{ \frac{y_b - y_a}{h_a} - \mu_y }{\sigma_y},
 \frac{ \log \frac{w_b}{w_a} - \mu_w }{\sigma_w},
 \frac{ \log \frac{h_b}{h_a} - \mu_h }{\sigma_h}\right),$$
 **]
-where default values of the constants are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1$, and $\sigma_w=\sigma_h=0.2$.
-This transformation is implemented below in the `offset_boxes` function.
+kur numatytosios konstantų reikšmės yra $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0{,}1$ ir $\sigma_w=\sigma_h=0{,}2$.
+Ši transformacija įgyvendinta toliau pateiktoje funkcijoje `offset_boxes`.
 
 ```{.python .input}
 #@tab all
@@ -464,12 +461,12 @@ def offset_boxes(anchors, assigned_bb, eps=1e-6):
     return offset
 ```
 
-If an anchor box is not assigned a ground-truth bounding box, we just label the class of the anchor box as "background".
-Anchor boxes whose classes are background are often referred to as *negative* anchor boxes,
-and the rest are called *positive* anchor boxes.
-We implement the following `multibox_target` function
-to [**label classes and offsets for anchor boxes**] (the `anchors` argument) using ground-truth bounding boxes (the `labels` argument).
-This function sets the background class to zero and increments the integer index of a new class by one.
+Jei inkariniam stačiakampiui nepriskirtas tikrasis apibrėžiamasis stačiakampis, tiesiog pažymime inkarinio stačiakampio klasę kaip „fonas“.
+Inkariniai stačiakampiai, kurių klasė yra fonas, dažnai vadinami *neigiamais* inkariniais stačiakampiais,
+o likusieji vadinami *teigiamais* inkariniais stačiakampiais.
+Įgyvendiname šią funkciją `multibox_target`,
+kad [**pažymėtume inkarinių stačiakampių klases ir poslinkius**] (argumentas `anchors`) naudodami tikruosius apibrėžiamuosius stačiakampius (argumentas `labels`).
+Ši funkcija fono klasę nustato į nulį, o naujos klasės sveikąjį indeksą padidina vienetu.
 
 ```{.python .input}
 #@tab mxnet
@@ -546,22 +543,22 @@ def multibox_target(anchors, labels):
     return (bbox_offset, bbox_mask, class_labels)
 ```
 
-### An Example
+### Pavyzdys
 
-Let's illustrate anchor box labeling
-via a concrete example.
-We define ground-truth bounding boxes for the dog and cat in the loaded image,
-where the first element is the class (0 for dog and 1 for cat) and the remaining four elements are the
-$(x, y)$-axis coordinates
-at the upper-left corner and the lower-right corner
-(range is between 0 and 1). 
-We also construct five anchor boxes to be labeled
-using the coordinates of
-the upper-left corner and the lower-right corner:
-$A_0, \ldots, A_4$ (the index starts from 0).
-Then we [**plot these ground-truth bounding boxes 
-and anchor boxes 
-in the image.**]
+Iliustruokime inkarinių stačiakampių žymėjimą
+konkrečiu pavyzdžiu.
+Įkeltame vaizde apibrėžiame šuns ir katės tikruosius apibrėžiamuosius stačiakampius,
+kur pirmasis elementas yra klasė (0 šuniui ir 1 katei), o likę keturi elementai yra
+viršutinio kairiojo ir apatinio dešiniojo kampų
+$(x, y)$ ašių koordinatės
+(intervalas tarp 0 ir 1).
+Taip pat sukonstruojame penkis pažymėtinus inkarinius stačiakampius
+naudodami
+viršutinio kairiojo ir apatinio dešiniojo kampų koordinates:
+$A_0, \ldots, A_4$ (indeksas prasideda nuo 0).
+Tada [**nubraižome šiuos tikruosius apibrėžiamuosius stačiakampius
+ir inkarinius stačiakampius
+vaizde.**]
 
 ```{.python .input}
 #@tab all
@@ -576,14 +573,14 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
-Using the `multibox_target` function defined above,
-we can [**label classes and offsets
-of these anchor boxes based on
-the ground-truth bounding boxes**] for the dog and cat.
-In this example, indices of
-the background, dog, and cat classes
-are 0, 1, and 2, respectively. 
-Below we add an dimension for examples of anchor boxes and ground-truth bounding boxes.
+Naudodami aukščiau apibrėžtą funkciją `multibox_target`,
+galime [**pažymėti šių inkarinių stačiakampių klases ir poslinkius
+pagal
+tikruosius apibrėžiamuosius stačiakampius**] šuniui ir katei.
+Šiame pavyzdyje
+fono, šuns ir katės klasių indeksai
+yra atitinkamai 0, 1 ir 2.
+Toliau pridedame dimensiją inkarinių stačiakampių ir tikrųjų apibrėžiamųjų stačiakampių pavyzdžiams.
 
 ```{.python .input}
 #@tab mxnet
@@ -597,66 +594,66 @@ labels = multibox_target(anchors.unsqueeze(dim=0),
                          ground_truth.unsqueeze(dim=0))
 ```
 
-There are three items in the returned result, all of which are in the tensor format.
-The third item contains the labeled classes of the input anchor boxes.
+Grąžintame rezultate yra trys elementai, visi tenzoriaus formato.
+Trečiajame elemente yra įvesties inkarinių stačiakampių pažymėtos klasės.
 
-Let's analyze the returned class labels below based on
-anchor box and ground-truth bounding box positions in the image.
-First, among all the pairs of anchor boxes
-and ground-truth bounding boxes,
-the IoU of the anchor box $A_4$ and the ground-truth bounding box of the cat is the largest. 
-Thus, the class of $A_4$ is labeled as the cat.
-Taking out 
-pairs containing $A_4$ or the ground-truth bounding box of the cat, among the rest 
-the pair of the anchor box $A_1$ and the ground-truth bounding box of the dog has the largest IoU.
-So the class of $A_1$ is labeled as the dog.
-Next, we need to traverse through the remaining three unlabeled anchor boxes: $A_0$, $A_2$, and $A_3$.
-For $A_0$,
-the class of the ground-truth bounding box with the largest IoU is the dog,
-but the IoU is below the predefined threshold (0.5),
-so the class is labeled as background;
-for $A_2$,
-the class of the ground-truth bounding box with the largest IoU is the cat and the IoU exceeds the threshold, so the class is labeled as the cat;
-for $A_3$,
-the class of the ground-truth bounding box with the largest IoU is the cat, but the value is below the threshold, so the class is labeled as background.
+Išanalizuokime toliau grąžintus klasių žymenis pagal
+inkarinių stačiakampių ir tikrųjų apibrėžiamųjų stačiakampių padėtis vaizde.
+Pirma, tarp visų inkarinių stačiakampių
+ir tikrųjų apibrėžiamųjų stačiakampių porų
+inkarinio stačiakampio $A_4$ ir katės tikrojo apibrėžiamojo stačiakampio IoU yra didžiausias.
+Taigi $A_4$ klasė pažymima kaip katė.
+Išėmus
+poras, kuriose yra $A_4$ arba katės tikrasis apibrėžiamasis stačiakampis, tarp likusių
+inkarinio stačiakampio $A_1$ ir šuns tikrojo apibrėžiamojo stačiakampio poros IoU yra didžiausias.
+Taigi $A_1$ klasė pažymima kaip šuo.
+Toliau turime pereiti per likusius tris nepažymėtus inkarinius stačiakampius: $A_0$, $A_2$ ir $A_3$.
+$A_0$ atveju
+tikrojo apibrėžiamojo stačiakampio, kurio IoU didžiausias, klasė yra šuo,
+bet IoU yra žemiau iš anksto nustatyto slenksčio (0,5),
+todėl klasė pažymima kaip fonas;
+$A_2$ atveju
+tikrojo apibrėžiamojo stačiakampio, kurio IoU didžiausias, klasė yra katė, o IoU viršija slenkstį, todėl klasė pažymima kaip katė;
+$A_3$ atveju
+tikrojo apibrėžiamojo stačiakampio, kurio IoU didžiausias, klasė yra katė, bet reikšmė yra žemiau slenksčio, todėl klasė pažymima kaip fonas.
 
 ```{.python .input}
 #@tab all
 labels[2]
 ```
 
-The second returned item is a mask variable of the shape (batch size, four times the number of anchor boxes).
-Every four elements in the mask variable 
-correspond to the four offset values of each anchor box.
-Since we do not care about background detection,
-offsets of this negative class should not affect the objective function.
-Through elementwise multiplications, zeros in the mask variable will filter out negative class offsets before calculating the objective function.
+Antrasis grąžintas elementas yra kaukės kintamasis, kurio forma (rinkinio dydis, keturis kartus didesnis už inkarinių stačiakampių skaičių).
+Kas keturi kaukės kintamojo elementai
+atitinka keturias kiekvieno inkarinio stačiakampio poslinkio reikšmes.
+Kadangi nesirūpiname fono aptikimu,
+šios neigiamos klasės poslinkiai neturėtų daryti įtakos tikslo funkcijai.
+Elementų daugyba iš kaukės nuliai kaukės kintamajame prieš skaičiuojant tikslo funkciją išfiltruos neigiamos klasės poslinkius.
 
 ```{.python .input}
 #@tab all
 labels[1]
 ```
 
-The first returned item contains the four offset values labeled for each anchor box.
-Note that the offsets of negative-class anchor boxes are labeled as zeros.
+Pirmajame grąžintame elemente yra keturios kiekvienam inkariniam stačiakampiui pažymėtos poslinkio reikšmės.
+Atkreipkite dėmesį, kad neigiamos klasės inkarinių stačiakampių poslinkiai pažymėti nuliais.
 
 ```{.python .input}
 #@tab all
 labels[0]
 ```
 
-## Predicting Bounding Boxes with Non-Maximum Suppression
+## Apibrėžiamųjų stačiakampių prognozavimas naudojant nemaksimalių reikšmių slopinimą
 :label:`subsec_predicting-bounding-boxes-nms`
 
-During prediction,
-we generate multiple anchor boxes for the image and predict classes and offsets for each of them.
-A *predicted bounding box*
-is thus obtained according to 
-an anchor box with its predicted offset.
-Below we implement the `offset_inverse` function
-that takes in anchors and
-offset predictions as inputs and [**applies inverse offset transformations to
-return the predicted bounding box coordinates**].
+Prognozavimo metu
+generuojame kelis vaizdo inkarinius stačiakampius ir prognozuojame kiekvieno iš jų klases bei poslinkius.
+*Prognozuojamas apibrėžiamasis stačiakampis*
+taip gaunamas pagal
+inkarinį stačiakampį su jo prognozuotu poslinkiu.
+Toliau įgyvendiname funkciją `offset_inverse`,
+kuri kaip įvestis priima inkarus ir
+poslinkių prognozes ir [**taiko atvirkštines poslinkio transformacijas,
+kad grąžintų prognozuojamų apibrėžiamųjų stačiakampių koordinates**].
 
 ```{.python .input}
 #@tab all
@@ -671,34 +668,34 @@ def offset_inverse(anchors, offset_preds):
     return predicted_bbox
 ```
 
-When there are many anchor boxes,
-many similar (with significant overlap)
-predicted bounding boxes 
-can be potentially output for surrounding the same object.
-To simplify the output,
-we can merge similar predicted bounding boxes
-that belong to the same object
-by using *non-maximum suppression* (NMS).
+Kai yra daug inkarinių stačiakampių,
+to paties objekto apjuostiems gali būti išvesta
+daug panašių (su dideliu persidengimu)
+prognozuojamų apibrėžiamųjų stačiakampių.
+Kad supaprastintume išvestį,
+galime sujungti panašius prognozuojamus apibrėžiamuosius stačiakampius,
+priklausančius tam pačiam objektui,
+naudodami *nemaksimalių reikšmių slopinimą* (angl. *non-maximum suppression*, NMS).
 
-Here is how non-maximum suppression works.
-For a predicted bounding box $B$,
-the object detection model calculates the predicted likelihood
-for each class.
-Denoting by $p$ the largest predicted likelihood,
-the class corresponding to this probability is the predicted class for $B$.
-Specifically, we refer to $p$ as the *confidence* (score) of the predicted bounding box $B$.
-On the same image,
-all the predicted non-background bounding boxes 
-are sorted by confidence in descending order
-to generate a list $L$.
-Then we manipulate the sorted list $L$ in the following steps:
+Štai kaip veikia nemaksimalių reikšmių slopinimas.
+Prognozuojamam apibrėžiamajam stačiakampiui $B$
+objektų aptikimo modelis apskaičiuoja prognozuojamą tikėtinumą
+kiekvienai klasei.
+Pažymėję $p$ didžiausią prognozuojamą tikėtinumą,
+šią tikimybę atitinkanti klasė yra $B$ prognozuojama klasė.
+Konkrečiai, $p$ vadiname prognozuojamo apibrėžiamojo stačiakampio $B$ *pasitikėjimu* (balu).
+Tame pačiame vaizde
+visi prognozuojami nefono apibrėžiamieji stačiakampiai
+surūšiuojami pagal pasitikėjimą mažėjimo tvarka,
+kad būtų sugeneruotas sąrašas $L$.
+Tada surūšiuotą sąrašą $L$ apdorojame šiais žingsniais:
 
-1. Select the predicted bounding box $B_1$ with the highest confidence from $L$ as a basis and remove all non-basis predicted bounding boxes whose IoU with $B_1$ exceeds a predefined threshold $\epsilon$ from $L$. At this point, $L$ keeps the predicted bounding box with the highest confidence but drops others that are too similar to it. In a nutshell, those with *non-maximum* confidence scores are *suppressed*.
-1. Select the predicted bounding box $B_2$ with the second highest confidence from $L$ as another basis and remove all non-basis predicted bounding boxes whose IoU with $B_2$ exceeds $\epsilon$ from $L$.
-1. Repeat the above process until all the predicted bounding boxes in $L$ have been used as a basis. At this time, the IoU of any pair of predicted bounding boxes in $L$ is below the threshold $\epsilon$; thus, no pair is too similar with each other. 
-1. Output all the predicted bounding boxes in the list $L$.
+1. Pasirinkite iš $L$ prognozuojamą apibrėžiamąjį stačiakampį $B_1$ su didžiausiu pasitikėjimu kaip pagrindą ir pašalinkite iš $L$ visus nepagrindinius prognozuojamus apibrėžiamuosius stačiakampius, kurių IoU su $B_1$ viršija iš anksto nustatytą slenkstį $\epsilon$. Šiuo metu $L$ išsaugo prognozuojamą apibrėžiamąjį stačiakampį su didžiausiu pasitikėjimu, bet atmeta kitus, kurie yra per daug panašūs į jį. Trumpai tariant, tie, kurių pasitikėjimo balai yra *nemaksimalūs*, yra *slopinami*.
+1. Pasirinkite iš $L$ prognozuojamą apibrėžiamąjį stačiakampį $B_2$ su antru pagal dydį pasitikėjimu kaip kitą pagrindą ir pašalinkite iš $L$ visus nepagrindinius prognozuojamus apibrėžiamuosius stačiakampius, kurių IoU su $B_2$ viršija $\epsilon$.
+1. Kartokite aukščiau aprašytą procesą, kol visi sąraše $L$ esantys prognozuojami apibrėžiamieji stačiakampiai bus panaudoti kaip pagrindas. Tuomet bet kurios sąraše $L$ esančios prognozuojamų apibrėžiamųjų stačiakampių poros IoU yra žemiau slenksčio $\epsilon$; taigi jokia pora nėra per daug panaši viena į kitą.
+1. Išveskite visus sąraše $L$ esančius prognozuojamus apibrėžiamuosius stačiakampius.
 
-[**The following `nms` function sorts confidence scores in descending order and returns their indices.**]
+[**Toliau pateikta funkcija `nms` surūšiuoja pasitikėjimo balus mažėjimo tvarka ir grąžina jų indeksus.**]
 
 ```{.python .input}
 #@tab mxnet
@@ -736,12 +733,12 @@ def nms(boxes, scores, iou_threshold):
     return d2l.tensor(keep, device=boxes.device)
 ```
 
-We define the following `multibox_detection`
-to [**apply non-maximum suppression
-to predicting bounding boxes**].
-Do not worry if you find the implementation
-a bit complicated: we will show how it works
-with a concrete example right after the implementation.
+Apibrėžiame šią funkciją `multibox_detection`,
+kad [**taikytume nemaksimalių reikšmių slopinimą
+prognozuojamiems apibrėžiamiesiems stačiakampiams**].
+Nesijaudinkite, jei įgyvendinimas atrodo
+šiek tiek sudėtingas: iškart po įgyvendinimo parodysime, kaip jis veikia,
+konkrečiu pavyzdžiu.
 
 ```{.python .input}
 #@tab mxnet
@@ -815,13 +812,13 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
     return d2l.stack(out)
 ```
 
-Now let's [**apply the above implementations
-to a concrete example with four anchor boxes**].
-For simplicity, we assume that the
-predicted offsets are all zeros.
-This means that the predicted bounding boxes are anchor boxes. 
-For each class among the background, dog, and cat,
-we also define its predicted likelihood.
+Dabar [**pritaikykime aukščiau pateiktus įgyvendinimus
+konkrečiam pavyzdžiui su keturiais inkariniais stačiakampiais**].
+Paprastumo dėlei darome prielaidą, kad
+prognozuojami poslinkiai yra visi nuliai.
+Tai reiškia, kad prognozuojami apibrėžiamieji stačiakampiai yra inkariniai stačiakampiai.
+Kiekvienai klasei – fonui, šuniui ir katei –
+taip pat apibrėžiame jos prognozuojamą tikėtinumą.
 
 ```{.python .input}
 #@tab all
@@ -833,7 +830,7 @@ cls_probs = d2l.tensor([[0] * 4,  # Predicted background likelihood
                       [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood
 ```
 
-We can [**plot these predicted bounding boxes with their confidence on the image.**]
+Galime [**nubraižyti šiuos prognozuojamus apibrėžiamuosius stačiakampius su jų pasitikėjimu vaizde.**]
 
 ```{.python .input}
 #@tab all
@@ -842,20 +839,20 @@ show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
 ```
 
-Now we can invoke the `multibox_detection` function
-to perform non-maximum suppression,
-where the threshold is set to 0.5.
-Note that we add
-a dimension for examples in the tensor input.
+Dabar galime iškviesti funkciją `multibox_detection`,
+kad atliktume nemaksimalių reikšmių slopinimą,
+kur slenkstis nustatytas į 0,5.
+Atkreipkite dėmesį, kad pridedame
+pavyzdžių dimensiją tenzoriaus įvestyje.
 
-We can see that [**the shape of the returned result**] is
-(batch size, number of anchor boxes, 6).
-The six elements in the innermost dimension
-gives the output information for the same predicted bounding box.
-The first element is the predicted class index, which starts from 0 (0 is dog and 1 is cat). The value -1 indicates background or removal in non-maximum suppression.
-The second element is the confidence of the predicted bounding box.
-The remaining four elements are the $(x, y)$-axis coordinates of the upper-left corner and 
-the lower-right corner of the predicted bounding box, respectively (range is between 0 and 1).
+Matome, kad [**grąžinto rezultato forma**] yra
+(rinkinio dydis, inkarinių stačiakampių skaičius, 6).
+Šeši giliausios dimensijos elementai
+pateikia išvesties informaciją to paties prognozuojamo apibrėžiamojo stačiakampio.
+Pirmasis elementas yra prognozuojamos klasės indeksas, prasidedantis nuo 0 (0 yra šuo, o 1 – katė). Reikšmė -1 rodo foną arba pašalinimą nemaksimalių reikšmių slopinimo metu.
+Antrasis elementas yra prognozuojamo apibrėžiamojo stačiakampio pasitikėjimas.
+Likę keturi elementai yra prognozuojamo apibrėžiamojo stačiakampio viršutinio kairiojo ir
+apatinio dešiniojo kampų $(x, y)$ ašių koordinatės atitinkamai (intervalas tarp 0 ir 1).
 
 ```{.python .input}
 #@tab mxnet
@@ -875,10 +872,10 @@ output = multibox_detection(cls_probs.unsqueeze(dim=0),
 output
 ```
 
-After removing those predicted bounding boxes
-of class -1, 
-we can [**output the final predicted bounding box
-kept by non-maximum suppression**].
+Pašalinę tuos prognozuojamus apibrėžiamuosius stačiakampius,
+kurių klasė yra -1,
+galime [**išvesti galutinį prognozuojamą apibrėžiamąjį stačiakampį,
+kurį paliko nemaksimalių reikšmių slopinimas**].
 
 ```{.python .input}
 #@tab all
@@ -890,32 +887,31 @@ for i in d2l.numpy(output[0]):
     show_bboxes(fig.axes, [d2l.tensor(i[2:]) * bbox_scale], label)
 ```
 
-In practice, we can remove predicted bounding boxes with lower confidence even before performing non-maximum suppression, thereby reducing computation in this algorithm.
-We may also post-process the output of non-maximum suppression, for example, by only keeping
-results with higher confidence
-in the final output.
+Praktikoje prognozuojamus apibrėžiamuosius stačiakampius su mažesniu pasitikėjimu galime pašalinti dar prieš atlikdami nemaksimalių reikšmių slopinimą, taip sumažindami šio algoritmo skaičiavimus.
+Taip pat galime papildomai apdoroti nemaksimalių reikšmių slopinimo išvestį, pavyzdžiui, galutinėje išvestyje palikdami tik
+rezultatus su didesniu pasitikėjimu.
 
 
-## Summary
+## Santrauka
 
-* We generate anchor boxes with different shapes centered on each pixel of the image.
-* Intersection over union (IoU), also known as Jaccard index, measures the similarity of two bounding boxes. It is the ratio of their intersection area to their union area.
-* In a training set, we need two types of labels for each anchor box. One is the class of the object relevant to the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
-* During prediction, we can use non-maximum suppression (NMS) to remove similar predicted bounding boxes, thereby simplifying the output.
+* Generuojame skirtingos formos inkarinius stačiakampius, kurių centras yra kiekvienas vaizdo pikselis.
+* Sankirtos ir sąjungos santykis (IoU), dar žinomas kaip Žakaro indeksas, matuoja dviejų apibrėžiamųjų stačiakampių panašumą. Tai jų sankirtos ploto ir sąjungos ploto santykis.
+* Apmokymo aibėje kiekvienam inkariniam stačiakampiui reikia dviejų tipų žymenų. Vienas yra su inkariniu stačiakampiu susijusio objekto klasė, o kitas – tikrojo apibrėžiamojo stačiakampio poslinkis inkarinio stačiakampio atžvilgiu.
+* Prognozavimo metu galime naudoti nemaksimalių reikšmių slopinimą (NMS), kad pašalintume panašius prognozuojamus apibrėžiamuosius stačiakampius ir taip supaprastintume išvestį.
 
 
-## Exercises
+## Pratimai
 
-1. Change values of `sizes` and `ratios` in the `multibox_prior` function. What are the changes to the generated anchor boxes?
-1. Construct and visualize two bounding boxes with an IoU of 0.5. How do they overlap with each other?
-1. Modify the variable `anchors` in :numref:`subsec_labeling-anchor-boxes` and :numref:`subsec_predicting-bounding-boxes-nms`. How do the results change?
-1. Non-maximum suppression is a greedy algorithm that suppresses predicted bounding boxes by *removing* them. Is it possible that some of these removed ones are actually useful? How can this algorithm be modified to suppress *softly*? You may refer to Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017`.
-1. Rather than being hand-crafted, can non-maximum suppression be learned?
+1. Pakeiskite funkcijos `multibox_prior` reikšmes `sizes` ir `ratios`. Kaip pasikeičia sugeneruoti inkariniai stačiakampiai?
+1. Sukonstruokite ir vizualizuokite du apibrėžiamuosius stačiakampius, kurių IoU yra 0,5. Kaip jie persidengia?
+1. Pakeiskite kintamąjį `anchors` :numref:`subsec_labeling-anchor-boxes` ir :numref:`subsec_predicting-bounding-boxes-nms`. Kaip keičiasi rezultatai?
+1. Nemaksimalių reikšmių slopinimas yra godusis algoritmas, kuris slopina prognozuojamus apibrėžiamuosius stačiakampius juos *pašalindamas*. Ar įmanoma, kad kai kurie iš šių pašalintų iš tikrųjų yra naudingi? Kaip šį algoritmą galima modifikuoti, kad slopintų *švelniai*? Galite remtis Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017`.
+1. Ar nemaksimalių reikšmių slopinimą galima išmokti, o ne sukurti rankiniu būdu?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/370)
+[Diskusijos](https://discuss.d2l.ai/t/370)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1603)
+[Diskusijos](https://discuss.d2l.ai/t/1603)
 :end_tab:

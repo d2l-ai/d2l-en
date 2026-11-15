@@ -1,64 +1,63 @@
-# Fine-Tuning
+# Patikslinimas
 :label:`sec_fine_tuning`
 
-In earlier chapters, we discussed how to train models on the Fashion-MNIST training dataset with only 60000 images. We also described ImageNet, the most widely used large-scale image dataset in academia, which has more than 10 million images and 1000 objects. However, the size of the dataset that we usually encounter is between those of the two datasets.
+Ankstesniuose skyriuose aptarėme, kaip apmokyti modelius Fashion-MNIST apmokymo duomenų rinkinyje, turinčiame tik 60000 vaizdų. Taip pat aprašėme ImageNet – plačiausiai akademinėje bendruomenėje naudojamą didelio masto vaizdų duomenų rinkinį, turintį daugiau nei 10 milijonų vaizdų ir 1000 objektų. Tačiau duomenų rinkinio dydis, su kuriuo paprastai susiduriame, yra tarp šių dviejų duomenų rinkinių dydžių.
 
 
-Suppose that we want to recognize different types of chairs from images, and then recommend purchase links to users. 
-One possible method is to first identify
-100 common chairs,
-take 1000 images of different angles for each chair, 
-and then train a classification model on the collected image dataset.
-Although this chair dataset may be larger than the Fashion-MNIST dataset,
-the number of examples is still less than one-tenth of 
-that in ImageNet.
-This may lead to overfitting of complicated models 
-that are suitable for ImageNet on this chair dataset.
-Besides, due to the limited amount of training examples,
-the accuracy of the trained model
-may not meet practical requirements.
+Tarkime, kad norime atpažinti skirtingų tipų kėdes iš vaizdų, o tada rekomenduoti naudotojams pirkimo nuorodas.
+Vienas galimas metodas – pirmiausia nustatyti
+100 įprastų kėdžių,
+kiekvienai kėdei nufotografuoti 1000 vaizdų skirtingais kampais
+ir tada apmokyti klasifikavimo modelį surinktame vaizdų duomenų rinkinyje.
+Nors šis kėdžių duomenų rinkinys gali būti didesnis nei Fashion-MNIST duomenų rinkinys,
+pavyzdžių skaičius vis dar yra mažesnis nei dešimtadalis
+to, kuris yra ImageNet.
+Tai gali lemti sudėtingų modelių, tinkamų ImageNet, persimokymą šiame kėdžių duomenų rinkinyje.
+Be to, dėl ribotos apmokymo pavyzdžių apimties
+apmokyto modelio tikslumas
+gali neatitikti praktinių reikalavimų.
 
 
-In order to address the above problems,
-an obvious solution is to collect more data.
-However, collecting and labeling data can take a lot of time and money.
-For example, in order to collect the ImageNet dataset, researchers have spent millions of dollars from research funding.
-Although the current data collection cost has been significantly reduced, this cost still cannot be ignored.
+Kad išspręstume aukščiau minėtas problemas,
+akivaizdus sprendimas yra surinkti daugiau duomenų.
+Tačiau duomenų rinkimas ir žymėjimas gali atimti daug laiko ir pinigų.
+Pavyzdžiui, kad surinktų ImageNet duomenų rinkinį, tyrėjai išleido milijonus dolerių iš tyrimų finansavimo.
+Nors dabartinės duomenų rinkimo išlaidos gerokai sumažėjo, šių išlaidų vis tiek negalima ignoruoti.
 
 
-Another solution is to apply *transfer learning* to transfer the knowledge learned from the *source dataset* to the *target dataset*.
-For example, although most of the images in the ImageNet dataset have nothing to do with chairs, the model trained on this dataset may extract more general image features, which can help identify edges, textures, shapes, and object composition.
-These similar features may
-also be effective for recognizing chairs.
+Kitas sprendimas yra taikyti *perkeliamąjį mokymąsi* (angl. *transfer learning*), kad žinios, išmoktos iš *šaltinio duomenų rinkinio*, būtų perkeltos į *tikslo duomenų rinkinį*.
+Pavyzdžiui, nors dauguma ImageNet duomenų rinkinio vaizdų neturi nieko bendro su kėdėmis, šiame duomenų rinkinyje apmokytas modelis gali išgauti bendresnius vaizdo požymius, kurie gali padėti identifikuoti kraštus, tekstūras, formas ir objektų kompoziciją.
+Šie panašūs požymiai
+taip pat gali būti veiksmingi atpažįstant kėdes.
 
 
-## Steps
+## Žingsniai
 
 
-In this section, we will introduce a common technique in transfer learning: *fine-tuning*. As shown in :numref:`fig_finetune`, fine-tuning consists of the following four steps:
+Šiame skyrelyje pristatysime įprastą perkeliamojo mokymosi techniką: *patikslinimą* (angl. *fine-tuning*). Kaip parodyta :numref:`fig_finetune`, patikslinimą sudaro šie keturi žingsniai:
 
 
-1. Pretrain a neural network model, i.e., the *source model*, on a source dataset (e.g., the ImageNet dataset).
-1. Create a new neural network model, i.e., the *target model*. This copies all model designs and their parameters on the source model except the output layer. We assume that these model parameters contain the knowledge learned from the source dataset and this knowledge will also be applicable to the target dataset. We also assume that the output layer of the source model is closely related to the labels of the source dataset; thus it is not used in the target model.
-1. Add an output layer to the target model, whose number of outputs is the number of categories in the target dataset. Then randomly initialize the model parameters of this layer.
-1. Train the target model on the target dataset, such as a chair dataset. The output layer will be trained from scratch, while the parameters of all the other layers are fine-tuned based on the parameters of the source model.
+1. Iš anksto apmokykite neuroninio tinklo modelį, t. y. *šaltinio modelį*, šaltinio duomenų rinkinyje (pvz., ImageNet duomenų rinkinyje).
+1. Sukurkite naują neuroninio tinklo modelį, t. y. *tikslo modelį*. Jis nukopijuoja visus šaltinio modelio dizainus ir jų parametrus, išskyrus išvesties sluoksnį. Darome prielaidą, kad šie modelio parametrai talpina iš šaltinio duomenų rinkinio išmoktas žinias ir kad šios žinios bus taikomos ir tikslo duomenų rinkiniui. Taip pat darome prielaidą, kad šaltinio modelio išvesties sluoksnis yra glaudžiai susijęs su šaltinio duomenų rinkinio žymenimis; todėl jis nenaudojamas tikslo modelyje.
+1. Pridėkite išvesties sluoksnį prie tikslo modelio, kurio išvesčių skaičius yra kategorijų skaičius tikslo duomenų rinkinyje. Tada atsitiktinai inicializuokite šio sluoksnio modelio parametrus.
+1. Apmokykite tikslo modelį tikslo duomenų rinkinyje, pavyzdžiui, kėdžių duomenų rinkinyje. Išvesties sluoksnis bus apmokomas nuo nulio, o visų kitų sluoksnių parametrai bus patikslinami remiantis šaltinio modelio parametrais.
 
-![Fine tuning.](../img/finetune.svg)
+![Patikslinimas.](../img/finetune.svg)
 :label:`fig_finetune`
 
-When target datasets are much smaller than source datasets, fine-tuning helps to improve models' generalization ability.
+Kai tikslo duomenų rinkiniai yra daug mažesni už šaltinio duomenų rinkinius, patikslinimas padeda pagerinti modelių apibendrinimo gebą.
 
 
-## Hot Dog Recognition
+## Dešrainio atpažinimas
 
-Let's demonstrate fine-tuning via a concrete case:
-hot dog recognition. 
-We will fine-tune a ResNet model on a small dataset,
-which was pretrained on the ImageNet dataset.
-This small dataset consists of
-thousands of images with and without hot dogs.
-We will use the fine-tuned model to recognize 
-hot dogs from images.
+Parodykime patikslinimą konkrečiu atveju:
+dešrainio (angl. *hot dog*) atpažinimu.
+Patikslinsime ResNet modelį mažame duomenų rinkinyje,
+kuris buvo iš anksto apmokytas ImageNet duomenų rinkinyje.
+Šį mažą duomenų rinkinį sudaro
+tūkstančiai vaizdų su dešrainiais ir be jų.
+Patikslintą modelį naudosime
+dešrainiams atpažinti iš vaizdų.
 
 ```{.python .input}
 #@tab mxnet
@@ -81,18 +80,18 @@ import torchvision
 import os
 ```
 
-### Reading the Dataset
+### Duomenų rinkinio skaitymas
 
-[**The hot dog dataset we use was taken from online images**].
-This dataset consists of
-1400 positive-class images containing hot dogs,
-and as many negative-class images containing other foods.
-1000 images of both classes are used for training and the rest are for testing.
+[**Mūsų naudojamas dešrainių duomenų rinkinys paimtas iš internetinių vaizdų**].
+Šį duomenų rinkinį sudaro
+1400 teigiamos klasės vaizdų su dešrainiais
+ir tiek pat neigiamos klasės vaizdų su kitais maisto produktais.
+1000 abiejų klasių vaizdų naudojama apmokymui, o likusieji – testavimui.
 
 
-After unzipping the downloaded dataset,
-we obtain two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` subfolders, either of which contains images of
-the corresponding class.
+Išpakavę atsisiųstą duomenų rinkinį,
+gauname du aplankus `hotdog/train` ir `hotdog/test`. Abiejuose aplankuose yra poaplankiai `hotdog` ir `not-hotdog`, kurių kiekviename yra
+atitinkamos klasės vaizdų.
 
 ```{.python .input}
 #@tab all
@@ -103,7 +102,7 @@ d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip',
 data_dir = d2l.download_extract('hotdog')
 ```
 
-We create two instances to read all the image files in the training and testing datasets, respectively.
+Sukuriame du egzempliorius, kad perskaitytume visus apmokymo ir testavimo duomenų rinkinių vaizdų failus atitinkamai.
 
 ```{.python .input}
 #@tab mxnet
@@ -119,7 +118,7 @@ train_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'train'))
 test_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'test'))
 ```
 
-The first 8 positive examples and the last 8 negative images are shown below. As you can see, [**the images vary in size and aspect ratio**].
+Toliau parodomi pirmieji 8 teigiami pavyzdžiai ir paskutiniai 8 neigiami vaizdai. Kaip matote, [**vaizdai skiriasi dydžiu ir kraštinių santykiu**].
 
 ```{.python .input}
 #@tab all
@@ -128,15 +127,15 @@ not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 
-During training, we first crop a random area of random size and random aspect ratio from the image,
-and then scale this area
-to a $224 \times 224$ input image. 
-During testing, we scale both the height and width of an image to 256 pixels, and then crop a central $224 \times 224$ area as input.
-In addition, 
-for the three RGB (red, green, and blue) color channels
-we *standardize* their values channel by channel.
-Concretely,
-the mean value of a channel is subtracted from each value of that channel and then the result is divided by the standard deviation of that channel.
+Apmokymo metu pirmiausia iš vaizdo apkerpame atsitiktinio dydžio ir atsitiktinio kraštinių santykio atsitiktinę sritį,
+o tada pakeičiame šios srities mastelį
+į $224 \times 224$ įvesties vaizdą.
+Testavimo metu pakeičiame vaizdo aukštį ir plotį iki 256 pikselių, o tada apkerpame centrinę $224 \times 224$ sritį kaip įvestį.
+Be to,
+trijų RGB (raudonos, žalios ir mėlynos) spalvų kanalų
+reikšmes *standartizuojame* kanalas po kanalo.
+Konkrečiai,
+kanalo vidurkis atimamas iš kiekvienos to kanalo reikšmės, o tada rezultatas padalijamas iš to kanalo standartinio nuokrypio.
 
 [~~Data augmentations~~]
 
@@ -180,11 +179,11 @@ test_augs = torchvision.transforms.Compose([
     normalize])
 ```
 
-### [**Defining and Initializing the Model**]
+### [**Modelio apibrėžimas ir inicializavimas**]
 
-We use ResNet-18, which was pretrained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download the pretrained model parameters. 
-If this model is used for the first time,
-Internet connection is required for download.
+Kaip šaltinio modelį naudojame ResNet-18, kuris buvo iš anksto apmokytas ImageNet duomenų rinkinyje. Čia nurodome `pretrained=True`, kad automatiškai būtų atsisiųsti iš anksto apmokyti modelio parametrai.
+Jei šis modelis naudojamas pirmą kartą,
+atsisiuntimui reikalingas interneto ryšys.
 
 ```{.python .input}
 #@tab mxnet
@@ -197,13 +196,13 @@ pretrained_net = torchvision.models.resnet18(pretrained=True)
 ```
 
 :begin_tab:`mxnet`
-The pretrained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model except the output layer, and the latter is the output layer of the model. 
-The main purpose of this division is to facilitate the fine-tuning of model parameters of all layers but the output layer. The member variable `output` of source model is shown below.
+Iš anksto apmokytas šaltinio modelio egzempliorius turi du narių kintamuosius: `features` ir `output`. Pirmasis apima visus modelio sluoksnius, išskyrus išvesties sluoksnį, o antrasis yra modelio išvesties sluoksnis.
+Pagrindinis šio padalijimo tikslas – palengvinti visų sluoksnių, išskyrus išvesties sluoksnį, modelio parametrų patikslinimą. Šaltinio modelio narys kintamasis `output` pateiktas toliau.
 :end_tab:
 
 :begin_tab:`pytorch`
-The pretrained source model instance contains a number of feature layers and an output layer `fc`.
-The main purpose of this division is to facilitate the fine-tuning of model parameters of all layers but the output layer. The member variable `fc` of source model is given below.
+Iš anksto apmokytas šaltinio modelio egzempliorius turi keletą požymių sluoksnių ir išvesties sluoksnį `fc`.
+Pagrindinis šio padalijimo tikslas – palengvinti visų sluoksnių, išskyrus išvesties sluoksnį, modelio parametrų patikslinimą. Šaltinio modelio narys kintamasis `fc` pateiktas toliau.
 :end_tab:
 
 ```{.python .input}
@@ -216,19 +215,19 @@ pretrained_net.output
 pretrained_net.fc
 ```
 
-As a fully connected layer, it transforms ResNet's final global average pooling outputs into 1000 class outputs of the ImageNet dataset.
-We then construct a new neural network as the target model. It is defined in the same way as the pretrained source model except that
-its number of outputs in the final layer
-is set to
-the number of classes in the target dataset (rather than 1000).
+Kaip pilnai sujungtas sluoksnis, jis paverčia ResNet galutinio globalaus sutelkimo vidurkinant išvestis į 1000 ImageNet duomenų rinkinio klasių išvesčių.
+Tada sukonstruojame naują neuroninį tinklą kaip tikslo modelį. Jis apibrėžiamas taip pat kaip iš anksto apmokytas šaltinio modelis, tik
+jo išvesčių skaičius paskutiniame sluoksnyje
+nustatomas lygus
+klasių skaičiui tikslo duomenų rinkinyje (o ne 1000).
 
-In the code below, the model parameters before the output layer of the target model instance `finetune_net` are initialized to model parameters of the corresponding layers from the source model.
-Since these model parameters were obtained via pretraining on ImageNet, 
-they are effective.
-Therefore, we can only use 
-a small learning rate to *fine-tune* such pretrained parameters.
-In contrast, model parameters in the output layer are randomly initialized and generally require a larger learning rate to be learned from scratch.
-Letting the base learning rate be $\eta$, a learning rate of $10\eta$ will be used to iterate the model parameters in the output layer.
+Toliau pateiktame kode tikslo modelio egzemplioriaus `finetune_net` modelio parametrai prieš išvesties sluoksnį inicializuojami atitinkamų šaltinio modelio sluoksnių modelio parametrais.
+Kadangi šie modelio parametrai buvo gauti išankstiniu apmokymu ImageNet duomenų rinkinyje,
+jie yra veiksmingi.
+Todėl tokius iš anksto apmokytus parametrus galime *patikslinti* naudodami tik
+mažą mokymosi greitį.
+Priešingai, išvesties sluoksnio modelio parametrai inicializuojami atsitiktinai ir paprastai reikalauja didesnio mokymosi greičio, kad būtų išmokti nuo nulio.
+Tegul bazinis mokymosi greitis yra $\eta$; tada išvesties sluoksnio modelio parametrams iteruoti bus naudojamas $10\eta$ mokymosi greitis.
 
 ```{.python .input}
 #@tab mxnet
@@ -247,9 +246,9 @@ finetune_net.fc = nn.Linear(finetune_net.fc.in_features, 2)
 nn.init.xavier_uniform_(finetune_net.fc.weight);
 ```
 
-### [**Fine-Tuning the Model**]
+### [**Modelio patikslinimas**]
 
-First, we define a training function `train_fine_tuning` that uses fine-tuning so it can be called multiple times.
+Pirmiausia apibrėžiame apmokymo funkciją `train_fine_tuning`, kuri naudoja patikslinimą, kad ją būtų galima iškviesti kelis kartus.
 
 ```{.python .input}
 #@tab mxnet
@@ -296,8 +295,8 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5,
                    devices)
 ```
 
-We [**set the base learning rate to a small value**]
-in order to *fine-tune* the model parameters obtained via pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
+[**Bazinį mokymosi greitį nustatome į mažą reikšmę**],
+kad *patikslintume* išankstiniu apmokymu gautus modelio parametrus. Remiantis ankstesnėmis nuostatomis, tikslo modelio išvesties sluoksnio parametrus apmokysime nuo nulio, naudodami dešimt kartų didesnį mokymosi greitį.
 
 ```{.python .input}
 #@tab mxnet
@@ -309,7 +308,7 @@ train_fine_tuning(finetune_net, 0.01)
 train_fine_tuning(finetune_net, 5e-5)
 ```
 
-[**For comparison,**] we define an identical model, but (**initialize all of its model parameters to random values**). Since the entire model needs to be trained from scratch, we can use a larger learning rate.
+[**Palyginimui**] apibrėžiame identišką modelį, bet (**visus jo modelio parametrus inicializuojame atsitiktinėmis reikšmėmis**). Kadangi visą modelį reikia apmokyti nuo nulio, galime naudoti didesnį mokymosi greitį.
 
 ```{.python .input}
 #@tab mxnet
@@ -325,22 +324,22 @@ scratch_net.fc = nn.Linear(scratch_net.fc.in_features, 2)
 train_fine_tuning(scratch_net, 5e-4, param_group=False)
 ```
 
-As we can see, the fine-tuned model tends to perform better for the same epoch
-because its initial parameter values are more effective.
+Kaip matome, patikslintas modelis per tą patį epochų skaičių linkęs veikti geriau,
+nes jo pradinės parametrų reikšmės yra veiksmingesnės.
 
 
-## Summary
+## Santrauka
 
-* Transfer learning transfers knowledge learned from the source dataset to the target dataset. Fine-tuning is a common technique for transfer learning.
-* The target model copies all model designs with their parameters from the source model except the output layer, and fine-tunes these parameters based on the target dataset. In contrast, the output layer of the target model needs to be trained from scratch.
-* Generally, fine-tuning parameters uses a smaller learning rate, while training the output layer from scratch can use a larger learning rate.
+* Perkeliamasis mokymasis perkelia žinias, išmoktas iš šaltinio duomenų rinkinio, į tikslo duomenų rinkinį. Patikslinimas yra įprasta perkeliamojo mokymosi technika.
+* Tikslo modelis nukopijuoja visus šaltinio modelio dizainus su jų parametrais, išskyrus išvesties sluoksnį, ir patikslina šiuos parametrus pagal tikslo duomenų rinkinį. Priešingai, tikslo modelio išvesties sluoksnį reikia apmokyti nuo nulio.
+* Paprastai patikslinant parametrus naudojamas mažesnis mokymosi greitis, o išvesties sluoksniui apmokyti nuo nulio galima naudoti didesnį mokymosi greitį.
 
 
-## Exercises
+## Pratimai
 
-1. Keep increasing the learning rate of `finetune_net`. How does the accuracy of the model change?
-2. Further adjust hyperparameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still differ in accuracy?
-3. Set the parameters before the output layer of `finetune_net` to those of the source model and do *not* update them during training. How does the accuracy of the model change? You can use the following code.
+1. Toliau didinkite `finetune_net` mokymosi greitį. Kaip kinta modelio tikslumas?
+2. Toliau koreguokite `finetune_net` ir `scratch_net` hiperparametrus lyginamajame eksperimente. Ar jų tikslumas vis dar skiriasi?
+3. Nustatykite `finetune_net` parametrus prieš išvesties sluoksnį lygius šaltinio modelio parametrams ir *neatnaujinkite* jų apmokymo metu. Kaip kinta modelio tikslumas? Galite naudoti toliau pateiktą kodą.
 
 ```{.python .input}
 #@tab mxnet
@@ -353,7 +352,7 @@ for param in finetune_net.parameters():
     param.requires_grad = False
 ```
 
-4. In fact, there is a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter in the output layer can be obtained via the following code. How can we leverage this weight parameter?
+4. Iš tikrųjų `ImageNet` duomenų rinkinyje yra „hotdog“ klasė. Jos atitinkamą svorio parametrą išvesties sluoksnyje galima gauti naudojant toliau pateiktą kodą. Kaip galime pasinaudoti šiuo svorio parametru?
 
 ```{.python .input}
 #@tab mxnet
@@ -370,9 +369,9 @@ hotdog_w.shape
 ```
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/368)
+[Diskusijos](https://discuss.d2l.ai/t/368)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1439)
+[Diskusijos](https://discuss.d2l.ai/t/1439)
 :end_tab:

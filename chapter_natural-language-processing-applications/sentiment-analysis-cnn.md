@@ -1,41 +1,39 @@
-# Sentiment Analysis: Using Convolutional Neural Networks
-:label:`sec_sentiment_cnn` 
+# Nuotaikų analizė: naudojant konvoliucinius neuroninius tinklus
+:label:`sec_sentiment_cnn`
 
 
-In :numref:`chap_cnn`,
-we investigated mechanisms
-for processing
-two-dimensional image data
-with two-dimensional CNNs,
-which were applied to
-local features such as adjacent pixels.
-Though originally
-designed for computer vision,
-CNNs are also widely used
-for natural language processing.
-Simply put,
-just think of any text sequence
-as a one-dimensional image.
-In this way,
-one-dimensional CNNs
-can process local features
-such as $n$-grams in text.
+:numref:`chap_cnn`
+nagrinėjome mechanizmus
+dvimačiams vaizdų duomenims apdoroti
+dvimačiais CNN,
+kurie buvo taikomi
+lokaliems požymiams, tokiems kaip gretimi pikseliai.
+Nors iš pradžių
+buvo sukurti kompiuterinei regai,
+CNN taip pat plačiai naudojami
+natūraliosios kalbos apdorojime.
+Paprastai tariant,
+tiesiog įsivaizduokite bet kurią teksto seką
+kaip vienmatį vaizdą.
+Taip
+vienmačiai CNN
+gali apdoroti lokalius požymius,
+tokius kaip $n$-gramos tekste.
 
-In this section,
-we will use the *textCNN* model
-to demonstrate
-how to design a CNN architecture
-for representing single text :cite:`Kim.2014`.
-Compared with
-:numref:`fig_nlp-map-sa-rnn`
-that uses an RNN architecture with GloVe pretraining
-for sentiment analysis,
-the only difference in :numref:`fig_nlp-map-sa-cnn`
-lies in
-the choice of the architecture.
+Šiame skyrelyje
+naudosime *textCNN* modelį,
+kad parodytume,
+kaip suprojektuoti CNN architektūrą
+atskiram tekstui vaizduoti :cite:`Kim.2014`.
+Palyginti su
+:numref:`fig_nlp-map-sa-rnn`,
+kuriame nuotaikų analizei naudojama RNN architektūra su GloVe išankstiniu apmokymu,
+vienintelis skirtumas :numref:`fig_nlp-map-sa-cnn`
+yra
+architektūros pasirinkimas.
 
 
-![This section feeds pretrained GloVe to a CNN-based architecture for sentiment analysis.](../img/nlp-map-sa-cnn.svg)
+![Šiame skyrelyje iš anksto apmokytas GloVe paduodamas į CNN pagrįstą architektūrą nuotaikų analizei.](../img/nlp-map-sa-cnn.svg)
 :label:`fig_nlp-map-sa-cnn`
 
 ```{.python .input}
@@ -59,34 +57,34 @@ batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
-## One-Dimensional Convolutions
+## Vienmatės konvoliucijos
 
-Before introducing the model,
-let's see how a one-dimensional convolution works.
-Bear in mind that it is just a special case
-of a two-dimensional convolution
-based on the cross-correlation operation.
+Prieš pristatydami modelį,
+pažiūrėkime, kaip veikia vienmatė konvoliucija.
+Atminkite, kad tai tik ypatingas
+dvimatės konvoliucijos atvejis,
+pagrįstas kryžminės koreliacijos operacija.
 
-![One-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2=2$.](../img/conv1d.svg)
+![Vienmatė kryžminės koreliacijos operacija. Užtamsintos dalys yra pirmasis išvesties elementas, taip pat išvesties skaičiavimui naudojami įvesties ir branduolio tenzorių elementai: $0\times1+1\times2=2$.](../img/conv1d.svg)
 :label:`fig_conv1d`
 
-As shown in :numref:`fig_conv1d`,
-in the one-dimensional case,
-the convolution window
-slides from left to right
-across the input tensor.
-During sliding,
-the input subtensor (e.g., $0$ and $1$ in :numref:`fig_conv1d`) contained in the convolution window
-at a certain position
-and the kernel tensor (e.g., $1$ and $2$ in :numref:`fig_conv1d`) are multiplied elementwise.
-The sum of these multiplications
-gives the single scalar value (e.g., $0\times1+1\times2=2$ in :numref:`fig_conv1d`)
-at the corresponding position of the output tensor.
+Kaip parodyta :numref:`fig_conv1d`,
+vienmačiu atveju
+konvoliucijos langas
+slenka iš kairės į dešinę
+per įvesties tenzorių.
+Slinkdamas
+įvesties potenzorius (pvz., $0$ ir $1$ :numref:`fig_conv1d`), esantis konvoliucijos lange
+tam tikroje padėtyje,
+ir branduolio tenzorius (pvz., $1$ ir $2$ :numref:`fig_conv1d`) dauginami elementas po elemento.
+Šių sandaugų suma
+duoda vieną skaliarinę reikšmę (pvz., $0\times1+1\times2=2$ :numref:`fig_conv1d`)
+atitinkamoje išvesties tenzoriaus padėtyje.
 
-We implement one-dimensional cross-correlation in the following `corr1d` function.
-Given an input tensor `X`
-and a kernel tensor `K`,
-it returns the output tensor `Y`.
+Vienmatę kryžminę koreliaciją įgyvendiname šioje funkcijoje `corr1d`.
+Turint įvesties tenzorių `X`
+ir branduolio tenzorių `K`,
+ji grąžina išvesties tenzorių `Y`.
 
 ```{.python .input}
 #@tab all
@@ -98,7 +96,7 @@ def corr1d(X, K):
     return Y
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_conv1d` to validate the output of the above one-dimensional cross-correlation implementation.
+Galime sukonstruoti įvesties tenzorių `X` ir branduolio tenzorių `K` iš :numref:`fig_conv1d`, kad patvirtintume aukščiau pateikto vienmatės kryžminės koreliacijos įgyvendinimo išvestį.
 
 ```{.python .input}
 #@tab all
@@ -106,22 +104,22 @@ X, K = d2l.tensor([0, 1, 2, 3, 4, 5, 6]), d2l.tensor([1, 2])
 corr1d(X, K)
 ```
 
-For any
-one-dimensional input with multiple channels,
-the convolution kernel
-needs to have the same number of input channels.
-Then for each channel,
-perform a cross-correlation operation on the one-dimensional tensor of the input and the one-dimensional tensor of the convolution kernel,
-summing the results over all the channels
-to produce the one-dimensional output tensor.
-:numref:`fig_conv1d_channel` shows a one-dimensional cross-correlation operation with 3 input channels.
+Bet kuriai
+vienmatei įvesčiai su keliais kanalais
+konvoliucijos branduolys
+turi turėti tiek pat įvesties kanalų.
+Tada kiekvienam kanalui
+atliekama kryžminės koreliacijos operacija su vienmačiu įvesties tenzoriumi ir vienmačiu konvoliucijos branduolio tenzoriumi,
+rezultatus susumuojant per visus kanalus,
+kad gautume vienmatį išvesties tenzorių.
+:numref:`fig_conv1d_channel` parodyta vienmatė kryžminės koreliacijos operacija su 3 įvesties kanalais.
 
-![One-dimensional cross-correlation operation with 3 input channels. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
+![Vienmatė kryžminės koreliacijos operacija su 3 įvesties kanalais. Užtamsintos dalys yra pirmasis išvesties elementas, taip pat išvesties skaičiavimui naudojami įvesties ir branduolio tenzorių elementai: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
 :label:`fig_conv1d_channel`
 
 
-We can implement the one-dimensional cross-correlation operation for multiple input channels
-and validate the results in :numref:`fig_conv1d_channel`.
+Galime įgyvendinti vienmatę kryžminės koreliacijos operaciją kelių įvesties kanalų atveju
+ir patvirtinti rezultatus :numref:`fig_conv1d_channel`.
 
 ```{.python .input}
 #@tab all
@@ -137,114 +135,108 @@ K = d2l.tensor([[1, 2], [3, 4], [-1, -3]])
 corr1d_multi_in(X, K)
 ```
 
-Note that
-multi-input-channel one-dimensional cross-correlations
-are equivalent
-to
-single-input-channel
-two-dimensional cross-correlations.
-To illustrate,
-an equivalent form of
-the multi-input-channel one-dimensional cross-correlation
-in :numref:`fig_conv1d_channel`
-is
-the
-single-input-channel
-two-dimensional cross-correlation
-in :numref:`fig_conv1d_2d`,
-where the height of the convolution kernel
-has to be the same as that of the input tensor.
+Atkreipkite dėmesį, kad
+vienmatės kryžminės koreliacijos su keliais įvesties kanalais
+yra ekvivalentios
+dvimatėms kryžminėms koreliacijoms
+su vienu įvesties kanalu.
+Kad iliustruotume,
+ekvivalentiška
+vienmatės kryžminės koreliacijos su keliais įvesties kanalais
+:numref:`fig_conv1d_channel` forma
+yra
+dvimatė kryžminė koreliacija
+su vienu įvesties kanalu
+:numref:`fig_conv1d_2d`,
+kur konvoliucijos branduolio aukštis
+turi būti toks pat kaip įvesties tenzoriaus.
 
 
-![Two-dimensional cross-correlation operation with a single input channel. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
+![Dvimatė kryžminės koreliacijos operacija su vienu įvesties kanalu. Užtamsintos dalys yra pirmasis išvesties elementas, taip pat išvesties skaičiavimui naudojami įvesties ir branduolio tenzorių elementai: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
 :label:`fig_conv1d_2d`
 
-Both the outputs in :numref:`fig_conv1d` and :numref:`fig_conv1d_channel` have only one channel.
-Same as two-dimensional convolutions with multiple output channels described in :numref:`subsec_multi-output-channels`,
-we can also specify multiple output channels
-for one-dimensional convolutions.
+Abiejų :numref:`fig_conv1d` ir :numref:`fig_conv1d_channel` išvestys turi tik vieną kanalą.
+Kaip ir dvimatėms konvoliucijoms su keliais išvesties kanalais, aprašytoms :numref:`subsec_multi-output-channels`,
+vienmatėms konvoliucijoms taip pat galime nurodyti kelis išvesties kanalus.
 
-## Max-Over-Time Pooling
+## Sutelkimas imant maksimumą per laiką
 
-Similarly, we can use pooling
-to extract the highest value
-from sequence representations
-as the most important feature
-across time steps.
-The *max-over-time pooling* used in textCNN
-works like
-the one-dimensional global max-pooling
+Panašiai galime naudoti sutelkimą,
+kad iš sekos vaizdavimų išgautume
+didžiausią reikšmę
+kaip svarbiausią požymį
+per laiko žingsnius.
+textCNN naudojamas *sutelkimas imant maksimumą per laiką*
+veikia kaip
+vienmatis globalus sutelkimas imant maksimumą
 :cite:`Collobert.Weston.Bottou.ea.2011`.
-For a multi-channel input
-where each channel stores values
-at different time steps,
-the output at each channel
-is the maximum value
-for that channel.
-Note that
-the max-over-time pooling
-allows different numbers of time steps
-at different channels.
+Kelių kanalų įvesčiai,
+kurioje kiekvienas kanalas saugo reikšmes
+skirtingais laiko žingsniais,
+kiekvieno kanalo išvestis
+yra
+to kanalo didžiausia reikšmė.
+Atkreipkite dėmesį, kad
+sutelkimas imant maksimumą per laiką
+leidžia skirtingą laiko žingsnių skaičių
+skirtinguose kanaluose.
 
-## The textCNN Model
+## textCNN modelis
 
-Using the one-dimensional convolution
-and max-over-time pooling,
-the textCNN model
-takes individual pretrained token representations
-as input,
-then obtains and transforms sequence representations
-for the downstream application.
+Naudodamas vienmatę konvoliuciją
+ir sutelkimą imant maksimumą per laiką,
+textCNN modelis
+kaip įvestį priima atskirus iš anksto apmokytus teksto vienetų vaizdavimus,
+tada gauna ir paverčia sekos vaizdavimus
+tolesniam taikymui.
 
-For a single text sequence
-with $n$ tokens represented by
-$d$-dimensional vectors,
-the width, height, and number of channels
-of the input tensor
-are $n$, $1$, and $d$, respectively.
-The textCNN model transforms the input
-into the output as follows:
+Vienai teksto sekai
+su $n$ teksto vienetų, vaizduojamų
+$d$ dimensijų vektoriais,
+įvesties tenzoriaus plotis, aukštis ir kanalų skaičius
+yra atitinkamai $n$, $1$ ir $d$.
+textCNN modelis paverčia įvestį
+išvestimi taip:
 
-1. Define multiple one-dimensional convolution kernels and perform convolution operations separately on the inputs. Convolution kernels with different widths may capture local features among different numbers of adjacent tokens.
-1. Perform max-over-time pooling on all the output channels, and then concatenate all the scalar pooling outputs as a vector.
-1. Transform the concatenated vector into the output categories using the fully connected layer. Dropout can be used for reducing overfitting.
+1. Apibrėžkite kelis vienmačius konvoliucijos branduolius ir atlikite konvoliucijos operacijas atskirai su įvestimis. Skirtingo pločio konvoliucijos branduoliai gali užfiksuoti lokalius požymius tarp skirtingo skaičiaus gretimų teksto vienetų.
+1. Atlikite sutelkimą imant maksimumą per laiką visiems išvesties kanalams, o tada sukonkatenuokite visas skaliarines sutelkimo išvestis į vieną vektorių.
+1. Paverskite sukonkatenuotą vektorių išvesties kategorijomis naudodami pilnai sujungtą sluoksnį. Persimokymui sumažinti galima naudoti dropout.
 
-![The model architecture of textCNN.](../img/textcnn.svg)
+![textCNN modelio architektūra.](../img/textcnn.svg)
 :label:`fig_conv1d_textcnn`
 
 :numref:`fig_conv1d_textcnn`
-illustrates the model architecture of textCNN
-with a concrete example.
-The input is a sentence with 11 tokens,
-where
-each token is represented by a 6-dimensional vectors.
-So we have a 6-channel input with width 11.
-Define
-two one-dimensional convolution kernels
-of widths 2 and 4,
-with 4 and 5 output channels, respectively.
-They produce
-4 output channels with width $11-2+1=10$
-and 5 output channels with width $11-4+1=8$.
-Despite different widths of these 9 channels,
-the max-over-time pooling
-gives a concatenated 9-dimensional vector,
-which is finally transformed
-into a 2-dimensional output vector
-for binary sentiment predictions.
+iliustruoja textCNN modelio architektūrą
+konkrečiu pavyzdžiu.
+Įvestis yra sakinys su 11 teksto vienetų,
+kur
+kiekvienas teksto vienetas vaizduojamas 6 dimensijų vektoriais.
+Taigi turime 6 kanalų įvestį, kurios plotis 11.
+Apibrėžiame
+du vienmačius konvoliucijos branduolius,
+kurių plotis 2 ir 4,
+su atitinkamai 4 ir 5 išvesties kanalais.
+Jie sukuria
+4 išvesties kanalus, kurių plotis $11-2+1=10$,
+ir 5 išvesties kanalus, kurių plotis $11-4+1=8$.
+Nepaisant skirtingų šių 9 kanalų pločių,
+sutelkimas imant maksimumą per laiką
+duoda sukonkatenuotą 9 dimensijų vektorių,
+kuris galiausiai paverčiamas
+2 dimensijų išvesties vektoriumi
+dvejetainėms nuotaikų prognozėms.
 
 
 
-### Defining the Model
+### Modelio apibrėžimas
 
-We implement the textCNN model in the following class.
-Compared with the bidirectional RNN model in
+textCNN modelį įgyvendiname šioje klasėje.
+Palyginti su dvikrypčiu RNN modeliu
 :numref:`sec_sentiment_rnn`,
-besides
-replacing recurrent layers with convolutional layers,
-we also use two embedding layers:
-one with trainable weights and the other
-with fixed weights.
+be rekurentinių sluoksnių pakeitimo konvoliuciniais sluoksniais,
+taip pat naudojame du įterpinių sluoksnius:
+vieną su apmokomais svoriais, o kitą
+su fiksuotais svoriais.
 
 ```{.python .input}
 #@tab mxnet
@@ -321,8 +313,8 @@ class TextCNN(nn.Module):
         return outputs
 ```
 
-Let's create a textCNN instance.
-It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
+Sukurkime textCNN egzempliorių.
+Jis turi 3 konvoliucinius sluoksnius su branduolių pločiais 3, 4 ir 5, visi su 100 išvesties kanalų.
 
 ```{.python .input}
 #@tab mxnet
@@ -345,14 +337,14 @@ def init_weights(module):
 net.apply(init_weights);
 ```
 
-### Loading Pretrained Word Vectors
+### Iš anksto apmokytų žodžių vektorių įkėlimas
 
-Same as :numref:`sec_sentiment_rnn`,
-we load pretrained 100-dimensional GloVe embeddings
-as the initialized token representations.
-These token representations (embedding weights)
-will be trained in `embedding`
-and fixed in `constant_embedding`.
+Kaip ir :numref:`sec_sentiment_rnn`,
+įkeliame iš anksto apmokytus 100 dimensijų GloVe įterpinius
+kaip pradinius teksto vienetų vaizdavimus.
+Šie teksto vienetų vaizdavimai (įterpinių svoriai)
+bus apmokomi `embedding`
+ir fiksuoti `constant_embedding`.
 
 ```{.python .input}
 #@tab mxnet
@@ -372,9 +364,9 @@ net.constant_embedding.weight.data.copy_(embeds)
 net.constant_embedding.weight.requires_grad = False
 ```
 
-### Training and Evaluating the Model
+### Modelio apmokymas ir vertinimas
 
-Now we can train the textCNN model for sentiment analysis.
+Dabar galime apmokyti textCNN modelį nuotaikų analizei.
 
 ```{.python .input}
 #@tab mxnet
@@ -392,7 +384,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-Below we use the trained model to predict the sentiment for two simple sentences.
+Toliau naudojame apmokytą modelį dviejų paprastų sakinių nuotaikai prognozuoti.
 
 ```{.python .input}
 #@tab all
@@ -404,24 +396,24 @@ d2l.predict_sentiment(net, vocab, 'this movie is so great')
 d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
-## Summary
+## Santrauka
 
-* One-dimensional CNNs can process local features such as $n$-grams in text.
-* Multi-input-channel one-dimensional cross-correlations are equivalent to single-input-channel two-dimensional cross-correlations.
-* The max-over-time pooling allows different numbers of time steps at different channels.
-* The textCNN model transforms individual token representations into downstream application outputs using one-dimensional convolutional layers and max-over-time pooling layers.
+* Vienmačiai CNN gali apdoroti lokalius požymius, tokius kaip $n$-gramos tekste.
+* Vienmatės kryžminės koreliacijos su keliais įvesties kanalais yra ekvivalentios dvimatėms kryžminėms koreliacijoms su vienu įvesties kanalu.
+* Sutelkimas imant maksimumą per laiką leidžia skirtingą laiko žingsnių skaičių skirtinguose kanaluose.
+* textCNN modelis paverčia atskirus teksto vienetų vaizdavimus tolesnio taikymo išvestimis naudodamas vienmačius konvoliucinius sluoksnius ir sutelkimo imant maksimumą per laiką sluoksnius.
 
 
-## Exercises
+## Pratimai
 
-1. Tune hyperparameters and compare the two architectures for sentiment analysis in :numref:`sec_sentiment_rnn` and in this section, such as in classification accuracy and computational efficiency.
-1. Can you further improve the classification accuracy of the model by using the methods introduced in the exercises of :numref:`sec_sentiment_rnn`?
-1. Add positional encoding in the input representations. Does it improve the classification accuracy?
+1. Derinkite hiperparametrus ir palyginkite dvi nuotaikų analizės architektūras :numref:`sec_sentiment_rnn` ir šiame skyrelyje, pavyzdžiui, klasifikavimo tikslumu ir skaičiavimo efektyvumu.
+1. Ar galite dar labiau pagerinti modelio klasifikavimo tikslumą naudodami metodus, pristatytus :numref:`sec_sentiment_rnn` pratimuose?
+1. Pridėkite pozicinį kodavimą įvesties vaizdavimuose. Ar tai pagerina klasifikavimo tikslumą?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/393)
+[Diskusijos](https://discuss.d2l.ai/t/393)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1425)
+[Diskusijos](https://discuss.d2l.ai/t/1425)
 :end_tab:

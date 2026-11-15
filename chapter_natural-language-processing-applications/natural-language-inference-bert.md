@@ -1,24 +1,24 @@
-# Natural Language Inference: Fine-Tuning BERT
+# Natūraliosios kalbos išvadų darymas: BERT patikslinimas
 :label:`sec_natural-language-inference-bert`
 
-In earlier sections of this chapter,
-we have designed an attention-based architecture
-(in :numref:`sec_natural-language-inference-attention`)
-for the natural language inference task
-on the SNLI dataset (as described in :numref:`sec_natural-language-inference-and-dataset`).
-Now we revisit this task by fine-tuning BERT.
-As discussed in :numref:`sec_finetuning-bert`,
-natural language inference is a sequence-level text pair classification problem,
-and fine-tuning BERT only requires an additional MLP-based architecture,
-as illustrated in :numref:`fig_nlp-map-nli-bert`.
+Ankstesniuose šio skyriaus skyreliuose
+suprojektavome dėmesio sutelkimu pagrįstą architektūrą
+(:numref:`sec_natural-language-inference-attention`)
+natūraliosios kalbos išvadų darymo užduočiai
+SNLI duomenų rinkinyje (kaip aprašyta :numref:`sec_natural-language-inference-and-dataset`).
+Dabar grįžtame prie šios užduoties patikslindami BERT.
+Kaip aptarta :numref:`sec_finetuning-bert`,
+natūraliosios kalbos išvadų darymas yra sekos lygmens tekstų porų klasifikavimo problema,
+o BERT patikslinimui reikia tik papildomos MLP pagrįstos architektūros,
+kaip iliustruota :numref:`fig_nlp-map-nli-bert`.
 
-![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
+![Šiame skyrelyje iš anksto apmokytas BERT paduodamas į MLP pagrįstą architektūrą natūraliosios kalbos išvadų darymui.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
 
-In this section,
-we will download a pretrained small version of BERT,
-then fine-tune it
-for natural language inference on the SNLI dataset.
+Šiame skyrelyje
+atsisiųsime iš anksto apmokytą mažą BERT versiją,
+tada ją patikslinsime
+natūraliosios kalbos išvadų darymui SNLI duomenų rinkinyje.
 
 ```{.python .input}
 #@tab mxnet
@@ -42,17 +42,17 @@ from torch import nn
 import os
 ```
 
-## [**Loading Pretrained BERT**]
+## [**Iš anksto apmokyto BERT įkėlimas**]
 
-We have explained how to pretrain BERT on the WikiText-2 dataset in
-:numref:`sec_bert-dataset` and :numref:`sec_bert-pretraining`
-(note that the original BERT model is pretrained on much bigger corpora).
-As discussed in :numref:`sec_bert-pretraining`,
-the original BERT model has hundreds of millions of parameters.
-In the following,
-we provide two versions of pretrained BERT:
-"bert.base" is about as big as the original BERT base model that requires a lot of computational resources to fine-tune,
-while "bert.small" is a small version to facilitate demonstration.
+Paaiškinome, kaip iš anksto apmokyti BERT WikiText-2 duomenų rinkinyje
+:numref:`sec_bert-dataset` ir :numref:`sec_bert-pretraining`
+(atkreipkite dėmesį, kad originalus BERT modelis iš anksto apmokytas daug didesniuose tekstynuose).
+Kaip aptarta :numref:`sec_bert-pretraining`,
+originalus BERT modelis turi šimtus milijonų parametrų.
+Toliau
+pateikiame dvi iš anksto apmokyto BERT versijas:
+„bert.base“ yra maždaug tokio dydžio kaip originalus bazinis BERT modelis, kuriam patikslinti reikia daug skaičiavimo išteklių,
+o „bert.small“ yra maža versija demonstravimui palengvinti.
 
 ```{.python .input}
 #@tab mxnet
@@ -70,9 +70,9 @@ d2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.torch.zip',
                               'c72329e68a732bef0452e4b96a1c341c8910f81f')
 ```
 
-Either pretrained BERT model contains a "vocab.json" file that defines the vocabulary set
-and a "pretrained.params" file of the pretrained parameters.
-We implement the following `load_pretrained_model` function to [**load pretrained BERT parameters**].
+Abiejuose iš anksto apmokytuose BERT modeliuose yra failas „vocab.json“, apibrėžiantis žodyno aibę,
+ir failas „pretrained.params“ su iš anksto apmokytais parametrais.
+Įgyvendiname šią funkciją `load_pretrained_model`, kad [**įkeltume iš anksto apmokytus BERT parametrus**].
 
 ```{.python .input}
 #@tab mxnet
@@ -111,9 +111,9 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
     return bert, vocab
 ```
 
-To facilitate demonstration on most of machines,
-we will load and fine-tune the small version ("bert.small") of the pretrained BERT in this section.
-In the exercise, we will show how to fine-tune the much larger "bert.base" to significantly improve the testing accuracy.
+Kad demonstravimą būtų galima atlikti daugumoje kompiuterių,
+šiame skyrelyje įkelsime ir patikslinsime mažą iš anksto apmokyto BERT versiją („bert.small“).
+Pratime parodysime, kaip patikslinti daug didesnį „bert.base“, kad gerokai pagerintume testavimo tikslumą.
 
 ```{.python .input}
 #@tab all
@@ -123,21 +123,21 @@ bert, vocab = load_pretrained_model(
     num_blks=2, dropout=0.1, max_len=512, devices=devices)
 ```
 
-## [**The Dataset for Fine-Tuning BERT**]
+## [**Duomenų rinkinys BERT patikslinimui**]
 
-For the downstream task natural language inference on the SNLI dataset,
-we define a customized dataset class `SNLIBERTDataset`.
-In each example,
-the premise and hypothesis form a pair of text sequence
-and is packed into one BERT input sequence as depicted in :numref:`fig_bert-two-seqs`.
-Recall :numref:`subsec_bert_input_rep` that segment IDs
-are used to distinguish the premise and the hypothesis in a BERT input sequence.
-With the predefined maximum length of a BERT input sequence (`max_len`),
-the last token of the longer of the input text pair keeps getting removed until
-`max_len` is met.
-To accelerate generation of the SNLI dataset
-for fine-tuning BERT,
-we use 4 worker processes to generate training or testing examples in parallel.
+Tolesnei užduočiai – natūraliosios kalbos išvadų darymui SNLI duomenų rinkinyje –
+apibrėžiame pritaikytą duomenų rinkinio klasę `SNLIBERTDataset`.
+Kiekviename pavyzdyje
+prielaida ir hipotezė sudaro teksto sekų porą,
+kuri supakuojama į vieną BERT įvesties seką, kaip pavaizduota :numref:`fig_bert-two-seqs`.
+Prisiminkite :numref:`subsec_bert_input_rep`, kad segmentų ID
+naudojami atskirti prielaidą ir hipotezę BERT įvesties sekoje.
+Esant iš anksto apibrėžtam didžiausiam BERT įvesties sekos ilgiui (`max_len`),
+ilgesnės įvesties teksto poros paskutinis teksto vienetas ir toliau šalinamas, kol
+pasiekiamas `max_len`.
+Kad paspartintume SNLI duomenų rinkinio generavimą
+BERT patikslinimui,
+naudojame 4 darbinius procesus apmokymo ar testavimo pavyzdžiams generuoti lygiagrečiai.
 
 ```{.python .input}
 #@tab mxnet
@@ -247,11 +247,11 @@ class SNLIBERTDataset(torch.utils.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-After downloading the SNLI dataset,
-we [**generate training and testing examples**]
-by instantiating the `SNLIBERTDataset` class.
-Such examples will be read in minibatches during training and testing
-of natural language inference.
+Atsisiuntę SNLI duomenų rinkinį,
+[**sugeneruojame apmokymo ir testavimo pavyzdžius**]
+sukurdami klasės `SNLIBERTDataset` egzempliorius.
+Tokie pavyzdžiai bus skaitomi minirinkiniais natūraliosios kalbos išvadų darymo
+apmokymo ir testavimo metu.
 
 ```{.python .input}
 #@tab mxnet
@@ -281,17 +281,17 @@ test_iter = torch.utils.data.DataLoader(test_set, batch_size,
                                   num_workers=num_workers)
 ```
 
-## Fine-Tuning BERT
+## BERT patikslinimas
 
-As :numref:`fig_bert-two-seqs` indicates,
-fine-tuning BERT for natural language inference
-requires only an extra MLP consisting of two fully connected layers
-(see `self.hidden` and `self.output` in the following `BERTClassifier` class).
-[**This MLP transforms the
-BERT representation of the special “&lt;cls&gt;” token**],
-which encodes the information of both the premise and the hypothesis,
-(**into three outputs of natural language inference**):
-entailment, contradiction, and neutral.
+Kaip rodo :numref:`fig_bert-two-seqs`,
+BERT patikslinimui natūraliosios kalbos išvadų darymui
+reikia tik papildomo MLP, sudaryto iš dviejų pilnai sujungtų sluoksnių
+(žr. `self.hidden` ir `self.output` šioje klasėje `BERTClassifier`).
+[**Šis MLP paverčia
+specialaus teksto vieneto „&lt;cls&gt;“ BERT vaizdavimą**],
+kuris užkoduoja ir prielaidos, ir hipotezės informaciją,
+(**į tris natūraliosios kalbos išvadų darymo išvestis**):
+išplaukimą, prieštarą ir neutralumą.
 
 ```{.python .input}
 #@tab mxnet
@@ -323,12 +323,12 @@ class BERTClassifier(nn.Module):
         return self.output(self.hidden(encoded_X[:, 0, :]))
 ```
 
-In the following,
-the pretrained BERT model `bert` is fed into the `BERTClassifier` instance `net` for
-the downstream application.
-In common implementations of BERT fine-tuning,
-only the parameters of the output layer of the additional MLP (`net.output`) will be learned from scratch.
-All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (`net.hidden`) will be fine-tuned.
+Toliau
+iš anksto apmokytas BERT modelis `bert` paduodamas į `BERTClassifier` egzempliorių `net`
+tolesniam taikymui.
+Įprastuose BERT patikslinimo įgyvendinimuose
+tik papildomo MLP išvesties sluoksnio (`net.output`) parametrai bus išmokstami nuo nulio.
+Visi iš anksto apmokyto BERT kodavimo bloko (`net.encoder`) ir papildomo MLP paslėptojo sluoksnio (`net.hidden`) parametrai bus patikslinami.
 
 ```{.python .input}
 #@tab mxnet
@@ -341,26 +341,26 @@ net.output.initialize(ctx=devices)
 net = BERTClassifier(bert)
 ```
 
-Recall that
-in :numref:`sec_bert`
-both the `MaskLM` class and the `NextSentencePred` class
-have parameters in their employed MLPs.
-These parameters are part of those in the pretrained BERT model
-`bert`, and thus part of parameters in `net`.
-However, such parameters are only for computing
-the masked language modeling loss
-and the next sentence prediction loss
-during pretraining.
-These two loss functions are irrelevant to fine-tuning downstream applications,
-thus the parameters of the employed MLPs in 
-`MaskLM` and `NextSentencePred` are not updated (staled) when BERT is fine-tuned.
+Prisiminkite, kad
+:numref:`sec_bert`
+tiek klasė `MaskLM`, tiek klasė `NextSentencePred`
+turi parametrų savo naudojamuose MLP.
+Šie parametrai yra dalis tų, kurie yra iš anksto apmokytame BERT modelyje
+`bert`, taigi ir dalis `net` parametrų.
+Tačiau tokie parametrai skirti tik
+užmaskuoto kalbos modeliavimo nuostoliui
+ir kito sakinio prognozavimo nuostoliui apskaičiuoti
+išankstinio apmokymo metu.
+Šios dvi nuostolių funkcijos nėra svarbios tolesnių taikymų patikslinimui,
+todėl `MaskLM` ir `NextSentencePred` naudojamų MLP parametrai
+nėra atnaujinami (yra pasenę), kai BERT patikslinamas.
 
-To allow parameters with stale gradients,
-the flag `ignore_stale_grad=True` is set in the `step` function of `d2l.train_batch_ch13`.
-We use this function to train and evaluate the model `net` using the training set
-(`train_iter`) and the testing set (`test_iter`) of SNLI.
-Due to the limited computational resources, [**the training**] and testing accuracy
-can be further improved: we leave its discussions in the exercises.
+Kad būtų leidžiami parametrai su pasenusiais gradientais,
+funkcijoje `step` iš `d2l.train_batch_ch13` nustatoma vėliavėlė `ignore_stale_grad=True`.
+Šią funkciją naudojame modeliui `net` apmokyti ir įvertinti naudodami SNLI apmokymo aibę
+(`train_iter`) ir testavimo aibę (`test_iter`).
+Dėl ribotų skaičiavimo išteklių [**apmokymo**] ir testavimo tikslumą
+galima dar pagerinti: jo aptarimą paliekame pratimams.
 
 ```{.python .input}
 #@tab mxnet
@@ -380,22 +380,22 @@ net(next(iter(train_iter))[0])
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-## Summary
+## Santrauka
 
-* We can fine-tune the pretrained BERT model for downstream applications, such as natural language inference on the SNLI dataset.
-* During fine-tuning, the BERT model becomes part of the model for the downstream application. Parameters that are only related to pretraining loss will not be updated during fine-tuning. 
+* Iš anksto apmokytą BERT modelį galime patikslinti tolesniems taikymams, pavyzdžiui, natūraliosios kalbos išvadų darymui SNLI duomenų rinkinyje.
+* Patikslinimo metu BERT modelis tampa tolesnio taikymo modelio dalimi. Parametrai, susiję tik su išankstinio apmokymo nuostoliu, patikslinimo metu nebus atnaujinami.
 
 
 
-## Exercises
+## Pratimai
 
-1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, and `num_blks=2` to 768, 3072, 12, and 12, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
-1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
+1. Jei leidžia jūsų skaičiavimo ištekliai, patikslinkite daug didesnį iš anksto apmokytą BERT modelį, maždaug tokio dydžio kaip originalus bazinis BERT modelis. Nustatykite funkcijos `load_pretrained_model` argumentus taip: pakeiskite „bert.small“ į „bert.base“, padidinkite reikšmes `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4` ir `num_blks=2` atitinkamai iki 768, 3072, 12 ir 12. Padidinę patikslinimo epochų skaičių (ir galbūt derindami kitus hiperparametrus), ar galite gauti didesnį nei 0,86 testavimo tikslumą?
+1. Kaip nukirsti sekų porą pagal jų ilgių santykį? Palyginkite šį porų nukirtimo metodą su naudojamu klasėje `SNLIBERTDataset`. Kokie jų privalumai ir trūkumai?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/397)
+[Diskusijos](https://discuss.d2l.ai/t/397)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1526)
+[Diskusijos](https://discuss.d2l.ai/t/1526)
 :end_tab:

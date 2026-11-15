@@ -1,48 +1,48 @@
-# Semantic Segmentation and the Dataset
+# Semantinis segmentavimas ir duomenų rinkinys
 :label:`sec_semantic_segmentation`
 
-When discussing object detection tasks
-in :numref:`sec_bbox`--:numref:`sec_rcnn`,
-rectangular bounding boxes
-are used to label and predict objects in images.
-This section will discuss the problem of *semantic segmentation*,
-which focuses on how to divide an image into regions belonging to different semantic classes.
-Different from object detection,
-semantic segmentation
-recognizes and understands
-what are in images in pixel level:
-its labeling and prediction of semantic regions are
-in pixel level.
-:numref:`fig_segmentation` shows the labels
-of the dog, cat, and background of the image in semantic segmentation.
-Compared with in object detection,
-the pixel-level borders labeled
-in semantic segmentation are obviously more fine-grained.
+Aptariant objektų aptikimo užduotis
+:numref:`sec_bbox`–:numref:`sec_rcnn`,
+vaizdų objektams pažymėti ir prognozuoti
+naudojami stačiakampiai apibrėžiamieji stačiakampiai.
+Šiame skyrelyje aptarsime *semantinio segmentavimo* uždavinį,
+kuris orientuotas į tai, kaip padalyti vaizdą į sritis, priklausančias skirtingoms semantinėms klasėms.
+Skirtingai nei objektų aptikimas,
+semantinis segmentavimas
+atpažįsta ir supranta,
+kas yra vaizduose, pikselių lygmeniu:
+semantinių sričių žymėjimas ir prognozavimas vyksta
+pikselių lygmeniu.
+:numref:`fig_segmentation` parodyti
+vaizdo šuns, katės ir fono žymenys semantiniame segmentavime.
+Palyginti su objektų aptikimu,
+pikselių lygmens ribos, pažymėtos
+semantiniame segmentavime, akivaizdžiai yra smulkesnės.
 
 
-![Labels of the dog, cat, and background of the image in semantic segmentation.](../img/segmentation.svg)
+![Vaizdo šuns, katės ir fono žymenys semantiniame segmentavime.](../img/segmentation.svg)
 :label:`fig_segmentation`
 
 
-## Image Segmentation and Instance Segmentation
+## Vaizdų segmentavimas ir egzempliorių segmentavimas
 
-There are also two important tasks
-in the field of computer vision that are similar to semantic segmentation,
-namely image segmentation and instance segmentation.
-We will briefly
-distinguish them from semantic segmentation as follows.
+Kompiuterinės regos srityje taip pat yra dvi svarbios užduotys,
+panašios į semantinį segmentavimą,
+būtent vaizdų segmentavimas ir egzempliorių segmentavimas.
+Trumpai
+atskirsime jas nuo semantinio segmentavimo taip.
 
-* *Image segmentation* divides an image into several constituent regions. The methods for this type of problem usually make use of the correlation between pixels in the image. It does not need label information about image pixels during training, and it cannot guarantee that the segmented regions will have the semantics that we hope to obtain during prediction. Taking the image in :numref:`fig_segmentation` as input, image segmentation may divide the dog into two regions: one covers the mouth and eyes which are mainly black, and the other covers the rest of the body which is mainly yellow.
-* *Instance segmentation* is also called *simultaneous detection and segmentation*. It studies how to recognize the pixel-level regions of each object instance in an image. Different from semantic segmentation, instance segmentation needs to distinguish not only semantics, but also different object instances. For example, if there are two dogs in the image, instance segmentation needs to distinguish which of the two dogs a pixel belongs to.
+* *Vaizdų segmentavimas* padalija vaizdą į kelias sudedamąsias sritis. Šio tipo uždavinių metodai paprastai naudoja vaizdo pikselių tarpusavio koreliaciją. Apmokymo metu jam nereikia žymenų informacijos apie vaizdo pikselius, ir jis negali garantuoti, kad segmentuotos sritys prognozavimo metu turės semantiką, kurią norime gauti. Imant :numref:`fig_segmentation` vaizdą kaip įvestį, vaizdų segmentavimas gali padalyti šunį į dvi sritis: viena apima burną ir akis, kurios daugiausia juodos, o kita apima likusią kūno dalį, kuri daugiausia geltona.
+* *Egzempliorių segmentavimas* dar vadinamas *vienalaikiu aptikimu ir segmentavimu*. Jis tiria, kaip atpažinti kiekvieno vaizde esančio objekto egzemplioriaus pikselių lygmens sritis. Skirtingai nei semantinis segmentavimas, egzempliorių segmentavimas turi atskirti ne tik semantiką, bet ir skirtingus objektų egzempliorius. Pavyzdžiui, jei vaizde yra du šunys, egzempliorių segmentavimas turi atskirti, kuriam iš dviejų šunų priklauso pikselis.
 
 
 
-## The Pascal VOC2012 Semantic Segmentation Dataset
+## Pascal VOC2012 semantinio segmentavimo duomenų rinkinys
 
-[**On of the most important semantic segmentation dataset
-is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/).**]
-In the following,
-we will take a look at this dataset.
+[**Vienas iš svarbiausių semantinio segmentavimo duomenų rinkinių
+yra [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/).**]
+Toliau
+apžvelgsime šį duomenų rinkinį.
 
 ```{.python .input}
 #@tab mxnet
@@ -63,9 +63,9 @@ import torchvision
 import os
 ```
 
-The tar file of the dataset is about 2 GB,
-so it may take a while to download the file.
-The extracted dataset is located at `../data/VOCdevkit/VOC2012`.
+Duomenų rinkinio tar failas yra maždaug 2 GB,
+todėl failo atsisiuntimas gali užtrukti.
+Išpakuotas duomenų rinkinys yra `../data/VOCdevkit/VOC2012`.
 
 ```{.python .input}
 #@tab all
@@ -76,18 +76,18 @@ d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
-After entering the path `../data/VOCdevkit/VOC2012`,
-we can see the different components of the dataset.
-The `ImageSets/Segmentation` path contains text files
-that specify training and test samples,
-while the `JPEGImages` and `SegmentationClass` paths
-store the input image and label for each example, respectively.
-The label here is also in the image format,
-with the same size
-as its labeled input image.
-Besides,
-pixels with the same color in any label image belong to the same semantic class.
-The following defines the `read_voc_images` function to [**read all the input images and labels into the memory**].
+Įėję į kelią `../data/VOCdevkit/VOC2012`,
+galime pamatyti skirtingus duomenų rinkinio komponentus.
+Kelyje `ImageSets/Segmentation` yra tekstiniai failai,
+nurodantys apmokymo ir testavimo pavyzdžius,
+o keliuose `JPEGImages` ir `SegmentationClass`
+saugomas kiekvieno pavyzdžio įvesties vaizdas ir žymuo atitinkamai.
+Žymuo čia taip pat yra vaizdo formato
+ir tokio paties dydžio
+kaip jo pažymėtas įvesties vaizdas.
+Be to,
+tokios pat spalvos pikseliai bet kuriame žymenų vaizde priklauso tai pačiai semantinei klasei.
+Toliau apibrėžiama funkcija `read_voc_images`, skirta [**nuskaityti visus įvesties vaizdus ir žymenis į atmintį**].
 
 ```{.python .input}
 #@tab mxnet
@@ -130,8 +130,8 @@ def read_voc_images(voc_dir, is_train=True):
 train_features, train_labels = read_voc_images(voc_dir, True)
 ```
 
-We [**draw the first five input images and their labels**].
-In the label images, white and black represent borders and  background, respectively, while the other colors correspond to different classes.
+[**Nubraižome pirmuosius penkis įvesties vaizdus ir jų žymenis**].
+Žymenų vaizduose balta ir juoda spalvos atitinkamai žymi ribas ir foną, o kitos spalvos atitinka skirtingas klases.
 
 ```{.python .input}
 #@tab mxnet
@@ -148,9 +148,9 @@ imgs = [img.permute(1,2,0) for img in imgs]
 d2l.show_images(imgs, 2, n);
 ```
 
-Next, we [**enumerate
-the RGB color values and class names**]
-for all the labels in this dataset.
+Toliau [**išvardijame
+RGB spalvų reikšmes ir klasių pavadinimus**]
+visiems šio duomenų rinkinio žymenims.
 
 ```{.python .input}
 #@tab all
@@ -169,14 +169,15 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
 ```
 
-With the two constants defined above,
-we can conveniently
-[**find the class index for each pixel in a label**].
-We define the `voc_colormap2label` function
-to build the mapping from the above RGB color values
-to class indices,
-and the `voc_label_indices` function
-to map any RGB values to their class indices in this Pascal VOC2012 dataset.
+Turėdami aukščiau apibrėžtas dvi konstantas,
+galime patogiai
+[**rasti kiekvieno žymens pikselio klasės indeksą**].
+Apibrėžiame funkciją `voc_colormap2label`,
+kad sukurtume atvaizdį iš aukščiau pateiktų RGB spalvų reikšmių
+į klasių indeksus,
+ir funkciją `voc_label_indices`,
+kad bet kurias RGB reikšmes šiame Pascal VOC2012 duomenų rinkinyje
+atvaizduotume į jų klasių indeksus.
 
 ```{.python .input}
 #@tab mxnet
@@ -218,9 +219,9 @@ def voc_label_indices(colormap, colormap2label):
     return colormap2label[idx]
 ```
 
-[**For example**], in the first example image,
-the class index for the front part of the airplane is 1,
-while the background index is 0.
+[**Pavyzdžiui**], pirmajame pavyzdiniame vaizde
+lėktuvo priekinės dalies klasės indeksas yra 1,
+o fono indeksas yra 0.
 
 ```{.python .input}
 #@tab all
@@ -228,20 +229,20 @@ y = voc_label_indices(train_labels[0], voc_colormap2label())
 y[105:115, 130:140], VOC_CLASSES[1]
 ```
 
-### Data Preprocessing
+### Duomenų išankstinis apdorojimas
 
-In previous experiments
-such as in :numref:`sec_alexnet`--:numref:`sec_googlenet`,
-images are rescaled
-to fit the model's required input shape.
-However, in semantic segmentation,
-doing so
-requires rescaling the predicted pixel classes
-back to the original shape of the input image.
-Such rescaling may be inaccurate,
-especially for segmented regions with different classes. To avoid this issue,
-we crop the image to a *fixed* shape instead of rescaling. Specifically, [**using random cropping from image augmentation, we crop the same area of
-the input image and the label**].
+Ankstesniuose eksperimentuose,
+pavyzdžiui, :numref:`sec_alexnet`–:numref:`sec_googlenet`,
+vaizdų mastelis keičiamas,
+kad atitiktų modelio reikalaujamą įvesties formą.
+Tačiau semantiniame segmentavime
+taip darant
+prognozuotas pikselių klases reikia perskaičiuoti
+atgal į pradinę įvesties vaizdo formą.
+Toks mastelio keitimas gali būti netikslus,
+ypač skirtingų klasių segmentuotose srityse. Kad išvengtume šios problemos,
+vietoj mastelio keitimo apkerpame vaizdą iki *fiksuotos* formos. Konkrečiai, [**naudodami atsitiktinį apkarpymą iš vaizdų augmentacijos, apkerpame tą pačią
+įvesties vaizdo ir žymens sritį**].
 
 ```{.python .input}
 #@tab mxnet
@@ -283,19 +284,20 @@ imgs = [img.permute(1, 2, 0) for img in imgs]
 d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
-### [**Custom Semantic Segmentation Dataset Class**]
+### [**Pritaikyta semantinio segmentavimo duomenų rinkinio klasė**]
 
-We define a custom semantic segmentation dataset class `VOCSegDataset` by inheriting the `Dataset` class provided by high-level APIs.
-By implementing the `__getitem__` function,
-we can arbitrarily access the input image indexed as `idx` in the dataset and the class index of each pixel in this image.
-Since some images in the dataset
-have a smaller size
-than the output size of random cropping,
-these examples are filtered out
-by a custom `filter` function.
-In addition, we also
-define the `normalize_image` function to
-standardize the values of the three RGB channels of input images.
+Apibrėžiame pritaikytą semantinio segmentavimo duomenų rinkinio klasę `VOCSegDataset`, paveldėdami `Dataset` klasę, kurią pateikia aukšto lygio API.
+Įgyvendindami funkciją `__getitem__`,
+galime savavališkai pasiekti duomenų rinkinio įvesties vaizdą, indeksuotą kaip `idx`, ir kiekvieno šio vaizdo pikselio klasės indeksą.
+Kadangi kai kurie duomenų rinkinio vaizdai
+yra mažesnio dydžio
+nei atsitiktinio apkarpymo išvesties dydis,
+šie pavyzdžiai atfiltruojami
+pritaikyta funkcija `filter`.
+Be to, taip pat
+apibrėžiame funkciją `normalize_image`,
+kad standartizuotume
+įvesties vaizdų trijų RGB kanalų reikšmes.
 
 ```{.python .input}
 #@tab mxnet
@@ -365,14 +367,14 @@ class VOCSegDataset(torch.utils.data.Dataset):
         return len(self.features)
 ```
 
-### [**Reading the Dataset**]
+### [**Duomenų rinkinio skaitymas**]
 
-We use the custom `VOCSegDatase`t class to
-create instances of the training set and test set, respectively.
-Suppose that
-we specify that the output shape of randomly cropped images is $320\times 480$.
-Below we can view the number of examples
-that are retained in the training set and test set.
+Naudojame pritaikytą klasę `VOCSegDataset`,
+kad sukurtume atitinkamai apmokymo ir testavimo aibių egzempliorius.
+Tarkime,
+kad nurodome, jog atsitiktinai apkarpytų vaizdų išvesties forma yra $320\times 480$.
+Toliau galime peržiūrėti pavyzdžių skaičių,
+kuris išlieka apmokymo ir testavimo aibėse.
 
 ```{.python .input}
 #@tab all
@@ -381,10 +383,10 @@ voc_train = VOCSegDataset(True, crop_size, voc_dir)
 voc_test = VOCSegDataset(False, crop_size, voc_dir)
 ```
 
-Setting the batch size to 64,
-we define the data iterator for the training set.
-Let's print the shape of the first minibatch.
-Different from in image classification or object detection, labels here are three-dimensional tensors.
+Nustatę rinkinio dydį į 64,
+apibrėžiame apmokymo aibės duomenų iteratorių.
+Atspausdinkime pirmojo minirinkinio formą.
+Skirtingai nei vaizdų klasifikavime ar objektų aptikime, žymenys čia yra trimačiai tenzoriai.
 
 ```{.python .input}
 #@tab mxnet
@@ -410,11 +412,11 @@ for X, Y in train_iter:
     break
 ```
 
-### [**Putting It All Together**]
+### [**Viskas kartu**]
 
-Finally, we define the following `load_data_voc` function
-to download and read the Pascal VOC2012 semantic segmentation dataset.
-It returns data iterators for both the training and test datasets.
+Galiausiai apibrėžiame šią funkciją `load_data_voc`,
+kad atsisiųstume ir nuskaitytume Pascal VOC2012 semantinio segmentavimo duomenų rinkinį.
+Ji grąžina duomenų iteratorius tiek apmokymo, tiek testavimo duomenų rinkiniams.
 
 ```{.python .input}
 #@tab mxnet
@@ -450,23 +452,23 @@ def load_data_voc(batch_size, crop_size):
     return train_iter, test_iter
 ```
 
-## Summary
+## Santrauka
 
-* Semantic segmentation recognizes and understands what are in an image in pixel level by dividing the image into regions belonging to different semantic classes.
-* One of the most important semantic segmentation dataset is Pascal VOC2012.
-* In semantic segmentation, since the input image and  label correspond one-to-one on the pixel, the input image is randomly cropped to a fixed shape rather than rescaled.
+* Semantinis segmentavimas atpažįsta ir supranta, kas yra vaizde, pikselių lygmeniu, padalydamas vaizdą į sritis, priklausančias skirtingoms semantinėms klasėms.
+* Vienas iš svarbiausių semantinio segmentavimo duomenų rinkinių yra Pascal VOC2012.
+* Semantiniame segmentavime, kadangi įvesties vaizdas ir žymuo pikselių lygmeniu atitinka vienas kitą, įvesties vaizdas atsitiktinai apkerpamas iki fiksuotos formos, o ne keičiamas jo mastelis.
 
 
-## Exercises
+## Pratimai
 
-1. How can semantic segmentation be applied in autonomous vehicles and medical image diagnostics? Can you think of other applications?
-1. Recall the descriptions of data augmentation in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be infeasible to be applied in semantic segmentation?
+1. Kaip semantinį segmentavimą galima taikyti savaeigėse transporto priemonėse ir medicininių vaizdų diagnostikoje? Ar galite sugalvoti kitų taikymų?
+1. Prisiminkite duomenų augmentacijos aprašymus :numref:`sec_image_augmentation`. Kurių vaizdų klasifikavime naudojamų vaizdų augmentacijos metodų būtų neįmanoma taikyti semantiniame segmentavime?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/375)
+[Diskusijos](https://discuss.d2l.ai/t/375)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1480)
+[Diskusijos](https://discuss.d2l.ai/t/1480)
 :end_tab:

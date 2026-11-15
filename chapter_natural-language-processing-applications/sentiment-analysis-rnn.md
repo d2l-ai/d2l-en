@@ -1,32 +1,33 @@
-# Sentiment Analysis: Using Recurrent Neural Networks
-:label:`sec_sentiment_rnn` 
+# Nuotaikų analizė: naudojant rekurentinius neuroninius tinklus
+:label:`sec_sentiment_rnn`
 
 
-Like word similarity and analogy tasks,
-we can also apply pretrained word vectors
-to sentiment analysis.
-Since the IMDb review dataset
-in :numref:`sec_sentiment`
-is not very big,
-using text representations
-that were pretrained
-on large-scale corpora
-may reduce overfitting of the model.
-As a specific example
-illustrated in :numref:`fig_nlp-map-sa-rnn`,
-we will represent each token
-using the pretrained GloVe model,
-and feed these token representations
-into a multilayer bidirectional RNN
-to obtain the text sequence representation,
-which will
-be transformed into 
-sentiment analysis outputs :cite:`Maas.Daly.Pham.ea.2011`.
-For the same downstream application,
-we will consider a different architectural
-choice later.
+Kaip ir žodžių panašumo bei analogijos užduotims,
+iš anksto apmokytus žodžių vektorius
+galime taikyti ir nuotaikų analizei.
+Kadangi IMDb apžvalgų duomenų rinkinys
+:numref:`sec_sentiment`
+nėra labai didelis,
+teksto vaizdavimų,
+iš anksto apmokytų
+dideliuose tekstynuose,
+naudojimas
+gali sumažinti modelio persimokymą.
+Kaip konkretus pavyzdys,
+iliustruotas :numref:`fig_nlp-map-sa-rnn`,
+kiekvieną teksto vienetą pavaizduosime
+naudodami iš anksto apmokytą GloVe modelį
+ir šiuos teksto vienetų vaizdavimus paduosime
+į daugiasluoksnį dvikryptį RNN,
+kad gautume teksto sekos vaizdavimą,
+kuris bus
+paverstas
+nuotaikų analizės išvestimis :cite:`Maas.Daly.Pham.ea.2011`.
+Tam pačiam tolesniam taikymui
+vėliau nagrinėsime kitokį architektūros
+pasirinkimą.
 
-![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
+![Šiame skyrelyje iš anksto apmokytas GloVe paduodamas į RNN pagrįstą architektūrą nuotaikų analizei.](../img/nlp-map-sa-rnn.svg)
 :label:`fig_nlp-map-sa-rnn`
 
 ```{.python .input}
@@ -50,30 +51,29 @@ batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
-## Representing Single Text with RNNs
+## Atskiro teksto vaizdavimas naudojant RNN
 
-In text classifications tasks,
-such as sentiment analysis,
-a varying-length text sequence 
-will be transformed into fixed-length categories.
-In the following `BiRNN` class,
-while each token of a text sequence
-gets its individual
-pretrained GloVe
-representation via the embedding layer
+Teksto klasifikavimo užduotyse,
+tokiose kaip nuotaikų analizė,
+kintamo ilgio teksto seka
+bus paversta fiksuoto ilgio kategorijomis.
+Toliau pateiktoje klasėje `BiRNN`
+kiekvienas teksto sekos teksto vienetas
+gauna savo individualų
+iš anksto apmokytą GloVe
+vaizdavimą per įterpinių sluoksnį
 (`self.embedding`),
-the entire sequence
-is encoded by a bidirectional RNN (`self.encoder`).
-More concretely,
-the hidden states (at the last layer)
-of the bidirectional LSTM
-at both the initial and final time steps
-are concatenated 
-as the representation of the text sequence.
-This single text representation
-is then transformed into output categories
-by a fully connected layer (`self.decoder`)
-with two outputs ("positive" and "negative").
+o visa seka
+užkoduojama dvikrypčiu RNN (`self.encoder`).
+Konkrečiau,
+dvikrypčio LSTM paslėptosios būsenos (paskutiniame sluoksnyje)
+tiek pradiniame, tiek paskutiniame laiko žingsnyje
+sukonkatenuojamos
+kaip teksto sekos vaizdavimas.
+Šis vieno teksto vaizdavimas
+tada paverčiamas išvesties kategorijomis
+pilnai sujungtu sluoksniu (`self.decoder`)
+su dviem išvestimis („teigiama“ ir „neigiama“).
 
 ```{.python .input}
 #@tab mxnet
@@ -138,7 +138,7 @@ class BiRNN(nn.Module):
         return outs
 ```
 
-Let's construct a bidirectional RNN with two hidden layers to represent single text for sentiment analysis.
+Sukonstruokime dvikryptį RNN su dviem paslėptaisiais sluoksniais, kad pavaizduotume atskirą tekstą nuotaikų analizei.
 
 ```{.python .input}
 #@tab all
@@ -163,17 +163,17 @@ def init_weights(module):
 net.apply(init_weights);
 ```
 
-## Loading Pretrained Word Vectors
+## Iš anksto apmokytų žodžių vektorių įkėlimas
 
-Below we load the pretrained 100-dimensional (needs to be consistent with `embed_size`) GloVe embeddings for tokens in the vocabulary.
+Toliau įkeliame iš anksto apmokytus 100 dimensijų (turi atitikti `embed_size`) GloVe įterpinius žodyno teksto vienetams.
 
 ```{.python .input}
 #@tab all
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 ```
 
-Print the shape of the vectors
-for all the tokens in the vocabulary.
+Atspausdinkite vektorių formą
+visiems žodyno teksto vienetams.
 
 ```{.python .input}
 #@tab all
@@ -181,11 +181,11 @@ embeds = glove_embedding[vocab.idx_to_token]
 embeds.shape
 ```
 
-We use these pretrained
-word vectors
-to represent tokens in the reviews
-and will not update
-these vectors during training.
+Šiuos iš anksto apmokytus
+žodžių vektorius naudojame
+apžvalgų teksto vienetams vaizduoti
+ir apmokymo metu
+šių vektorių neatnaujinsime.
 
 ```{.python .input}
 #@tab mxnet
@@ -199,9 +199,9 @@ net.embedding.weight.data.copy_(embeds)
 net.embedding.weight.requires_grad = False
 ```
 
-## Training and Evaluating the Model
+## Modelio apmokymas ir vertinimas
 
-Now we can train the bidirectional RNN for sentiment analysis.
+Dabar galime apmokyti dvikryptį RNN nuotaikų analizei.
 
 ```{.python .input}
 #@tab mxnet
@@ -219,7 +219,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-We define the following function to predict the sentiment of a text sequence using the trained model `net`.
+Apibrėžiame šią funkciją, kad prognozuotume teksto sekos nuotaiką naudodami apmokytą modelį `net`.
 
 ```{.python .input}
 #@tab mxnet
@@ -241,7 +241,7 @@ def predict_sentiment(net, vocab, sequence):
     return 'positive' if label == 1 else 'negative'
 ```
 
-Finally, let's use the trained model to predict the sentiment for two simple sentences.
+Galiausiai panaudokime apmokytą modelį dviejų paprastų sakinių nuotaikai prognozuoti.
 
 ```{.python .input}
 #@tab all
@@ -253,23 +253,23 @@ predict_sentiment(net, vocab, 'this movie is so great')
 predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
-## Summary
+## Santrauka
 
-* Pretrained word vectors can represent individual tokens in a text sequence.
-* Bidirectional RNNs can represent a text sequence, such as via the concatenation of its hidden states at the initial and final time steps. This single text representation can be transformed into categories using a fully connected layer.
+* Iš anksto apmokyti žodžių vektoriai gali vaizduoti atskirus teksto sekos teksto vienetus.
+* Dvikrypčiai RNN gali vaizduoti teksto seką, pavyzdžiui, sukonkatenuojant jos paslėptąsias būsenas pradiniame ir paskutiniame laiko žingsniuose. Šį vieno teksto vaizdavimą galima paversti kategorijomis naudojant pilnai sujungtą sluoksnį.
 
 
 
-## Exercises
+## Pratimai
 
-1. Increase the number of epochs. Can you improve the training and testing accuracies? How about tuning other hyperparameters?
-1. Use larger pretrained word vectors, such as 300-dimensional GloVe embeddings. Does it improve classification accuracy?
-1. Can we improve the classification accuracy by using the spaCy tokenization? You need to install spaCy (`pip install spacy`) and install the English package (`python -m spacy download en`). In the code, first, import spaCy (`import spacy`). Then, load the spaCy English package (`spacy_en = spacy.load('en')`). Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. Note the different forms of phrase tokens in GloVe and spaCy. For example, the phrase token "new york" takes the form of "new-york" in GloVe and the form of "new york" after the spaCy tokenization.
+1. Padidinkite epochų skaičių. Ar galite pagerinti apmokymo ir testavimo tikslumą? O kaip su kitų hiperparametrų derinimu?
+1. Naudokite didesnius iš anksto apmokytus žodžių vektorius, pavyzdžiui, 300 dimensijų GloVe įterpinius. Ar tai pagerina klasifikavimo tikslumą?
+1. Ar galime pagerinti klasifikavimo tikslumą naudodami spaCy teksto skaidymą į teksto vienetus? Reikia įdiegti spaCy (`pip install spacy`) ir anglų kalbos paketą (`python -m spacy download en`). Kode pirmiausia importuokite spaCy (`import spacy`). Tada įkelkite spaCy anglų kalbos paketą (`spacy_en = spacy.load('en')`). Galiausiai apibrėžkite funkciją `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` ir pakeiskite pradinę funkciją `tokenizer`. Atkreipkite dėmesį į skirtingas frazių teksto vienetų formas GloVe ir spaCy. Pavyzdžiui, frazės teksto vienetas „new york“ GloVe turi formą „new-york“, o po spaCy teksto skaidymo – formą „new york“.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/392)
+[Diskusijos](https://discuss.d2l.ai/t/392)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1424)
+[Diskusijos](https://discuss.d2l.ai/t/1424)
 :end_tab:

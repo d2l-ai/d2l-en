@@ -1,20 +1,20 @@
-# The Dataset for Pretraining Word Embeddings
+# Duomenų rinkinys žodžių įterpiniams iš anksto apmokyti
 :label:`sec_word2vec_data`
 
-Now that we know the technical details of 
-the word2vec models and approximate training methods,
-let's walk through their implementations. 
-Specifically,
-we will take the skip-gram model in :numref:`sec_word2vec`
-and negative sampling in :numref:`sec_approx_train`
-as an example.
-In this section,
-we begin with the dataset
-for pretraining the word embedding model:
-the original format of the data
-will be transformed
-into minibatches
-that can be iterated over during training.
+Dabar, kai žinome
+word2vec modelių technines detales
+ir apytikrius apmokymo metodus,
+pereikime prie jų įgyvendinimo.
+Konkrečiai,
+kaip pavyzdį imsime skip-gram modelį iš :numref:`sec_word2vec`
+ir neigiamų pavyzdžių atranką iš :numref:`sec_approx_train`.
+Šiame skyrelyje
+pradedame nuo duomenų rinkinio
+žodžių įterpinių modeliui iš anksto apmokyti:
+pradinis duomenų formatas
+bus paverstas
+minirinkiniais,
+kuriuos galima iteruoti apmokymo metu.
 
 ```{.python .input}
 #@tab mxnet
@@ -36,17 +36,17 @@ import os
 import random
 ```
 
-## Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-The dataset that we use here
-is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42). 
-This corpus is sampled
-from Wall Street Journal articles,
-split into training, validation, and test sets.
-In the original format,
-each line of the text file
-represents a sentence of words that are separated by spaces.
-Here we treat each word as a token.
+Čia naudojamas duomenų rinkinys yra
+[Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42).
+Šis tekstynas atrinktas
+iš Wall Street Journal straipsnių
+ir padalytas į apmokymo, patikros ir testavimo aibes.
+Pradiniame formate
+kiekviena teksto failo eilutė
+yra žodžių sakinys, kurio žodžiai atskirti tarpais.
+Čia kiekvieną žodį laikome teksto vienetu.
 
 ```{.python .input}
 #@tab all
@@ -67,13 +67,13 @@ sentences = read_ptb()
 f'# sentences: {len(sentences)}'
 ```
 
-After reading the training set,
-we build a vocabulary for the corpus,
-where any word that appears 
-less than 10 times is replaced by 
-the "&lt;unk&gt;" token.
-Note that the original dataset
-also contains "&lt;unk&gt;" tokens that represent rare (unknown) words.
+Nuskaitę apmokymo aibę,
+sudarome tekstyno žodyną,
+kuriame bet kuris žodis, pasirodantis
+rečiau nei 10 kartų, pakeičiamas
+teksto vienetu „&lt;unk&gt;“.
+Atkreipkite dėmesį, kad pradiniame duomenų rinkinyje
+taip pat yra „&lt;unk&gt;“ teksto vienetų, vaizduojančių retus (nežinomus) žodžius.
 
 ```{.python .input}
 #@tab all
@@ -81,45 +81,44 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 f'vocab size: {len(vocab)}'
 ```
 
-## Subsampling
+## Imties retinimas
 
-Text data
-typically have high-frequency words
-such as "the", "a", and "in":
-they may even occur billions of times in
-very large corpora.
-However,
-these words often co-occur
-with many different words in
-context windows, providing little useful signals.
-For instance,
-consider the word "chip" in a context window:
-intuitively
-its co-occurrence with a low-frequency word "intel"
-is more useful in training
-than 
-the co-occurrence with a high-frequency word "a".
-Moreover, training with vast amounts of (high-frequency) words
-is slow.
-Thus, when training word embedding models, 
-high-frequency words can be *subsampled* :cite:`Mikolov.Sutskever.Chen.ea.2013`.
-Specifically, 
-each indexed word $w_i$ 
-in the dataset will be discarded with probability
+Teksto duomenyse
+paprastai yra dažnai pasitaikančių žodžių,
+tokių kaip „the“, „a“ ir „in“:
+jie gali pasirodyti net milijardus kartų
+labai dideliuose tekstynuose.
+Tačiau
+šie žodžiai dažnai pasirodo kartu
+su daugeliu skirtingų žodžių
+konteksto languose ir suteikia mažai naudingų signalų.
+Pavyzdžiui,
+panagrinėkime žodį „chip“ konteksto lange:
+intuityviai
+jo bendras pasirodymas su retu žodžiu „intel“
+yra naudingesnis apmokymui nei
+bendras pasirodymas su dažnu žodžiu „a“.
+Be to, apmokymas su milžiniškais (dažnų) žodžių kiekiais
+yra lėtas.
+Todėl apmokant žodžių įterpinių modelius
+dažnus žodžius galima *išretinti* (angl. *subsample*) :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+Konkrečiai,
+kiekvienas duomenų rinkinio indeksuotas žodis $w_i$
+bus atmetamas su tikimybe
 
 
 $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
-where $f(w_i)$ is the ratio of 
-the number of words $w_i$
-to the total number of words in the dataset, 
-and the constant $t$ is a hyperparameter
-($10^{-4}$ in the experiment). 
-We can see that only when
-the relative frequency
-$f(w_i) > t$  can the (high-frequency) word $w_i$ be discarded, 
-and the higher the relative frequency of the word, 
-the greater the probability of being discarded.
+kur $f(w_i)$ yra
+žodžių $w_i$ skaičiaus
+ir bendro duomenų rinkinio žodžių skaičiaus santykis,
+o konstanta $t$ yra hiperparametras
+(eksperimente $10^{-4}$).
+Matome, kad tik tada, kai
+santykinis dažnis
+$f(w_i) > t$, (dažnas) žodis $w_i$ gali būti atmestas,
+ir kuo didesnis santykinis žodžio dažnis,
+tuo didesnė tikimybė, kad jis bus atmestas.
 
 ```{.python .input}
 #@tab all
@@ -144,14 +143,14 @@ def subsample(sentences, vocab):
 subsampled, counter = subsample(sentences, vocab)
 ```
 
-The following code snippet 
-plots the histogram of
-the number of tokens per sentence
-before and after subsampling.
-As expected, 
-subsampling significantly shortens sentences
-by dropping high-frequency words,
-which will lead to training speedup.
+Šis kodo fragmentas
+nubraižo teksto vienetų skaičiaus viename sakinyje
+histogramą
+prieš imties retinimą ir po jo.
+Kaip ir tikėtasi,
+imties retinimas gerokai sutrumpina sakinius
+atmesdamas dažnus žodžius,
+o tai paspartins apmokymą.
 
 ```{.python .input}
 #@tab all
@@ -159,7 +158,7 @@ d2l.show_list_len_pair_hist(['origin', 'subsampled'], '# tokens per sentence',
                             'count', sentences, subsampled);
 ```
 
-For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
+Atskiriems teksto vienetams dažno žodžio „the“ atrankos dažnis yra mažesnis nei 1/20.
 
 ```{.python .input}
 #@tab all
@@ -171,15 +170,15 @@ def compare_counts(token):
 compare_counts('the')
 ```
 
-In contrast, 
-low-frequency words "join" are completely kept.
+Priešingai,
+reti žodžiai, pavyzdžiui, „join“, išsaugomi visiškai.
 
 ```{.python .input}
 #@tab all
 compare_counts('join')
 ```
 
-After subsampling, we map tokens to their indices for the corpus.
+Po imties retinimo tekstyno teksto vienetus atvaizduojame į jų indeksus.
 
 ```{.python .input}
 #@tab all
@@ -187,21 +186,20 @@ corpus = [vocab[line] for line in subsampled]
 corpus[:3]
 ```
 
-## Extracting Center Words and Context Words
+## Centrinių ir konteksto žodžių išgavimas
 
 
-The following `get_centers_and_contexts`
-function extracts all the 
-center words and their context words
-from `corpus`.
-It uniformly samples an integer between 1 and `max_window_size`
-at random as the context window size.
-For any center word,
-those words 
-whose distance from it
-does not exceed the sampled
-context window size
-are its context words.
+Toliau pateikta funkcija `get_centers_and_contexts`
+iš `corpus` išgauna visus
+centrinius žodžius ir jų konteksto žodžius.
+Ji atsitiktinai ir tolygiai atrenka sveikąjį skaičių nuo 1 iki `max_window_size`
+kaip konteksto lango dydį.
+Bet kuriam centriniam žodžiui
+tie žodžiai,
+kurių atstumas nuo jo
+neviršija atrinkto
+konteksto lango dydžio,
+yra jo konteksto žodžiai.
 
 ```{.python .input}
 #@tab all
@@ -225,9 +223,9 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 ```
 
-Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. 
-Let the maximum context window size be 2 
-and print all the center words and their context words.
+Toliau sukuriame dirbtinį duomenų rinkinį, sudarytą iš dviejų atitinkamai 7 ir 3 žodžių sakinių.
+Tegul didžiausias konteksto lango dydis yra 2,
+ir atspausdinkime visus centrinius žodžius bei jų konteksto žodžius.
 
 ```{.python .input}
 #@tab all
@@ -237,9 +235,9 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
     print('center', center, 'has contexts', context)
 ```
 
-When training on the PTB dataset,
-we set the maximum context window size to 5. 
-The following extracts all the center words and their context words in the dataset.
+Apmokant PTB duomenų rinkinyje,
+didžiausią konteksto lango dydį nustatome 5.
+Toliau išgaunami visi duomenų rinkinio centriniai žodžiai ir jų konteksto žodžiai.
 
 ```{.python .input}
 #@tab all
@@ -247,14 +245,14 @@ all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 f'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'
 ```
 
-## Negative Sampling
+## Neigiamų pavyzdžių atranka
 
-We use negative sampling for approximate training. 
-To sample noise words according to 
-a predefined distribution,
-we define the following `RandomGenerator` class,
-where the (possibly unnormalized) sampling distribution is passed
-via the argument `sampling_weights`.
+Apytikriam apmokymui naudojame neigiamų pavyzdžių atranką.
+Kad atrinktume triukšmo žodžius pagal
+iš anksto apibrėžtą pasiskirstymą,
+apibrėžiame šią klasę `RandomGenerator`,
+kurioje (galbūt nenormuotas) atrankos pasiskirstymas perduodamas
+per argumentą `sampling_weights`.
 
 ```{.python .input}
 #@tab all
@@ -278,10 +276,10 @@ class RandomGenerator:
         return self.candidates[self.i - 1]
 ```
 
-For example, 
-we can draw 10 random variables $X$
-among indices 1, 2, and 3
-with sampling probabilities $P(X=1)=2/9, P(X=2)=3/9$, and $P(X=3)=4/9$ as follows.
+Pavyzdžiui,
+galime išgauti 10 atsitiktinių dydžių $X$
+tarp indeksų 1, 2 ir 3
+su atrankos tikimybėmis $P(X=1)=2/9, P(X=2)=3/9$ ir $P(X=3)=4/9$ taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -289,15 +287,13 @@ generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
 
-For a pair of center word and context word, 
-we randomly sample `K` (5 in the experiment) noise words. According to the suggestions in the word2vec paper,
-the sampling probability $P(w)$ of 
-a noise word $w$
-is 
-set to its relative frequency 
-in the dictionary
-raised to 
-the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+Centrinio žodžio ir konteksto žodžio porai
+atsitiktinai atrenkame `K` (eksperimente 5) triukšmo žodžių. Pagal word2vec straipsnio pasiūlymus,
+triukšmo žodžio $w$ atrankos tikimybė $P(w)$
+nustatoma lygi jo santykiniam dažniui
+žodyne,
+pakeltam
+0,75 laipsniu :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 
 ```{.python .input}
 #@tab all
@@ -322,57 +318,57 @@ def get_negatives(all_contexts, vocab, counter, K):
 all_negatives = get_negatives(all_contexts, vocab, counter, 5)
 ```
 
-## Loading Training Examples in Minibatches
+## Apmokymo pavyzdžių įkėlimas minirinkiniais
 :label:`subsec_word2vec-minibatch-loading`
 
-After
-all the center words
-together with their
-context words and sampled noise words are extracted,
-they will be transformed into 
-minibatches of examples
-that can be iteratively loaded
-during training.
+Išgavus
+visus centrinius žodžius
+kartu su jų
+konteksto žodžiais ir atrinktais triukšmo žodžiais,
+jie bus paversti
+pavyzdžių minirinkiniais,
+kuriuos galima iteratyviai įkelti
+apmokymo metu.
 
 
 
-In a minibatch,
-the $i^\textrm{th}$ example includes a center word
-and its $n_i$ context words and $m_i$ noise words. 
-Due to varying context window sizes,
-$n_i+m_i$ varies for different $i$.
-Thus,
-for each example
-we concatenate its context words and noise words in 
-the `contexts_negatives` variable,
-and pad zeros until the concatenation length
-reaches $\max_i n_i+m_i$ (`max_len`).
-To exclude paddings
-in the calculation of the loss,
-we define a mask variable `masks`.
-There is a one-to-one correspondence
-between elements in `masks` and elements in `contexts_negatives`,
-where zeros (otherwise ones) in `masks` correspond to paddings in `contexts_negatives`.
+Minirinkinyje
+$i$-asis pavyzdys apima centrinį žodį
+ir jo $n_i$ konteksto žodžių bei $m_i$ triukšmo žodžių.
+Dėl skirtingų konteksto langų dydžių
+$n_i+m_i$ skiriasi skirtingiems $i$.
+Todėl
+kiekvienam pavyzdžiui
+jo konteksto žodžius ir triukšmo žodžius sukonkatenuojame kintamajame
+`contexts_negatives`
+ir papildome nuliais, kol konkatenacijos ilgis
+pasiekia $\max_i n_i+m_i$ (`max_len`).
+Kad skaičiuojant nuostolį
+papildymai būtų neįtraukiami,
+apibrėžiame kaukės kintamąjį `masks`.
+Tarp `masks` elementų ir `contexts_negatives` elementų
+yra abipus vienareikšmė atitiktis,
+kur `masks` nuliai (kitaip – vienetai) atitinka `contexts_negatives` papildymus.
 
 
-To distinguish between positive and negative examples,
-we separate context words from noise words in  `contexts_negatives` via a `labels` variable. 
-Similar to `masks`,
-there is also a one-to-one correspondence
-between elements in `labels` and elements in `contexts_negatives`,
-where ones (otherwise zeros) in `labels` correspond to context words (positive examples) in `contexts_negatives`.
+Kad atskirtume teigiamus ir neigiamus pavyzdžius,
+`contexts_negatives` konteksto žodžius nuo triukšmo žodžių atskiriame per kintamąjį `labels`.
+Panašiai kaip `masks`,
+taip pat yra abipus vienareikšmė atitiktis
+tarp `labels` elementų ir `contexts_negatives` elementų,
+kur `labels` vienetai (kitaip – nuliai) atitinka `contexts_negatives` konteksto žodžius (teigiamus pavyzdžius).
 
 
-The above idea is implemented in the following `batchify` function.
-Its input `data` is a list with length
-equal to the batch size,
-where each element is an example
-consisting of
-the center word `center`, its context words `context`, and its noise words `negative`.
-This function returns 
-a minibatch that can be loaded for calculations 
-during training,
-such as including the mask variable.
+Aukščiau pateikta idėja įgyvendinta šioje funkcijoje `batchify`.
+Jos įvestis `data` yra sąrašas, kurio ilgis
+lygus rinkinio dydžiui,
+kur kiekvienas elementas yra pavyzdys,
+sudarytas iš
+centrinio žodžio `center`, jo konteksto žodžių `context` ir jo triukšmo žodžių `negative`.
+Ši funkcija grąžina
+minirinkinį, kurį galima įkelti skaičiavimams
+apmokymo metu,
+pavyzdžiui, įskaitant kaukės kintamąjį.
 
 ```{.python .input}
 #@tab all
@@ -391,7 +387,7 @@ def batchify(data):
         contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
-Let's test this function using a minibatch of two examples.
+Išbandykime šią funkciją naudodami dviejų pavyzdžių minirinkinį.
 
 ```{.python .input}
 #@tab all
@@ -404,9 +400,9 @@ for name, data in zip(names, batch):
     print(name, '=', data)
 ```
 
-## Putting It All Together
+## Viskas kartu
 
-Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator and the vocabulary.
+Galiausiai apibrėžiame funkciją `load_data_ptb`, kuri nuskaito PTB duomenų rinkinį ir grąžina duomenų iteratorių bei žodyną.
 
 ```{.python .input}
 #@tab mxnet
@@ -466,7 +462,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
-Let's print the first minibatch of the data iterator.
+Atspausdinkime pirmąjį duomenų iteratoriaus minirinkinį.
 
 ```{.python .input}
 #@tab all
@@ -477,23 +473,23 @@ for batch in data_iter:
     break
 ```
 
-## Summary
+## Santrauka
 
-* High-frequency words may not be so useful in training. We can subsample them for speedup in training.
-* For computational efficiency, we load examples in minibatches. We can define other variables to distinguish paddings from non-paddings, and positive examples from negative ones.
+* Dažni žodžiai apmokymui gali būti ne tokie naudingi. Galime juos išretinti, kad apmokymas būtų greitesnis.
+* Skaičiavimo efektyvumui pasiekti pavyzdžius įkeliame minirinkiniais. Galime apibrėžti kitus kintamuosius, kad atskirtume papildymus nuo ne papildymų ir teigiamus pavyzdžius nuo neigiamų.
 
 
 
-## Exercises
+## Pratimai
 
-1. How does the running time of code in this section changes if not using subsampling?
-1. The `RandomGenerator` class caches `k` random sampling results. Set `k` to other values and see how it affects the data loading speed.
-1. What other hyperparameters in the code of this section may affect the data loading speed?
+1. Kaip pasikeistų šiame skyrelyje pateikto kodo veikimo laikas, jei nenaudotume imties retinimo?
+1. Klasė `RandomGenerator` kaupia `k` atsitiktinės atrankos rezultatų. Nustatykite `k` į kitas reikšmes ir pažiūrėkite, kaip tai veikia duomenų įkėlimo greitį.
+1. Kokie kiti šio skyrelio kodo hiperparametrai gali turėti įtakos duomenų įkėlimo greičiui?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/383)
+[Diskusijos](https://discuss.d2l.ai/t/383)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1330)
+[Diskusijos](https://discuss.d2l.ai/t/1330)
 :end_tab:

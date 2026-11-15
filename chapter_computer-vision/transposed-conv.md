@@ -1,32 +1,32 @@
-# Transposed Convolution
+# Transponuotoji konvoliucija
 :label:`sec_transposed_conv`
 
-The CNN layers we have seen so far,
-such as convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`),
-typically reduce (downsample) the spatial dimensions (height and width) of the input,
-or keep them unchanged.
-In semantic segmentation
-that classifies at pixel-level,
-it will be convenient if
-the spatial dimensions of the
-input and output are the same.
-For example,
-the channel dimension at one output pixel 
-can hold the classification results
-for the input pixel at the same spatial position.
+Iki šiol matyti CNN sluoksniai,
+tokie kaip konvoliuciniai sluoksniai (:numref:`sec_conv_layer`) ir sutelkimo sluoksniai (:numref:`sec_pooling`),
+paprastai sumažina (sumažina skiriamąją gebą) įvesties erdvines dimensijas (aukštį ir plotį)
+arba palieka jas nepakitusias.
+Semantiniame segmentavime,
+kuris klasifikuoja pikselių lygmeniu,
+būtų patogu, jei
+įvesties ir išvesties erdvinės dimensijos
+būtų tokios pačios.
+Pavyzdžiui,
+vieno išvesties pikselio kanalų dimensija
+gali talpinti
+to paties erdvinės padėties įvesties pikselio klasifikavimo rezultatus.
 
 
-To achieve this, especially after 
-the spatial dimensions are reduced by CNN layers,
-we can use another type
-of CNN layers
-that can increase (upsample) the spatial dimensions
-of intermediate feature maps.
-In this section,
-we will introduce 
-*transposed convolution*, which is also called *fractionally-strided convolution* :cite:`Dumoulin.Visin.2016`, 
-for reversing downsampling operations
-by the convolution.
+Kad tai pasiektume, ypač po to, kai
+CNN sluoksniai sumažino erdvines dimensijas,
+galime naudoti kito tipo
+CNN sluoksnius,
+kurie gali padidinti (padidinti skiriamąją gebą) tarpinių požymių žemėlapių
+erdvines dimensijas.
+Šiame skyrelyje
+pristatysime
+*transponuotąją konvoliuciją*, dar vadinamą *dalinio žingsnio konvoliucija* :cite:`Dumoulin.Visin.2016`,
+skirtą konvoliucijos atliktoms
+mažinimo operacijoms atšaukti.
 
 ```{.python .input}
 #@tab mxnet
@@ -44,47 +44,47 @@ from torch import nn
 from d2l import torch as d2l
 ```
 
-## Basic Operation
+## Pagrindinė operacija
 
-Ignoring channels for now,
-let's begin with
-the basic transposed convolution operation
-with stride of 1 and no padding.
-Suppose that
-we are given a 
-$n_h \times n_w$ input tensor
-and a $k_h \times k_w$ kernel.
-Sliding the kernel window with stride of 1
-for $n_w$ times in each row
-and $n_h$ times in each column
-yields 
-a total of $n_h n_w$ intermediate results.
-Each intermediate result is
-a $(n_h + k_h - 1) \times (n_w + k_w - 1)$
-tensor that are initialized as zeros.
-To compute each intermediate tensor,
-each element in the input tensor
-is multiplied by the kernel
-so that the resulting $k_h \times k_w$ tensor
-replaces a portion in
-each intermediate tensor.
-Note that
-the position of the replaced portion in each
-intermediate tensor corresponds to the position of the element
-in the input tensor used for the computation.
-In the end, all the intermediate results
-are summed over to produce the output.
+Kol kas ignoruodami kanalus,
+pradėkime nuo
+pagrindinės transponuotosios konvoliucijos operacijos
+su 1 žingsniu ir be papildymo.
+Tarkime,
+kad turime
+$n_h \times n_w$ įvesties tenzorių
+ir $k_h \times k_w$ branduolį.
+Stumdant branduolio langą su 1 žingsniu
+$n_w$ kartų kiekvienoje eilutėje
+ir $n_h$ kartų kiekviename stulpelyje,
+gaunama
+iš viso $n_h n_w$ tarpinių rezultatų.
+Kiekvienas tarpinis rezultatas yra
+$(n_h + k_h - 1) \times (n_w + k_w - 1)$
+tenzorius, inicializuotas nuliais.
+Kad apskaičiuotume kiekvieną tarpinį tenzorių,
+kiekvienas įvesties tenzoriaus elementas
+dauginamas iš branduolio,
+kad gautas $k_h \times k_w$ tenzorius
+pakeistų dalį
+kiekviename tarpiniame tenzoriuje.
+Atkreipkite dėmesį, kad
+pakeistos dalies padėtis kiekviename
+tarpiniame tenzoriuje atitinka skaičiavimui naudojamo
+įvesties tenzoriaus elemento padėtį.
+Galiausiai visi tarpiniai rezultatai
+susumuojami, kad gautume išvestį.
 
-As an example,
-:numref:`fig_trans_conv` illustrates
-how transposed convolution with a $2\times 2$ kernel is computed for a $2\times 2$ input tensor.
+Pavyzdžiui,
+:numref:`fig_trans_conv` iliustruoja,
+kaip transponuotoji konvoliucija su $2\times 2$ branduoliu apskaičiuojama $2\times 2$ įvesties tenzoriui.
 
 
-![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
+![Transponuotoji konvoliucija su $2\times 2$ branduoliu. Užtamsintos dalys yra tarpinio tenzoriaus dalis, taip pat skaičiavimui naudojami įvesties ir branduolio tenzorių elementai.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
 
 
-We can (**implement this basic transposed convolution operation**) `trans_conv` for a input matrix `X` and a kernel matrix `K`.
+Galime (**įgyvendinti šią pagrindinę transponuotosios konvoliucijos operaciją**) `trans_conv` įvesties matricai `X` ir branduolio matricai `K`.
 
 ```{.python .input}
 #@tab all
@@ -97,14 +97,14 @@ def trans_conv(X, K):
     return Y
 ```
 
-In contrast to the regular convolution (in :numref:`sec_conv_layer`) that *reduces* input elements
-via the kernel,
-the transposed convolution
-*broadcasts* input elements 
-via the kernel, thereby
-producing an output
-that is larger than the input.
-We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_trans_conv` to [**validate the output of the above implementation**] of the basic two-dimensional transposed convolution operation.
+Priešingai nei įprasta konvoliucija (:numref:`sec_conv_layer`), kuri *sumažina* įvesties elementus
+per branduolį,
+transponuotoji konvoliucija
+*išskleidžia* įvesties elementus
+per branduolį, taip
+sukurdama išvestį,
+kuri yra didesnė už įvestį.
+Galime sukonstruoti įvesties tenzorių `X` ir branduolio tenzorių `K` iš :numref:`fig_trans_conv`, kad [**patvirtintume aukščiau pateikto pagrindinės dvimatės transponuotosios konvoliucijos operacijos įgyvendinimo išvestį**].
 
 ```{.python .input}
 #@tab all
@@ -113,10 +113,10 @@ K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 trans_conv(X, K)
 ```
 
-Alternatively,
-when the input `X` and kernel `K` are both
-four-dimensional tensors,
-we can [**use high-level APIs to obtain the same results**].
+Alternatyviai,
+kai įvestis `X` ir branduolys `K` abu yra
+keturmačiai tenzoriai,
+galime [**naudoti aukšto lygio API tiems patiems rezultatams gauti**].
 
 ```{.python .input}
 #@tab mxnet
@@ -134,18 +134,17 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-## [**Padding, Strides, and Multiple Channels**]
+## [**Papildymas, žingsniai ir keli kanalai**]
 
-Different from in the regular convolution
-where padding is applied to input,
-it is applied to output
-in the transposed convolution.
-For example,
-when specifying the padding number
-on either side of the height and width 
-as 1,
-the first and last rows and columns
-will be removed from the transposed convolution output.
+Skirtingai nei įprastoje konvoliucijoje,
+kur papildymas taikomas įvesčiai,
+transponuotojoje konvoliucijoje jis taikomas išvesčiai.
+Pavyzdžiui,
+nurodžius papildymo skaičių
+abiejose aukščio ir pločio pusėse
+lygų 1,
+pirmoji ir paskutinė eilutės bei stulpeliai
+bus pašalinti iš transponuotosios konvoliucijos išvesties.
 
 ```{.python .input}
 #@tab mxnet
@@ -161,22 +160,21 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-In the transposed convolution,
-strides are specified for intermediate results (thus output), not for input.
-Using the same input and kernel tensors
-from :numref:`fig_trans_conv`,
-changing the stride from 1 to 2
-increases both the height and weight
-of intermediate tensors, hence the output tensor
-in :numref:`fig_trans_conv_stride2`.
+Transponuotojoje konvoliucijoje
+žingsniai nurodomi tarpiniams rezultatams (taigi ir išvesčiai), o ne įvesčiai.
+Naudojant tuos pačius įvesties ir branduolio tenzorius
+iš :numref:`fig_trans_conv`,
+pakeitus žingsnį iš 1 į 2,
+padidėja tiek tarpinių tenzorių aukštis, tiek plotis, taigi ir išvesties tenzorius
+:numref:`fig_trans_conv_stride2`.
 
 
-![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
+![Transponuotoji konvoliucija su $2\times 2$ branduoliu ir 2 žingsniu. Užtamsintos dalys yra tarpinio tenzoriaus dalis, taip pat skaičiavimui naudojami įvesties ir branduolio tenzorių elementai.](../img/trans_conv_stride2.svg)
 :label:`fig_trans_conv_stride2`
 
 
 
-The following code snippet can validate the transposed convolution output for stride of 2 in :numref:`fig_trans_conv_stride2`.
+Šis kodo fragmentas gali patvirtinti transponuotosios konvoliucijos išvestį su 2 žingsniu :numref:`fig_trans_conv_stride2`.
 
 ```{.python .input}
 #@tab mxnet
@@ -192,24 +190,23 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-For multiple input and output channels,
-the transposed convolution
-works in the same way as the regular convolution.
-Suppose that
-the input has $c_i$ channels,
-and that the transposed convolution
-assigns a $k_h\times k_w$ kernel tensor
-to each input channel.
-When multiple output channels 
-are specified,
-we will have a $c_i\times k_h\times k_w$ kernel for each output channel.
+Kelių įvesties ir išvesties kanalų atveju
+transponuotoji konvoliucija
+veikia taip pat kaip įprasta konvoliucija.
+Tarkime,
+kad įvestis turi $c_i$ kanalų
+ir kad transponuotoji konvoliucija
+priskiria $k_h\times k_w$ branduolio tenzorių
+kiekvienam įvesties kanalui.
+Kai nurodoma keli išvesties kanalai,
+kiekvienam išvesties kanalui turėsime $c_i\times k_h\times k_w$ branduolį.
 
 
-As in all, if we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolutional layer $g$ with the same hyperparameters as $f$ except 
-for the number of output channels 
-being the number of channels in $\mathsf{X}$,
-then $g(Y)$ will have the same shape as $\mathsf{X}$.
-This can be illustrated in the following example.
+Apskritai, jei paduodame $\mathsf{X}$ į konvoliucinį sluoksnį $f$, kad išvestume $\mathsf{Y}=f(\mathsf{X})$, ir sukuriame transponuotąjį konvoliucinį sluoksnį $g$ su tais pačiais hiperparametrais kaip $f$, išskyrus
+išvesties kanalų skaičių,
+kuris yra lygus $\mathsf{X}$ kanalų skaičiui,
+tai $g(Y)$ turės tokią pačią formą kaip $\mathsf{X}$.
+Tai galima iliustruoti šiuo pavyzdžiu.
 
 ```{.python .input}
 #@tab mxnet
@@ -229,16 +226,16 @@ tconv = nn.ConvTranspose2d(20, 10, kernel_size=5, padding=2, stride=3)
 tconv(conv(X)).shape == X.shape
 ```
 
-## [**Connection to Matrix Transposition**]
+## [**Sąryšis su matricos transponavimu**]
 :label:`subsec-connection-to-mat-transposition`
 
-The transposed convolution is named after
-the matrix transposition.
-To explain,
-let's first
-see how to implement convolutions
-using matrix multiplications.
-In the example below, we define a $3\times 3$ input `X` and a $2\times 2$ convolution kernel `K`, and then use the `corr2d` function to compute the convolution output `Y`.
+Transponuotoji konvoliucija pavadinta
+matricos transponavimo vardu.
+Kad paaiškintume,
+pirmiausia pažiūrėkime,
+kaip įgyvendinti konvoliucijas
+naudojant matricų daugybą.
+Toliau pateiktame pavyzdyje apibrėžiame $3\times 3$ įvestį `X` ir $2\times 2$ konvoliucijos branduolį `K`, o tada naudojame funkciją `corr2d` konvoliucijos išvesčiai `Y` apskaičiuoti.
 
 ```{.python .input}
 #@tab all
@@ -248,12 +245,12 @@ Y = d2l.corr2d(X, K)
 Y
 ```
 
-Next, we rewrite the convolution kernel `K` as
-a sparse weight matrix `W`
-containing a lot of zeros. 
-The shape of the weight matrix is ($4$, $9$),
-where the non-zero elements come from
-the convolution kernel `K`.
+Toliau perrašome konvoliucijos branduolį `K` kaip
+retąją svorių matricą `W`,
+kurioje yra daug nulių.
+Svorių matricos forma yra ($4$, $9$),
+kur nenuliniai elementai gaunami
+iš konvoliucijos branduolio `K`.
 
 ```{.python .input}
 #@tab all
@@ -267,25 +264,25 @@ W = kernel2matrix(K)
 W
 ```
 
-Concatenate the input `X` row by row to get a vector of length 9. Then the matrix multiplication of `W` and the vectorized `X` gives a vector of length 4.
-After reshaping it, we can obtain the same result `Y`
-from the original convolution operation above:
-we just implemented convolutions using matrix multiplications.
+Sukonkatenuokite įvestį `X` eilutė po eilutės, kad gautumėte 9 ilgio vektorių. Tada `W` ir vektorizuoto `X` matricų daugyba duoda 4 ilgio vektorių.
+Pakeitę jo formą, galime gauti tą patį rezultatą `Y`
+iš aukščiau pateiktos pradinės konvoliucijos operacijos:
+ką tik įgyvendinome konvoliucijas naudodami matricų daugybą.
 
 ```{.python .input}
 #@tab all
 Y == d2l.matmul(W, d2l.reshape(X, -1)).reshape(2, 2)
 ```
 
-Likewise, we can implement transposed convolutions using
-matrix multiplications.
-In the following example,
-we take the $2 \times 2$ output `Y` from the above
-regular convolution
-as input to the transposed convolution.
-To implement this operation by multiplying matrices,
-we only need to transpose the weight matrix `W`
-with the new shape $(9, 4)$.
+Panašiai galime įgyvendinti transponuotąsias konvoliucijas naudodami
+matricų daugybą.
+Toliau pateiktame pavyzdyje
+$2 \times 2$ išvestį `Y` iš aukščiau pateiktos
+įprastos konvoliucijos
+imame kaip transponuotosios konvoliucijos įvestį.
+Kad įgyvendintume šią operaciją dauginant matricas,
+tereikia transponuoti svorių matricą `W`,
+kurios nauja forma yra $(9, 4)$.
 
 ```{.python .input}
 #@tab all
@@ -293,48 +290,48 @@ Z = trans_conv(Y, K)
 Z == d2l.matmul(W.T, d2l.reshape(Y, -1)).reshape(3, 3)
 ```
 
-Consider implementing the convolution
-by multiplying matrices.
-Given an input vector $\mathbf{x}$
-and a weight matrix $\mathbf{W}$,
-the forward propagation function of the convolution
-can be implemented
-by multiplying its input with the weight matrix
-and outputting a vector 
+Apsvarstykime konvoliucijos įgyvendinimą
+dauginant matricas.
+Turint įvesties vektorių $\mathbf{x}$
+ir svorių matricą $\mathbf{W}$,
+konvoliucijos tiesioginio sklidimo funkciją
+galima įgyvendinti
+dauginant jos įvestį iš svorių matricos
+ir išvedant vektorių
 $\mathbf{y}=\mathbf{W}\mathbf{x}$.
-Since backpropagation
-follows the chain rule
-and $\nabla_{\mathbf{x}}\mathbf{y}=\mathbf{W}^\top$,
-the backpropagation function of the convolution
-can be implemented
-by multiplying its input with the 
-transposed weight matrix $\mathbf{W}^\top$.
-Therefore, 
-the transposed convolutional layer
-can just exchange the forward propagation function
-and the backpropagation function of the convolutional layer:
-its forward propagation 
-and backpropagation functions
-multiply their input vector with 
-$\mathbf{W}^\top$ and $\mathbf{W}$, respectively.
+Kadangi atgalinis sklidimas
+vadovaujasi grandinės taisykle
+ir $\nabla_{\mathbf{x}}\mathbf{y}=\mathbf{W}^\top$,
+konvoliucijos atgalinio sklidimo funkciją
+galima įgyvendinti
+dauginant jos įvestį iš
+transponuotosios svorių matricos $\mathbf{W}^\top$.
+Todėl
+transponuotasis konvoliucinis sluoksnis
+tiesiog gali sukeisti konvoliucinio sluoksnio tiesioginio sklidimo funkciją
+ir atgalinio sklidimo funkciją:
+jo tiesioginio sklidimo
+ir atgalinio sklidimo funkcijos
+daugina savo įvesties vektorių atitinkamai iš
+$\mathbf{W}^\top$ ir $\mathbf{W}$.
 
 
-## Summary
+## Santrauka
 
-* In contrast to the regular convolution that reduces input elements via the kernel, the transposed convolution broadcasts input elements via the kernel, thereby producing an output that is larger than the input.
-* If we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolutional layer $g$ with the same hyperparameters as $f$ except for the number of output channels being the number of channels in $\mathsf{X}$, then $g(Y)$ will have the same shape as $\mathsf{X}$.
-* We can implement convolutions using matrix multiplications. The transposed convolutional layer can just exchange the forward propagation function and the backpropagation function of the convolutional layer.
+* Priešingai nei įprasta konvoliucija, kuri sumažina įvesties elementus per branduolį, transponuotoji konvoliucija išskleidžia įvesties elementus per branduolį, taip sukurdama išvestį, kuri yra didesnė už įvestį.
+* Jei paduodame $\mathsf{X}$ į konvoliucinį sluoksnį $f$, kad išvestume $\mathsf{Y}=f(\mathsf{X})$, ir sukuriame transponuotąjį konvoliucinį sluoksnį $g$ su tais pačiais hiperparametrais kaip $f$, išskyrus išvesties kanalų skaičių, kuris yra lygus $\mathsf{X}$ kanalų skaičiui, tai $g(Y)$ turės tokią pačią formą kaip $\mathsf{X}$.
+* Konvoliucijas galime įgyvendinti naudodami matricų daugybą. Transponuotasis konvoliucinis sluoksnis tiesiog gali sukeisti konvoliucinio sluoksnio tiesioginio sklidimo funkciją ir atgalinio sklidimo funkciją.
 
 
-## Exercises
+## Pratimai
 
-1. In :numref:`subsec-connection-to-mat-transposition`, the convolution input `X` and the transposed convolution output `Z` have the same shape. Do they have the same value? Why?
-1. Is it efficient to use matrix multiplications to implement convolutions? Why?
+1. :numref:`subsec-connection-to-mat-transposition` konvoliucijos įvestis `X` ir transponuotosios konvoliucijos išvestis `Z` turi tokią pačią formą. Ar jų reikšmės tokios pačios? Kodėl?
+1. Ar efektyvu konvoliucijoms įgyvendinti naudoti matricų daugybą? Kodėl?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/376)
+[Diskusijos](https://discuss.d2l.ai/t/376)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1450)
+[Diskusijos](https://discuss.d2l.ai/t/1450)
 :end_tab:

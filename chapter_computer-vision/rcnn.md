@@ -1,136 +1,133 @@
-# Region-based CNNs (R-CNNs)
+# Sritymis pagrįsti CNN (R-CNN)
 :label:`sec_rcnn`
 
-Besides single shot multibox detection
-described in :numref:`sec_ssd`,
-region-based CNNs or regions with CNN features (R-CNNs)
-are also among many pioneering
-approaches of
-applying
-deep learning to object detection
+Be vieno praėjimo daugiastačiakampio aptikimo,
+aprašyto :numref:`sec_ssd`,
+sritymis pagrįsti CNN arba sritys su CNN požymiais (R-CNN)
+taip pat yra vienas iš daugelio novatoriškų
+giliojo mokymosi taikymo
+objektų aptikimui metodų
 :cite:`Girshick.Donahue.Darrell.ea.2014`.
-In this section, we will introduce
-the R-CNN and its series of improvements: the fast R-CNN
-:cite:`Girshick.2015`, the faster R-CNN :cite:`Ren.He.Girshick.ea.2015`, and the mask R-CNN
+Šiame skyrelyje pristatysime
+R-CNN ir jo patobulinimų seriją: greitąjį R-CNN
+:cite:`Girshick.2015`, greitesnįjį R-CNN :cite:`Ren.He.Girshick.ea.2015` ir kaukių R-CNN
 :cite:`He.Gkioxari.Dollar.ea.2017`.
-Due to limited space, we will only
-focus on the design of these models.
+Dėl ribotos vietos susitelksime tik į
+šių modelių dizainą.
 
 
 
-## R-CNNs
+## R-CNN
 
 
-The *R-CNN* first extracts
-many (e.g., 2000) *region proposals*
-from the input image
-(e.g., anchor boxes can also be considered
-as region proposals),
-labeling their classes and bounding boxes (e.g., offsets).
+*R-CNN* pirmiausia iš įvesties vaizdo išgauna
+daug (pvz., 2000) *sričių pasiūlymų*
+(pvz., inkarinius stačiakampius taip pat galima laikyti
+sričių pasiūlymais),
+pažymėdamas jų klases ir apibrėžiamuosius stačiakampius (pvz., poslinkius).
 :cite:`Girshick.Donahue.Darrell.ea.2014`
-Then a CNN is used to
-perform forward propagation on each region proposal
-to extract its features.
-Next, features of each region proposal
-are used for
-predicting the class and bounding box
-of this region proposal.
+Tada CNN naudojamas
+tiesioginiam sklidimui atlikti kiekvienam sričių pasiūlymui,
+kad būtų išgauti jo požymiai.
+Toliau kiekvieno sričių pasiūlymo požymiai
+naudojami
+šio sričių pasiūlymo klasei ir apibrėžiamajam stačiakampiui
+prognozuoti.
 
 
-![The R-CNN model.](../img/r-cnn.svg)
+![R-CNN modelis.](../img/r-cnn.svg)
 :label:`fig_r-cnn`
 
-:numref:`fig_r-cnn` shows the R-CNN model. More concretely, the R-CNN consists of the following four steps:
+:numref:`fig_r-cnn` parodytas R-CNN modelis. Konkrečiau, R-CNN sudaro šie keturi žingsniai:
 
-1. Perform *selective search* to extract multiple high-quality region proposals on the input image :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013`. These proposed regions are usually selected at multiple scales with different shapes and sizes. Each region proposal will be labeled with a class and a ground-truth bounding box.
-1. Choose a pretrained CNN and truncate it before the output layer. Resize each region proposal to the input size required by the network, and output the extracted features for the region proposal through forward propagation.
-1. Take the extracted features and labeled class of each region proposal as an example. Train multiple support vector machines to classify objects, where each support vector machine individually determines whether the example contains a specific class.
-1. Take the extracted features and labeled bounding box of each region proposal as an example. Train a linear regression model to predict the ground-truth bounding box.
+1. Atlikite *selektyviąją paiešką* (angl. *selective search*), kad išgautumėte kelis aukštos kokybės sričių pasiūlymus įvesties vaizde :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013`. Šios pasiūlytos sritys paprastai atrenkamos keliais masteliais, skirtingų formų ir dydžių. Kiekvienas sričių pasiūlymas bus pažymėtas klase ir tikruoju apibrėžiamuoju stačiakampiu.
+1. Pasirinkite iš anksto apmokytą CNN ir nupjaukite jį prieš išvesties sluoksnį. Pakeiskite kiekvieno sričių pasiūlymo dydį į tinklo reikalaujamą įvesties dydį ir per tiesioginį sklidimą išveskite sričių pasiūlymo išgautus požymius.
+1. Paimkite kiekvieno sričių pasiūlymo išgautus požymius ir pažymėtą klasę kaip pavyzdį. Apmokykite kelias atraminių vektorių mašinas objektams klasifikuoti, kur kiekviena atraminių vektorių mašina atskirai nustato, ar pavyzdyje yra tam tikra klasė.
+1. Paimkite kiekvieno sričių pasiūlymo išgautus požymius ir pažymėtą apibrėžiamąjį stačiakampį kaip pavyzdį. Apmokykite tiesinės regresijos modelį tikrajam apibrėžiamajam stačiakampiui prognozuoti.
 
 
-Although the R-CNN model uses pretrained CNNs to effectively extract image features,
-it is slow.
-Imagine that we select
-thousands of region proposals from a single input image:
-this requires thousands of
-CNN forward propagations to perform object detection.
-This massive
-computing load makes it infeasible to
-widely use R-CNNs in real-world applications.
+Nors R-CNN modelis naudoja iš anksto apmokytus CNN, kad veiksmingai išgautų vaizdų požymius,
+jis yra lėtas.
+Įsivaizduokite, kad iš vieno įvesties vaizdo atrenkame
+tūkstančius sričių pasiūlymų:
+objektų aptikimui reikia tūkstančių
+CNN tiesioginio sklidimo kartų.
+Dėl šios milžiniškos
+skaičiavimo apkrovos R-CNN plačiai naudoti realaus pasaulio taikymuose
+neįmanoma.
 
-## Fast R-CNN
+## Greitasis R-CNN
 
-The main performance bottleneck of
-an R-CNN lies in
-the independent CNN forward propagation
-for each region proposal,
-without sharing computation.
-Since these regions usually have
-overlaps,
-independent feature extractions lead to
-much repeated computation.
-One of the major improvements of
-the *fast R-CNN* from the
-R-CNN is that
-the CNN forward propagation
-is only performed on
-the entire image :cite:`Girshick.2015`.
+Pagrindinis R-CNN našumo kliūtis slypi
+nepriklausomame CNN tiesioginiame sklidime
+kiekvienam sričių pasiūlymui,
+nesidalijant skaičiavimais.
+Kadangi šios sritys paprastai
+persidengia,
+nepriklausomas požymių išgavimas lemia
+daug pasikartojančių skaičiavimų.
+Vienas iš pagrindinių
+*greitojo R-CNN* patobulinimų, palyginti su
+R-CNN, yra tai, kad
+CNN tiesioginis sklidimas
+atliekamas tik
+visam vaizdui :cite:`Girshick.2015`.
 
-![The fast R-CNN model.](../img/fast-rcnn.svg)
+![Greitasis R-CNN modelis.](../img/fast-rcnn.svg)
 :label:`fig_fast_r-cnn`
 
-:numref:`fig_fast_r-cnn` describes the fast R-CNN model. Its major computations are as follows:
+:numref:`fig_fast_r-cnn` aprašytas greitasis R-CNN modelis. Pagrindiniai jo skaičiavimai yra tokie:
 
 
-1. Compared with the R-CNN, in the fast R-CNN the input of the CNN for feature extraction is the entire image, rather than individual region proposals. Moreover, this CNN is trainable. Given an input image, let the shape of the CNN output be $1 \times c \times h_1  \times w_1$.
-1. Suppose that selective search generates $n$ region proposals. These region proposals (of different shapes) mark regions of interest (of different shapes) on the CNN output. Then these regions of interest further extract features of the same shape (say height $h_2$ and width $w_2$ are specified) in order to be easily concatenated. To achieve this, the fast R-CNN introduces the *region of interest (RoI) pooling* layer: the CNN output and region proposals are input into this layer, outputting concatenated features of shape $n \times c \times h_2 \times w_2$ that are further extracted for all the region proposals.
-1. Using a fully connected layer, transform the concatenated features into an output of shape $n \times d$, where $d$ depends on the model design.
-1. Predict the class and bounding box for each of the $n$ region proposals. More concretely, in class and bounding box prediction, transform the fully connected layer output into an output of shape $n \times q$ ($q$ is the number of classes) and an output of shape $n \times 4$, respectively. The class prediction uses softmax regression.
+1. Palyginti su R-CNN, greitajame R-CNN požymiams išgauti skirto CNN įvestis yra visas vaizdas, o ne atskiri sričių pasiūlymai. Be to, šis CNN yra apmokomas. Turint įvesties vaizdą, tegul CNN išvesties forma yra $1 \times c \times h_1  \times w_1$.
+1. Tarkime, kad selektyvioji paieška sugeneruoja $n$ sričių pasiūlymų. Šie sričių pasiūlymai (skirtingų formų) žymi dominančias sritis (skirtingų formų) CNN išvestyje. Tada iš šių dominančių sričių išgaunami tos pačios formos požymiai (tarkime, nurodytas aukštis $h_2$ ir plotis $w_2$), kad juos būtų lengva sukonkatenuoti. Tam pasiekti greitasis R-CNN pristato *dominančios srities (angl. region of interest, RoI) sutelkimo* sluoksnį: CNN išvestis ir sričių pasiūlymai paduodami į šį sluoksnį, kuris išveda sukonkatenuotus požymius, kurių forma $n \times c \times h_2 \times w_2$, išgautus visiems sričių pasiūlymams.
+1. Naudodami pilnai sujungtą sluoksnį, paverskite sukonkatenuotus požymius į išvestį, kurios forma $n \times d$, kur $d$ priklauso nuo modelio dizaino.
+1. Prognozuokite kiekvieno iš $n$ sričių pasiūlymų klasę ir apibrėžiamąjį stačiakampį. Konkrečiau, klasės ir apibrėžiamojo stačiakampio prognozavime pilnai sujungto sluoksnio išvestį paverskite atitinkamai išvestimi, kurios forma $n \times q$ ($q$ yra klasių skaičius), ir išvestimi, kurios forma $n \times 4$. Klasės prognozavimui naudojama softmax regresija.
 
 
-The region of interest pooling layer proposed in the fast R-CNN is different from the pooling layer introduced in :numref:`sec_pooling`.
-In the pooling layer,
-we indirectly control the output shape
-by specifying sizes of
-the pooling window, padding, and stride.
-In contrast,
-we can directly specify the output shape
-in the region of interest pooling layer.
+Greitajame R-CNN pasiūlytas dominančios srities sutelkimo sluoksnis skiriasi nuo sutelkimo sluoksnio, pristatyto :numref:`sec_pooling`.
+Sutelkimo sluoksnyje
+išvesties formą valdome netiesiogiai,
+nurodydami
+sutelkimo lango dydžius, papildymą ir žingsnį.
+Priešingai,
+dominančios srities sutelkimo sluoksnyje
+išvesties formą galime nurodyti tiesiogiai.
 
-For example, let's specify
-the output height and width
-for each region as $h_2$ and $w_2$, respectively.
-For any region of interest window
-of shape $h \times w$,
-this window is divided into a $h_2 \times w_2$ grid
-of subwindows,
-where the shape of each subwindow is approximately
+Pavyzdžiui, nurodykime
+kiekvienos srities išvesties aukštį ir plotį
+atitinkamai kaip $h_2$ ir $w_2$.
+Bet kuriam dominančios srities langui,
+kurio forma $h \times w$,
+šis langas padalijamas į $h_2 \times w_2$ tinklelį
+poslangių,
+kur kiekvieno poslangio forma yra apytiksliai
 $(h/h_2) \times (w/w_2)$.
-In practice,
-the height and width of any subwindow shall be rounded up, and the largest element shall be used as output of the subwindow.
-Therefore, the region of interest pooling layer can extract features of the same shape
-even when regions of interest have different shapes.
+Praktikoje
+bet kurio poslangio aukštis ir plotis suapvalinami aukštyn, o didžiausias elementas naudojamas kaip poslangio išvestis.
+Todėl dominančios srities sutelkimo sluoksnis gali išgauti tos pačios formos požymius
+net kai dominančios sritys turi skirtingas formas.
 
 
-As an illustrative example,
-in :numref:`fig_roi`,
-the upper-left $3\times 3$ region of interest
-is selected on a $4 \times 4$ input.
-For this region of interest,
-we use a $2\times 2$ region of interest pooling layer to obtain
-a $2\times 2$ output.
-Note that
-each of the four divided subwindows
-contains elements
-0, 1, 4, and 5 (5 is the maximum);
-2 and 6 (6 is the maximum);
-8 and 9 (9 is the maximum);
-and 10.
+Kaip iliustracinis pavyzdys,
+:numref:`fig_roi`
+$4 \times 4$ įvestyje
+pasirinkta viršutinė kairioji $3\times 3$ dominanti sritis.
+Šiai dominančiai sričiai
+naudojame $2\times 2$ dominančios srities sutelkimo sluoksnį, kad gautume
+$2\times 2$ išvestį.
+Atkreipkite dėmesį, kad
+kiekviename iš keturių padalytų poslangių
+yra elementai
+0, 1, 4 ir 5 (5 yra maksimumas);
+2 ir 6 (6 yra maksimumas);
+8 ir 9 (9 yra maksimumas);
+ir 10.
 
-![A $2\times 2$ region of interest pooling layer.](../img/roi.svg)
+![$2\times 2$ dominančios srities sutelkimo sluoksnis.](../img/roi.svg)
 :label:`fig_roi`
 
-Below we demonstrate the computation of the region of interest pooling layer. Suppose that the height and width of the CNN-extracted features `X` are both 4, and there is only a single channel.
+Toliau parodome dominančios srities sutelkimo sluoksnio skaičiavimą. Tarkime, kad CNN išgautų požymių `X` aukštis ir plotis yra 4, ir yra tik vienas kanalas.
 
 ```{.python .input}
 #@tab mxnet
@@ -151,11 +148,11 @@ X = torch.arange(16.).reshape(1, 1, 4, 4)
 X
 ```
 
-Let's further suppose
-that  the height and width of the input image are both 40 pixels and that selective search generates two region proposals on this image.
-Each region proposal
-is expressed as five elements:
-its object class followed by the $(x, y)$-coordinates of its upper-left and lower-right corners.
+Be to, tarkime,
+kad įvesties vaizdo aukštis ir plotis yra po 40 pikselių ir kad selektyvioji paieška šiame vaizde sugeneruoja du sričių pasiūlymus.
+Kiekvienas sričių pasiūlymas
+išreiškiamas penkiais elementais:
+jo objekto klase, po kurios eina viršutinio kairiojo ir apatinio dešiniojo kampų $(x, y)$ koordinatės.
 
 ```{.python .input}
 #@tab mxnet
@@ -167,14 +164,14 @@ rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 rois = torch.Tensor([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
-Because the height and width of `X` are $1/10$ of the height and width of the input image,
-the coordinates of the two region proposals
-are multiplied by 0.1 according to the specified `spatial_scale` argument.
-Then the two regions of interest are marked on `X` as `X[:, :, 0:3, 0:3]` and `X[:, :, 1:4, 0:4]`, respectively.
-Finally in the $2\times 2$ region of interest pooling,
-each region of interest is divided
-into a grid of sub-windows to
-further extract features of the same shape $2\times 2$.
+Kadangi `X` aukštis ir plotis yra $1/10$ įvesties vaizdo aukščio ir pločio,
+abiejų sričių pasiūlymų koordinatės
+padauginamos iš 0,1 pagal nurodytą argumentą `spatial_scale`.
+Tada dvi dominančios sritys `X` pažymimos kaip `X[:, :, 0:3, 0:3]` ir `X[:, :, 1:4, 0:4]` atitinkamai.
+Galiausiai $2\times 2$ dominančios srities sutelkime
+kiekviena dominanti sritis padalijama
+į poslangių tinklelį, kad
+būtų išgauti tos pačios $2\times 2$ formos požymiai.
 
 ```{.python .input}
 #@tab mxnet
@@ -186,115 +183,113 @@ npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)
 torchvision.ops.roi_pool(X, rois, output_size=(2, 2), spatial_scale=0.1)
 ```
 
-## Faster R-CNN
+## Greitesnysis R-CNN
 
-To be more accurate in object detection,
-the fast R-CNN model
-usually has to generate
-a lot of region proposals in selective search.
-To reduce region proposals
-without loss of accuracy,
-the *faster R-CNN*
-proposes to replace selective search with a *region proposal network* :cite:`Ren.He.Girshick.ea.2015`.
+Kad objektų aptikimas būtų tikslesnis,
+greitasis R-CNN modelis
+paprastai turi sugeneruoti
+daug sričių pasiūlymų selektyviojoje paieškoje.
+Kad sričių pasiūlymų skaičius sumažėtų
+neprarandant tikslumo,
+*greitesnysis R-CNN*
+siūlo selektyviąją paiešką pakeisti *sričių pasiūlymų tinklu* :cite:`Ren.He.Girshick.ea.2015`.
 
 
 
-![The faster R-CNN model.](../img/faster-rcnn.svg)
+![Greitesnysis R-CNN modelis.](../img/faster-rcnn.svg)
 :label:`fig_faster_r-cnn`
 
 
-:numref:`fig_faster_r-cnn` shows the faster R-CNN model. Compared with the fast R-CNN,
-the faster R-CNN only changes
-the region proposal method
-from selective search to a region proposal network.
-The rest of the model remain
-unchanged.
-The region proposal network
-works in the following steps:
+:numref:`fig_faster_r-cnn` parodytas greitesnysis R-CNN modelis. Palyginti su greitaisiais R-CNN,
+greitesnysis R-CNN pakeičia tik
+sričių pasiūlymų metodą:
+selektyviąją paiešką keičia sričių pasiūlymų tinklu.
+Likusi modelio dalis lieka
+nepakitusi.
+Sričių pasiūlymų tinklas
+veikia šiais žingsniais:
 
-1. Use a $3\times 3$ convolutional layer with padding of 1 to transform the CNN output to a new output with $c$ channels. In this way, each unit along the spatial dimensions of the CNN-extracted feature maps gets a new feature vector of length $c$.
-1. Centered on each pixel of the feature maps, generate multiple anchor boxes of different scales and aspect ratios and label them.
-1. Using the length-$c$ feature vector at the center of each anchor box, predict the binary class (background or objects) and bounding box for this anchor box.
-1. Consider those predicted bounding boxes whose  predicted classes are objects. Remove overlapped results using non-maximum suppression. The remaining  predicted bounding boxes for objects are the region proposals required by the region of interest pooling layer.
+1. Naudokite $3\times 3$ konvoliucinį sluoksnį su 1 papildymu, kad paverstumėte CNN išvestį nauja išvestimi su $c$ kanalų. Taip kiekvienas CNN išgautų požymių žemėlapių erdvinių dimensijų vienetas gauna naują $c$ ilgio požymių vektorių.
+1. Aplink kiekvieną požymių žemėlapių pikselį sugeneruokite kelis skirtingų mastelių ir kraštinių santykių inkarinius stačiakampius ir juos pažymėkite.
+1. Naudodami $c$ ilgio požymių vektorių kiekvieno inkarinio stačiakampio centre, prognozuokite šio inkarinio stačiakampio dvejetainę klasę (fonas arba objektai) ir apibrėžiamąjį stačiakampį.
+1. Atsižvelkite į tuos prognozuojamus apibrėžiamuosius stačiakampius, kurių prognozuojamos klasės yra objektai. Pašalinkite persidengiančius rezultatus naudodami nemaksimalių reikšmių slopinimą. Likę prognozuojami objektų apibrėžiamieji stačiakampiai yra sričių pasiūlymai, reikalingi dominančios srities sutelkimo sluoksniui.
 
 
 
-It is worth noting that,
-as part of the faster R-CNN model,
-the region
-proposal network is jointly trained
-with the rest of the model.
-In other words, the objective function of
-the faster R-CNN includes
-not only the class and bounding box prediction
-in object detection,
-but also the binary class and bounding box prediction
-of anchor boxes in the region proposal network.
-As a result of the end-to-end training,
-the region proposal network learns
-how to generate high-quality region proposals,
-so as to stay accurate in object detection
-with a reduced number of region proposals
-that are learned from data.
+Verta pažymėti, kad
+kaip greitesniojo R-CNN modelio dalis,
+sričių pasiūlymų tinklas apmokomas kartu
+su likusia modelio dalimi.
+Kitaip tariant, greitesniojo R-CNN tikslo funkcija apima
+ne tik klasės ir apibrėžiamojo stačiakampio prognozavimą
+objektų aptikime,
+bet ir inkarinių stačiakampių dvejetainės klasės bei apibrėžiamojo stačiakampio prognozavimą
+sričių pasiūlymų tinkle.
+Dėl apmokymo nuo pradžios iki galo
+sričių pasiūlymų tinklas išmoksta,
+kaip generuoti aukštos kokybės sričių pasiūlymus,
+kad objektų aptikimas išliktų tikslus
+su sumažintu sričių pasiūlymų skaičiumi,
+kurie išmokstami iš duomenų.
 
 
 
 
-## Mask R-CNN
+## Kaukių R-CNN
 
-In the training dataset,
-if pixel-level positions of object
-are also labeled on images,
-the *mask R-CNN* can effectively leverage
-such detailed labels
-to further improve the accuracy of object detection :cite:`He.Gkioxari.Dollar.ea.2017`.
+Apmokymo duomenų rinkinyje,
+jei vaizduose taip pat pažymėtos
+pikselių lygmens objektų padėtys,
+*kaukių R-CNN* gali veiksmingai pasinaudoti
+tokiais išsamiais žymenimis,
+kad dar labiau pagerintų objektų aptikimo tikslumą :cite:`He.Gkioxari.Dollar.ea.2017`.
 
 
-![The mask R-CNN model.](../img/mask-rcnn.svg)
+![Kaukių R-CNN modelis.](../img/mask-rcnn.svg)
 :label:`fig_mask_r-cnn`
 
-As shown in :numref:`fig_mask_r-cnn`,
-the mask R-CNN
-is modified based on the faster R-CNN.
-Specifically,
-the mask R-CNN replaces the
-region of interest pooling layer with the
-*region of interest (RoI) alignment* layer.
-This region of interest alignment layer
-uses bilinear interpolation
-to preserve the spatial information on the feature maps, which is more suitable for pixel-level prediction.
-The output of this layer
-contains feature maps of the same shape
-for all the regions of interest.
-They are used
-to predict
-not only the class and bounding box for each region of interest,
-but also the pixel-level position of the object through an additional fully convolutional network.
-More details on using a fully convolutional network to predict pixel-level semantics of an image
-will be provided
-in subsequent sections of this chapter.
+Kaip parodyta :numref:`fig_mask_r-cnn`,
+kaukių R-CNN
+yra modifikuotas remiantis greitesniuoju R-CNN.
+Konkrečiai,
+kaukių R-CNN pakeičia
+dominančios srities sutelkimo sluoksnį
+*dominančios srities (RoI) sulygiavimo* sluoksniu.
+Šis dominančios srities sulygiavimo sluoksnis
+naudoja bitiesinę interpoliaciją,
+kad išsaugotų erdvinę informaciją požymių žemėlapiuose, o tai labiau tinka pikselių lygmens prognozavimui.
+Šio sluoksnio išvestis
+apima tos pačios formos požymių žemėlapius
+visoms dominančioms sritims.
+Jie naudojami
+prognozuoti
+ne tik kiekvienos dominančios srities klasę ir apibrėžiamąjį stačiakampį,
+bet ir pikselių lygmens objekto padėtį per papildomą pilnai konvoliucinį tinklą.
+Daugiau informacijos apie pilnai konvoliucinio tinklo naudojimą vaizdo pikselių lygmens semantikai prognozuoti
+bus pateikta
+tolesniuose šio skyriaus skyreliuose.
 
 
 
 
-## Summary
+## Santrauka
 
 
-* The R-CNN extracts many region proposals from the input image, uses a CNN to perform forward propagation on each region proposal to extract its features, then uses these features to predict the class and bounding box of this region proposal.
-* One of the major improvements of  the fast R-CNN from the R-CNN is that the CNN forward propagation is only performed on  the entire image. It also introduces the region of interest pooling layer, so that features of the same shape can be further extracted for regions of interest that have different shapes.
-* The faster R-CNN replaces the selective search used in the fast R-CNN with a jointly trained region proposal network, so that the former can stay accurate in object detection with a reduced number of region proposals.
-* Based on the faster R-CNN, the mask R-CNN additionally introduces a fully convolutional network, so as to leverage pixel-level labels to further improve the accuracy of object detection.
+* R-CNN iš įvesties vaizdo išgauna daug sričių pasiūlymų, naudoja CNN tiesioginiam sklidimui atlikti kiekvienam sričių pasiūlymui, kad išgautų jo požymius, tada naudoja šiuos požymius šio sričių pasiūlymo klasei ir apibrėžiamajam stačiakampiui prognozuoti.
+* Vienas iš pagrindinių greitojo R-CNN patobulinimų, palyginti su R-CNN, yra tai, kad CNN tiesioginis sklidimas atliekamas tik visam vaizdui. Jis taip pat pristato dominančios srities sutelkimo sluoksnį, kad tos pačios formos požymius būtų galima išgauti iš skirtingų formų dominančių sričių.
+* Greitesnysis R-CNN pakeičia greitajame R-CNN naudojamą selektyviąją paiešką kartu apmokomu sričių pasiūlymų tinklu, kad objektų aptikimas išliktų tikslus su sumažintu sričių pasiūlymų skaičiumi.
+* Remdamasis greitesniuoju R-CNN, kaukių R-CNN papildomai pristato pilnai konvoliucinį tinklą, kad pasinaudotų pikselių lygmens žymenimis ir dar labiau pagerintų objektų aptikimo tikslumą.
 
 
-## Exercises
+## Pratimai
 
-1. Can we frame object detection as a single regression problem, such as predicting bounding boxes and class probabilities? You may refer to the design of the YOLO model :cite:`Redmon.Divvala.Girshick.ea.2016`.
-1. Compare single shot multibox detection with the methods introduced in this section. What are their major differences? You may refer to Figure 2 of :citet:`Zhao.Zheng.Xu.ea.2019`.
+1. Ar galime objektų aptikimą formuluoti kaip vieną regresijos uždavinį, pavyzdžiui, prognozuojant apibrėžiamuosius stačiakampius ir klasių tikimybes? Galite remtis YOLO modelio dizainu :cite:`Redmon.Divvala.Girshick.ea.2016`.
+1. Palyginkite vieno praėjimo daugiastačiakampį aptikimą su šiame skyrelyje pristatytais metodais. Kokie yra jų pagrindiniai skirtumai? Galite remtis :citet:`Zhao.Zheng.Xu.ea.2019` 2 paveikslu.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/374)
+[Diskusijos](https://discuss.d2l.ai/t/374)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1409)
+[Diskusijos](https://discuss.d2l.ai/t/1409)
 :end_tab:

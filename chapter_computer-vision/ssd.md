@@ -1,132 +1,127 @@
-# Single Shot Multibox Detection
+# Vieno praėjimo daugiastačiakampis aptikimas
 :label:`sec_ssd`
 
-In :numref:`sec_bbox`--:numref:`sec_object-detection-dataset`,
-we introduced bounding boxes, anchor boxes,
-multiscale object detection, and the dataset for object detection.
-Now we are ready to use such background
-knowledge to design an object detection model:
-single shot multibox detection
-(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`.
-This model is simple, fast, and widely used.
-Although this is just one of vast amounts of
-object detection models,
-some of the design principles
-and implementation details in this section
-are also applicable to other models.
+:numref:`sec_bbox`–:numref:`sec_object-detection-dataset`
+pristatėme apibrėžiamuosius stačiakampius, inkarinius stačiakampius,
+daugiamastelį objektų aptikimą ir objektų aptikimo duomenų rinkinį.
+Dabar esame pasirengę panaudoti šias pagrindines
+žinias objektų aptikimo modeliui suprojektuoti:
+vieno praėjimo daugiastačiakampiam aptikimui
+(angl. *single shot multibox detection*, SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`.
+Šis modelis yra paprastas, greitas ir plačiai naudojamas.
+Nors tai tik vienas iš daugybės
+objektų aptikimo modelių,
+kai kurie šiame skyrelyje aprašyti projektavimo principai
+ir įgyvendinimo detalės
+taikomi ir kitiems modeliams.
 
 
-## Model
+## Modelis
 
-:numref:`fig_ssd` provides an overview of
-the design of single-shot multibox detection.
-This model mainly consists of
-a base network
-followed by
-several multiscale feature map blocks.
-The base network
-is for extracting features from the input image,
-so it can use a deep CNN.
-For example,
-the original single-shot multibox detection paper
-adopts a VGG network truncated before the
-classification layer :cite:`Liu.Anguelov.Erhan.ea.2016`,
-while ResNet has also been commonly used.
-Through our design
-we can make the base network output
-larger feature maps
-so as to generate more anchor boxes
-for detecting smaller objects.
-Subsequently,
-each multiscale feature map block
-reduces (e.g., by half)
-the height and width of the feature maps
-from the previous block,
-and enables each unit
-of the feature maps
-to increase its receptive field on the input image.
-
-
-Recall the design
-of multiscale object detection
-through layerwise representations of images by
-deep neural networks
-in :numref:`sec_multiscale-object-detection`.
-Since
-multiscale feature maps closer to the top of :numref:`fig_ssd`
-are smaller but have larger receptive fields,
-they are suitable for detecting
-fewer but larger objects.
-
-In a nutshell,
-via its base network and several multiscale feature map blocks,
-single-shot multibox detection
-generates a varying number of anchor boxes with different sizes,
-and detects varying-size objects
-by predicting classes and offsets
-of these anchor boxes (thus the bounding boxes);
-thus, this is a multiscale object detection model.
+:numref:`fig_ssd` pateikiama vieno praėjimo daugiastačiakampio aptikimo
+dizaino apžvalga.
+Šį modelį daugiausia sudaro
+bazinis tinklas,
+po kurio eina
+keli daugiamasteliai požymių žemėlapių blokai.
+Bazinis tinklas
+skirtas požymiams iš įvesties vaizdo išgauti,
+todėl jame gali būti naudojamas gilusis CNN.
+Pavyzdžiui,
+originaliame vieno praėjimo daugiastačiakampio aptikimo straipsnyje
+naudojamas VGG tinklas, nupjautas prieš
+klasifikavimo sluoksnį :cite:`Liu.Anguelov.Erhan.ea.2016`,
+nors dažnai naudojamas ir ResNet.
+Savo dizainu
+galime padaryti, kad bazinis tinklas išvestų
+didesnius požymių žemėlapius,
+kad būtų sugeneruota daugiau inkarinių stačiakampių
+mažesniems objektams aptikti.
+Vėliau
+kiekvienas daugiamastelis požymių žemėlapių blokas
+sumažina (pvz., perpus)
+ankstesnio bloko požymių žemėlapių aukštį ir plotį
+ir leidžia kiekvienam požymių žemėlapių
+vienetui
+padidinti savo lokalią matymo sritį įvesties vaizde.
 
 
-![As a multiscale object detection model, single-shot multibox detection mainly consists of a base network followed by several multiscale feature map blocks.](../img/ssd.svg)
+Prisiminkite daugiamastelio objektų aptikimo dizainą,
+naudojant giliųjų neuroninių tinklų
+sluoksninius vaizdų vaizdavimus,
+:numref:`sec_multiscale-object-detection`.
+Kadangi
+daugiamasteliai požymių žemėlapiai, esantys arčiau :numref:`fig_ssd` viršaus,
+yra mažesni, bet turi didesnes lokalias matymo sritis,
+jie tinka aptikti
+mažiau, bet didesnių objektų.
+
+Trumpai tariant,
+per savo bazinį tinklą ir kelis daugiamastelius požymių žemėlapių blokus
+vieno praėjimo daugiastačiakampis aptikimas
+generuoja kintamą skirtingo dydžio inkarinių stačiakampių skaičių
+ir aptinka skirtingo dydžio objektus
+prognozuodamas šių inkarinių stačiakampių (taigi ir apibrėžiamųjų stačiakampių)
+klases ir poslinkius;
+taigi tai yra daugiamastelis objektų aptikimo modelis.
+
+
+![Kaip daugiamastelis objektų aptikimo modelis, vieno praėjimo daugiastačiakampį aptikimą daugiausia sudaro bazinis tinklas, po kurio eina keli daugiamasteliai požymių žemėlapių blokai.](../img/ssd.svg)
 :label:`fig_ssd`
 
 
-In the following,
-we will describe the implementation details
-of different blocks in :numref:`fig_ssd`. To begin with, we discuss how to implement
-the class and bounding box prediction.
+Toliau
+aprašysime skirtingų blokų
+įgyvendinimo detales :numref:`fig_ssd`. Pradėkime nuo to, kaip įgyvendinti
+klasių ir apibrėžiamųjų stačiakampių prognozavimą.
 
 
 
-### [**Class Prediction Layer**]
+### [**Klasių prognozavimo sluoksnis**]
 
-Let the number of object classes be $q$.
-Then anchor boxes have $q+1$ classes,
-where class 0 is background.
-At some scale,
-suppose that the height and width of feature maps
-are $h$ and $w$, respectively.
-When $a$ anchor boxes
-are generated with
-each spatial position of these feature maps as their center,
-a total of $hwa$ anchor boxes need to be classified.
-This often makes classification with fully connected layers infeasible due to likely
-heavy parametrization costs.
-Recall how we used channels of
-convolutional layers
-to predict classes in :numref:`sec_nin`.
-Single-shot multibox detection uses the
-same technique to reduce model complexity.
+Tegul objektų klasių skaičius yra $q$.
+Tada inkariniai stačiakampiai turi $q+1$ klasių,
+kur 0 klasė yra fonas.
+Tam tikru masteliu
+tarkime, kad požymių žemėlapių aukštis ir plotis
+yra atitinkamai $h$ ir $w$.
+Kai $a$ inkarinių stačiakampių
+generuojama kiekvieną šių požymių žemėlapių erdvinę padėtį laikant jų centru,
+iš viso reikia klasifikuoti $hwa$ inkarinių stačiakampių.
+Dėl galimai
+didelių parametrizavimo sąnaudų tai dažnai daro klasifikavimą pilnai sujungtais sluoksniais neįgyvendinamu.
+Prisiminkite, kaip :numref:`sec_nin` naudojome
+konvoliucinių sluoksnių kanalus
+klasėms prognozuoti.
+Vieno praėjimo daugiastačiakampis aptikimas naudoja
+tą pačią techniką modelio sudėtingumui sumažinti.
 
-Specifically,
-the class prediction layer uses a convolutional layer
-without altering width or height of feature maps.
-In this way,
-there can be a one-to-one correspondence
-between outputs and inputs
-at the same spatial dimensions (width and height)
-of feature maps.
-More concretely,
-channels of the output feature maps
-at any spatial position ($x$, $y$)
-represent class predictions
-for all the anchor boxes centered on
-($x$, $y$) of the input feature maps.
-To produce valid predictions,
-there must be $a(q+1)$ output channels,
-where for the same spatial position
-the output channel with index $i(q+1) + j$
-represents the prediction of
-the class $j$ ($0 \leq j \leq q$)
-for the anchor box $i$ ($0 \leq i < a$).
+Konkrečiai,
+klasių prognozavimo sluoksnis naudoja konvoliucinį sluoksnį,
+nekeisdamas požymių žemėlapių pločio ar aukščio.
+Taip
+išvestys ir įvestys gali atitikti viena kitą
+tose pačiose požymių žemėlapių erdvinėse dimensijose (plotis ir aukštis).
+Konkrečiau,
+išvesties požymių žemėlapių kanalai
+bet kurioje erdvinėje padėtyje ($x$, $y$)
+vaizduoja klasių prognozes
+visiems inkariniams stačiakampiams, kurių centras yra
+įvesties požymių žemėlapių ($x$, $y$).
+Kad būtų gautos galiojančios prognozės,
+turi būti $a(q+1)$ išvesties kanalų,
+kur toje pačioje erdvinėje padėtyje
+išvesties kanalas su indeksu $i(q+1) + j$
+vaizduoja
+$j$ klasės ($0 \leq j \leq q$) prognozę
+inkariniam stačiakampiui $i$ ($0 \leq i < a$).
 
-Below we define such a class prediction layer,
-specifying $a$ and $q$ via arguments `num_anchors` and `num_classes`, respectively.
-This layer uses a $3\times3$ convolutional layer with a
-padding of 1.
-The width and height of the input and output of this
-convolutional layer remain unchanged.
+Toliau apibrėžiame tokį klasių prognozavimo sluoksnį,
+nurodydami $a$ ir $q$ argumentais `num_anchors` ir `num_classes` atitinkamai.
+Šis sluoksnis naudoja $3\times3$ konvoliucinį sluoksnį su
+1 papildymu.
+Šio konvoliucinio sluoksnio įvesties ir išvesties plotis bei aukštis
+nesikeičia.
 
 ```{.python .input}
 #@tab mxnet
@@ -156,11 +151,11 @@ def cls_predictor(num_inputs, num_anchors, num_classes):
                      kernel_size=3, padding=1)
 ```
 
-### (**Bounding Box Prediction Layer**)
+### (**Apibrėžiamųjų stačiakampių prognozavimo sluoksnis**)
 
-The design of the bounding box prediction layer is similar to that of the class prediction layer.
-The only difference lies in the number of outputs for each anchor box:
-here we need to predict four offsets rather than $q+1$ classes.
+Apibrėžiamųjų stačiakampių prognozavimo sluoksnio dizainas panašus į klasių prognozavimo sluoksnio.
+Vienintelis skirtumas yra kiekvieno inkarinio stačiakampio išvesčių skaičius:
+čia reikia prognozuoti keturis poslinkius, o ne $q+1$ klasių.
 
 ```{.python .input}
 #@tab mxnet
@@ -174,35 +169,35 @@ def bbox_predictor(num_inputs, num_anchors):
     return nn.Conv2d(num_inputs, num_anchors * 4, kernel_size=3, padding=1)
 ```
 
-### [**Concatenating Predictions for Multiple Scales**]
+### [**Kelių mastelių prognozių konkatenavimas**]
 
-As we mentioned, single-shot multibox detection
-uses multiscale feature maps to generate anchor boxes and predict their classes and offsets.
-At different scales,
-the shapes of feature maps
-or the numbers of anchor boxes centered on the same unit
-may vary.
-Therefore,
-shapes of the prediction outputs
-at different scales may vary.
+Kaip minėjome, vieno praėjimo daugiastačiakampis aptikimas
+naudoja daugiamačio mastelio požymių žemėlapius inkariniams stačiakampiams generuoti ir jų klasėms bei poslinkiams prognozuoti.
+Skirtingais masteliais
+požymių žemėlapių formos
+arba to paties vieneto centre esančių inkarinių stačiakampių skaičius
+gali skirtis.
+Todėl
+prognozių išvesčių formos
+skirtingais masteliais gali skirtis.
 
-In the following example,
-we construct feature maps at two different scales,
-`Y1` and `Y2`,
-for the same minibatch,
-where the height and width of `Y2`
-are half of those of `Y1`.
-Let's take class prediction as an example.
-Suppose that
-5 and 3 anchor boxes
-are generated for every unit in `Y1` and `Y2`, respectively.
-Suppose further that
-the number of object classes is 10.
-For feature maps `Y1` and `Y2`
-the numbers of channels in the class prediction outputs
-are $5\times(10+1)=55$ and $3\times(10+1)=33$, respectively,
-where either output shape is
-(batch size, number of channels, height, width).
+Toliau pateiktame pavyzdyje
+sukonstruojame požymių žemėlapius dviem skirtingais masteliais,
+`Y1` ir `Y2`,
+tam pačiam minirinkiniui,
+kur `Y2` aukštis ir plotis
+yra perpus mažesni nei `Y1`.
+Paimkime klasių prognozavimą kaip pavyzdį.
+Tarkime, kad
+5 ir 3 inkariniai stačiakampiai
+generuojami kiekvienam `Y1` ir `Y2` vienetui atitinkamai.
+Be to, tarkime,
+kad objektų klasių skaičius yra 10.
+Požymių žemėlapiams `Y1` ir `Y2`
+klasių prognozių išvesčių kanalų skaičius
+yra atitinkamai $5\times(10+1)=55$ ir $3\times(10+1)=33$,
+kur abiejų išvesčių forma yra
+(rinkinio dydis, kanalų skaičius, aukštis, plotis).
 
 ```{.python .input}
 #@tab mxnet
@@ -225,22 +220,22 @@ Y2 = forward(torch.zeros((2, 16, 10, 10)), cls_predictor(16, 3, 10))
 Y1.shape, Y2.shape
 ```
 
-As we can see, except for the batch size dimension,
-the other three dimensions all have different sizes.
-To concatenate these two prediction outputs for more efficient computation,
-we will transform these tensors into a more consistent format.
+Kaip matome, išskyrus rinkinio dydžio dimensiją,
+kitos trys dimensijos turi skirtingus dydžius.
+Kad sukonkatenuotume šias dvi prognozių išvestis efektyvesniam skaičiavimui,
+paversime šiuos tenzorius nuoseklesniu formatu.
 
-Note that
-the channel dimension holds the predictions for
-anchor boxes with the same center.
-We first move this dimension to the innermost.
-Since the batch size remains the same for different scales,
-we can transform the prediction output
-into a two-dimensional tensor
-with shape (batch size, height $\times$ width $\times$ number of channels).
-Then we can concatenate
-such outputs at different scales
-along dimension 1.
+Atkreipkite dėmesį, kad
+kanalų dimensijoje saugomos
+to paties centro inkarinių stačiakampių prognozės.
+Pirmiausia perkeliame šią dimensiją į giliausią.
+Kadangi rinkinio dydis skirtingais masteliais išlieka tas pats,
+prognozių išvestį galime paversti
+dvimačiu tenzoriumi,
+kurio forma (rinkinio dydis, aukštis $\times$ plotis $\times$ kanalų skaičius).
+Tada galime sukonkatenuoti
+tokias išvestis skirtingais masteliais
+pagal 1 dimensiją.
 
 ```{.python .input}
 #@tab mxnet
@@ -260,35 +255,35 @@ def concat_preds(preds):
     return torch.cat([flatten_pred(p) for p in preds], dim=1)
 ```
 
-In this way,
-even though `Y1` and `Y2` have different sizes
-in channels, heights, and widths,
-we can still concatenate these two prediction outputs at two different scales for the same minibatch.
+Taip,
+nors `Y1` ir `Y2` turi skirtingus dydžius
+kanalų, aukščio ir pločio atžvilgiu,
+vis tiek galime sukonkatenuoti šias dvi dviem skirtingais masteliais gautas prognozių išvestis tam pačiam minirinkiniui.
 
 ```{.python .input}
 #@tab all
 concat_preds([Y1, Y2]).shape
 ```
 
-### [**Downsampling Block**]
+### [**Mažinimo blokas**]
 
-In order to detect objects at multiple scales,
-we define the following downsampling block `down_sample_blk` that
-halves the height and width of input feature maps.
-In fact,
-this block applies the design of VGG blocks
-in :numref:`subsec_vgg-blocks`.
-More concretely,
-each downsampling block consists of
-two $3\times3$ convolutional layers with padding of 1
-followed by a $2\times2$ max-pooling layer with stride of 2.
-As we know, $3\times3$ convolutional layers with padding of 1 do not change the shape of feature maps.
-However, the subsequent $2\times2$ max-pooling  reduces the height and width of input feature maps by half.
-For both input and output feature maps of this downsampling block,
-because $1\times 2+(3-1)+(3-1)=6$,
-each unit in the output
-has a $6\times6$ receptive field on the input.
-Therefore, the downsampling block enlarges the receptive field of each unit in its output feature maps.
+Kad aptiktume objektus keliais masteliais,
+apibrėžiame šį mažinimo bloką `down_sample_blk`, kuris
+perpus sumažina įvesties požymių žemėlapių aukštį ir plotį.
+Iš tikrųjų
+šis blokas taiko VGG blokų dizainą
+iš :numref:`subsec_vgg-blocks`.
+Konkrečiau,
+kiekvieną mažinimo bloką sudaro
+du $3\times3$ konvoliciniai sluoksniai su 1 papildymu,
+po kurių eina $2\times2$ sutelkimo sluoksnis imant maksimumą su 2 žingsniu.
+Kaip žinome, $3\times3$ konvoliciniai sluoksniai su 1 papildymu nekeičia požymių žemėlapių formos.
+Tačiau paskesnis $2\times2$ sutelkimo sluoksnis imant maksimumą perpus sumažina įvesties požymių žemėlapių aukštį ir plotį.
+Tiek šio mažinimo bloko įvesties, tiek išvesties požymių žemėlapiams,
+kadangi $1\times 2+(3-1)+(3-1)=6$,
+kiekvienas išvesties vienetas
+turi $6\times6$ lokalią matymo sritį įvestyje.
+Todėl mažinimo blokas padidina kiekvieno savo išvesties požymių žemėlapių vieneto lokalią matymo sritį.
 
 ```{.python .input}
 #@tab mxnet
@@ -316,7 +311,7 @@ def down_sample_blk(in_channels, out_channels):
     return nn.Sequential(*blk)
 ```
 
-In the following example, our constructed downsampling block changes the number of input channels and halves the height and width of the input feature maps.
+Toliau pateiktame pavyzdyje mūsų sukonstruotas mažinimo blokas pakeičia įvesties kanalų skaičių ir perpus sumažina įvesties požymių žemėlapių aukštį ir plotį.
 
 ```{.python .input}
 #@tab mxnet
@@ -328,15 +323,15 @@ forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape
 ```
 
-### [**Base Network Block**]
+### [**Bazinio tinklo blokas**]
 
-The base network block is used to extract features from input images.
-For simplicity,
-we construct a small base network
-consisting of three downsampling blocks
-that double the number of channels at each block.
-Given a $256\times256$ input image,
-this base network block outputs $32 \times 32$ feature maps ($256/2^3=32$).
+Bazinio tinklo blokas naudojamas požymiams iš įvesties vaizdų išgauti.
+Paprastumo dėlei
+sukonstruojame mažą bazinį tinklą,
+sudarytą iš trijų mažinimo blokų,
+kurie kiekviename bloke padvigubina kanalų skaičių.
+Kai įvesties vaizdas yra $256\times256$,
+šis bazinio tinklo blokas išveda $32 \times 32$ požymių žemėlapius ($256/2^3=32$).
 
 ```{.python .input}
 #@tab mxnet
@@ -361,30 +356,29 @@ def base_net():
 forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 ```
 
-### The Complete Model
+### Pilnas modelis
 
 
-[**The complete
-single shot multibox detection model
-consists of five blocks.**]
-The feature maps produced by each block
-are used for both
-(i) generating anchor boxes
-and (ii) predicting classes and offsets of these anchor boxes.
-Among these five blocks,
-the first one
-is the base network block,
-the second to the fourth are
-downsampling blocks,
-and the last block
-uses global max-pooling
-to reduce both the height and width to 1.
-Technically,
-the second to the fifth blocks
-are all
-those
-multiscale feature map blocks
-in :numref:`fig_ssd`.
+[**Pilną
+vieno praėjimo daugiastačiakampio aptikimo modelį
+sudaro penki blokai.**]
+Kiekvieno bloko sukurti požymių žemėlapiai
+naudojami tiek
+(i) inkariniams stačiakampiams generuoti,
+tiek (ii) šių inkarinių stačiakampių klasėms ir poslinkiams prognozuoti.
+Iš šių penkių blokų
+pirmasis
+yra bazinio tinklo blokas,
+nuo antrojo iki ketvirtojo
+yra mažinimo blokai,
+o paskutinis blokas
+naudoja globalų sutelkimą imant maksimumą,
+kad sumažintų ir aukštį, ir plotį iki 1.
+Techniškai
+nuo antrojo iki penktojo blokai
+yra visi tie
+daugiamasteliai požymių žemėlapių blokai
+iš :numref:`fig_ssd`.
 
 ```{.python .input}
 #@tab mxnet
@@ -412,15 +406,14 @@ def get_blk(i):
     return blk
 ```
 
-Now we [**define the forward propagation**]
-for each block.
-Different from
-in image classification tasks,
-outputs here include
-(i) CNN feature maps `Y`,
-(ii) anchor boxes generated using `Y` at the current scale,
-and (iii) classes and offsets predicted (based on `Y`)
-for these anchor boxes.
+Dabar [**apibrėžiame tiesioginį sklidimą**]
+kiekvienam blokui.
+Skirtingai nei
+vaizdų klasifikavimo užduotyse,
+išvestis čia apima
+(i) CNN požymių žemėlapius `Y`,
+(ii) inkarinius stačiakampius, sugeneruotus naudojant `Y` dabartiniu masteliu,
+ir (iii) šių inkarinių stačiakampių prognozuotas (remiantis `Y`) klases ir poslinkius.
 
 ```{.python .input}
 #@tab mxnet
@@ -442,25 +435,25 @@ def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     return (Y, anchors, cls_preds, bbox_preds)
 ```
 
-Recall that
-in :numref:`fig_ssd`
-a multiscale feature map block
-that is closer to the top
-is for detecting larger objects;
-thus, it needs to generate larger anchor boxes.
-In the above forward propagation,
-at each multiscale feature map block
-we pass in a list of two scale values
-via the `sizes` argument
-of the invoked `multibox_prior` function (described in :numref:`sec_anchor`).
-In the following,
-the interval between 0.2 and 1.05
-is split evenly
-into five sections to determine the
-smaller scale values at the five blocks: 0.2, 0.37, 0.54, 0.71, and 0.88.
-Then their larger scale values
-are given by
-$\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and so on.
+Prisiminkite, kad
+:numref:`fig_ssd`
+daugiamastelis požymių žemėlapių blokas,
+esantis arčiau viršaus,
+skirtas didesniems objektams aptikti;
+todėl jam reikia generuoti didesnius inkarinius stačiakampius.
+Aukščiau pateiktame tiesioginiame sklidime
+kiekviename daugiamasteliame požymių žemėlapių bloke
+perduodame dviejų mastelio reikšmių sąrašą
+per iškviestos funkcijos `multibox_prior` (aprašytos :numref:`sec_anchor`)
+argumentą `sizes`.
+Toliau
+intervalas tarp 0,2 ir 1,05
+tolygiai padalijamas
+į penkias dalis, kad būtų nustatytos
+mažesnės mastelio reikšmės penkiuose blokuose: 0,2, 0,37, 0,54, 0,71 ir 0,88.
+Tada jų didesnės mastelio reikšmės
+nustatomos pagal
+$\sqrt{0{,}2 \times 0{,}37} = 0{,}272$, $\sqrt{0{,}37 \times 0{,}54} = 0{,}447$ ir t. t.
 
 [~~Hyperparameters for each block~~]
 
@@ -472,7 +465,7 @@ ratios = [[1, 2, 0.5]] * 5
 num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 ```
 
-Now we can [**define the complete model**] `TinySSD` as follows.
+Dabar galime [**apibrėžti pilną modelį**] `TinySSD` taip.
 
 ```{.python .input}
 #@tab mxnet
@@ -531,21 +524,21 @@ class TinySSD(nn.Module):
         return anchors, cls_preds, bbox_preds
 ```
 
-We [**create a model instance
-and use it to perform forward propagation**]
-on a minibatch of $256 \times 256$ images `X`.
+[**Sukuriame modelio egzempliorių
+ir naudojame jį tiesioginiam sklidimui atlikti**]
+su $256 \times 256$ vaizdų minirinkiniu `X`.
 
-As shown earlier in this section,
-the first block outputs $32 \times 32$ feature maps.
-Recall that
-the second to fourth downsampling blocks
-halve the height and width
-and the fifth block uses global pooling.
-Since 4 anchor boxes
-are generated for each unit along spatial dimensions
-of feature maps,
-at all the five scales
-a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image.
+Kaip parodyta anksčiau šiame skyrelyje,
+pirmasis blokas išveda $32 \times 32$ požymių žemėlapius.
+Prisiminkite, kad
+nuo antrojo iki ketvirtojo mažinimo blokai
+perpus sumažina aukštį ir plotį,
+o penktasis blokas naudoja globalų sutelkimą.
+Kadangi 4 inkariniai stačiakampiai
+generuojami kiekvienam vienetui išilgai požymių žemėlapių
+erdvinių dimensijų,
+visais penkiais masteliais
+kiekvienam vaizdui sugeneruojama iš viso $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ inkariniai stačiakampiai.
 
 ```{.python .input}
 #@tab mxnet
@@ -570,19 +563,19 @@ print('output class preds:', cls_preds.shape)
 print('output bbox preds:', bbox_preds.shape)
 ```
 
-## Training
+## Apmokymas
 
-Now we will explain
-how to train the single shot multibox detection model
-for object detection.
+Dabar paaiškinsime,
+kaip apmokyti vieno praėjimo daugiastačiakampio aptikimo modelį
+objektams aptikti.
 
 
-### Reading the Dataset and Initializing the Model
+### Duomenų rinkinio skaitymas ir modelio inicializavimas
 
-To begin with,
-let's [**read
-the banana detection dataset**]
-described in :numref:`sec_object-detection-dataset`.
+Pirmiausia
+[**nuskaitykime
+bananų aptikimo duomenų rinkinį**],
+aprašytą :numref:`sec_object-detection-dataset`.
 
 ```{.python .input}
 #@tab all
@@ -590,9 +583,9 @@ batch_size = 32
 train_iter, _ = d2l.load_data_bananas(batch_size)
 ```
 
-There is only one class in the banana detection dataset. After defining the model,
-we need to (**initialize its parameters and define
-the optimization algorithm**).
+Bananų aptikimo duomenų rinkinyje yra tik viena klasė. Apibrėžę modelį,
+turime (**inicializuoti jo parametrus ir apibrėžti
+optimizavimo algoritmą**).
 
 ```{.python .input}
 #@tab mxnet
@@ -608,32 +601,31 @@ device, net = d2l.try_gpu(), TinySSD(num_classes=1)
 trainer = torch.optim.SGD(net.parameters(), lr=0.2, weight_decay=5e-4)
 ```
 
-### [**Defining Loss and Evaluation Functions**]
+### [**Nuostolių ir vertinimo funkcijų apibrėžimas**]
 
-Object detection has two types of losses.
-The first loss concerns classes of anchor boxes:
-its computation
-can simply reuse
-the cross-entropy loss function
-that we used for image classification.
-The second loss
-concerns offsets of positive (non-background) anchor boxes:
-this is a regression problem.
-For this regression problem,
-however,
-here we do not use the squared loss
-described in :numref:`subsec_normal_distribution_and_squared_loss`.
-Instead,
-we use the $\ell_1$ norm loss,
-the absolute value of the difference between
-the prediction and the ground-truth.
-The mask variable `bbox_masks` filters out
-negative anchor boxes and illegal (padded)
-anchor boxes in the loss calculation.
-In the end, we sum up
-the anchor box class loss
-and the anchor box offset loss
-to obtain the loss function for the model.
+Objektų aptikimas turi du nuostolių tipus.
+Pirmasis nuostolis susijęs su inkarinių stačiakampių klasėmis:
+jam apskaičiuoti
+galima tiesiog pakartotinai naudoti
+kryžminės entropijos nuostolių funkciją,
+kurią naudojome vaizdų klasifikavimui.
+Antrasis nuostolis
+susijęs su teigiamų (nefono) inkarinių stačiakampių poslinkiais:
+tai yra regresijos uždavinys.
+Tačiau šiam regresijos uždaviniui
+čia nenaudojame kvadratinio nuostolio,
+aprašyto :numref:`subsec_normal_distribution_and_squared_loss`.
+Vietoj to
+naudojame $\ell_1$ normos nuostolį,
+prognozės ir tikrosios reikšmės skirtumo
+absoliučiąją vertę.
+Kaukės kintamasis `bbox_masks` nuostolio skaičiavime išfiltruoja
+neigiamus inkarinius stačiakampius ir neleistinus (papildymo)
+inkarinius stačiakampius.
+Galiausiai susumuojame
+inkarinių stačiakampių klasių nuostolį
+ir inkarinių stačiakampių poslinkių nuostolį,
+kad gautume modelio nuostolių funkciją.
 
 ```{.python .input}
 #@tab mxnet
@@ -660,13 +652,13 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
     return cls + bbox
 ```
 
-We can use accuracy to evaluate the classification results.
-Due to the used $\ell_1$ norm loss for the offsets,
-we use the *mean absolute error* to evaluate the
-predicted bounding boxes.
-These prediction results are obtained
-from the generated anchor boxes and the
-predicted offsets for them.
+Klasifikavimo rezultatams įvertinti galime naudoti tikslumą.
+Kadangi poslinkiams naudojamas $\ell_1$ normos nuostolis,
+prognozuotiems apibrėžiamiesiems stačiakampiams įvertinti
+naudojame *vidutinę absoliučiąją paklaidą*.
+Šie prognozavimo rezultatai gaunami
+iš sugeneruotų inkarinių stačiakampių ir
+jiems prognozuotų poslinkių.
 
 ```{.python .input}
 #@tab mxnet
@@ -692,18 +684,18 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
     return float((torch.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
 ```
 
-### [**Training the Model**]
+### [**Modelio apmokymas**]
 
-When training the model,
-we need to generate multiscale anchor boxes (`anchors`)
-and predict their classes (`cls_preds`) and offsets (`bbox_preds`) in the forward propagation.
-Then we label the classes (`cls_labels`) and offsets (`bbox_labels`) of such generated anchor boxes
-based on the label information `Y`.
-Finally, we calculate the loss function
-using the predicted and labeled values
-of the classes and offsets.
-For concise implementations,
-evaluation of the test dataset is omitted here.
+Apmokydami modelį,
+tiesioginiame sklidime turime generuoti daugiamastelius inkarinius stačiakampius (`anchors`)
+ir prognozuoti jų klases (`cls_preds`) bei poslinkius (`bbox_preds`).
+Tada pažymime tokių sugeneruotų inkarinių stačiakampių klases (`cls_labels`) ir poslinkius (`bbox_labels`)
+pagal žymenų informaciją `Y`.
+Galiausiai apskaičiuojame nuostolių funkciją
+naudodami prognozuotas ir pažymėtas
+klasių bei poslinkių reikšmes.
+Glaustiems įgyvendinimams
+testavimo duomenų rinkinio vertinimas čia praleistas.
 
 ```{.python .input}
 #@tab mxnet
@@ -777,16 +769,16 @@ print(f'{len(train_iter.dataset) / timer.stop():.1f} examples/sec on '
       f'{str(device)}')
 ```
 
-## [**Prediction**]
+## [**Prognozavimas**]
 
-During prediction,
-the goal is to detect all the objects of interest
-on the image.
-Below
-we read and resize a test image,
-converting it to
-a four-dimensional tensor that is
-required by convolutional layers.
+Prognozavimo metu
+tikslas yra aptikti visus dominančius objektus
+vaizde.
+Toliau
+nuskaitome ir pakeičiame testinio vaizdo dydį,
+paversdami jį
+keturmačiu tenzoriumi,
+kurio reikalauja konvoliciniai sluoksniai.
 
 ```{.python .input}
 #@tab mxnet
@@ -801,12 +793,12 @@ X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()
 img = X.squeeze(0).permute(1, 2, 0).long()
 ```
 
-Using the `multibox_detection` function below,
-the predicted bounding boxes
-are obtained
-from the anchor boxes and their predicted offsets.
-Then non-maximum suppression is used
-to remove similar predicted bounding boxes.
+Naudojant toliau pateiktą funkciją `multibox_detection`,
+prognozuojami apibrėžiamieji stačiakampiai
+gaunami
+iš inkarinių stačiakampių ir jų prognozuotų poslinkių.
+Tada nemaksimalių reikšmių slopinimas naudojamas
+panašiems prognozuojamiems apibrėžiamiesiems stačiakampiams pašalinti.
 
 ```{.python .input}
 #@tab mxnet
@@ -833,10 +825,9 @@ def predict(X):
 output = predict(X)
 ```
 
-Finally, we [**display
-all the predicted bounding boxes with
-confidence 0.9 or above**]
-as output.
+Galiausiai kaip išvestį [**parodome
+visus prognozuojamus apibrėžiamuosius stačiakampius, kurių
+pasitikėjimas yra 0,9 arba didesnis**].
 
 ```{.python .input}
 #@tab mxnet
@@ -870,16 +861,16 @@ def display(img, output, threshold):
 display(img, output.cpu(), threshold=0.9)
 ```
 
-## Summary
+## Santrauka
 
-* Single shot multibox detection is a multiscale object detection model. Via its base network and several multiscale feature map blocks, single-shot multibox detection generates a varying number of anchor boxes with different sizes, and detects varying-size objects by predicting classes and offsets of these anchor boxes (thus the bounding boxes).
-* When training the single-shot multibox detection model, the loss function is calculated based on the predicted and labeled values of the anchor box classes and offsets.
+* Vieno praėjimo daugiastačiakampis aptikimas yra daugiamastelis objektų aptikimo modelis. Per savo bazinį tinklą ir kelis daugiamastelius požymių žemėlapių blokus vieno praėjimo daugiastačiakampis aptikimas generuoja kintamą skirtingo dydžio inkarinių stačiakampių skaičių ir aptinka skirtingo dydžio objektus prognozuodamas šių inkarinių stačiakampių (taigi ir apibrėžiamųjų stačiakampių) klases ir poslinkius.
+* Apmokant vieno praėjimo daugiastačiakampio aptikimo modelį, nuostolių funkcija apskaičiuojama pagal prognozuotas ir pažymėtas inkarinių stačiakampių klasių ir poslinkių reikšmes.
 
 
 
-## Exercises
+## Pratimai
 
-1. Can you improve the single-shot multibox detection by improving the loss function? For example, replace $\ell_1$ norm loss with smooth $\ell_1$ norm loss for the predicted offsets. This loss function uses a square function around zero for smoothness, which is controlled by the hyperparameter $\sigma$:
+1. Ar galite pagerinti vieno praėjimo daugiastačiakampį aptikimą patobulindami nuostolių funkciją? Pavyzdžiui, pakeiskite $\ell_1$ normos nuostolį glotniuoju $\ell_1$ normos nuostoliu prognozuotiems poslinkiams. Ši nuostolių funkcija aplink nulį naudoja kvadratinę funkciją glotnumui užtikrinti, kurį valdo hiperparametras $\sigma$:
 
 $$
 f(x) =
@@ -889,7 +880,7 @@ f(x) =
     \end{cases}
 $$
 
-When $\sigma$ is very large, this loss is similar to the $\ell_1$ norm loss. When its value is smaller, the loss function is smoother.
+Kai $\sigma$ yra labai didelis, šis nuostolis panašus į $\ell_1$ normos nuostolį. Kai jo reikšmė mažesnė, nuostolių funkcija yra glotnesnė.
 
 ```{.python .input}
 #@tab mxnet
@@ -926,18 +917,18 @@ for l, s in zip(lines, sigmas):
 d2l.plt.legend();
 ```
 
-Besides, in the experiment we used cross-entropy loss for class prediction:
-denoting by $p_j$ the predicted probability for the ground-truth class $j$, the cross-entropy loss is $-\log p_j$. We can also use the focal loss
-:cite:`Lin.Goyal.Girshick.ea.2017`: given hyperparameters $\gamma > 0$
-and $\alpha > 0$, this loss is defined as:
+Be to, eksperimente klasėms prognozuoti naudojome kryžminės entropijos nuostolį:
+pažymėję $p_j$ prognozuotą tikrosios klasės $j$ tikimybę, kryžminės entropijos nuostolis yra $-\log p_j$. Taip pat galime naudoti židininį nuostolį (angl. *focal loss*)
+:cite:`Lin.Goyal.Girshick.ea.2017`: turint hiperparametrus $\gamma > 0$
+ir $\alpha > 0$, šis nuostolis apibrėžiamas taip:
 
 $$ - \alpha (1-p_j)^{\gamma} \log p_j.$$
 
-As we can see, increasing $\gamma$
-can effectively reduce the relative loss
-for well-classified examples (e.g., $p_j > 0.5$)
-so the training
-can focus more on those difficult examples that are misclassified.
+Kaip matome, didinant $\gamma$
+galima veiksmingai sumažinti santykinį nuostolį
+gerai suklasifikuotiems pavyzdžiams (pvz., $p_j > 0{,}5$),
+todėl apmokymas
+gali labiau susitelkti į tuos sunkius pavyzdžius, kurie suklasifikuoti neteisingai.
 
 ```{.python .input}
 #@tab mxnet
@@ -962,18 +953,18 @@ for l, gamma in zip(lines, [0, 1, 5]):
 d2l.plt.legend();
 ```
 
-2. Due to space limitations, we have omitted some implementation details of the single shot multibox detection model in this section. Can you further improve the model in the following aspects:
-    1. When an object is much smaller compared with the image, the model could resize the input image bigger.
-    1. There are typically a vast number of negative anchor boxes. To make the class distribution more balanced, we could downsample negative anchor boxes.
-    1. In the loss function, assign different weight hyperparameters to the class loss and the offset loss.
-    1. Use other methods to evaluate the object detection model, such as those in the single shot multibox detection paper :cite:`Liu.Anguelov.Erhan.ea.2016`.
+2. Dėl vietos stokos šiame skyrelyje praleidome kai kurias vieno praėjimo daugiastačiakampio aptikimo modelio įgyvendinimo detales. Ar galite toliau pagerinti modelį šiais aspektais:
+    1. Kai objektas yra daug mažesnis už vaizdą, modelis galėtų padidinti įvesties vaizdo dydį.
+    1. Paprastai yra daugybė neigiamų inkarinių stačiakampių. Kad klasių pasiskirstymas būtų labiau subalansuotas, galėtume sumažinti neigiamų inkarinių stačiakampių imtį.
+    1. Nuostolių funkcijoje klasių nuostoliui ir poslinkių nuostoliui priskirkite skirtingus svorio hiperparametrus.
+    1. Naudokite kitus objektų aptikimo modelio vertinimo metodus, pavyzdžiui, aprašytus vieno praėjimo daugiastačiakampio aptikimo straipsnyje :cite:`Liu.Anguelov.Erhan.ea.2016`.
 
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/373)
+[Diskusijos](https://discuss.d2l.ai/t/373)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1604)
+[Diskusijos](https://discuss.d2l.ai/t/1604)
 :end_tab:

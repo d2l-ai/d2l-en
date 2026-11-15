@@ -1,18 +1,18 @@
-# Pretraining word2vec
+# word2vec išankstinis apmokymas
 :label:`sec_word2vec_pretraining`
 
 
-We go on to implement the skip-gram
-model defined in
+Toliau įgyvendiname skip-gram
+modelį, apibrėžtą
 :numref:`sec_word2vec`.
-Then
-we will pretrain word2vec using negative sampling
-on the PTB dataset.
-First of all,
-let's obtain the data iterator
-and the vocabulary for this dataset
-by calling the `d2l.load_data_ptb`
-function, which was described in :numref:`sec_word2vec_data`
+Tada
+iš anksto apmokysime word2vec naudodami neigiamų pavyzdžių atranką
+PTB duomenų rinkinyje.
+Pirmiausia
+gaukime duomenų iteratorių
+ir šio duomenų rinkinio žodyną
+iškviesdami funkciją `d2l.load_data_ptb`,
+kuri buvo aprašyta :numref:`sec_word2vec_data`
 
 ```{.python .input}
 #@tab mxnet
@@ -39,26 +39,26 @@ data_iter, vocab = d2l.load_data_ptb(batch_size, max_window_size,
                                      num_noise_words)
 ```
 
-## The Skip-Gram Model
+## Skip-gram modelis
 
-We implement the skip-gram model
-by using embedding layers and batch matrix multiplications.
-First, let's review
-how embedding layers work.
+Skip-gram modelį įgyvendiname
+naudodami įterpinių sluoksnius ir rinkinio matricų daugybą.
+Pirmiausia prisiminkime,
+kaip veikia įterpinių sluoksniai.
 
 
-### Embedding Layer
+### Įterpinių sluoksnis
 
-As described in :numref:`sec_seq2seq`,
-an embedding layer
-maps a token's index to its feature vector.
-The weight of this layer
-is a matrix whose number of rows equals to
-the dictionary size (`input_dim`) and
-number of columns equals to
-the vector dimension for each token (`output_dim`).
-After a word embedding model is trained,
-this weight is what we need.
+Kaip aprašyta :numref:`sec_seq2seq`,
+įterpinių sluoksnis
+atvaizduoja teksto vieneto indeksą į jo požymių vektorių.
+Šio sluoksnio svoris
+yra matrica, kurios eilučių skaičius lygus
+žodyno dydžiui (`input_dim`), o
+stulpelių skaičius lygus
+kiekvieno teksto vieneto vektoriaus dimensijai (`output_dim`).
+Apmokius žodžių įterpinių modelį,
+būtent šio svorio mums ir reikia.
 
 ```{.python .input}
 #@tab mxnet
@@ -74,18 +74,18 @@ print(f'Parameter embedding_weight ({embed.weight.shape}, '
       f'dtype={embed.weight.dtype})')
 ```
 
-The input of an embedding layer is the
-index of a token (word).
-For any token index $i$,
-its vector representation
-can be obtained from
-the $i^\textrm{th}$ row of the weight matrix
-in the embedding layer.
-Since the vector dimension (`output_dim`)
-was set to 4,
-the embedding layer
-returns vectors with shape (2, 3, 4)
-for a minibatch of token indices with shape
+Įterpinių sluoksnio įvestis yra
+teksto vieneto (žodžio) indeksas.
+Bet kuriam teksto vieneto indeksui $i$
+jo vektorinį vaizdavimą
+galima gauti iš
+įterpinių sluoksnio svorių matricos
+$i$-osios eilutės.
+Kadangi vektoriaus dimensija (`output_dim`)
+buvo nustatyta 4,
+įterpinių sluoksnis
+grąžina vektorius, kurių forma (2, 3, 4),
+teksto vienetų indeksų minirinkiniui, kurio forma
 (2, 3).
 
 ```{.python .input}
@@ -94,27 +94,27 @@ x = d2l.tensor([[1, 2, 3], [4, 5, 6]])
 embed(x)
 ```
 
-### Defining the Forward Propagation
+### Tiesioginio sklidimo apibrėžimas
 
-In the forward propagation,
-the input of the skip-gram model
-includes
-the center word indices `center`
-of shape (batch size, 1)
-and
-the concatenated context and noise word indices `contexts_and_negatives`
-of shape (batch size, `max_len`),
-where `max_len`
-is defined
-in :numref:`subsec_word2vec-minibatch-loading`.
-These two variables are first transformed from the
-token indices into vectors via the embedding layer,
-then their batch matrix multiplication
-(described in :numref:`subsec_batch_dot`)
-returns
-an output of shape (batch size, 1, `max_len`).
-Each element in the output is the dot product of
-a center word vector and a context or noise word vector.
+Tiesioginiame sklidime
+skip-gram modelio įvestis
+apima
+centrinių žodžių indeksus `center`,
+kurių forma (rinkinio dydis, 1),
+ir
+sukonkatenuotus konteksto ir triukšmo žodžių indeksus `contexts_and_negatives`,
+kurių forma (rinkinio dydis, `max_len`),
+kur `max_len`
+apibrėžta
+:numref:`subsec_word2vec-minibatch-loading`.
+Šie du kintamieji pirmiausia paverčiami iš
+teksto vienetų indeksų į vektorius per įterpinių sluoksnį,
+tada jų rinkinio matricų daugyba
+(aprašyta :numref:`subsec_batch_dot`)
+grąžina
+išvestį, kurios forma (rinkinio dydis, 1, `max_len`).
+Kiekvienas išvesties elementas yra
+centrinio žodžio vektoriaus ir konteksto ar triukšmo žodžio vektoriaus skaliarinė sandauga.
 
 ```{.python .input}
 #@tab mxnet
@@ -134,7 +134,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     return pred
 ```
 
-Let's print the output shape of this `skip_gram` function for some example inputs.
+Atspausdinkime šios funkcijos `skip_gram` išvesties formą kelioms pavyzdinėms įvestims.
 
 ```{.python .input}
 #@tab mxnet
@@ -147,18 +147,18 @@ skip_gram(torch.ones((2, 1), dtype=torch.long),
           torch.ones((2, 4), dtype=torch.long), embed, embed).shape
 ```
 
-## Training
+## Apmokymas
 
-Before training the skip-gram model with negative sampling,
-let's first define its loss function.
+Prieš apmokydami skip-gram modelį su neigiamų pavyzdžių atranka,
+pirmiausia apibrėžkime jo nuostolių funkciją.
 
 
-### Binary Cross-Entropy Loss
+### Dvejetainės kryžminės entropijos nuostolis
 
-According to the definition of the loss function
-for negative sampling in :numref:`subsec_negative-sampling`, 
-we will use 
-the binary cross-entropy loss.
+Pagal neigiamų pavyzdžių atrankos nuostolių funkcijos apibrėžimą
+:numref:`subsec_negative-sampling`,
+naudosime
+dvejetainės kryžminės entropijos nuostolį.
 
 ```{.python .input}
 #@tab mxnet
@@ -180,14 +180,13 @@ class SigmoidBCELoss(nn.Module):
 loss = SigmoidBCELoss()
 ```
 
-Recall our descriptions
-of the mask variable
-and the label variable in
+Prisiminkite mūsų aprašymus
+apie kaukės kintamąjį
+ir žymenų kintamąjį
 :numref:`subsec_word2vec-minibatch-loading`.
-The following
-calculates the 
-binary cross-entropy loss
-for the given variables.
+Toliau pateiktas kodas apskaičiuoja
+dvejetainės kryžminės entropijos nuostolį
+duotiems kintamiesiems.
 
 ```{.python .input}
 #@tab all
@@ -197,16 +196,15 @@ mask = d2l.tensor([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask) * mask.shape[1] / mask.sum(axis=1)
 ```
 
-Below shows
-how the above results are calculated
-(in a less efficient way)
-using the
-sigmoid activation function
-in the binary cross-entropy loss.
-We can consider 
-the two outputs as
-two normalized losses
-that are averaged over non-masked predictions.
+Toliau parodoma,
+kaip aukščiau pateikti rezultatai apskaičiuojami
+(mažiau efektyviu būdu)
+naudojant
+sigmoidinę aktyvinimo funkciją
+dvejetainės kryžminės entropijos nuostolyje.
+Dvi išvestis galime laikyti
+dviem normuotais nuostoliais,
+kurie vidurkinami per nemaskuotas prognozes.
 
 ```{.python .input}
 #@tab all
@@ -217,14 +215,14 @@ print(f'{(sigmd(1.1) + sigmd(2.2) + sigmd(-3.3) + sigmd(4.4)) / 4:.4f}')
 print(f'{(sigmd(-1.1) + sigmd(-2.2)) / 2:.4f}')
 ```
 
-### Initializing Model Parameters
+### Modelio parametrų inicializavimas
 
-We define two embedding layers
-for all the words in the vocabulary
-when they are used as center words
-and context words, respectively.
-The word vector dimension
-`embed_size` is set to 100.
+Apibrėžiame du įterpinių sluoksnius
+visiems žodyno žodžiams,
+kai jie naudojami atitinkamai kaip centriniai žodžiai
+ir konteksto žodžiai.
+Žodžių vektoriaus dimensija
+`embed_size` nustatoma 100.
 
 ```{.python .input}
 #@tab mxnet
@@ -243,9 +241,9 @@ net = nn.Sequential(nn.Embedding(num_embeddings=len(vocab),
                                  embedding_dim=embed_size))
 ```
 
-### Defining the Training Loop
+### Apmokymo ciklo apibrėžimas
 
-The training loop is defined below. Because of the existence of padding, the calculation of the loss function is slightly different compared to the previous training functions.
+Apmokymo ciklas apibrėžiamas toliau. Dėl papildymų nuostolių funkcijos skaičiavimas šiek tiek skiriasi nuo ankstesnių apmokymo funkcijų.
 
 ```{.python .input}
 #@tab mxnet
@@ -309,7 +307,7 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
           f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')
 ```
 
-Now we can train a skip-gram model using negative sampling.
+Dabar galime apmokyti skip-gram modelį naudodami neigiamų pavyzdžių atranką.
 
 ```{.python .input}
 #@tab all
@@ -317,17 +315,17 @@ lr, num_epochs = 0.002, 5
 train(net, data_iter, lr, num_epochs)
 ```
 
-## Applying Word Embeddings
+## Žodžių įterpinių taikymas
 :label:`subsec_apply-word-embed`
 
 
-After training the word2vec model,
-we can use the cosine similarity
-of word vectors from the trained model
-to 
-find words from the dictionary
-that are most semantically similar
-to an input word.
+Apmokę word2vec modelį,
+galime naudoti apmokyto modelio
+žodžių vektorių kosinuso panašumą,
+kad
+rastume žodyno žodžius,
+semantiškai panašiausius
+į įvesties žodį.
 
 ```{.python .input}
 #@tab mxnet
@@ -358,21 +356,21 @@ def get_similar_tokens(query_token, k, embed):
 get_similar_tokens('chip', 3, net[0])
 ```
 
-## Summary
+## Santrauka
 
-* We can train a skip-gram model with negative sampling using embedding layers and the binary cross-entropy loss.
-* Applications of word embeddings include finding semantically similar words for a given word based on the cosine similarity of word vectors.
+* Skip-gram modelį su neigiamų pavyzdžių atranka galime apmokyti naudodami įterpinių sluoksnius ir dvejetainės kryžminės entropijos nuostolį.
+* Žodžių įterpinių taikymai apima semantiškai panašių žodžių radimą duotam žodžiui pagal žodžių vektorių kosinuso panašumą.
 
 
-## Exercises
+## Pratimai
 
-1. Using the trained model, find semantically similar words for other input words. Can you improve the results by tuning hyperparameters?
-1. When a training corpus is huge, we often sample context words and noise words for the center words in the current minibatch *when updating model parameters*. In other words, the same center word may have different context words or noise words in different training epochs. What are the benefits of this method? Try to implement this training method.
+1. Naudodami apmokytą modelį, raskite semantiškai panašių žodžių kitiems įvesties žodžiams. Ar galite pagerinti rezultatus derindami hiperparametrus?
+1. Kai apmokymo tekstynas yra milžiniškas, centriniams dabartinio minirinkinio žodžiams dažnai atrenkame konteksto ir triukšmo žodžius *atnaujindami modelio parametrus*. Kitaip tariant, tas pats centrinis žodis skirtingose apmokymo epochose gali turėti skirtingus konteksto ar triukšmo žodžius. Kokie šio metodo privalumai? Pabandykite įgyvendinti šį apmokymo metodą.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/384)
+[Diskusijos](https://discuss.d2l.ai/t/384)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1335)
+[Diskusijos](https://discuss.d2l.ai/t/1335)
 :end_tab:

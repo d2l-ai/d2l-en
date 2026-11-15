@@ -1,8 +1,8 @@
-# Pretraining BERT
+# BERT išankstinis apmokymas
 :label:`sec_bert-pretraining`
 
-With the BERT model implemented in :numref:`sec_bert`
-and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
+Turėdami BERT modelį, įgyvendintą :numref:`sec_bert`,
+ir išankstinio apmokymo pavyzdžius, sugeneruotus iš WikiText-2 duomenų rinkinio :numref:`sec_bert-dataset`, šiame skyrelyje iš anksto apmokysime BERT WikiText-2 duomenų rinkinyje.
 
 ```{.python .input}
 #@tab mxnet
@@ -19,10 +19,10 @@ import torch
 from torch import nn
 ```
 
-To start, we load the WikiText-2 dataset as minibatches
-of pretraining examples for masked language modeling and next sentence prediction.
-The batch size is 512 and the maximum length of a BERT input sequence is 64.
-Note that in the original BERT model, the maximum length is 512.
+Pradėkime nuo WikiText-2 duomenų rinkinio įkėlimo kaip minirinkinių
+išankstinio apmokymo pavyzdžių užmaskuotam kalbos modeliavimui ir kito sakinio prognozavimui.
+Rinkinio dydis yra 512, o didžiausias BERT įvesties sekos ilgis yra 64.
+Atkreipkite dėmesį, kad originaliame BERT modelyje didžiausias ilgis yra 512.
 
 ```{.python .input}
 #@tab all
@@ -30,16 +30,16 @@ batch_size, max_len = 512, 64
 train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
 
-## Pretraining BERT
+## BERT išankstinis apmokymas
 
-The original BERT has two versions of different model sizes :cite:`Devlin.Chang.Lee.ea.2018`.
-The base model ($\textrm{BERT}_{\textrm{BASE}}$) uses 12 layers (Transformer encoder blocks)
-with 768 hidden units (hidden size) and 12 self-attention heads.
-The large model ($\textrm{BERT}_{\textrm{LARGE}}$) uses 24 layers
-with 1024 hidden units and 16 self-attention heads.
-Notably, the former has 110 million parameters while the latter has 340 million parameters.
-For demonstration with ease,
-we define [**a small BERT, using 2 layers, 128 hidden units, and 2 self-attention heads**].
+Originalus BERT turi dvi skirtingų modelio dydžių versijas :cite:`Devlin.Chang.Lee.ea.2018`.
+Bazinis modelis ($\textrm{BERT}_{\textrm{BASE}}$) naudoja 12 sluoksnių (transformerio kodavimo blokų)
+su 768 paslėptaisiais vienetais (paslėptuoju dydžiu) ir 12 saviraiškės dėmesio sutelkimo transformacijos vienetų.
+Didysis modelis ($\textrm{BERT}_{\textrm{LARGE}}$) naudoja 24 sluoksnius
+su 1024 paslėptaisiais vienetais ir 16 saviraiškės dėmesio sutelkimo transformacijos vienetų.
+Pažymėtina, kad pirmasis turi 110 milijonų parametrų, o antrasis – 340 milijonų parametrų.
+Kad demonstravimas būtų paprastas,
+apibrėžiame [**mažą BERT, naudojantį 2 sluoksnius, 128 paslėptuosius vienetus ir 2 saviraiškės dėmesio sutelkimo transformacijos vienetus**].
 
 ```{.python .input}
 #@tab mxnet
@@ -58,13 +58,13 @@ devices = d2l.try_all_gpus()
 loss = nn.CrossEntropyLoss()
 ```
 
-Before defining the training loop,
-we define a helper function `_get_batch_loss_bert`.
-Given the shard of training examples,
-this function [**computes the loss for both the masked language modeling and next sentence prediction tasks**].
-Note that the final loss of BERT pretraining
-is just the sum of both the masked language modeling loss
-and the next sentence prediction loss.
+Prieš apibrėždami apmokymo ciklą,
+apibrėžiame pagalbinę funkciją `_get_batch_loss_bert`.
+Turint apmokymo pavyzdžių fragmentą,
+ši funkcija [**apskaičiuoja ir užmaskuoto kalbos modeliavimo, ir kito sakinio prognozavimo užduočių nuostolį**].
+Atkreipkite dėmesį, kad galutinis BERT išankstinio apmokymo nuostolis
+yra tiesiog užmaskuoto kalbos modeliavimo nuostolio
+ir kito sakinio prognozavimo nuostolio suma.
 
 ```{.python .input}
 #@tab mxnet
@@ -120,14 +120,14 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X,
     return mlm_l, nsp_l, l
 ```
 
-Invoking the two aforementioned helper functions,
-the following `train_bert` function
-defines the procedure to [**pretrain BERT (`net`) on the WikiText-2 (`train_iter`) dataset**].
-Training BERT can take very long.
-Instead of specifying the number of epochs for training
-as in the `train_ch13` function (see :numref:`sec_image_augmentation`),
-the input `num_steps` of the following function
-specifies the number of iteration steps for training.
+Iškviesdama dvi aukščiau minėtas pagalbines funkcijas,
+toliau pateikta funkcija `train_bert`
+apibrėžia procedūrą [**BERT (`net`) iš anksto apmokyti WikiText-2 (`train_iter`) duomenų rinkinyje**].
+BERT apmokymas gali trukti labai ilgai.
+Užuot nurodžius apmokymo epochų skaičių,
+kaip funkcijoje `train_ch13` (žr. :numref:`sec_image_augmentation`),
+toliau pateiktos funkcijos įvestis `num_steps`
+nurodo apmokymo iteracijos žingsnių skaičių.
 
 ```{.python .input}
 #@tab mxnet
@@ -217,20 +217,19 @@ def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
           f'{str(devices)}')
 ```
 
-We can plot both the masked language modeling loss and the next sentence prediction loss
-during BERT pretraining.
+BERT išankstinio apmokymo metu galime nubraižyti ir užmaskuoto kalbos modeliavimo nuostolį, ir kito sakinio prognozavimo nuostolį.
 
 ```{.python .input}
 #@tab all
 train_bert(train_iter, net, loss, len(vocab), devices, 50)
 ```
 
-## [**Representing Text with BERT**]
+## [**Teksto vaizdavimas naudojant BERT**]
 
-After pretraining BERT,
-we can use it to represent single text, text pairs, or any token in them.
-The following function returns the BERT (`net`) representations for all tokens
-in `tokens_a` and `tokens_b`.
+Iš anksto apmokę BERT,
+galime jį naudoti vienam tekstui, tekstų poroms ar bet kuriam jų teksto vienetui vaizduoti.
+Toliau pateikta funkcija grąžina BERT (`net`) vaizdavimus visiems teksto vienetams
+`tokens_a` ir `tokens_b`.
 
 ```{.python .input}
 #@tab mxnet
@@ -255,15 +254,15 @@ def get_bert_encoding(net, tokens_a, tokens_b=None):
     return encoded_X
 ```
 
-[**Consider the sentence "a crane is flying".**]
-Recall the input representation of BERT as discussed in :numref:`subsec_bert_input_rep`.
-After inserting special tokens “&lt;cls&gt;” (used for classification)
-and “&lt;sep&gt;” (used for separation),
-the BERT input sequence has a length of six.
-Since zero is the index of the “&lt;cls&gt;” token,
-`encoded_text[:, 0, :]` is the BERT representation of the entire input sentence.
-To evaluate the polysemy token "crane",
-we also print out the first three elements of the BERT representation of the token.
+[**Panagrinėkime sakinį „a crane is flying“.**]
+Prisiminkite BERT įvesties vaizdavimą, aptartą :numref:`subsec_bert_input_rep`.
+Įterpus specialius teksto vienetus „&lt;cls&gt;“ (naudojamą klasifikavimui)
+ir „&lt;sep&gt;“ (naudojamą atskyrimui),
+BERT įvesties sekos ilgis yra šeši.
+Kadangi nulis yra teksto vieneto „&lt;cls&gt;“ indeksas,
+`encoded_text[:, 0, :]` yra viso įvesties sakinio BERT vaizdavimas.
+Kad įvertintume daugiareikšmį teksto vienetą „crane“,
+taip pat išspausdiname pirmuosius tris šio teksto vieneto BERT vaizdavimo elementus.
 
 ```{.python .input}
 #@tab all
@@ -275,11 +274,11 @@ encoded_text_crane = encoded_text[:, 2, :]
 encoded_text.shape, encoded_text_cls.shape, encoded_text_crane[0][:3]
 ```
 
-[**Now consider a sentence pair
-"a crane driver came" and "he just left".**]
-Similarly, `encoded_pair[:, 0, :]` is the encoded result of the entire sentence pair from the pretrained BERT.
-Note that the first three elements of the polysemy token "crane" are different from those when the context is different.
-This supports that BERT representations are context-sensitive.
+[**Dabar panagrinėkime sakinių porą
+„a crane driver came“ ir „he just left“.**]
+Panašiai `encoded_pair[:, 0, :]` yra viso sakinių poros užkoduotas rezultatas iš iš anksto apmokyto BERT.
+Atkreipkite dėmesį, kad pirmieji trys daugiareikšmio teksto vieneto „crane“ elementai skiriasi nuo tų, kai kontekstas yra kitoks.
+Tai patvirtina, kad BERT vaizdavimai priklauso nuo konteksto.
 
 ```{.python .input}
 #@tab all
@@ -292,25 +291,25 @@ encoded_pair_crane = encoded_pair[:, 2, :]
 encoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]
 ```
 
-In :numref:`chap_nlp_app`, we will fine-tune a pretrained BERT model
-for downstream natural language processing applications.
+:numref:`chap_nlp_app` patikslinsime iš anksto apmokytą BERT modelį
+tolesniems natūraliosios kalbos apdorojimo taikymams.
 
-## Summary
+## Santrauka
 
-* The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
-* After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
-* In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
+* Originalus BERT turi dvi versijas: bazinis modelis turi 110 milijonų parametrų, o didysis modelis – 340 milijonų parametrų.
+* Iš anksto apmokę BERT, galime jį naudoti vienam tekstui, tekstų poroms ar bet kuriam jų teksto vienetui vaizduoti.
+* Eksperimente tas pats teksto vienetas turi skirtingą BERT vaizdavimą, kai jų kontekstai skiriasi. Tai patvirtina, kad BERT vaizdavimai priklauso nuo konteksto.
 
 
-## Exercises
+## Pratimai
 
-1. In the experiment, we can see that the masked language modeling loss is significantly higher than the next sentence prediction loss. Why?
-2. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\textrm{BERT}_{\textrm{LARGE}}$. Do you encounter any error when running this section? Why?
+1. Eksperimente matome, kad užmaskuoto kalbos modeliavimo nuostolis yra gerokai didesnis už kito sakinio prognozavimo nuostolį. Kodėl?
+2. Nustatykite didžiausią BERT įvesties sekos ilgį 512 (tokį patį kaip originaliame BERT modelyje). Naudokite originalaus BERT modelio konfigūracijas, pavyzdžiui, $\textrm{BERT}_{\textrm{LARGE}}$. Ar paleisdami šį skyrelį susiduriate su kokia nors klaida? Kodėl?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/390)
+[Diskusijos](https://discuss.d2l.ai/t/390)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1497)
+[Diskusijos](https://discuss.d2l.ai/t/1497)
 :end_tab:

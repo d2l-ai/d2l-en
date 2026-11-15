@@ -1,55 +1,55 @@
-# Natural Language Inference and the Dataset
+# Natūraliosios kalbos išvadų darymas ir duomenų rinkinys
 :label:`sec_natural-language-inference-and-dataset`
 
-In :numref:`sec_sentiment`, we discussed the problem of sentiment analysis.
-This task aims to classify a single text sequence into predefined categories,
-such as a set of sentiment polarities.
-However, when there is a need to decide whether one sentence can be inferred form another, 
-or eliminate redundancy by identifying sentences that are semantically equivalent,
-knowing how to classify one text sequence is insufficient.
-Instead, we need to be able to reason over pairs of text sequences.
+:numref:`sec_sentiment` aptarėme nuotaikų analizės problemą.
+Ši užduotis siekia suklasifikuoti vieną teksto seką į iš anksto apibrėžtas kategorijas,
+pavyzdžiui, nuotaikų poliškumų aibę.
+Tačiau kai reikia nuspręsti, ar vieną sakinį galima išvesti iš kito,
+arba pašalinti pertekliškumą nustatant semantiškai ekvivalentiškus sakinius,
+nepakanka žinoti, kaip suklasifikuoti vieną teksto seką.
+Vietoj to turime gebėti samprotauti apie teksto sekų poras.
 
 
-## Natural Language Inference
+## Natūraliosios kalbos išvadų darymas
 
-*Natural language inference* studies whether a *hypothesis*
-can be inferred from a *premise*, where both are a text sequence.
-In other words, natural language inference determines the logical relationship between a pair of text sequences.
-Such relationships usually fall into three types:
+*Natūraliosios kalbos išvadų darymas* tiria, ar *hipotezę*
+galima išvesti iš *prielaidos*, kur abi yra teksto sekos.
+Kitaip tariant, natūraliosios kalbos išvadų darymas nustato loginį sąryšį tarp teksto sekų poros.
+Tokie sąryšiai paprastai skirstomi į tris tipus:
 
-* *Entailment*: the hypothesis can be inferred from the premise.
-* *Contradiction*: the negation of the hypothesis can be inferred from the premise.
-* *Neutral*: all the other cases.
+* *Išplaukimas* (angl. *entailment*): hipotezę galima išvesti iš prielaidos.
+* *Prieštara* (angl. *contradiction*): hipotezės neigimą galima išvesti iš prielaidos.
+* *Neutralumas* (angl. *neutral*): visi kiti atvejai.
 
-Natural language inference is also known as the recognizing textual entailment task.
-For example, the following pair will be labeled as *entailment* because "showing affection" in the hypothesis can be inferred from "hugging one another" in the premise.
+Natūraliosios kalbos išvadų darymas taip pat žinomas kaip teksto išplaukimo atpažinimo užduotis.
+Pavyzdžiui, ši pora bus pažymėta kaip *išplaukimas*, nes „rodo prieraišumą“ hipotezėje galima išvesti iš „apsikabina“ prielaidoje.
 
-> Premise: Two women are hugging each other.
+> Prielaida: Dvi moterys apsikabina.
 
-> Hypothesis: Two women are showing affection.
+> Hipotezė: Dvi moterys rodo prieraišumą.
 
-The following is an example of *contradiction* as "running the coding example" indicates "not sleeping" rather than "sleeping".
+Toliau pateiktas *prieštaros* pavyzdys, nes „vykdo kodo pavyzdį“ rodo „nemiega“, o ne „miega“.
 
-> Premise: A man is running the coding example from Dive into Deep Learning.
+> Prielaida: Vyras vykdo kodo pavyzdį iš „Dive into Deep Learning“.
 
-> Hypothesis: The man is sleeping.
+> Hipotezė: Vyras miega.
 
-The third example shows a *neutrality* relationship because neither "famous" nor "not famous" can be inferred from the fact that "are performing for us". 
+Trečiasis pavyzdys rodo *neutralumo* sąryšį, nes iš fakto, kad „atlieka mums“, negalima išvesti nei „yra žinomi“, nei „nėra žinomi“.
 
-> Premise: The musicians are performing for us.
+> Prielaida: Muzikantai mums groja.
 
-> Hypothesis: The musicians are famous.
+> Hipotezė: Muzikantai yra žinomi.
 
-Natural language inference has been a central topic for understanding natural language.
-It enjoys wide applications ranging from
-information retrieval to open-domain question answering.
-To study this problem, we will begin by investigating a popular natural language inference benchmark dataset.
+Natūraliosios kalbos išvadų darymas buvo svarbi natūraliosios kalbos supratimo tema.
+Jis plačiai taikomas – nuo
+informacijos paieškos iki atsakymo į atvirų sričių klausimus.
+Kad ištirtume šią problemą, pradėsime nuo populiaraus natūraliosios kalbos išvadų darymo lyginamojo duomenų rinkinio nagrinėjimo.
 
 
-## The Stanford Natural Language Inference (SNLI) Dataset
+## Stanfordo natūraliosios kalbos išvadų darymo (SNLI) duomenų rinkinys
 
-[**Stanford Natural Language Inference (SNLI) Corpus**] is a collection of over 500000 labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
-We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
+[**Stanfordo natūraliosios kalbos išvadų darymo (SNLI) tekstynas**] yra daugiau nei 500000 pažymėtų anglų kalbos sakinių porų rinkinys :cite:`Bowman.Angeli.Potts.ea.2015`.
+Atsisiunčiame ir išsaugome išpakuotą SNLI duomenų rinkinį kelyje `../data/snli_1.0`.
 
 ```{.python .input}
 #@tab mxnet
@@ -84,9 +84,9 @@ d2l.DATA_HUB['SNLI'] = (
 data_dir = d2l.download_extract('SNLI')
 ```
 
-### [**Reading the Dataset**]
+### [**Duomenų rinkinio skaitymas**]
 
-The original SNLI dataset contains much richer information than what we really need in our experiments. Thus, we define a function `read_snli` to only extract part of the dataset, then return lists of premises, hypotheses, and their labels.
+Pradinis SNLI duomenų rinkinys turi daug daugiau informacijos, nei mums iš tikrųjų reikia eksperimentuose. Todėl apibrėžiame funkciją `read_snli`, kad išgautume tik dalį duomenų rinkinio, o tada grąžintume prielaidų, hipotezių ir jų žymenų sąrašus.
 
 ```{.python .input}
 #@tab all
@@ -111,7 +111,7 @@ def read_snli(data_dir, is_train):
     return premises, hypotheses, labels
 ```
 
-Now let's [**print the first 3 pairs**] of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
+Dabar [**atspausdinkime pirmąsias 3 prielaidos ir hipotezės poras**], taip pat jų žymenis („0“, „1“ ir „2“ atitinka atitinkamai „išplaukimas“, „prieštara“ ir „neutralumas“).
 
 ```{.python .input}
 #@tab all
@@ -122,11 +122,11 @@ for x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):
     print('label:', y)
 ```
 
-The training set has about 550000 pairs,
-and the testing set has about 10000 pairs.
-The following shows that 
-the three [**labels "entailment", "contradiction", and "neutral" are balanced**] in 
-both the training set and the testing set.
+Apmokymo aibėje yra apie 550000 porų,
+o testavimo aibėje – apie 10000 porų.
+Toliau parodoma, kad
+trys [**žymenys „išplaukimas“, „prieštara“ ir „neutralumas“ yra subalansuoti**]
+tiek apmokymo, tiek testavimo aibėje.
 
 ```{.python .input}
 #@tab all
@@ -135,12 +135,12 @@ for data in [train_data, test_data]:
     print([[row for row in data[2]].count(i) for i in range(3)])
 ```
 
-### [**Defining a Class for Loading the Dataset**]
+### [**Klasės duomenų rinkiniui įkelti apibrėžimas**]
 
-Below we define a class for loading the SNLI dataset by inheriting from the `Dataset` class in Gluon. The argument `num_steps` in the class constructor specifies the length of a text sequence so that each minibatch of sequences will have the same shape. 
-In other words,
-tokens after the first `num_steps` ones in longer sequence are trimmed, while special tokens “&lt;pad&gt;” will be appended to shorter sequences until their length becomes `num_steps`.
-By implementing the `__getitem__` function, we can arbitrarily access the premise, hypothesis, and label with the index `idx`.
+Toliau apibrėžiame klasę SNLI duomenų rinkiniui įkelti paveldėdami iš `Dataset` klasės Gluon. Klasės konstruktoriaus argumentas `num_steps` nurodo teksto sekos ilgį, kad kiekvienas sekų minirinkinys turėtų tą pačią formą.
+Kitaip tariant,
+teksto vienetai po pirmųjų `num_steps` ilgesnėje sekoje nukertami, o specialūs teksto vienetai „&lt;pad&gt;“ pridedami prie trumpesnių sekų, kol jų ilgis tampa `num_steps`.
+Įgyvendinę funkciją `__getitem__`, galime savavališkai pasiekti prielaidą, hipotezę ir žymenį pagal indeksą `idx`.
 
 ```{.python .input}
 #@tab mxnet
@@ -204,12 +204,11 @@ class SNLIDataset(torch.utils.data.Dataset):
         return len(self.premises)
 ```
 
-### [**Putting It All Together**]
+### [**Viskas kartu**]
 
-Now we can invoke the `read_snli` function and the `SNLIDataset` class to download the SNLI dataset and return `DataLoader` instances for both training and testing sets, together with the vocabulary of the training set.
-It is noteworthy that we must use the vocabulary constructed from the training set
-as that of the testing set. 
-As a result, any new token from the testing set will be unknown to the model trained on the training set.
+Dabar galime iškviesti funkciją `read_snli` ir klasę `SNLIDataset`, kad atsisiųstume SNLI duomenų rinkinį ir grąžintume `DataLoader` egzempliorius tiek apmokymo, tiek testavimo aibėms kartu su apmokymo aibės žodynu.
+Pažymėtina, kad testavimo aibei turime naudoti žodyną, sukonstruotą iš apmokymo aibės.
+Todėl bet kuris naujas teksto vienetas iš testavimo aibės bus nežinomas modeliui, apmokytam apmokymo aibėje.
 
 ```{.python .input}
 #@tab mxnet
@@ -249,9 +248,9 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 ```
 
-Here we set the batch size to 128 and sequence length to 50,
-and invoke the `load_data_snli` function to get the data iterators and vocabulary.
-Then we print the vocabulary size.
+Čia rinkinio dydį nustatome 128, o sekos ilgį 50,
+ir iškviečiame funkciją `load_data_snli`, kad gautume duomenų iteratorius ir žodyną.
+Tada atspausdiname žodyno dydį.
 
 ```{.python .input}
 #@tab all
@@ -259,9 +258,9 @@ train_iter, test_iter, vocab = load_data_snli(128, 50)
 len(vocab)
 ```
 
-Now we print the shape of the first minibatch.
-Contrary to sentiment analysis,
-we have two inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
+Dabar atspausdiname pirmojo minirinkinio formą.
+Priešingai nei nuotaikų analizėje,
+turime dvi įvestis `X[0]` ir `X[1]`, vaizduojančias prielaidų ir hipotezių poras.
 
 ```{.python .input}
 #@tab all
@@ -272,22 +271,22 @@ for X, Y in train_iter:
     break
 ```
 
-## Summary
+## Santrauka
 
-* Natural language inference studies whether a hypothesis can be inferred from a premise, where both are a text sequence.
-* In natural language inference, relationships between premises and hypotheses include entailment, contradiction, and neutral.
-* Stanford Natural Language Inference (SNLI) Corpus is a popular benchmark dataset of natural language inference.
+* Natūraliosios kalbos išvadų darymas tiria, ar hipotezę galima išvesti iš prielaidos, kur abi yra teksto sekos.
+* Natūraliosios kalbos išvadų darymo srityje sąryšiai tarp prielaidų ir hipotezių apima išplaukimą, prieštarą ir neutralumą.
+* Stanfordo natūraliosios kalbos išvadų darymo (SNLI) tekstynas yra populiarus natūraliosios kalbos išvadų darymo lyginamasis duomenų rinkinys.
 
 
-## Exercises
+## Pratimai
 
-1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using natural language inference?
-1. How can we change hyperparameters to reduce the vocabulary size?
+1. Mašininis vertimas ilgą laiką buvo vertinamas remiantis paviršutinišku $n$-gramų sutapimu tarp išvesties vertimo ir tikrojo vertimo. Ar galite suprojektuoti mašininio vertimo rezultatų vertinimo matą naudodami natūraliosios kalbos išvadų darymą?
+1. Kaip galime pakeisti hiperparametrus, kad sumažintume žodyno dydį?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/394)
+[Diskusijos](https://discuss.d2l.ai/t/394)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1388)
+[Diskusijos](https://discuss.d2l.ai/t/1388)
 :end_tab:

@@ -1,47 +1,47 @@
-# Sequence-Aware Recommender Systems
+# Sekai jautrios rekomendacinės sistemos
 
-In previous sections, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender :cite:`Quadrana.Cremonesi.Jannach.2018` where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drift.
+Ankstesniuose skyreliuose rekomendavimo užduotį abstrahavome kaip matricos užbaigimo problemą, neatsižvelgdami į naudotojų trumpalaikį elgesį. Šiame skyrelyje pristatysime rekomendacinį modelį, kuris atsižvelgia į nuosekliai sutvarkytus naudotojų sąveikų žurnalus. Tai sekai jautri rekomendacinė sistema :cite:`Quadrana.Cremonesi.Jannach.2018`, kurios įvestis yra sutvarkytas ir dažnai laiko žymomis pažymėtas ankstesnių naudotojo veiksmų sąrašas. Daugelis naujausių darbų parodė tokios informacijos įtraukimo naudą modeliuojant naudotojų laikinius elgesio dėsningumus ir atrandant jų interesų dreifą.
 
-The model we will introduce, Caser :cite:`Tang.Wang.2018`, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully connected layers, resulting in a more comprehensive modeling of user interests. Details of the model are described as follows.
+Modelis, kurį pristatysime, Caser :cite:`Tang.Wang.2018` (konvoliucinio sekos įterpinių rekomendavimo modelio santrumpa), naudoja konvoliucinius neuroninius tinklus, kad užfiksuotų dinaminį naudotojų naujausios veiklos poveikį. Pagrindinį Caser komponentą sudaro horizontalusis konvoliucinis tinklas ir vertikalusis konvoliucinis tinklas, kuriais siekiama atskleisti atitinkamai sąjungos lygmens ir taško lygmens sekų dėsningumus. Taško lygmens dėsningumas rodo atskiro istorinės sekos elemento poveikį tiksliniam elementui, o sąjungos lygmens dėsningumas reiškia kelių ankstesnių veiksmų įtaką vėlesniam tikslui. Pavyzdžiui, nusipirkus ir pieno, ir sviesto, didesnė tikimybė, kad bus perkami miltai, nei nusipirkus tik vieną iš jų. Be to, naudotojų bendri interesai, arba ilgalaikiai pageidavimai, taip pat modeliuojami paskutiniuose pilnai sujungtuose sluoksniuose, todėl naudotojų interesai modeliuojami išsamiau. Modelio detalės aprašytos toliau.
 
-## Model Architectures
+## Modelio architektūros
 
-In sequence-aware recommendation system, each user is associated with a sequence of some items from the item set. Let $S^u = (S_1^u, ... S_{|S_u|}^u)$ denotes the ordered sequence. The goal of Caser is to recommend item by considering user general tastes as well as short-term intention. Suppose we take the previous $L$ items into consideration, an embedding matrix that represents the former interactions for time step $t$ can be constructed:
+Sekai jautrioje rekomendacinėje sistemoje kiekvienas naudotojas susijęs su kai kurių elementų iš elementų aibės seka. Tegul $S^u = (S_1^u, ... S_{|S_u|}^u)$ žymi sutvarkytą seką. Caser tikslas – rekomenduoti elementą atsižvelgiant į bendrą naudotojo skonį ir trumpalaikį ketinimą. Tarkime, kad atsižvelgiame į ankstesnius $L$ elementų; galima sukonstruoti įterpinių matricą, vaizduojančią ankstesnes sąveikas laiko žingsniui $t$:
 
 $$
 \mathbf{E}^{(u, t)} = [ \mathbf{q}_{S_{t-L}^u} , ..., \mathbf{q}_{S_{t-2}^u}, \mathbf{q}_{S_{t-1}^u} ]^\top,
 $$
 
-where $\mathbf{Q} \in \mathbb{R}^{n \times k}$ represents item embeddings and $\mathbf{q}_i$ denotes the $i^\textrm{th}$ row. $\mathbf{E}^{(u, t)} \in \mathbb{R}^{L \times k}$ can be used to infer the transient interest of user $u$ at time-step $t$. We can view the input matrix $\mathbf{E}^{(u, t)}$ as an image which is the input of the subsequent two convolutional components.
+kur $\mathbf{Q} \in \mathbb{R}^{n \times k}$ žymi elementų įterpinius, o $\mathbf{q}_i$ – $i$-ąją eilutę. $\mathbf{E}^{(u, t)} \in \mathbb{R}^{L \times k}$ galima naudoti naudotojo $u$ trumpalaikiam interesui laiko žingsniu $t$ nustatyti. Įvesties matricą $\mathbf{E}^{(u, t)}$ galime vertinti kaip vaizdą, kuris yra kitų dviejų konvoliucinių komponentų įvestis.
 
-The horizontal convolutional layer has $d$ horizontal filters $\mathbf{F}^j \in \mathbb{R}^{h \times k}, 1 \leq j \leq d, h = \{1, ..., L\}$, and the vertical convolutional layer has $d'$ vertical filters $\mathbf{G}^j \in \mathbb{R}^{ L \times 1}, 1 \leq j \leq d'$. After a series of convolutional and pool operations, we get the two outputs:
+Horizontalusis konvoliucinis sluoksnis turi $d$ horizontaliųjų filtrų $\mathbf{F}^j \in \mathbb{R}^{h \times k}, 1 \leq j \leq d, h = \{1, ..., L\}$, o vertikalusis konvoliucinis sluoksnis turi $d'$ vertikaliųjų filtrų $\mathbf{G}^j \in \mathbb{R}^{ L \times 1}, 1 \leq j \leq d'$. Po konvoliucijos ir sutelkimo operacijų serijos gauname dvi išvestis:
 
 $$
 \mathbf{o} = \textrm{HConv}(\mathbf{E}^{(u, t)}, \mathbf{F}) \\
 \mathbf{o}'= \textrm{VConv}(\mathbf{E}^{(u, t)}, \mathbf{G}) ,
 $$
 
-where $\mathbf{o} \in \mathbb{R}^d$ is the output of horizontal convolutional network and $\mathbf{o}' \in \mathbb{R}^{kd'}$ is the output of vertical convolutional network. For simplicity, we omit the details of convolution and pool operations. They are concatenated and fed into a fully connected neural network layer to get more high-level representations.
+kur $\mathbf{o} \in \mathbb{R}^d$ yra horizontaliojo konvoliucinio tinklo išvestis, o $\mathbf{o}' \in \mathbb{R}^{kd'}$ – vertikaliojo konvoliucinio tinklo išvestis. Paprastumo dėlei konvoliucijos ir sutelkimo operacijų detales praleidžiame. Jos sujungiamos ir paduodamos į pilnai sujungtą neuroninio tinklo sluoksnį, kad gautume aukštesnio lygio vaizdavimus.
 
 $$
 \mathbf{z} = \phi(\mathbf{W}[\mathbf{o}, \mathbf{o}']^\top + \mathbf{b}),
 $$
 
-where $\mathbf{W} \in \mathbb{R}^{k \times (d + kd')}$ is the weight matrix and $\mathbf{b} \in \mathbb{R}^k$ is the bias. The learned vector $\mathbf{z} \in \mathbb{R}^k$ is the representation of user's short-term intent.
+kur $\mathbf{W} \in \mathbb{R}^{k \times (d + kd')}$ yra svorių matrica, o $\mathbf{b} \in \mathbb{R}^k$ – poslinkis. Išmoktas vektorius $\mathbf{z} \in \mathbb{R}^k$ yra naudotojo trumpalaikio ketinimo vaizdavimas.
 
-At last, the prediction function combines users' short-term and general taste together, which is defined as:
+Galiausiai prognozavimo funkcija sujungia naudotojų trumpalaikį ir bendrąjį skonį ir apibrėžiama taip:
 
 $$
 \hat{y}_{uit} = \mathbf{v}_i \cdot [\mathbf{z}, \mathbf{p}_u]^\top + \mathbf{b}'_i,
 $$
 
-where $\mathbf{V} \in \mathbb{R}^{n \times 2k}$ is another item embedding matrix. $\mathbf{b}' \in \mathbb{R}^n$ is the item specific bias.  $\mathbf{P} \in \mathbb{R}^{m \times k}$ is the user embedding matrix for users' general tastes. $\mathbf{p}_u \in \mathbb{R}^{ k}$ is the $u^\textrm{th}$ row of $P$ and $\mathbf{v}_i \in \mathbb{R}^{2k}$ is the $i^\textrm{th}$ row of $\mathbf{V}$.
+kur $\mathbf{V} \in \mathbb{R}^{n \times 2k}$ yra kita elementų įterpinių matrica. $\mathbf{b}' \in \mathbb{R}^n$ yra elementui specifinis poslinkis. $\mathbf{P} \in \mathbb{R}^{m \times k}$ yra naudotojų įterpinių matrica naudotojų bendram skoniui. $\mathbf{p}_u \in \mathbb{R}^{ k}$ yra $u$-oji $P$ eilutė, o $\mathbf{v}_i \in \mathbb{R}^{2k}$ – $i$-oji $\mathbf{V}$ eilutė.
 
-The model can be learned with BPR or Hinge loss. The architecture of Caser is shown below:
+Modelį galima mokyti naudojant BPR ar vyrio nuostolį. Caser architektūra parodyta žemiau:
 
-![Illustration of the Caser Model](../img/rec-caser.svg)
+![Caser modelio iliustracija](../img/rec-caser.svg)
 
-We first import the required libraries.
+Pirmiausia importuojame reikalingas bibliotekas.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -54,8 +54,8 @@ import random
 npx.set_np()
 ```
 
-## Model Implementation
-The following code implements the Caser model. It consists of a vertical convolutional layer, a horizontal convolutional layer, and a full-connected layer.
+## Modelio įgyvendinimas
+Toliau pateiktas kodas įgyvendina Caser modelį. Jį sudaro vertikalusis konvoliucinis sluoksnis, horizontalusis konvoliucinis sluoksnis ir pilnai sujungtas sluoksnis.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -105,10 +105,10 @@ class Caser(nn.Block):
         return res
 ```
 
-## Sequential Dataset with Negative Sampling
-To process the sequential interaction data, we need to reimplement the `Dataset` class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, his previous $L$ interacted items as a sequence and the next item he interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 9 movies, we organize these nine movies in chronological order. The latest movie is left out as the test item. For the remaining eight movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item. Negative samples are also included in the customized dataset.
+## Sekinis duomenų rinkinys su neigiamų pavyzdžių atranka
+Norėdami apdoroti sekines sąveikų duomenis, turime iš naujo įgyvendinti klasę `Dataset`. Šis kodas sukuria naują duomenų rinkinio klasę `SeqDataset`. Kiekviename pavyzdyje ji išveda naudotojo tapatybę, ankstesnius $L$ jo sąveikautų elementų kaip seką ir kitą jo sąveikautą elementą kaip tikslą. Šiame paveiksle parodytas vieno naudotojo duomenų įkėlimo procesas. Tarkime, kad šiam naudotojui patiko 9 filmai; šiuos devynis filmus sutvarkome chronologine tvarka. Naujausias filmas paliekamas kaip testavimo elementas. Iš likusių aštuonių filmų galime gauti tris apmokymo pavyzdžius, kurių kiekvienas turi penkių ($L=5$) filmų seką ir vėlesnį elementą kaip tikslinį elementą. Į pritaikytą duomenų rinkinį taip pat įtraukiami neigiami pavyzdžiai.
 
-![Illustration of the data generation process](../img/rec-seq-data.svg)
+![Duomenų generavimo proceso iliustracija](../img/rec-seq-data.svg)
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -165,9 +165,9 @@ class SeqDataset(gluon.data.Dataset):
                 neg[i])
 ```
 
-## Load the MovieLens 100K dataset
+## MovieLens 100K duomenų rinkinio įkėlimas
 
-Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode and load the training data with sequential dataloader implemented above.
+Po to nuskaitome ir padalijame MovieLens 100K duomenų rinkinį sekai jautriu režimu ir įkeliame apmokymo duomenis aukščiau įgyvendintu sekiniu duomenų įkėlikliu.
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -188,10 +188,10 @@ test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
 ```
 
-The training data structure is shown above. The first element is the user identity, the next list indicates the last five items this user liked, and the last element is the item this user liked after the five items.
+Apmokymo duomenų struktūra parodyta aukščiau. Pirmasis elementas yra naudotojo tapatybė, kitas sąrašas nurodo paskutinius penkis šiam naudotojui patikusius elementus, o paskutinis elementas yra elementas, kuris naudotojui patiko po tų penkių.
 
-## Train the Model
-Now, let's train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
+## Modelio apmokymas
+Dabar apmokykime modelį. Naudojame tuos pačius nustatymus kaip NeuMF ankstesniame skyrelyje, įskaitant mokymosi greitį, optimizatorių ir $k$, kad rezultatai būtų palyginami.
 
 ```{.python .input  n=7}
 #@tab mxnet
@@ -207,17 +207,17 @@ trainer = gluon.Trainer(net.collect_params(), optimizer,
 # d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, num_users, num_items, num_epochs, devices, d2l.evaluate_ranking, candidates, eval_step=1)
 ```
 
-## Summary
-* Inferring a user's short-term and long-term interests can make prediction of the next item that he preferred more effectively.
-* Convolutional neural networks can be utilized to capture users' short-term interests from sequential interactions.
+## Santrauka
+* Naudotojo trumpalaikių ir ilgalaikių interesų nustatymas gali padaryti jo pageidaujamo kito elemento prognozavimą veiksmingesnį.
+* Konvoliuciniai neuroniniai tinklai gali būti naudojami užfiksuoti naudotojų trumpalaikius interesus iš sekinių sąveikų.
 
-## Exercises
+## Pratimai
 
-* Conduct an ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ?
-* Vary the hyperparameter $L$. Does longer historical interactions bring higher accuracy?
-* Apart from the sequence-aware recommendation task we introduced above, there is another type of sequence-aware recommendation task called session-based recommendation :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015`. Can you explain the differences between these two tasks?
+* Atlikite abliacijos tyrimą pašalindami vieną iš horizontaliojo ir vertikaliojo konvoliucinių tinklų: kuris komponentas svarbesnis?
+* Keiskite hiperparametrą $L$. Ar ilgesnės istorinės sąveikos suteikia didesnį tikslumą?
+* Be aukščiau pristatytos sekai jautraus rekomendavimo užduoties, yra kitas sekai jautraus rekomendavimo užduoties tipas, vadinamas sesijomis pagrįstu rekomendavimu :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015`. Ar galite paaiškinti šių dviejų užduočių skirtumus?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/404)
+[Diskusijos](https://discuss.d2l.ai/t/404)
 :end_tab:

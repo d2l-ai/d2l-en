@@ -1,47 +1,45 @@
-# Multiscale Object Detection
+# Daugiamastelis objektų aptikimas
 :label:`sec_multiscale-object-detection`
 
 
-In :numref:`sec_anchor`,
-we generated multiple anchor boxes centered on each pixel of an input image. 
-Essentially these anchor boxes 
-represent samples of
-different regions of the image.
-However, 
-we may end up with too many anchor boxes to compute
-if they are generated for *every* pixel.
-Think of a $561 \times 728$ input image.
-If five anchor boxes 
-with varying shapes
-are generated for each pixel as their center,
-over two million anchor boxes ($561 \times 728 \times 5$) need to be labeled and predicted on the image.
+:numref:`sec_anchor`
+sugeneravome kelis inkarinius stačiakampius, kurių centras yra kiekvienas įvesties vaizdo pikselis.
+Iš esmės šie inkariniai stačiakampiai
+atvaizduoja
+skirtingų vaizdo sričių imtis.
+Tačiau
+jei jie generuojami *kiekvienam* pikseliui, galime gauti per daug inkarinių stačiakampių, kuriuos reikia skaičiuoti.
+Pagalvokite apie $561 \times 728$ dydžio įvesties vaizdą.
+Jei kiekvienam pikseliui kaip centrui
+sugeneruojami penki skirtingos formos
+inkariniai stačiakampiai,
+vaizde reikės pažymėti ir prognozuoti daugiau nei du milijonus inkarinių stačiakampių ($561 \times 728 \times 5$).
 
-## Multiscale Anchor Boxes
+## Daugiamasteliai inkariniai stačiakampiai
 :label:`subsec_multiscale-anchor-boxes`
 
-You may realize that
-it is not difficult to reduce anchor boxes on an image.
-For instance, we can just 
-uniformly sample a small portion of pixels
-from the input image
-to generate anchor boxes centered on them.
-In addition, 
-at different scales
-we can generate different numbers of anchor boxes
-of different sizes.
-Intuitively,
-smaller objects are more likely
-to appear on an image than larger ones.
-As an example,
-$1 \times 1$, $1 \times 2$, and $2 \times 2$ objects 
-can appear on a $2 \times 2$ image
-in 4, 2, and 1 possible ways, respectively.
-Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions,
-while for larger objects we can sample fewer regions.
+Galbūt pastebėjote, kad
+nesunku sumažinti vaizde esančių inkarinių stačiakampių skaičių.
+Pavyzdžiui, galime tiesiog
+tolygiai atrinkti nedidelę pikselių dalį
+iš įvesties vaizdo
+ir sugeneruoti inkarinius stačiakampius, kurių centrai yra šie pikseliai.
+Be to,
+skirtingais masteliais
+galime generuoti skirtingą skirtingų dydžių inkarinių stačiakampių skaičių.
+Intuityviai,
+mažesni objektai vaizde
+tikėtina, kad pasirodys dažniau nei didesni.
+Pavyzdžiui,
+$1 \times 1$, $1 \times 2$ ir $2 \times 2$ objektai
+gali pasirodyti $2 \times 2$ vaizde
+atitinkamai 4, 2 ir 1 galimais būdais.
+Todėl naudodami mažesnius inkarinius stačiakampius mažesniems objektams aptikti, galime atrinkti daugiau sričių,
+o didesniems objektams – mažiau sričių.
 
-To demonstrate how to generate anchor boxes
-at multiple scales, let's read an image.
-Its height and width are 561 and 728 pixels, respectively.
+Kad parodytume, kaip generuoti inkarinius stačiakampius
+keliais masteliais, nuskaitykime vaizdą.
+Jo aukštis ir plotis yra atitinkamai 561 ir 728 pikseliai.
 
 ```{.python .input}
 #@tab mxnet
@@ -67,34 +65,34 @@ h, w = img.shape[:2]
 h, w
 ```
 
-Recall that in :numref:`sec_conv_layer`
-we call a two-dimensional array output of 
-a convolutional layer a feature map.
-By defining the feature map shape,
-we can determine centers of uniformly sampled anchor boxes  on any image.
+Prisiminkite, kad :numref:`sec_conv_layer`
+dvimatį konvoliucinio sluoksnio išvesties masyvą
+pavadinome požymių žemėlapiu.
+Apibrėždami požymių žemėlapio formą,
+galime nustatyti bet kurio vaizdo tolygiai atrinktų inkarinių stačiakampių centrus.
 
 
-The `display_anchors` function is defined below.
-[**We generate anchor boxes (`anchors`) on the feature map (`fmap`) with each unit (pixel) as the anchor box center.**]
-Since the $(x, y)$-axis coordinate values
-in the anchor boxes (`anchors`) have been divided by the width and height of the feature map (`fmap`),
-these values are between 0 and 1,
-which indicate the relative positions of
-anchor boxes in the feature map.
+Toliau apibrėžta funkcija `display_anchors`.
+[**Generuojame inkarinius stačiakampius (`anchors`) požymių žemėlapyje (`fmap`), kiekvieną vienetą (pikselį) laikydami inkarinio stačiakampio centru.**]
+Kadangi inkarinių stačiakampių (`anchors`) $(x, y)$ ašių koordinačių reikšmės
+buvo padalytos iš požymių žemėlapio (`fmap`) pločio ir aukščio,
+šios reikšmės yra tarp 0 ir 1,
+o tai rodo santykines
+inkarinių stačiakampių padėtis požymių žemėlapyje.
 
-Since centers of the anchor boxes (`anchors`)
-are spread over all units on the feature map (`fmap`),
-these centers must be *uniformly* distributed
-on any input image
-in terms of their relative spatial positions.
-More concretely,
-given the width and height of the feature map `fmap_w` and `fmap_h`, respectively,
-the following function will *uniformly* sample
-pixels in `fmap_h` rows and `fmap_w` columns
-on any input image.
-Centered on these uniformly sampled pixels,
-anchor boxes of scale `s` (assuming the length of the list `s` is 1) and different aspect ratios (`ratios`)
-will be generated.
+Kadangi inkarinių stačiakampių (`anchors`) centrai
+pasiskirstę per visus požymių žemėlapio (`fmap`) vienetus,
+šie centrai turi būti *tolygiai* pasiskirstę
+bet kuriame įvesties vaizde
+pagal jų santykines erdvines padėtis.
+Konkrečiau,
+turint požymių žemėlapio plotį ir aukštį atitinkamai `fmap_w` ir `fmap_h`,
+ši funkcija *tolygiai* atrinks
+pikselius `fmap_h` eilučių ir `fmap_w` stulpelių
+bet kuriame įvesties vaizde.
+Aplink šiuos tolygiai atrinktus pikselius
+bus sugeneruoti
+mastelio `s` (darant prielaidą, kad sąrašo `s` ilgis yra 1) ir skirtingų kraštinių santykių (`ratios`) inkariniai stačiakampiai.
 
 ```{.python .input}
 #@tab mxnet
@@ -120,119 +118,117 @@ def display_anchors(fmap_w, fmap_h, s):
                     anchors[0] * bbox_scale)
 ```
 
-First, let's [**consider
-detection of small objects**].
-In order to make it easier to distinguish when displayed, the anchor boxes with different centers here do not overlap:
-the anchor box scale is set to 0.15
-and the height and width of the feature map are set to 4. We can see
-that the centers of the anchor boxes in 4 rows and 4 columns on the image are uniformly distributed.
+Pirmiausia [**panagrinėkime
+mažų objektų aptikimą**].
+Kad rodomus stačiakampius būtų lengviau atskirti, čia skirtingų centrų inkariniai stačiakampiai nepersidengia:
+inkarinio stačiakampio mastelis nustatytas 0,15,
+o požymių žemėlapio aukštis ir plotis – 4. Matome,
+kad 4 eilučių ir 4 stulpelių inkarinių stačiakampių centrai vaizde pasiskirstę tolygiai.
 
 ```{.python .input}
 #@tab all
 display_anchors(fmap_w=4, fmap_h=4, s=[0.15])
 ```
 
-We move on to [**reduce the height and width of the feature map by half and use larger anchor boxes to detect larger objects**]. When the scale is set to 0.4, 
-some anchor boxes will overlap with each other.
+Toliau [**perpus sumažiname požymių žemėlapio aukštį ir plotį ir naudojame didesnius inkarinius stačiakampius didesniems objektams aptikti**]. Kai mastelis nustatytas 0,4,
+kai kurie inkariniai stačiakampiai persidengs.
 
 ```{.python .input}
 #@tab all
 display_anchors(fmap_w=2, fmap_h=2, s=[0.4])
 ```
 
-Finally, we [**further reduce the height and width of the feature map by half and increase the anchor box scale to 0.8**]. Now the center of the anchor box is the center of the image.
+Galiausiai [**dar perpus sumažiname požymių žemėlapio aukštį ir plotį ir padidiname inkarinio stačiakampio mastelį iki 0,8**]. Dabar inkarinio stačiakampio centras yra vaizdo centras.
 
 ```{.python .input}
 #@tab all
 display_anchors(fmap_w=1, fmap_h=1, s=[0.8])
 ```
 
-## Multiscale Detection
+## Daugiamastelis aptikimas
 
 
-Since we have generated multiscale anchor boxes,
-we will use them to detect objects of various sizes
-at different scales.
-In the following
-we introduce a CNN-based multiscale object detection
-method that we will implement
-in :numref:`sec_ssd`.
+Kadangi sugeneravome daugiamastelius inkarinius stačiakampius,
+juos naudosime įvairaus dydžio objektams aptikti
+skirtingais masteliais.
+Toliau
+pristatome daugiamastelį objektų aptikimo
+metodą, pagrįstą CNN, kurį įgyvendinsime
+:numref:`sec_ssd`.
 
-At some scale,
-say that we have $c$ feature maps of shape $h \times w$.
-Using the method in :numref:`subsec_multiscale-anchor-boxes`,
-we generate $hw$ sets of anchor boxes,
-where each set has $a$ anchor boxes with the same center.
-For example, 
-at the first scale in the experiments in :numref:`subsec_multiscale-anchor-boxes`,
-given ten (number of channels) $4 \times 4$ feature maps,
-we generated 16 sets of anchor boxes,
-where each set contains 3 anchor boxes with the same center.
-Next, each anchor box is labeled with
-the class and offset based on ground-truth bounding boxes. At the current scale, the object detection model needs to predict the classes and offsets of $hw$ sets of anchor boxes on the input image, where different sets have different centers.
-
-
-Assume that the $c$ feature maps here
-are the intermediate outputs obtained
-by the CNN forward propagation based on the input image. Since there are $hw$ different spatial positions on each feature map,
-the same spatial position can be 
-thought of as having $c$ units.
-According to the
-definition of receptive field in :numref:`sec_conv_layer`,
-these $c$ units at the same spatial position
-of the feature maps
-have the same receptive field on the input image:
-they represent the input image information
-in the same receptive field.
-Therefore, we can transform the $c$ units
-of the feature maps at the same spatial position
-into the
-classes and offsets of the $a$ anchor boxes
-generated using this spatial position.
-In essence,
-we use the information of the input image in a certain receptive field
-to predict the classes and offsets of the anchor boxes
-that are
-close to that receptive field
-on the input image.
+Tam tikru masteliu
+tarkime, kad turime $c$ požymių žemėlapių, kurių forma $h \times w$.
+Naudodami :numref:`subsec_multiscale-anchor-boxes` metodą,
+generuojame $hw$ inkarinių stačiakampių rinkinių,
+kur kiekvieną rinkinį sudaro $a$ inkarinių stačiakampių su tuo pačiu centru.
+Pavyzdžiui,
+pirmuoju masteliu :numref:`subsec_multiscale-anchor-boxes` eksperimentuose,
+turėdami dešimt (kanalų skaičius) $4 \times 4$ požymių žemėlapių,
+sugeneravome 16 inkarinių stačiakampių rinkinių,
+kur kiekviename rinkinyje yra 3 inkariniai stačiakampiai su tuo pačiu centru.
+Toliau kiekvienas inkarinis stačiakampis pažymimas
+klase ir poslinkiu pagal tikruosius apibrėžiamuosius stačiakampius. Dabartiniu masteliu objektų aptikimo modelis turi prognozuoti $hw$ inkarinių stačiakampių rinkinių klases ir poslinkius įvesties vaizde, kur skirtingi rinkiniai turi skirtingus centrus.
 
 
-When the feature maps at different layers
-have varying-size receptive fields on the input image, they can be used to detect objects of different sizes.
-For example, we can design a neural network where
-units of feature maps that are closer to the output layer
-have wider receptive fields,
-so they can detect larger objects from the input image.
+Tarkime, kad čia esantys $c$ požymių žemėlapių yra tarpinės išvestys, gautos
+CNN tiesioginio sklidimo metu pagal įvesties vaizdą. Kadangi kiekviename požymių žemėlapyje yra $hw$ skirtingų erdvinių padėčių,
+tą pačią erdvinę padėtį galima
+laikyti turinčia $c$ vienetų.
+Pagal
+lokalios matymo srities apibrėžimą :numref:`sec_conv_layer`,
+šie $c$ vienetų toje pačioje požymių žemėlapių
+erdvinėje padėtyje
+turi tą pačią lokalią matymo sritį įvesties vaizde:
+jie vaizduoja įvesties vaizdo informaciją
+toje pačioje lokalioje matymo srityje.
+Todėl šiuos $c$ požymių žemėlapių vienetų
+toje pačioje erdvinėje padėtyje
+galime transformuoti į
+$a$ inkarinių stačiakampių, sugeneruotų naudojant šią erdvinę padėtį,
+klases ir poslinkius.
+Iš esmės
+naudojame tam tikroje lokalioje matymo srityje esančią įvesties vaizdo informaciją
+prognozuoti inkarinių stačiakampių, esančių
+arti tos lokalios matymo srities
+įvesties vaizde, klases ir poslinkius.
 
-In a nutshell, we can leverage
-layerwise representations of images at multiple levels
-by deep neural networks
-for multiscale object detection.
-We will show how this works through a concrete example
-in :numref:`sec_ssd`.
+
+Kai skirtingų sluoksnių požymių žemėlapiai
+turi skirtingo dydžio lokalias matymo sritis įvesties vaizde, juos galima naudoti skirtingo dydžio objektams aptikti.
+Pavyzdžiui, galime suprojektuoti neuroninį tinklą, kuriame
+požymių žemėlapių vienetai, esantys arčiau išvesties sluoksnio,
+turi platesnes lokalias matymo sritis,
+todėl gali aptikti didesnius įvesties vaizdo objektus.
+
+Trumpai tariant, galime pasinaudoti
+giliųjų neuroninių tinklų
+daugialygiais sluoksniniais vaizdų vaizdavimais
+daugiamasteliam objektų aptikimui.
+Kaip tai veikia, parodysime konkrečiu pavyzdžiu
+:numref:`sec_ssd`.
 
 
 
 
-## Summary
+## Santrauka
 
-* At multiple scales, we can generate anchor boxes with different sizes to detect objects with different sizes.
-* By defining the shape of feature maps, we can determine centers of uniformly sampled anchor boxes on any image.
-* We use the information of the input image in a certain receptive field to predict the classes and offsets of the anchor boxes that are close to that receptive field on the input image.
-* Through deep learning, we can leverage its layerwise representations of images at multiple levels for multiscale object detection.
+* Keliais masteliais galime generuoti skirtingo dydžio inkarinius stačiakampius, kad aptiktume skirtingo dydžio objektus.
+* Apibrėždami požymių žemėlapių formą, galime nustatyti bet kurio vaizdo tolygiai atrinktų inkarinių stačiakampių centrus.
+* Naudojame tam tikroje lokalioje matymo srityje esančią įvesties vaizdo informaciją, kad prognozuotume inkarinių stačiakampių, esančių arti tos lokalios matymo srities įvesties vaizde, klases ir poslinkius.
+* Naudodami gilųjį mokymąsi, galime pasinaudoti jo daugialygiais sluoksniniais vaizdų vaizdavimais daugiamasteliam objektų aptikimui.
 
 
-## Exercises
+## Pratimai
 
-1. According to our discussions in :numref:`sec_alexnet`, deep neural networks learn hierarchical features with increasing levels of abstraction for images. In multiscale object detection, do feature maps at different scales correspond to different levels of abstraction? Why or why not?
-1. At the first scale (`fmap_w=4, fmap_h=4`) in the experiments in :numref:`subsec_multiscale-anchor-boxes`, generate uniformly distributed anchor boxes that may overlap.
-1. Given a feature map variable with shape $1 \times c \times h \times w$, where $c$, $h$, and $w$ are the number of channels, height, and width of the feature maps, respectively. How can you transform this variable into the classes and offsets of anchor boxes? What is the shape of the output?
+1. Remiantis mūsų diskusijomis :numref:`sec_alexnet`, gilieji neuroniniai tinklai išmoksta hierarchinius vaizdų požymius su vis aukštesniu abstrakcijos lygiu. Ar daugiamasteliame objektų aptikime skirtingų mastelių požymių žemėlapiai atitinka skirtingus abstrakcijos lygius? Kodėl taip arba kodėl ne?
+1. Pirmuoju masteliu (`fmap_w=4, fmap_h=4`) :numref:`subsec_multiscale-anchor-boxes` eksperimentuose sugeneruokite tolygiai pasiskirsčiusius inkarinius stačiakampius, kurie gali persidengti.
+1. Duotas požymių žemėlapio kintamasis, kurio forma $1 \times c \times h \times w$, kur $c$, $h$ ir $w$ yra atitinkamai požymių žemėlapių kanalų skaičius, aukštis ir plotis. Kaip galite transformuoti šį kintamąjį į inkarinių stačiakampių klases ir poslinkius? Kokia yra išvesties forma?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/371)
+[Diskusijos](https://discuss.d2l.ai/t/371)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1607)
+[Diskusijos](https://discuss.d2l.ai/t/1607)
 :end_tab:

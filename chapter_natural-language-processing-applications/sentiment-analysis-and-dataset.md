@@ -1,45 +1,42 @@
-# Sentiment Analysis and the Dataset
+# Nuotaikų analizė ir duomenų rinkinys
 :label:`sec_sentiment`
 
 
-With the proliferation of online social media
-and review platforms,
-a plethora of
-opinionated data
-has been logged,
-bearing great potential for
-supporting decision making processes.
-*Sentiment analysis*
-studies people's sentiments
-in their produced text,
-such as product reviews,
-blog comments,
-and
-forum discussions.
-It enjoys wide applications
-to fields as diverse as 
-politics (e.g., analysis of public sentiments towards policies),
-finance (e.g., analysis of sentiments of the market),
-and 
-marketing (e.g., product research and brand management).
+Plintant internetinei socialinei žiniasklaidai
+ir apžvalgų platformoms,
+buvo užfiksuota gausybė
+nuomonių duomenų,
+turinčių didelį potencialą
+palaikyti sprendimų priėmimo procesus.
+*Nuotaikų analizė*
+tiria žmonių nuotaikas
+jų sukurtame tekste,
+pavyzdžiui, produktų atsiliepimuose,
+tinklaraščių komentaruose
+ir
+forumų diskusijose.
+Ji plačiai taikoma
+tokiose skirtingose srityse kaip
+politika (pvz., visuomenės nuotaikų politikos atžvilgiu analizė),
+finansai (pvz., rinkos nuotaikų analizė)
+ir
+rinkodara (pvz., produktų tyrimai ir prekių ženklų valdymas).
 
-Since sentiments
-can be categorized
-as discrete polarities or scales (e.g., positive and negative),
-we can consider 
-sentiment analysis 
-as a text classification task,
-which transforms a varying-length text sequence
-into a fixed-length text category.
-In this chapter,
-we will use Stanford's [large movie review dataset](https://ai.stanford.edu/%7Eamaas/data/sentiment/)
-for sentiment analysis. 
-It consists of a training set and a testing set, 
-either containing 25000 movie reviews downloaded from IMDb.
-In both datasets, 
-there are equal number of 
-"positive" and "negative" labels,
-indicating different sentiment polarities.
+Kadangi nuotaikas
+galima suskirstyti
+į diskrečius poliškumus arba skales (pvz., teigiama ir neigiama),
+nuotaikų analizę galime laikyti
+teksto klasifikavimo užduotimi,
+kuri kintamo ilgio teksto seką paverčia
+fiksuoto ilgio teksto kategorija.
+Šiame skyriuje
+nuotaikų analizei naudosime Stanfordo [didelį filmų apžvalgų duomenų rinkinį](https://ai.stanford.edu/%7Eamaas/data/sentiment/).
+Jį sudaro apmokymo ir testavimo aibės,
+kurių kiekvienoje yra 25000 filmų apžvalgų, atsisiųstų iš IMDb.
+Abiejuose duomenų rinkiniuose
+yra vienodas skaičius
+„teigiamų“ ir „neigiamų“ žymenų,
+nurodančių skirtingus nuotaikų poliškumus.
 
 ```{.python .input}
 #@tab mxnet
@@ -57,10 +54,10 @@ from torch import nn
 import os
 ```
 
-##  Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-First, download and extract this IMDb review dataset
-in the path `../data/aclImdb`.
+Pirmiausia atsisiųskite ir išpakuokite šį IMDb apžvalgų duomenų rinkinį
+kelyje `../data/aclImdb`.
 
 ```{.python .input}
 #@tab all
@@ -71,7 +68,7 @@ d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz',
 data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```
 
-Next, read the training and test datasets. Each example is a review and its label: 1 for "positive" and 0 for "negative".
+Toliau nuskaitykite apmokymo ir testavimo duomenų rinkinius. Kiekvienas pavyzdys yra apžvalga ir jos žymuo: 1 „teigiamam“ ir 0 „neigiamam“.
 
 ```{.python .input}
 #@tab all
@@ -95,11 +92,11 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
     print('label:', y, 'review:', x[:60])
 ```
 
-## Preprocessing the Dataset
+## Duomenų rinkinio išankstinis apdorojimas
 
-Treating each word as a token
-and filtering out words that appear less than 5 times,
-we create a vocabulary out of the training dataset.
+Kiekvieną žodį laikydami teksto vienetu
+ir atfiltruodami žodžius, pasirodančius rečiau nei 5 kartus,
+sukuriame žodyną iš apmokymo duomenų rinkinio.
 
 ```{.python .input}
 #@tab all
@@ -107,9 +104,9 @@ train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
 ```
 
-After tokenization,
-let's plot the histogram of
-review lengths in tokens.
+Po teksto skaidymo į teksto vienetus
+nubraižykime
+apžvalgų ilgių teksto vienetais histogramą.
 
 ```{.python .input}
 #@tab all
@@ -119,15 +116,15 @@ d2l.plt.ylabel('count')
 d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 ```
 
-As we expected,
-the reviews have varying lengths.
-To process
-a minibatch of such reviews at each time,
-we set the length of each review to 500 with truncation and padding,
-which is similar to 
-the preprocessing step 
-for the machine translation dataset
-in :numref:`sec_machine_translation`.
+Kaip ir tikėjomės,
+apžvalgos yra skirtingo ilgio.
+Kad vienu metu apdorotume
+tokių apžvalgų minirinkinį,
+kiekvienos apžvalgos ilgį nustatome 500 su nukirtimu ir užpildymu,
+panašiai kaip
+mašininio vertimo duomenų rinkinio
+išankstinio apdorojimo žingsnyje
+:numref:`sec_machine_translation`.
 
 ```{.python .input}
 #@tab all
@@ -137,10 +134,10 @@ train_features = d2l.tensor([d2l.truncate_pad(
 print(train_features.shape)
 ```
 
-## Creating Data Iterators
+## Duomenų iteratorių kūrimas
 
-Now we can create data iterators.
-At each iteration, a minibatch of examples are returned.
+Dabar galime sukurti duomenų iteratorius.
+Kiekvienoje iteracijoje grąžinamas pavyzdžių minirinkinys.
 
 ```{.python .input}
 #@tab mxnet
@@ -162,10 +159,10 @@ for X, y in train_iter:
 print('# batches:', len(train_iter))
 ```
 
-## Putting It All Together
+## Viskas kartu
 
-Last, we wrap up the above steps into the `load_data_imdb` function.
-It returns training and test data iterators and the vocabulary of the IMDb review dataset.
+Galiausiai aukščiau pateiktus žingsnius apgaubiame funkcija `load_data_imdb`.
+Ji grąžina IMDb apžvalgų duomenų rinkinio apmokymo ir testavimo duomenų iteratorius bei žodyną.
 
 ```{.python .input}
 #@tab mxnet
@@ -211,24 +208,24 @@ def load_data_imdb(batch_size, num_steps=500):
     return train_iter, test_iter, vocab
 ```
 
-## Summary
+## Santrauka
 
-* Sentiment analysis studies people's sentiments in their produced text, which is considered as a text classification problem that transforms a varying-length text sequence
-into a fixed-length text category.
-* After preprocessing, we can load Stanford's large movie review dataset (IMDb review dataset) into data iterators with a vocabulary.
-
-
-## Exercises
+* Nuotaikų analizė tiria žmonių nuotaikas jų sukurtame tekste, kuri laikoma teksto klasifikavimo problema, paverčiančia kintamo ilgio teksto seką
+fiksuoto ilgio teksto kategorija.
+* Po išankstinio apdorojimo galime įkelti Stanfordo didelį filmų apžvalgų duomenų rinkinį (IMDb apžvalgų duomenų rinkinį) į duomenų iteratorius su žodynu.
 
 
-1. What hyperparameters in this section can we modify to accelerate training sentiment analysis models?
-1. Can you implement a function to load the dataset of [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html) into data iterators and labels for sentiment analysis?
+## Pratimai
+
+
+1. Kokius šio skyrelio hiperparametrus galime keisti, kad paspartintume nuotaikų analizės modelių apmokymą?
+1. Ar galite įgyvendinti funkciją, kuri įkeltų [Amazon apžvalgų](https://snap.stanford.edu/data/web-Amazon.html) duomenų rinkinį į duomenų iteratorius ir žymenis nuotaikų analizei?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/391)
+[Diskusijos](https://discuss.d2l.ai/t/391)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1387)
+[Diskusijos](https://discuss.d2l.ai/t/1387)
 :end_tab:

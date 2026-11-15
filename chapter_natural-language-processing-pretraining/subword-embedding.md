@@ -1,107 +1,107 @@
-# Subword Embedding
+# Žodžių dalių įterpiniai
 :label:`sec_fasttext`
 
-In English,
-words such as
-"helps", "helped", and "helping" are 
-inflected forms of the same word "help".
-The relationship 
-between "dog" and "dogs"
-is the same as 
-that between "cat" and "cats",
-and 
-the relationship 
-between "boy" and "boyfriend"
-is the same as 
-that between "girl" and "girlfriend".
-In other languages
-such as French and Spanish,
-many verbs have over 40 inflected forms,
-while in Finnish,
-a noun may have up to 15 cases.
-In linguistics,
-morphology studies word formation and word relationships.
-However,
-the internal structure of words
-was neither explored in word2vec
-nor in GloVe.
+Anglų kalboje
+žodžiai, tokie kaip
+„helps“, „helped“ ir „helping“, yra
+to paties žodžio „help“ (padėti)
+linksniuotės ar asmenuotės formos.
+Sąryšis
+tarp „dog“ ir „dogs“
+yra toks pat kaip
+tarp „cat“ ir „cats“,
+o
+sąryšis
+tarp „boy“ ir „boyfriend“
+yra toks pat kaip
+tarp „girl“ ir „girlfriend“.
+Kitose kalbose,
+pavyzdžiui, prancūzų ir ispanų,
+daugelis veiksmažodžių turi daugiau nei 40 kaitomų formų,
+o suomių kalboje
+daiktavardis gali turėti iki 15 linksnių.
+Kalbotyroje
+morfologija tiria žodžių darybą ir žodžių sąryšius.
+Tačiau
+vidinė žodžių struktūra
+nebuvo nagrinėjama nei word2vec,
+nei GloVe.
 
-## The fastText Model
+## fastText modelis
 
-Recall how words are represented in word2vec.
-In both the skip-gram model
-and the continuous bag-of-words model,
-different inflected forms of the same word
-are directly represented by different vectors
-without shared parameters.
-To use morphological information,
-the *fastText* model
-proposed a *subword embedding* approach,
-where a subword is a character $n$-gram :cite:`Bojanowski.Grave.Joulin.ea.2017`.
-Instead of learning word-level vector representations,
-fastText can be considered as
-the subword-level skip-gram,
-where each *center word* is represented by the sum of 
-its subword vectors.
+Prisiminkite, kaip žodžiai vaizduojami word2vec.
+Ir skip-gram modelyje,
+ir nuolatinio žodžių krepšio modelyje
+skirtingos to paties žodžio kaitomos formos
+tiesiogiai vaizduojamos skirtingais vektoriais
+be bendrų parametrų.
+Kad būtų panaudota morfologinė informacija,
+*fastText* modelis
+pasiūlė *žodžių dalių įterpinių* (angl. *subword embedding*) metodą,
+kur žodžio dalis yra simbolių $n$-grama :cite:`Bojanowski.Grave.Joulin.ea.2017`.
+Užuot mokęsis žodžių lygmens vektorinių vaizdavimų,
+fastText galima laikyti
+žodžių dalių lygmens skip-gram,
+kur kiekvienas *centrinis žodis* vaizduojamas
+jo žodžių dalių vektorių suma.
 
-Let's illustrate how to obtain 
-subwords for each center word in fastText
-using the word "where".
-First, add special characters “&lt;” and “&gt;” 
-at the beginning and end of the word to distinguish prefixes and suffixes from other subwords. 
-Then, extract character $n$-grams from the word.
-For example, when $n=3$,
-we obtain all subwords of length 3: "&lt;wh", "whe", "her", "ere", "re&gt;", and the special subword "&lt;where&gt;".
+Iliustruokime, kaip gauti
+kiekvieno centrinio žodžio žodžių dalis fastText
+naudojant žodį „where“.
+Pirmiausia pridėkite specialius simbolius „&lt;“ ir „&gt;“
+žodžio pradžioje ir pabaigoje, kad atskirtumėte priešdėlius ir priesagas nuo kitų žodžių dalių.
+Tada iš žodžio išgaukite simbolių $n$-gramas.
+Pavyzdžiui, kai $n=3$,
+gauname visas 3 ilgio žodžio dalis: „&lt;wh“, „whe“, „her“, „ere“, „re&gt;“ ir specialią žodžio dalį „&lt;where&gt;“.
 
 
-In fastText, for any word $w$,
-denote by $\mathcal{G}_w$
-the union of all its subwords of length between 3 and 6
-and its special subword.
-The vocabulary 
-is the union of the subwords of all words.
-Letting $\mathbf{z}_g$
-be the vector of subword $g$ in the dictionary,
-the vector $\mathbf{v}_w$ for 
-word $w$ as a center word
-in the skip-gram model
-is the sum of its subword vectors:
+fastText bet kuriam žodžiui $w$
+pažymėkime $\mathcal{G}_w$
+visų jo žodžių dalių, kurių ilgis tarp 3 ir 6,
+ir jo specialios žodžio dalies sąjungą.
+Žodynas
+yra visų žodžių žodžių dalių sąjunga.
+Tegul $\mathbf{z}_g$
+yra žodžio dalies $g$ žodyne vektorius;
+tuomet žodžio $w$ kaip centrinio žodžio
+skip-gram modelyje vektorius $\mathbf{v}_w$
+yra jo žodžių dalių vektorių suma:
 
 $$\mathbf{v}_w = \sum_{g\in\mathcal{G}_w} \mathbf{z}_g.$$
 
-The rest of fastText is the same as the skip-gram model. Compared with the skip-gram model, 
-the vocabulary in fastText is larger,
-resulting in more model parameters. 
-Besides, 
-to calculate the representation of a word,
-all its subword vectors
-have to be summed,
-leading to higher computational complexity.
-However,
-thanks to shared parameters from subwords among words with similar structures,
-rare words and even out-of-vocabulary words
-may obtain better vector representations in fastText.
+Likusi fastText dalis yra tokia pati kaip skip-gram modelio. Palyginti su skip-gram modeliu,
+fastText žodynas yra didesnis,
+todėl yra daugiau modelio parametrų.
+Be to,
+kad apskaičiuotume žodžio vaizdavimą,
+reikia susumuoti
+visus jo žodžių dalių vektorius,
+o tai lemia didesnį skaičiavimo sudėtingumą.
+Tačiau
+dėl bendrų parametrų iš žodžių dalių tarp panašios struktūros žodžių
+reti žodžiai ir net žodžiai, kurių nėra žodyne,
+fastText gali gauti geresnius vektorinius vaizdavimus.
 
 
 
-## Byte Pair Encoding
+## Baitų porų kodavimas
 :label:`subsec_Byte_Pair_Encoding`
 
-In fastText, all the extracted subwords have to be of the specified lengths, such as $3$ to $6$, thus the vocabulary size cannot be predefined.
-To allow for variable-length subwords in a fixed-size vocabulary,
-we can apply a compression algorithm
-called *byte pair encoding* (BPE) to extract subwords :cite:`Sennrich.Haddow.Birch.2015`.
+fastText visos išgautos žodžių dalys turi būti nurodytų ilgių, pavyzdžiui, nuo $3$ iki $6$, todėl žodyno dydžio iš anksto nustatyti negalima.
+Kad fiksuoto dydžio žodyne būtų galima turėti kintamo ilgio žodžių dalis,
+galime taikyti glaudinimo algoritmą,
+vadinamą *baitų porų kodavimu* (angl. *byte pair encoding*, BPE), žodžių dalims išgauti :cite:`Sennrich.Haddow.Birch.2015`.
 
-Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word,
-such as consecutive characters of arbitrary length.
-Starting from symbols of length 1,
-byte pair encoding iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
-Note that for efficiency, pairs crossing word boundaries are not considered.
-In the end, we can use such symbols as subwords to segment words.
-Byte pair encoding and its variants has been used for input representations in popular natural language processing pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
-In the following, we will illustrate how byte pair encoding works.
+Baitų porų kodavimas atlieka apmokymo duomenų rinkinio statistinę analizę, kad atrastų dažnus simbolius žodyje,
+pavyzdžiui, bet kokio ilgio iš eilės einančių simbolių sekas.
+Pradedant nuo 1 ilgio simbolių,
+baitų porų kodavimas iteratyviai sujungia dažniausią iš eilės einančių simbolių porą, kad sukurtų naujus ilgesnius simbolius.
+Atkreipkite dėmesį, kad dėl efektyvumo poros, kertančios žodžių ribas, neįtraukiamos.
+Galiausiai tokius simbolius galime naudoti kaip žodžių dalis žodžiams segmentuoti.
+Baitų porų kodavimas ir jo variantai buvo naudojami įvesties vaizdavimams populiariuose natūraliosios kalbos apdorojimo išankstinio apmokymo modeliuose, tokiuose kaip GPT-2 :cite:`Radford.Wu.Child.ea.2019` ir RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
+Toliau iliustruosime, kaip veikia baitų porų kodavimas.
 
-First, we initialize the vocabulary of symbols as all the English lowercase characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
+Pirmiausia simbolių žodyną inicializuojame visais angliškais mažosiomis raidėmis, specialiu žodžio pabaigos simboliu `'_'` ir specialiu nežinomo simboliu `'[UNK]'`.
 
 ```{.python .input}
 #@tab all
@@ -112,14 +112,14 @@ symbols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
            '_', '[UNK]']
 ```
 
-Since we do not consider symbol pairs that cross boundaries of words,
-we only need a dictionary `raw_token_freqs` that maps words to their frequencies (number of occurrences)
-in a dataset.
-Note that the special symbol `'_'` is appended to each word so that
-we can easily recover a word sequence (e.g., "a taller man")
-from a sequence of output symbols ( e.g., "a_ tall er_ man").
-Since we start the merging process from a vocabulary of only single characters and special symbols, space is inserted between every pair of consecutive characters within each word (keys of the dictionary `token_freqs`).
-In other words, space is the delimiter between symbols within a word.
+Kadangi nenagrinėjame simbolių porų, kertančių žodžių ribas,
+mums reikia tik žodyno `raw_token_freqs`, kuris atvaizduoja žodžius į jų dažnius (pasirodymų skaičių)
+duomenų rinkinyje.
+Atkreipkite dėmesį, kad specialus simbolis `'_'` pridedamas prie kiekvieno žodžio, kad
+galėtume lengvai atkurti žodžių seką (pvz., „a taller man“)
+iš išvesties simbolių sekos (pvz., „a_ tall er_ man“).
+Kadangi sujungimo procesą pradedame nuo žodyno, sudaryto tik iš pavienių simbolių ir specialių simbolių, tarpas įterpiamas tarp kiekvienos iš eilės einančių simbolių poros kiekviename žodyje (žodyno `token_freqs` raktai).
+Kitaip tariant, tarpas yra skirtukas tarp simbolių žodyje.
 
 ```{.python .input}
 #@tab all
@@ -130,9 +130,9 @@ for token, freq in raw_token_freqs.items():
 token_freqs
 ```
 
-We define the following `get_max_freq_pair` function that
-returns the most frequent pair of consecutive symbols within a word,
-where words come from keys of the input dictionary `token_freqs`.
+Apibrėžiame šią funkciją `get_max_freq_pair`, kuri
+grąžina dažniausią iš eilės einančių simbolių porą žodyje,
+kur žodžiai gaunami iš įvesties žodyno `token_freqs` raktų.
 
 ```{.python .input}
 #@tab all
@@ -146,8 +146,8 @@ def get_max_freq_pair(token_freqs):
     return max(pairs, key=pairs.get)  # Key of `pairs` with the max value
 ```
 
-As a greedy approach based on frequency of consecutive symbols,
-byte pair encoding will use the following `merge_symbols` function to merge the most frequent pair of consecutive symbols to produce new symbols.
+Kaip godusis metodas, pagrįstas iš eilės einančių simbolių dažniu,
+baitų porų kodavimas naudos šią funkciją `merge_symbols`, kad sujungtų dažniausią iš eilės einančių simbolių porą ir sukurtų naujus simbolius.
 
 ```{.python .input}
 #@tab all
@@ -161,7 +161,7 @@ def merge_symbols(max_freq_pair, token_freqs, symbols):
     return new_token_freqs
 ```
 
-Now we iteratively perform the byte pair encoding algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus byte pair encoding merges them to produce a new symbol `'ta'`. In the second iteration, byte pair encoding continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`.
+Dabar iteratyviai vykdome baitų porų kodavimo algoritmą žodyno `token_freqs` raktams. Pirmoje iteracijoje dažniausia iš eilės einančių simbolių pora yra `'t'` ir `'a'`, todėl baitų porų kodavimas juos sujungia ir sukuria naują simbolį `'ta'`. Antroje iteracijoje baitų porų kodavimas toliau sujungia `'ta'` ir `'l'`, kad gautų dar vieną naują simbolį `'tal'`.
 
 ```{.python .input}
 #@tab all
@@ -172,27 +172,27 @@ for i in range(num_merges):
     print(f'merge #{i + 1}:', max_freq_pair)
 ```
 
-After 10 iterations of byte pair encoding, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.
+Po 10 baitų porų kodavimo iteracijų matome, kad sąraše `symbols` dabar yra 10 daugiau simbolių, iteratyviai sujungtų iš kitų simbolių.
 
 ```{.python .input}
 #@tab all
 print(symbols)
 ```
 
-For the same dataset specified in the keys of the dictionary `raw_token_freqs`,
-each word in the dataset is now segmented by subwords "fast_", "fast", "er_", "tall_", and "tall"
-as a result of the byte pair encoding algorithm.
-For instance, words "faster_" and "taller_" are segmented as "fast er_" and "tall er_", respectively.
+Tam pačiam duomenų rinkiniui, nurodytam žodyno `raw_token_freqs` raktuose,
+kiekvienas duomenų rinkinio žodis dabar segmentuotas žodžių dalimis „fast_“, „fast“, „er_“, „tall_“ ir „tall“
+baitų porų kodavimo algoritmo dėka.
+Pavyzdžiui, žodžiai „faster_“ ir „taller_“ segmentuojami atitinkamai kaip „fast er_“ ir „tall er_“.
 
 ```{.python .input}
 #@tab all
 print(list(token_freqs.keys()))
 ```
 
-Note that the result of byte pair encoding depends on the dataset being used.
-We can also use the subwords learned from one dataset
-to segment words of another dataset.
-As a greedy approach, the following `segment_BPE` function tries to break words into the longest possible subwords from the input argument `symbols`.
+Atkreipkite dėmesį, kad baitų porų kodavimo rezultatas priklauso nuo naudojamo duomenų rinkinio.
+Taip pat galime naudoti žodžių dalis, išmoktas iš vieno duomenų rinkinio,
+kito duomenų rinkinio žodžiams segmentuoti.
+Kaip godusis metodas, ši funkcija `segment_BPE` bando suskaidyti žodžius į ilgiausias galimas žodžių dalis iš įvesties argumento `symbols`.
 
 ```{.python .input}
 #@tab all
@@ -215,8 +215,8 @@ def segment_BPE(tokens, symbols):
     return outputs
 ```
 
-In the following, we use the subwords in list `symbols`, which is learned from the aforementioned dataset,
-to segment `tokens` that represent another dataset.
+Toliau naudojame sąraše `symbols` esančias žodžių dalis, išmoktas iš aukščiau minėto duomenų rinkinio,
+kad segmentuotume `tokens`, vaizduojančius kitą duomenų rinkinį.
 
 ```{.python .input}
 #@tab all
@@ -224,25 +224,25 @@ tokens = ['tallest_', 'fatter_']
 print(segment_BPE(tokens, symbols))
 ```
 
-## Summary
+## Santrauka
 
-* The fastText model proposes a subword embedding approach. Based on the skip-gram model in word2vec, it represents a center word as the sum of its subword vectors.
-* Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word. As a greedy approach, byte pair encoding iteratively merges the most frequent pair of consecutive symbols.
-* Subword embedding may improve the quality of representations of rare words and out-of-dictionary words.
+* fastText modelis siūlo žodžių dalių įterpinių metodą. Remdamasis word2vec skip-gram modeliu, jis vaizduoja centrinį žodį kaip jo žodžių dalių vektorių sumą.
+* Baitų porų kodavimas atlieka apmokymo duomenų rinkinio statistinę analizę, kad atrastų dažnus simbolius žodyje. Kaip godusis metodas, baitų porų kodavimas iteratyviai sujungia dažniausią iš eilės einančių simbolių porą.
+* Žodžių dalių įterpiniai gali pagerinti retų žodžių ir žodžių, kurių nėra žodyne, vaizdavimų kokybę.
 
-## Exercises
+## Pratimai
 
-1. As an example, there are about $3\times 10^8$ possible  $6$-grams in English. What is the issue when there are too many subwords? How to address the issue? Hint: refer to the end of Section 3.2 of the fastText paper :cite:`Bojanowski.Grave.Joulin.ea.2017`.
-1. How to design a subword embedding model based on the continuous bag-of-words model?
-1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
-1. How to extend the idea of byte pair encoding to extract phrases?
+1. Pavyzdžiui, anglų kalboje yra apie $3\times 10^8$ galimų $6$-gramų. Kokia problema kyla, kai žodžių dalių per daug? Kaip ją išspręsti? Užuomina: žr. fastText straipsnio 3.2 skyriaus pabaigą :cite:`Bojanowski.Grave.Joulin.ea.2017`.
+1. Kaip suprojektuoti žodžių dalių įterpinių modelį, pagrįstą nuolatinio žodžių krepšio modeliu?
+1. Kad gautume $m$ dydžio žodyną, kiek sujungimo operacijų reikia, kai pradinio simbolių žodyno dydis yra $n$?
+1. Kaip išplėsti baitų porų kodavimo idėją frazėms išgauti?
 
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/386)
+[Diskusijos](https://discuss.d2l.ai/t/386)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/4587)
+[Diskusijos](https://discuss.d2l.ai/t/4587)
 :end_tab:

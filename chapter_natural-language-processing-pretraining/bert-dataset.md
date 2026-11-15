@@ -1,23 +1,23 @@
-# The Dataset for Pretraining BERT
+# Duomenų rinkinys BERT išankstiniam apmokymui
 :label:`sec_bert-dataset`
 
-To pretrain the BERT model as implemented in :numref:`sec_bert`,
-we need to generate the dataset in the ideal format to facilitate
-the two pretraining tasks:
-masked language modeling and next sentence prediction.
-On the one hand,
-the original BERT model is pretrained on the concatenation of
-two huge corpora BookCorpus and English Wikipedia (see :numref:`subsec_bert_pretraining_tasks`),
-making it hard to run for most readers of this book.
-On the other hand,
-the off-the-shelf pretrained BERT model
-may not fit for applications from specific domains like medicine.
-Thus, it is getting popular to pretrain BERT on a customized dataset.
-To facilitate the demonstration of BERT pretraining,
-we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
+Kad iš anksto apmokytume BERT modelį, įgyvendintą :numref:`sec_bert`,
+turime sugeneruoti duomenų rinkinį idealiu formatu, kuris palengvintų
+dvi išankstinio apmokymo užduotis:
+užmaskuotą kalbos modeliavimą ir kito sakinio prognozavimą.
+Viena vertus,
+originalus BERT modelis iš anksto apmokytas dviejų milžiniškų tekstynų BookCorpus ir anglų kalbos Vikipedijos
+konkatenacijoje (žr. :numref:`subsec_bert_pretraining_tasks`),
+todėl daugumai šios knygos skaitytojų jį sunku paleisti.
+Kita vertus,
+paruoštas iš anksto apmokytas BERT modelis
+gali netikti taikymams konkrečiose srityse, pavyzdžiui, medicinoje.
+Todėl vis populiaresnis tampa BERT išankstinis apmokymas pritaikytame duomenų rinkinyje.
+Kad palengvintume BERT išankstinio apmokymo demonstravimą,
+naudojame mažesnį tekstyną WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 
-Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_word2vec_data`,
-WikiText-2 (i) retains the original punctuation, making it suitable for next sentence prediction; (ii) retains the original case and numbers; (iii) is over twice larger.
+Palyginti su PTB duomenų rinkiniu, naudotu word2vec išankstiniam apmokymui :numref:`sec_word2vec_data`,
+WikiText-2 (i) išsaugo originalią skyrybą, todėl tinka kito sakinio prognozavimui; (ii) išsaugo originalius didžiuosius ir mažuosius raidžių atvejus bei skaičius; (iii) yra daugiau nei dvigubai didesnis.
 
 ```{.python .input}
 #@tab mxnet
@@ -37,13 +37,13 @@ import random
 import torch
 ```
 
-In [**the WikiText-2 dataset**],
-each line represents a paragraph where
-space is inserted between any punctuation and its preceding token.
-Paragraphs with at least two sentences are retained.
-To split sentences, we only use the period as the delimiter for simplicity.
-We leave discussions of more complex sentence splitting techniques in the exercises
-at the end of this section.
+[**WikiText-2 duomenų rinkinyje**]
+kiekviena eilutė vaizduoja pastraipą, kurioje
+tarpas įterpiamas tarp bet kokio skyrybos ženklo ir jį einančio teksto vieneto.
+Paliekamos pastraipos, turinčios bent du sakinius.
+Kad suskaidytume sakinius, paprastumo dėlei kaip skirtuką naudojame tik tašką.
+Sudėtingesnių sakinių skaidymo technikų aptarimą paliekame pratimams
+šio skyrelio pabaigoje.
 
 ```{.python .input}
 #@tab all
@@ -64,20 +64,20 @@ def _read_wiki(data_dir):
     return paragraphs
 ```
 
-## Defining Helper Functions for Pretraining Tasks
+## Pagalbinių funkcijų išankstinio apmokymo užduotims apibrėžimas
 
-In the following,
-we begin by implementing helper functions for the two BERT pretraining tasks:
-next sentence prediction and masked language modeling.
-These helper functions will be invoked later
-when transforming the raw text corpus
-into the dataset of the ideal format to pretrain BERT.
+Toliau
+pradedame nuo pagalbinių funkcijų įgyvendinimo dviem BERT išankstinio apmokymo užduotims:
+kito sakinio prognozavimui ir užmaskuotam kalbos modeliavimui.
+Šios pagalbinės funkcijos bus iškviečiamos vėliau,
+paverčiant neapdorotą teksto tekstyną
+į duomenų rinkinį idealiu formatu BERT iš anksto apmokyti.
 
-### [**Generating the Next Sentence Prediction Task**]
+### [**Kito sakinio prognozavimo užduoties generavimas**]
 
-According to descriptions of :numref:`subsec_nsp`,
-the `_get_next_sentence` function generates a training example
-for the binary classification task.
+Pagal :numref:`subsec_nsp` aprašymus,
+funkcija `_get_next_sentence` generuoja apmokymo pavyzdį
+dvejetainio klasifikavimo užduočiai.
 
 ```{.python .input}
 #@tab all
@@ -92,10 +92,10 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     return sentence, next_sentence, is_next
 ```
 
-The following function generates training examples for next sentence prediction
-from the input `paragraph` by invoking the `_get_next_sentence` function.
-Here `paragraph` is a list of sentences, where each sentence is a list of tokens.
-The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
+Toliau pateikta funkcija generuoja apmokymo pavyzdžius kito sakinio prognozavimui
+iš įvesties `paragraph` iškviesdama funkciją `_get_next_sentence`.
+Čia `paragraph` yra sakinių sąrašas, kur kiekvienas sakinys yra teksto vienetų sąrašas.
+Argumentas `max_len` nurodo didžiausią BERT įvesties sekos ilgį išankstinio apmokymo metu.
 
 ```{.python .input}
 #@tab all
@@ -113,22 +113,22 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     return nsp_data_from_paragraph
 ```
 
-### [**Generating the Masked Language Modeling Task**]
+### [**Užmaskuoto kalbos modeliavimo užduoties generavimas**]
 :label:`subsec_prepare_mlm_data`
 
-In order to generate training examples
-for the masked language modeling task
-from a BERT input sequence,
-we define the following `_replace_mlm_tokens` function.
-In its inputs, `tokens` is a list of tokens representing a BERT input sequence,
-`candidate_pred_positions` is a list of token indices of the BERT input sequence
-excluding those of special tokens (special tokens are not predicted in the masked language modeling task),
-and `num_mlm_preds` indicates the number of predictions (recall 15% random tokens to predict).
-Following the definition of the masked language modeling task in :numref:`subsec_mlm`,
-at each prediction position, the input may be replaced by
-a special “&lt;mask&gt;” token or a random token, or remain unchanged.
-In the end, the function returns the input tokens after possible replacement,
-the token indices where predictions take place and labels for these predictions.
+Kad sugeneruotume apmokymo pavyzdžius
+užmaskuoto kalbos modeliavimo užduočiai
+iš BERT įvesties sekos,
+apibrėžiame šią funkciją `_replace_mlm_tokens`.
+Jos įvestyse `tokens` yra teksto vienetų sąrašas, vaizduojantis BERT įvesties seką,
+`candidate_pred_positions` yra BERT įvesties sekos teksto vienetų indeksų sąrašas,
+neįtraukiant specialių teksto vienetų (specialūs teksto vienetai neprognozuojami užmaskuoto kalbos modeliavimo užduotyje),
+o `num_mlm_preds` nurodo prognozių skaičių (prisiminkite 15 % atsitiktinių teksto vienetų prognozei).
+Laikantis užmaskuoto kalbos modeliavimo užduoties apibrėžimo :numref:`subsec_mlm`,
+kiekvienoje prognozavimo pozicijoje įvestis gali būti pakeista
+specialiu „&lt;mask&gt;“ teksto vienetu arba atsitiktiniu teksto vienetu, arba likti nepakeista.
+Galiausiai funkcija grąžina įvesties teksto vienetus po galimo pakeitimo,
+teksto vienetų indeksus, kuriuose vyksta prognozės, ir šių prognozių žymenis.
 
 ```{.python .input}
 #@tab all
@@ -162,12 +162,12 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     return mlm_input_tokens, pred_positions_and_labels
 ```
 
-By invoking the aforementioned `_replace_mlm_tokens` function,
-the following function takes a BERT input sequence (`tokens`)
-as an input and returns indices of the input tokens
-(after possible token replacement as described in :numref:`subsec_mlm`),
-the token indices where predictions take place,
-and label indices for these predictions.
+Iškviesdama aukščiau minėtą funkciją `_replace_mlm_tokens`,
+toliau pateikta funkcija kaip įvestį priima BERT įvesties seką (`tokens`)
+ir grąžina įvesties teksto vienetų indeksus
+(po galimo teksto vienetų pakeitimo, kaip aprašyta :numref:`subsec_mlm`),
+teksto vienetų indeksus, kuriuose vyksta prognozės,
+ir šių prognozių žymenų indeksus.
 
 ```{.python .input}
 #@tab all
@@ -192,13 +192,13 @@ def _get_mlm_data_from_tokens(tokens, vocab):
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 ```
 
-## Transforming Text into the Pretraining Dataset
+## Teksto transformavimas į išankstinio apmokymo duomenų rinkinį
 
-Now we are almost ready to customize a `Dataset` class for pretraining BERT.
-Before that, 
-we still need to define a helper function `_pad_bert_inputs`
-to [**append the special “&lt;pad&gt;” tokens to the inputs.**]
-Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
+Dabar esame beveik pasirengę pritaikyti klasę `Dataset` BERT išankstiniam apmokymui.
+Prieš tai
+dar turime apibrėžti pagalbinę funkciją `_pad_bert_inputs`,
+kad [**prie įvesčių pridėtume specialius „&lt;pad&gt;“ teksto vienetus.**]
+Jos argumente `examples` yra išvestys iš pagalbinių funkcijų `_get_nsp_data_from_paragraph` ir `_get_mlm_data_from_tokens` dviem išankstinio apmokymo užduotims.
 
 ```{.python .input}
 #@tab mxnet
@@ -261,19 +261,19 @@ def _pad_bert_inputs(examples, max_len, vocab):
             all_mlm_weights, all_mlm_labels, nsp_labels)
 ```
 
-Putting the helper functions for
-generating training examples of the two pretraining tasks,
-and the helper function for padding inputs together,
-we customize the following `_WikiTextDataset` class as [**the WikiText-2 dataset for pretraining BERT**].
-By implementing the `__getitem__ `function,
-we can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples 
-generated from a pair of sentences from the WikiText-2 corpus.
+Sudėję kartu pagalbines funkcijas
+dviejų išankstinio apmokymo užduočių apmokymo pavyzdžiams generuoti
+ir pagalbinę funkciją įvestims papildyti,
+pritaikome šią klasę `_WikiTextDataset` kaip [**WikiText-2 duomenų rinkinį BERT išankstiniam apmokymui**].
+Įgyvendinę funkciją `__getitem__`,
+galime savavališkai pasiekti išankstinio apmokymo (užmaskuoto kalbos modeliavimo ir kito sakinio prognozavimo) pavyzdžius,
+sugeneruotus iš WikiText-2 tekstyno sakinių poros.
 
-The original BERT model uses WordPiece embeddings whose vocabulary size is 30000 :cite:`Wu.Schuster.Chen.ea.2016`.
-The tokenization method of WordPiece is a slight modification of
-the original byte pair encoding algorithm in :numref:`subsec_Byte_Pair_Encoding`.
-For simplicity, we use the `d2l.tokenize` function for tokenization.
-Infrequent tokens that appear less than five times are filtered out.
+Originalus BERT modelis naudoja WordPiece įterpinius, kurių žodyno dydis yra 30000 :cite:`Wu.Schuster.Chen.ea.2016`.
+WordPiece teksto skaidymo į teksto vienetus metodas yra nedidelė
+pradinio baitų porų kodavimo algoritmo iš :numref:`subsec_Byte_Pair_Encoding` modifikacija.
+Paprastumo dėlei teksto skaidymui naudojame funkciją `d2l.tokenize`.
+Reti teksto vienetai, pasirodantys rečiau nei penkis kartus, atfiltruojami.
 
 ```{.python .input}
 #@tab mxnet
@@ -353,9 +353,9 @@ class _WikiTextDataset(torch.utils.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-By using the `_read_wiki` function and the `_WikiTextDataset` class,
-we define the following `load_data_wiki` to [**download and WikiText-2 dataset
-and generate pretraining examples**] from it.
+Naudodami funkciją `_read_wiki` ir klasę `_WikiTextDataset`,
+apibrėžiame šią funkciją `load_data_wiki`, kad [**atsisiųstume WikiText-2 duomenų rinkinį
+ir iš jo sugeneruotume išankstinio apmokymo pavyzdžius**].
 
 ```{.python .input}
 #@tab mxnet
@@ -385,10 +385,10 @@ def load_data_wiki(batch_size, max_len):
     return train_iter, train_set.vocab
 ```
 
-Setting the batch size to 512 and the maximum length of a BERT input sequence to be 64,
-we [**print out the shapes of a minibatch of BERT pretraining examples**].
-Note that in each BERT input sequence,
-$10$ ($64 \times 0.15$) positions are predicted for the masked language modeling task.
+Nustatę rinkinio dydį 512, o didžiausią BERT įvesties sekos ilgį 64,
+[**atspausdiname BERT išankstinio apmokymo pavyzdžių minirinkinio formas**].
+Atkreipkite dėmesį, kad kiekvienoje BERT įvesties sekoje
+$10$ ($64 \times 0{,}15$) pozicijų prognozuojama užmaskuoto kalbos modeliavimo užduočiai.
 
 ```{.python .input}
 #@tab all
@@ -403,30 +403,30 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
-In the end, let's take a look at the vocabulary size.
-Even after filtering out infrequent tokens,
-it is still over twice larger than that of the PTB dataset.
+Galiausiai pažvelkime į žodyno dydį.
+Net atfiltravus retus teksto vienetus,
+jis vis dar yra daugiau nei dvigubai didesnis nei PTB duomenų rinkinio.
 
 ```{.python .input}
 #@tab all
 len(vocab)
 ```
 
-## Summary
+## Santrauka
 
-* Comparing with the PTB dataset, the WikiText-2 dateset retains the original punctuation, case and numbers, and is over twice larger.
-* We can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples generated from a pair of sentences from the WikiText-2 corpus.
+* Palyginti su PTB duomenų rinkiniu, WikiText-2 duomenų rinkinys išsaugo originalią skyrybą, didžiųjų ir mažųjų raidžių atvejus bei skaičius ir yra daugiau nei dvigubai didesnis.
+* Galime savavališkai pasiekti išankstinio apmokymo (užmaskuoto kalbos modeliavimo ir kito sakinio prognozavimo) pavyzdžius, sugeneruotus iš WikiText-2 tekstyno sakinių poros.
 
 
-## Exercises
+## Pratimai
 
-1. For simplicity, the period is used as the only delimiter for splitting sentences. Try other sentence splitting techniques, such as the spaCy and NLTK. Take NLTK as an example. You need to install NLTK first: `pip install nltk`. In the code, first `import nltk`. Then, download the Punkt sentence tokenizer: `nltk.download('punkt')`. To split sentences such as `sentences = 'This is great ! Why not ?'`, invoking `nltk.tokenize.sent_tokenize(sentences)` will return a list of two sentence strings: `['This is great !', 'Why not ?']`.
-1. What is the vocabulary size if we do not filter out any infrequent token?
+1. Paprastumo dėlei taškas naudojamas kaip vienintelis sakinių skaidymo skirtukas. Išbandykite kitas sakinių skaidymo technikas, pavyzdžiui, spaCy ir NLTK. Paimkime NLTK kaip pavyzdį. Pirmiausia reikia įdiegti NLTK: `pip install nltk`. Kode pirmiausia `import nltk`. Tada atsisiųskite Punkt sakinių skaidymo į teksto vienetus modelį: `nltk.download('punkt')`. Kad suskaidytumėte sakinius, pavyzdžiui, `sentences = 'This is great ! Why not ?'`, iškvietus `nltk.tokenize.sent_tokenize(sentences)` bus grąžintas dviejų sakinių eilučių sąrašas: `['This is great !', 'Why not ?']`.
+1. Koks būtų žodyno dydis, jei neatfiltruotume jokio reto teksto vieneto?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/389)
+[Diskusijos](https://discuss.d2l.ai/t/389)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1496)
+[Diskusijos](https://discuss.d2l.ai/t/1496)
 :end_tab:

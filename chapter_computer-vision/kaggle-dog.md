@@ -1,21 +1,21 @@
-# Dog Breed Identification (ImageNet Dogs) on Kaggle
+# Šunų veislių atpažinimas (ImageNet Dogs) Kaggle platformoje
 
-In this section, we will practice
-the dog breed identification problem on
-Kaggle. (**The web address of this competition is https://www.kaggle.com/c/dog-breed-identification**)
+Šiame skyrelyje praktikuosime
+šunų veislių atpažinimo uždavinį
+Kaggle platformoje. (**Šio konkurso interneto adresas yra https://www.kaggle.com/c/dog-breed-identification**)
 
-In this competition,
-120 different breeds of dogs will be recognized.
-In fact,
-the dataset for this competition is
-a subset of the ImageNet dataset.
-Unlike the images in the CIFAR-10 dataset in :numref:`sec_kaggle_cifar10`,
-the images in the ImageNet dataset are both higher and wider in varying dimensions.
-:numref:`fig_kaggle_dog` shows the information on the competition's webpage. You need a Kaggle account
-to submit your results.
+Šiame konkurse
+bus atpažįstamos 120 skirtingų šunų veislių.
+Iš tikrųjų
+šio konkurso duomenų rinkinys yra
+ImageNet duomenų rinkinio poaibis.
+Skirtingai nei CIFAR-10 duomenų rinkinio vaizdai :numref:`sec_kaggle_cifar10`,
+ImageNet duomenų rinkinio vaizdai yra ir aukštesni, ir platesni, kintančių matmenų.
+:numref:`fig_kaggle_dog` parodyta informacija konkurso tinklalapyje. Rezultatams pateikti reikia Kaggle
+paskyros.
 
 
-![The dog breed identification competition website. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-dog.jpg)
+![Šunų veislių atpažinimo konkurso svetainė. Konkurso duomenų rinkinį galima gauti spustelėjus skirtuką „Data“.](../img/kaggle-dog.jpg)
 :width:`400px`
 :label:`fig_kaggle_dog`
 
@@ -38,32 +38,32 @@ from torch import nn
 import os
 ```
 
-## Obtaining and Organizing the Dataset
+## Duomenų rinkinio gavimas ir tvarkymas
 
-The competition dataset is divided into a training set and a test set, which contain 10222 and 10357 JPEG images
-of three RGB (color) channels, respectively.
-Among the training dataset,
-there are 120 breeds of dogs
-such as Labradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahuas, and Yorkshire Terriers.
+Konkurso duomenų rinkinys padalytas į apmokymo ir testavimo aibes, kuriose atitinkamai yra 10222 ir 10357 JPEG vaizdų
+su trimis RGB (spalvotais) kanalais.
+Apmokymo duomenų rinkinyje
+yra 120 šunų veislių,
+tokių kaip labradorai, pudeliai, taksai, samojedai, haskiai, čihuahua ir jorkšyro terjerai.
 
 
-### Downloading the Dataset
+### Duomenų rinkinio atsisiuntimas
 
-After logging into Kaggle,
-you can click on the "Data" tab on the
-competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button.
-After unzipping the downloaded file in `../data`, you will find the entire dataset in the following paths:
+Prisijungę prie Kaggle,
+galite spustelėti skirtuką „Data“
+konkurso tinklalapyje, parodytame :numref:`fig_kaggle_dog`, ir atsisiųsti duomenų rinkinį spustelėję mygtuką „Download All“.
+Išpakavę atsisiųstą failą aplanke `../data`, visą duomenų rinkinį rasite šiuose keliuose:
 
 * ../data/dog-breed-identification/labels.csv
 * ../data/dog-breed-identification/sample_submission.csv
 * ../data/dog-breed-identification/train
 * ../data/dog-breed-identification/test
 
-You may have noticed that the above structure is
-similar to that of the CIFAR-10 competition in :numref:`sec_kaggle_cifar10`, where folders `train/` and `test/` contain training and testing dog images, respectively, and `labels.csv` contains
-the labels for the training images.
-Similarly, to make it easier to get started, [**we provide a small sample of the dataset**] mentioned above: `train_valid_test_tiny.zip`.
-If you are going to use the full dataset for the Kaggle competition, you need to change the `demo` variable below to `False`.
+Galbūt pastebėjote, kad aukščiau pateikta struktūra
+panaši į CIFAR-10 konkurso struktūrą :numref:`sec_kaggle_cifar10`, kur aplankuose `train/` ir `test/` atitinkamai yra apmokymo ir testavimo šunų vaizdai, o `labels.csv` talpina
+apmokymo vaizdų žymenis.
+Panašiai, kad būtų lengviau pradėti, [**pateikiame mažą aukščiau minėto duomenų rinkinio pavyzdį**]: `train_valid_test_tiny.zip`.
+Jei ketinate naudoti pilną duomenų rinkinį Kaggle konkursui, toliau pateiktą kintamąjį `demo` turite pakeisti į `False`.
 
 ```{.python .input}
 #@tab all
@@ -80,13 +80,13 @@ else:
     data_dir = os.path.join('..', 'data', 'dog-breed-identification')
 ```
 
-### [**Organizing the Dataset**]
+### [**Duomenų rinkinio tvarkymas**]
 
-We can organize the dataset similarly to what we did in :numref:`sec_kaggle_cifar10`, namely splitting out
-a validation set from the original training set, and moving images into subfolders grouped by labels.
+Duomenų rinkinį galime sutvarkyti panašiai, kaip darėme :numref:`sec_kaggle_cifar10`, būtent išskirdami
+patikros aibę iš pradinės apmokymo aibės ir perkeldami vaizdus į poaplankius, sugrupuotus pagal žymenis.
 
-The `reorg_dog_data` function below reads
-the training data labels, splits out the validation set, and organizes the training set.
+Toliau pateikta funkcija `reorg_dog_data` nuskaito
+apmokymo duomenų žymenis, išskiria patikros aibę ir sutvarko apmokymo aibę.
 
 ```{.python .input}
 #@tab all
@@ -101,16 +101,16 @@ valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
 ```
 
-## [**Image Augmentation**]
+## [**Vaizdų augmentacija**]
 
-Recall that this dog breed dataset
-is a subset of the ImageNet dataset,
-whose images
-are larger than those of the CIFAR-10 dataset
-in :numref:`sec_kaggle_cifar10`.
-The following
-lists a few image augmentation operations
-that might be useful for relatively larger images.
+Prisiminkite, kad šis šunų veislių duomenų rinkinys
+yra ImageNet duomenų rinkinio poaibis,
+kurio vaizdai
+yra didesni nei CIFAR-10 duomenų rinkinio vaizdai
+:numref:`sec_kaggle_cifar10`.
+Toliau
+išvardytos kelios vaizdų augmentacijos operacijos,
+kurios gali būti naudingos santykinai didesniems vaizdams.
 
 ```{.python .input}
 #@tab mxnet
@@ -153,9 +153,9 @@ transform_train = torchvision.transforms.Compose([
                                      [0.229, 0.224, 0.225])])
 ```
 
-During prediction,
-we only use image preprocessing operations
-without randomness.
+Prognozavimo metu
+naudojame tik vaizdų išankstinio apdorojimo operacijas
+be atsitiktinumo.
 
 ```{.python .input}
 #@tab mxnet
@@ -179,11 +179,11 @@ transform_test = torchvision.transforms.Compose([
                                      [0.229, 0.224, 0.225])])
 ```
 
-## [**Reading the Dataset**]
+## [**Duomenų rinkinio skaitymas**]
 
-As in :numref:`sec_kaggle_cifar10`,
-we can read the organized dataset
-consisting of raw image files.
+Kaip :numref:`sec_kaggle_cifar10`,
+galime nuskaityti sutvarkytą duomenų rinkinį,
+sudarytą iš neapdorotų vaizdų failų.
 
 ```{.python .input}
 #@tab mxnet
@@ -204,9 +204,9 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
     transform=transform_test) for folder in ['valid', 'test']]
 ```
 
-Below we create data iterator instances
-the same way
-as in :numref:`sec_kaggle_cifar10`.
+Toliau sukuriame duomenų iteratoriaus egzempliorius
+tokiu pačiu būdu
+kaip :numref:`sec_kaggle_cifar10`.
 
 ```{.python .input}
 #@tab mxnet
@@ -236,41 +236,40 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## [**Fine-Tuning a Pretrained Model**]
+## [**Iš anksto apmokyto modelio patikslinimas**]
 
-Again,
-the dataset for this competition is a subset of the ImageNet dataset.
-Therefore, we can use the approach discussed in
-:numref:`sec_fine_tuning`
-to select a model pretrained on the
-full ImageNet dataset and use it to extract image features to be fed into a
-custom small-scale output network.
-High-level APIs of deep learning frameworks
-provide a wide range of models
-pretrained on the ImageNet dataset.
-Here, we choose
-a pretrained ResNet-34 model,
-where we simply reuse
-the input of this model's output layer
-(i.e., the extracted
-features).
-Then we can replace the original output layer with a small custom
-output network that can be trained,
-such as stacking two
-fully connected layers.
-Different from the experiment in
+Dar kartą,
+šio konkurso duomenų rinkinys yra ImageNet duomenų rinkinio poaibis.
+Todėl galime naudoti metodą, aptartą
 :numref:`sec_fine_tuning`,
-the following does
-not retrain the pretrained model used for feature
-extraction. This reduces training time and
-memory for storing gradients.
+kad pasirinktume modelį, iš anksto apmokytą
+pilname ImageNet duomenų rinkinyje, ir naudotume jį vaizdo požymiams išgauti, kurie būtų paduodami į
+pritaikytą mažo masto išvesties tinklą.
+Giliojo mokymosi karkasų aukšto lygio API
+pateikia platų
+ImageNet duomenų rinkinyje iš anksto apmokytų modelių pasirinkimą.
+Čia pasirenkame
+iš anksto apmokytą ResNet-34 modelį,
+kuriame tiesiog pakartotinai naudojame
+šio modelio išvesties sluoksnio įvestį
+(t. y. išgautus
+požymius).
+Tada originalų išvesties sluoksnį galime pakeisti nedideliu pritaikytu
+išvesties tinklu, kurį galima apmokyti,
+pavyzdžiui, sukrovę du
+pilnai sujungtus sluoksnius.
+Skirtingai nei eksperimente
+:numref:`sec_fine_tuning`,
+toliau
+neapmokome iš naujo iš anksto apmokyto modelio, naudojamo požymiams išgauti. Tai sumažina apmokymo laiką ir
+atmintį gradientams saugoti.
 
-Recall that we
-standardized images using
-the means and standard deviations of the three RGB channels for the full ImageNet dataset.
-In fact,
-this is also consistent with the standardization operation
-by the pretrained model on ImageNet.
+Prisiminkite, kad vaizdus
+standartizavome naudodami
+pilno ImageNet duomenų rinkinio trijų RGB kanalų vidurkius ir standartinius nuokrypius.
+Iš tikrųjų
+tai taip pat atitinka standartizavimo operaciją,
+kurią atlieka ImageNet duomenyse iš anksto apmokytas modelis.
 
 ```{.python .input}
 #@tab mxnet
@@ -305,9 +304,9 @@ def get_net(devices):
     return finetune_net
 ```
 
-Before [**calculating the loss**],
-we first obtain the input of the pretrained model's output layer, i.e., the extracted feature.
-Then we use this feature as input for our small custom output network to calculate the loss.
+Prieš [**skaičiuodami nuostolį**],
+pirmiausia gauname iš anksto apmokyto modelio išvesties sluoksnio įvestį, t. y. išgautą požymį.
+Tada šį požymį naudojame kaip įvestį savo nedideliam pritaikytam išvesties tinklui, kad apskaičiuotume nuostolį.
 
 ```{.python .input}
 #@tab mxnet
@@ -341,10 +340,10 @@ def evaluate_loss(data_iter, net, devices):
     return l_sum / n
 ```
 
-## Defining [**the Training Function**]
+## [**Apmokymo funkcijos**] apibrėžimas
 
-We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only
-iterates parameters of the small custom output network.
+Modelį rinksimės ir hiperparametrus derinsime pagal modelio našumą patikros aibėje. Modelio apmokymo funkcija `train` iteruoja
+tik nedidelio pritaikyto išvesties tinklo parametrus.
 
 ```{.python .input}
 #@tab mxnet
@@ -432,11 +431,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f' examples/sec on {str(devices)}')
 ```
 
-## [**Training and Validating the Model**]
+## [**Modelio apmokymas ir patikra**]
 
-Now we can train and validate the model.
-The following hyperparameters are all tunable.
-For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
+Dabar galime apmokyti ir patikrinti modelį.
+Visi toliau pateikti hiperparametrai yra derinami.
+Pavyzdžiui, galima padidinti epochų skaičių. Kadangi `lr_period` ir `lr_decay` nustatyti atitinkamai į 2 ir 0,9, optimizavimo algoritmo mokymosi greitis bus padaugintas iš 0,9 po kiekvienų 2 epochų.
 
 ```{.python .input}
 #@tab mxnet
@@ -455,13 +454,12 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## [**Classifying the Testing Set**] and Submitting Results on Kaggle
+## [**Testavimo aibės klasifikavimas**] ir rezultatų pateikimas Kaggle platformoje
 
 
-Similar to the final step in :numref:`sec_kaggle_cifar10`,
-in the end all the labeled data (including the validation set) are used for training the model and classifying the testing set.
-We will use the trained custom output network
-for classification.
+Panašiai kaip galutiniame žingsnyje :numref:`sec_kaggle_cifar10`,
+galiausiai visi pažymėti duomenys (įskaitant patikros aibę) naudojami modeliui apmokyti ir testavimo aibei suklasifikuoti.
+Klasifikavimui naudosime apmokytą pritaikytą išvesties tinklą.
 
 ```{.python .input}
 #@tab mxnet
@@ -503,28 +501,28 @@ with open('submission.csv', 'w') as f:
             [str(num) for num in output]) + '\n')
 ```
 
-The above code
-will generate a `submission.csv` file
-to be submitted
-to Kaggle in the same way described in :numref:`sec_kaggle_house`.
+Aukščiau pateiktas kodas
+sugeneruos failą `submission.csv`,
+kurį reikia pateikti
+Kaggle tokiu pačiu būdu, kaip aprašyta :numref:`sec_kaggle_house`.
 
 
-## Summary
+## Santrauka
 
 
-* Images in the ImageNet dataset are larger (with varying dimensions) than CIFAR-10 images. We may modify image augmentation operations for tasks on a different dataset.
-* To classify a subset of the ImageNet dataset, we can leverage pre-trained models on the full ImageNet dataset to extract features and only train a custom small-scale output network. This will lead to less computational time and memory cost.
+* ImageNet duomenų rinkinio vaizdai yra didesni (kintančių matmenų) nei CIFAR-10 vaizdai. Užduotims kitame duomenų rinkinyje galime modifikuoti vaizdų augmentacijos operacijas.
+* Kad suklasifikuotume ImageNet duomenų rinkinio poaibį, galime pasinaudoti iš anksto apmokytais modeliais pilname ImageNet duomenų rinkinyje požymiams išgauti ir apmokyti tik pritaikytą mažo masto išvesties tinklą. Tai sumažins skaičiavimo laiką ir atminties sąnaudas.
 
 
-## Exercises
+## Pratimai
 
-1. When using the full Kaggle competition dataset, what results can you achieve when you increase `batch_size` (batch size) and `num_epochs` (number of epochs) while setting some other hyperparameters as `lr = 0.01`, `lr_period = 10`, and `lr_decay = 0.1`?
-1. Do you get better results if you use a deeper pretrained model? How do you tune hyperparameters? Can you further improve the results?
+1. Naudojant pilną Kaggle konkurso duomenų rinkinį, kokių rezultatų galite pasiekti didindami `batch_size` (rinkinio dydį) ir `num_epochs` (epochų skaičių), o kai kuriuos kitus hiperparametrus nustatę `lr = 0.01`, `lr_period = 10` ir `lr_decay = 0.1`?
+1. Ar gaunate geresnių rezultatų naudodami gilesnį iš anksto apmokytą modelį? Kaip derinate hiperparametrus? Ar galite dar pagerinti rezultatus?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/380)
+[Diskusijos](https://discuss.d2l.ai/t/380)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1481)
+[Diskusijos](https://discuss.d2l.ai/t/1481)
 :end_tab:

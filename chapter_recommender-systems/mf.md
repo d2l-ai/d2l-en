@@ -1,25 +1,25 @@
-# Matrix Factorization
+# Matricos faktorizavimas
 
-Matrix Factorization :cite:`Koren.Bell.Volinsky.2009` is a well-established algorithm in the recommender systems literature. The first version of matrix factorization model is proposed by Simon Funk in a famous [blog
-post](https://sifter.org/%7Esimon/journal/20061211.html) in which he described the idea of factorizing the interaction matrix. It then became widely known due to the Netflix contest which was held in 2006. At that time, Netflix, a media-streaming and video-rental company, announced a contest to improve its recommender system performance. The best team that can improve on the Netflix baseline, i.e., Cinematch), by 10 percent would win a one million USD prize.  As such, this contest attracted
-a lot of attention to the field of recommender system research. Subsequently, the grand prize was won by the BellKor's Pragmatic Chaos team, a combined team of BellKor, Pragmatic Theory, and BigChaos (you do not need to worry about these algorithms now). Although the final score was the result of an ensemble solution (i.e., a combination of many algorithms), the matrix factorization algorithm played a critical role in the final blend. The technical report of the Netflix Grand Prize solution :cite:`Toscher.Jahrer.Bell.2009` provides a detailed introduction to the adopted model. In this section, we will dive into the details of the matrix factorization model and its implementation.
+Matricos faktorizavimas :cite:`Koren.Bell.Volinsky.2009` yra gerai įsitvirtinęs rekomendacinių sistemų literatūros algoritmas. Pirmąją matricos faktorizavimo modelio versiją pasiūlė Simon Funk garsiame [tinklaraščio
+įraše](https://sifter.org/%7Esimon/journal/20061211.html), kuriame aprašė sąveikų matricos faktorizavimo idėją. Vėliau ji tapo plačiai žinoma dėl 2006 m. vykusio „Netflix“ konkurso. Tuo metu „Netflix“, medijų transliavimo ir vaizdo įrašų nuomos įmonė, paskelbė konkursą savo rekomendacinės sistemos našumui pagerinti. Geriausia komanda, galinti 10 procentų pagerinti „Netflix“ bazinį lygį (t. y. „Cinematch“), laimėtų milijono JAV dolerių prizą. Todėl šis konkursas pritraukė
+daug dėmesio rekomendacinių sistemų tyrimų sričiai. Vėliau pagrindinį prizą laimėjo komanda BellKor's Pragmatic Chaos – jungtinė BellKor, Pragmatic Theory ir BigChaos komanda (dabar nereikia sukti galvos dėl šių algoritmų). Nors galutinis rezultatas buvo ansamblinio sprendimo (t. y. daugelio algoritmų derinio) vaisius, matricos faktorizavimo algoritmas galutiniame mišinyje atliko lemiamą vaidmenį. „Netflix“ pagrindinio prizo sprendimo techninė ataskaita :cite:`Toscher.Jahrer.Bell.2009` pateikia išsamų pritaikyto modelio pristatymą. Šiame skyrelyje panagrinėsime matricos faktorizavimo modelį ir jo įgyvendinimą išsamiai.
 
 
-## The Matrix Factorization Model
+## Matricos faktorizavimo modelis
 
-Matrix factorization is a class of collaborative filtering models. Specifically, the model factorizes the user-item interaction matrix (e.g., rating matrix) into the product of two lower-rank matrices, capturing the low-rank structure of the user-item interactions.
+Matricos faktorizavimas yra kolaboratyviojo filtravimo modelių klasė. Konkrečiai, modelis faktorizuoja naudotojų ir elementų sąveikų matricą (pvz., įvertinimų matricą) į dviejų žemesnio rango matricų sandaugą, taip užfiksuodamas žemo rango naudotojų ir elementų sąveikų struktūrą.
 
-Let $\mathbf{R} \in \mathbb{R}^{m \times n}$ denote the interaction matrix with $m$ users and $n$ items, and the values of $\mathbf{R}$ represent explicit ratings. The user-item interaction will be factorized into a user latent matrix $\mathbf{P} \in \mathbb{R}^{m \times k}$ and an item latent matrix $\mathbf{Q} \in \mathbb{R}^{n \times k}$, where $k \ll m, n$, is the latent factor size. Let $\mathbf{p}_u$ denote the $u^\textrm{th}$ row of $\mathbf{P}$ and $\mathbf{q}_i$ denote the $i^\textrm{th}$ row of $\mathbf{Q}$.  For a given item $i$, the elements of $\mathbf{q}_i$ measure the extent to which the item possesses those characteristics such as the genres and languages of a movie. For a given user $u$, the elements of $\mathbf{p}_u$ measure the extent of interest the user has in items' corresponding characteristics. These latent factors might measure obvious dimensions as mentioned in those examples or are completely uninterpretable. The predicted ratings can be estimated by
+Tegul $\mathbf{R} \in \mathbb{R}^{m \times n}$ žymi sąveikų matricą su $m$ naudotojų ir $n$ elementų, o $\mathbf{R}$ reikšmės reiškia aiškiuosius įvertinimus. Naudotojų ir elementų sąveika bus faktorizuojama į naudotojų latentinę matricą $\mathbf{P} \in \mathbb{R}^{m \times k}$ ir elementų latentinę matricą $\mathbf{Q} \in \mathbb{R}^{n \times k}$, kur $k \ll m, n$ yra latentinių veiksnių dydis. Tegul $\mathbf{p}_u$ žymi $u$-ąją $\mathbf{P}$ eilutę, o $\mathbf{q}_i$ – $i$-ąją $\mathbf{Q}$ eilutę. Duotam elementui $i$ vektoriaus $\mathbf{q}_i$ elementai matuoja, kiek elementas turi tokias charakteristikas kaip filmo žanrai ir kalbos. Duotam naudotojui $u$ vektoriaus $\mathbf{p}_u$ elementai matuoja, kiek naudotojas domisi atitinkamomis elementų charakteristikomis. Šie latentiniai veiksniai gali matuoti akivaizdžias dimensijas, kaip minėta pavyzdžiuose, arba būti visiškai neinterpretuojami. Prognozuojami įvertinimai gali būti apskaičiuojami kaip
 
 $$\hat{\mathbf{R}} = \mathbf{PQ}^\top$$
 
-where $\hat{\mathbf{R}}\in \mathbb{R}^{m \times n}$ is the predicted rating matrix which has the same shape as $\mathbf{R}$. One major problem of this prediction rule is that users/items biases can not be modeled. For example, some users tend to give higher ratings or some items always get lower ratings due to poorer quality. These biases are commonplace in real-world applications. To capture these biases, user specific and item specific bias terms are introduced. Specifically, the predicted rating user $u$ gives to item $i$ is calculated by
+kur $\hat{\mathbf{R}}\in \mathbb{R}^{m \times n}$ yra prognozuojamų įvertinimų matrica, kurios forma tokia pati kaip $\mathbf{R}$. Viena pagrindinių šios prognozavimo taisyklės problemų yra ta, kad negalima modeliuoti naudotojų ir elementų poslinkių. Pavyzdžiui, kai kurie naudotojai linkę skirti aukštesnius įvertinimus arba kai kurie elementai dėl prastesnės kokybės visada gauna žemesnius. Šie poslinkiai yra įprasti realaus pasaulio taikymuose. Kad šiuos poslinkius užfiksuotume, įvedami naudotojui ir elementui specifiniai poslinkio nariai. Konkrečiai, naudotojo $u$ elementui $i$ skiriamas prognozuojamas įvertinimas apskaičiuojamas pagal
 
 $$
 \hat{\mathbf{R}}_{ui} = \mathbf{p}_u\mathbf{q}^\top_i + b_u + b_i
 $$
 
-Then, we train the matrix factorization model by minimizing the mean squared error between predicted rating scores and real rating scores.  The objective function is defined as follows:
+Tada matricos faktorizavimo modelį apmokome minimizuodami vidutinę kvadratinę paklaidą tarp prognozuojamų ir tikrų įvertinimų. Tikslo funkcija apibrėžiama taip:
 
 $$
 \underset{\mathbf{P}, \mathbf{Q}, b}{\mathrm{argmin}} \sum_{(u, i) \in \mathcal{K}} \| \mathbf{R}_{ui} -
@@ -27,15 +27,15 @@ $$
 \|^2_F + b_u^2 + b_i^2 )
 $$
 
-where $\lambda$ denotes the regularization rate. The regularizing term $\lambda (\| \mathbf{P} \|^2_F + \| \mathbf{Q}
-\|^2_F + b_u^2 + b_i^2 )$ is used to avoid over-fitting by penalizing the magnitude of the parameters. The $(u, i)$ pairs for which $\mathbf{R}_{ui}$ is known are stored in the set
-$\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \textrm{ is known}\}$. The model parameters can be learned with an optimization algorithm, such as Stochastic Gradient Descent and Adam.
+kur $\lambda$ žymi reguliarizavimo koeficientą. Reguliarizavimo narys $\lambda (\| \mathbf{P} \|^2_F + \| \mathbf{Q}
+\|^2_F + b_u^2 + b_i^2 )$ naudojamas persimokymui išvengti baudžiant parametrų dydį. Poros $(u, i)$, kurioms $\mathbf{R}_{ui}$ žinomas, saugomos aibėje
+$\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \textrm{ yra žinomas}\}$. Modelio parametrus galima išmokti optimizavimo algoritmu, pavyzdžiui, stochastiniu gradientiniu nusileidimu ar Adam.
 
-An intuitive illustration of the matrix factorization model is shown below:
+Intuityvi matricos faktorizavimo modelio iliustracija pateikta žemiau:
 
-![Illustration of matrix factorization model](../img/rec-mf.svg)
+![Matricos faktorizavimo modelio iliustracija](../img/rec-mf.svg)
 
-In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
+Likusioje šio skyrelio dalyje paaiškinsime matricos faktorizavimo įgyvendinimą ir apmokysime modelį MovieLens duomenų rinkinyje.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -46,9 +46,9 @@ import mxnet as mx
 npx.set_np()
 ```
 
-## Model Implementation
+## Modelio įgyvendinimas
 
-First, we implement the matrix factorization model described above. The user and item latent factors can be created with the `nn.Embedding`. The `input_dim` is the number of items/users and the `output_dim` is the dimension of the latent factors $k$.  We can also use `nn.Embedding` to create the user/item biases by setting the `output_dim` to one. In the `forward` function, user and item ids are used to look up the embeddings.
+Pirmiausia įgyvendiname aukščiau aprašytą matricos faktorizavimo modelį. Naudotojų ir elementų latentinius veiksnius galima sukurti naudojant `nn.Embedding`. Parametras `input_dim` yra elementų ar naudotojų skaičius, o `output_dim` – latentinių veiksnių dimensija $k$. Taip pat galime naudoti `nn.Embedding` naudotojų ir elementų poslinkiams sukurti, nustatydami `output_dim` lygų vienam. Funkcijoje `forward` naudotojų ir elementų ID naudojami įterpiniams surasti.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -69,15 +69,15 @@ class MF(nn.Block):
         return outputs.flatten()
 ```
 
-## Evaluation Measures
+## Vertinimo matai
 
-We then implement the RMSE (root-mean-square error) measure, which is commonly used to measure the differences between rating scores predicted by the model and the actually observed ratings (ground truth) :cite:`Gunawardana.Shani.2015`. RMSE is defined as:
+Toliau įgyvendiname RMSE (vidutinės kvadratinės paklaidos šaknies) matą, kuris įprastai naudojamas modelio prognozuojamų įvertinimų ir faktiškai stebėtų įvertinimų (tikrųjų reikšmių) skirtumams matuoti :cite:`Gunawardana.Shani.2015`. RMSE apibrėžiamas taip:
 
 $$
 \textrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u, i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
 $$
 
-where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. $|\mathcal{T}|$ is the size of this set. We can use the RMSE function provided by `mx.metric`.
+kur $\mathcal{T}$ yra aibė, sudaryta iš naudotojų ir elementų porų, kuriose norite vertinti. $|\mathcal{T}|$ yra šios aibės dydis. Galime naudoti `mx.metric` pateiktą RMSE funkciją.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -94,10 +94,10 @@ def evaluator(net, test_iter, devices):
     return float(np.mean(np.array(rmse_list)))
 ```
 
-## Training and Evaluating the Model
+## Modelio apmokymas ir vertinimas
 
 
-In the training function, we adopt the $\ell_2$ loss with weight decay. The weight decay mechanism has the same effect as the $\ell_2$ regularization.
+Apmokymo funkcijoje naudojame $\ell_2$ nuostolį su svorių mažinimu. Svorių mažinimo mechanizmas turi tokį patį poveikį kaip $\ell_2$ reguliarizavimas.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -139,7 +139,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
           f'on {str(devices)}')
 ```
 
-Finally, let's put all things together and train the model. Here, we set the latent factor dimension to 30.
+Galiausiai sujunkime viską ir apmokykime modelį. Čia latentinių veiksnių dimensiją nustatome 30.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -156,7 +156,7 @@ train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                     devices, evaluator)
 ```
 
-Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
+Toliau naudojame apmokytą modelį prognozuoti įvertinimą, kurį naudotojas (ID 20) galėtų skirti elementui (ID 30).
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -165,19 +165,19 @@ scores = net(np.array([20], dtype='int', ctx=devices[0]),
 scores
 ```
 
-## Summary
+## Santrauka
 
-* The matrix factorization model is widely used in recommender systems.  It can be used to predict ratings that a user might give to an item.
-* We can implement and train matrix factorization for recommender systems.
+* Matricos faktorizavimo modelis plačiai naudojamas rekomendacinėse sistemose. Jį galima naudoti prognozuojant įvertinimus, kuriuos naudotojas galėtų skirti elementui.
+* Galime įgyvendinti ir apmokyti matricos faktorizavimą rekomendacinėms sistemoms.
 
 
-## Exercises
+## Pratimai
 
-* Vary the size of latent factors. How does the size of latent factors influence the model performance?
-* Try different optimizers, learning rates, and weight decay rates.
-* Check the predicted rating scores of other users for a specific movie.
+* Keiskite latentinių veiksnių dydį. Kaip latentinių veiksnių dydis veikia modelio našumą?
+* Išbandykite skirtingus optimizatorius, mokymosi greičius ir svorių mažinimo koeficientus.
+* Patikrinkite kitų naudotojų prognozuojamus įvertinimus konkrečiam filmui.
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/400)
+[Diskusijos](https://discuss.d2l.ai/t/400)
 :end_tab:

@@ -1,14 +1,14 @@
-#  The MovieLens Dataset
+#  MovieLens duomenų rinkinys
 
-There are a number of datasets that are available for recommendation research. Amongst them, the [MovieLens](https://movielens.org/) dataset is probably one of the more popular ones. MovieLens is a non-commercial web-based movie recommender system. It is created in 1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research purposes.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.
-
-
-## Getting the Data
+Rekomendacijų tyrimams yra prieinama daug duomenų rinkinių. Vienas populiariausių iš jų yra [MovieLens](https://movielens.org/) duomenų rinkinys. MovieLens yra nekomercinė internetinė filmų rekomendacinė sistema. Ją 1997 m. sukūrė ir valdo GroupLens – Minesotos universiteto tyrimų laboratorija, siekdama rinkti filmų įvertinimų duomenis tyrimų tikslais. MovieLens duomenys buvo labai svarbūs keliems moksliniams tyrimams, įskaitant personalizuotas rekomendacijas ir socialinę psichologiją.
 
 
-The MovieLens dataset is hosted by the [GroupLens](https://grouplens.org/datasets/movielens/) website. Several versions are available. We will use the MovieLens 100K dataset :cite:`Herlocker.Konstan.Borchers.ea.1999`.  This dataset is comprised of $100,000$ ratings, ranging from 1 to 5 stars, from 943 users on 1682 movies. It has been cleaned up so that each user has rated at least 20 movies. Some simple demographic information such as age, gender, genres for the users and items are also available.  We can download the [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) and extract the `u.data` file, which contains all the $100,000$ ratings in the csv format. There are many other files in the folder, a detailed description for each file can be found in the [README](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) file of the dataset.
+## Duomenų gavimas
 
-To begin with, let's import the packages required to run this section's experiments.
+
+MovieLens duomenų rinkinį talpina svetainė [GroupLens](https://grouplens.org/datasets/movielens/). Yra kelios versijos. Naudosime MovieLens 100K duomenų rinkinį :cite:`Herlocker.Konstan.Borchers.ea.1999`. Šį duomenų rinkinį sudaro $100\,000$ įvertinimų nuo 1 iki 5 žvaigždučių, kuriuos 1682 filmams skyrė 943 naudotojai. Jis išvalytas taip, kad kiekvienas naudotojas būtų įvertinęs bent 20 filmų. Taip pat prieinama kai kuri paprasta demografinė informacija, pavyzdžiui, naudotojų amžius, lytis ir elementų žanrai. Galime atsisiųsti [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) ir išskleisti failą `u.data`, kuriame yra visi $100\,000$ įvertinimų csv formatu. Aplanke yra daug kitų failų; išsamų kiekvieno failo aprašymą galima rasti duomenų rinkinio [README](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) faile.
+
+Pirmiausia importuokime paketus, reikalingus šio skyrelio eksperimentams vykdyti.
 
 ```{.python .input  n=1}
 #@tab mxnet
@@ -18,7 +18,7 @@ import os
 import pandas as pd
 ```
 
-Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
+Tada atsisiunčiame MovieLens 100k duomenų rinkinį ir įkeliame sąveikas kaip `DataFrame`.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -38,9 +38,9 @@ def read_data_ml100k():
     return data, num_users, num_items
 ```
 
-## Statistics of the Dataset
+## Duomenų rinkinio statistika
 
-Let's load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
+Įkelkime duomenis ir patikrinkime pirmuosius penkis įrašus rankiniu būdu. Tai efektyvus būdas sužinoti duomenų struktūrą ir įsitikinti, kad jie įkelti teisingai.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -51,9 +51,9 @@ print(f'matrix sparsity: {sparsity:f}')
 print(data.head(5))
 ```
 
-We can see that each line consists of four columns, including "user id" 1-943, "item id" 1-1682, "rating" 1-5 and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings, so we can also call it rating matrix and we will use interaction matrix and rating matrix interchangeably in case that the values of this matrix represent exact ratings. Most of the values in the rating matrix are unknown as users have not rated the majority of movies. We also show the sparsity of this dataset. The sparsity is defined as `1 - number of nonzero entries / ( number of users * number of items)`. Clearly, the interaction matrix is extremely sparse (i.e., sparsity = 93.695%). Real world datasets may suffer from a greater extent of sparsity and has been a long-standing challenge in building recommender systems. A viable solution is to use additional side information such as user/item features to alleviate the sparsity.
+Matome, kad kiekvieną eilutę sudaro keturi stulpeliai: „user id“ 1–943, „item id“ 1–1682, „rating“ 1–5 ir „timestamp“. Galime sukonstruoti $n \times m$ dydžio sąveikų matricą, kur $n$ ir $m$ yra atitinkamai naudotojų ir elementų skaičius. Šis duomenų rinkinys fiksuoja tik esamus įvertinimus, todėl ją galime vadinti ir įvertinimų matrica; sąveikų matricą ir įvertinimų matricą vartosime pakaitomis, kai šios matricos reikšmės yra tikslūs įvertinimai. Dauguma įvertinimų matricos reikšmių nežinomos, nes naudotojai neįvertino daugumos filmų. Taip pat parodome šio duomenų rinkinio retumą. Retumas apibrėžiamas kaip `1 - nenulinių elementų skaičius / ( naudotojų skaičius * elementų skaičius)`. Akivaizdu, kad sąveikų matrica yra labai reta (t. y. retumas = 93,695 %). Realaus pasaulio duomenų rinkiniai gali būti dar retesni, o tai jau seniai yra iššūkis kuriant rekomendacines sistemas. Perspektyvus sprendimas yra naudoti papildomą šalutinę informaciją, pavyzdžiui, naudotojų ir elementų požymius, retumui sušvelninti.
 
-We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings centered at 3-4.
+Tada nubraižome skirtingų įvertinimų skaičiaus pasiskirstymą. Kaip ir tikėtasi, jis atrodo kaip normalusis pasiskirstymas, kurio dauguma įvertinimų susitelkę ties 3–4.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -64,9 +64,9 @@ d2l.plt.title('Distribution of Ratings in MovieLens 100K')
 d2l.plt.show()
 ```
 
-## Splitting the dataset
+## Duomenų rinkinio skaidymas
 
-We split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from oldest to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
+Duomenų rinkinį padalijame į apmokymo ir testavimo aibes. Toliau pateikta funkcija siūlo du skaidymo režimus: `random` ir `seq-aware`. Režimu `random` funkcija padalija 100 tūkst. sąveikų atsitiktinai neatsižvelgdama į laiko žymas ir pagal numatytuosius nustatymus 90 % duomenų naudoja kaip apmokymo pavyzdžius, o likusius 10 % – kaip testavimo pavyzdžius. Režimu `seq-aware` testavimui paliekame elementą, kurį naudotojas įvertino paskutinį, o naudotojų istorines sąveikas naudojame kaip apmokymo aibę. Naudotojų istorinės sąveikos surikiuojamos nuo seniausios iki naujausios pagal laiko žymą. Šis režimas bus naudojamas sekai jautraus rekomendavimo skyrelyje.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -95,11 +95,11 @@ def split_data_ml100k(data, num_users, num_items,
     return train_data, test_data
 ```
 
-Note that it is good practice to use a validation set in practice, apart from only a test set. However, we omit that for the sake of brevity. In this case, our test set can be regarded as our held-out validation set.
+Atkreipkite dėmesį, kad praktikoje gera praktika be testavimo aibės naudoti ir patikros aibę. Tačiau trumpumo dėlei to nedarome. Šiuo atveju testavimo aibę galima laikyti atidėta patikros aibe.
 
-## Loading the data
+## Duomenų įkėlimas
 
-After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and enumerates the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
+Padalijus duomenų rinkinį, patogumo dėlei apmokymo ir testavimo aibes paversime sąrašais ir žodynais ar matricomis. Toliau pateikta funkcija skaito duomenų lentelę eilutė po eilutės ir sunumeruoja naudotojų ir elementų indeksus pradėdama nuo nulio. Tada funkcija grąžina naudotojų, elementų, įvertinimų sąrašus ir žodyną ar matricą, kurioje saugomos sąveikos. Grįžtamosios informacijos tipą galime nurodyti kaip `explicit` (aiškioji) arba `implicit` (numanomoji).
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -120,7 +120,7 @@ def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
     return users, items, scores, inter
 ```
 
-Afterwards, we put the above steps together and it will be used in the next section. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode (The remaining samples are rolled over to the next epoch.) and orders are shuffled.
+Po to sujungiame aukščiau pateiktus žingsnius, ir tai bus naudojama kitame skyrelyje. Rezultatai apgaubiami `Dataset` ir `DataLoader`. Atkreipkite dėmesį, kad apmokymo duomenų `DataLoader` parametras `last_batch` nustatytas į režimą `rollover` (likę pavyzdžiai perkeliami į kitą epochą), o tvarka sumaišoma.
 
 ```{.python .input  n=7}
 #@tab mxnet
@@ -146,17 +146,17 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
     return num_users, num_items, train_iter, test_iter
 ```
 
-## Summary
+## Santrauka
 
-* MovieLens datasets are widely used for recommendation research. It is public available and free to use.
-* We define functions to download and preprocess the MovieLens 100k dataset for further use in later sections.
+* MovieLens duomenų rinkiniai plačiai naudojami rekomendacijų tyrimams. Jie viešai prieinami ir nemokami.
+* Apibrėžiame funkcijas MovieLens 100k duomenų rinkiniui atsisiųsti ir iš anksto apdoroti, kad galėtume jį naudoti tolesniuose skyreliuose.
 
 
-## Exercises
+## Pratimai
 
-* What other similar recommendation datasets can you find?
-* Go through the [https://movielens.org/](https://movielens.org/) site for more information about MovieLens.
+* Kokius kitus panašius rekomendacijų duomenų rinkinius galite rasti?
+* Peržiūrėkite svetainę [https://movielens.org/](https://movielens.org/) ir sužinokite daugiau apie MovieLens.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/399)
+[Diskusijos](https://discuss.d2l.ai/t/399)
 :end_tab:

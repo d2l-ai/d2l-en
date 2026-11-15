@@ -1,44 +1,41 @@
-# Overview of Recommender Systems
+# Rekomendacinių sistemų apžvalga
 
 
 
-In the last decade, the Internet has evolved into a platform for large-scale online services, which profoundly changed the way we communicate, read news, buy products, and watch movies.  In the meanwhile, the unprecedented number of items (we use the term *item* to refer to movies, news, books, and products.) offered online requires a system that can help us discover items that we preferred. Recommender systems are therefore powerful information filtering tools that can facilitate personalized services and provide tailored experience to individual users. In short, recommender systems play a pivotal role in utilizing the wealth of data available to make choices manageable. Nowadays, recommender systems are at the core of a number of online services providers such as Amazon, Netflix, and YouTube. Recall the example of Deep learning books recommended by Amazon in :numref:`subsec_recommender_systems`. The benefits of employing recommender systems are two-folds: On the one hand, it can largely reduce users' effort in finding items and alleviate the issue of information overload. On the other hand, it can add business value to  online
-service providers and is an important source of revenue.  This chapter will introduce the fundamental concepts, classic models and recent advances with deep learning in the field of recommender systems, together with implemented examples.
+Per pastarąjį dešimtmetį internetas virto platforma didelio masto internetinėms paslaugoms, kuri iš esmės pakeitė mūsų bendravimo, naujienų skaitymo, produktų pirkimo ir filmų žiūrėjimo būdus. Kartu precedento neturintis internete siūlomų elementų (terminą *elementas* vartojame filmams, naujienoms, knygoms ir produktams žymėti) skaičius reikalauja sistemos, kuri padėtų atrasti mums patinkančius elementus. Todėl rekomendacinės sistemos yra galingi informacijos filtravimo įrankiai, galintys palengvinti personalizuotas paslaugas ir suteikti individualiems naudotojams pritaikytą patirtį. Trumpai tariant, rekomendacinės sistemos atlieka esminį vaidmenį naudojant turimų duomenų gausą, kad pasirinkimai taptų valdomi. Šiandien rekomendacinės sistemos yra daugelio internetinių paslaugų teikėjų, tokių kaip Amazon, Netflix ir YouTube, pagrindas. Prisiminkite giliojo mokymosi knygų, kurias rekomenduoja Amazon, pavyzdį :numref:`subsec_recommender_systems`. Rekomendacinių sistemų naudojimo nauda yra dviguba: viena vertus, jos gali gerokai sumažinti naudotojų pastangas ieškant elementų ir sušvelninti informacijos pertekliaus problemą. Kita vertus, jos gali sukurti verslo vertę internetinių paslaugų teikėjams ir yra svarbus pajamų šaltinis. Šiame skyriuje pristatysime pagrindines sąvokas, klasikinius modelius ir naujausius giliojo mokymosi pasiekimus rekomendacinių sistemų srityje kartu su įgyvendintais pavyzdžiais.
 
-![Illustration of the Recommendation Process](../img/rec-intro.svg)
+![Rekomendavimo proceso iliustracija](../img/rec-intro.svg)
 
 
-## Collaborative Filtering
+## Kolaboratyvusis filtravimas
 
-We start the journey with the important concept in recommender systems---collaborative filtering
-(CF), which was first coined by the Tapestry system :cite:`Goldberg.Nichols.Oki.ea.1992`, referring to "people collaborate to help one another perform the filtering process  in order to handle the large amounts of email and messages posted to newsgroups". This term has been enriched with more senses. In a broad sense, it is the process of
-filtering for information or patterns using techniques involving collaboration among multiple users, agents, and data sources. CF has many forms and numerous CF methods proposed since its advent.
+Kelionę pradedame nuo svarbios rekomendacinių sistemų sąvokos – kolaboratyviojo filtravimo
+(angl. *collaborative filtering*, CF), kurią pirmiausia pavartojo sistema Tapestry :cite:`Goldberg.Nichols.Oki.ea.1992`, turėdama omenyje, kad „žmonės bendradarbiauja padėdami vieni kitiems atlikti filtravimo procesą, kad susidorotų su dideliu el. laiškų ir naujienų grupėse paskelbtų pranešimų kiekiu“. Šis terminas įgijo daugiau reikšmių. Plačiąja prasme tai yra informacijos ar dėsningumų filtravimo procesas, naudojant metodus, apimančius daugelio naudotojų, agentų ir duomenų šaltinių bendradarbiavimą. CF turi daug formų, o nuo jo atsiradimo pasiūlyta daugybė CF metodų.
 
-Overall, CF techniques can be categorized into: memory-based CF, model-based CF, and their hybrid :cite:`Su.Khoshgoftaar.2009`. Representative memory-based CF techniques are nearest neighbor-based CF such as user-based CF and item-based CF :cite:`Sarwar.Karypis.Konstan.ea.2001`.  Latent factor models such as matrix factorization are examples of model-based CF.  Memory-based CF has limitations in dealing with sparse and large-scale data since it computes the similarity values based on common items.  Model-based methods become more popular with its
-better capability in dealing with sparsity and scalability.  Many model-based CF approaches can be extended with neural networks, leading to more flexible and scalable models with the computation acceleration in deep learning :cite:`Zhang.Yao.Sun.ea.2019`.  In general, CF only uses the user-item interaction data to make predictions and recommendations. Besides CF, content-based and context-based recommender systems are also useful in incorporating the content descriptions of items/users and contextual signals such as timestamps and locations.  Obviously, we may need to adjust the model types/structures when different input data is available.
+Apskritai CF metodus galima suskirstyti į atmintimi pagrįstą CF, modeliu pagrįstą CF ir jų hibridą :cite:`Su.Khoshgoftaar.2009`. Būdingi atmintimi pagrįsti CF metodai yra artimiausių kaimynų pagrįstas CF, pavyzdžiui, naudotojais pagrįstas CF ir elementais pagrįstas CF :cite:`Sarwar.Karypis.Konstan.ea.2001`. Latentinių veiksnių modeliai, tokie kaip matricos faktorizavimas, yra modeliu pagrįsto CF pavyzdžiai. Atmintimi pagrįstas CF turi apribojimų dirbant su retais ir didelio masto duomenimis, nes panašumo reikšmes skaičiuoja pagal bendrus elementus. Modeliu pagrįsti metodai tampa populiaresni dėl geresnių gebėjimų tvarkyti retumą ir mastelį. Daugelį modeliu pagrįstų CF metodų galima išplėsti neuroniniais tinklais, gaunant lankstesnius ir geriau mastelio didėjimui pritaikytus modelius, kuriems skaičiavimus pagreitina giliojo mokymosi priemonės :cite:`Zhang.Yao.Sun.ea.2019`. Apskritai CF prognozėms ir rekomendacijoms naudoja tik naudotojų ir elementų sąveikos duomenis. Be CF, turiniu pagrįstos ir kontekstu pagrįstos rekomendacinės sistemos taip pat naudingos įtraukiant elementų ar naudotojų turinio aprašymus ir konteksto signalus, tokius kaip laiko žymos ir vietos. Akivaizdu, kad esant skirtingiems įvesties duomenims gali tekti koreguoti modelių tipus ar struktūras.
 
 
 
-## Explicit Feedback and Implicit Feedback
+## Aiškioji ir numanomoji grįžtamoji informacija
 
-To learn the preference of users, the system shall collect feedback from them.  The feedback can be either explicit or implicit :cite:`Hu.Koren.Volinsky.2008`. For example, [IMDb](https://www.imdb.com/) collects star ratings ranging from one to ten stars for movies. YouTube provides the thumbs-up and thumbs-down buttons for users to show their preferences.  It is apparent that gathering explicit feedback requires users to indicate their interests proactively.  Nonetheless, explicit feedback is not always readily available as many users may be reluctant to rate products. Relatively speaking, implicit feedback is often readily available since it is mainly concerned with modeling implicit behavior such as user clicks. As such, many recommender systems are centered on implicit feedback which indirectly reflects user's opinion through observing user behavior.  There are diverse forms of implicit feedback including purchase history, browsing history, watches and even mouse movements. For example, a user that purchased many books by the same author probably likes that author.   Note that implicit feedback is inherently noisy.  We can only *guess* their preferences and true motives. A user watched a movie does not necessarily indicate a positive view of that movie.
-
-
-
-## Recommendation Tasks
-
-A number of recommendation tasks have been investigated in the past decades.  Based on the domain of applications, there are movies recommendation, news recommendations, point-of-interest recommendation :cite:`Ye.Yin.Lee.ea.2011` and so forth.  It is also possible to differentiate the tasks based on the types of feedback and input data, for example, the rating prediction task aims to predict the explicit ratings. Top-$n$ recommendation (item ranking) ranks all items for each user personally based on the implicit feedback. If time-stamp information is also included, we can build sequence-aware recommendation :cite:`Quadrana.Cremonesi.Jannach.2018`.  Another popular task is called click-through rate prediction, which is also based on implicit feedback, but various categorical features can be utilized. Recommending for new users and recommending new items to existing users are called cold-start recommendation :cite:`Schein.Popescul.Ungar.ea.2002`.
+Kad išmoktų naudotojų pageidavimus, sistema turi rinkti iš jų grįžtamąją informaciją. Ji gali būti aiškioji arba numanomoji :cite:`Hu.Koren.Volinsky.2008`. Pavyzdžiui, [IMDb](https://www.imdb.com/) renka filmų įvertinimus žvaigždutėmis nuo vienos iki dešimties. YouTube pateikia mygtukus „patinka“ ir „nepatinka“, kad naudotojai galėtų išreikšti savo pageidavimus. Akivaizdu, kad aiškiajai grįžtamajai informacijai rinkti reikia, kad naudotojai aktyviai nurodytų savo interesus. Vis dėlto aiškioji grįžtamoji informacija ne visada lengvai prieinama, nes daugelis naudotojų gali nenorėti vertinti produktų. Palyginti, numanomoji grįžtamoji informacija dažnai lengvai prieinama, nes ji daugiausia susijusi su numanomo elgesio, pavyzdžiui, naudotojų paspaudimų, modeliavimu. Todėl daugelis rekomendacinių sistemų orientuotos į numanomąją grįžtamąją informaciją, kuri netiesiogiai atspindi naudotojo nuomonę stebint jo elgesį. Numanomoji grįžtamoji informacija pasireiškia įvairiomis formomis, įskaitant pirkimų istoriją, naršymo istoriją, peržiūras ir net pelės judesius. Pavyzdžiui, naudotojas, nusipirkęs daug to paties autoriaus knygų, tikriausiai mėgsta tą autorių. Atkreipkite dėmesį, kad numanomoji grįžtamoji informacija iš prigimties yra triukšminga. Jų pageidavimus ir tikruosius motyvus galime tik *spėlioti*. Tai, kad naudotojas peržiūrėjo filmą, nebūtinai rodo teigiamą požiūrį į tą filmą.
 
 
 
-## Summary
+## Rekomendavimo užduotys
 
-* Recommender systems are important for individual users and industries. Collaborative filtering is a key concept in recommendation.
-* There are two types of feedbacks: implicit feedback and explicit feedback.  A number of recommendation tasks have been explored during the last decade.
+Per pastaruosius dešimtmečius ištirta daug rekomendavimo užduočių. Pagal taikymo sritį yra filmų rekomendavimas, naujienų rekomendavimas, dominančių vietų rekomendavimas :cite:`Ye.Yin.Lee.ea.2011` ir t. t. Užduotis taip pat galima skirti pagal grįžtamosios informacijos ir įvesties duomenų tipus, pavyzdžiui, įvertinimų prognozavimo užduotis siekia prognozuoti aiškiuosius įvertinimus. Top-$n$ rekomendavimas (elementų rikiavimas) kiekvienam naudotojui asmeniškai surikiuoja visus elementus pagal numanomąją grįžtamąją informaciją. Jei įtraukta ir laiko žymų informacija, galime sudaryti sekai jautrų rekomendavimą :cite:`Quadrana.Cremonesi.Jannach.2018`. Kita populiari užduotis vadinama paspaudimų dažnio prognozavimu; ji taip pat pagrįsta numanomąja grįžtamąja informacija, tačiau gali būti naudojami įvairūs kategoriniai požymiai. Rekomendavimas naujiems naudotojams ir naujų elementų rekomendavimas esamiems naudotojams vadinamas šalto starto rekomendavimu :cite:`Schein.Popescul.Ungar.ea.2002`.
 
-## Exercises
 
-1. Can you explain how recommender systems influence your daily life?
-2. What interesting recommendation tasks do you think can be investigated?
 
-[Discussions](https://discuss.d2l.ai/t/398)
+## Santrauka
+
+* Rekomendacinės sistemos svarbios tiek atskiriems naudotojams, tiek pramonei. Kolaboratyvusis filtravimas yra pagrindinė rekomendavimo sąvoka.
+* Yra du grįžtamosios informacijos tipai: numanomoji ir aiškioji grįžtamoji informacija. Per pastarąjį dešimtmetį ištirta nemažai rekomendavimo užduočių.
+
+## Pratimai
+
+1. Ar galite paaiškinti, kaip rekomendacinės sistemos veikia jūsų kasdienį gyvenimą?
+2. Kokias įdomias rekomendavimo užduotis, jūsų manymu, būtų galima tirti?
+
+[Diskusijos](https://discuss.d2l.ai/t/398)

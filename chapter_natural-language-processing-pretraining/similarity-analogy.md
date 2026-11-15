@@ -1,23 +1,23 @@
-# Word Similarity and Analogy
+# Žodžių panašumas ir analogija
 :label:`sec_synonyms`
 
-In :numref:`sec_word2vec_pretraining`, 
-we trained a word2vec model on a small dataset, 
-and applied it
-to find semantically similar words 
-for an input word.
-In practice,
-word vectors that are pretrained
-on large corpora can be
-applied to downstream
-natural language processing tasks,
-which will be covered later
-in :numref:`chap_nlp_app`.
-To demonstrate 
-semantics of pretrained word vectors
-from large corpora in a straightforward way,
-let's apply them
-in the word similarity and analogy tasks.
+:numref:`sec_word2vec_pretraining`
+apmokėme word2vec modelį mažame duomenų rinkinyje
+ir pritaikėme jį
+semantiškai panašiems žodžiams
+duotam žodžiui rasti.
+Praktikoje
+žodžių vektorius, iš anksto apmokytus
+dideliuose tekstynuose, galima
+taikyti tolesnėms
+natūraliosios kalbos apdorojimo užduotims,
+kurios bus aptartos vėliau
+:numref:`chap_nlp_app`.
+Kad paprastai parodytume
+iš anksto apmokytų žodžių vektorių semantiką
+iš didelių tekstynų,
+pritaikykime juos
+žodžių panašumo ir analogijos užduotims.
 
 ```{.python .input}
 #@tab mxnet
@@ -36,13 +36,13 @@ from torch import nn
 import os
 ```
 
-## Loading Pretrained Word Vectors
+## Iš anksto apmokytų žodžių vektorių įkėlimas
 
-Below lists pretrained GloVe embeddings of dimension 50, 100, and 300,
-which can be downloaded from the [GloVe website](https://nlp.stanford.edu/projects/glove/).
-The pretrained fastText embeddings are available in multiple languages.
-Here we consider one English version (300-dimensional "wiki.en") that can be downloaded from the
-[fastText website](https://fasttext.cc/).
+Toliau išvardyti iš anksto apmokyti GloVe įterpiniai, kurių dimensija 50, 100 ir 300,
+kuriuos galima atsisiųsti iš [GloVe svetainės](https://nlp.stanford.edu/projects/glove/).
+Iš anksto apmokyti fastText įterpiniai prieinami keliomis kalbomis.
+Čia nagrinėjame vieną angliškąją versiją (300 dimensijų „wiki.en“), kurią galima atsisiųsti iš
+[fastText svetainės](https://fasttext.cc/).
 
 ```{.python .input}
 #@tab all
@@ -63,7 +63,7 @@ d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
                            'c1816da3821ae9f43899be655002f6c723e91b88')
 ```
 
-To load these pretrained GloVe and fastText embeddings, we define the following `TokenEmbedding` class.
+Kad įkeltume šiuos iš anksto apmokytus GloVe ir fastText įterpinius, apibrėžiame šią klasę `TokenEmbedding`.
 
 ```{.python .input}
 #@tab all
@@ -103,49 +103,49 @@ class TokenEmbedding:
         return len(self.idx_to_token)
 ```
 
-Below we load the
-50-dimensional GloVe embeddings
-(pretrained on a Wikipedia subset).
-When creating the `TokenEmbedding` instance,
-the specified embedding file has to be downloaded if it
-was not yet.
+Toliau įkeliame
+50 dimensijų GloVe įterpinius
+(iš anksto apmokytus Wikipedia poaibyje).
+Kuriant `TokenEmbedding` egzempliorių,
+nurodytą įterpinių failą reikia atsisiųsti, jei jis
+dar nebuvo atsisiųstas.
 
 ```{.python .input}
 #@tab all
 glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
-Output the vocabulary size. The vocabulary contains 400000 words (tokens) and a special unknown token.
+Išveskite žodyno dydį. Žodyne yra 400000 žodžių (teksto vienetų) ir specialus nežinomo teksto vieneto simbolis.
 
 ```{.python .input}
 #@tab all
 len(glove_6b50d)
 ```
 
-We can get the index of a word in the vocabulary, and vice versa.
+Galime gauti žodžio indeksą žodyne ir atvirkščiai.
 
 ```{.python .input}
 #@tab all
 glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 ```
 
-## Applying Pretrained Word Vectors
+## Iš anksto apmokytų žodžių vektorių taikymas
 
-Using the loaded GloVe vectors,
-we will demonstrate their semantics
-by applying them
-in the following word similarity and analogy tasks.
+Naudodami įkeltus GloVe vektorius,
+parodysime jų semantiką
+pritaikydami juos
+šioms žodžių panašumo ir analogijos užduotims.
 
 
-### Word Similarity
+### Žodžių panašumas
 
-Similar to :numref:`subsec_apply-word-embed`,
-in order to find semantically similar words
-for an input word
-based on cosine similarities between
-word vectors,
-we implement the following `knn`
-($k$-nearest neighbors) function.
+Panašiai kaip :numref:`subsec_apply-word-embed`,
+kad rastume semantiškai panašius žodžius
+duotam žodžiui
+remiantis žodžių vektorių
+kosinuso panašumais,
+įgyvendiname šią funkciją `knn`
+($k$ artimiausių kaimynų).
 
 ```{.python .input}
 #@tab mxnet
@@ -168,10 +168,10 @@ def knn(W, x, k):
     return topk, [cos[int(i)] for i in topk]
 ```
 
-Then, we 
-search for similar words
-using the pretrained word vectors 
-from the `TokenEmbedding` instance `embed`.
+Tada
+ieškome panašių žodžių
+naudodami iš anksto apmokytus žodžių vektorius
+iš `TokenEmbedding` egzemplioriaus `embed`.
 
 ```{.python .input}
 #@tab all
@@ -181,21 +181,21 @@ def get_similar_tokens(query_token, k, embed):
         print(f'cosine sim={float(c):.3f}: {embed.idx_to_token[int(i)]}')
 ```
 
-The vocabulary of the pretrained word vectors
-in `glove_6b50d` contains 400000 words and a special unknown token. 
-Excluding the input word and unknown token,
-among this vocabulary
-let's find 
-three most semantically similar words
-to word "chip".
+Iš anksto apmokytų žodžių vektorių žodyne
+`glove_6b50d` yra 400000 žodžių ir specialus nežinomo teksto vieneto simbolis.
+Neįtraukdami įvesties žodžio ir nežinomo teksto vieneto,
+šiame žodyne
+raskime
+tris semantiškai panašiausius žodžius
+žodžiui „chip“.
 
 ```{.python .input}
 #@tab all
 get_similar_tokens('chip', 3, glove_6b50d)
 ```
 
-Below outputs similar words
-to "baby" and "beautiful".
+Toliau išvedami panašūs žodžiai
+žodžiams „baby“ ir „beautiful“.
 
 ```{.python .input}
 #@tab all
@@ -207,25 +207,25 @@ get_similar_tokens('baby', 3, glove_6b50d)
 get_similar_tokens('beautiful', 3, glove_6b50d)
 ```
 
-### Word Analogy
+### Žodžių analogija
 
-Besides finding similar words,
-we can also apply word vectors
-to word analogy tasks.
-For example,
-“man”:“woman”::“son”:“daughter”
-is the form of a word analogy:
-“man” is to “woman” as “son” is to “daughter”.
-Specifically,
-the word analogy completion task
-can be defined as:
-for a word analogy 
-$a : b :: c : d$, given the first three words $a$, $b$ and $c$, find $d$. 
-Denote the vector of word $w$ by $\textrm{vec}(w)$. 
-To complete the analogy,
-we will find the word 
-whose vector is most similar
-to the result of $\textrm{vec}(c)+\textrm{vec}(b)-\textrm{vec}(a)$.
+Be panašių žodžių paieškos,
+žodžių vektorius taip pat galime taikyti
+žodžių analogijos užduotims.
+Pavyzdžiui,
+„man“ : „woman“ :: „son“ : „daughter“
+yra žodžių analogijos forma:
+„man“ yra „woman“, kaip „son“ yra „daughter“.
+Konkrečiau,
+žodžių analogijos užbaigimo užduotį
+galima apibrėžti taip:
+žodžių analogijai
+$a : b :: c : d$, turint pirmuosius tris žodžius $a$, $b$ ir $c$, raskite $d$.
+Žodžio $w$ vektorių pažymėkime $\textrm{vec}(w)$.
+Kad užbaigtume analogiją,
+rasime žodį,
+kurio vektorius yra panašiausias
+į $\textrm{vec}(c)+\textrm{vec}(b)-\textrm{vec}(a)$ rezultatą.
 
 ```{.python .input}
 #@tab all
@@ -236,61 +236,60 @@ def get_analogy(token_a, token_b, token_c, embed):
     return embed.idx_to_token[int(topk[0])]  # Remove unknown words
 ```
 
-Let's verify the "male-female" analogy using the loaded word vectors.
+Patikrinkime „vyriškas–moteriškas“ analogiją naudodami įkeltus žodžių vektorius.
 
 ```{.python .input}
 #@tab all
 get_analogy('man', 'woman', 'son', glove_6b50d)
 ```
 
-Below completes a
-“capital-country” analogy: 
-“beijing”:“china”::“tokyo”:“japan”.
-This demonstrates 
-semantics in the pretrained word vectors.
+Toliau užbaigiama
+„sostinė–šalis“ analogija:
+„beijing“ : „china“ :: „tokyo“ : „japan“.
+Tai parodo
+iš anksto apmokytų žodžių vektorių semantiką.
 
 ```{.python .input}
 #@tab all
 get_analogy('beijing', 'china', 'tokyo', glove_6b50d)
 ```
 
-For the
-“adjective-superlative adjective” analogy
-such as 
-“bad”:“worst”::“big”:“biggest”,
-we can see that the pretrained word vectors
-may capture the syntactic information.
+„Būdvardis–aukščiausiojo laipsnio būdvardis“ analogijai,
+pavyzdžiui,
+„bad“ : „worst“ :: „big“ : „biggest“,
+matome, kad iš anksto apmokyti žodžių vektoriai
+gali užfiksuoti sintaksinę informaciją.
 
 ```{.python .input}
 #@tab all
 get_analogy('bad', 'worst', 'big', glove_6b50d)
 ```
 
-To show the captured notion
-of past tense in the pretrained word vectors,
-we can test the syntax using the
-"present tense-past tense" analogy: “do”:“did”::“go”:“went”.
+Kad parodytume iš anksto apmokytuose žodžių vektoriuose užfiksuotą
+būtojo laiko sąvoką,
+sintaksę galime patikrinti naudodami
+„esamasis laikas–būtasis laikas“ analogiją: „do“ : „did“ :: „go“ : „went“.
 
 ```{.python .input}
 #@tab all
 get_analogy('do', 'did', 'go', glove_6b50d)
 ```
 
-## Summary
+## Santrauka
 
-* In practice, word vectors that are pretrained on large corpora can be applied to downstream natural language processing tasks.
-* Pretrained word vectors can be applied to the word similarity and analogy tasks.
+* Praktikoje žodžių vektorius, iš anksto apmokytus dideliuose tekstynuose, galima taikyti tolesnėms natūraliosios kalbos apdorojimo užduotims.
+* Iš anksto apmokytus žodžių vektorius galima taikyti žodžių panašumo ir analogijos užduotims.
 
 
-## Exercises
+## Pratimai
 
-1. Test the fastText results using `TokenEmbedding('wiki.en')`.
-1. When the vocabulary is extremely large, how can we find similar words or complete a word analogy faster?
+1. Išbandykite fastText rezultatus naudodami `TokenEmbedding('wiki.en')`.
+1. Kai žodynas yra labai didelis, kaip galime greičiau rasti panašius žodžius arba užbaigti žodžių analogiją?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/387)
+[Diskusijos](https://discuss.d2l.ai/t/387)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1336)
+[Diskusijos](https://discuss.d2l.ai/t/1336)
 :end_tab:

@@ -1,30 +1,30 @@
-# Natural Language Inference: Using Attention
+# Natūraliosios kalbos išvadų darymas: naudojant dėmesio sutelkimą
 :label:`sec_natural-language-inference-attention`
 
-We introduced the natural language inference task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, :citet:`Parikh.Tackstrom.Das.ea.2016` proposed to address natural language inference with attention mechanisms and called it a "decomposable attention model".
-This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
-In this section, we will describe and implement this attention-based method (with MLPs) for natural language inference, as depicted in :numref:`fig_nlp-map-nli-attention`.
+:numref:`sec_natural-language-inference-and-dataset` pristatėme natūraliosios kalbos išvadų darymo užduotį ir SNLI duomenų rinkinį. Turėdami omenyje daugelį modelių, pagrįstų sudėtingomis ir giliomis architektūromis, :citet:`Parikh.Tackstrom.Das.ea.2016` pasiūlė spręsti natūraliosios kalbos išvadų darymą dėmesio sutelkimo mechanizmais ir pavadino tai „skaidomos dėmesio sutelkimo transformacijos modeliu“.
+Taip gaunamas modelis be rekurentinių ar konvoliucinių sluoksnių, pasiekęs geriausią to meto rezultatą SNLI duomenų rinkinyje su daug mažiau parametrų.
+Šiame skyrelyje aprašysime ir įgyvendinsime šį dėmesio sutelkimu pagrįstą metodą (su MLP) natūraliosios kalbos išvadų darymui, kaip pavaizduota :numref:`fig_nlp-map-nli-attention`.
 
-![This section feeds pretrained GloVe to an architecture based on attention and MLPs for natural language inference.](../img/nlp-map-nli-attention.svg)
+![Šiame skyrelyje iš anksto apmokytas GloVe paduodamas į architektūrą, pagrįstą dėmesio sutelkimu ir MLP, natūraliosios kalbos išvadų darymui.](../img/nlp-map-nli-attention.svg)
 :label:`fig_nlp-map-nli-attention`
 
 
-## The Model
+## Modelis
 
-Simpler than preserving the order of tokens in premises and hypotheses,
-we can just align tokens in one text sequence to every token in the other, and vice versa,
-then compare and aggregate such information to predict the logical relationships
-between premises and hypotheses.
-Similar to alignment of tokens between source and target sentences in machine translation,
-the alignment of tokens between premises and hypotheses
-can be neatly accomplished by attention mechanisms.
+Paprasčiau nei išsaugoti teksto vienetų tvarką prielaidose ir hipotezėse,
+galime tiesiog sulygiuoti vienos teksto sekos teksto vienetus su kiekvienu kitos sekos teksto vienetu ir atvirkščiai,
+tada palyginti ir agreguoti tokią informaciją, kad prognozuotume loginius sąryšius
+tarp prielaidų ir hipotezių.
+Panašiai kaip teksto vienetų sulygiavimas tarp šaltinio ir tikslo sakinių mašininiame vertime,
+teksto vienetų sulygiavimą tarp prielaidų ir hipotezių
+galima tvarkingai atlikti dėmesio sutelkimo mechanizmais.
 
-![Natural language inference using attention mechanisms.](../img/nli-attention.svg)
+![Natūraliosios kalbos išvadų darymas naudojant dėmesio sutelkimo mechanizmus.](../img/nli-attention.svg)
 :label:`fig_nli_attention`
 
-:numref:`fig_nli_attention` depicts the natural language inference method using attention mechanisms.
-At a high level, it consists of three jointly trained steps: attending, comparing, and aggregating.
-We will illustrate them step by step in the following.
+:numref:`fig_nli_attention` pavaizduotas natūraliosios kalbos išvadų darymo metodas, naudojantis dėmesio sutelkimo mechanizmus.
+Aukštu lygiu jį sudaro trys kartu apmokomi žingsniai: dėmesio sutelkimas, palyginimas ir agregavimas.
+Juos iliustruosime žingsnis po žingsnio toliau.
 
 ```{.python .input}
 #@tab mxnet
@@ -43,31 +43,31 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-### Attending
+### Dėmesio sutelkimas
 
-The first step is to align tokens in one text sequence to each token in the other sequence.
-Suppose that the premise is "i do need sleep" and the hypothesis is "i am tired".
-Due to semantical similarity,
-we may wish to align "i" in the hypothesis with "i" in the premise,
-and align "tired" in the hypothesis with "sleep" in the premise.
-Likewise, we may wish to align "i" in the premise with "i" in the hypothesis,
-and align "need" and "sleep" in the premise with "tired" in the hypothesis.
-Note that such alignment is *soft* using weighted average,
-where ideally large weights are associated with the tokens to be aligned.
-For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a *hard* way.
+Pirmasis žingsnis yra sulygiuoti vienos teksto sekos teksto vienetus su kiekvienu kitos sekos teksto vienetu.
+Tarkime, kad prielaida yra „i do need sleep“ (man tikrai reikia miego), o hipotezė – „i am tired“ (aš pavargęs).
+Dėl semantinio panašumo
+galime norėti sulygiuoti „i“ hipotezėje su „i“ prielaidoje
+ir sulygiuoti „tired“ hipotezėje su „sleep“ prielaidoje.
+Panašiai galime norėti sulygiuoti „i“ prielaidoje su „i“ hipotezėje
+ir sulygiuoti „need“ bei „sleep“ prielaidoje su „tired“ hipotezėje.
+Atkreipkite dėmesį, kad toks sulygiavimas yra *minkštas* naudojant svertinį vidurkį,
+kur idealiu atveju dideli svoriai priskiriami sulygiuotiniems teksto vienetams.
+Demonstravimo patogumui :numref:`fig_nli_attention` rodo tokį sulygiavimą *kietuoju* būdu.
 
-Now we describe the soft alignment using attention mechanisms in more detail.
-Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
-and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis,
-whose number of tokens are $m$ and $n$, respectively,
-where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word vector.
-For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
+Dabar išsamiau aprašome minkštąjį sulygiavimą naudojant dėmesio sutelkimo mechanizmus.
+Pažymėkime $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
+ir $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ prielaidą ir hipotezę,
+kurių teksto vienetų skaičius yra atitinkamai $m$ ir $n$,
+kur $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) yra $d$ dimensijų žodžio vektorius.
+Minkštajam sulygiavimui apskaičiuojame dėmesio svorius $e_{ij} \in \mathbb{R}$ kaip
 
 $$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
 :eqlabel:`eq_nli_e`
 
-where the function $f$ is an MLP defined in the following `mlp` function.
-The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
+kur funkcija $f$ yra MLP, apibrėžtas šioje funkcijoje `mlp`.
+$f$ išvesties dimensiją nurodo `mlp` argumentas `num_hiddens`.
 
 ```{.python .input}
 #@tab mxnet
@@ -97,27 +97,27 @@ def mlp(num_inputs, num_hiddens, flatten):
     return nn.Sequential(*net)
 ```
 
-It should be highlighted that, in :eqref:`eq_nli_e`
-$f$ takes inputs $\mathbf{a}_i$ and $\mathbf{b}_j$ separately rather than takes a pair of them together as input.
-This *decomposition* trick leads to only $m + n$ applications (linear complexity) of $f$ rather than $mn$ applications
-(quadratic complexity).
+Reikia pabrėžti, kad :eqref:`eq_nli_e`
+$f$ priima įvestis $\mathbf{a}_i$ ir $\mathbf{b}_j$ atskirai, o ne kaip jų porą kartu.
+Šis *dekompozicijos* triukas lemia tik $m + n$ $f$ taikymų (tiesinis sudėtingumas), o ne $mn$ taikymų
+(kvadratinis sudėtingumas).
 
 
-Normalizing the attention weights in :eqref:`eq_nli_e`,
-we compute the weighted average of all the token vectors in the hypothesis
-to obtain representation of the hypothesis that is softly aligned with the token indexed by $i$ in the premise:
+Normuodami dėmesio svorius :eqref:`eq_nli_e`,
+apskaičiuojame visų hipotezės teksto vienetų vektorių svertinį vidurkį,
+kad gautume hipotezės vaizdavimą, minkštai sulygiuotą su prielaidos teksto vienetu, indeksuotu $i$:
 
 $$
 \boldsymbol{\beta}_i = \sum_{j=1}^{n}\frac{\exp(e_{ij})}{ \sum_{k=1}^{n} \exp(e_{ik})} \mathbf{b}_j.
 $$
 
-Likewise, we compute soft alignment of premise tokens for each token indexed by $j$ in the hypothesis:
+Panašiai apskaičiuojame prielaidos teksto vienetų minkštąjį sulygiavimą kiekvienam hipotezės teksto vienetui, indeksuotam $j$:
 
 $$
 \boldsymbol{\alpha}_j = \sum_{i=1}^{m}\frac{\exp(e_{ij})}{ \sum_{k=1}^{m} \exp(e_{kj})} \mathbf{a}_i.
 $$
 
-Below we define the `Attend` class to compute the soft alignment of hypotheses (`beta`) with input premises `A` and soft alignment of premises (`alpha`) with input hypotheses `B`.
+Toliau apibrėžiame klasę `Attend`, kad apskaičiuotume hipotezių minkštąjį sulygiavimą (`beta`) su įvesties prielaidomis `A` ir prielaidų minkštąjį sulygiavimą (`alpha`) su įvesties hipotezėmis `B`.
 
 ```{.python .input}
 #@tab mxnet
@@ -175,23 +175,23 @@ class Attend(nn.Module):
         return beta, alpha
 ```
 
-### Comparing
+### Palyginimas
 
-In the next step, we compare a token in one sequence with the other sequence that is softly aligned with that token.
-Note that in soft alignment, all the tokens from one sequence, though with probably different attention weights, will be compared with a token in the other sequence.
-For easy of demonstration, :numref:`fig_nli_attention` pairs tokens with aligned tokens in a *hard* way.
-For example, suppose that the attending step determines that "need" and "sleep" in the premise are both aligned with "tired" in the hypothesis, the pair "tired--need sleep" will be compared.
+Kitame žingsnyje palyginame vienos sekos teksto vienetą su kita seka, kuri yra minkštai sulygiuota su tuo teksto vienetu.
+Atkreipkite dėmesį, kad minkštajame sulygiavime visi vienos sekos teksto vienetai, nors ir su tikriausiai skirtingais dėmesio svoriais, bus lyginami su kitos sekos teksto vienetu.
+Demonstravimo patogumui :numref:`fig_nli_attention` poruoja teksto vienetus su sulygiuotais teksto vienetais *kietuoju* būdu.
+Pavyzdžiui, tarkime, kad dėmesio sutelkimo žingsnis nustato, jog „need“ ir „sleep“ prielaidoje abu yra sulygiuoti su „tired“ hipotezėje; tuomet bus lyginama pora „tired–need sleep“.
 
-In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of tokens from one sequence and aligned tokens from the other sequence into a function $g$ (an MLP):
+Palyginimo žingsnyje į funkciją $g$ (MLP) paduodame vienos sekos teksto vienetų ir kitos sekos sulygiuotų teksto vienetų konkatenaciją (operatorius $[\cdot, \cdot]$):
 
 $$\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\ \mathbf{v}_{B,j} = g([\mathbf{b}_j, \boldsymbol{\alpha}_j]), j = 1, \ldots, n.$$
 
 :eqlabel:`eq_nli_v_ab`
 
 
-In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between token $i$ in the premise and all the hypothesis tokens that are softly aligned with token $i$;
-while $\mathbf{v}_{B,j}$ is the comparison between token $j$ in the hypothesis and all the premise tokens that are softly aligned with token $j$.
-The following `Compare` class defines such as comparing step.
+:eqref:`eq_nli_v_ab` $\mathbf{v}_{A,i}$ yra prielaidos teksto vieneto $i$ ir visų hipotezės teksto vienetų, minkštai sulygiuotų su teksto vienetu $i$, palyginimas;
+o $\mathbf{v}_{B,j}$ yra hipotezės teksto vieneto $j$ ir visų prielaidos teksto vienetų, minkštai sulygiuotų su teksto vienetu $j$, palyginimas.
+Šį palyginimo žingsnį apibrėžia šioji klasė `Compare`.
 
 ```{.python .input}
 #@tab mxnet
@@ -219,23 +219,23 @@ class Compare(nn.Module):
         return V_A, V_B
 ```
 
-### Aggregating
+### Agregavimas
 
-With two sets of comparison vectors $\mathbf{v}_{A,i}$ ($i = 1, \ldots, m$) and $\mathbf{v}_{B,j}$ ($j = 1, \ldots, n$) on hand,
-in the last step we will aggregate such information to infer the logical relationship.
-We begin by summing up both sets:
+Turėdami dvi palyginimo vektorių aibes $\mathbf{v}_{A,i}$ ($i = 1, \ldots, m$) ir $\mathbf{v}_{B,j}$ ($j = 1, \ldots, n$),
+paskutiniame žingsnyje agreguosime šią informaciją, kad padarytume išvadą apie loginį sąryšį.
+Pradedame susumuodami abi aibes:
 
 $$
 \mathbf{v}_A = \sum_{i=1}^{m} \mathbf{v}_{A,i}, \quad \mathbf{v}_B = \sum_{j=1}^{n}\mathbf{v}_{B,j}.
 $$
 
-Next we feed the concatenation of both summarization results into function $h$ (an MLP) to obtain the classification result of the logical relationship:
+Toliau abiejų sumavimo rezultatų konkatenaciją paduodame į funkciją $h$ (MLP), kad gautume loginio sąryšio klasifikavimo rezultatą:
 
 $$
 \hat{\mathbf{y}} = h([\mathbf{v}_A, \mathbf{v}_B]).
 $$
 
-The aggregation step is defined in the following `Aggregate` class.
+Agregavimo žingsnis apibrėžtas šioje klasėje `Aggregate`.
 
 ```{.python .input}
 #@tab mxnet
@@ -271,10 +271,10 @@ class Aggregate(nn.Module):
         return Y_hat
 ```
 
-### Putting It All Together
+### Viskas kartu
 
-By putting the attending, comparing, and aggregating steps together,
-we define the decomposable attention model to jointly train these three steps.
+Sudėję kartu dėmesio sutelkimo, palyginimo ir agregavimo žingsnius,
+apibrėžiame skaidomos dėmesio sutelkimo transformacijos modelį, kad kartu apmokytume šiuos tris žingsnius.
 
 ```{.python .input}
 #@tab mxnet
@@ -319,15 +319,15 @@ class DecomposableAttention(nn.Module):
         return Y_hat
 ```
 
-## Training and Evaluating the Model
+## Modelio apmokymas ir vertinimas
 
-Now we will train and evaluate the defined decomposable attention model on the SNLI dataset.
-We begin by reading the dataset.
+Dabar apmokysime ir įvertinsime apibrėžtą skaidomos dėmesio sutelkimo transformacijos modelį SNLI duomenų rinkinyje.
+Pradedame nuo duomenų rinkinio skaitymo.
 
 
-### Reading the dataset
+### Duomenų rinkinio skaitymas
 
-We download and read the SNLI dataset using the function defined in :numref:`sec_natural-language-inference-and-dataset`. The batch size and sequence length are set to $256$ and $50$, respectively.
+Atsisiunčiame ir nuskaitome SNLI duomenų rinkinį naudodami funkciją, apibrėžtą :numref:`sec_natural-language-inference-and-dataset`. Rinkinio dydis ir sekos ilgis nustatomi atitinkamai $256$ ir $50$.
 
 ```{.python .input}
 #@tab all
@@ -335,13 +335,13 @@ batch_size, num_steps = 256, 50
 train_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)
 ```
 
-### Creating the Model
+### Modelio sukūrimas
 
-We use the pretrained 100-dimensional GloVe embedding to represent the input tokens.
-Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqref:`eq_nli_e` as 100.
-The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq_nli_v_ab` is set to 200.
-Then we create a model instance, initialize its parameters,
-and load the GloVe embedding to initialize vectors of input tokens.
+Įvesties teksto vienetams vaizduoti naudojame iš anksto apmokytą 100 dimensijų GloVe įterpinį.
+Todėl iš anksto apibrėžiame vektorių $\mathbf{a}_i$ ir $\mathbf{b}_j$ dimensiją :eqref:`eq_nli_e` kaip 100.
+Funkcijų $f$ :eqref:`eq_nli_e` ir $g$ :eqref:`eq_nli_v_ab` išvesties dimensija nustatoma 200.
+Tada sukuriame modelio egzempliorių, inicializuojame jo parametrus
+ir įkeliame GloVe įterpinį įvesties teksto vienetų vektoriams inicializuoti.
 
 ```{.python .input}
 #@tab mxnet
@@ -362,10 +362,10 @@ embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.data.copy_(embeds);
 ```
 
-### Training and Evaluating the Model
+### Modelio apmokymas ir vertinimas
 
-In contrast to the `split_batch` function in :numref:`sec_multi_gpu` that takes single inputs such as text sequences (or images),
-we define a `split_batch_multi_inputs` function to take multiple inputs such as premises and hypotheses in minibatches.
+Priešingai nei funkcija `split_batch` :numref:`sec_multi_gpu`, kuri priima vieną įvestį, pavyzdžiui, teksto sekas (ar vaizdus),
+apibrėžiame funkciją `split_batch_multi_inputs`, kad ji priimtų kelias įvestis, pavyzdžiui, prielaidas ir hipotezes minirinkiniuose.
 
 ```{.python .input}
 #@tab mxnet
@@ -377,7 +377,7 @@ def split_batch_multi_inputs(X, y, devices):
     return (X, gluon.utils.split_and_load(y, devices, even_split=False))
 ```
 
-Now we can train and evaluate the model on the SNLI dataset.
+Dabar galime apmokyti ir įvertinti modelį SNLI duomenų rinkinyje.
 
 ```{.python .input}
 #@tab mxnet
@@ -396,9 +396,9 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-### Using the Model
+### Modelio naudojimas
 
-Finally, define the prediction function to output the logical relationship between a pair of premise and hypothesis.
+Galiausiai apibrėžiame prognozavimo funkciją, kuri išveda loginį sąryšį tarp prielaidos ir hipotezės poros.
 
 ```{.python .input}
 #@tab mxnet
@@ -427,31 +427,31 @@ def predict_snli(net, vocab, premise, hypothesis):
             else 'neutral'
 ```
 
-We can use the trained model to obtain the natural language inference result for a sample pair of sentences.
+Galime naudoti apmokytą modelį, kad gautume natūraliosios kalbos išvadų darymo rezultatą pavyzdinei sakinių porai.
 
 ```{.python .input}
 #@tab all
 predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 ```
 
-## Summary
+## Santrauka
 
-* The decomposable attention model consists of three steps for predicting the logical relationships between premises and hypotheses: attending, comparing, and aggregating.
-* With attention mechanisms, we can align tokens in one text sequence to every token in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the tokens to be aligned.
-* The decomposition trick leads to a more desirable linear complexity than quadratic complexity when computing attention weights.
-* We can use pretrained word vectors as the input representation for downstream natural language processing task such as natural language inference.
+* Skaidomos dėmesio sutelkimo transformacijos modelį sudaro trys žingsniai loginiams sąryšiams tarp prielaidų ir hipotezių prognozuoti: dėmesio sutelkimas, palyginimas ir agregavimas.
+* Naudodami dėmesio sutelkimo mechanizmus, galime sulygiuoti vienos teksto sekos teksto vienetus su kiekvienu kitos sekos teksto vienetu ir atvirkščiai. Toks sulygiavimas yra minkštas naudojant svertinį vidurkį, kur idealiu atveju dideli svoriai priskiriami sulygiuotiniems teksto vienetams.
+* Dekompozicijos triukas lemia pageidautinesnį tiesinį sudėtingumą, o ne kvadratinį, skaičiuojant dėmesio svorius.
+* Iš anksto apmokytus žodžių vektorius galime naudoti kaip įvesties vaizdavimą tolesnėms natūraliosios kalbos apdorojimo užduotims, tokioms kaip natūraliosios kalbos išvadų darymas.
 
 
-## Exercises
+## Pratimai
 
-1. Train the model with other combinations of hyperparameters. Can you get better accuracy on the test set?
-1. What are major drawbacks of the decomposable attention model for natural language inference?
-1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between 0 and 1) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
+1. Apmokykite modelį su kitais hiperparametrų deriniais. Ar galite gauti didesnį tikslumą testavimo aibėje?
+1. Kokie yra pagrindiniai skaidomos dėmesio sutelkimo transformacijos modelio trūkumai natūraliosios kalbos išvadų darymui?
+1. Tarkime, kad norime gauti bet kurios sakinių poros semantinio panašumo lygį (pvz., tolydžią reikšmę tarp 0 ir 1). Kaip turėtume surinkti ir pažymėti duomenų rinkinį? Ar galite suprojektuoti modelį su dėmesio sutelkimo mechanizmais?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/395)
+[Diskusijos](https://discuss.d2l.ai/t/395)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1530)
+[Diskusijos](https://discuss.d2l.ai/t/1530)
 :end_tab:

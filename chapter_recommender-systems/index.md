@@ -1,15 +1,15 @@
-# Recommender Systems
+# Rekomendacinės sistemos
 :label:`chap_recsys`
 
 
-**Shuai Zhang** (*Amazon*), **Aston Zhang** (*Amazon*), and **Yi Tay** (*Google*)
+**Shuai Zhang** (*Amazon*), **Aston Zhang** (*Amazon*) ir **Yi Tay** (*Google*)
 
-Recommender systems are widely employed in industry and are ubiquitous in our daily lives. These systems are utilized in a number of areas such as online shopping sites (e.g., amazon.com), music/movie services site (e.g., Netflix and Spotify), mobile application stores (e.g., IOS app store and google play), online advertising, just to name a few. 
+Rekomendacinės sistemos plačiai naudojamos pramonėje ir yra visur mūsų kasdieniame gyvenime. Šios sistemos taikomos įvairiose srityse, pavyzdžiui, internetinėse prekybos svetainėse (pvz., amazon.com), muzikos ir filmų paslaugų svetainėse (pvz., Netflix ir Spotify), mobiliųjų programėlių parduotuvėse (pvz., IOS app store ir Google Play), internetinėje reklamoje ir kt.
 
-The major goal of recommender systems is to help users discover relevant items such as movies to watch, text to read or products to buy, so as to create a delightful user experience. Moreover, recommender systems are among the most powerful machine learning systems that online retailers implement in order to drive incremental revenue. Recommender systems are replacements of search engines by reducing the efforts in proactive searches and surprising users with offers they never searched for. Many companies managed to position themselves ahead of their competitors with the help of more effective recommender systems. As such, recommender systems are central to not only our everyday lives but also highly indispensable in some industries.
+Pagrindinis rekomendacinių sistemų tikslas yra padėti naudotojams atrasti aktualius elementus, pavyzdžiui, filmus žiūrėti, tekstus skaityti ar produktus pirkti, ir taip sukurti malonią naudotojo patirtį. Be to, rekomendacinės sistemos yra viena galingiausių mašininio mokymosi sistemų, kurias internetinės parduotuvės diegia siekdamos papildomų pajamų. Rekomendacinės sistemos pakeičia paieškos sistemas, nes sumažina aktyvios paieškos pastangas ir nustebina naudotojus pasiūlymais, kurių jie neieškojo. Daugeliui įmonių pavyko aplenkti konkurentus padedant veiksmingesnėms rekomendacinėms sistemoms. Taigi rekomendacinės sistemos yra svarbios ne tik mūsų kasdieniame gyvenime, bet ir neišvengiamai reikalingos kai kuriose pramonės šakose.
 
 
-In this chapter, we will cover the fundamentals and advancements of recommender systems, along with exploring some common fundamental techniques for building recommender systems with different data sources available and their implementations. Specifically, you will learn how to predict the rating a user might give to a prospective item, how to generate a recommendation list of items and how to predict the click-through rate from abundant features. These tasks are commonplace in real-world applications. By studying this chapter, you will get hands-on experience pertaining to solving real world recommendation problems with not only classical methods but the more advanced deep learning based models as well.
+Šiame skyriuje aptarsime rekomendacinių sistemų pagrindus ir pažangą, taip pat išnagrinėsime kai kuriuos įprastus pagrindinius metodus rekomendacinėms sistemoms kurti su skirtingais turimais duomenų šaltiniais ir jų įgyvendinimus. Konkrečiai, sužinosite, kaip prognozuoti įvertinimą, kurį naudotojas galėtų skirti tikėtinam elementui, kaip sudaryti rekomenduojamų elementų sąrašą ir kaip prognozuoti paspaudimų dažnį iš gausių požymių. Šios užduotys yra įprastos realaus pasaulio taikymuose. Studijuodami šį skyrių įgysite praktinės patirties sprendžiant realaus pasaulio rekomendavimo problemas ne tik klasikiniais metodais, bet ir pažangesniais giliuoju mokymusi pagrįstais modeliais.
 
 ```toc
 :maxdepth: 2
@@ -25,4 +25,3 @@ ctr
 fm
 deepfm
 ```
-

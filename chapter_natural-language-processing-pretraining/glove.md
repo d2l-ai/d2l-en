@@ -1,204 +1,198 @@
-# Word Embedding with Global Vectors (GloVe)
+# Žodžių įterpiniai su globaliaisiais vektoriais (GloVe)
 :label:`sec_glove`
 
 
-Word-word co-occurrences
-within context windows
-may carry rich semantic information.
-For example,
-in a large corpus
-word "solid" is
-more likely to co-occur
-with "ice" than "steam",
-but word "gas"
-probably co-occurs with "steam"
-more frequently than "ice".
-Besides,
-global corpus statistics
-of such co-occurrences
-can be precomputed:
-this can lead to more efficient training.
-To leverage statistical
-information in the entire corpus
-for word embedding,
-let's first revisit
-the skip-gram model in :numref:`subsec_skip-gram`,
-but interpreting it
-using global corpus statistics
-such as co-occurrence counts.
+Žodžių ir žodžių bendras pasirodymas
+konteksto languose
+gali nešti gausią semantinę informaciją.
+Pavyzdžiui,
+dideliame tekstyne
+žodis „solid“ (kietas) yra
+labiau linkęs pasirodyti kartu
+su „ice“ (ledas) nei su „steam“ (garai),
+o žodis „gas“ (dujos)
+tikriausiai pasirodo kartu su „steam“
+dažniau nei su „ice“.
+Be to,
+tokių bendrų pasirodymų
+globalią tekstyno statistiką
+galima apskaičiuoti iš anksto:
+tai gali lemti efektyvesnį apmokymą.
+Kad žodžių įterpiniams
+pasinaudotume viso tekstyno statistine
+informacija,
+pirmiausia grįžkime prie
+skip-gram modelio :numref:`subsec_skip-gram`,
+bet interpretuokime jį
+naudodami globalią tekstyno statistiką,
+tokią kaip bendrų pasirodymų skaičiai.
 
-## Skip-Gram with Global Corpus Statistics
+## Skip-gram su globalia tekstyno statistika
 :label:`subsec_skipgram-global`
 
-Denoting by $q_{ij}$
-the conditional probability
+Pažymėję $q_{ij}$
+skip-gram modelio sąlyginę tikimybę
 $P(w_j\mid w_i)$
-of word $w_j$ given word $w_i$
-in the skip-gram model,
-we have
+žodžio $w_j$ turint žodį $w_i$,
+turime
 
 $$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \exp(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 
-where
-for any index $i$
-vectors $\mathbf{v}_i$ and $\mathbf{u}_i$
-represent word $w_i$
-as the center word and context word,
-respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$
-is the index set of the vocabulary.
+kur
+bet kuriam indeksui $i$
+vektoriai $\mathbf{v}_i$ ir $\mathbf{u}_i$
+vaizduoja žodį $w_i$
+atitinkamai kaip centrinį ir konteksto žodį,
+o $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$
+yra žodyno indeksų aibė.
 
-Consider word $w_i$
-that may occur multiple times
-in the corpus.
-In the entire corpus,
-all the context words
-wherever $w_i$ is taken as their center word
-form a *multiset* $\mathcal{C}_i$
-of word indices
-that *allows for multiple instances of the same element*.
-For any element,
-its number of instances is called its *multiplicity*.
-To illustrate with an example,
-suppose that word $w_i$ occurs twice in the corpus
-and indices of the context words
-that take $w_i$ as their center word
-in the two context windows
-are
-$k, j, m, k$ and $k, l, k, j$.
-Thus, multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, where
-multiplicities of elements $j, k, l, m$
-are 2, 4, 1, 1, respectively.
+Panagrinėkime žodį $w_i$,
+kuris gali pasirodyti kelis kartus
+tekstyne.
+Visame tekstyne
+visi konteksto žodžiai,
+kai $w_i$ laikomas jų centriniu žodžiu,
+sudaro žodžių indeksų *daugiaaibę* (angl. *multiset*) $\mathcal{C}_i$,
+*kuri leidžia to paties elemento kelis egzempliorius*.
+Bet kuriam elementui
+jo egzempliorių skaičius vadinamas jo *kartotinumu*.
+Kad iliustruotume pavyzdžiu,
+tarkime, kad žodis $w_i$ tekstyne pasirodo du kartus,
+o konteksto žodžių indeksai,
+kai $w_i$ yra jų centrinis žodis,
+dviejuose konteksto languose
+yra
+$k, j, m, k$ ir $k, l, k, j$.
+Taigi daugiaaibė $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, kur
+elementų $j, k, l, m$
+kartotinumai yra atitinkamai 2, 4, 1, 1.
 
-Now let's denote the multiplicity of element $j$ in
-multiset $\mathcal{C}_i$ as $x_{ij}$.
-This is the global co-occurrence count
-of word $w_j$ (as the context word)
-and word $w_i$ (as the center word)
-in the same context window
-in the entire corpus.
-Using such global corpus statistics,
-the loss function of the skip-gram model
-is equivalent to
+Dabar elemento $j$ kartotinumą
+daugiaaibėje $\mathcal{C}_i$ pažymėkime $x_{ij}$.
+Tai yra globalus
+žodžio $w_j$ (kaip konteksto žodžio)
+ir žodžio $w_i$ (kaip centrinio žodžio)
+bendro pasirodymo tame pačiame konteksto lange
+visame tekstyne skaičius.
+Naudojant tokią globalią tekstyno statistiką,
+skip-gram modelio nuostolių funkcija
+ekvivalenti
 
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
 :eqlabel:`eq_skipgram-x_ij`
 
-We further denote by
+Toliau pažymime
 $x_i$
-the number of all the context words
-in the context windows
-where $w_i$ occurs as their center word,
-which is equivalent to $|\mathcal{C}_i|$.
-Letting $p_{ij}$
-be the conditional probability
-$x_{ij}/x_i$ for generating
-context word $w_j$ given center word $w_i$,
+visų konteksto žodžių skaičių
+konteksto languose,
+kuriuose $w_i$ pasirodo kaip jų centrinis žodis,
+kuris ekvivalentus $|\mathcal{C}_i|$.
+Tegul $p_{ij}$
+yra sąlyginė tikimybė
+$x_{ij}/x_i$ generuoti
+konteksto žodį $w_j$ turint centrinį žodį $w_i$;
 :eqref:`eq_skipgram-x_ij`
-can be rewritten as
+galima perrašyti kaip
 
 $$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
 :eqlabel:`eq_skipgram-p_ij`
 
-In :eqref:`eq_skipgram-p_ij`, $-\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ calculates
-the cross-entropy
-of
-the conditional distribution $p_{ij}$
-of global corpus statistics
-and
-the
-conditional distribution $q_{ij}$
-of model predictions.
-This loss
-is also weighted by $x_i$ as explained above.
-Minimizing the loss function in
-:eqref:`eq_skipgram-p_ij`
-will allow
-the predicted conditional distribution
-to get close to
-the conditional distribution
-from the global corpus statistics.
+:eqref:`eq_skipgram-p_ij` išraiška $-\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ apskaičiuoja
+globalios tekstyno statistikos
+sąlyginio pasiskirstymo $p_{ij}$
+ir
+modelio prognozių
+sąlyginio pasiskirstymo $q_{ij}$
+kryžminę entropiją.
+Šis nuostolis
+taip pat sverlamas $x_i$, kaip paaiškinta aukščiau.
+Minimizuojant nuostolių funkciją
+:eqref:`eq_skipgram-p_ij`,
+prognozuojamas sąlyginis pasiskirstymas
+priartės prie
+sąlyginio pasiskirstymo
+iš globalios tekstyno statistikos.
 
 
-Though being commonly used
-for measuring the distance
-between probability distributions,
-the cross-entropy loss function may not be a good choice here.
-On the one hand, as we mentioned in :numref:`sec_approx_train`,
-the cost of properly normalizing $q_{ij}$
-results in the sum over the entire vocabulary,
-which can be computationally expensive.
-On the other hand,
-a large number of rare
-events from a large corpus
-are often modeled by the cross-entropy loss
-to be assigned with
-too much weight.
+Nors kryžminės entropijos nuostolių funkcija
+dažnai naudojama
+tikimybinių pasiskirstymų atstumui matuoti,
+čia ji gali būti ne pats geriausias pasirinkimas.
+Viena vertus, kaip minėjome :numref:`sec_approx_train`,
+tinkamo $q_{ij}$ normavimo sąnaudos
+lemia sumą per visą žodyną,
+kuri gali būti skaičiavimo požiūriu brangi.
+Kita vertus,
+didelis kiekis retų
+įvykių iš didelio tekstyno
+kryžminės entropijos nuostolio dažnai modeliuojamas
+priskiriant
+per didelį svorį.
 
-## The GloVe Model
+## GloVe modelis
 
-In view of this,
-the *GloVe* model makes three changes
-to the skip-gram model based on squared loss :cite:`Pennington.Socher.Manning.2014`:
+Atsižvelgiant į tai,
+*GloVe* modelis atlieka tris skip-gram modelio pakeitimus,
+paremtus kvadratiniu nuostoliu :cite:`Pennington.Socher.Manning.2014`:
 
-1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$
-that are not probability distributions
-and take the logarithm of both, so the squared loss term is $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
-2. Add two scalar model parameters for each word $w_i$: the center word bias $b_i$ and the context word bias $c_i$.
-3. Replace the weight of each loss term with the weight function $h(x_{ij})$, where $h(x)$ is increasing in the interval of $[0, 1]$.
+1. Naudoja kintamuosius $p'_{ij}=x_{ij}$ ir $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$,
+kurie nėra tikimybiniai pasiskirstymai,
+ir abiejų logaritmus, todėl kvadratinio nuostolio narys yra $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
+2. Prideda du skaliarinius modelio parametrus kiekvienam žodžiui $w_i$: centrinio žodžio poslinkį $b_i$ ir konteksto žodžio poslinkį $c_i$.
+3. Kiekvieno nuostolio nario svorį pakeičia svorio funkcija $h(x_{ij})$, kur $h(x)$ didėja intervale $[0, 1]$.
 
-Putting all things together, training GloVe is to minimize the following loss function:
+Sudėjus viską kartu, GloVe apmokymas yra šios nuostolių funkcijos minimizavimas:
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
 :eqlabel:`eq_glove-loss`
 
-For the weight function, a suggested choice is:
-$h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$) if $x < c$ (e.g., $c = 100$); otherwise $h(x) = 1$.
-In this case,
-because $h(0)=0$,
-the squared loss term for any $x_{ij}=0$ can be omitted
-for computational efficiency.
-For example,
-when using minibatch stochastic gradient descent for training,
-at each iteration
-we randomly sample a minibatch of *non-zero* $x_{ij}$
-to calculate gradients
-and update the model parameters.
-Note that these non-zero $x_{ij}$ are precomputed
-global corpus statistics;
-thus, the model is called GloVe
-for *Global Vectors*.
+Svorio funkcijai siūlomas pasirinkimas yra:
+$h(x) = (x/c) ^\alpha$ (pvz., $\alpha = 0{,}75$), jei $x < c$ (pvz., $c = 100$); kitaip $h(x) = 1$.
+Šiuo atveju,
+kadangi $h(0)=0$,
+bet kurio $x_{ij}=0$ kvadratinio nuostolio narį
+galima praleisti skaičiavimo efektyvumui.
+Pavyzdžiui,
+naudojant minirinkinių stochastinį gradientinį nusileidimą apmokymui,
+kiekvienoje iteracijoje
+atsitiktinai atrenkame *nenulinių* $x_{ij}$ minirinkinį
+gradientams apskaičiuoti
+ir modelio parametrams atnaujinti.
+Atkreipkite dėmesį, kad šie nenuliniai $x_{ij}$ yra iš anksto apskaičiuota
+globali tekstyno statistika;
+todėl modelis vadinamas GloVe –
+*Global Vectors* (globalieji vektoriai).
 
-It should be emphasized that
-if word $w_i$ appears in the context window of
-word $w_j$, then *vice versa*.
-Therefore, $x_{ij}=x_{ji}$.
-Unlike word2vec
-that fits the asymmetric conditional probability
+Reikia pabrėžti, kad
+jei žodis $w_i$ pasirodo žodžio $w_j$ konteksto lange,
+tai *ir atvirkščiai*.
+Todėl $x_{ij}=x_{ji}$.
+Skirtingai nei word2vec,
+kuris pritaiko asimetrinę sąlyginę tikimybę
 $p_{ij}$,
-GloVe fits the symmetric $\log \, x_{ij}$.
-Therefore, the center word vector and
-the context word vector of any word are mathematically equivalent in the GloVe model.
-However in practice, owing to different initialization values,
-the same word may still get different values
-in these two vectors after training:
-GloVe sums them up as the output vector.
+GloVe pritaiko simetrinį $\log \, x_{ij}$.
+Todėl bet kurio žodžio centrinio žodžio vektorius ir
+konteksto žodžio vektorius GloVe modelyje yra matematiškai ekvivalentūs.
+Tačiau praktikoje dėl skirtingų inicializavimo reikšmių
+tas pats žodis po apmokymo šiuose dviejuose vektoriuose vis tiek gali gauti skirtingas reikšmes:
+GloVe juos susumuoja kaip išvesties vektorių.
 
 
 
-## Interpreting GloVe from the Ratio of Co-occurrence Probabilities
+## GloVe interpretavimas iš bendro pasirodymo tikimybių santykio
 
 
-We can also interpret the GloVe model from another perspective.
-Using the same notation in
+GloVe modelį taip pat galime interpretuoti iš kitos perspektyvos.
+Naudodami tuos pačius žymėjimus
 :numref:`subsec_skipgram-global`,
-let $p_{ij} \stackrel{\textrm{def}}{=} P(w_j \mid w_i)$ be the conditional probability of generating the context word $w_j$ given $w_i$ as the center word in the corpus.
+tegul $p_{ij} \stackrel{\textrm{def}}{=} P(w_j \mid w_i)$ yra sąlyginė tikimybė generuoti konteksto žodį $w_j$ turint $w_i$ kaip centrinį žodį tekstyne.
 :numref:`tab_glove`
-lists several co-occurrence probabilities
-given words "ice" and "steam"
-and their ratios based on  statistics from a large corpus.
+išvardyta keletas bendro pasirodymo tikimybių
+turint žodžius „ice“ ir „steam“
+bei jų santykiai, pagrįsti statistika iš didelio tekstyno.
 
 
-:Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :citet:`Pennington.Socher.Manning.2014`)
+:Žodžių ir žodžių bendro pasirodymo tikimybės bei jų santykiai iš didelio tekstyno (adaptuota iš 1 lentelės :citet:`Pennington.Socher.Manning.2014`)
 :label:`tab_glove`
 
 |$w_k$=|solid|gas|water|fashion|
@@ -209,77 +203,75 @@ and their ratios based on  statistics from a large corpus.
 
 
 
-We can observe the following from :numref:`tab_glove`:
+Iš :numref:`tab_glove` galime pastebėti:
 
-* For a word $w_k$ that is related to "ice" but unrelated to "steam", such as $w_k=\textrm{solid}$, we expect a larger ratio of co-occurence probabilities, such as 8.9.
-* For a word $w_k$ that is related to "steam" but unrelated to "ice", such as $w_k=\textrm{gas}$, we expect a smaller ratio of co-occurence probabilities, such as 0.085.
-* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=\textrm{water}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 1.36.
-* For a word $w_k$ that is unrelated to both "ice" and "steam", such as $w_k=\textrm{fashion}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 0.96.
-
-
+* Žodžiui $w_k$, kuris susijęs su „ice“, bet nesusijęs su „steam“, pavyzdžiui, $w_k=\textrm{solid}$, tikimės didesnio bendro pasirodymo tikimybių santykio, pavyzdžiui, 8,9.
+* Žodžiui $w_k$, kuris susijęs su „steam“, bet nesusijęs su „ice“, pavyzdžiui, $w_k=\textrm{gas}$, tikimės mažesnio bendro pasirodymo tikimybių santykio, pavyzdžiui, 0,085.
+* Žodžiui $w_k$, kuris susijęs ir su „ice“, ir su „steam“, pavyzdžiui, $w_k=\textrm{water}$, tikimės bendro pasirodymo tikimybių santykio, artimo 1, pavyzdžiui, 1,36.
+* Žodžiui $w_k$, kuris nesusijęs nei su „ice“, nei su „steam“, pavyzdžiui, $w_k=\textrm{fashion}$, tikimės bendro pasirodymo tikimybių santykio, artimo 1, pavyzdžiui, 0,96.
 
 
-It can be seen that the ratio
-of co-occurrence probabilities
-can intuitively express
-the relationship between words.
-Thus, we can design a function
-of three word vectors
-to fit this ratio.
-For the ratio of co-occurrence probabilities
-${p_{ij}}/{p_{ik}}$
-with $w_i$ being the center word
-and $w_j$ and $w_k$ being the context words,
-we want to fit this ratio
-using some function $f$:
+
+
+Matyti, kad bendro pasirodymo tikimybių santykis
+gali intuityviai išreikšti
+žodžių tarpusavio sąryšį.
+Todėl galime suprojektuoti
+trijų žodžių vektorių funkciją,
+kuri pritaikytų šį santykį.
+Bendro pasirodymo tikimybių santykiui
+${p_{ij}}/{p_{ik}}$,
+kai $w_i$ yra centrinis žodis,
+o $w_j$ ir $w_k$ yra konteksto žodžiai,
+norime pritaikyti šį santykį
+naudodami kokią nors funkciją $f$:
 
 $$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) \approx \frac{p_{ij}}{p_{ik}}.$$
 :eqlabel:`eq_glove-f`
 
-Among many possible designs for $f$,
-we only pick a reasonable choice in the following.
-Since the ratio of co-occurrence probabilities
-is a scalar,
-we require that
-$f$ be a scalar function, such as
+Iš daugelio galimų $f$ dizainų
+toliau pasirenkame tik vieną pagrįstą variantą.
+Kadangi bendro pasirodymo tikimybių santykis
+yra skaliaras,
+reikalaujame, kad
+$f$ būtų skaliarinė funkcija, pavyzdžiui,
 $f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$.
-Switching word indices
-$j$ and $k$ in :eqref:`eq_glove-f`,
-it must hold that
+Sukeitus žodžių indeksus
+$j$ ir $k$ :eqref:`eq_glove-f`,
+turi galioti
 $f(x)f(-x)=1$,
-so one possibility is $f(x)=\exp(x)$,
-i.e.,
+todėl viena galimybė yra $f(x)=\exp(x)$,
+t. y.
 
 $$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = \frac{\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right)}{\exp\left(\mathbf{u}_k^\top {\mathbf{v}}_i\right)} \approx \frac{p_{ij}}{p_{ik}}.$$
 
-Now let's pick
+Dabar pasirinkime
 $\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right) \approx \alpha p_{ij}$,
-where $\alpha$ is a constant.
-Since $p_{ij}=x_{ij}/x_i$, after taking the logarithm on both sides we get $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$.
-We may use additional bias terms to fit $- \log\, \alpha + \log\, x_i$, such as the center word bias $b_i$ and the context word bias $c_j$:
+kur $\alpha$ yra konstanta.
+Kadangi $p_{ij}=x_{ij}/x_i$, suėmę abiejų pusių logaritmus gauname $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$.
+Papildomus poslinkio narius galime naudoti $- \log\, \alpha + \log\, x_i$ pritaikyti, pavyzdžiui, centrinio žodžio poslinkį $b_i$ ir konteksto žodžio poslinkį $c_j$:
 
 $$\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j \approx \log\, x_{ij}.$$
 :eqlabel:`eq_glove-square`
 
-Measuring the squared error of
-:eqref:`eq_glove-square` with weights,
-the GloVe loss function in
-:eqref:`eq_glove-loss` is obtained.
+Matuodami :eqref:`eq_glove-square` kvadratinę paklaidą su svoriais,
+gauname GloVe nuostolių funkciją
+:eqref:`eq_glove-loss`.
 
 
 
-## Summary
+## Santrauka
 
-* The skip-gram model can be interpreted using global corpus statistics such as word-word co-occurrence counts.
-* The cross-entropy loss may not be a good choice for measuring the difference of two probability distributions, especially for a large corpus. GloVe uses squared loss to fit precomputed global corpus statistics.
-* The center word vector and the context word vector are mathematically equivalent for any word in GloVe.
-* GloVe can be interpreted from the ratio of word-word co-occurrence probabilities.
-
-
-## Exercises
-
-1. If words $w_i$ and $w_j$ co-occur in the same context window, how can we use their   distance in the text sequence to redesign the method for  calculating the conditional probability $p_{ij}$? Hint: see Section 4.2 of the GloVe paper :cite:`Pennington.Socher.Manning.2014`.
-1. For any word, are its center word bias  and context word bias mathematically equivalent in GloVe? Why?
+* Skip-gram modelį galima interpretuoti naudojant globalią tekstyno statistiką, pavyzdžiui, žodžių ir žodžių bendro pasirodymo skaičius.
+* Kryžminės entropijos nuostolis gali būti ne pats geriausias pasirinkimas dviejų tikimybinių pasiskirstymų skirtumui matuoti, ypač dideliam tekstynui. GloVe naudoja kvadratinį nuostolį iš anksto apskaičiuotai globaliai tekstyno statistikai pritaikyti.
+* GloVe centrinio žodžio vektorius ir konteksto žodžio vektorius bet kuriam žodžiui yra matematiškai ekvivalentūs.
+* GloVe galima interpretuoti iš žodžių ir žodžių bendro pasirodymo tikimybių santykio.
 
 
-[Discussions](https://discuss.d2l.ai/t/385)
+## Pratimai
+
+1. Jei žodžiai $w_i$ ir $w_j$ pasirodo tame pačiame konteksto lange, kaip galime naudoti jų atstumą teksto sekoje, kad performuotume sąlyginės tikimybės $p_{ij}$ skaičiavimo metodą? Užuomina: žr. GloVe straipsnio 4.2 skyrių :cite:`Pennington.Socher.Manning.2014`.
+1. Ar bet kurio žodžio centrinio žodžio poslinkis ir konteksto žodžio poslinkis GloVe modelyje yra matematiškai ekvivalentūs? Kodėl?
+
+
+[Diskusijos](https://discuss.d2l.ai/t/385)

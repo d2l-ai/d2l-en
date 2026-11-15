@@ -1,13 +1,13 @@
-# Feature-Rich Recommender Systems
+# Požymiais turtingos rekomendacinės sistemos
 
-Interaction data is the most basic indication of users' preferences and interests. It plays a critical role in former introduced models. Yet, interaction data is usually extremely sparse and can be noisy at times. To address this issue, we can integrate side information such as features of items, profiles of users, and even in which context that the interaction occurred into the recommendation model. Utilizing these features are helpful in making recommendations in that these features can be an effective predictor of users interests especially when interaction data is lacking. As such, it is essential for recommendation models also have the capability to deal with those features and give the model some content/context awareness. To demonstrate this type of recommendation models, we introduce another task on click-through rate (CTR) for online advertisement recommendations :cite:`McMahan.Holt.Sculley.ea.2013` and present an anonymous advertising dataset. Targeted advertisement services have attracted widespread attention and are often framed as recommendation engines. Recommending advertisements that match users' personal taste and interest is important for click-through rate improvement.
+Sąveikų duomenys yra pats pagrindinis naudotojų pageidavimų ir interesų rodiklis. Jie atlieka lemiamą vaidmenį anksčiau pristatytuose modeliuose. Tačiau sąveikų duomenys paprastai būna itin reti ir kartais triukšmingi. Šiai problemai spręsti į rekomendacinį modelį galime integruoti šalutinę informaciją, pavyzdžiui, elementų požymius, naudotojų profilius ir net kontekstą, kuriame įvyko sąveika. Šių požymių naudojimas padeda rekomenduoti, nes jie gali būti veiksmingi naudotojų interesų prognozuotojai, ypač kai sąveikų duomenų trūksta. Todėl būtina, kad rekomendaciniai modeliai taip pat gebėtų tvarkyti tokius požymius ir turėtų tam tikrą turinio ar konteksto jautrumą. Kad parodytume šio tipo rekomendacinius modelius, pristatome kitą užduotį – internetinės reklamos rekomendacijų paspaudimų dažnio (angl. *click-through rate*, CTR) prognozavimą :cite:`McMahan.Holt.Sculley.ea.2013` – ir pateikiame anonimizuotą reklamos duomenų rinkinį. Tikslinės reklamos paslaugos sulaukė didelio dėmesio ir dažnai laikomos rekomendavimo varikliais. Rekomenduoti reklamas, atitinkančias asmeninį naudotojų skonį ir interesus, svarbu siekiant padidinti paspaudimų dažnį.
 
 
-Digital marketers use online advertising to display advertisements to customers. Click-through rate is a metric that measures the number of clicks advertisers receive on their ads per number of impressions and it is expressed as a percentage calculated with the formula: 
+Skaitmeninės rinkodaros specialistai naudoja internetinę reklamą, kad rodytų reklamas klientams. Paspaudimų dažnis yra metrika, matuojanti reklamuotojų gaunamų paspaudimų ant reklamų skaičių, tenkantį peržiūrų skaičiui, ir išreiškiama procentais, apskaičiuojamais pagal formulę:
 
 $$ \textrm{CTR} = \frac{\#\textrm{Clicks}} {\#\textrm{Impressions}} \times 100 \% .$$
 
-Click-through rate is an important signal that indicates the effectiveness of prediction algorithms. Click-through rate prediction is a task of predicting the likelihood that something on a website will be clicked. Models on CTR prediction can not only be employed in targeted advertising systems but also in general item (e.g., movies, news, products) recommender systems, email campaigns, and even search engines. It is also closely related to user satisfaction, conversion rate, and can be helpful in setting campaign goals as it can help advertisers to set realistic expectations.
+Paspaudimų dažnis yra svarbus signalas, rodantis prognozavimo algoritmų veiksmingumą. Paspaudimų dažnio prognozavimas yra užduotis prognozuoti tikimybę, kad kažkas svetainėje bus paspausta. CTR prognozavimo modeliai gali būti naudojami ne tik tikslinės reklamos sistemose, bet ir bendrose elementų (pvz., filmų, naujienų, produktų) rekomendacinėse sistemose, el. pašto kampanijose ir net paieškos sistemose. Jis taip pat glaudžiai susijęs su naudotojų pasitenkinimu, konversijos rodikliu ir gali padėti nustatant kampanijos tikslus, nes padeda reklamuotojams kelti realistiškus lūkesčius.
 
 ```{.python .input}
 #@tab mxnet
@@ -17,11 +17,11 @@ from mxnet import gluon, np
 import os
 ```
 
-## An Online Advertising Dataset
+## Internetinės reklamos duomenų rinkinys
 
-With the considerable advancements of Internet and mobile technology, online advertising has become an important income resource and generates vast majority of revenue in the Internet industry. It is important to display relevant advertisements or advertisements that pique users' interests so that casual visitors can be converted into paying customers. The dataset we introduced is an online advertising dataset. It consists of 34 fields, with the first column representing the target variable that indicates if an ad was clicked (1) or not (0). All the other columns are categorical features. The columns might represent the advertisement id, site or application id, device id, time, user profiles and so on. The real semantics of the features are undisclosed due to anonymization and privacy concern.
+Dėl didelės interneto ir mobiliųjų technologijų pažangos internetinė reklama tapo svarbiu pajamų šaltiniu ir sukuria didžiąją dalį interneto pramonės pajamų. Svarbu rodyti aktualias reklamas arba reklamas, sužadinančias naudotojų susidomėjimą, kad atsitiktiniai lankytojai taptų mokančiais klientais. Mūsų pristatomas duomenų rinkinys yra internetinės reklamos duomenų rinkinys. Jį sudaro 34 laukai, kurių pirmasis stulpelis yra tikslinis kintamasis, nurodantis, ar reklama buvo paspausta (1), ar ne (0). Visi kiti stulpeliai yra kategoriniai požymiai. Stulpeliai gali reikšti reklamos ID, svetainės ar programos ID, įrenginio ID, laiką, naudotojų profilius ir t. t. Tikrosios požymių reikšmės neatskleidžiamos dėl anonimizavimo ir privatumo sumetimų.
 
-The following code downloads the dataset from our server and saves it into the local data folder.
+Šis kodas atsisiunčia duomenų rinkinį iš mūsų serverio ir išsaugo jį vietiniame duomenų aplanke.
 
 ```{.python .input  n=15}
 #@tab mxnet
@@ -32,11 +32,11 @@ d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
 data_dir = d2l.download_extract('ctr')
 ```
 
-There are a training set and a test set, consisting of 15000 and 3000 samples/lines, respectively.
+Yra apmokymo ir testavimo aibės, kurias sudaro atitinkamai 15000 ir 3000 pavyzdžių (eilučių).
 
-## Dataset Wrapper
+## Duomenų rinkinio apvalkalas
 
-For the convenience of data loading, we implement a `CTRDataset` which loads the advertising dataset from the CSV file and can be used by `DataLoader`.
+Duomenų įkėlimo patogumui įgyvendiname `CTRDataset`, kuris įkelia reklamos duomenų rinkinį iš CSV failo ir gali būti naudojamas su `DataLoader`.
 
 ```{.python .input  n=13}
 #@tab mxnet
@@ -82,7 +82,7 @@ class CTRDataset(gluon.data.Dataset):
         return feat + self.offsets, self.data[idx]['y']
 ```
 
-The following example loads the training data and print out the first record.
+Šis pavyzdys įkelia apmokymo duomenis ir išspausdina pirmąjį įrašą.
 
 ```{.python .input  n=16}
 #@tab mxnet
@@ -90,16 +90,16 @@ train_data = CTRDataset(os.path.join(data_dir, 'train.csv'))
 train_data[0]
 ```
 
-As can be seen, all the 34 fields are categorical features. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
+Kaip matyti, visi 34 laukai yra kategoriniai požymiai. Kiekviena reikšmė žymi atitinkamo įrašo fiktyvaus kintamojo indeksą. Žymuo $0$ reiškia, kad nebuvo paspausta. Šis `CTRDataset` taip pat gali būti naudojamas kitiems duomenų rinkiniams įkelti, pavyzdžiui, Criteo rodomosios reklamos iššūkio [duomenų rinkiniui](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) ir Avazu paspaudimų dažnio prognozavimo [duomenų rinkiniui](https://www.kaggle.com/c/avazu-ctr-prediction).  
 
-## Summary 
-* Click-through rate is an important metric that is used to measure the effectiveness of advertising systems and recommender systems.
-* Click-through rate prediction is usually converted to a binary classification problem. The target is to predict whether an ad/item will be clicked or not based on given features.
+## Santrauka 
+* Paspaudimų dažnis yra svarbi metrika, naudojama reklamos sistemų ir rekomendacinių sistemų veiksmingumui matuoti.
+* Paspaudimų dažnio prognozavimas paprastai paverčiamas dvejetainio klasifikavimo problema. Tikslas – prognozuoti, ar reklama (elementas) bus paspausta, remiantis duotais požymiais.
 
-## Exercises
+## Pratimai
 
-* Can you load the Criteo and Avazu dataset with the provided `CTRDataset`. It is worth noting that the Criteo dataset consisting of real-valued features so you may have to revise the code a bit.
+* Ar galite įkelti Criteo ir Avazu duomenų rinkinius su pateiktu `CTRDataset`? Verta pažymėti, kad Criteo duomenų rinkinį sudaro realiosios reikšmės požymiai, todėl gali tekti šiek tiek pakeisti kodą.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/405)
+[Diskusijos](https://discuss.d2l.ai/t/405)
 :end_tab:

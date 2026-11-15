@@ -1,114 +1,115 @@
-# Bidirectional Encoder Representations from Transformers (BERT)
+# Dvikryptės kodavimo bloko reprezentacijos iš transformerių (BERT)
 :label:`sec_bert`
 
-We have introduced several word embedding models for natural language understanding.
-After pretraining, the output can be thought of as a matrix
-where each row is a vector that represents a word of a predefined vocabulary.
-In fact, these word embedding models are all *context-independent*.
-Let's begin by illustrating this property.
+Pristatėme kelis žodžių įterpinių modelius natūraliosios kalbos supratimui.
+Po išankstinio apmokymo išvestį galima laikyti matrica,
+kurios kiekviena eilutė yra vektorius, vaizduojantis iš anksto apibrėžto žodyno žodį.
+Iš tikrųjų visi šie žodžių įterpinių modeliai yra *nuo konteksto nepriklausomi*.
+Pradėkime iliustruodami šią savybę.
 
 
-## From Context-Independent to Context-Sensitive
+## Nuo konteksto nepriklausomų prie nuo konteksto priklausomų
 
-Recall the experiments in :numref:`sec_word2vec_pretraining` and :numref:`sec_synonyms`.
-For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word (if any).
-Formally, a context-independent representation of any token $x$
-is a function $f(x)$ that only takes $x$ as its input.
-Given the abundance of polysemy and complex semantics in natural languages,
-context-independent representations have obvious limitations.
-For instance, the word "crane" in contexts
-"a crane is flying" and "a crane driver came" has completely different meanings;
-thus, the same word may be assigned different representations depending on contexts.
+Prisiminkite eksperimentus :numref:`sec_word2vec_pretraining` ir :numref:`sec_synonyms`.
+Pavyzdžiui, word2vec ir GloVe abu priskiria tą patį iš anksto apmokytą vektorių tam pačiam žodžiui nepriklausomai nuo žodžio konteksto (jei toks yra).
+Formaliai nuo konteksto nepriklausomas bet kurio teksto vieneto $x$ vaizdavimas
+yra funkcija $f(x)$, kuri kaip įvestį priima tik $x$.
+Turint omenyje daugiareikšmiškumo ir sudėtingos semantikos gausą natūraliosiose kalbose,
+nuo konteksto nepriklausomi vaizdavimai turi akivaizdžių apribojimų.
+Pavyzdžiui, žodis „crane“ kontekstuose
+„a crane is flying“ (skrenda gervė) ir „a crane driver came“ (atvyko krano operatorius) turi visiškai skirtingas reikšmes;
+todėl tam pačiam žodžiui gali būti priskirti skirtingi vaizdavimai priklausomai nuo konteksto.
 
-This motivates the development of *context-sensitive* word representations,
-where representations of words depend on their contexts.
-Hence, a context-sensitive representation of token $x$ is a function $f(x, c(x))$
-depending on both $x$ and its context $c(x)$.
-Popular context-sensitive representations
-include TagLM (language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bhagavatula.ea.2017`,
-CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017`,
-and ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
+Tai skatina kurti *nuo konteksto priklausomus* žodžių vaizdavimus,
+kuriuose žodžių vaizdavimai priklauso nuo jų konteksto.
+Taigi nuo konteksto priklausomas teksto vieneto $x$ vaizdavimas yra funkcija $f(x, c(x))$,
+priklausanti ir nuo $x$, ir nuo jo konteksto $c(x)$.
+Populiarūs nuo konteksto priklausomi vaizdavimai
+apima TagLM (kalbos modeliu papildytą sekų žymėtoją) :cite:`Peters.Ammar.Bhagavatula.ea.2017`,
+CoVe (konteksto vektorius) :cite:`McCann.Bradbury.Xiong.ea.2017`
+ir ELMo (įterpinius iš kalbos modelių) :cite:`Peters.Neumann.Iyyer.ea.2018`.
 
-For example, by taking the entire sequence as input,
-ELMo is a function that assigns a representation to each word from the input sequence.
-Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
-Then the ELMo representation will be added to a downstream task's existing supervised model
-as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
-On the one hand,
-all the weights in the pretrained bidirectional LSTM model are frozen after ELMo representations are added.
-On the other hand,
-the existing supervised model is specifically customized for a given task.
-Leveraging different best models for different tasks at that time,
-adding ELMo improved the state of the art across six natural language processing tasks:
-sentiment analysis, natural language inference,
-semantic role labeling, coreference resolution,
-named entity recognition, and question answering.
-
-
-## From Task-Specific to Task-Agnostic
-
-Although ELMo has significantly improved solutions to a diverse set of natural language processing tasks,
-each solution still hinges on a *task-specific* architecture.
-However, it is practically non-trivial to craft a specific architecture for every natural language processing task.
-The GPT (Generative Pre-Training) model represents an effort in designing
-a general *task-agnostic* model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
-Built on a Transformer decoder,
-GPT pretrains a language model that will be used to represent text sequences.
-When applying GPT to a downstream task,
-the output of the language model will be fed into an added linear output layer
-to predict the label of the task.
-In sharp contrast to ELMo that freezes parameters of the pretrained model,
-GPT fine-tunes *all* the parameters in the pretrained Transformer decoder
-during supervised learning of the downstream task.
-GPT was evaluated on twelve tasks of natural language inference,
-question answering, sentence similarity, and classification,
-and improved the state of the art in nine of them with minimal changes
-to the model architecture.
-
-However, due to the autoregressive nature of language models,
-GPT only looks forward (left-to-right).
-In contexts "i went to the bank to deposit cash" and "i went to the bank to sit down",
-as "bank" is sensitive to the context to its left,
-GPT will return the same representation for "bank",
-though it has different meanings.
+Pavyzdžiui, kaip įvestį imdamas visą seką,
+ELMo yra funkcija, kuri kiekvienam įvesties sekos žodžiui priskiria vaizdavimą.
+Konkrečiai, ELMo kaip išvesties vaizdavimą sujungia visų iš anksto apmokyto dvikrypčio LSTM tarpinių sluoksnių vaizdavimus.
+Tada ELMo vaizdavimas pridedamas prie tolesnės užduoties esamo prižiūrimo modelio
+kaip papildomi požymiai, pavyzdžiui, sukonkatenuojant ELMo vaizdavimą ir esamo modelio teksto vienetų pradinį vaizdavimą (pvz., GloVe).
+Viena vertus,
+visi iš anksto apmokyto dvikrypčio LSTM modelio svoriai užšaldomi pridėjus ELMo vaizdavimus.
+Kita vertus,
+esamas prižiūrimas modelis yra specialiai pritaikytas duotai užduočiai.
+Pasinaudojus tuo metu skirtingiems uždaviniams geriausiais skirtingais modeliais,
+pridėjus ELMo pagerėjo pažangiausi rezultatai šešiose natūraliosios kalbos apdorojimo užduotyse:
+nuotaikų analizėje, natūraliosios kalbos išvadų darymo,
+semantinių vaidmenų žymėjime, koreferencijos nustatyme,
+įvardytų esybių atpažinime ir atsakyme į klausimus.
 
 
-## BERT: Combining the Best of Both Worlds
+## Nuo užduočiai specifinių prie užduoties atžvilgiu agnostinių
 
-As we have seen,
-ELMo encodes context bidirectionally but uses task-specific architectures;
-while GPT is task-agnostic but encodes context left-to-right.
-Combining the best of both worlds,
-BERT (Bidirectional Encoder Representations from Transformers)
-encodes context bidirectionally and requires minimal architecture changes
-for a wide range of natural language processing tasks :cite:`Devlin.Chang.Lee.ea.2018`.
-Using a pretrained Transformer encoder,
-BERT is able to represent any token based on its bidirectional context.
-During supervised learning of downstream tasks,
-BERT is similar to GPT in two aspects.
-First, BERT representations will be fed into an added output layer,
-with minimal changes to the model architecture depending on nature of tasks,
-such as predicting for every token vs. predicting for the entire sequence.
-Second,
-all the parameters of the pretrained Transformer encoder are fine-tuned,
-while the additional output layer will be trained from scratch.
-:numref:`fig_elmo-gpt-bert` depicts the differences among ELMo, GPT, and BERT.
+Nors ELMo gerokai pagerino įvairių natūraliosios kalbos apdorojimo užduočių sprendimus,
+kiekvienas sprendimas vis dar remiasi *užduočiai specifine* architektūra.
+Tačiau praktiškai nėra paprasta sukurti specifinę architektūrą kiekvienai natūraliosios kalbos apdorojimo užduočiai.
+GPT (angl. *Generative Pre-Training*, generatyvusis išankstinis apmokymas) modelis atspindi pastangas suprojektuoti
+bendrą *užduoties atžvilgiu agnostinį* modelį nuo konteksto priklausomiems vaizdavimams :cite:`Radford.Narasimhan.Salimans.ea.2018`.
+Sukurtas ant transformerio dekodavimo bloko,
+GPT iš anksto apmoko kalbos modelį, kuris bus naudojamas teksto sekoms vaizduoti.
+Taikant GPT tolesnei užduočiai,
+kalbos modelio išvestis bus paduodama į pridėtą tiesinį išvesties sluoksnį,
+kad būtų prognozuojamas užduoties žymuo.
+Visiškai priešingai nei ELMo, kuris užšaldo iš anksto apmokyto modelio parametrus,
+GPT patikslina *visus* iš anksto apmokyto transformerio dekodavimo bloko parametrus
+prižiūrimo mokymosi tolesnėje užduotyje metu.
+GPT buvo įvertintas dvylikoje natūraliosios kalbos išvadų darymo,
+atsakymo į klausimus, sakinių panašumo ir klasifikavimo užduočių
+ir pagerino pažangiausius rezultatus devyniose iš jų su minimaliais
+modelio architektūros pakeitimais.
 
-![A comparison of ELMo, GPT, and BERT.](../img/elmo-gpt-bert.svg)
+Tačiau dėl kalbos modelių autoregresinės prigimties
+GPT žiūri tik į priekį (iš kairės į dešinę).
+Kontekstuose „i went to the bank to deposit cash“ (nuėjau į banką įnešti grynųjų) ir „i went to the bank to sit down“ (nuėjau į krantą atsisėsti),
+kadangi „bank“ yra jautrus savo kairiajam kontekstui,
+GPT grąžins tą patį „bank“ vaizdavimą,
+nors jis turi skirtingas reikšmes.
+
+
+## BERT: geriausia iš abiejų pasaulių
+
+Kaip matėme,
+ELMo koduoja kontekstą dvikrypčiai, bet naudoja užduočiai specifines architektūras;
+o GPT yra agnostinis užduoties atžvilgiu, bet koduoja kontekstą iš kairės į dešinę.
+Sujungdamas geriausia iš abiejų pasaulių,
+BERT (angl. *Bidirectional Encoder Representations from Transformers*, dvikryptės kodavimo bloko reprezentacijos iš transformerių)
+koduoja kontekstą dvikrypčiai ir reikalauja minimalių architektūros pakeitimų
+plačiam natūraliosios kalbos apdorojimo užduočių spektrui :cite:`Devlin.Chang.Lee.ea.2018`.
+Naudodamas iš anksto apmokytą transformerio kodavimo bloką,
+BERT geba pavaizduoti bet kurį teksto vienetą remdamasis jo dvikrypčiu kontekstu.
+Prižiūrimo tolesnių užduočių mokymosi metu
+BERT yra panašus į GPT dviem aspektais.
+Pirma, BERT vaizdavimai bus paduodami į pridėtą išvesties sluoksnį,
+su minimaliais modelio architektūros pakeitimais priklausomai nuo užduočių pobūdžio,
+pavyzdžiui, prognozuojant kiekvienam teksto vienetui ar prognozuojant visai sekai.
+Antra,
+visi iš anksto apmokyto transformerio kodavimo bloko parametrai yra patikslinami,
+o papildomas išvesties sluoksnis bus apmokomas nuo nulio.
+:numref:`fig_elmo-gpt-bert` pavaizduoti ELMo, GPT ir BERT skirtumai.
+
+![ELMo, GPT ir BERT palyginimas.](../img/elmo-gpt-bert.svg)
 :label:`fig_elmo-gpt-bert`
 
 
-BERT further improved the state of the art on eleven natural language processing tasks
-under broad categories of (i) single text classification (e.g., sentiment analysis), (ii) text pair classification (e.g., natural language inference),
-(iii) question answering, (iv) text tagging (e.g., named entity recognition).
-All proposed in 2018,
-from context-sensitive ELMo to task-agnostic GPT and BERT,
-conceptually simple yet empirically powerful pretraining of deep representations for natural languages have revolutionized solutions to various natural language processing tasks.
+BERT dar labiau pagerino pažangiausius rezultatus vienuolikoje natūraliosios kalbos apdorojimo užduočių
+pagal plačias kategorijas: (i) vieno teksto klasifikavimas (pvz., nuotaikų analizė), (ii) tekstų porų klasifikavimas (pvz., natūraliosios kalbos išvadų darymas),
+(iii) atsakymas į klausimus, (iv) teksto žymėjimas (pvz., įvardytų esybių atpažinimas).
+Visi pasiūlyti 2018 m.,
+nuo kontekstui jautraus ELMo iki užduoties atžvilgiu agnostinių GPT ir BERT,
+konceptualiai paprastas, bet empiriškai galingas giliųjų vaizdavimų išankstinis apmokymas natūraliosioms kalboms
+padarė revoliuciją įvairių natūraliosios kalbos apdorojimo užduočių sprendimuose.
 
-In the rest of this chapter,
-we will dive into the pretraining of BERT.
-When natural language processing applications are explained in :numref:`chap_nlp_app`,
-we will illustrate fine-tuning of BERT for downstream applications.
+Likusioje šio skyriaus dalyje
+gilinsimės į BERT išankstinį apmokymą.
+Kai natūraliosios kalbos apdorojimo taikymai bus paaiškinti :numref:`chap_nlp_app`,
+iliustruosime BERT patikslinimą tolesniems taikymams.
 
 ```{.python .input}
 #@tab mxnet
@@ -126,35 +127,35 @@ import torch
 from torch import nn
 ```
 
-## [**Input Representation**]
+## [**Įvesties vaizdavimas**]
 :label:`subsec_bert_input_rep`
 
-In natural language processing,
-some tasks (e.g., sentiment analysis) take single text as input,
-while in some other tasks (e.g., natural language inference),
-the input is a pair of text sequences.
-The BERT input sequence unambiguously represents both single text and text pairs.
-In the former,
-the BERT input sequence is the concatenation of
-the special classification token “&lt;cls&gt;”,
-tokens of a text sequence,
-and the special separation token “&lt;sep&gt;”.
-In the latter,
-the BERT input sequence is the concatenation of
-“&lt;cls&gt;”, tokens of the first text sequence,
-“&lt;sep&gt;”, tokens of the second text sequence, and “&lt;sep&gt;”.
-We will consistently distinguish the terminology "BERT input sequence"
-from other types of "sequences".
-For instance, one *BERT input sequence* may include either one *text sequence* or two *text sequences*.
+Natūraliosios kalbos apdorojime
+kai kurios užduotys (pvz., nuotaikų analizė) kaip įvestį priima vieną tekstą,
+o kitose užduotyse (pvz., natūraliosios kalbos išvadų darymas)
+įvestis yra teksto sekų pora.
+BERT įvesties seka vienareikšmiškai vaizduoja ir vieną tekstą, ir tekstų poras.
+Pirmuoju atveju
+BERT įvesties seka yra
+specialaus klasifikavimo teksto vieneto „&lt;cls&gt;“,
+teksto sekos teksto vienetų
+ir specialaus atskyrimo teksto vieneto „&lt;sep&gt;“ konkatenacija.
+Antruoju atveju
+BERT įvesties seka yra
+„&lt;cls&gt;“, pirmosios teksto sekos teksto vienetų,
+„&lt;sep&gt;“, antrosios teksto sekos teksto vienetų ir „&lt;sep&gt;“ konkatenacija.
+Nuosekliai atskirsime terminą „BERT įvesties seka“
+nuo kitų „sekų“ tipų.
+Pavyzdžiui, viena *BERT įvesties seka* gali apimti arba vieną *teksto seką*, arba dvi *teksto sekas*.
 
-To distinguish text pairs,
-the learned segment embeddings $\mathbf{e}_A$ and $\mathbf{e}_B$
-are added to the token embeddings of the first sequence and the second sequence, respectively.
-For single text inputs, only $\mathbf{e}_A$ is used.
+Kad atskirtume tekstų poras,
+išmokti segmentų įterpiniai $\mathbf{e}_A$ ir $\mathbf{e}_B$
+pridedami atitinkamai prie pirmosios ir antrosios sekos teksto vienetų įterpinių.
+Vieno teksto įvestims naudojamas tik $\mathbf{e}_A$.
 
-The following `get_tokens_and_segments` takes either one sentence or two sentences
-as input, then returns tokens of the BERT input sequence
-and their corresponding segment IDs.
+Toliau pateikta funkcija `get_tokens_and_segments` kaip įvestį priima arba vieną sakinį, arba du sakinius,
+tada grąžina BERT įvesties sekos teksto vienetus
+ir jų atitinkamus segmentų ID.
 
 ```{.python .input}
 #@tab all
@@ -170,23 +171,23 @@ def get_tokens_and_segments(tokens_a, tokens_b=None):
     return tokens, segments
 ```
 
-BERT chooses the Transformer encoder as its bidirectional architecture.
-Common in the Transformer encoder,
-positional embeddings are added at every position of the BERT input sequence.
-However, different from the original Transformer encoder,
-BERT uses *learnable* positional embeddings.
-To sum up, :numref:`fig_bert-input` shows that
-the embeddings of the BERT input sequence are the sum
-of the token embeddings, segment embeddings, and positional embeddings.
+BERT kaip savo dvikryptę architektūrą pasirenka transformerio kodavimo bloką.
+Kaip įprasta transformerio kodavimo bloke,
+pozicijų įterpiniai pridedami kiekvienoje BERT įvesties sekos pozicijoje.
+Tačiau, skirtingai nei pradiniame transformerio kodavimo bloke,
+BERT naudoja *išmokstamus* pozicijų įterpinius.
+Apibendrinant, :numref:`fig_bert-input` rodo, kad
+BERT įvesties sekos įterpiniai yra
+teksto vienetų įterpinių, segmentų įterpinių ir pozicijų įterpinių suma.
 
-![The embeddings of the BERT input sequence are the sum
-of the token embeddings, segment embeddings, and positional embeddings.](../img/bert-input.svg)
+![BERT įvesties sekos įterpiniai yra
+teksto vienetų įterpinių, segmentų įterpinių ir pozicijų įterpinių suma.](../img/bert-input.svg)
 :label:`fig_bert-input`
 
-The following [**`BERTEncoder` class**] is similar to the `TransformerEncoder` class
-as implemented in :numref:`sec_transformer`.
-Different from `TransformerEncoder`, `BERTEncoder` uses
-segment embeddings and learnable positional embeddings.
+Toliau pateikta [**klasė `BERTEncoder`**] yra panaši į klasę `TransformerEncoder`,
+įgyvendintą :numref:`sec_transformer`.
+Skirtingai nuo `TransformerEncoder`, `BERTEncoder` naudoja
+segmentų įterpinius ir išmokstamus pozicijų įterpinius.
 
 ```{.python .input}
 #@tab mxnet
@@ -246,9 +247,9 @@ class BERTEncoder(nn.Module):
         return X
 ```
 
-Suppose that the vocabulary size is 10000.
-To demonstrate forward [**inference of `BERTEncoder`**],
-let's create an instance of it and initialize its parameters.
+Tarkime, kad žodyno dydis yra 10000.
+Kad parodytume `BERTEncoder` [**tiesioginį išvedimą**],
+sukurkime jo egzempliorių ir inicializuokime jo parametrus.
 
 ```{.python .input}
 #@tab mxnet
@@ -267,13 +268,13 @@ encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                       num_blks, dropout)
 ```
 
-We define `tokens` to be 2 BERT input sequences of length 8,
-where each token is an index of the vocabulary.
-The forward inference of `BERTEncoder` with the input `tokens`
-returns the encoded result where each token is represented by a vector
-whose length is predefined by the hyperparameter `num_hiddens`.
-This hyperparameter is usually referred to as the *hidden size*
-(number of hidden units) of the Transformer encoder.
+`tokens` apibrėžiame kaip 2 BERT įvesties sekas, kurių ilgis 8,
+kur kiekvienas teksto vienetas yra žodyno indeksas.
+`BERTEncoder` tiesioginis išvedimas su įvestimi `tokens`
+grąžina užkoduotą rezultatą, kur kiekvienas teksto vienetas vaizduojamas vektoriumi,
+kurio ilgį iš anksto apibrėžia hiperparametras `num_hiddens`.
+Šis hiperparametras paprastai vadinamas transformerio kodavimo bloko *paslėptuoju dydžiu*
+(paslėptųjų vienetų skaičiumi).
 
 ```{.python .input}
 #@tab mxnet
@@ -291,50 +292,50 @@ encoded_X = encoder(tokens, segments, None)
 encoded_X.shape
 ```
 
-## Pretraining Tasks
+## Išankstinio apmokymo užduotys
 :label:`subsec_bert_pretraining_tasks`
 
-The forward inference of `BERTEncoder` gives the BERT representation
-of each token of the input text and the inserted
-special tokens “&lt;cls&gt;” and “&lt;seq&gt;”.
-Next, we will use these representations to compute the loss function
-for pretraining BERT.
-The pretraining is composed of the following two tasks:
-masked language modeling and next sentence prediction.
+`BERTEncoder` tiesioginis išvedimas pateikia BERT vaizdavimą
+kiekvieno įvesties teksto teksto vieneto ir įterptų
+specialių teksto vienetų „&lt;cls&gt;“ bei „&lt;seq&gt;“.
+Toliau naudosime šiuos vaizdavimus nuostolių funkcijai apskaičiuoti
+BERT išankstiniam apmokymui.
+Išankstinį apmokymą sudaro šios dvi užduotys:
+užmaskuoto kalbos modeliavimo ir kito sakinio prognozavimo.
 
-### [**Masked Language Modeling**]
+### [**Užmaskuotas kalbos modeliavimas**]
 :label:`subsec_mlm`
 
-As illustrated in :numref:`sec_language-model`,
-a language model predicts a token using the context on its left.
-To encode context bidirectionally for representing each token,
-BERT randomly masks tokens and uses tokens from the bidirectional context to
-predict the masked tokens in a self-supervised fashion.
-This task is referred to as a *masked language model*.
+Kaip iliustruota :numref:`sec_language-model`,
+kalbos modelis prognozuoja teksto vienetą naudodamas jo kairįjį kontekstą.
+Kad kontekstas būtų koduojamas dvikrypčiai kiekvienam teksto vienetui vaizduoti,
+BERT atsitiktinai užmaskuoja teksto vienetus ir naudoja dvikrypčio konteksto teksto vienetus
+užmaskuotiems teksto vienetams prognozuoti savaime prižiūrimu būdu.
+Ši užduotis vadinama *užmaskuotu kalbos modeliu*.
 
-In this pretraining task,
-15% of tokens will be selected at random as the masked tokens for prediction.
-To predict a masked token without cheating by using the label,
-one straightforward approach is to always replace it with a special “&lt;mask&gt;” token in the BERT input sequence.
-However, the artificial special token “&lt;mask&gt;” will never appear
-in fine-tuning.
-To avoid such a mismatch between pretraining and fine-tuning,
-if a token is masked for prediction (e.g., "great" is selected to be masked and predicted in "this movie is great"),
-in the input it will be replaced with:
+Šioje išankstinio apmokymo užduotyje
+15 % teksto vienetų bus atsitiktinai atrinkti kaip užmaskuoti teksto vienetai prognozei.
+Kad užmaskuotą teksto vienetą prognozuotume neapgaudinėdami naudodami žymenį,
+vienas paprastas būdas yra visada pakeisti jį specialiu „&lt;mask&gt;“ teksto vienetu BERT įvesties sekoje.
+Tačiau dirbtinis specialus teksto vienetas „&lt;mask&gt;“ niekada nepasirodys
+patikslinant.
+Kad išvengtume tokio neatitikimo tarp išankstinio apmokymo ir patikslinimo,
+jei teksto vienetas užmaskuojamas prognozei (pvz., „great“ pasirenkamas užmaskuoti ir prognozuoti sakinyje „this movie is great“),
+įvestyje jis bus pakeistas:
 
-* a special “&lt;mask&gt;” token for 80% of the time (e.g., "this movie is great" becomes "this movie is &lt;mask&gt;");
-* a random token for 10% of the time (e.g., "this movie is great" becomes "this movie is drink");
-* the unchanged label token for 10% of the time (e.g., "this movie is great" becomes "this movie is great").
+* specialiu „&lt;mask&gt;“ teksto vienetu 80 % laiko (pvz., „this movie is great“ tampa „this movie is &lt;mask&gt;“);
+* atsitiktiniu teksto vienetu 10 % laiko (pvz., „this movie is great“ tampa „this movie is drink“);
+* nepakeistu žymens teksto vienetu 10 % laiko (pvz., „this movie is great“ tampa „this movie is great“).
 
-Note that for 10% of 15% time a random token is inserted.
-This occasional noise encourages BERT to be less biased towards the masked token (especially when the label token remains unchanged) in its bidirectional context encoding.
+Atkreipkite dėmesį, kad 10 % iš 15 % laiko įterpiamas atsitiktinis teksto vienetas.
+Šis retkarčiais pasitaikantis triukšmas skatina BERT mažiau būti šališkam užmaskuoto teksto vieneto atžvilgiu (ypač kai žymens teksto vienetas lieka nepakeistas) dvikrypčiame konteksto kodavime.
 
-We implement the following `MaskLM` class to predict masked tokens
-in the masked language model task of BERT pretraining.
-The prediction uses a one-hidden-layer MLP (`self.mlp`).
-In forward inference, it takes two inputs:
-the encoded result of `BERTEncoder` and the token positions for prediction.
-The output is the prediction results at these positions.
+Įgyvendiname šią klasę `MaskLM` užmaskuotiems teksto vienetams prognozuoti
+BERT išankstinio apmokymo užmaskuoto kalbos modelio užduotyje.
+Prognozė naudoja vieno paslėptojo sluoksnio MLP (`self.mlp`).
+Tiesioginiame išvedime ji priima dvi įvestis:
+`BERTEncoder` užkoduotą rezultatą ir teksto vienetų pozicijas prognozei.
+Išvestis yra prognozės rezultatai šiose pozicijose.
 
 ```{.python .input}
 #@tab mxnet
@@ -389,14 +390,14 @@ class MaskLM(nn.Module):
         return mlm_Y_hat
 ```
 
-To demonstrate [**the forward inference of `MaskLM`**],
-we create its instance `mlm` and initialize it.
-Recall that `encoded_X` from the forward inference of `BERTEncoder`
-represents 2 BERT input sequences.
-We define `mlm_positions` as the 3 indices to predict in either BERT input sequence of `encoded_X`.
-The forward inference of `mlm` returns prediction results `mlm_Y_hat`
-at all the masked positions `mlm_positions` of `encoded_X`.
-For each prediction, the size of the result is equal to the vocabulary size.
+Kad parodytume [**`MaskLM` tiesioginį išvedimą**],
+sukuriame jo egzempliorių `mlm` ir jį inicializuojame.
+Prisiminkite, kad `encoded_X` iš `BERTEncoder` tiesioginio išvedimo
+vaizduoja 2 BERT įvesties sekas.
+`mlm_positions` apibrėžiame kaip 3 indeksus, kuriuos reikia prognozuoti bet kurioje `encoded_X` BERT įvesties sekoje.
+`mlm` tiesioginis išvedimas grąžina prognozės rezultatus `mlm_Y_hat`
+visose `encoded_X` užmaskuotose pozicijose `mlm_positions`.
+Kiekvienai prognozei rezultato dydis lygus žodyno dydžiui.
 
 ```{.python .input}
 #@tab mxnet
@@ -415,8 +416,8 @@ mlm_Y_hat = mlm(encoded_X, mlm_positions)
 mlm_Y_hat.shape
 ```
 
-With the ground truth labels `mlm_Y` of the predicted tokens `mlm_Y_hat` under masks,
-we can calculate the cross-entropy loss of the masked language model task in BERT pretraining.
+Turėdami prognozuotų užmaskuotų teksto vienetų `mlm_Y_hat` tikrąsias žymenų reikšmes `mlm_Y`,
+galime apskaičiuoti užmaskuoto kalbos modelio užduoties kryžminės entropijos nuostolį BERT išankstiniame apmokyme.
 
 ```{.python .input}
 #@tab mxnet
@@ -434,26 +435,26 @@ mlm_l = loss(mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y.reshape(-1))
 mlm_l.shape
 ```
 
-### [**Next Sentence Prediction**]
+### [**Kito sakinio prognozavimas**]
 :label:`subsec_nsp`
 
-Although masked language modeling is able to encode bidirectional context
-for representing words, it does not explicitly model the logical relationship
-between text pairs.
-To help understand the relationship between two text sequences,
-BERT considers a binary classification task, *next sentence prediction*, in its pretraining.
-When generating sentence pairs for pretraining,
-for half of the time they are indeed consecutive sentences with the label "True";
-while for the other half of the time the second sentence is randomly sampled from the corpus with the label "False".
+Nors užmaskuotas kalbos modeliavimas geba užkoduoti dvikryptį kontekstą
+žodžiams vaizduoti, jis aiškiai nemodeliuoja loginio sąryšio
+tarp tekstų porų.
+Kad padėtų suprasti sąryšį tarp dviejų teksto sekų,
+BERT išankstiniame apmokyme nagrinėja dvejetainio klasifikavimo užduotį – *kito sakinio prognozavimą*.
+Generuojant sakinių poras išankstiniam apmokymui,
+pusę laiko jie iš tiesų yra iš eilės einantys sakiniai su žymeniu „True“;
+o kitą pusę laiko antrasis sakinys atsitiktinai atrenkamas iš tekstyno su žymeniu „False“.
 
-The following `NextSentencePred` class uses a one-hidden-layer MLP
-to predict whether the second sentence is the next sentence of the first
-in the BERT input sequence.
-Due to self-attention in the Transformer encoder,
-the BERT representation of the special token “&lt;cls&gt;”
-encodes both the two sentences from the input.
-Hence, the output layer (`self.output`) of the MLP classifier takes `X` as input,
-where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
+Toliau pateikta klasė `NextSentencePred` naudoja vieno paslėptojo sluoksnio MLP,
+kad prognozuotų, ar antrasis sakinys yra pirmojo kitas sakinys
+BERT įvesties sekoje.
+Dėl saviraiškės dėmesio sutelkimo transformacijos transformerio kodavimo bloke
+specialaus teksto vieneto „&lt;cls&gt;“ BERT vaizdavimas
+užkoduoja abu įvesties sakinius.
+Todėl MLP klasifikatoriaus išvesties sluoksnis (`self.output`) kaip įvestį priima `X`,
+kur `X` yra MLP paslėptojo sluoksnio išvestis, kurios įvestis yra užkoduotas „&lt;cls&gt;“ teksto vienetas.
 
 ```{.python .input}
 #@tab mxnet
@@ -483,8 +484,8 @@ class NextSentencePred(nn.Module):
         return self.output(X)
 ```
 
-We can see that [**the forward inference of an `NextSentencePred`**] instance
-returns binary predictions for each BERT input sequence.
+Matome, kad [**`NextSentencePred` egzemplioriaus tiesioginis išvedimas**]
+grąžina dvejetaines prognozes kiekvienai BERT įvesties sekai.
 
 ```{.python .input}
 #@tab mxnet
@@ -505,7 +506,7 @@ nsp_Y_hat = nsp(encoded_X)
 nsp_Y_hat.shape
 ```
 
-The cross-entropy loss of the 2 binary classifications can also be computed.
+Taip pat galima apskaičiuoti 2 dvejetainių klasifikavimų kryžminės entropijos nuostolį.
 
 ```{.python .input}
 #@tab mxnet
@@ -521,23 +522,23 @@ nsp_l = loss(nsp_Y_hat, nsp_y)
 nsp_l.shape
 ```
 
-It is noteworthy that all the labels in both the aforementioned pretraining tasks
-can be trivially obtained from the pretraining corpus without manual labeling effort.
-The original BERT has been pretrained on the concatenation of BookCorpus :cite:`Zhu.Kiros.Zemel.ea.2015`
-and English Wikipedia.
-These two text corpora are huge:
-they have 800 million words and 2.5 billion words, respectively.
+Verta pažymėti, kad visus abiejų aukščiau minėtų išankstinio apmokymo užduočių žymenis
+galima paprastai gauti iš išankstinio apmokymo tekstyno be rankinio žymėjimo pastangų.
+Originalus BERT buvo iš anksto apmokytas BookCorpus :cite:`Zhu.Kiros.Zemel.ea.2015` ir anglų kalbos Vikipedijos
+konkatenacijoje.
+Šie du tekstynai yra milžiniški:
+juose yra atitinkamai 800 milijonų ir 2,5 milijardo žodžių.
 
 
-## [**Putting It All Together**]
+## [**Viskas kartu**]
 
-When pretraining BERT, the final loss function is a linear combination of
-both the loss functions for masked language modeling and next sentence prediction.
-Now we can define the `BERTModel` class by instantiating the three classes
-`BERTEncoder`, `MaskLM`, and `NextSentencePred`.
-The forward inference returns the encoded BERT representations `encoded_X`,
-predictions of masked language modeling `mlm_Y_hat`,
-and next sentence predictions `nsp_Y_hat`.
+Apmokant BERT iš anksto, galutinė nuostolių funkcija yra abiejų
+užmaskuoto kalbos modeliavimo ir kito sakinio prognozavimo nuostolių funkcijų tiesinis derinys.
+Dabar galime apibrėžti klasę `BERTModel` sukurdami trijų klasių
+`BERTEncoder`, `MaskLM` ir `NextSentencePred` egzempliorius.
+Tiesioginis išvedimas grąžina užkoduotus BERT vaizdavimus `encoded_X`,
+užmaskuoto kalbos modeliavimo prognozes `mlm_Y_hat`
+ir kito sakinio prognozes `nsp_Y_hat`.
 
 ```{.python .input}
 #@tab mxnet
@@ -593,25 +594,25 @@ class BERTModel(nn.Module):
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 ```
 
-## Summary
+## Santrauka
 
-* Word embedding models such as word2vec and GloVe are context-independent. They assign the same pretrained vector to the same word regardless of the context of the word (if any). It is hard for them to handle well polysemy or complex semantics in natural languages.
-* For context-sensitive word representations such as ELMo and GPT, representations of words depend on their contexts.
-* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right.
-* BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
-* The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
-* Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the latter explicitly models the logical relationship between text pairs.
+* Žodžių įterpinių modeliai, tokie kaip word2vec ir GloVe, yra nuo konteksto nepriklausomi. Jie priskiria tą patį iš anksto apmokytą vektorių tam pačiam žodžiui nepriklausomai nuo žodžio konteksto (jei toks yra). Jiems sunku gerai apdoroti daugiareikšmiškumą ar sudėtingą natūraliųjų kalbų semantiką.
+* Nuo konteksto priklausomuose žodžių vaizdavimuose, tokiuose kaip ELMo ir GPT, žodžių vaizdavimai priklauso nuo jų konteksto.
+* ELMo koduoja kontekstą dvikrypčiai, bet naudoja užduočiai specifines architektūras (tačiau praktiškai nėra paprasta sukurti specifinę architektūrą kiekvienai natūraliosios kalbos apdorojimo užduočiai); o GPT yra agnostinis užduoties atžvilgiu, bet koduoja kontekstą iš kairės į dešinę.
+* BERT sujungia geriausia iš abiejų pasaulių: jis koduoja kontekstą dvikrypčiai ir reikalauja minimalių architektūros pakeitimų plačiam natūraliosios kalbos apdorojimo užduočių spektrui.
+* BERT įvesties sekos įterpiniai yra teksto vienetų įterpinių, segmentų įterpinių ir pozicijų įterpinių suma.
+* BERT išankstinį apmokymą sudaro dvi užduotys: užmaskuotas kalbos modeliavimas ir kito sakinio prognozavimas. Pirmoji geba užkoduoti dvikryptį kontekstą žodžiams vaizduoti, o antroji aiškiai modeliuoja loginį sąryšį tarp tekstų porų.
 
 
-## Exercises
+## Pratimai
 
-1. All other things being equal, will a masked language model require more or fewer pretraining steps to converge than a left-to-right language model? Why?
-1. In the original implementation of BERT, the positionwise feed-forward network in `BERTEncoder` (via `d2l.TransformerEncoderBlock`) and the fully connected layer in `MaskLM` both use the Gaussian error linear unit (GELU) :cite:`Hendrycks.Gimpel.2016` as the activation function. Research into the difference between GELU and ReLU.
+1. Kitoms sąlygoms esant vienodoms, ar užmaskuotam kalbos modeliui reikės daugiau, ar mažiau išankstinio apmokymo žingsnių, kad konverguotų, nei kalbos modeliui iš kairės į dešinę? Kodėl?
+1. Originaliame BERT įgyvendinime pozicinis tiesioginio sklidimo tinklas `BERTEncoder` (per `d2l.TransformerEncoderBlock`) ir pilnai sujungtas sluoksnis `MaskLM` abu kaip aktyvinimo funkciją naudoja Gauso paklaidos tiesinį vienetą (GELU) :cite:`Hendrycks.Gimpel.2016`. Pasidomėkite GELU ir ReLU skirtumu.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/388)
+[Diskusijos](https://discuss.d2l.ai/t/388)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1490)
+[Diskusijos](https://discuss.d2l.ai/t/1490)
 :end_tab:

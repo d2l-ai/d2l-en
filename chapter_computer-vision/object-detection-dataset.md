@@ -1,21 +1,21 @@
-# The Object Detection Dataset
+# Objektų aptikimo duomenų rinkinys
 :label:`sec_object-detection-dataset`
 
-There is no small dataset such as MNIST and Fashion-MNIST in the field of object detection.
-In order to quickly demonstrate object detection models,
-[**we collected and labeled a small dataset**].
-First, we took photos of free bananas from our office
-and generated
-1000 banana images with different rotations and sizes.
-Then we placed each banana image
-at a random position on some background image.
-In the end, we labeled bounding boxes for those bananas on the images.
+Objektų aptikimo srityje nėra mažo duomenų rinkinio, kaip MNIST ar Fashion-MNIST.
+Kad greitai parodytume objektų aptikimo modelius,
+[**surinkome ir pažymėjome nedidelį duomenų rinkinį**].
+Pirmiausia nufotografavome nemokamus bananus savo biure
+ir sugeneravome
+1000 bananų vaizdų su skirtingais pasukimais ir dydžiais.
+Tada kiekvieną bananų vaizdą patalpinome
+atsitiktinėje kai kurio fono vaizdo vietoje.
+Galiausiai pažymėjome tų bananų apibrėžiamuosius stačiakampius vaizduose.
 
 
-## [**Downloading the Dataset**]
+## [**Duomenų rinkinio atsisiuntimas**]
 
-The banana detection dataset with all the image and
-csv label files can be downloaded directly from the Internet.
+Bananų aptikimo duomenų rinkinį su visais vaizdų ir
+csv žymenų failais galima atsisiųsti tiesiogiai iš interneto.
 
 ```{.python .input}
 #@tab mxnet
@@ -46,14 +46,14 @@ d2l.DATA_HUB['banana-detection'] = (
     '5de26c8fce5ccdea9f91267273464dc968d20d72')
 ```
 
-## Reading the Dataset
+## Duomenų rinkinio skaitymas
 
-We are going to [**read the banana detection dataset**] in the `read_data_bananas`
-function below.
-The dataset includes a csv file for
-object class labels and
-ground-truth bounding box coordinates
-at the upper-left and lower-right corners.
+Toliau pateiktoje funkcijoje `read_data_bananas`
+[**nuskaitysime bananų aptikimo duomenų rinkinį**].
+Duomenų rinkinyje yra csv failas
+objektų klasių žymenims ir
+tikrųjų apibrėžiamųjų stačiakampių koordinatėms
+viršutiniame kairiajame ir apatiniame dešiniajame kampuose.
 
 ```{.python .input}
 #@tab mxnet
@@ -99,10 +99,10 @@ def read_data_bananas(is_train=True):
     return images, torch.tensor(targets).unsqueeze(1) / 256
 ```
 
-By using the `read_data_bananas` function to read images and labels,
-the following `BananasDataset` class
-will allow us to [**create a customized `Dataset` instance**]
-for loading the banana detection dataset.
+Naudodami funkciją `read_data_bananas` vaizdams ir žymenims skaityti,
+toliau pateikta klasė `BananasDataset`
+leis mums [**sukurti pritaikytą `Dataset` egzempliorių**]
+bananų aptikimo duomenų rinkiniui įkelti.
 
 ```{.python .input}
 #@tab mxnet
@@ -139,11 +139,11 @@ class BananasDataset(torch.utils.data.Dataset):
         return len(self.features)
 ```
 
-Finally, we define
-the `load_data_bananas` function to [**return two
-data iterator instances for both the training and test sets.**]
-For the test dataset,
-there is no need to read it in random order.
+Galiausiai apibrėžiame
+funkciją `load_data_bananas`, kad [**grąžintume du
+duomenų iteratoriaus egzempliorius apmokymo ir testavimo aibėms.**]
+Testavimo duomenų rinkiniui
+nereikia skaityti atsitiktine tvarka.
 
 ```{.python .input}
 #@tab mxnet
@@ -169,37 +169,37 @@ def load_data_bananas(batch_size):
     return train_iter, val_iter
 ```
 
-Let's [**read a minibatch and print the shapes of
-both images and labels**] in this minibatch.
-The shape of the image minibatch,
-(batch size, number of channels, height, width),
-looks familiar:
-it is the same as in our earlier image classification tasks.
-The shape of the label minibatch is
-(batch size, $m$, 5),
-where $m$ is the largest possible number of bounding boxes
-that any image has in the dataset.
+[**Nuskaitykime minirinkinį ir atspausdinkime
+vaizdų ir žymenų formas**] šiame minirinkinyje.
+Vaizdų minirinkinio forma
+(rinkinio dydis, kanalų skaičius, aukštis, plotis)
+atrodo pažįstama:
+ji tokia pati kaip ankstesnėse vaizdų klasifikavimo užduotyse.
+Žymenų minirinkinio forma yra
+(rinkinio dydis, $m$, 5),
+kur $m$ yra didžiausias galimas apibrėžiamųjų stačiakampių skaičius,
+kurį turi bet kuris duomenų rinkinio vaizdas.
 
-Although computation in minibatches is more efficient,
-it requires that all the image examples
-contain the same number of bounding boxes to form a minibatch via concatenation.
-In general,
-images may have a varying number of bounding boxes;
-thus,
-images with fewer than $m$ bounding boxes
-will be padded with illegal bounding boxes
-until $m$ is reached.
-Then
-the label of each bounding box is represented by an array of length 5.
-The first element in the array is the class of the object in the bounding box,
-where -1 indicates an illegal bounding box for padding.
-The remaining four elements of the array are
-the ($x$, $y$)-coordinate values
-of the upper-left corner and the lower-right corner
-of the bounding box (the range is between 0 and 1).
-For the banana dataset,
-since there is only one bounding box on each image,
-we have $m=1$.
+Nors skaičiavimai minirinkiniais yra efektyvesni,
+jiems reikia, kad visi vaizdų pavyzdžiai
+turėtų tiek pat apibrėžiamųjų stačiakampių, kad konkatenacija būtų galima sudaryti minirinkinį.
+Apskritai
+vaizdai gali turėti skirtingą apibrėžiamųjų stačiakampių skaičių;
+todėl
+vaizdai, turintys mažiau nei $m$ apibrėžiamųjų stačiakampių,
+bus papildyti neleistinais apibrėžiamaisiais stačiakampiais,
+kol bus pasiektas $m$.
+Tada
+kiekvieno apibrėžiamojo stačiakampio žymuo vaizduojamas 5 ilgio masyvu.
+Pirmasis masyvo elementas yra apibrėžiamajame stačiakampyje esančio objekto klasė,
+kur -1 rodo neleistiną apibrėžiamąjį stačiakampį papildymui.
+Likę keturi masyvo elementai yra
+apibrėžiamojo stačiakampio viršutinio kairiojo ir apatinio dešiniojo kampų
+($x$, $y$) koordinačių reikšmės
+(intervalas tarp 0 ir 1).
+Bananų duomenų rinkiniui,
+kadangi kiekviename vaizde yra tik vienas apibrėžiamasis stačiakampis,
+turime $m=1$.
 
 ```{.python .input}
 #@tab all
@@ -209,12 +209,12 @@ batch = next(iter(train_iter))
 batch[0].shape, batch[1].shape
 ```
 
-## [**Demonstration**]
+## [**Demonstracija**]
 
-Let's demonstrate ten images with their labeled ground-truth bounding boxes.
-We can see that the rotations, sizes, and positions of bananas vary across all these images.
-Of course, this is just a simple artificial dataset.
-In practice, real-world datasets are usually much more complicated.
+Parodykime dešimt vaizdų su jų pažymėtais tikraisiais apibrėžiamaisiais stačiakampiais.
+Matome, kad bananų pasukimai, dydžiai ir padėtys visuose šiuose vaizduose skiriasi.
+Žinoma, tai tik paprastas dirbtinis duomenų rinkinys.
+Praktikoje realaus pasaulio duomenų rinkiniai paprastai yra daug sudėtingesni.
 
 ```{.python .input}
 #@tab mxnet
@@ -232,21 +232,21 @@ for ax, label in zip(axes, batch[1][:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
 
-## Summary
+## Santrauka
 
-* The banana detection dataset we collected can be used to demonstrate object detection models.
-* The data loading for object detection is similar to that for image classification. However, in object detection the labels also contain information of ground-truth bounding boxes, which is missing in image classification.
+* Mūsų surinktas bananų aptikimo duomenų rinkinys gali būti naudojamas objektų aptikimo modeliams demonstruoti.
+* Objektų aptikimo duomenų įkėlimas panašus į vaizdų klasifikavimo. Tačiau objektų aptikime žymenyse taip pat yra informacijos apie tikruosius apibrėžiamuosius stačiakampius, kurios vaizdų klasifikavime nėra.
 
 
-## Exercises
+## Pratimai
 
-1. Demonstrate other images with ground-truth bounding boxes in the banana detection dataset. How do they differ with respect to bounding boxes and objects?
-1. Say that we want to apply data augmentation, such as random cropping, to object detection. How can it be different from that in image classification? Hint: what if a cropped image only contains a small portion of an object?
+1. Parodykite kitus bananų aptikimo duomenų rinkinio vaizdus su tikraisiais apibrėžiamaisiais stačiakampiais. Kuo jie skiriasi apibrėžiamųjų stačiakampių ir objektų atžvilgiu?
+1. Tarkime, kad norime objektų aptikimui taikyti duomenų augmentaciją, pavyzdžiui, atsitiktinį apkarpymą. Kuo ji gali skirtis nuo vaizdų klasifikavimo? Užuomina: kas, jei apkarpytame vaizde yra tik nedidelė objekto dalis?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/372)
+[Diskusijos](https://discuss.d2l.ai/t/372)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1608)
+[Diskusijos](https://discuss.d2l.ai/t/1608)
 :end_tab:

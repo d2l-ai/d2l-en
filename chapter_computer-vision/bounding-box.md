@@ -1,37 +1,37 @@
-# Object Detection and Bounding Boxes
+# Objektų aptikimas ir apibrėžiamieji stačiakampiai
 :label:`sec_bbox`
 
 
-In earlier sections (e.g., :numref:`sec_alexnet`--:numref:`sec_googlenet`),
-we introduced various models for image classification.
-In image classification tasks,
-we assume that there is only *one*
-major object
-in the image and we only focus on how to 
-recognize its category.
-However, there are often *multiple* objects
-in the image of interest.
-We not only want to know their categories, but also their specific positions in the image.
-In computer vision, we refer to such tasks as *object detection* (or *object recognition*).
+Ankstesniuose skyreliuose (pvz., :numref:`sec_alexnet`–:numref:`sec_googlenet`)
+pristatėme įvairius vaizdų klasifikavimo modelius.
+Vaizdų klasifikavimo užduotyse
+darome prielaidą, kad vaizde yra tik *vienas*
+pagrindinis objektas
+ir mus domina tik tai, kaip
+atpažinti jo kategoriją.
+Tačiau dominančiame vaizde dažnai būna *keli* objektai.
+Norime žinoti ne tik jų kategorijas, bet ir jų konkrečias padėtis vaizde.
+Kompiuterinėje regoje tokias užduotis vadiname *objektų aptikimu* (arba *objektų atpažinimu*).
 
-Object detection has been
-widely applied in many fields.
-For example, self-driving needs to plan 
-traveling routes
-by detecting the positions
-of vehicles, pedestrians, roads, and obstacles in the captured video images.
-Besides,
-robots may use this technique
-to detect and localize objects of interest
-throughout its navigation of an environment.
-Moreover,
-security systems
-may need to detect abnormal objects, such as intruders or bombs.
+Objektų aptikimas
+plačiai taikomas daugelyje sričių.
+Pavyzdžiui, savaeigėms transporto priemonėms reikia planuoti
+kelionės maršrutus
+aptinkant
+transporto priemonių, pėsčiųjų, kelių ir kliūčių padėtis
+užfiksuotuose vaizdo įrašų kadruose.
+Be to,
+robotai gali naudoti šią techniką
+dominantiems objektams aptikti ir lokalizuoti
+naršydami aplinkoje.
+Be to,
+saugumo sistemoms
+gali prireikti aptikti nenormalius objektus, tokius kaip įsilaužėliai ar bombos.
 
-In the next few sections, we will introduce 
-several deep learning methods for object detection.
-We will begin with an introduction
-to *positions* (or *locations*) of objects.
+Kituose keliuose skyreliuose pristatysime
+kelis giliojo mokymosi metodus objektams aptikti.
+Pradėsime nuo
+objektų *padėčių* (arba *vietų*) pristatymo.
 
 ```{.python .input}
 #@tab mxnet
@@ -56,8 +56,8 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-We will load the sample image to be used in this section. We can see that there is a dog on the left side of the image and a cat on the right.
-They are the two major objects in this image.
+Įkelsime pavyzdinį vaizdą, kurį naudosime šiame skyrelyje. Matome, kad vaizdo kairėje yra šuo, o dešinėje – katė.
+Tai du pagrindiniai šio vaizdo objektai.
 
 ```{.python .input}
 #@tab mxnet
@@ -73,22 +73,23 @@ img = d2l.plt.imread('../img/catdog.jpg')
 d2l.plt.imshow(img);
 ```
 
-## Bounding Boxes
+## Apibrėžiamieji stačiakampiai
 
 
-In object detection,
-we usually use a *bounding box* to describe the spatial location of an object.
-The bounding box is rectangular, which is determined by the $x$ and $y$ coordinates of the upper-left corner of the rectangle and the such coordinates of the lower-right corner. 
-Another commonly used bounding box representation is the $(x, y)$-axis
-coordinates of the bounding box center, and the width and height of the box.
+Objektų aptikime
+paprastai naudojame *apibrėžiamąjį stačiakampį* (angl. *bounding box*) objekto erdvinei vietai apibūdinti.
+Apibrėžiamasis stačiakampis yra stačiakampis, kurį nustato stačiakampio viršutinio kairiojo kampo $x$ ir $y$ koordinatės bei tokios pat apatinio dešiniojo kampo koordinatės.
+Kitas dažnai naudojamas apibrėžiamojo stačiakampio vaizdavimas yra
+apibrėžiamojo stačiakampio centro $(x, y)$ ašių
+koordinatės ir stačiakampio plotis bei aukštis.
 
-[**Here we define functions to convert between**] these (**two
-representations**):
-`box_corner_to_center` converts from the two-corner
-representation to the center-width-height presentation,
-and `box_center_to_corner` vice versa.
-The input argument `boxes` should be a two-dimensional tensor of
-shape ($n$, 4), where $n$ is the number of bounding boxes.
+[**Čia apibrėžiame funkcijas, skirtas konvertuoti tarp**] šių (**dviejų
+vaizdavimų**):
+`box_corner_to_center` konvertuoja iš dviejų kampų
+vaizdavimo į centro, pločio ir aukščio vaizdavimą,
+o `box_center_to_corner` – atvirkščiai.
+Įvesties argumentas `boxes` turėtų būti dvimatis tenzorius,
+kurio forma ($n$, 4), kur $n$ yra apibrėžiamųjų stačiakampių skaičius.
 
 ```{.python .input}
 #@tab all
@@ -115,11 +116,10 @@ def box_center_to_corner(boxes):
     return boxes
 ```
 
-We will [**define the bounding boxes of the dog and the cat in the image**] based
-on the coordinate information.
-The origin of the coordinates in the image
-is the upper-left corner of the image, and to the right and down are the
-positive directions of the $x$ and $y$ axes, respectively.
+Remdamiesi koordinačių informacija [**apibrėšime vaizdo šuns ir katės apibrėžiamuosius stačiakampius**].
+Koordinačių pradžia vaizde
+yra viršutinis kairysis vaizdo kampas, o į dešinę ir žemyn yra
+atitinkamai teigiamos $x$ ir $y$ ašių kryptys.
 
 ```{.python .input}
 #@tab all
@@ -127,8 +127,7 @@ positive directions of the $x$ and $y$ axes, respectively.
 dog_bbox, cat_bbox = [60.0, 45.0, 378.0, 516.0], [400.0, 112.0, 655.0, 493.0]
 ```
 
-We can verify the correctness of the two
-bounding box conversion functions by converting twice.
+Dviejų apibrėžiamųjų stačiakampių konvertavimo funkcijų teisingumą galime patikrinti konvertuodami du kartus.
 
 ```{.python .input}
 #@tab all
@@ -136,8 +135,8 @@ boxes = d2l.tensor((dog_bbox, cat_bbox))
 box_center_to_corner(box_corner_to_center(boxes)) == boxes
 ```
 
-Let's [**draw the bounding boxes in the image**] to check if they are accurate.
-Before drawing, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of the  `matplotlib` package.
+[**Nubraižykime apibrėžiamuosius stačiakampius vaizde**], kad patikrintume, ar jie tikslūs.
+Prieš braižydami apibrėšime pagalbinę funkciją `bbox_to_rect`. Ji vaizduoja apibrėžiamąjį stačiakampį `matplotlib` paketo apibrėžiamojo stačiakampio formatu.
 
 ```{.python .input}
 #@tab all
@@ -152,8 +151,8 @@ def bbox_to_rect(bbox, color):
         fill=False, edgecolor=color, linewidth=2)
 ```
 
-After adding the bounding boxes on the image,
-we can see that the main outline of the two objects are basically inside the two boxes.
+Pridėję apibrėžiamuosius stačiakampius prie vaizdo,
+matome, kad pagrindiniai dviejų objektų kontūrai iš esmės yra dviejų stačiakampių viduje.
 
 ```{.python .input}
 #@tab all
@@ -162,21 +161,21 @@ fig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))
 fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 ```
 
-## Summary
+## Santrauka
 
-* Object detection not only recognizes all the objects of interest in the image, but also their positions. The position is generally represented by a rectangular bounding box.
-* We can convert between two commonly used bounding box representations.
+* Objektų aptikimas ne tik atpažįsta visus dominančius vaizdo objektus, bet ir jų padėtis. Padėtis paprastai vaizduojama apibrėžiamuoju stačiakampiu.
+* Galime konvertuoti tarp dviejų dažnai naudojamų apibrėžiamojo stačiakampio vaizdavimų.
 
-## Exercises
+## Pratimai
 
-1. Find another image and try to label a bounding box that contains the object. Compare labeling bounding boxes and categories: which usually takes longer?
-1. Why is the innermost dimension of the input argument `boxes` of `box_corner_to_center` and `box_center_to_corner` always 4?
+1. Raskite kitą vaizdą ir pabandykite pažymėti apibrėžiamąjį stačiakampį, kuriame yra objektas. Palyginkite apibrėžiamųjų stačiakampių ir kategorijų žymėjimą: kas paprastai trunka ilgiau?
+1. Kodėl giliausia įvesties argumento `boxes` dimensija funkcijose `box_corner_to_center` ir `box_center_to_corner` visada yra 4?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/369)
+[Diskusijos](https://discuss.d2l.ai/t/369)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1527)
+[Diskusijos](https://discuss.d2l.ai/t/1527)
 :end_tab:
