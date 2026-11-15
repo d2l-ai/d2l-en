@@ -1,16 +1,16 @@
-# Automatic Parallelism
+# Automatinis lygiagretinimas
 :label:`sec_auto_para`
 
 
-Deep learning frameworks (e.g., MXNet and PyTorch) automatically construct computational graphs at the backend. Using a
-computational graph, the system is aware of all the dependencies,
-and can selectively execute multiple non-interdependent tasks in parallel to
-improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` initializes two variables independently. Consequently the system can choose to execute them in parallel.
+Giliojo mokymosi karkasai (pvz., MXNet ir PyTorch) automatiškai sukonstruoja skaičiavimo grafus vidinėje dalyje. Naudodama
+skaičiavimo grafą, sistema žino visas priklausomybes
+ir gali pasirinktinai lygiagrečiai vykdyti kelias tarpusavyje nepriklausomas užduotis,
+kad pagerintų greitį. Pavyzdžiui, :numref:`fig_asyncgraph` iš :numref:`sec_async` inicializuoja du kintamuosius nepriklausomai. Todėl sistema gali pasirinkti vykdyti juos lygiagrečiai.
 
 
-Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :citet:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
+Paprastai vienas operatorius naudos visus skaičiavimo išteklius visuose CPU arba viename GPU. Pavyzdžiui, operatorius `dot` naudos visus branduolius (ir gijas) visuose CPU, net jei viename kompiuteryje yra keli CPU procesoriai. Tas pats taikoma ir vienam GPU. Todėl lygiagretinimas nėra toks naudingas vieno įrenginio kompiuteriams. Su keliais įrenginiais reikalai tampa svarbesni. Nors lygiagretinimas paprastai aktualiausias tarp kelių GPU, pridėjus vietinį CPU našumas šiek tiek padidės. Pavyzdžiui, žr. :citet:`Hadjis.Zhang.Mitliagkas.ea.2016`, kur dėmesys sutelktas į kompiuterinės regos modelių apmokymą derinant GPU ir CPU. Su automatiškai lygiagretinančio karkaso patogumu tą patį tikslą galime pasiekti keliomis Python kodo eilutėmis. Plačiau kalbant, mūsų automatinio lygiagrečiojo skaičiavimo aptarimas sutelktas į lygiagretųjį skaičiavimą naudojant ir CPU, ir GPU, taip pat skaičiavimo ir komunikacijos lygiagretinimą.
 
-Note that we need at least two GPUs to run the experiments in this section.
+Atkreipkite dėmesį, kad šio skyrelio eksperimentams vykdyti mums reikia bent dviejų GPU.
 
 ```{.python .input}
 #@tab mxnet
@@ -25,9 +25,9 @@ from d2l import torch as d2l
 import torch
 ```
 
-## Parallel Computation on GPUs
+## Lygiagretusis skaičiavimas GPU
 
-Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
+Pradėkime apibrėždami etaloninę testuojamą apkrovą: toliau pateikta funkcija `run` atlieka 10 matricų daugybų pasirinktame įrenginyje naudodama duomenis, paskirstytus dviem kintamiesiems: `x_gpu1` ir `x_gpu2`.
 
 ```{.python .input}
 #@tab mxnet
@@ -50,11 +50,11 @@ x_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])
 ```
 
 :begin_tab:`mxnet`
-Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on either of them prior to measuring.
+Dabar pritaikome funkciją duomenims. Kad užtikrintume, jog spartinančioji atmintinė neturi įtakos rezultatams, apšildome įrenginius prieš matuodami atlikdami vieną praėjimą kiekviename iš jų.
 :end_tab:
 
 :begin_tab:`pytorch`
-Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on either of them prior to measuring. `torch.cuda.synchronize()` waits for all kernels in all streams on a CUDA device to complete. It takes in a `device` argument, the device for which we need to synchronize. It uses the current device, given by `current_device()`, if the device argument is `None` (default).
+Dabar pritaikome funkciją duomenims. Kad užtikrintume, jog spartinančioji atmintinė neturi įtakos rezultatams, apšildome įrenginius prieš matuodami atlikdami vieną praėjimą kiekviename iš jų. `torch.cuda.synchronize()` laukia, kol baigsis visi branduoliai visuose srautuose CUDA įrenginyje. Ji priima argumentą `device` – įrenginį, kuriam reikia sinchronizuoti. Jei argumentas `device` yra `None` (numatytasis), naudojamas dabartinis įrenginys, nurodytas `current_device()`.
 :end_tab:
 
 ```{.python .input}
@@ -89,11 +89,11 @@ with d2l.Benchmark('GPU2 time'):
 ```
 
 :begin_tab:`mxnet`
-If we remove the `waitall` statement between both tasks the system is free to parallelize computation on both devices automatically.
+Jei pašalinsime sakinį `waitall` tarp abiejų užduočių, sistema galės laisvai automatiškai lygiagretinti skaičiavimą abiejuose įrenginiuose.
 :end_tab:
 
 :begin_tab:`pytorch`
-If we remove the `synchronize` statement between both tasks the system is free to parallelize computation on both devices automatically.
+Jei pašalinsime sakinį `synchronize` tarp abiejų užduočių, sistema galės laisvai automatiškai lygiagretinti skaičiavimą abiejuose įrenginiuose.
 :end_tab:
 
 ```{.python .input}
@@ -112,15 +112,15 @@ with d2l.Benchmark('GPU1 & GPU2'):
     torch.cuda.synchronize()
 ```
 
-In the above case the total execution time is less than the sum of its parts, since the deep learning framework automatically schedules computation on both GPU devices without the need for sophisticated code on behalf of the user.
+Aukščiau aprašytu atveju bendras vykdymo laikas yra trumpesnis nei jo dalių suma, nes giliojo mokymosi karkasas automatiškai suplanuoja skaičiavimą abiejuose GPU įrenginiuose, naudotojui nereikalaujant sudėtingo kodo.
 
 
 
-## Parallel Computation and Communication
+## Lygiagretusis skaičiavimas ir komunikacija
 
-In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs.
-For instance,
-this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
+Daugeliu atvejų mums reikia perkelti duomenis tarp skirtingų įrenginių, tarkime, tarp CPU ir GPU arba tarp skirtingų GPU.
+Pavyzdžiui,
+tai vyksta, kai norime atlikti paskirstytąjį optimizavimą, kur reikia agreguoti gradientus per kelias spartintuvų korteles. Imituokime tai skaičiuodami GPU, o tada nukopijuodami rezultatus atgal į CPU.
 
 ```{.python .input}
 #@tab mxnet
@@ -151,11 +151,11 @@ with d2l.Benchmark('Copy to CPU'):
 ```
 
 :begin_tab:`mxnet`
-This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. Removing `waitall` between both parts allows us to simulate this scenario.
+Tai kiek neefektyvu. Atkreipkite dėmesį, kad galėtume jau pradėti kopijuoti `y` dalis į CPU, kol likusi sąrašo dalis dar skaičiuojama. Ši situacija atsiranda, pavyzdžiui, kai skaičiuojame gradientą minirinkiniui. Kai kurių parametrų gradientai bus prieinami anksčiau nei kitų. Todėl mums naudinga pradėti naudoti PCI-Express magistralės pralaidumą, kol GPU dar veikia. Pašalinus `waitall` tarp abiejų dalių, galime imituoti šį scenarijų.
 :end_tab:
 
 :begin_tab:`pytorch`
-This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. In PyTorch, several functions such as `to()` and `copy_()` admit an explicit `non_blocking` argument, which lets the caller bypass synchronization when it is unnecessary. Setting `non_blocking=True` allows us to simulate this scenario.
+Tai kiek neefektyvu. Atkreipkite dėmesį, kad galėtume jau pradėti kopijuoti `y` dalis į CPU, kol likusi sąrašo dalis dar skaičiuojama. Ši situacija atsiranda, pavyzdžiui, kai skaičiuojame (atgalinio sklidimo) gradientą minirinkiniui. Kai kurių parametrų gradientai bus prieinami anksčiau nei kitų. Todėl mums naudinga pradėti naudoti PCI-Express magistralės pralaidumą, kol GPU dar veikia. PyTorch kelios funkcijos, pavyzdžiui, `to()` ir `copy_()`, priima aiškų argumentą `non_blocking`, kuris leidžia kvietėjui apeiti sinchronizavimą, kai jis nereikalingas. Nustatę `non_blocking=True`, galime imituoti šį scenarijų.
 :end_tab:
 
 ```{.python .input}
@@ -174,33 +174,33 @@ with d2l.Benchmark('Run on GPU1 and copy to CPU'):
     torch.cuda.synchronize()
 ```
 
-The total time required for both operations is (as expected) less than the sum of their parts.
-Note that this task is different from parallel computation as it uses a different resource: the bus between the CPU and GPUs. In fact, we could compute on both devices and communicate, all at the same time. As noted above, there is a dependency between computation and communication: `y[i]` must be computed before it can be copied to the CPU. Fortunately, the system can copy `y[i-1]` while computing `y[i]` to reduce the total running time.
+Bendras abiem operacijoms reikalingas laikas (kaip ir tikėtasi) yra trumpesnis nei jų dalių suma.
+Atkreipkite dėmesį, kad ši užduotis skiriasi nuo lygiagrečiojo skaičiavimo, nes naudoja kitą išteklių: magistralę tarp CPU ir GPU. Iš tikrųjų galėtume skaičiuoti abiejuose įrenginiuose ir komunikuoti vienu metu. Kaip minėta aukščiau, tarp skaičiavimo ir komunikacijos yra priklausomybė: `y[i]` turi būti apskaičiuotas prieš jį nukopijuojant į CPU. Laimei, sistema gali kopijuoti `y[i-1]` skaičiuodama `y[i]`, kad sumažintų bendrą vykdymo laiką.
 
-We conclude with an illustration of the computational graph and its dependencies for a simple two-layer MLP when training on a CPU and two GPUs, as depicted in :numref:`fig_twogpu`. It would be quite painful to schedule the parallel program resulting from this manually. This is where it is advantageous to have a graph-based computing backend for optimization.
+Baigiame skaičiavimo grafo ir jo priklausomybių iliustracija paprastam dviejų sluoksnių MLP apmokant CPU ir dviejuose GPU, kaip pavaizduota :numref:`fig_twogpu`. Būtų gana varginga rankiniu būdu suplanuoti iš to kylančią lygiagrečiąją programą. Čia naudinga turėti grafu pagrįstą skaičiavimo vidinę dalį optimizavimui.
 
-![The computational graph and its dependencies of a two-layer MLP on a CPU and two GPUs.](../img/twogpu.svg)
+![Dviejų sluoksnių MLP skaičiavimo grafas ir jo priklausomybės CPU ir dviejuose GPU.](../img/twogpu.svg)
 :label:`fig_twogpu`
 
 
-## Summary
+## Santrauka
 
-* Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously.
-* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks), and network bandwidth. They can be used in parallel for peak efficiency.
-* The backend can improve performance through automatic parallel computation and communication.
+* Šiuolaikinės sistemos turi įvairių įrenginių, pavyzdžiui, kelis GPU ir CPU. Juos galima naudoti lygiagrečiai ir asinchroniškai.
+* Šiuolaikinės sistemos taip pat turi įvairių komunikacijos išteklių, pavyzdžiui, PCI Express, saugyklą (paprastai kietojo kūno diskus arba per tinklus) ir tinklo pralaidumą. Juos galima naudoti lygiagrečiai didžiausiam efektyvumui pasiekti.
+* Vidinė dalis gali pagerinti našumą per automatinį lygiagretųjį skaičiavimą ir komunikaciją.
 
-## Exercises
+## Pratimai
 
-1. Eight operations were performed in the `run` function defined in this section. There are no dependencies between them. Design an experiment to see if the deep learning framework will automatically execute them in parallel.
-1. When the workload of an individual operator is sufficiently small, parallelization can help even on a single CPU or GPU. Design an experiment to verify this.
-1. Design an experiment that uses parallel computation on CPUs, GPUs, and communication between both devices.
-1. Use a debugger such as NVIDIA's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) to verify that your code is efficient.
-1. Designing computation tasks that include more complex data dependencies, and run experiments to see if you can obtain the correct results while improving performance.
+1. Šiame skyrelyje apibrėžtoje funkcijoje `run` buvo atliktos aštuonios operacijos. Tarp jų nėra priklausomybių. Suprojektuokite eksperimentą, kad pamatytumėte, ar giliojo mokymosi karkasas jas automatiškai vykdys lygiagrečiai.
+1. Kai atskiro operatoriaus apkrova yra pakankamai maža, lygiagretinimas gali padėti net viename CPU ar GPU. Suprojektuokite eksperimentą tam patikrinti.
+1. Suprojektuokite eksperimentą, kuriame naudojamas lygiagretusis skaičiavimas CPU, GPU ir komunikacija tarp abiejų įrenginių.
+1. Naudokite derintuvą, pavyzdžiui, NVIDIA [Nsight](https://developer.nvidia.com/nsight-compute-2019_5), kad patikrintumėte, ar jūsų kodas yra efektyvus.
+1. Suprojektuokite skaičiavimo užduotis, apimančias sudėtingesnes duomenų priklausomybes, ir vykdykite eksperimentus, kad pamatytumėte, ar galite gauti teisingus rezultatus gerindami našumą.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/362)
+[Diskusijos](https://discuss.d2l.ai/t/362)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1681)
+[Diskusijos](https://discuss.d2l.ai/t/1681)
 :end_tab:

@@ -4,74 +4,74 @@ tab.interact_select(["pytorch"])
 #required_libs("setuptools==66", "wheel==0.38.4", "gym==0.21.0")
 ```
 
-# Q-Learning
+# Q mokymasis
 :label:`sec_qlearning`
 
-In the previous section, we discussed the Value Iteration algorithm which requires accessing the complete Markov decision process (MDP), e.g., the transition and reward functions. In this section, we will look at Q-Learning :cite:`Watkins.Dayan.1992` which is an algorithm to learn the value function without necessarily knowing the MDP. This algorithm embodies the central idea behind reinforcement learning: it will enable the robot to obtain its own data.
+Ankstesniame skyrelyje aptarėme reikšmių iteracijos algoritmą, kuriam reikia prieigos prie viso Markovo sprendimų proceso (MDP), pavyzdžiui, perėjimo ir atlygio funkcijų. Šiame skyrelyje nagrinėsime Q mokymąsi :cite:`Watkins.Dayan.1992` – algoritmą, skirtą išmokti reikšmės funkciją nebūtinai žinant MDP. Šis algoritmas įkūnija pagrindinę skatinamojo mokymosi idėją: jis leis robotui pačiam gauti savo duomenis.
 <!-- , instead of relying upon the expert. -->
 
-## The Q-Learning Algorithm
+## Q mokymosi algoritmas
 
-Recall that value iteration for the action-value function in :ref:`sec_valueiter` corresponds to the update
+Prisiminkite, kad veiksmo reikšmės funkcijos reikšmių iteracija :ref:`sec_valueiter` atitinka atnaujinimą
 
 $$Q_{k+1}(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \max_{a' \in \mathcal{A}} Q_k (s', a'); \ \textrm{for all } s \in \mathcal{S} \textrm{ and } a \in \mathcal{A}.$$
 
-As we discussed, implementing this algorithm requires knowing the MDP, specifically the transition function $P(s' \mid s, a)$. The key idea behind Q-Learning is to replace the summation over all $s' \in \mathcal{S}$ in the above expression by a summation over the states visited by the robot. This allows us to subvert the need to know the transition function.
+Kaip aptarėme, šiam algoritmui įgyvendinti reikia žinoti MDP, būtent perėjimo funkciją $P(s' \mid s, a)$. Pagrindinė Q mokymosi idėja yra aukščiau pateiktoje išraiškoje pakeisti sumą per visus $s' \in \mathcal{S}$ suma per būsenas, kuriose lankėsi robotas. Tai leidžia apeiti poreikį žinoti perėjimo funkciją.
 
-## An Optimization Problem Underlying Q-Learning
+## Optimizavimo uždavinys, slypintis už Q mokymosi
 
-Let us imagine that the robot uses a policy $\pi_e(a \mid s)$ to take actions. Just like the previous chapter, it collects a dataset of $n$ trajectories of $T$ timesteps each $\{ (s_t^i, a_t^i)_{t=0,\ldots,T-1}\}_{i=1,\ldots, n}$. Recall that value iteration is really a set of constraints that ties together the action-value $Q^*(s, a)$ of different states and actions to each other. We can implement an approximate version of value iteration using the data that the robot has collected using $\pi_e$ as
+Įsivaizduokime, kad robotas veiksmams atlikti naudoja strategiją $\pi_e(a \mid s)$. Kaip ir ankstesniame skyriuje, jis surenka $n$ trajektorijų, kurių kiekviena po $T$ laiko žingsnių, duomenų rinkinį $\{ (s_t^i, a_t^i)_{t=0,\ldots,T-1}\}_{i=1,\ldots, n}$. Prisiminkite, kad reikšmių iteracija iš tiesų yra ribojimų aibė, siejanti skirtingų būsenų ir veiksmų veiksmo reikšmes $Q^*(s, a)$ tarpusavyje. Apytikslę reikšmių iteracijos versiją galime įgyvendinti naudodami duomenis, kuriuos robotas surinko naudodamas $\pi_e$, taip
 
 $$\hat{Q} = \min_Q \underbrace{\frac{1}{nT} \sum_{i=1}^n \sum_{t=0}^{T-1} (Q(s_t^i, a_t^i) - r(s_t^i, a_t^i) - \gamma \max_{a'} Q(s_{t+1}^i, a'))^2}_{\stackrel{\textrm{def}}{=} \ell(Q)}.$$
 :eqlabel:`q_learning_optimization_problem`
 
-Let us first observe the similarities and differences between this expression and value iteration above. If the robot's policy $\pi_e$ were equal to the optimal policy $\pi^*$, and if it collected an infinite amount of data, then this optimization problem would be identical to the optimization problem underlying value iteration. But while value iteration requires us to know $P(s' \mid s, a)$, the optimization objective does not have this term. We have not cheated: as the robot uses the policy $\pi_e$ to take an action $a_t^i$ at state $s_t^i$, the next state $s_{t+1}^i$ is a sample drawn from the transition function. So the optimization objective also has access to the transition function, but implicitly in terms of the data collected by the robot.
+Pirmiausia pastebėkime šios išraiškos ir aukščiau pateiktos reikšmių iteracijos panašumus bei skirtumus. Jei roboto strategija $\pi_e$ būtų lygi optimaliai strategijai $\pi^*$ ir jei jis surinktų begalinį duomenų kiekį, šis optimizavimo uždavinys būtų identiškas optimizavimo uždaviniui, slypinčiam už reikšmių iteracijos. Tačiau nors reikšmių iteracijai reikia žinoti $P(s' \mid s, a)$, optimizavimo tikslo funkcijoje šio nario nėra. Mes nesukčiavome: kai robotas naudoja strategiją $\pi_e$, kad atliktų veiksmą $a_t^i$ būsenoje $s_t^i$, kita būsena $s_{t+1}^i$ yra imtis, atrinkta pagal perėjimo funkciją. Taigi optimizavimo tikslas taip pat turi prieigą prie perėjimo funkcijos, bet netiesiogiai – per roboto surinktus duomenis.
 
-The variables of our optimization problem are $Q(s, a)$ for all $s \in \mathcal{S}$ and $a \in \mathcal{A}$. We can minimize the objective using gradient descent. For every pair $(s_t^i, a_t^i)$ in our dataset, we can write
+Mūsų optimizavimo uždavinio kintamieji yra $Q(s, a)$ visiems $s \in \mathcal{S}$ ir $a \in \mathcal{A}$. Tikslo funkciją galime minimizuoti gradientiniu nusileidimu. Kiekvienai porai $(s_t^i, a_t^i)$ mūsų duomenų rinkinyje galime užrašyti
 
 $$\begin{aligned}Q(s_t^i, a_t^i) &\leftarrow Q(s_t^i, a_t^i) - \alpha \nabla_{Q(s_t^i,a_t^i)} \ell(Q) \\&=(1 - \alpha) Q(s_t^i,a_t^i) - \alpha \Big( r(s_t^i, a_t^i) + \gamma \max_{a'} Q(s_{t+1}^i, a') \Big),\end{aligned}$$
 :eqlabel:`q_learning`
 
-where $\alpha$ is the learning rate. Typically in real problems, when the robot reaches the goal location, the trajectories end. The value of such a terminal state is zero because the robot does not take any further actions beyond this state. We should modify our update to handle such states as
+kur $\alpha$ yra mokymosi greitis. Paprastai realiuose uždaviniuose, kai robotas pasiekia tikslo vietą, trajektorijos baigiasi. Tokios galutinės būsenos reikšmė yra nulis, nes robotas už šios būsenos nebeatlieka jokių tolesnių veiksmų. Savo atnaujinimą turėtume modifikuoti, kad jis tvarkytų tokias būsenas, taip
 
 $$Q(s_t^i, a_t^i) =(1 - \alpha) Q(s_t^i,a_t^i) - \alpha \Big( r(s_t^i, a_t^i) + \gamma (1 - \mathbb{1}_{s_{t+1}^i \textrm{ is terminal}} )\max_{a'} Q(s_{t+1}^i, a') \Big).$$
 
-where $\mathbb{1}_{s_{t+1}^i \textrm{ is terminal}}$ is an indicator variable that is one if $s_{t+1}^i$ is a terminal state and zero otherwise. The value of state-action tuples $(s, a)$ that are not a part of the dataset is set to $-\infty$. This algorithm is known as Q-Learning.
+kur $\mathbb{1}_{s_{t+1}^i \textrm{ is terminal}}$ yra indikatorinis kintamasis, lygus vienam, jei $s_{t+1}^i$ yra galutinė būsena, ir nuliui kitu atveju. Būsenos ir veiksmo kortežų $(s, a)$, kurie nėra duomenų rinkinio dalis, reikšmė nustatoma į $-\infty$. Šis algoritmas žinomas kaip Q mokymasis.
 
-Given the solution of these updates $\hat{Q}$, which is an approximation of the optimal value function $Q^*$, we can obtain the optimal deterministic policy corresponding to this value function easily using
+Turėdami šių atnaujinimų sprendinį $\hat{Q}$, kuris yra optimalios reikšmės funkcijos $Q^*$ aproksimacija, galime lengvai gauti šią reikšmės funkciją atitinkančią optimalią deterministinę strategiją naudodami
 
 $$\hat{\pi}(s) = \mathrm{argmax}_{a} \hat{Q}(s, a).$$
 
-There can be situations when there are multiple deterministic policies that correspond to the same optimal value function; such ties can be broken arbitrarily because they have the same value function.
+Gali pasitaikyti situacijų, kai yra kelios deterministinės strategijos, atitinkančios tą pačią optimalią reikšmės funkciją; tokias lygybes galima nutraukti savavališkai, nes jos turi tą pačią reikšmės funkciją.
 
-## Exploration in Q-Learning
+## Tyrinėjimas Q mokymesi
 
-The policy used by the robot to collect data $\pi_e$ is critical to ensure that Q-Learning works well. Afterall, we have replaced the expectation over $s'$ using the transition function $P(s' \mid s, a)$ using the data collected by the robot. If the policy $\pi_e$ does not reach diverse parts of the state-action space, then it is easy to imagine our estimate $\hat{Q}$ will be a poor approximation of the optimal $Q^*$. It is also important to note that in such a situation, the estimate of $Q^*$ at *all states* $s \in \mathcal{S}$ will be bad, not just the ones visited by $\pi_e$. This is because the Q-Learning objective (or value iteration) is a constraint that ties together the value of all state-action pairs. It is therefore critical to pick the correct policy $\pi_e$ to collect data.
+Strategija, kurią robotas naudoja duomenims rinkti, $\pi_e$, yra esminė, kad Q mokymasis veiktų gerai. Juk vidurkį per $s'$, naudojantį perėjimo funkciją $P(s' \mid s, a)$, pakeitėme roboto surinktais duomenimis. Jei strategija $\pi_e$ nepasiekia įvairių būsenų ir veiksmų erdvės dalių, nesunku įsivaizduoti, kad mūsų įvertis $\hat{Q}$ bus prasta optimalios $Q^*$ aproksimacija. Taip pat svarbu pažymėti, kad tokioje situacijoje $Q^*$ įvertis *visose būsenose* $s \in \mathcal{S}$ bus blogas, ne tik tose, kuriose lankėsi $\pi_e$. Taip yra todėl, kad Q mokymosi tikslas (arba reikšmių iteracija) yra ribojimas, siejantis visų būsenos ir veiksmo porų reikšmes. Todėl labai svarbu duomenims rinkti pasirinkti teisingą strategiją $\pi_e$.
 
-We can mitigate this concern by picking a completely random policy $\pi_e$ that samples actions uniformly randomly from $\mathcal{A}$. Such a policy would visit all states, but it will take a large number of trajectories before it does so.
+Šią problemą galime sušvelninti pasirinkdami visiškai atsitiktinę strategiją $\pi_e$, kuri veiksmus iš $\mathcal{A}$ atrenka tolygiai atsitiktinai. Tokia strategija aplankytų visas būsenas, bet tam prireiktų didelio trajektorijų skaičiaus.
 
-We thus arrive at the second key idea in Q-Learning, namely exploration. Typical implementations of Q-Learning tie together the current estimate of $Q$ and the policy $\pi_e$ to set
+Taip prieiname prie antrosios pagrindinės Q mokymosi idėjos – tyrinėjimo. Tipiniai Q mokymosi įgyvendinimai susieja dabartinį $Q$ įvertį ir strategiją $\pi_e$ nustatydami
 
 $$\pi_e(a \mid s) = \begin{cases}\mathrm{argmax}_{a'} \hat{Q}(s, a') & \textrm{with prob. } 1-\epsilon \\ \textrm{uniform}(\mathcal{A}) & \textrm{with prob. } \epsilon,\end{cases}$$
 :eqlabel:`epsilon_greedy`
 
-where $\epsilon$ is called the "exploration parameter" and is chosen by the user. The policy $\pi_e$ is called an exploration policy. This particular $\pi_e$ is called an $\epsilon$-greedy exploration policy because it chooses the optimal action (under the current estimate $\hat{Q}$) with probability $1-\epsilon$ but explores randomly with the remainder probability $\epsilon$. We can also use the so-called softmax exploration policy
+kur $\epsilon$ vadinamas „tyrinėjimo parametru“ ir yra pasirenkamas naudotojo. Strategija $\pi_e$ vadinama tyrinėjimo strategija. Ši konkreti $\pi_e$ vadinama $\epsilon$-godžiąja tyrinėjimo strategija, nes ji pasirenka optimalų veiksmą (pagal dabartinį įvertį $\hat{Q}$) su tikimybe $1-\epsilon$, o su likusia tikimybe $\epsilon$ tyrinėja atsitiktinai. Taip pat galime naudoti vadinamąją softmax tyrinėjimo strategiją
 
 $$\pi_e(a \mid s) = \frac{e^{\hat{Q}(s, a)/T}}{\sum_{a'} e^{\hat{Q}(s, a')/T}};$$
 
-where the hyper-parameter $T$ is called temperature. A large value of $\epsilon$ in $\epsilon$-greedy policy functions similarly to a large value of temperature $T$ for the softmax policy.
+kur hiperparametras $T$ vadinamas temperatūra. Didelė $\epsilon$ reikšmė $\epsilon$-godžiojoje strategijoje veikia panašiai kaip didelė temperatūros $T$ reikšmė softmax strategijoje.
 
-It is important to note that when we pick an exploration that depends upon the current estimate of the action-value function $\hat{Q}$, we need to resolve the optimization problem periodically. Typical implementations of Q-Learning make one mini-batch update using a few state-action pairs in the collected dataset (typically the ones collected from the previous timestep of the robot) after taking every action using $\pi_e$.
+Svarbu pažymėti, kad kai pasirenkame tyrinėjimą, priklausantį nuo dabartinio veiksmo reikšmės funkcijos įverčio $\hat{Q}$, optimizavimo uždavinį turime periodiškai spręsti iš naujo. Tipiniai Q mokymosi įgyvendinimai po kiekvieno veiksmo, atlikto naudojant $\pi_e$, atlieka vieną minirinkinio atnaujinimą naudodami kelias surinkto duomenų rinkinio būsenos ir veiksmo poras (paprastai surinktas ankstesniame roboto laiko žingsnyje).
 
-## The "Self-correcting" Property of Q-Learning
+## „Savaime besitaisanti“ Q mokymosi savybė
 
-The dataset collected by the robot during Q-Learning grows with time. Both the exploration policy $\pi_e$ and the estimate $\hat{Q}$ evolve as the robot collects more data. This gives us a key insight into why Q-Learning works well. Consider a state $s$: if a particular action $a$ has a large value under the current estimate $\hat{Q}(s,a)$, then both the $\epsilon$-greedy and the softmax exploration policies have a larger probability of picking this action. If this action actually is *not* the ideal action, then the future states that arise from this action will have poor rewards. The next update of the Q-Learning objective will therefore reduce the value $\hat{Q}(s,a)$, which will reduce the probability of picking this action the next time the robot visits state $s$. Bad actions, e.g., ones whose value is overestimated in $\hat{Q}(s,a)$, are explored by the robot but their value is correct in the next update of the Q-Learning objective. Good actions, e.g., whose value $\hat{Q}(s, a)$ is large, are explored more often by the robot and thereby reinforced. This property can be used to show that Q-Learning can converge to the optimal policy even if it begins with a random policy $\pi_e$ :cite:`Watkins.Dayan.1992`.
+Duomenų rinkinys, kurį robotas surenka Q mokymosi metu, laikui bėgant auga. Tiek tyrinėjimo strategija $\pi_e$, tiek įvertis $\hat{Q}$ kinta robotui renkant vis daugiau duomenų. Tai suteikia pagrindinį supratimą, kodėl Q mokymasis veikia gerai. Panagrinėkime būseną $s$: jei tam tikras veiksmas $a$ pagal dabartinį įvertį $\hat{Q}(s,a)$ turi didelę reikšmę, tada ir $\epsilon$-godžioji, ir softmax tyrinėjimo strategijos turi didesnę tikimybę pasirinkti šį veiksmą. Jei šis veiksmas iš tikrųjų *nėra* idealus veiksmas, tada vėlesnės būsenos, atsirandančios dėl šio veiksmo, turės prastus atlygius. Todėl kitas Q mokymosi tikslo atnaujinimas sumažins reikšmę $\hat{Q}(s,a)$, o tai sumažins tikimybę pasirinkti šį veiksmą kitą kartą, kai robotas aplankys būseną $s$. Blogus veiksmus, pvz., tuos, kurių reikšmė pervertinta $\hat{Q}(s,a)$, robotas ištyrinėja, bet jų reikšmė pataisoma kitame Q mokymosi tikslo atnaujinime. Gerus veiksmus, pvz., tuos, kurių reikšmė $\hat{Q}(s, a)$ didelė, robotas tyrinėja dažniau ir taip juos sustiprina. Pasinaudojus šia savybe galima įrodyti, kad Q mokymasis gali konverguoti į optimalią strategiją, net jei pradedama nuo atsitiktinės strategijos $\pi_e$ :cite:`Watkins.Dayan.1992`.
 
-This ability to not only collect new data but also collect the right kind of data is the central feature of reinforcement learning algorithms, and this is what distinguishes them from supervised learning. Q-Learning, using deep neural networks (which we will see in the DQN chapeter later), is responsible for the resurgence of reinforcement learning :cite:`mnih2013playing`.
+Šis gebėjimas ne tik rinkti naujus duomenis, bet ir rinkti tinkamo tipo duomenis yra pagrindinė skatinamojo mokymosi algoritmų savybė, ir būtent ji juos skiria nuo prižiūrimojo mokymosi. Q mokymasis, naudojantis giliuosius neuroninius tinklus (kuriuos pamatysime vėlesniame DQN skyriuje), yra atsakingas už skatinamojo mokymosi atgimimą :cite:`mnih2013playing`.
 
-## Implementation of Q-Learning
+## Q mokymosi įgyvendinimas
 
-We now show how to implement Q-Learning on FrozenLake from [Open AI Gym](https://gym.openai.com). Note this is the same setup as we consider in :ref:`sec_valueiter` experiment.
+Dabar parodome, kaip įgyvendinti Q mokymąsi FrozenLake aplinkoje iš [Open AI Gym](https://gym.openai.com). Atkreipkite dėmesį, kad tai ta pati sąranka, kurią nagrinėjome :ref:`sec_valueiter` eksperimente.
 
 ```{.python .input}
 %%tab all
@@ -93,9 +93,9 @@ np.random.seed(seed)
 env_info = d2l.make_env('FrozenLake-v1', seed=seed)
 ```
 
-In the FrozenLake environment, the robot moves on a $4 \times 4$ grid (these are the states) with actions that are "up" ($\uparrow$), "down" ($\rightarrow$), "left" ($\leftarrow$), and "right" ($\rightarrow$). The environment contains a number of holes (H) cells and frozen (F) cells as well as a goal cell (G), all of which are unknown to the robot. To keep the problem simple, we assume the robot has reliable actions, i.e. $P(s' \mid s, a) = 1$ for all $s \in \mathcal{S}, a \in \mathcal{A}$. If the robot reaches the goal, the trial ends and the robot receives a reward of $1$ irrespective of the action; the reward at any other state is $0$ for all actions. The objective of the robot is to learn a policy that reaches the goal location (G) from a given start location (S) (this is $s_0$) to maximize the *return*.
+FrozenLake aplinkoje robotas juda $4 \times 4$ tinkleliu (tai yra būsenos) su veiksmais „aukštyn“ ($\uparrow$), „žemyn“ ($\rightarrow$), „į kairę“ ($\leftarrow$) ir „į dešinę“ ($\rightarrow$). Aplinkoje yra keletas duobių (H) langelių ir užšalusių (F) langelių, taip pat tikslo langelis (G), ir visi jie robotui nežinomi. Kad uždavinys būtų paprastas, darome prielaidą, kad robotas turi patikimus veiksmus, t. y. $P(s' \mid s, a) = 1$ visiems $s \in \mathcal{S}, a \in \mathcal{A}$. Jei robotas pasiekia tikslą, bandymas baigiasi ir robotas gauna $1$ atlygį nepriklausomai nuo veiksmo; atlygis bet kurioje kitoje būsenoje yra $0$ visiems veiksmams. Roboto tikslas yra išmokti strategiją, kuri iš nurodytos pradinės vietos (S) (tai yra $s_0$) pasiekia tikslo vietą (G), kad būtų maksimizuota *grąža*.
 
-We first implement $\epsilon$-greedy method as follows:
+Pirmiausia įgyvendiname $\epsilon$-godųjį metodą taip:
 
 ```{.python .input}
 %%tab all
@@ -109,7 +109,7 @@ def e_greedy(env, Q, s, epsilon):
 
 ```
 
-We are now ready to implement Q-learning:
+Dabar esame pasirengę įgyvendinti Q mokymąsi:
 
 ```{.python .input}
 %%tab all
@@ -148,18 +148,18 @@ q_learning(env_info=env_info, gamma=gamma, num_iters=num_iters, alpha=alpha, eps
 
 ```
 
-This result shows that Q-learning can find the optimal solution for this problem roughly after 250 iterations. However, when we compare this result with the Value Iteration algorithm's result (see :ref:`subsec_valueitercode`), we can see that the Value Iteration algorithm needs way fewer iterations to find the optimal solution for this problem. This happens because the Value Iteration algorithm has access to the full MDP whereas Q-learning does not.
+Šis rezultatas rodo, kad Q mokymasis gali rasti optimalų šio uždavinio sprendinį maždaug po 250 iteracijų. Tačiau palyginus šį rezultatą su reikšmių iteracijos algoritmo rezultatu (žr. :ref:`subsec_valueitercode`), matome, kad reikšmių iteracijos algoritmui šio uždavinio optimaliam sprendiniui rasti reikia daug mažiau iteracijų. Taip nutinka todėl, kad reikšmių iteracijos algoritmas turi prieigą prie viso MDP, o Q mokymasis – ne.
 
 
-## Summary
-Q-learning is one of the most fundamental reinforcement-learning algorithms. It has been at the epicenter of the recent success of reinforcement learning, most notably in learning to play video games :cite:`mnih2013playing`. Implementing Q-learning does not require that we know the Markov decision process (MDP), e.g., the transition and reward functions, completely.
+## Santrauka
+Q mokymasis yra vienas iš pačių pagrindinių skatinamojo mokymosi algoritmų. Jis buvo naujausios skatinamojo mokymosi sėkmės epicentre, ypač mokantis žaisti vaizdo žaidimus :cite:`mnih2013playing`. Q mokymosi įgyvendinimui nereikia, kad visiškai žinotume Markovo sprendimų procesą (MDP), pavyzdžiui, perėjimo ir atlygio funkcijas.
 
-## Exercises
+## Pratimai
 
-1. Try increasing the grid size to $8 \times 8$. Compared with $4 \times 4$ grid, how many iterations does it take to find the optimal value function?
-1. Run the Q-learning algorithm again with $\gamma$ (i.e. "gamma" in the above code) when it equals to $0$, $0.5$, and $1$ and analyze its results.
-1. Run the Q-learning algorithm again with $\epsilon$ (i.e. "epsilon" in the above code) when it equals to $0$, $0.5$, and $1$ and analyze its results.
+1. Pabandykite padidinti tinklelio dydį iki $8 \times 8$. Kiek iteracijų prireikia optimaliai reikšmės funkcijai rasti, palyginti su $4 \times 4$ tinkleliu?
+1. Dar kartą paleiskite Q mokymosi algoritmą su $\gamma$ (t. y. „gamma“ aukščiau pateiktame kode), kai jis lygus $0$, $0.5$ ir $1$, ir išanalizuokite rezultatus.
+1. Dar kartą paleiskite Q mokymosi algoritmą su $\epsilon$ (t. y. „epsilon“ aukščiau pateiktame kode), kai jis lygus $0$, $0.5$ ir $1$, ir išanalizuokite rezultatus.
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12103)
+[Diskusijos](https://discuss.d2l.ai/t/12103)
 :end_tab:

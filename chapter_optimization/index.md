@@ -1,20 +1,20 @@
-# Optimization Algorithms
+# Optimizavimo algoritmai
 :label:`chap_optimization`
 
-If you read the book in sequence up to this point you already used a number of optimization algorithms to train deep learning models.
-They were the tools that allowed us to continue updating model parameters and to minimize the value of the loss function, as evaluated on the training set. Indeed, anyone content with treating optimization as a black box device to minimize objective functions in a simple setting might well content oneself with the knowledge that there exists an array of incantations of such a procedure (with names such as "SGD" and "Adam").
+Jei skaitėte knygą nuosekliai iki šios vietos, jau naudojote nemažai optimizavimo algoritmų giliojo mokymosi modeliams apmokyti.
+Tai buvo įrankiai, leidę mums toliau atnaujinti modelio parametrus ir minimizuoti nuostolio funkcijos reikšmę, įvertintą apmokymo aibėje. Iš tiesų tas, kuriam pakanka optimizavimą laikyti juodąja dėže, minimizuojančia tikslo funkcijas paprastoje aplinkoje, galėtų tenkintis žinojimu, kad egzistuoja eilė šio proceso „burtažodžių“ (pavadinimų, tokių kaip „SGD“ ir „Adam“).
 
-To do well, however, some deeper knowledge is required.
-Optimization algorithms are important for deep learning.
-On the one hand, training a complex deep learning model can take hours, days, or even weeks.
-The performance of the optimization algorithm directly affects the model's training efficiency.
-On the other hand, understanding the principles of different optimization algorithms and the role of their hyperparameters
-will enable us to tune the hyperparameters in a targeted manner to improve the performance of deep learning models.
+Tačiau norint pasiekti gerų rezultatų, reikia gilesnių žinių.
+Optimizavimo algoritmai yra svarbūs giliajam mokymuisi.
+Viena vertus, sudėtingo giliojo mokymosi modelio apmokymas gali trukti valandas, dienas ar net savaites.
+Optimizavimo algoritmo našumas tiesiogiai veikia modelio apmokymo efektyvumą.
+Kita vertus, suprasdami skirtingų optimizavimo algoritmų principus ir jų hiperparametrų vaidmenį,
+galėsime tikslingai derinti hiperparametrus, kad pagerintume giliojo mokymosi modelių našumą.
 
-In this chapter, we explore common deep learning optimization algorithms in depth.
-Almost all optimization problems arising in deep learning are *nonconvex*.
-Nonetheless, the design and analysis of algorithms in the context of *convex* problems have proven to be very instructive.
-It is for that reason that this chapter includes a primer on convex optimization and the proof for a very simple stochastic gradient descent algorithm on a convex objective function.
+Šiame skyriuje išsamiai nagrinėjame įprastus giliojo mokymosi optimizavimo algoritmus.
+Beveik visos giliajame mokymesi kylančios optimizavimo problemos yra *neiškilosios*.
+Vis dėlto algoritmų projektavimas ir analizė *iškiliųjų* problemų kontekste pasirodė esą labai pamokantys.
+Todėl šiame skyriuje pateikiamas įvadas į iškilųjį optimizavimą ir labai paprasto stochastinio gradientinio nusileidimo algoritmo iškiliajai tikslo funkcijai įrodymas.
 
 ```toc
 :maxdepth: 2
@@ -31,4 +31,3 @@ adadelta
 adam
 lr-scheduler
 ```
-

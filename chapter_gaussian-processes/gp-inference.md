@@ -4,26 +4,26 @@ tab.interact_select(["pytorch"])
 #required_libs("gpytorch")
 ```
 
-# Gaussian Process Inference
+# Gauso procesų inferencija
 
-In this section, we will show how to perform posterior inference and make predictions using the GP priors we introduced in the last section. We will start with regression, where we can perform inference in _closed form_. This is a "GPs in a nutshell" section to quickly get up and running with Gaussian processes in practice. We'll start coding all the basic operations from scratch, and then introduce [GPyTorch](https://gpytorch.ai/), which will make working with state-of-the-art Gaussian processes and integration with deep neural networks much more convenient. We will consider these more advanced topics in depth in the next section. In that section, we will also consider settings where approximate inference is required --- classification, point processes, or any non-Gaussian likelihoods. 
+Šiame skyrelyje parodysime, kaip atlikti aposteriorinę inferenciją ir daryti prognozes naudojant GP apriorinius skirstinius, kuriuos pristatėme ankstesniame skyrelyje. Pradėsime nuo regresijos, kur inferenciją galime atlikti _uždaros formos_ išraiška. Tai „GP trumpai“ skyrelis, skirtas greitai pradėti praktiškai dirbti su Gauso procesais. Pradėsime nuo visų pagrindinių operacijų programavimo nuo nulio, o tada pristatysime [GPyTorch](https://gpytorch.ai/), kuris daug patogesnį padarys darbą su pažangiausiais Gauso procesais ir integravimą su giliaisiais neuroniniais tinklais. Šias pažangesnes temas išsamiai nagrinėsime kitame skyrelyje. Tame skyrelyje taip pat nagrinėsime aplinkybes, kai reikalinga apytikslė inferencija – klasifikavimą, taškinius procesus ar bet kokius ne Gauso tikėtinumus. 
 
-## Posterior Inference for Regression
+## Aposteriorinė regresijos inferencija
 
-An _observation_ model relates the function we want to learn, $f(x)$, to our observations $y(x)$, both indexed by some input $x$. In classification, $x$ could be the pixels of an image, and $y$ could be the associated class label. In regression, $y$ typically represents a continuous output, such as a land surface temperature, a sea-level, a $CO_2$ concentration, etc.  
+_Stebėjimo_ modelis susieja funkciją, kurios norime išmokti, $f(x)$, su mūsų stebiniais $y(x)$, abiem indeksuotais tam tikra įvestimi $x$. Klasifikavime $x$ galėtų būti vaizdo pikseliai, o $y$ – susijusi klasės žymė. Regresijoje $y$ paprastai atitinka tolydžiąją išvestį, pavyzdžiui, žemės paviršiaus temperatūrą, jūros lygį, $CO_2$ koncentraciją ir pan.  
 
-In regression, we often assume the outputs are given by a latent noise-free function $f(x)$ plus i.i.d. Gaussian noise $\epsilon(x)$: 
+Regresijoje dažnai darome prielaidą, kad išvestis yra latentinė be triukšmo funkcija $f(x)$ plius nepriklausomas vienodai pasiskirstęs (i.i.d.) Gauso triukšmas $\epsilon(x)$: 
 
 $$y(x) = f(x) + \epsilon(x),$$
 :eqlabel:`eq_gp-regression`
 
-with $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$. Let $\mathbf{y} = y(X) = (y(x_1),\dots,y(x_n))^{\top}$ be a vector of our training observations, and $\textbf{f} = (f(x_1),\dots,f(x_n))^{\top}$ be a vector of the latent noise-free function values, queried at the training inputs $X = {x_1, \dots, x_n}$.
+su $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$. Tegu $\mathbf{y} = y(X) = (y(x_1),\dots,y(x_n))^{\top}$ yra mūsų apmokymo stebinių vektorius, o $\textbf{f} = (f(x_1),\dots,f(x_n))^{\top}$ yra latentinių be triukšmo funkcijos reikšmių vektorius, užklaustas apmokymo įvestyse $X = {x_1, \dots, x_n}$.
 
-We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection of function values $\textbf{f}$ has a joint multivariate Gaussian distribution, with mean vector $\mu_i = m(x_i)$ and covariance matrix $K_{ij} = k(x_i,x_j)$. The RBF kernel $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x_i-x_j||^2\right)$ would be a standard choice of covariance function. For notational simplicity, we will assume the mean function $m(x)=0$; our derivations can easily be generalized later on.
+Darysime prielaidą, kad $f(x) \sim \mathcal{GP}(m,k)$, o tai reiškia, kad bet kuris funkcijos reikšmių rinkinys $\textbf{f}$ turi jungtinį daugiamatį Gauso skirstinį su vidurkio vektoriumi $\mu_i = m(x_i)$ ir kovariacijų matrica $K_{ij} = k(x_i,x_j)$. RBF branduolys $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x_i-x_j||^2\right)$ būtų standartinis kovariacijos funkcijos pasirinkimas. Žymėjimo paprastumo dėlei darysime prielaidą, kad vidurkio funkcija $m(x)=0$; mūsų išvedimus vėliau galima lengvai apibendrinti.
 
-Suppose we want to make predictions at a set of inputs $$X_* = x_{*1},x_{*2},\dots,x_{*m}.$$ Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
+Tarkime, norime daryti prognozes įvesčių aibėje $$X_* = x_{*1},x_{*2},\dots,x_{*m}.$$ Tada norime rasti $x^2$ ir $p(\mathbf{f}_* | \mathbf{y}, X)$. Regresijos atveju šį skirstinį galime patogiai rasti naudodami Gauso tapatybes, suradę jungtinį skirstinį $\mathbf{f}_* = f(X_*)$ ir $\mathbf{y}$. 
 
-If we evaluate equation :eqref:`eq_gp-regression` at the training inputs $X$, we have $\mathbf{y} = \mathbf{f} + \mathbf{\epsilon}$. By the definition of a Gaussian process (see last section), $\mathbf{f} \sim \mathcal{N}(0,K(X,X))$ where $K(X,X)$ is an $n \times n$ matrix formed by evaluating our covariance function (aka _kernel_) at all possible pairs of inputs $x_i, x_j \in X$. $\mathbf{\epsilon}$ is simply a vector comprised of iid samples from $\mathcal{N}(0,\sigma^2)$ and thus has distribution $\mathcal{N}(0,\sigma^2I)$. $\mathbf{y}$ is therefore a sum of two independent multivariate Gaussian variables, and thus has distribution $\mathcal{N}(0, K(X,X) + \sigma^2I)$. One can also show that $\textrm{cov}(\mathbf{f}_*, \mathbf{y}) = \textrm{cov}(\mathbf{y},\mathbf{f}_*)^{\top} = K(X_*,X)$ where $K(X_*,X)$ is an $m \times n$ matrix formed by evaluating the kernel at all pairs of test and training inputs. 
+Jei lygtį :eqref:`eq_gp-regression` įvertiname apmokymo įvestyse $X$, turime $\mathbf{y} = \mathbf{f} + \mathbf{\epsilon}$. Pagal Gauso proceso apibrėžimą (žr. ankstesnį skyrelį), $\mathbf{f} \sim \mathcal{N}(0,K(X,X))$, kur $K(X,X)$ yra $n \times n$ matrica, sudaryta įvertinus mūsų kovariacijos funkciją (dar vadinamą _branduoliu_) visose galimose įvesčių porose $x_i, x_j \in X$. $\mathbf{\epsilon}$ yra tiesiog vektorius, sudarytas iš i.i.d. imčių iš $\mathcal{N}(0,\sigma^2)$, todėl jo skirstinys yra $\mathcal{N}(0,\sigma^2I)$. Todėl $\mathbf{y}$ yra dviejų nepriklausomų daugiamačių Gauso kintamųjų suma, taigi jo skirstinys yra $\mathcal{N}(0, K(X,X) + \sigma^2I)$. Taip pat galima parodyti, kad $\textrm{cov}(\mathbf{f}_*, \mathbf{y}) = \textrm{cov}(\mathbf{y},\mathbf{f}_*)^{\top} = K(X_*,X)$, kur $K(X_*,X)$ yra $m \times n$ matrica, sudaryta įvertinus branduolį visose testavimo ir apmokymo įvesčių porose. 
 
 $$
 \begin{bmatrix}
@@ -39,12 +39,12 @@ K(X_*,X) & K(X_*,X_*)
 \right)
 $$
 
-We can then use standard Gaussian identities to find the conditional distribution from the joint distribution (see, e.g., Bishop Chapter 2), 
-$\mathbf{f}_* | \mathbf{y}, X, X_* \sim \mathcal{N}(m_*,S_*)$, where $m_* = K(X_*,X)[K(X,X)+\sigma^2I]^{-1}\textbf{y}$, and $S = K(X_*,X_*) - K(X_*,X)[K(X,X)+\sigma^2I]^{-1}K(X,X_*)$.
+Tada galime naudoti standartines Gauso tapatybes, kad iš jungtinio skirstinio rastume sąlyginį skirstinį (žr., pvz., Bishop, 2 skyrių), 
+$\mathbf{f}_* | \mathbf{y}, X, X_* \sim \mathcal{N}(m_*,S_*)$, kur $m_* = K(X_*,X)[K(X,X)+\sigma^2I]^{-1}\textbf{y}$, o $S = K(X_*,X_*) - K(X_*,X)[K(X,X)+\sigma^2I]^{-1}K(X,X_*)$.
 
-Typically, we do not need to make use of the full predictive covariance matrix $S$, and instead use the diagonal of $S$ for uncertainty about each prediction. Often for this reason we write the predictive distribution for a single test point $x_*$, rather than a collection of test points. 
+Paprastai mums nereikia naudoti pilnos prognozuojamosios kovariacijų matricos $S$, o vietoj to naudojame $S$ įstrižainę neapibrėžtumui apie kiekvieną prognozę. Dažnai dėl šios priežasties prognozuojamąjį skirstinį užrašome vienam testavimo taškui $x_*$, o ne testavimo taškų rinkiniui. 
 
-The kernel matrix has parameters $\theta$ that we also wish to estimate, such the amplitude $a$ and lengthscale $\ell$ of the RBF kernel above. For these purposes we use the _marginal likelihood_, $p(\textbf{y} | \theta, X)$, which we already derived in working out the marginal distributions to find the joint distribution over $\textbf{y},\textbf{f}_*$. As we will see, the marginal likelihood compartmentalizes into model fit and model complexity terms, and automatically encodes a notion of Occam's razor for learning hyperparameters. For a full discussion, see MacKay Ch. 28 :cite:`mackay2003information`, and Rasmussen and Williams Ch. 5 :cite:`rasmussen2006gaussian`.
+Branduolio matrica turi parametrus $\theta$, kuriuos taip pat norime įvertinti, pavyzdžiui, aukščiau pateikto RBF branduolio amplitudę $a$ ir ilgio skalę $\ell$. Šiems tikslams naudojame _ribinį tikėtinumą_, $p(\textbf{y} | \theta, X)$, kurį jau išvedėme nustatydami ribinius skirstinius, kad rastume jungtinį skirstinį $\textbf{y},\textbf{f}_*$. Kaip pamatysime, ribinis tikėtinumas skyla į modelio pritaikymo ir modelio sudėtingumo narius ir automatiškai koduoja Okamo skustuvo (angl. *Occam's razor*) sąvoką hiperparametrams mokytis. Išsamų aptarimą žr. MacKay 28 sk. :cite:`mackay2003information` ir Rasmussen ir Williams 5 sk. :cite:`rasmussen2006gaussian`.
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -60,44 +60,44 @@ import os
 d2l.set_figsize()
 ```
 
-## Equations for Making Predictions and Learning Kernel Hyperparameters in GP Regression
+## Prognozavimo ir branduolio hiperparametrų mokymosi GP regresijoje lygtys
 
-We list here the equations you will use for learning hyperparameters and making predictions in Gaussian process regression. Again, we assume a vector of regression targets $\textbf{y}$, indexed by inputs $X = \{x_1,\dots,x_n\}$, and we wish to make a prediction at a test input $x_*$. We assume i.i.d. additive zero-mean Gaussian noise with variance $\sigma^2$. We use a Gaussian process prior $f(x) \sim \mathcal{GP}(m,k)$ for the latent noise-free function, with mean function $m$ and kernel function $k$. The kernel itself has parameters $\theta$ that we want to learn. For example, if we use an RBF kernel, $k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)$, we want to learn $\theta = \{a^2, \ell^2\}$. Let $K(X,X)$ represent an $n \times n$ matrix corresponding to evaluating the kernel for all possible pairs of $n$ training inputs. Let $K(x_*,X)$ represent a $1 \times n$ vector formed by evaluating $k(x_*, x_i)$, $i=1,\dots,n$. Let $\mu$ be a mean vector formed by evaluating the mean function $m(x)$ at every training points $x$.
+Čia pateikiame lygtis, kurias naudosite hiperparametrams mokytis ir prognozėms daryti Gauso procesų regresijoje. Vėlgi darome prielaidą, kad turime regresijos tikslų vektorių $\textbf{y}$, indeksuotą įvestimis $X = \{x_1,\dots,x_n\}$, ir norime padaryti prognozę testavimo įvestyje $x_*$. Darome prielaidą apie i.i.d. adityvų nulinio vidurkio Gauso triukšmą su dispersija $\sigma^2$. Latentinei be triukšmo funkcijai naudojame Gauso proceso apriorinį skirstinį $f(x) \sim \mathcal{GP}(m,k)$ su vidurkio funkcija $m$ ir branduolio funkcija $k$. Pats branduolys turi parametrus $\theta$, kuriuos norime išmokti. Pavyzdžiui, jei naudojame RBF branduolį, $k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)$, norime išmokti $\theta = \{a^2, \ell^2\}$. Tegu $K(X,X)$ žymi $n \times n$ matricą, atitinkančią branduolio įvertinimą visose galimose $n$ apmokymo įvesčių porose. Tegu $K(x_*,X)$ žymi $1 \times n$ vektorių, sudarytą įvertinus $k(x_*, x_i)$, $i=1,\dots,n$. Tegu $\mu$ yra vidurkio vektorius, sudarytas įvertinus vidurkio funkciją $m(x)$ kiekviename apmokymo taške $x$.
 
-Typically in working with Gaussian processes, we follow a two-step procedure. 
-1. Learn kernel hyperparameters $\hat{\theta}$ by maximizing the marginal likelihood with respect to these hyperparameters.
-2. Use the predictive mean as a point predictor, and 2 times the predictive standard deviation to form a 95\% credible set, conditioning on these learned hyperparameters $\hat{\theta}$.
+Dirbant su Gauso procesais paprastai laikomasi dviejų žingsnių procedūros. 
+1. Išmokstami branduolio hiperparametrai $\hat{\theta}$ maksimizuojant ribinį tikėtinumą šių hiperparametrų atžvilgiu.
+2. Prognozuojamasis vidurkis naudojamas kaip taškinis prognozuotuvas, o 2 kartus prognozuojamasis standartinis nuokrypis – 95 % patikimajai aibei sudaryti, sąlygojant šiais išmoktais hiperparametrais $\hat{\theta}$.
 
-The log marginal likelihood is simply a log Gaussian density, which has the form:
+Logaritminis ribinis tikėtinumas yra tiesiog logaritminis Gauso tankis, kurio forma yra:
 $$\log p(\textbf{y} | \theta, X) = -\frac{1}{2}\textbf{y}^{\top}[K_{\theta}(X,X) + \sigma^2I]^{-1}\textbf{y} - \frac{1}{2}\log|K_{\theta}(X,X)| + c$$
 
-The predictive distribution has the form:
+Prognozuojamasis skirstinys turi formą:
 $$p(y_* | x_*, \textbf{y}, \theta) = \mathcal{N}(a_*,v_*)$$
 $$a_* = k_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}(\textbf{y}-\mu) + \mu$$
 $$v_* = k_{\theta}(x_*,x_*) - K_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}k_{\theta}(X,x_*)$$
 
-## Interpreting Equations for Learning and Predictions
+## Mokymosi ir prognozių lygčių interpretavimas
 
-There are some key points to note about the predictive distributions for Gaussian processes:
+Yra keletas esminių dalykų, į kuriuos verta atkreipti dėmesį dėl Gauso procesų prognozuojamųjų skirstinių:
 
-* Despite the flexibility of the model class, it is possible to do _exact_ Bayesian inference for GP regression in _closed form_. Aside from learning the kernel hyperparameters, there is no _training_. We can write down exactly what equations we want to use to make predictions. Gaussian processes are relatively exceptional in this respect, and it has greatly contributed to their convenience, versatility, and continued popularity. 
+* Nepaisant modelių klasės lankstumo, GP regresijai galima atlikti _tikslią_ Bajeso inferenciją _uždaros formos_ išraiška. Be branduolio hiperparametrų mokymosi, nėra jokio _apmokymo_. Galime tiksliai užrašyti, kokias lygtis norime naudoti prognozėms daryti. Gauso procesai šiuo požiūriu yra gana išskirtiniai, ir tai labai prisidėjo prie jų patogumo, universalumo ir nuolatinio populiarumo. 
 
-* The predictive mean $a_*$ is a linear combination of the training targets $\textbf{y}$, weighted by the kernel $k_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}$. As we will see, the kernel (and its hyperparameters) thus plays a crucial role in the generalization properties of the model.
+* Prognozuojamasis vidurkis $a_*$ yra apmokymo tikslų $\textbf{y}$ tiesinis darinys, pasvertas branduoliu $k_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}$. Kaip pamatysime, branduolys (ir jo hiperparametrai) todėl atlieka lemiamą vaidmenį modelio apibendrinimo savybėse.
 
-* The predictive mean explicitly depends on the target values $\textbf{y}$ but the predictive variance does not. The predictive uncertainty instead grows as the test input $x_*$ moves away from the target locations $X$, as governed by the kernel function. However, uncertainty will implicitly depend on the values of the targets $\textbf{y}$ through the kernel hyperparameters $\theta$, which are learned from the data.
+* Prognozuojamasis vidurkis aiškiai priklauso nuo tikslo reikšmių $\textbf{y}$, bet prognozuojamoji dispersija – ne. Vietoj to prognozuojamasis neapibrėžtumas didėja, kai testavimo įvestis $x_*$ tolsta nuo tikslų vietų $X$, kaip nulemia branduolio funkcija. Tačiau neapibrėžtumas netiesiogiai priklausys nuo tikslų reikšmių $\textbf{y}$ per branduolio hiperparametrus $\theta$, kurie išmokstami iš duomenų.
 
-* The marginal likelihood compartmentalizes into model fit and model complexity (log determinant) terms. The marginal likelihood tends to select for hyperparameters that provide the simplest fits that are still consistent with the data. 
+* Ribinis tikėtinumas skyla į modelio pritaikymo ir modelio sudėtingumo (logaritminio determinanto) narius. Ribinis tikėtinumas linkęs parinkti hiperparametrus, kurie suteikia paprasčiausius pritaikymus, vis dar suderinamus su duomenimis. 
 
-* The key computational bottlenecks come from solving a linear system and computing a log determinant over an $n \times n$ symmetric positive definite matrix $K(X,X)$ for $n$ training points. Naively, these operations each incur $\mathcal{O}(n^3)$ computations, as well as $\mathcal{O}(n^2)$ storage for each entry of the kernel (covariance) matrix, often starting with a Cholesky decomposition. Historically, these bottlenecks have limited GPs to problems with fewer than about 10,000 training points, and have given GPs a reputation for "being slow" that has been inaccurate now for almost a decade. In advanced topics, we will discuss how GPs can be scaled to problems with millions of points.
+* Pagrindinės skaičiavimo kliūtys kyla dėl tiesinės sistemos sprendimo ir logaritminio determinanto skaičiavimo $n \times n$ simetrinei teigiamai apibrėžtai matricai $K(X,X)$, turint $n$ apmokymo taškų. Naiviai kiekviena iš šių operacijų reikalauja $\mathcal{O}(n^3)$ skaičiavimų, taip pat $\mathcal{O}(n^2)$ saugyklos kiekvienam branduolio (kovariacijų) matricos elementui, dažnai pradedant Choleskio skaida. Istoriškai šios kliūtys apribojo GP uždaviniais, turinčiais mažiau nei maždaug 10 000 apmokymo taškų, ir suteikė GP reputaciją „lėtų“, kuri jau beveik dešimtmetį yra netiksli. Pažangiose temose aptarsime, kaip GP galima pritaikyti uždaviniams su milijonais taškų, didinant mastelį.
 
-* For popular choices of kernel functions, $K(X,X)$ is often close to singular, which can cause numerical issues when performing Cholesky decompositions or other operations intended to solve linear systems. Fortunately, in regression we are often working with $K_{\theta}(X,X)+\sigma^2I$, such that the noise variance $\sigma^2$ gets added to the diagonal of $K(X,X)$, significantly improving its conditioning. If the noise variance is small, or we are doing noise free regression, it is common practice to add a small amount of "jitter" to the diagonal, on the order of $10^{-6}$, to improve conditioning.
+* Populiariems branduolio funkcijų pasirinkimams $K(X,X)$ dažnai yra artima singuliariajai, o tai gali sukelti skaitinių problemų atliekant Choleskio skaidas ar kitas operacijas, skirtas tiesinėms sistemoms spręsti. Laimei, regresijoje dažnai dirbame su $K_{\theta}(X,X)+\sigma^2I$, kad triukšmo dispersija $\sigma^2$ būtų pridedama prie $K(X,X)$ įstrižainės, žymiai pagerinant jos sąlygotumą. Jei triukšmo dispersija maža arba atliekame regresiją be triukšmo, įprasta praktika yra pridėti nedidelį „virpėjimo“ (angl. *jitter*) kiekį prie įstrižainės, apie $10^{-6}$, kad pagerintume sąlygotumą.
 
 
-## Worked Example from Scratch
+## Išdirbtas pavyzdys nuo nulio
 
-Let's create some regression data, and then fit the data with a GP, implementing every step from scratch. 
-We'll sample data from 
-$$y(x) = \sin(x) + \frac{1}{2}\sin(4x) + \epsilon,$$ with $\epsilon \sim \mathcal{N}(0,\sigma^2)$. The noise free function we wish to find is $f(x) = \sin(x) + \frac{1}{2}\sin(4x)$. We'll start by using a noise standard deviation $\sigma = 0.25$.
+Sukurkime kelis regresijos duomenis ir tada pritaikykime GP duomenims, įgyvendindami kiekvieną žingsnį nuo nulio. 
+Duomenis atrinksime iš 
+$$y(x) = \sin(x) + \frac{1}{2}\sin(4x) + \epsilon,$$ su $\epsilon \sim \mathcal{N}(0,\sigma^2)$. Be triukšmo funkcija, kurią norime rasti, yra $f(x) = \sin(x) + \frac{1}{2}\sin(4x)$. Pradėsime nuo triukšmo standartinio nuokrypio $\sigma = 0.25$.
 
 ```{.python .input}
 def data_maker1(x, sig):
@@ -114,9 +114,9 @@ d2l.plt.ylabel("Observations y", fontsize=20)
 d2l.plt.show()
 ```
 
-Here we see the noisy observations as circles, and the noise-free function in blue that we wish to find. 
+Čia matome triukšmingus stebinius kaip apskritimus ir be triukšmo funkciją mėlyna spalva, kurią norime rasti. 
 
-Now, let's specify a GP prior over the latent noise-free function, $f(x)\sim \mathcal{GP}(m,k)$. We'll use a mean function $m(x) = 0$, and an RBF covariance function (kernel)
+Dabar nurodykime GP apriorinį skirstinį latentinei be triukšmo funkcijai, $f(x)\sim \mathcal{GP}(m,k)$. Naudosime vidurkio funkciją $m(x) = 0$ ir RBF kovariacijos funkciją (branduolį)
 $$k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right).$$
 
 ```{.python .input}
@@ -124,7 +124,7 @@ mean = np.zeros(test_x.shape[0])
 cov = d2l.rbfkernel(test_x, test_x, ls=0.2)
 ```
 
-We have started with a length-scale of 0.2. Before we fit the data, it is important to consider whether we have specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
+Pradėjome nuo 0.2 ilgio skalės. Prieš pritaikydami duomenims, svarbu apsvarstyti, ar nurodėme pagrįstą apriorinį skirstinį. Vizualizuokime kelias imties funkcijas iš šio apriorinio skirstinio, taip pat 95 % patikimąją aibę (manome, kad yra 95 % tikimybė, jog tikroji funkcija yra šioje srityje).
 
 ```{.python .input}
 prior_samples = np.random.multivariate_normal(mean=mean, cov=cov, size=5)
@@ -135,9 +135,9 @@ d2l.plt.fill_between(test_x, mean - 2 * np.diag(cov), mean + 2 * np.diag(cov),
 d2l.plt.show()
 ```
 
-Do these samples look reasonable? Are the high-level properties of the functions aligned with the type of data we are trying to model?
+Ar šios imtys atrodo pagrįstos? Ar aukšto lygio funkcijų savybės atitinka duomenų tipą, kurį bandome modeliuoti?
 
-Now let's form the mean and variance of the posterior predictive distribution at any arbitrary test point $x_*$.
+Dabar sudarykime aposteriorinio prognozuojamojo skirstinio vidurkį ir dispersiją bet kuriame savavališkame testavimo taške $x_*$.
 
 $$
 \bar{f}_{*} = K(x, x_*)^T (K(x, x) + \sigma^2 I)^{-1}y
@@ -147,9 +147,9 @@ $$
 V(f_{*}) = K(x_*, x_*) - K(x, x_*)^T (K(x, x) + \sigma^2 I)^{-1}K(x, x_*)
 $$
 
-Before we make predictions, we should learn our kernel hyperparameters $\theta$ and noise variance $\sigma^2$. Let's initialize our length-scale at 0.75, as our prior functions looked too quickly varying compared to the data we are fitting. We'll also guess a noise standard deviation $\sigma$ of 0.75. 
+Prieš darydami prognozes turėtume išmokti savo branduolio hiperparametrus $\theta$ ir triukšmo dispersiją $\sigma^2$. Inicializuokime savo ilgio skalę ties 0.75, nes mūsų apriorinės funkcijos atrodė pernelyg sparčiai kintančios, palyginti su duomenimis, kuriuos pritaikome. Taip pat spėsime triukšmo standartinį nuokrypį $\sigma$ lygų 0.75. 
 
-In order to learn these parameters, we will maximize the marginal likelihood with respect to these parameters.
+Kad išmoktume šiuos parametrus, maksimizuosime ribinį tikėtinumą šių parametrų atžvilgiu.
 
 $$
 \log p(y | X) = \log \int p(y | f, X)p(f | X)df
@@ -159,7 +159,7 @@ $$
 $$
 
 
-Perhaps our prior functions were too quickly varying. Let's guess a length-scale of 0.4. We'll also guess a noise standard deviation of 0.75. These are simply hyperparameter initializations --- we will learn these parameters from the marginal likelihood.
+Galbūt mūsų apriorinės funkcijos kito pernelyg sparčiai. Spėkime 0.4 ilgio skalę. Taip pat spėsime 0.75 triukšmo standartinį nuokrypį. Tai tik hiperparametrų inicializacijos – šiuos parametrus išmoksime iš ribinio tikėtinumo.
 
 ```{.python .input}
 ell_est = 0.4
@@ -182,11 +182,11 @@ ell = learned_hypers.x[0]
 post_sig_est = learned_hypers.x[1]
 ```
 
-In this instance, we learn a length-scale of 0.299, and a noise standard deviation of 0.24. Note that the learned noise is extremely close to the true noise, which helps indicate that our GP is a very well-specified to this problem. 
+Šiuo atveju išmokstame 0.299 ilgio skalę ir 0.24 triukšmo standartinį nuokrypį. Atkreipkite dėmesį, kad išmoktas triukšmas yra labai artimas tikrajam triukšmui, o tai rodo, kad mūsų GP yra labai gerai nurodytas šiam uždaviniui. 
 
-In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. While marginal likelihood optimization can be relatively robust to initialization, it is not immune to poor initializations. Try running the above script with a variety of initializations and see what results you find.
+Apskritai labai svarbu atidžiai pagalvoti renkantis branduolį ir inicializuojant hiperparametrus. Nors ribinio tikėtinumo optimizavimas gali būti gana atsparus inicializacijai, jis nėra apsaugotas nuo prastų inicializacijų. Pabandykite paleisti aukščiau pateiktą scenarijų su įvairiomis inicializacijomis ir pažiūrėkite, kokius rezultatus gausite.
 
-Now, let's make predictions with these learned hypers.
+Dabar darykime prognozes su šiais išmoktais hiperparametrais.
 
 ```{.python .input}
 K_x_xstar = d2l.rbfkernel(train_x, test_x, ls=ell)
@@ -209,22 +209,22 @@ d2l.plt.legend(['Observed Data', 'True Function', 'Predictive Mean', '95% Set on
 d2l.plt.show()
 ```
 
-We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ (true) function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute
+Matome, kad aposteriorinis vidurkis oranžine spalva beveik tobulai atitinka tikrąją be triukšmo funkciją! Atkreipkite dėmesį, kad rodoma 95 % patikimoji aibė yra latentinei _be triukšmo_ (tikrajai) funkcijai, o ne duomenų taškams. Matome, kad ši patikimoji aibė visiškai apima tikrąją funkciją ir neatrodo pernelyg plati ar siaura. Nenorėtume ir nesitikėtume, kad ji apimtų duomenų taškus. Jei norime patikimosios aibės stebiniams, turėtume apskaičiuoti
 
 ```{.python .input}
 lw_bd_observed = post_mean - 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
 up_bd_observed = post_mean + 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
 ```
 
-There are two sources of uncertainty, _epistemic_ uncertainty, representing _reducible_ uncertainty, and _aleatoric_ or _irreducible_ uncertainty. The _epistemic_ uncertainty here represents uncertainty about the true values of the noise free function. This uncertainty should grow as we move away from the data points, as away from the data there are a greater variety of function values consistent with our data. As we observe more and more data, our beliefs about the true function become more confident, and the epistemic uncertainty disappears. The _aleatoric_ uncertainty in this instance is the observation noise, since the data are given to us with this noise, and it cannot be reduced.
+Yra du neapibrėžtumo šaltiniai: _epistemilinis_ neapibrėžtumas, atitinkantis _sumažinamą_ neapibrėžtumą, ir _aleatorinis_ arba _nesumažinamas_ neapibrėžtumas. _Epistemilinis_ neapibrėžtumas čia atitinka neapibrėžtumą dėl tikrųjų be triukšmo funkcijos reikšmių. Šis neapibrėžtumas turėtų didėti tolstant nuo duomenų taškų, nes toli nuo duomenų yra didesnė funkcijos reikšmių, suderinamų su mūsų duomenimis, įvairovė. Stebint vis daugiau duomenų, mūsų įsitikinimai apie tikrąją funkciją tampa tikresni, ir epistemilinis neapibrėžtumas išnyksta. _Aleatorinis_ neapibrėžtumas šiuo atveju yra stebėjimo triukšmas, nes duomenys mums pateikiami su šiuo triukšmu, ir jo sumažinti negalima.
 
-The _epistemic_ uncertainty in the data is captured by variance of the latent noise free function np.diag(post\_cov). The _aleatoric_ uncertainty is captured by the noise variance post_sig_est**2. 
+_Epistemilinį_ neapibrėžtumą duomenyse užfiksuoja latentinės be triukšmo funkcijos dispersija np.diag(post\_cov). _Aleatorinį_ neapibrėžtumą užfiksuoja triukšmo dispersija post_sig_est**2. 
 
-Unfortunately, people are often careless about how they represent uncertainty, with many papers showing error bars that are completely undefined, no clear sense of whether we are visualizing epistemic or aleatoric uncertainty or both, and confusing noise variances with noise standard deviations, standard deviations with standard errors, confidence intervals with credible sets, and so on. Without being precise about what the uncertainty represents, it is essentially meaningless. 
+Deja, žmonės dažnai nerūpestingai atvaizduoja neapibrėžtumą: daugelyje straipsnių rodomos visiškai neapibrėžtos paklaidos juostos, nėra aiškaus supratimo, ar vizualizuojame epistemilinį, ar aleatorinį neapibrėžtumą, ar abu, ir painiojamos triukšmo dispersijos su triukšmo standartiniais nuokrypiais, standartiniai nuokrypiai su standartinėmis paklaidomis, pasikliautinieji intervalai su patikimosiomis aibėmis ir pan. Be tikslumo, ką atvaizduoja neapibrėžtumas, jis iš esmės yra beprasmis. 
 
-In the spirit of playing close attention to what our uncertainty represents, it is crucial to note that we are taking _two times_ the _square root_ of our variance estimate for the noise free function. Since our predictive distribution is Gaussian, this quantity enables us to form a 95\% credible set, representing our beliefs about the interval which is 95\% likely to contain the ground truth function. The noise _variance_ is living on a completely different scale, and is much less interpretable. 
+Atidžiai sekant, ką atvaizduoja mūsų neapibrėžtumas, labai svarbu pažymėti, kad imame _dvigubą_ be triukšmo funkcijos dispersijos įverčio _kvadratinę šaknį_. Kadangi mūsų prognozuojamasis skirstinys yra Gauso, šis dydis leidžia sudaryti 95 % patikimąją aibę, atvaizduojančią mūsų įsitikinimus apie intervalą, kuris su 95 % tikimybe turi etaloninę funkciją. Triukšmo _dispersija_ yra visiškai kitame mastelyje ir yra daug mažiau interpretuojama. 
 
-Finally, let's take a look at 20 posterior samples. These samples tell us what types of functions we believe might fit our data, a posteriori.
+Galiausiai pažiūrėkime į 20 aposteriorinių imčių. Šios imtys mums sako, kokių tipų funkcijos, mūsų manymu, galėtų atitikti mūsų duomenis aposteriori.
 
 ```{.python .input}
 post_samples = np.random.multivariate_normal(post_mean, post_cov, size=20)
@@ -237,13 +237,13 @@ plt.legend(['Observed Data', 'True Function', 'Predictive Mean', 'Posterior Samp
 d2l.plt.show()
 ```
 
-In basic regression applications, it is most common to use the posterior predictive mean and standard deviation as a point predictor and metric for uncertainty, respectively. In more advanced applications, such as Bayesian optimization with Monte Carlo acquisition functions, or Gaussian processes for model-based RL, it often necessary to take posterior samples. However, even if not strictly required in the basic applications, these samples give us more intuition about the fit we have for the data, and are often useful to include in visualizations. 
+Pagrindiniuose regresijos taikymuose dažniausiai naudojamas aposteriorinis prognozuojamasis vidurkis ir standartinis nuokrypis atitinkamai kaip taškinis prognozuotuvas ir neapibrėžtumo metrika. Pažangesniuose taikymuose, pavyzdžiui, Bajeso optimizavime su Monte Karlo gavimo funkcijomis arba Gauso procesuose modeliu pagrįstam RL, dažnai būtina imti aposteriorines imtis. Tačiau net jei pagrindiniuose taikymuose jų ir nebūtina imti, šios imtys suteikia daugiau intuicijos apie pritaikymą duomenims ir dažnai naudingos vizualizacijose. 
 
-## Making Life Easy with GPyTorch
+## Gyvenimo palengvinimas su GPyTorch
 
-As we have seen, it is actually pretty easy to implement basic Gaussian process regression entirely from scratch. However, as soon as we want to explore a variety of kernel choices, consider approximate inference (which is needed even for classification), combine GPs with neural networks, or even have a dataset larger than about 10,000 points, then an implementation from scratch becomes unwieldy and cumbersome. Some of the most effective methods for scalable GP inference, such as SKI (also known as KISS-GP), can require hundreds of lines of code implementing advanced numerical linear algebra routines. 
+Kaip matėme, iš tikrųjų yra gana lengva įgyvendinti pagrindinę Gauso procesų regresiją visiškai nuo nulio. Tačiau vos tik norime ištirti įvairius branduolių pasirinkimus, apsvarstyti apytikslę inferenciją (kuri reikalinga net klasifikavimui), derinti GP su neuroniniais tinklais ar net turime duomenų rinkinį, didesnį nei maždaug 10 000 taškų, įgyvendinimas nuo nulio tampa sunkiai valdomas ir varginantis. Kai kurie efektyviausi mastelio didėjimui pritaikytos GP inferencijos metodai, pavyzdžiui, SKI (dar žinomas kaip KISS-GP), gali reikalauti šimtų kodo eilučių, įgyvendinančių pažangias skaitines tiesinės algebros rutinas. 
 
-In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch more in future notebooks on Gaussian process numerics, and advanced methods. The GPyTorch library contains [many examples](https://github.com/cornellius-gp/gpytorch/tree/master/examples). To get a feel for the package, we will walk through the [simple regression example](https://github.com/cornellius-gp/gpytorch/blob/master/examples/01_Exact_GPs/Simple_GP_Regression.ipynb), showing how it can be adapted to reproduce our above results using GPyTorch. This may seem like a lot of code to simply reproduce the basic regression above, and in a sense, it is. But we can immediately use a variety of kernels, scalable inference techniques, and approximate inference, by only changing a few lines of code from below, instead of writing potentially thousands of lines of new code.
+Šiais atvejais _GPyTorch_ biblioteka mums gerokai palengvins gyvenimą. GPyTorch plačiau aptarsime būsimose užrašų knygutėse apie Gauso procesų skaitmeniką ir pažangius metodus. GPyTorch bibliotekoje yra [daug pavyzdžių](https://github.com/cornellius-gp/gpytorch/tree/master/examples). Kad pajaustume paketą, peržiūrėsime [paprastą regresijos pavyzdį](https://github.com/cornellius-gp/gpytorch/blob/master/examples/01_Exact_GPs/Simple_GP_Regression.ipynb), parodydami, kaip jį galima pritaikyti, kad atkurtume aukščiau gautus rezultatus naudojant GPyTorch. Gali atrodyti, kad tai daug kodo vien pagrindinei regresijai atkurti, ir tam tikra prasme taip ir yra. Tačiau galime nedelsdami naudoti įvairius branduolius, mastelio didėjimui pritaikytus inferencijos metodus ir apytikslę inferenciją pakeitę tik kelias kodo eilutes žemiau, užuot rašę potencialiai tūkstančius naujo kodo eilučių.
 
 ```{.python .input}
 # First let's convert our data into tensors for use with PyTorch
@@ -265,13 +265,13 @@ class ExactGPModel(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 ```
 
-This code block puts the data in the right format for GPyTorch, and specifies that we are using exact inference, as well
-the mean function (zero) and kernel function (RBF) that we want to use. We can use any other kernel very easily, by 
-calling, for instance, gpytorch.kernels.matern_kernel(), or gpyotrch.kernels.spectral_mixture_kernel(). So far, we have
-only discussed exact inference, where it is possible to infer a predictive distribution without making any approximations.
-For Gaussian processes, we can only perform exact inference when we have a Gaussian likelihood; more specifically, when we
-assume that our observations are generated as a noise-free function represented by a Gaussian process, plus Gaussian noise.
-In future notebooks, we will consider other settings, such as classification, where we cannot make these assumptions.
+Šis kodo blokas pateikia duomenis GPyTorch tinkamu formatu ir nurodo, kad naudojame tikslią inferenciją, taip pat
+vidurkio funkciją (nulinę) ir branduolio funkciją (RBF), kuriuos norime naudoti. Bet kurį kitą branduolį galime naudoti labai lengvai,
+iškviesdami, pavyzdžiui, gpytorch.kernels.matern_kernel() arba gpyotrch.kernels.spectral_mixture_kernel(). Iki šiol aptarėme
+tik tikslią inferenciją, kai prognozuojamąjį skirstinį įmanoma nustatyti nedarant jokių aproksimacijų.
+Gauso procesams tikslią inferenciją galime atlikti tik tada, kai turime Gauso tikėtinumą; tiksliau, kai
+darome prielaidą, kad mūsų stebiniai generuojami kaip be triukšmo funkcija, atvaizduojama Gauso procesu, plius Gauso triukšmas.
+Būsimose užrašų knygutėse nagrinėsime kitas aplinkybes, pavyzdžiui, klasifikavimą, kai šių prielaidų daryti negalime.
 
 ```{.python .input}
 # Initialize Gaussian likelihood
@@ -287,7 +287,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 ```
 
-Here, we explicitly specify the likelihood we want to use (Gaussian), the objective we will use for training kernel hyperparameters (here, the marginal likelihood), and the procedure we we want to use for optimizing that objective (in this case, Adam). We note that while we are using Adam, which is a "stochastic" optimizer, in this case, it is full-batch Adam. Because the marginal likelihood does not factorize over data instances, we cannot use an optimizer over "mini-batches" of data and be guaranteed convergence. Other optimizers, such as L-BFGS, are also supported by GPyTorch. Unlike in standard deep learning, doing a good job of optimizing the marginal likelihood corresponds strongly with good generalization, which often inclines us towards powerful optimizers like L-BFGS, assuming they are not prohibitively expensive.
+Čia aiškiai nurodome tikėtinumą, kurį norime naudoti (Gauso), tikslą, kurį naudosime branduolio hiperparametrams apmokyti (čia – ribinį tikėtinumą), ir procedūrą, kurią norime naudoti tam tikslui optimizuoti (šiuo atveju – Adam). Pažymime, kad nors naudojame Adam, kuris yra „stochastinis“ optimizatorius, šiuo atveju tai viso rinkinio Adam. Kadangi ribinis tikėtinumas nefaktorizuojasi per duomenų egzempliorius, negalime naudoti optimizatoriaus per duomenų „minirinkinius“ ir tikėtis garantuotos konvergencijos. GPyTorch taip pat palaiko kitus optimizatorius, pavyzdžiui, L-BFGS. Skirtingai nei standartiniame giliajame mokyme, gerai optimizuotas ribinis tikėtinumas stipriai koreliuoja su geru apibendrinimu, todėl dažnai linkstame prie galingų optimizatorių, tokių kaip L-BFGS, jei jie nėra pernelyg brangūs.
 
 ```{.python .input}
 for i in range(training_iter):
@@ -306,7 +306,7 @@ for i in range(training_iter):
     optimizer.step()
 ```
 
-Here we actually run the optimization procedure, outputting the values of the loss every 10 iterations.
+Čia iš tikrųjų vykdome optimizavimo procedūrą, išvesdami nuostolio reikšmes kas 10 iteracijų.
 
 ```{.python .input}
 # Get into evaluation (predictive posterior) mode
@@ -316,7 +316,7 @@ likelihood.eval()
 observed_pred = likelihood(model(test_x)) 
 ```
 
-The above codeblock enables us to make predictions on our test inputs.
+Aukščiau pateiktas kodo blokas leidžia mums daryti prognozes mūsų testavimo įvestyse.
 
 ```{.python .input}
 with torch.no_grad():
@@ -334,32 +334,32 @@ with torch.no_grad():
                '95% Credible Set'])
 ```
 
-Finally, we plot the fit.
+Galiausiai nubraižome pritaikymą.
 
-We see the fits are virtually identical. A few things to note: GPyTorch is working with _squared_ length-scales and observation noise. For example, our learned noise standard deviation in the for scratch code is about 0.283. The noise variance found by GPyTorch is $0.81 \approx 0.283^2$. In the GPyTorch plot, we also show the credible set in the _observation space_ rather than the latent function space, to demonstrate that they indeed cover the observed datapoints.
+Matome, kad pritaikymai yra praktiškai identiški. Keletas pastabų: GPyTorch dirba su ilgio skalių ir stebėjimo triukšmo _kvadratais_. Pavyzdžiui, mūsų išmoktas triukšmo standartinis nuokrypis kode nuo nulio yra apie 0.283. GPyTorch rasta triukšmo dispersija yra $0.81 \approx 0.283^2$. GPyTorch grafike taip pat rodome patikimąją aibę _stebėjimų erdvėje_, o ne latentinių funkcijų erdvėje, kad parodytume, jog ji iš tiesų apima stebėtus duomenų taškus.
 
-## Summary
+## Santrauka
 
-We can combine a Gaussian process prior with data to form a posterior, which we use to make predictions. We can also form a marginal likelihood, which is useful for automatic learning of kernel hyperparameters, which control properties such as the rate of variation of the Gaussian process. The mechanics of forming the posterior and learning kernel hyperparameters for regression are simple, involving about a dozen lines of code. This notebook is a good reference for any reader wanting to quickly get "up and running" with Gaussian processes. We also introduced the GPyTorch library. Although the GPyTorch code for basic regression is relatively long, it can be trivially modified for other kernel functions, or more advanced functionality we will discuss in future notebooks, such as scalable inference, or non-Gaussian likelihoods for classification.
+Gauso proceso apriorinį skirstinį galime derinti su duomenimis, kad sudarytume aposteriorinį skirstinį, kurį naudojame prognozėms daryti. Taip pat galime sudaryti ribinį tikėtinumą, kuris naudingas automatiniam branduolio hiperparametrų mokymuisi, valdančiam tokias savybes kaip Gauso proceso kitimo sparta. Aposteriorinio skirstinio sudarymo ir branduolio hiperparametrų mokymosi regresijai mechanika yra paprasta ir užima apie tuziną kodo eilučių. Ši užrašų knygutė yra gera nuoroda bet kuriam skaitytojui, norinčiam greitai „įsibėgėti“ su Gauso procesais. Taip pat pristatėme GPyTorch biblioteką. Nors GPyTorch kodas pagrindinei regresijai yra gana ilgas, jį galima nesunkiai modifikuoti kitoms branduolio funkcijoms ar pažangesnėms funkcijoms, kurias aptarsime būsimose užrašų knygutėse, pavyzdžiui, mastelio didėjimui pritaikytai inferencijai ar ne Gauso tikėtinumams klasifikavimui.
 
 
-## Exercises
+## Pratimai
 
-1. We have emphasized the importance of _learning_ kernel hyperparameters, and the effect of hyperparameters and kernels on the generalization properties of Gaussian processes. Try skipping the step where we learn hypers, and instead guess a variety of length-scales and noise variances, and check their effect on predictions. What happens when you use a large length-scale? A small length-scale? A large noise variance? A small noise variance?
-2. We have said that the marginal likelihood is not a convex objective, but that hyperparameters like length-scale and noise variance can be reliably estimated in GP regression. This is generally true --- in fact, the marginal likelihood is _much_ better at learning length-scale hyperparameters than conventional approaches in spatial statistics, which involve fitting empirical autocorrelation functions ("covariograms"). Arguably, the biggest contribution from machine learning to Gaussian process research, at least before recent work on scalable inference, was the introduction of the marginal lkelihood for hyperparameter learning. 
+1. Pabrėžėme _mokymosi_ branduolio hiperparametrų svarbą ir hiperparametrų bei branduolių poveikį Gauso procesų apibendrinimo savybėms. Pabandykite praleisti žingsnį, kuriame mokomės hiperparametrų, ir vietoj to spėkite įvairias ilgio skales ir triukšmo dispersijas bei patikrinkite jų poveikį prognozėms. Kas nutinka, kai naudojate didelę ilgio skalę? Mažą ilgio skalę? Didelę triukšmo dispersiją? Mažą triukšmo dispersiją?
+2. Sakėme, kad ribinis tikėtinumas nėra iškilasis tikslas, bet kad hiperparametrai, pavyzdžiui, ilgio skalė ir triukšmo dispersija, GP regresijoje gali būti patikimai įvertinti. Tai paprastai tiesa – iš tikrųjų ribinis tikėtinumas _daug_ geriau išmoksta ilgio skalės hiperparametrus nei įprasti erdvinės statistikos metodai, apimantys empirinių autokoreliacijos funkcijų („kovariogramų“) pritaikymą. Galima teigti, kad didžiausias mašininio mokymosi indėlis į Gauso procesų tyrimus, bent jau iki pastarojo darbo apie mastelio didėjimui pritaikytą inferenciją, buvo ribinio tikėtinumo įvedimas hiperparametrų mokymuisi. 
 
-*However*, different pairings of even these parameters provide interpretably different plausible explanations for many datasets, leading to local optima in our objective. If we use a large length-scale, then we assume the true underlying function is slowly varying. If the observed data _are_ varying significantly, then the only we can plausibly have a large length-scale is with a large noise-variance. If we use a small length-scale, on the  other hand, our fit will be very sensitive to the variations in the data, leaving little room to explain variations with noise (aleatoric uncertainty). 
+*Tačiau* skirtingos net šių parametrų poros suteikia interpretuojamai skirtingus tikėtinus daugelio duomenų rinkinių paaiškinimus, o tai lemia lokaliuosius optimumus mūsų tiksle. Jei naudojame didelę ilgio skalę, tada darome prielaidą, kad tikroji pagrindinė funkcija kinta lėtai. Jei stebimi duomenys _kinta_ žymiai, vienintelis būdas, kaip galime tikėtinai turėti didelę ilgio skalę, yra didelė triukšmo dispersija. Kita vertus, jei naudojame mažą ilgio skalę, mūsų pritaikymas bus labai jautrus duomenų kitimui, paliekant mažai vietos kitimams paaiškinti triukšmu (aleatoriniu neapibrėžtumu). 
 
-Try seeing if you can find these local optima: initialize with very large length-scale with large noise, and small length-scales with small noise. Do you converge to different solutions?
+Pabandykite pažiūrėti, ar galite rasti šiuos lokaliuosius optimumus: inicializuokite su labai didele ilgio skale ir dideliu triukšmu bei su mažomis ilgio skalėmis ir mažu triukšmu. Ar konverguojate į skirtingus sprendinius?
   
-3. We have said that a fundamental advantage of Bayesian methods is in naturally representing _epistemic_ uncertainty. In the above example, we cannot fully see the effects of epistemic uncertainty. Try instead to predict with `test_x = np.linspace(0, 10, 1000)`. What happens to the 95\% credible set as your predictions move beyond the data? Does it cover the true function in that interval? What happens if you only visualize aleatoric uncertainty in that region? 
+3. Sakėme, kad esminis Bajeso metodų privalumas yra natūralus _epistemilinio_ neapibrėžtumo atvaizdavimas. Aukščiau pateiktame pavyzdyje negalime pilnai pamatyti epistemilinio neapibrėžtumo poveikio. Vietoj to pabandykite prognozuoti su `test_x = np.linspace(0, 10, 1000)`. Kas nutinka 95 % patikimajai aibei, kai jūsų prognozės išeina už duomenų ribų? Ar ji apima tikrąją funkciją tame intervale? Kas nutinka, jei tame regione vizualizuojate tik aleatorinį neapibrėžtumą? 
 
-4. Try running the above example, but instead with 10,000, 20,000 and 40,000 training points, and measure the runtimes. How does the training time scale? Alternatively, how do the runtimes scale with the number of test points? Is it different for the predictive mean and the predictive variance? Answer this question both by theoretically working out the training and testing time complexities, and by running the code above with a different number of points.
+4. Pabandykite paleisti aukščiau pateiktą pavyzdį, bet vietoj to su 10 000, 20 000 ir 40 000 apmokymo taškų, ir išmatuokite vykdymo laikus. Kaip kinta apmokymo laikas didėjant mastui? Arba kaip vykdymo laikai kinta priklausomai nuo testavimo taškų skaičiaus? Ar tai skiriasi prognozuojamajam vidurkiui ir prognozuojamajai dispersijai? Atsakykite į šį klausimą tiek teoriškai išvesdami apmokymo ir testavimo laiko sudėtingumus, tiek paleisdami aukščiau pateiktą kodą su skirtingu taškų skaičiumi.
 
-5. Try running the GPyTorch example with different covariance functions, such as the Matern kernel. How do the results change? How about the spectral mixture kernel, found in the GPyTorch library? Are some easier to train the marginal likelihood than others? Are some more valuable for long-range versus short-range predictions?
+5. Pabandykite paleisti GPyTorch pavyzdį su skirtingomis kovariacijos funkcijomis, pavyzdžiui, Materno branduoliu. Kaip keičiasi rezultatai? O su spektrinių mišinių branduoliu, esančiu GPyTorch bibliotekoje? Ar kai kuriuos lengviau apmokyti pagal ribinį tikėtinumą nei kitus? Ar kai kurie vertingesni ilgojo, o ne trumpojo nuotolio prognozėms?
 
-6. In our GPyTorch example, we plotted the predictive distribution including observation noise, while in our "from scratch" example, we only included epistemic uncertainty. Re-do the GPyTorch example, but this time only plotting epistemic uncertainty, and compare to the from-scratch results. Do the predictive distributions now look the same?  (They should.)
+6. Mūsų GPyTorch pavyzdyje nubraižėme prognozuojamąjį skirstinį, įskaitant stebėjimo triukšmą, o savo pavyzdyje „nuo nulio“ įtraukėme tik epistemilinį neapibrėžtumą. Pakartokite GPyTorch pavyzdį, bet šį kartą braižydami tik epistemilinį neapibrėžtumą, ir palyginkite su rezultatais nuo nulio. Ar prognozuojamieji skirstiniai dabar atrodo vienodai? (Turėtų.)
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12117)
+[Diskusijos](https://discuss.d2l.ai/t/12117)
 :end_tab:

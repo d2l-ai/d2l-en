@@ -1,12 +1,12 @@
-# Convexity
+# Iškilumas
 :label:`sec_convexity`
 
-Convexity plays a vital role in the design of optimization algorithms. 
-This is largely due to the fact that it is much easier to analyze and test algorithms in such a context. 
-In other words,
-if the algorithm performs poorly even in the convex setting,
-typically we should not hope to see great results otherwise. 
-Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`.
+Iškilumas atlieka esminį vaidmenį projektuojant optimizavimo algoritmus.
+Tai iš esmės lemia faktas, kad tokiame kontekste daug lengviau analizuoti ir testuoti algoritmus.
+Kitaip tariant,
+jei algoritmas prastai veikia net iškiliojoje aplinkoje,
+paprastai neturėtume tikėtis puikių rezultatų ir kitais atvejais.
+Be to, nors giliojo mokymosi optimizavimo uždaviniai paprastai yra neiškilieji, netoli lokaliųjų minimumų jie dažnai pasižymi kai kuriomis iškiliųjų uždavinių savybėmis. Tai gali lemti įdomius naujus optimizavimo variantus, tokius kaip :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`.
 
 ```{.python .input}
 #@tab mxnet
@@ -35,51 +35,51 @@ from mpl_toolkits import mplot3d
 import tensorflow as tf
 ```
 
-## Definitions
+## Apibrėžimai
 
-Before convex analysis,
-we need to define *convex sets* and *convex functions*.
-They lead to mathematical tools that are commonly applied to machine learning.
+Prieš iškilumo analizę
+turime apibrėžti *iškiliąsias aibes* ir *iškiliąsias funkcijas*.
+Jos veda prie matematinių įrankių, kurie įprastai taikomi mašininiam mokymuisi.
 
 
-### Convex Sets
+### Iškiliosios aibės
 
-Sets are the basis of convexity. Simply put, a set $\mathcal{X}$ in a vector space is *convex* if for any $a, b \in \mathcal{X}$ the line segment connecting $a$ and $b$ is also in $\mathcal{X}$. In mathematical terms this means that for all $\lambda \in [0, 1]$ we have
+Aibės yra iškilumo pagrindas. Paprasčiau tariant, vektorinės erdvės aibė $\mathcal{X}$ yra *iškiloji*, jei bet kuriems $a, b \in \mathcal{X}$ atkarpa, jungianti $a$ ir $b$, taip pat yra $\mathcal{X}$. Matematiškai tai reiškia, kad visiems $\lambda \in [0, 1]$ turime
 
 $$\lambda  a + (1-\lambda)  b \in \mathcal{X} \textrm{ whenever } a, b \in \mathcal{X}.$$
 
-This sounds a bit abstract. Consider :numref:`fig_pacman`. The first set is not convex since there exist line segments that are not contained in it.
-The other two sets suffer no such problem.
+Tai skamba šiek tiek abstrakčiai. Panagrinėkime :numref:`fig_pacman`. Pirmoji aibė nėra iškiloji, nes yra atkarpų, kurios joje nesitelpa.
+Kitos dvi aibės tokios problemos neturi.
 
-![The first set is nonconvex and the other two are convex.](../img/pacman.svg)
+![Pirmoji aibė yra neiškiloji, o kitos dvi yra iškilosios.](../img/pacman.svg)
 :label:`fig_pacman`
 
-Definitions on their own are not particularly useful unless you can do something with them.
-In this case we can look at intersections as shown in :numref:`fig_convex_intersect`.
-Assume that $\mathcal{X}$ and $\mathcal{Y}$ are convex sets. Then $\mathcal{X} \cap \mathcal{Y}$ is also convex. To see this, consider any $a, b \in \mathcal{X} \cap \mathcal{Y}$. Since $\mathcal{X}$ and $\mathcal{Y}$ are convex, the line segments connecting $a$ and $b$ are contained in both $\mathcal{X}$ and $\mathcal{Y}$. Given that, they also need to be contained in $\mathcal{X} \cap \mathcal{Y}$, thus proving our theorem.
+Patys apibrėžimai nėra ypač naudingi, nebent galite su jais ką nors padaryti.
+Šiuo atveju galime pažvelgti į sankirtas, kaip parodyta :numref:`fig_convex_intersect`.
+Tarkime, kad $\mathcal{X}$ ir $\mathcal{Y}$ yra iškilosios aibės. Tada $\mathcal{X} \cap \mathcal{Y}$ taip pat yra iškiloji. Kad tai pamatytume, panagrinėkime bet kuriuos $a, b \in \mathcal{X} \cap \mathcal{Y}$. Kadangi $\mathcal{X}$ ir $\mathcal{Y}$ yra iškilosios, atkarpos, jungiančios $a$ ir $b$, yra ir $\mathcal{X}$, ir $\mathcal{Y}$. Tai reiškia, kad jos taip pat turi būti $\mathcal{X} \cap \mathcal{Y}$, taigi įrodome savo teoremą.
 
-![The intersection between two convex sets is convex.](../img/convex-intersect.svg)
+![Dviejų iškiliųjų aibių sankirta yra iškiloji.](../img/convex-intersect.svg)
 :label:`fig_convex_intersect`
 
-We can strengthen this result with little effort: given convex sets $\mathcal{X}_i$, their intersection $\cap_{i} \mathcal{X}_i$ is convex.
-To see that the converse is not true, consider two disjoint sets $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Now pick $a \in \mathcal{X}$ and $b \in \mathcal{Y}$. The line segment in :numref:`fig_nonconvex` connecting $a$ and $b$ needs to contain some part that is neither in $\mathcal{X}$ nor in $\mathcal{Y}$, since we assumed that $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Hence the line segment is not in $\mathcal{X} \cup \mathcal{Y}$ either, thus proving that in general unions of convex sets need not be convex.
+Šį rezultatą galime sustiprinti be didelių pastangų: turint iškiliąsias aibes $\mathcal{X}_i$, jų sankirta $\cap_{i} \mathcal{X}_i$ yra iškiloji.
+Kad pamatytume, jog atvirkštinis teiginys nėra teisingas, panagrinėkime dvi nesikertančias aibes $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Dabar pasirinkime $a \in \mathcal{X}$ ir $b \in \mathcal{Y}$. Atkarpa :numref:`fig_nonconvex`, jungianti $a$ ir $b$, turi turėti tam tikrą dalį, kuri nėra nei $\mathcal{X}$, nei $\mathcal{Y}$, nes darėme prielaidą, kad $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Todėl atkarpa nėra ir $\mathcal{X} \cup \mathcal{Y}$, taigi įrodome, kad apskritai iškiliųjų aibių sąjungos nebūtinai yra iškilosios.
 
-![The union of two convex sets need not be convex.](../img/nonconvex.svg)
+![Dviejų iškiliųjų aibių sąjunga nebūtinai yra iškiloji.](../img/nonconvex.svg)
 :label:`fig_nonconvex`
 
-Typically the problems in deep learning are defined on convex sets. For instance, $\mathbb{R}^d$,
-the set of $d$-dimensional vectors of real numbers,
-is a convex set (after all, the line between any two points in $\mathbb{R}^d$ remains in $\mathbb{R}^d$). In some cases we work with variables of bounded length, such as balls of radius $r$ as defined by $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \textrm{ and } \|\mathbf{x}\| \leq r\}$.
+Paprastai giliojo mokymosi uždaviniai apibrėžiami iškiliosiose aibėse. Pavyzdžiui, $\mathbb{R}^d$,
+$d$ dimensijų realiųjų skaičių vektorių aibė,
+yra iškiloji aibė (juk atkarpa tarp bet kurių dviejų taškų $\mathbb{R}^d$ lieka $\mathbb{R}^d$). Kai kuriais atvejais dirbame su aprėžto ilgio kintamaisiais, pavyzdžiui, $r$ spindulio rutuliais, apibrėžtais kaip $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \textrm{ ir } \|\mathbf{x}\| \leq r\}$.
 
-### Convex Functions
+### Iškiliosios funkcijos
 
-Now that we have convex sets we can introduce *convex functions* $f$.
-Given a convex set $\mathcal{X}$, a function $f: \mathcal{X} \to \mathbb{R}$ is *convex* if for all $x, x' \in \mathcal{X}$ and for all $\lambda \in [0, 1]$ we have
+Dabar, kai turime iškiliąsias aibes, galime pristatyti *iškiliąsias funkcijas* $f$.
+Duota iškilioji aibė $\mathcal{X}$, funkcija $f: \mathcal{X} \to \mathbb{R}$ yra *iškiloji*, jei visiems $x, x' \in \mathcal{X}$ ir visiems $\lambda \in [0, 1]$ turime
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
-To illustrate this let's plot a few functions and check which ones satisfy the requirement.
-Below we define a few functions, both convex and nonconvex.
+Kad tai iliustruotume, nubraižykime kelias funkcijas ir patikrinkime, kurios tenkina šį reikalavimą.
+Toliau apibrėžiame kelias funkcijas, tiek iškiliąsias, tiek neiškiliąsias.
 
 ```{.python .input}
 #@tab all
@@ -94,61 +94,61 @@ for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
 
-As expected, the cosine function is *nonconvex*, whereas the parabola and the exponential function are. Note that the requirement that $\mathcal{X}$ is a convex set is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined.
+Kaip ir tikėtasi, kosinuso funkcija yra *neiškiloji*, o parabolė ir eksponentinė funkcija yra iškilosios. Atkreipkite dėmesį, kad reikalavimas, jog $\mathcal{X}$ yra iškilioji aibė, yra būtinas, kad sąlyga turėtų prasmę. Priešingu atveju $f(\lambda x + (1-\lambda) x')$ rezultatas gali būti nepakankamai apibrėžtas.
 
 
-### Jensen's Inequality
+### Jenseno nelygybė
 
-Given a convex function $f$,
-one of the most useful mathematical tools
-is *Jensen's inequality*.
-It amounts to a generalization of the definition of convexity:
+Turint iškiliąją funkciją $f$,
+vienas naudingiausių matematinių įrankių
+yra *Jenseno nelygybė*.
+Ji reiškia iškilumo apibrėžimo apibendrinimą:
 
 $$\sum_i \alpha_i f(x_i)  \geq f\left(\sum_i \alpha_i x_i\right)    \textrm{ and }    E_X[f(X)]  \geq f\left(E_X[X]\right),$$
 :eqlabel:`eq_jensens-inequality`
 
-where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$ and $X$ is a random variable.
-In other words, the expectation of a convex function is no less than the convex function of an expectation, where the latter is usually a simpler expression. 
-To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time.
+kur $\alpha_i$ yra neneigiami realieji skaičiai, kad $\sum_i \alpha_i = 1$, o $X$ yra atsitiktinis kintamasis.
+Kitaip tariant, iškiliosios funkcijos vidurkis yra ne mažesnis už iškiliąją vidurkio funkciją, kur pastaroji paprastai yra paprastesnė išraiška.
+Kad įrodytume pirmąją nelygybę, pakartotinai taikome iškilumo apibrėžimą vienam sumos nariui vienu metu.
 
 
-One of the common applications of Jensen's inequality is
-to bound a more complicated expression by a simpler one.
-For example,
-its application can be
-with regard to the log-likelihood of partially observed random variables. That is, we use
+Vienas įprastų Jenseno nelygybės taikymų yra
+sudėtingesnę išraišką aprėžti paprastesne.
+Pavyzdžiui,
+ją galima taikyti
+iš dalies stebėtų atsitiktinių kintamųjų logaritminiam tikėtinumui. Tai yra, naudojame
 
 $$E_{Y \sim P(Y)}[-\log P(X \mid Y)] \geq -\log P(X),$$
 
-since $\int P(Y) P(X \mid Y) dY = P(X)$.
-This can be used in variational methods. Here $Y$ is typically the unobserved random variable, $P(Y)$ is the best guess of how it might be distributed, and $P(X)$ is the distribution with $Y$ integrated out. For instance, in clustering $Y$ might be the cluster labels and $P(X \mid Y)$ is the generative model when applying cluster labels.
+nes $\int P(Y) P(X \mid Y) dY = P(X)$.
+Tai galima naudoti variaciniuose metoduose. Čia $Y$ paprastai yra nestebimas atsitiktinis kintamasis, $P(Y)$ yra geriausias spėjimas, kaip jis gali būti pasiskirstęs, o $P(X)$ yra skirstinys, iš kurio $Y$ suintegruotas. Pavyzdžiui, klasterizavime $Y$ gali būti klasterių žymenys, o $P(X \mid Y)$ yra generatyvinis modelis taikant klasterių žymenis.
 
 
 
-## Properties
+## Savybės
 
-Convex functions have many useful properties. We describe a few commonly-used ones below.
+Iškiliosios funkcijos turi daug naudingų savybių. Toliau aprašome kelias dažniausiai naudojamas.
 
 
-### Local Minima Are Global Minima
+### Lokalieji minimumai yra globalieji minimumai
 
-First and foremost, the local minima of convex functions are also the global minima. 
-We can prove it by contradiction as follows.
+Pirmiausia, iškiliųjų funkcijų lokalieji minimumai yra ir globalieji minimumai.
+Tai galime įrodyti prieštaros metodu taip.
 
-Consider a convex function $f$ defined on a convex set $\mathcal{X}$.
-Suppose that $x^{\ast} \in \mathcal{X}$ is a local minimum:
-there exists a small positive value $p$ so that for $x \in \mathcal{X}$ that satisfies $0 < |x - x^{\ast}| \leq p$ we have $f(x^{\ast}) < f(x)$.
+Panagrinėkime iškiliąją funkciją $f$, apibrėžtą iškiliojoje aibėje $\mathcal{X}$.
+Tarkime, kad $x^{\ast} \in \mathcal{X}$ yra lokalusis minimumas:
+egzistuoja nedidelė teigiama reikšmė $p$, kad $x \in \mathcal{X}$, tenkinantiems $0 < |x - x^{\ast}| \leq p$, turime $f(x^{\ast}) < f(x)$.
 
-Assume that the local minimum $x^{\ast}$
-is not the global minimum of $f$:
-there exists $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. 
-There also exists 
-$\lambda \in [0, 1)$ such as $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$
-so that
-$0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. 
+Tarkime, kad lokalusis minimumas $x^{\ast}$
+nėra globalusis $f$ minimumas:
+egzistuoja $x' \in \mathcal{X}$, kuriam $f(x') < f(x^{\ast})$.
+Taip pat egzistuoja
+$\lambda \in [0, 1)$, pavyzdžiui, $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$,
+kad
+$0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$.
 
-However,
-according to the definition of convex functions, we have
+Tačiau
+pagal iškiliųjų funkcijų apibrėžimą turime
 
 $$\begin{aligned}
     f(\lambda x^{\ast} + (1-\lambda) x') &\leq \lambda f(x^{\ast}) + (1-\lambda) f(x') \\
@@ -156,10 +156,10 @@ $$\begin{aligned}
     &= f(x^{\ast}),
 \end{aligned}$$
 
-which contradicts with our statement that $x^{\ast}$ is a local minimum.
-Therefore, there does not exist $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
+o tai prieštarauja mūsų teiginiui, kad $x^{\ast}$ yra lokalusis minimumas.
+Todėl neegzistuoja $x' \in \mathcal{X}$, kuriam $f(x') < f(x^{\ast})$. Lokalusis minimumas $x^{\ast}$ taip pat yra globalusis minimumas.
 
-For instance, the convex function $f(x) = (x-1)^2$ has a local minimum at $x=1$, which is also the global minimum.
+Pavyzdžiui, iškilioji funkcija $f(x) = (x-1)^2$ turi lokalųjį minimumą ties $x=1$, kuris taip pat yra globalusis minimumas.
 
 ```{.python .input}
 #@tab all
@@ -168,88 +168,88 @@ d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
 
-The fact that the local minima for convex functions are also the global minima is very convenient. 
-It means that if we minimize functions we cannot "get stuck". 
-Note, though, that this does not mean that there cannot be more than one global minimum or that there might even exist one. For instance, the function $f(x) = \mathrm{max}(|x|-1, 0)$ attains its minimum value over the interval $[-1, 1]$. Conversely, the function $f(x) = \exp(x)$ does not attain a minimum value on $\mathbb{R}$: for $x \to -\infty$ it asymptotes to $0$, but there is no $x$ for which $f(x) = 0$.
+Faktas, kad iškiliųjų funkcijų lokalieji minimumai yra ir globalieji minimumai, yra labai patogus.
+Tai reiškia, kad minimizuodami funkcijas negalime „įstrigti“.
+Vis dėlto atkreipkite dėmesį, kad tai nereiškia, jog negali būti daugiau nei vieno globaliojo minimumo ar kad jis apskritai egzistuoja. Pavyzdžiui, funkcija $f(x) = \mathrm{max}(|x|-1, 0)$ pasiekia savo minimalią reikšmę intervale $[-1, 1]$. Ir atvirkščiai, funkcija $f(x) = \exp(x)$ nepasiekia minimalios reikšmės $\mathbb{R}$: kai $x \to -\infty$, ji asimptotiškai artėja prie $0$, bet nėra $x$, kuriam $f(x) = 0$.
 
-### Below Sets of Convex Functions Are Convex
+### Iškiliųjų funkcijų žemutinės aibės yra iškilosios
 
-We can conveniently 
-define convex sets 
-via *below sets* of convex functions.
-Concretely,
-given a convex function $f$ defined on a convex set $\mathcal{X}$,
-any below set
+Iškiliąsias aibes galime patogiai
+apibrėžti
+per iškiliųjų funkcijų *žemutines aibes*.
+Konkrečiai,
+turint iškiliąją funkciją $f$, apibrėžtą iškiliojoje aibėje $\mathcal{X}$,
+bet kuri žemutinė aibė
 
 $$\mathcal{S}_b \stackrel{\textrm{def}}{=} \{x | x \in \mathcal{X} \textrm{ and } f(x) \leq b\}$$
 
-is convex. 
+yra iškiloji.
 
-Let's prove this quickly. Recall that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. 
-Since $f(x) \leq b$ and $f(x') \leq b$,
-by the definition of convexity we have 
+Greitai tai įrodykime. Prisiminkite, kad bet kuriems $x, x' \in \mathcal{S}_b$ turime parodyti, kad $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$, kol $\lambda \in [0, 1]$.
+Kadangi $f(x) \leq b$ ir $f(x') \leq b$,
+pagal iškilumo apibrėžimą turime
 
 $$f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b.$$
 
 
-### Convexity and Second Derivatives
+### Iškilumas ir antrosios išvestinės
 
-Whenever the second derivative of a function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ exists it is very easy to check whether $f$ is convex. 
-All we need to do is check whether the Hessian of $f$ is positive semidefinite: $\nabla^2f \succeq 0$, i.e., 
-denoting the Hessian matrix $\nabla^2f$ by $\mathbf{H}$,
+Kai tik egzistuoja funkcijos $f: \mathbb{R}^n \rightarrow \mathbb{R}$ antroji išvestinė, labai lengva patikrinti, ar $f$ yra iškiloji.
+Tereikia patikrinti, ar $f$ Hesės matrica yra teigiamai pusiau apibrėžta: $\nabla^2f \succeq 0$, t. y.,
+Hesės matricą $\nabla^2f$ pažymėjus $\mathbf{H}$,
 $\mathbf{x}^\top \mathbf{H} \mathbf{x} \geq 0$
-for all $\mathbf{x} \in \mathbb{R}^n$.
-For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $\nabla^2 f = \mathbf{1}$, i.e., its Hessian is an identity matrix.
+visiems $\mathbf{x} \in \mathbb{R}^n$.
+Pavyzdžiui, funkcija $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ yra iškilioji, nes $\nabla^2 f = \mathbf{1}$, t. y. jos Hesės matrica yra vienetinė matrica.
 
 
-Formally, a twice-differentiable one-dimensional function $f: \mathbb{R} \rightarrow \mathbb{R}$ is convex
-if and only if its second derivative $f'' \geq 0$. For any twice-differentiable multidimensional function $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$,
-it is convex if and only if its Hessian $\nabla^2f \succeq 0$.
+Formaliai, du kartus diferencijuojama vienmatė funkcija $f: \mathbb{R} \rightarrow \mathbb{R}$ yra iškilioji
+tada ir tik tada, kai jos antroji išvestinė $f'' \geq 0$. Bet kuri du kartus diferencijuojama daugiamatė funkcija $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$
+yra iškilioji tada ir tik tada, kai jos Hesės matrica $\nabla^2f \succeq 0$.
 
-First, we need to prove the one-dimensional case.
-To see that 
-convexity of $f$ implies 
-$f'' \geq 0$  we use the fact that
+Pirmiausia turime įrodyti vienmatį atvejį.
+Kad pamatytume, jog
+$f$ iškilumas implikuoja
+$f'' \geq 0$, naudojame faktą, kad
 
 $$\frac{1}{2} f(x + \epsilon) + \frac{1}{2} f(x - \epsilon) \geq f\left(\frac{x + \epsilon}{2} + \frac{x - \epsilon}{2}\right) = f(x).$$
 
-Since the second derivative is given by the limit over finite differences it follows that
+Kadangi antroji išvestinė yra baigtinių skirtumų riba, išplaukia, kad
 
 $$f''(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) + f(x - \epsilon) - 2f(x)}{\epsilon^2} \geq 0.$$
 
-To see that 
-$f'' \geq 0$ implies that $f$ is convex
-we use the fact that $f'' \geq 0$ implies that $f'$ is a monotonically nondecreasing function. Let $a < x < b$ be three points in $\mathbb{R}$,
-where $x = (1-\lambda)a + \lambda b$ and $\lambda \in (0, 1)$.
-According to the mean value theorem,
-there exist $\alpha \in [a, x]$ and $\beta \in [x, b]$
-such that
+Kad pamatytume, jog
+$f'' \geq 0$ implikuoja, kad $f$ yra iškilioji,
+naudojame faktą, kad $f'' \geq 0$ implikuoja, jog $f'$ yra monotoniškai nemažėjanti funkcija. Tegul $a < x < b$ yra trys $\mathbb{R}$ taškai,
+kur $x = (1-\lambda)a + \lambda b$ ir $\lambda \in (0, 1)$.
+Pagal vidutinės reikšmės teoremą
+egzistuoja $\alpha \in [a, x]$ ir $\beta \in [x, b]$,
+kad
 
 $$f'(\alpha) = \frac{f(x) - f(a)}{x-a} \textrm{ and } f'(\beta) = \frac{f(b) - f(x)}{b-x}.$$
 
 
-By monotonicity $f'(\beta) \geq f'(\alpha)$, hence
+Pagal monotoniškumą $f'(\beta) \geq f'(\alpha)$, taigi
 
 $$\frac{x-a}{b-a}f(b) + \frac{b-x}{b-a}f(a) \geq f(x).$$
 
-Since $x = (1-\lambda)a + \lambda b$,
-we have
+Kadangi $x = (1-\lambda)a + \lambda b$,
+turime
 
 $$\lambda f(b) + (1-\lambda)f(a) \geq f((1-\lambda)a + \lambda b),$$
 
-thus proving convexity.
+taigi įrodome iškilumą.
 
-Second, we need a lemma before 
-proving the multidimensional case:
+Antra, prieš įrodant daugiamatį atvejį
+mums reikia lemos:
 $f: \mathbb{R}^n \rightarrow \mathbb{R}$
-is convex if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
+yra iškilioji tada ir tik tada, kai visiems $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
 
-$$g(z) \stackrel{\textrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \textrm{ where } z \in [0,1]$$ 
+$$g(z) \stackrel{\textrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \textrm{ where } z \in [0,1]$$
 
-is convex.
+yra iškilioji.
 
-To prove that convexity of $f$ implies that $g$ is convex,
-we can show that for all $a, b, \lambda \in [0, 1]$ (thus
+Kad įrodytume, jog $f$ iškilumas implikuoja, kad $g$ yra iškilioji,
+galime parodyti, kad visiems $a, b, \lambda \in [0, 1]$ (taigi
 $0 \leq \lambda a + (1-\lambda) b \leq 1$)
 
 $$\begin{aligned} &g(\lambda a + (1-\lambda) b)\\
@@ -259,9 +259,9 @@ $$\begin{aligned} &g(\lambda a + (1-\lambda) b)\\
 =& \lambda g(a) + (1-\lambda) g(b).
 \end{aligned}$$
 
-To prove the converse,
-we can show that for 
-all $\lambda \in [0, 1]$ 
+Kad įrodytume atvirkštinį teiginį,
+galime parodyti, kad
+visiems $\lambda \in [0, 1]$
 
 $$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
 =&g(\lambda \cdot 1 + (1-\lambda) \cdot 0)\\
@@ -270,106 +270,106 @@ $$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
 \end{aligned}$$
 
 
-Finally,
-using the lemma above and the result of the one-dimensional case,
-the multidimensional case
-can be proven as follows.
-A multidimensional function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is convex
-if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ $g(z) \stackrel{\textrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y})$, where $z \in [0,1]$,
-is convex.
-According to the one-dimensional case,
-this holds if and only if
+Galiausiai,
+naudodami aukščiau pateiktą lemą ir vienmačio atvejo rezultatą,
+daugiamatį atvejį
+galime įrodyti taip.
+Daugiamatė funkcija $f: \mathbb{R}^n \rightarrow \mathbb{R}$ yra iškilioji
+tada ir tik tada, kai visiems $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ funkcija $g(z) \stackrel{\textrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y})$, kur $z \in [0,1]$,
+yra iškilioji.
+Pagal vienmatį atvejį
+tai galioja tada ir tik tada, kai
 $g'' = (\mathbf{x} - \mathbf{y})^\top \mathbf{H}(\mathbf{x} - \mathbf{y}) \geq 0$ ($\mathbf{H} \stackrel{\textrm{def}}{=} \nabla^2f$)
-for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
-which is equivalent to $\mathbf{H} \succeq 0$
-per the definition of positive semidefinite matrices.
+visiems $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
+o tai ekvivalentu $\mathbf{H} \succeq 0$
+pagal teigiamai pusiau apibrėžtų matricų apibrėžimą.
 
 
-## Constraints
+## Apribojimai
 
-One of the nice properties of convex optimization is that it allows us to handle constraints efficiently. That is, it allows us to solve *constrained optimization* problems of the form:
+Viena iš gerų iškiliojo optimizavimo savybių yra ta, kad jis leidžia efektyviai tvarkyti apribojimus. Tai yra, jis leidžia spręsti *optimizavimo su apribojimais* uždavinius tokios formos:
 
 $$\begin{aligned} \mathop{\textrm{minimize~}}_{\mathbf{x}} & f(\mathbf{x}) \\
     \textrm{ subject to } & c_i(\mathbf{x}) \leq 0 \textrm{ for all } i \in \{1, \ldots, n\},
 \end{aligned}$$
 
-where $f$ is the objective and the functions $c_i$ are constraint functions. To see what this does consider the case where $c_1(\mathbf{x}) = \|\mathbf{x}\|_2 - 1$. In this case the parameters $\mathbf{x}$ are constrained to the unit ball. If a second constraint is $c_2(\mathbf{x}) = \mathbf{v}^\top \mathbf{x} + b$, then this corresponds to all $\mathbf{x}$ lying on a half-space. Satisfying both constraints simultaneously amounts to selecting a slice of a ball.
+kur $f$ yra tikslas, o funkcijos $c_i$ yra apribojimų funkcijos. Kad pamatytume, ką tai reiškia, panagrinėkime atvejį, kai $c_1(\mathbf{x}) = \|\mathbf{x}\|_2 - 1$. Šiuo atveju parametrai $\mathbf{x}$ apriboti vienetiniu rutuliu. Jei antrasis apribojimas yra $c_2(\mathbf{x}) = \mathbf{v}^\top \mathbf{x} + b$, tai atitinka visus $\mathbf{x}$, esančius pusiaerdvėje. Abiejų apribojimų tenkinimas vienu metu reiškia rutulio skiltelės pasirinkimą.
 
-### Lagrangian
+### Lagranžianas
 
-In general, solving a constrained optimization problem is difficult. One way of addressing it stems from physics with a rather simple intuition. Imagine a ball inside a box. The ball will roll to the place that is lowest and the forces of gravity will be balanced out with the forces that the sides of the box can impose on the ball. In short, the gradient of the objective function (i.e., gravity) will be offset by the gradient of the constraint function (the ball need to remain inside the box by virtue of the walls "pushing back"). 
-Note that some constraints may not be active:
-the walls that are not touched by the ball
-will not be able to exert any force on the ball.
+Apskritai spręsti optimizavimo su apribojimais uždavinį sunku. Vienas būdas jį spręsti kyla iš fizikos su gana paprasta intuicija. Įsivaizduokite rutulį dėžėje. Rutulys nuriedės į žemiausią vietą, o sunkio jėgos bus subalansuotos su jėgomis, kurias dėžės sienelės gali veikti rutulį. Trumpai tariant, tikslo funkcijos gradientą (t. y. sunkį) atsvers apribojimų funkcijos gradientas (rutulys turi likti dėžėje, nes sienelės „stumia atgal“).
+Atkreipkite dėmesį, kad kai kurie apribojimai gali būti neaktyvūs:
+sienelės, kurių rutulys neliečia,
+negalės veikti rutulio jokia jėga.
 
 
-Skipping over the derivation of the *Lagrangian* $L$,
-the above reasoning
-can be expressed via the following saddle point optimization problem:
+Praleidžiant *Lagranžiano* $L$ išvedimą,
+aukščiau pateiktą samprotavimą
+galima išreikšti šiuo balno taško optimizavimo uždaviniu:
 
 $$L(\mathbf{x}, \alpha_1, \ldots, \alpha_n) = f(\mathbf{x}) + \sum_{i=1}^n \alpha_i c_i(\mathbf{x}) \textrm{ where } \alpha_i \geq 0.$$
 
-Here the variables $\alpha_i$ ($i=1,\ldots,n$) are the so-called *Lagrange multipliers* that ensure that constraints are properly enforced. They are chosen just large enough to ensure that $c_i(\mathbf{x}) \leq 0$ for all $i$. For instance, for any $\mathbf{x}$ where $c_i(\mathbf{x}) < 0$ naturally, we'd end up picking $\alpha_i = 0$. Moreover, this is a saddle point optimization problem where one wants to *maximize* $L$ with respect to all $\alpha_i$ and simultaneously *minimize* it with respect to $\mathbf{x}$. There is a rich body of literature explaining how to arrive at the function $L(\mathbf{x}, \alpha_1, \ldots, \alpha_n)$. For our purposes it is sufficient to know that the saddle point of $L$ is where the original constrained optimization problem is solved optimally.
+Čia kintamieji $\alpha_i$ ($i=1,\ldots,n$) yra vadinamieji *Lagranžo daugikliai*, kurie užtikrina, kad apribojimai būtų tinkamai vykdomi. Jie parenkami tik pakankamai dideli, kad $c_i(\mathbf{x}) \leq 0$ visiems $i$. Pavyzdžiui, bet kuriam $\mathbf{x}$, kur $c_i(\mathbf{x}) < 0$ natūraliai, galiausiai pasirinktume $\alpha_i = 0$. Be to, tai yra balno taško optimizavimo uždavinys, kur norima *maksimizuoti* $L$ visų $\alpha_i$ atžvilgiu ir kartu *minimizuoti* jį $\mathbf{x}$ atžvilgiu. Yra gausi literatūra, aiškinanti, kaip gauti funkciją $L(\mathbf{x}, \alpha_1, \ldots, \alpha_n)$. Mūsų tikslams pakanka žinoti, kad $L$ balno taškas yra ten, kur pradinis optimizavimo su apribojimais uždavinys išsprendžiamas optimaliai.
 
-### Penalties
+### Baudos
 
-One way of satisfying constrained optimization problems at least *approximately* is to adapt the Lagrangian $L$. 
-Rather than satisfying $c_i(\mathbf{x}) \leq 0$ we simply add $\alpha_i c_i(\mathbf{x})$ to the objective function $f(x)$. This ensures that the constraints will not be violated too badly.
+Vienas būdas tenkinti optimizavimo su apribojimais uždavinius bent *apytiksliai* yra pritaikyti Lagranžianą $L$.
+Užuot tenkinę $c_i(\mathbf{x}) \leq 0$, tiesiog pridedame $\alpha_i c_i(\mathbf{x})$ prie tikslo funkcijos $f(x)$. Tai užtikrina, kad apribojimai nebus pažeisti per daug.
 
-In fact, we have been using this trick all along. Consider weight decay in :numref:`sec_weight_decay`. In it we add $\frac{\lambda}{2} \|\mathbf{w}\|^2$ to the objective function to ensure that $\mathbf{w}$ does not grow too large. From the constrained optimization point of view we can see that this will ensure that $\|\mathbf{w}\|^2 - r^2 \leq 0$ for some radius $r$. Adjusting the value of $\lambda$ allows us to vary the size of $\mathbf{w}$.
+Iš tikrųjų visą laiką naudojome šį triuką. Panagrinėkime svorių nykimą :numref:`sec_weight_decay`. Jame prie tikslo funkcijos pridedame $\frac{\lambda}{2} \|\mathbf{w}\|^2$, kad užtikrintume, jog $\mathbf{w}$ neišaugs per daug. Iš optimizavimo su apribojimais požiūrio matome, kad tai užtikrins $\|\mathbf{w}\|^2 - r^2 \leq 0$ tam tikram spinduliui $r$. Keisdami $\lambda$ reikšmę, galime keisti $\mathbf{w}$ dydį.
 
-In general, adding penalties is a good way of ensuring approximate constraint satisfaction. In practice this turns out to be much more robust than exact satisfaction. Furthermore, for nonconvex problems many of the properties that make the exact approach so appealing in the convex case (e.g., optimality) no longer hold.
+Apskritai baudų pridėjimas yra geras būdas užtikrinti apytikslį apribojimų tenkinimą. Praktikoje tai pasirodo esąs daug patikimesnis nei tikslus tenkinimas. Be to, neiškiliesiems uždaviniams daugelis savybių, dėl kurių tikslus metodas iškiliuoju atveju yra toks patrauklus (pvz., optimalumas), nebegalioja.
 
-### Projections
+### Projekcijos
 
-An alternative strategy for satisfying constraints is projections. Again, we encountered them before, e.g., when dealing with gradient clipping in :numref:`sec_rnn-scratch`. There we ensured that a gradient has length bounded by $\theta$ via
+Alternatyvi apribojimų tenkinimo strategija yra projekcijos. Su jomis taip pat susidūrėme anksčiau, pavyzdžiui, nagrinėdami gradientų apkarpymą :numref:`sec_rnn-scratch`. Ten užtikrinome, kad gradiento ilgis būtų aprėžtas $\theta$, taip:
 
 $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, \theta/\|\mathbf{g}\|).$$
 
-This turns out to be a *projection* of $\mathbf{g}$ onto the ball of radius $\theta$. More generally, a projection on a convex set $\mathcal{X}$ is defined as
+Paaiškėja, kad tai yra $\mathbf{g}$ *projekcija* į $\theta$ spindulio rutulį. Bendriau, projekcija į iškiliąją aibę $\mathcal{X}$ apibrėžiama kaip
 
 $$\textrm{Proj}_\mathcal{X}(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in \mathcal{X}} \|\mathbf{x} - \mathbf{x}'\|,$$
 
-which is the closest point in $\mathcal{X}$ to $\mathbf{x}$. 
+tai yra artimiausias $\mathcal{X}$ taškas taškui $\mathbf{x}$.
 
-![Convex Projections.](../img/projections.svg)
+![Iškiliosios projekcijos.](../img/projections.svg)
 :label:`fig_projections`
 
-The mathematical definition of projections may sound a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. 
-Points inside both sets (yellow) remain unchanged during projections. 
-Points outside both sets (black) are projected to 
-the points inside the sets (red) that are closet to the original points (black).
-While for $\ell_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
+Matematinis projekcijų apibrėžimas gali skambėti šiek tiek abstrakčiai. :numref:`fig_projections` paaiškina jį kiek aiškiau. Jame turime dvi iškiliąsias aibes – apskritimą ir rombą.
+Taškai abiejose aibėse viduje (geltoni) projekcijų metu nesikeičia.
+Taškai už abiejų aibių ribų (juodi) projektuojami į
+aibių viduje esančius taškus (raudonus), kurie yra artimiausi pradiniams taškams (juodiems).
+Nors $\ell_2$ rutuliams tai palieka kryptį nepakeistą, apskritai taip būti nebūtinai, kaip matyti rombo atveju.
 
 
-One of the uses for convex projections is to compute sparse weight vectors. In this case we project weight vectors onto an $\ell_1$ ball,
-which is a generalized version of the diamond case in :numref:`fig_projections`.
+Vienas iškiliųjų projekcijų panaudojimo būdų yra retų svorių vektorių skaičiavimas. Tokiu atveju svorių vektorius projektuojame į $\ell_1$ rutulį,
+kuris yra apibendrinta rombo atvejo :numref:`fig_projections` versija.
 
 
-## Summary
+## Santrauka
 
-In the context of deep learning the main purpose of convex functions is to motivate optimization algorithms and help us understand them in detail. In the following we will see how gradient descent and stochastic gradient descent can be derived accordingly.
-
-
-* Intersections of convex sets are convex. Unions are not.
-* The expectation of a convex function is no less than the convex function of an expectation (Jensen's inequality).
-* A twice-differentiable function is convex if and only if its Hessian (a matrix of second derivatives) is positive semidefinite.
-* Convex constraints can be added via the Lagrangian. In practice we may simply add them with a penalty to the objective function.
-* Projections map to points in the convex set closest to the original points.
-
-## Exercises
-
-1. Assume that we want to verify convexity of a set by drawing all lines between points within the set and checking whether the lines are contained.
-    1. Prove that it is sufficient to check only the points on the boundary.
-    1. Prove that it is sufficient to check only the vertices of the set.
-1. Denote by $\mathcal{B}_p[r] \stackrel{\textrm{def}}{=} \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \textrm{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $\mathcal{B}_p[r]$ is convex for all $p \geq 1$.
-1. Given convex functions $f$ and $g$, show that $\mathrm{max}(f, g)$ is convex, too. Prove that $\mathrm{min}(f, g)$ is not convex.
-1. Prove that the normalization of the softmax function is convex. More specifically prove the convexity of
-    $f(x) = \log \sum_i \exp(x_i)$.
-1. Prove that linear subspaces, i.e., $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, are convex sets.
-1. Prove that in the case of linear subspaces with $\mathbf{b} = \mathbf{0}$ the projection $\textrm{Proj}_\mathcal{X}$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
-1. Show that for  twice-differentiable convex functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
-1. Given a convex set $\mathcal{X}$ and two vectors $\mathbf{x}$ and $\mathbf{y}$, prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\textrm{Proj}_\mathcal{X}(\mathbf{x}) - \textrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
+Giliojo mokymosi kontekste pagrindinis iškiliųjų funkcijų tikslas yra motyvuoti optimizavimo algoritmus ir padėti mums juos suprasti išsamiai. Toliau pamatysime, kaip atitinkamai galima išvesti gradientinį nusileidimą ir stochastinį gradientinį nusileidimą.
 
 
-[Discussions](https://discuss.d2l.ai/t/350)
+* Iškiliųjų aibių sankirtos yra iškilosios. Sąjungos – ne.
+* Iškiliosios funkcijos vidurkis yra ne mažesnis už iškiliąją vidurkio funkciją (Jenseno nelygybė).
+* Du kartus diferencijuojama funkcija yra iškilioji tada ir tik tada, kai jos Hesės matrica (antrųjų išvestinių matrica) yra teigiamai pusiau apibrėžta.
+* Iškiliuosius apribojimus galima pridėti per Lagranžianą. Praktikoje galime juos tiesiog pridėti su bauda prie tikslo funkcijos.
+* Projekcijos atvaizduoja į iškiliosios aibės taškus, artimiausius pradiniams taškams.
+
+## Pratimai
+
+1. Tarkime, kad norime patikrinti aibės iškilumą nubrėždami visas linijas tarp aibės taškų ir patikrindami, ar linijos yra aibėje.
+    1. Įrodykite, kad pakanka patikrinti tik ribos taškus.
+    1. Įrodykite, kad pakanka patikrinti tik aibės viršūnes.
+1. Pažymėkime $\mathcal{B}_p[r] \stackrel{\textrm{def}}{=} \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \textrm{ ir } \|\mathbf{x}\|_p \leq r\}$ $r$ spindulio rutulį, naudojantį $p$-normą. Įrodykite, kad $\mathcal{B}_p[r]$ yra iškiloji visiems $p \geq 1$.
+1. Turint iškiliąsias funkcijas $f$ ir $g$, parodykite, kad $\mathrm{max}(f, g)$ taip pat yra iškilioji. Įrodykite, kad $\mathrm{min}(f, g)$ nėra iškilioji.
+1. Įrodykite, kad softmax funkcijos normalizavimas yra iškilioji funkcija. Konkrečiau, įrodykite
+    $f(x) = \log \sum_i \exp(x_i)$ iškilumą.
+1. Įrodykite, kad tiesiniai poerdviai, t. y. $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, yra iškilosios aibės.
+1. Įrodykite, kad tiesinių poerdvių su $\mathbf{b} = \mathbf{0}$ atveju projekciją $\textrm{Proj}_\mathcal{X}$ galima užrašyti kaip $\mathbf{M} \mathbf{x}$ su tam tikra matrica $\mathbf{M}$.
+1. Parodykite, kad du kartus diferencijuojamoms iškiliosioms funkcijoms $f$ galime rašyti $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ su tam tikru $\xi \in [0, \epsilon]$.
+1. Turint iškiliąją aibę $\mathcal{X}$ ir du vektorius $\mathbf{x}$ ir $\mathbf{y}$, įrodykite, kad projekcijos niekada nepadidina atstumų, t. y. $\|\mathbf{x} - \mathbf{y}\| \geq \|\textrm{Proj}_\mathcal{X}(\mathbf{x}) - \textrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
+
+
+[Diskusijos](https://discuss.d2l.ai/t/350)

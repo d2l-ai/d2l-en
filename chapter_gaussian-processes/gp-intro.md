@@ -1,54 +1,54 @@
-# Introduction to Gaussian Processes
+# Įvadas į Gauso procesus
 
-In many cases, machine learning amounts to estimating parameters from data. These parameters are often numerous and relatively uninterpretable --- such as the weights of a neural network. Gaussian processes, by contrast, provide a mechanism for directly reasoning about the high-level properties of functions that could fit our data. For example, we may have a sense of whether these functions are quickly varying, periodic, involve conditional independencies, or translation invariance. Gaussian processes enable us to easily incorporate these properties into our model, by directly specifying a Gaussian distribution over the function values that could fit our data. 
+Daugeliu atvejų mašininis mokymasis reiškia parametrų vertinimą iš duomenų. Šie parametrai dažnai yra gausūs ir santykinai sunkiai interpretuojami – pavyzdžiui, neuroninio tinklo svoriai. Priešingai, Gauso procesai suteikia mechanizmą tiesiogiai samprotauti apie aukšto lygio funkcijų, kurios galėtų atitikti mūsų duomenis, savybes. Pavyzdžiui, galime nujausti, ar šios funkcijos kinta sparčiai, ar yra periodinės, ar turi sąlyginių nepriklausomumų, ar yra invariantiškos postūmiui. Gauso procesai leidžia lengvai įtraukti šias savybes į savo modelį tiesiogiai nurodant Gauso skirstinį funkcijos reikšmėms, kurios galėtų atitikti mūsų duomenis. 
 
-Let's get a feel for how Gaussian processes operate, by starting with some examples.
+Pajauskime, kaip veikia Gauso procesai, pradėdami nuo kelių pavyzdžių.
 
-Suppose we observe the following dataset, of regression targets (outputs), $y$, indexed by inputs, $x$. As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded. What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until $x=25$?
+Tarkime, stebime šį duomenų rinkinį – regresijos tikslus (išvestis) $y$, indeksuotus įvestimis $x$. Pavyzdžiui, tikslai galėtų būti anglies dioksido koncentracijų pokyčiai, o įvestys – laikai, kuriais šie tikslai buvo užregistruoti. Kokios yra duomenų ypatybės? Kaip sparčiai jie, atrodo, kinta? Ar turime duomenų taškų, surinktų reguliariais intervalais, ar yra trūkstamų įvesčių? Kaip įsivaizduotumėte trūkstamų sričių užpildymą arba prognozavimą iki $x=25$?
 
-![Observed data.](../img/gp-observed-data.svg)
+![Stebimi duomenys.](../img/gp-observed-data.svg)
 
-In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable? Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. Note that we will see code for reproducing all of the plots in this notebook, in the next notebooks on priors and inference.
+Norėdami pritaikyti Gauso procesą duomenims, pradedame nurodydami apriorinį skirstinį, kokių tipų funkcijas galime laikyti pagrįstomis. Čia parodome kelias Gauso proceso imčių funkcijas. Ar šis apriorinis skirstinys atrodo pagrįstas? Atkreipkite dėmesį, kad čia ieškome ne funkcijų, atitinkančių mūsų duomenų rinkinį, o nurodome pagrįstas aukšto lygio sprendinių savybes, pavyzdžiui, kaip sparčiai jie kinta priklausomai nuo įvesčių. Atkreipkite dėmesį, kad visų šioje užrašų knygutėje esančių grafikų atkūrimo kodą pamatysime kitose užrašų knygutėse apie apriorinius skirstinius ir inferenciją.
 
-![Sample prior functions that we may want to represent with our model.](../img/gp-sample-prior-functions.svg)
+![Apriorinių funkcijų imčių pavyzdžiai, kuriuos galbūt norime atvaizduoti savo modeliu.](../img/gp-sample-prior-functions.svg)
 
-Once we condition on data, we can use this prior to infer a posterior distribution over functions that could fit the data. Here we show sample posterior functions.
+Kai sąlygojame duomenimis, galime naudoti šį apriorinį skirstinį, kad atliktume inferenciją apie aposteriorinį funkcijų, kurios galėtų atitikti duomenis, skirstinį. Čia parodome aposteriorinių funkcijų imtis.
 
-![Sample posterior functions, once we have observed the data.](../img/gp-sample-posterior-functions.svg)
+![Aposteriorinių funkcijų imčių pavyzdžiai, kai jau stebėjome duomenis.](../img/gp-sample-posterior-functions.svg)
 
-We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we do not actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form. 
+Matome, kad kiekviena iš šių funkcijų yra visiškai suderinama su mūsų duomenimis ir tiksliai eina per kiekvieną stebinį. Norėdami naudoti šias aposteriorines imtis prognozėms daryti, galime suvidurkinti kiekvienos galimos aposteriorinės imties funkcijos reikšmes ir sukurti žemiau pateiktą kreivę storai mėlyna spalva. Atkreipkite dėmesį, kad iš tikrųjų nereikia imti begalinio imčių skaičiaus šiam vidurkiui apskaičiuoti; kaip pamatysime vėliau, vidurkį galime apskaičiuoti uždaros formos išraiška. 
 
-![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](../img/gp-posterior-samples.svg)
+![Aposteriorinės imtys kartu su aposterioriniu vidurkiu, kurį galima naudoti taškinėms prognozėms, mėlyna spalva.](../img/gp-posterior-samples.svg)
 
-We may also want a representation of uncertainty, so we know how confident we should be in our predictions. Intuitively, we should have more uncertainty where there is more variability in the sample posterior functions, as this tells us there are many more possible values the true function could take. This type of uncertainty is called _epistemic uncertainty_, which is the _reducible uncertainty_ associated with lack of information. As we acquire more data, this type of uncertainty disappears, as there will be increasingly fewer solutions consistent with what we observe. Like with the posterior mean, we can compute the posterior variance (the variability of these functions in the posterior) in closed form. With shade, we show two times the posterior standard deviation on either side of the mean, creating a _credible interval_ that has a 95% probability of containing the true value of the function for any input $x$.
+Taip pat galime norėti neapibrėžtumo atvaizdavimo, kad žinotume, kiek pasitikėti savo prognozėmis. Intuityviai neapibrėžtumas turėtų būti didesnis ten, kur aposteriorinių imčių funkcijos labiau kinta, nes tai mums sako, kad tikroji funkcija galėtų įgyti daug daugiau galimų reikšmių. Šis neapibrėžtumo tipas vadinamas _epistemiliniu neapibrėžtumu_, kuris yra su informacijos trūkumu susijęs _sumažinamas neapibrėžtumas_. Gaunant daugiau duomenų, šio tipo neapibrėžtumas išnyksta, nes vis mažiau sprendinių bus suderinami su tuo, ką stebime. Kaip ir aposteriorinį vidurkį, aposteriorinę dispersiją (šių funkcijų kintamumą aposteriorinio skirstinio atveju) galime apskaičiuoti uždaros formos išraiška. Šešėliu rodome dvigubą aposteriorinį standartinį nuokrypį į abi vidurkio puses, sukurdami _patikimąjį intervalą_, kuris su 95 % tikimybe turi tikrąją funkcijos reikšmę bet kuriai įvesčiai $x$.
 
-![Posterior samples, including 95% credible set.](../img/gp-posterior-samples-95.svg)
+![Aposteriorinės imtys, įskaitant 95 % patikimąją aibę.](../img/gp-posterior-samples-95.svg)
 
-The plot looks somewhat cleaner if we remove the posterior samples, simply visualizing the data, posterior mean, and 95% credible set. Notice how the uncertainty grows away from the data, a property of epistemic uncertainty. 
+Grafikas atrodo kiek tvarkingiau, jei pašaliname aposteriorines imtis ir tiesiog vizualizuojame duomenis, aposteriorinį vidurkį ir 95 % patikimąją aibę. Atkreipkite dėmesį, kaip neapibrėžtumas didėja tolstant nuo duomenų – tai epistemilinio neapibrėžtumo savybė. 
 
-![Point predictions, and credible set.](../img/gp-point-predictions.svg)
+![Taškinės prognozės ir patikimoji aibė.](../img/gp-point-predictions.svg)
 
-The properties of the Gaussian process that we used to fit the data are strongly controlled by what's called a _covariance function_, also known as a _kernel_. The covariance function we used is called the _RBF (Radial Basis Function) kernel_, which has the form
+Gauso proceso, kurį naudojome duomenims pritaikyti, savybes stipriai valdo vadinamoji _kovariacijos funkcija_, dar žinoma kaip _branduolys_. Mūsų naudota kovariacijos funkcija vadinama _RBF (radialiosios bazinės funkcijos) branduoliu_, kurio forma yra
 $$ k_{\textrm{RBF}}(x,x') = \textrm{Cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right) $$
 
-The _hyperparameters_ of this kernel are interpretable. The _amplitude_ parameter $a$ controls the vertical scale over which the function is varying, and the _length-scale_ parameter
+Šio branduolio _hiperparametrai_ yra interpretuojami. _Amplitudės_ parametras $a$ valdo vertikalųjį mastelį, kuriuo funkcija kinta, o _ilgio skalės_ parametras
 $\ell$
-controls the rate of variation (the wiggliness) of the function. Larger $a$ means larger function values, and larger 
-$\ell$ 
-means more slowly varying functions. Let's see what happens to our sample prior and posterior functions as we vary $a$ and 
+valdo funkcijos kitimo spartą (banguotumą). Didesnis $a$ reiškia didesnes funkcijos reikšmes, o didesnis
+$\ell$
+reiškia lėčiau kintančias funkcijas. Pažiūrėkime, kas nutinka mūsų apriorinėms ir aposteriorinėms imties funkcijoms keičiant $a$ ir
 $\ell$. 
 
-The _length-scale_ has a particularly pronounced effect on the predictions and uncertainty of a GP. At 
+_Ilgio skalė_ turi ypač ryškų poveikį GP prognozėms ir neapibrėžtumui. Kai
 $||x-x'|| = \ell$
-, the covariance between a pair of function values is $a^2\exp(-0.5)$. At larger distances than 
+, kovariacija tarp funkcijos reikšmių poros yra $a^2\exp(-0.5)$. Esant didesniems atstumams nei
 $\ell$
-, the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point $x_*$, then function values with inputs $x$ such that 
-$||x-x'||>\ell$
-will not have a strong effect on our predictions. 
+, funkcijos reikšmės tampa beveik nekoreliuotos. Tai reiškia, kad jei norime padaryti prognozę taške $x_*$, tai funkcijos reikšmės su įvestimis $x$, tokiomis kad
+$||x-x'||>\ell$,
+stipriai nepaveiks mūsų prognozių. 
 
-Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider 
+Pažiūrėkime, kaip ilgio skalės keitimas veikia apriorines ir aposteriorines imties funkcijas bei patikimąsias aibes. Aukščiau pateikti pritaikymai naudoja $2$ ilgio skalę. Dabar panagrinėkime
 $\ell = 0.1, 0.5, 2, 5, 10$
-. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
+. $0.1$ ilgio skalė yra labai maža, palyginti su nagrinėjamos įvesties srities intervalu $25$. Pavyzdžiui, funkcijos reikšmės taškuose $x=5$ ir $x=10$ tokioje ilgio skalėje iš esmės neturės jokios koreliacijos. Kita vertus, esant $10$ ilgio skalei, funkcijos reikšmės šiose įvestyse bus labai koreliuotos. Atkreipkite dėmesį, kad vertikalusis mastelis šiuose paveiksluose keičiasi.
 
 
 ![priorpoint1](../img/gp-priorpoint1.svg)
@@ -63,9 +63,9 @@ $\ell = 0.1, 0.5, 2, 5, 10$
 ![prior5](../img/gp-prior5.svg)
 ![post5](../img/gp-post5.svg)
 
-Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values. 
+Pastebėkite, kad didėjant ilgio skalei funkcijų „banguotumas“ mažėja, ir mūsų neapibrėžtumas mažėja. Jei ilgio skalė maža, neapibrėžtumas greitai didės tolstant nuo duomenų, nes duomenų taškai tampa mažiau informatyvūs apie funkcijos reikšmes. 
 
-Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. Note the vertical scale is held fixed for the prior samples, and varies for the posterior samples, so you can clearly see both the increasing scale of the function, and the fits to the data.
+Dabar keiskime amplitudės parametrą, laikydami ilgio skalę fiksuotą ties $2$. Atkreipkite dėmesį, kad vertikalusis mastelis apriorinėms imtims laikomas fiksuotu, o aposteriorinėms imtims keičiasi, taigi aiškiai matote ir didėjantį funkcijos mastelį, ir pritaikymus duomenims.
 
 
 ![priorap1](../img/gp-priorap1.svg)
@@ -77,36 +77,36 @@ Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. 
 ![priora8](../img/gp-priora8.svg)
 ![posta8](../img/gp-posta8.svg)
 
-We see the amplitude parameter affects the scale of the function, but not the rate of variation. At this point, we also have the sense that the generalization performance of our procedure will depend on having reasonable values for these hyperparameters. Values of $\ell=2$ and $a=1$ appeared to provide reasonable fits, while some of the other values did not. Fortunately, there is a robust and automatic way to specify these hyperparameters, using what is called the _marginal likelihood_, which we will return to in the notebook on inference. 
+Matome, kad amplitudės parametras veikia funkcijos mastelį, bet ne kitimo spartą. Šiuo metu taip pat nujaučiame, kad mūsų procedūros apibendrinimo našumas priklausys nuo pagrįstų šių hiperparametrų reikšmių. Reikšmės $\ell=2$ ir $a=1$ atrodė suteikiančios pagrįstus pritaikymus, o kai kurios kitos reikšmės – ne. Laimei, yra patikimas ir automatinis būdas nurodyti šiuos hiperparametrus naudojant vadinamąjį _ribinį tikėtinumą_, prie kurio grįšime inferencijos užrašų knygutėje. 
 
-So what is a GP, really? As we started, a GP simply says that any collection of function values 
-$f(x_1),\dots,f(x_n)$, 
-indexed by any collection of inputs 
-$x_1,\dots,x_n$ 
-has a joint multivariate Gaussian distribution. The mean vector $\mu$ of this distribution is given by a _mean function_, which is typically taken to be a constant or zero. The covariance matrix of this distribution is given by the _kernel_ evaluated at all pairs of the inputs $x$. 
+Taigi kas iš tikrųjų yra GP? Kaip pradėjome, GP tiesiog teigia, kad bet kuri funkcijos reikšmių aibė
+$f(x_1),\dots,f(x_n)$,
+indeksuota bet kuria įvesčių aibe
+$x_1,\dots,x_n$,
+turi jungtinį daugiamatį Gauso skirstinį. Šio skirstinio vidurkio vektorių $\mu$ nurodo _vidurkio funkcija_, kuri paprastai laikoma pastovia arba nuline. Šio skirstinio kovariacijų matricą nurodo _branduolys_, įvertintas visose įvesčių $x$ porose. 
 
 $$\begin{bmatrix}f(x) \\f(x_1) \\ \vdots \\ f(x_n) \end{bmatrix}\sim \mathcal{N}\left(\mu, \begin{bmatrix}k(x,x) & k(x, x_1) & \dots & k(x,x_n) \\ k(x_1,x) & k(x_1,x_1) & \dots & k(x_1,x_n) \\ \vdots & \vdots & \ddots & \vdots \\ k(x_n, x) & k(x_n, x_1) & \dots & k(x_n,x_n) \end{bmatrix}\right)$$
 :eqlabel:`eq_gp_prior`
 
-Equation :eqref:`eq_gp_prior` specifies a GP prior. We can compute the conditional distribution of $f(x)$ for any $x$ given $f(x_1), \dots, f(x_n)$, the function values we have observed. This conditional distribution is called the _posterior_, and it is what we use to make predictions.
+Lygtis :eqref:`eq_gp_prior` nurodo GP apriorinį skirstinį. Galime apskaičiuoti $f(x)$ sąlyginį skirstinį bet kuriam $x$, žinant $f(x_1), \dots, f(x_n)$ – funkcijos reikšmes, kurias stebėjome. Šis sąlyginis skirstinys vadinamas _aposterioriniu_, ir būtent jį naudojame prognozėms daryti.
 
-In particular, 
+Konkrečiai, 
 
 $$f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)$$ 
 
-where
+kur
 
 $$m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})$$ 
 
 $$s^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$$ 
 
-where $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. The predictive means and uncertainties for all the above figures were created using these equations. The observed data points were given by 
-$f(x_1), \dots, f(x_n)$
-and chose a fine grained set of $x$ points to make predictions.
+kur $k(x,x_{1:n})$ yra $1 \times n$ vektorius, sudarytas įvertinus $k(x,x_{i})$ su $i=1,\dots,n$, o $k(x_{1:n},x_{1:n})$ yra $n \times n$ matrica, sudaryta įvertinus $k(x_i,x_j)$ su $i,j = 1,\dots,n$. $m$ galime naudoti kaip taškinį prognozuotuvą bet kuriam $x$, o $s^2$ naudojame neapibrėžtumui: jei norime sukurti intervalą su 95 % tikimybe, kad $f(x)$ yra tame intervale, naudotume $m \pm 2s$. Visų aukščiau pateiktų paveikslų prognozuojami vidurkiai ir neapibrėžtumai buvo sukurti naudojant šias lygtis. Stebėti duomenų taškai buvo
+$f(x_1), \dots, f(x_n)$,
+o prognozėms daryti pasirinkome smulkią $x$ taškų aibę.
 
-Let's suppose we observe a single datapoint, $f(x_1)$, and we want to determine the value of $f(x)$ at some $x$. Because $f(x)$ is described by a Gaussian process, we know the joint distribution over 
-$(f(x), f(x_1))$ 
-is Gaussian: 
+Tarkime, kad stebime vieną duomenų tašką $f(x_1)$ ir norime nustatyti $f(x)$ reikšmę kuriame nors $x$. Kadangi $f(x)$ aprašomas Gauso procesu, žinome, kad jungtinis skirstinys
+$(f(x), f(x_1))$
+yra Gauso: 
 
 $$
 \begin{bmatrix}
@@ -122,67 +122,67 @@ k(x_1,x) & k(x_1,x_1)
 \right)
 $$
 
-The off-diagonal expression $k(x,x_1) = k(x_1,x)$ 
-tells us how correlated the function values will be --- how strongly determined $f(x)$
-will be from $f(x_1)$. 
-We have seen already that if we use a large length-scale, relative to the distance between $x$ and $x_1$, 
-$||x-x_1||$, then the function values will be highly correlated. We can visualize the process of determining $f(x)$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1), f(x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.9$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
+Nediagonalinė išraiška $k(x,x_1) = k(x_1,x)$
+mums sako, kiek koreliuotos bus funkcijos reikšmės – kaip stipriai $f(x)$
+bus nulemta pagal $f(x_1)$. 
+Jau matėme, kad jei naudojame didelę ilgio skalę, palyginti su atstumu tarp $x$ ir $x_1$,
+$||x-x_1||$, tada funkcijos reikšmės bus labai koreliuotos. Galime vizualizuoti $f(x)$ nustatymo iš $f(x_1)$ procesą tiek funkcijų erdvėje, tiek jungtiniame skirstinyje $f(x_1), f(x)$. Pirmiausia panagrinėkime tokį $x$, kad $k(x,x_1) = 0.9$, o $k(x,x)=1$, tai reiškia, kad $f(x)$ reikšmė yra vidutiniškai koreliuota su $f(x_1)$ reikšme. Jungtiniame skirstinyje pastovios tikimybės kontūrai bus gana siauros elipsės.
 
-Suppose we observe $f(x_1) = 1.2$. 
-To condition on this value of $f(x_1)$, 
-we can draw a horizontal line at $1.2$ on our plot of the density, and see that the value of $f(x)$ 
-is mostly constrained to $[0.64,1.52]$. We have also drawn this plot in function space, showing the observed
-point $f(x_1)$ in orange, and 1 standard deviation of the Gaussian process predictive distribution for $f(x)$ 
-in blue, about the mean value of $1.08$.
+Tarkime, kad stebime $f(x_1) = 1.2$. 
+Norėdami sąlygoti šia $f(x_1)$ reikšme,
+galime nubrėžti horizontalią liniją ties $1.2$ tankio grafike ir pamatyti, kad $f(x)$ reikšmė
+daugiausia apribojama intervale $[0.64,1.52]$. Šį grafiką taip pat nubraižėme funkcijų erdvėje, parodydami stebimą
+tašką $f(x_1)$ oranžine spalva ir 1 standartinį Gauso proceso prognozuojamojo skirstinio $f(x)$ nuokrypį
+mėlyna spalva apie vidurkio reikšmę $1.08$.
 
-![Contours of constant probability of a bivariate Gaussian density over $f(x_1)$ and $f(x)$ with $k(x,x_1) = 0.9$.](https://user-images.githubusercontent.com/6753639/206867364-b4707db5-0c2e-4ae4-a412-8292bca4d08d.svg)
-![Gaussian process predictive distribution in function space at $f(x)$, with $k(x,x_1) = 0.9$.](https://user-images.githubusercontent.com/6753639/206867367-3815720c-93c8-4b4b-80e7-296db1d3553b.svg)
+![Pastovios tikimybės dvimačio Gauso tankio kontūrai $f(x_1)$ ir $f(x)$ atžvilgiu, kai $k(x,x_1) = 0.9$.](https://user-images.githubusercontent.com/6753639/206867364-b4707db5-0c2e-4ae4-a412-8292bca4d08d.svg)
+![Gauso proceso prognozuojamasis skirstinys funkcijų erdvėje taške $f(x)$, kai $k(x,x_1) = 0.9$.](https://user-images.githubusercontent.com/6753639/206867367-3815720c-93c8-4b4b-80e7-296db1d3553b.svg)
 
-Now suppose we have a stronger correlation, $k(x,x_1) = 0.95$. 
-Now the ellipses have narrowed further, and the value of $f(x)$ 
-is even more strongly determined by $f(x_1)$. Drawing a horizontal line at $1.2$, we see the contours for $f(x)$
-support values mostly within $[0.83, 1.45]$. Again, we also show the plot in function space, with one standard 
-deviation about the mean predictive value of $1.14$.
+Dabar tarkime, kad turime stipresnę koreliaciją, $k(x,x_1) = 0.95$. 
+Dabar elipsės dar labiau susiaurėjo, o $f(x)$ reikšmė
+dar stipriau nulemta pagal $f(x_1)$. Nubrėžę horizontalią liniją ties $1.2$, matome, kad $f(x)$ kontūrai
+palaiko reikšmes daugiausia intervale $[0.83, 1.45]$. Vėlgi parodome ir grafiką funkcijų erdvėje su vienu standartiniu
+nuokrypiu apie vidutinę prognozuojamąją reikšmę $1.14$.
 
-![Contours of constant probability of a bivariate Gaussian density over $f(x_1)$ and $f(x)$ with $k(x,x_1) = 0.95$.](https://user-images.githubusercontent.com/6753639/206867797-20e42783-31de-4c50-8103-e9441ba6d0a9.svg)
-![Gaussian process predictive distribution in function space at $f(x)$, with $k(x,x_1)$ = 0.95.](https://user-images.githubusercontent.com/6753639/206867800-d9fc7add-649d-492c-8848-cab07c8fb83e.svg)
+![Pastovios tikimybės dvimačio Gauso tankio kontūrai $f(x_1)$ ir $f(x)$ atžvilgiu, kai $k(x,x_1) = 0.95$.](https://user-images.githubusercontent.com/6753639/206867797-20e42783-31de-4c50-8103-e9441ba6d0a9.svg)
+![Gauso proceso prognozuojamasis skirstinys funkcijų erdvėje taške $f(x)$, kai $k(x,x_1)$ = 0.95.](https://user-images.githubusercontent.com/6753639/206867800-d9fc7add-649d-492c-8848-cab07c8fb83e.svg)
 
-We see that the posterior mean predictor of our Gaussian process is closer to $1.2$, because there is now a stronger correlation. We also see that our uncertainty (the error bars) have somewhat decreased. Despite the strong correlation between these function values, our uncertainty is still righly quite large, because we have only observed a single data point! 
+Matome, kad mūsų Gauso proceso aposteriorinis vidurkio prognozuotuvas yra arčiau $1.2$, nes dabar yra stipresnė koreliacija. Taip pat matome, kad mūsų neapibrėžtumas (paklaidos juostos) kiek sumažėjo. Nepaisant stiprios šių funkcijos reikšmių koreliacijos, mūsų neapibrėžtumas vis tiek pagrįstai gana didelis, nes stebėjome tik vieną duomenų tašką! 
 
-This procedure can give us a posterior on $f(x)$ for any $x$, for any number of points we have observed. Suppose we observe $f(x_1), f(x_2)$. We now visualize the posterior for $f(x)$ at a particular $x=x'$ in function space. The exact distribution for $f(x)$ is given by the above equations. $f(x)$ is Gaussian distributed, with mean 
+Ši procedūra gali suteikti $f(x)$ aposteriorinį skirstinį bet kuriam $x$ su bet kuriuo stebėtų taškų skaičiumi. Tarkime, stebime $f(x_1), f(x_2)$. Dabar vizualizuojame $f(x)$ aposteriorinį skirstinį tam tikrame $x=x'$ funkcijų erdvėje. Tikslus $f(x)$ skirstinys nurodytas aukščiau pateiktomis lygtimis. $f(x)$ yra pasiskirstęs pagal Gauso skirstinį su vidurkiu 
 
 $$m = k(x,x_{1:3}) k(x_{1:3},x_{1:3})^{-1} f(x_{1:3})$$
 
-and variance 
+ir dispersija 
 
 $$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
 
-In this introductory notebook, we have been considering _noise free_ observations. As we will see, it is easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise 
+Šioje įvadinėje užrašų knygutėje nagrinėjome _be triukšmo_ stebinius. Kaip pamatysime, stebėjimo triukšmą įtraukti lengva. Jei darome prielaidą, kad duomenys generuojami iš latentinės be triukšmo funkcijos $f(x)$ plius nepriklausomo vienodai pasiskirsčiusio (iid) Gauso triukšmo
 $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$
-with variance $\sigma^2$, then our covariance function simply becomes 
+su dispersija $\sigma^2$, tada mūsų kovariacijos funkcija tiesiog tampa
 $k(x_i,x_j) \to k(x_i,x_j) + \delta_{ij}\sigma^2$,
-where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
+kur $\delta_{ij} = 1$, jei $i=j$, ir $0$ kitu atveju.
 
-We have already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we will precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
+Jau pradėjome įgyti tam tikrą intuiciją, kaip galime naudoti Gauso procesą aprioriniam ir aposterioriniam sprendinių skirstiniui nurodyti ir kaip branduolio funkcija veikia šių sprendinių savybes. Kitose užrašų knygutėse tiksliai parodysime, kaip nurodyti Gauso proceso apriorinį skirstinį, pristatysime ir išvesime įvairias branduolio funkcijas, o tada aptarsime, kaip automatiškai išmokti branduolio hiperparametrus ir sudaryti Gauso proceso aposteriorinį skirstinį prognozėms daryti. Nors reikia laiko ir praktikos priprasti prie tokių sąvokų kaip „funkcijų skirstiniai“, pati GP prognozavimo lygčių radimo mechanika iš tikrųjų yra gana paprasta, todėl lengva praktikuotis, kad susiformuotų intuityvus šių sąvokų supratimas.
 
-## Summary
+## Santrauka
 
-In typical machine learning, we specify a function with some free parameters (such as a neural network and its weights), and we focus on estimating those parameters, which may not be interpretable. With a Gaussian process, we instead reason about distributions over functions directly, which enables us to reason about the high-level properties of the solutions. These properties are controlled by a covariance function (kernel), which often has a few highly interpretable hyperparameters. These hyperparameters include the _length-scale_, which controls how rapidly (how wiggily) the functions are. Another hyperparameter is the amplitude, which controls the vertical scale over which our functions are varying. 
-Representing many different functions that can fit the data, and combining them all together into a predictive distribution, is a distinctive feature of Bayesian methods. Because there is a greater amount of variability between possible solutions far away from the data, our uncertainty intuitively grows as we move from the data. 
+Tipiniame mašininiame mokymesi nurodome funkciją su tam tikrais laisvais parametrais (pavyzdžiui, neuroninį tinklą ir jo svorius) ir sutelkiame dėmesį į šių parametrų, kurie gali būti neinterpretuojami, vertinimą. Su Gauso procesu vietoj to samprotaujame tiesiogiai apie funkcijų skirstinius, o tai leidžia mums samprotauti apie aukšto lygio sprendinių savybes. Šias savybes valdo kovariacijos funkcija (branduolys), kuri dažnai turi kelis labai interpretuojamus hiperparametrus. Šie hiperparametrai apima _ilgio skalę_, kuri valdo, kaip sparčiai (kaip banguotai) kinta funkcijos. Kitas hiperparametras yra amplitudė, kuri valdo vertikalųjį mastelį, kuriuo mūsų funkcijos kinta. 
+Daugelio skirtingų funkcijų, kurios gali atitikti duomenis, atvaizdavimas ir jų sujungimas į prognozuojamąjį skirstinį yra išskirtinė Bajeso metodų savybė. Kadangi tarp galimų sprendinių toli nuo duomenų yra didesnis kintamumas, mūsų neapibrėžtumas intuityviai didėja tolstant nuo duomenų. 
 
 
-A Gaussian process represents a distribution over functions by specifying a multivariate normal (Gaussian) distribution over all possible function values. It is possible to easily manipulate Gaussian distributions to find the distribution of one function value based on the values of any set of other values. In other words, if we observe a set of points, then we can condition on these points and infer a distribution over what the value of the function might look like at any other input. How we model the correlations between these points is determined by the covariance function and is what defines the generalization properties of the Gaussian process. While it takes time to get used to Gaussian processes, they are easy to work with, have many applications, and help us understand and develop other model classes, like neural networks.
+Gauso procesas atvaizduoja funkcijų skirstinį nurodydamas daugiamatį normalųjį (Gauso) skirstinį visoms galimoms funkcijos reikšmėms. Gauso skirstinius galima lengvai manipuliuoti, kad būtų rastas vienos funkcijos reikšmės skirstinys pagal bet kurios kitų reikšmių aibės reikšmes. Kitaip tariant, jei stebime taškų aibę, galime sąlygoti šiais taškais ir daryti inferenciją apie skirstinį, kaip gali atrodyti funkcijos reikšmė bet kurioje kitoje įvestyje. Tai, kaip modeliuojame koreliacijas tarp šių taškų, nustato kovariacijos funkcija ir būtent tai apibrėžia Gauso proceso apibendrinimo savybes. Nors reikia laiko priprasti prie Gauso procesų, su jais lengva dirbti, jie turi daug taikymų ir padeda suprasti bei kurti kitas modelių klases, pavyzdžiui, neuroninius tinklus.
 
-## Exercises
+## Pratimai
 
-1. What is the difference between epistemic uncertainty versus observation uncertainty?
-2. Besides rate of variation and amplitude, what other properties of functions might we want to consider, and what would be real-world examples of functions that have those properties?
-3. The RBF covariance function we considered says that covariances (and correlations) between observations decrease with their distance in the input space (times, spatial locations, etc.). Is this a reasonable assumption? Why or why not?
-4. Is a sum of two Gaussian variables Gaussian? Is a product of two Gaussian variables Gaussian? If (a,b) have a joint Gaussian distribution, is a|b (a given b) Gaussian? Is a Gaussian?
-5. Repeat the exercise where we observe a data point at $f(x_1) = 1.2$, but now suppose we additionally observe $f(x_2) = 1.4$. Let $k(x,x_1) = 0.9$, and $k(x,x_2) = 0.8$. Will we be more or less certain about the value of $f(x)$, than when we had only observed $f(x_1)$? What is the mean and 95\% credible set for our value of $f(x)$ now? 
-6. Do you think increasing our estimate of observation noise would increase or decrease our estimate of the length-scale of the ground truth function?
-7. As we move away from the data, suppose the uncertainty in our predictive distribution increases to a point, then stops increasing. Why might that happen?
+1. Koks skirtumas tarp epistemilinio neapibrėžtumo ir stebėjimo neapibrėžtumo?
+2. Be kitimo spartos ir amplitudės, kokias kitas funkcijų savybes galėtume norėti apsvarstyti ir kokie būtų realaus pasaulio funkcijų, turinčių tas savybes, pavyzdžiai?
+3. Mūsų nagrinėta RBF kovariacijos funkcija teigia, kad kovariacijos (ir koreliacijos) tarp stebinių mažėja didėjant jų atstumui įvesčių erdvėje (laikai, erdvinės vietos ir kt.). Ar tai pagrįsta prielaida? Kodėl taip arba kodėl ne?
+4. Ar dviejų Gauso kintamųjų suma yra Gauso? Ar dviejų Gauso kintamųjų sandauga yra Gauso? Jei (a,b) turi jungtinį Gauso skirstinį, ar a|b (a esant b) yra Gauso? Ar a yra Gauso?
+5. Pakartokite pratimą, kuriame stebime duomenų tašką $f(x_1) = 1.2$, bet dabar tarkime, kad papildomai stebime $f(x_2) = 1.4$. Tegu $k(x,x_1) = 0.9$ ir $k(x,x_2) = 0.8$. Ar dabar būsime daugiau, ar mažiau tikri dėl $f(x)$ reikšmės, nei kai buvome stebėję tik $f(x_1)$? Koks dabar yra mūsų $f(x)$ reikšmės vidurkis ir 95 % patikimoji aibė? 
+6. Kaip manote, ar padidinus mūsų stebėjimo triukšmo įvertį padidėtų, ar sumažėtų mūsų etaloninės funkcijos ilgio skalės įvertis?
+7. Tarkime, tolstant nuo duomenų neapibrėžtumas mūsų prognozuojamajame skirstinyje didėja iki tam tikro taško, o tada nustoja didėti. Kodėl taip gali nutikti?
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12115)
+[Diskusijos](https://discuss.d2l.ai/t/12115)
 :end_tab:

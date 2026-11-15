@@ -4,49 +4,48 @@ tab.interact_select(["pytorch"])
 #required_libs("syne-tune[gpsearchers]==0.3.2")
 ```
 
-# Asynchronous Random Search
+# Asinchroninė atsitiktinė paieška
 :label:`sec_rs_async`
 
-As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait
-hours or even days before random search returns a good hyperparameter
-configuration, because of the expensive evaluation of hyperparameter
-configurations. In practice, we have often access to a pool of resources such as
-multiple GPUs on the same machine or multiple machines with a single GPU. This
-begs the question: *How do we efficiently distribute random search?*
+Kaip matėme ankstesniame skyrelyje :numref:`sec_api_hpo`, gali tekti laukti
+valandų ar net dienų, kol atsitiktinė paieška grąžins gerą hiperparametrų
+konfigūraciją, nes hiperparametrų konfigūracijų įvertinimas yra brangus. Praktikoje dažnai turime prieigą prie išteklių telkinio, pavyzdžiui,
+kelių GPU tame pačiame kompiuteryje arba kelių kompiuterių su vienu GPU. Tai
+kelia klausimą: *kaip efektyviai paskirstyti atsitiktinę paiešką?*
 
-In general, we distinguish between synchronous and asynchronous parallel
-hyperparameter optimization (see :numref:`distributed_scheduling`). In the
-synchronous setting, we wait for all concurrently running trials to finish,
-before we start the next batch. Consider configuration spaces that contain
-hyperparameters such as the number of filters or number of layers of a deep
-neural network. Hyperparameter configurations that contain a larger number of 
-layers of filters will naturally take more time to finish, and all other trials
-in the same batch will have to wait at synchronisation points (grey area in
-:numref:`distributed_scheduling`) before we can continue the optimization
-process.
+Apskritai skiriame sinchroninį ir asinchroninį lygiagretųjį
+hiperparametrų optimizavimą (žr. :numref:`distributed_scheduling`). Sinchroniniu
+atveju laukiame, kol baigsis visi vienu metu vykdomi bandymai,
+ir tik tada pradedame kitą partiją. Panagrinėkime konfigūracijų erdves, kuriose yra
+tokių hiperparametrų kaip filtrų skaičius ar giliojo
+neuroninio tinklo sluoksnių skaičius. Hiperparametrų konfigūracijos, turinčios daugiau
+sluoksnių ar filtrų, natūraliai užtruks ilgiau, ir visi kiti tos pačios partijos bandymai
+turės laukti sinchronizavimo taškuose (pilka sritis
+:numref:`distributed_scheduling`), kol galėsime tęsti optimizavimo
+procesą.
 
-In the asynchronous setting we immediately schedule a new trial as soon as resources
-become available. This will optimally exploit our resources, since we can avoid any
-synchronisation overhead. For random search, each new hyperparameter configuration
-is chosen independently of all others, and in particular without exploiting
-observations from any prior evaluation. This means we can trivially parallelize random
-search asynchronously. This is not straight-forward with more sophisticated methods
-that make decision based on previous observations (see :numref:`sec_sh_async`).
-While we need access to more resources than in the sequential setting, asynchronous
-random search exhibits a linear speed-up, in that a certain performance is reached
-$K$ times faster if $K$ trials can be run in parallel. 
+Asinchroniniu atveju naują bandymą suplanuojame iš karto, kai tik atsiranda
+ištekliai. Tai optimaliai išnaudoja mūsų išteklius, nes išvengiame bet kokių
+sinchronizavimo pridėtinių sąnaudų. Atsitiktinėje paieškoje kiekviena nauja hiperparametrų konfigūracija
+parenkama nepriklausomai nuo visų kitų ir visų pirma neišnaudojant
+jokio ankstesnio įvertinimo stebėjimų. Tai reiškia, kad atsitiktinę
+paiešką galime lengvai asinchroniškai lygiagretinti. Su sudėtingesniais metodais,
+kurie sprendimus priima pagal ankstesnius stebėjimus, tai padaryti nėra paprasta (žr. :numref:`sec_sh_async`).
+Nors mums reikia prieigos prie daugiau išteklių nei nuosekliu atveju, asinchroninė
+atsitiktinė paieška rodo tiesinį pagreitėjimą: tam tikras našumas pasiekiamas
+$K$ kartų greičiau, jei galima lygiagrečiai vykdyti $K$ bandymų.
 
 
-![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overall wall-clock time while keep the total compute constant. Synchronous scheduling might lead to idling workers in the case of stragglers.](../img/distributed_scheduling.svg)
+![Hiperparametrų optimizavimo proceso paskirstymas sinchroniškai arba asinchroniškai. Palyginti su nuosekliu atveju, galime sumažinti bendrą sienos laikrodžio laiką išlaikydami tą patį bendrą skaičiavimo kiekį. Sinchroninis planavimas gali lemti dykinančius darbininkus, kai yra atsiliekančių bandymų.](../img/distributed_scheduling.svg)
 :label:`distributed_scheduling`
 
-In this notebook, we will look at asynchronous random search that, where trials are
-executed in multiple python processes on the same machine. Distributed job scheduling
-and execution is difficult to implement from scratch. We will use *Syne Tune*
-:cite:`salinas-automl22`, which provides us with a simple interface for asynchronous
-HPO. Syne Tune is designed to be run with different execution back-ends, and the
-interested reader is invited to study its simple APIs in order to learn more about
-distributed HPO.
+Šioje užrašų knygutėje nagrinėsime asinchroninę atsitiktinę paiešką, kai bandymai
+vykdomi keliuose Python procesuose tame pačiame kompiuteryje. Paskirstytą užduočių planavimą
+ir vykdymą sunku įgyvendinti nuo nulio. Naudosime *Syne Tune*
+:cite:`salinas-automl22`, kuris suteikia paprastą sąsają asinchroniniam
+HPO. Syne Tune sukurtas veikti su skirtingomis vykdymo vidinėmis dalimis, ir
+besidominčius skaitytojus kviečiame išnagrinėti jo paprastas API, kad daugiau
+sužinotų apie paskirstytąjį HPO.
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -59,10 +58,10 @@ from syne_tune import Tuner, StoppingCriterion
 from syne_tune.experiments import load_experiment
 ```
 
-## Objective Function
+## Tikslo funkcija
 
-First, we have to define a new objective function such that it now returns the
-performance back to Syne Tune via the `report` callback.
+Pirmiausia turime apibrėžti naują tikslo funkciją, kad ji dabar grąžintų
+našumą į Syne Tune per atgalinio iškvietimo funkciją `report`.
 
 ```{.python .input  n=34}
 def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
@@ -84,14 +83,14 @@ def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
-Note that the `PythonBackend` of Syne Tune requires dependencies to be imported
-inside the function definition.
+Atkreipkite dėmesį, kad Syne Tune `PythonBackend` reikalauja, kad priklausomybės būtų importuojamos
+funkcijos apibrėžimo viduje.
 
-## Asynchronous Scheduler
+## Asinchroninis planuoklis
 
-First, we define the number of workers that evaluate trials concurrently. We
-also need to specify how long we want to run random search, by defining an
-upper limit on the total wall-clock time.
+Pirmiausia apibrėžiame darbininkų, kurie vienu metu vertina bandymus, skaičių. Taip pat
+turime nurodyti, kiek laiko norime vykdyti atsitiktinę paiešką, apibrėždami
+viršutinę bendro sienos laikrodžio laiko ribą.
 
 ```{.python .input  n=37}
 n_workers = 2  # Needs to be <= the number of available GPUs
@@ -99,19 +98,19 @@ n_workers = 2  # Needs to be <= the number of available GPUs
 max_wallclock_time = 12 * 60  # 12 minutes
 ```
 
-Next, we state which metric we want to optimize and whether we want to minimize or
-maximize this metric. Namely, `metric` needs to correspond to the argument name
-passed to the `report` callback.
+Toliau nurodome, kurią metriką norime optimizuoti ir ar ją norime minimizuoti, ar
+maksimizuoti. Būtent `metric` turi atitikti argumento pavadinimą,
+perduodamą atgaliniam iškvietimui `report`.
 
 ```{.python .input  n=38}
 mode = "min"
 metric = "validation_error"
 ```
 
-We use the configuration space from our previous example. In Syne Tune, this
-dictionary can also be used to pass constant attributes to the training script.
-We make use of this feature in order to pass `max_epochs`. Moreover, we specify
-the first configuration to be evaluated in `initial_config`.
+Naudojame konfigūracijų erdvę iš ankstesnio pavyzdžio. Syne Tune šį
+žodyną taip pat galima naudoti pastovioms savybėms perduoti apmokymo scenarijui.
+Šia galimybe pasinaudojame, kad perduotume `max_epochs`. Be to, nurodome
+pirmąją įvertinamą konfigūraciją per `initial_config`.
 
 ```{.python .input  n=39}
 config_space = {
@@ -125,10 +124,10 @@ initial_config = {
 }
 ```
 
-Next, we need to specify the back-end for job executions. Here we just consider
-the distribution on a local machine where parallel jobs are executed as
-sub-processes. However, for large scale HPO, we could run this also on a cluster
-or cloud environment, where each trial consumes a full instance.
+Toliau turime nurodyti užduočių vykdymo vidinę dalį. Čia nagrinėjame tik
+paskirstymą vietiniame kompiuteryje, kur lygiagrečios užduotys vykdomos kaip
+posistemiai procesai. Tačiau didelio masto HPO galėtume tai vykdyti ir klasteryje
+ar debesies aplinkoje, kur kiekvienas bandymas naudoja visą egzempliorių.
 
 ```{.python .input  n=40}
 trial_backend = PythonBackend(
@@ -137,8 +136,8 @@ trial_backend = PythonBackend(
 )
 ```
 
-We can now create the scheduler for asynchronous random search, which is similar
-in behaviour to our `BasicScheduler` from :numref:`sec_api_hpo`.
+Dabar galime sukurti asinchroninės atsitiktinės paieškos planuoklį, kurio elgesys panašus
+į mūsų `BasicScheduler` iš :numref:`sec_api_hpo`.
 
 ```{.python .input  n=41}
 scheduler = RandomSearch(
@@ -149,9 +148,9 @@ scheduler = RandomSearch(
 )
 ```
 
-Syne Tune also features a `Tuner`, where the main experiment loop and
-bookkeeping is centralized, and interactions between scheduler and back-end are
-mediated.
+Syne Tune taip pat turi `Tuner`, kuriame centralizuoti pagrindinis eksperimento ciklas ir
+apskaita, o sąveiką tarp planuoklio ir vidinės dalies
+tarpininkauja.
 
 ```{.python .input  n=42}
 stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
@@ -165,16 +164,16 @@ tuner = Tuner(
 )
 ```
 
-Let us run our distributed HPO experiment. According to our stopping criterion,
-it will run for about 12 minutes.
+Paleiskime savo paskirstytojo HPO eksperimentą. Pagal mūsų sustojimo kriterijų
+jis vyks apie 12 minučių.
 
 ```{.python .input  n=43}
 tuner.run()
 ```
 
-The logs of all evaluated hyperparameter configurations are stored for further
-analysis. At any time during the tuning job, we can easily get the results
-obtained so far and plot the incumbent trajectory.
+Visų įvertintų hiperparametrų konfigūracijų žurnalai išsaugomi tolesnei
+analizei. Bet kuriuo derinimo užduoties metu galime lengvai gauti
+iki šiol gautus rezultatus ir nubraižyti geriausios esamos konfigūracijos trajektoriją.
 
 ```{.python .input  n=46}
 d2l.set_figsize()
@@ -182,13 +181,13 @@ tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
 
-## Visualize the Asynchronous Optimization Process
+## Asinchroninio optimizavimo proceso vizualizavimas
 
-Below we visualize how the learning curves of every trial (each color in the plot represents a trial) evolve during the
-asynchronous optimization process. At any point in time, there are as many trials
-running concurrently as we have workers. Once a trial finishes, we immediately
-start the next trial, without waiting for the other trials to finish. Idle time
-of workers is reduced to a minimum with asynchronous scheduling.
+Toliau vizualizuojame, kaip kiekvieno bandymo mokymosi kreivės (kiekviena grafiko spalva atitinka bandymą) kinta
+asinchroninio optimizavimo proceso metu. Bet kuriuo momentu vienu metu
+vykdoma tiek bandymų, kiek turime darbininkų. Kai bandymas baigiasi, iš karto
+pradedame kitą bandymą nelaukdami, kol baigsis kiti bandymai. Darbininkų
+dykinimo laikas taikant asinchroninį planavimą sumažinamas iki minimumo.
 
 ```{.python .input  n=45}
 d2l.set_figsize([6, 2.5])
@@ -206,32 +205,32 @@ d2l.plt.xlabel("wall-clock time")
 d2l.plt.ylabel("objective function")
 ```
 
-## Summary
+## Santrauka
 
-We can reduce the waiting time for random search substantially by distribution
-trials across parallel resources. In general, we distinguish between synchronous
-scheduling and asynchronous scheduling. Synchronous scheduling means that we
-sample a new batch of hyperparameter configurations once the previous batch
-finished. If we have a stragglers - trials that takes more time to finish than
-other trials - our workers need to wait at synchronization points. Asynchronous
-scheduling evaluates a new hyperparameter configurations as soon as resources
-become available, and, hence, ensures that all workers are busy at any point in
-time. While random search is easy to distribute asynchronously and does not
-require any change of the actual algorithm, other methods require some additional
-modifications.
+Atsitiktinės paieškos laukimo laiką galime žymiai sumažinti paskirstydami
+bandymus per lygiagrečius išteklius. Apskritai skiriame sinchroninį
+planavimą ir asinchroninį planavimą. Sinchroninis planavimas reiškia, kad
+atrenkame naują hiperparametrų konfigūracijų partiją, kai tik ankstesnė partija
+baigiasi. Jei yra atsiliekančių bandymų, t. y. bandymų, kurie baigiasi ilgiau nei
+kiti, mūsų darbininkai turi laukti sinchronizavimo taškuose. Asinchroninis
+planavimas įvertina naują hiperparametrų konfigūraciją, kai tik
+atsiranda ištekliai, todėl užtikrina, kad visi darbininkai bet kuriuo
+momentu būtų užimti. Nors atsitiktinę paiešką lengva asinchroniškai paskirstyti ir jai
+nereikia keisti paties algoritmo, kitiems metodams reikalingi tam tikri papildomi
+pakeitimai.
 
-## Exercises
+## Pratimai
 
-1. Consider the `DropoutMLP` model implemented in :numref:`sec_dropout`, and used in Exercise 1 of :numref:`sec_api_hpo`.
-    1. Implement an objective function `hpo_objective_dropoutmlp_synetune` to be used with Syne Tune. Make sure that your function reports the validation error after every epoch.
-    2. Using the setup of Exercise 1 in :numref:`sec_api_hpo`, compare random search to Bayesian optimization. If you use SageMaker, feel free to use Syne Tune's benchmarking facilities in order to run experiments in parallel. Hint: Bayesian optimization is provided as `syne_tune.optimizer.baselines.BayesianOptimization`.
-    3. For this exercise, you need to run on an instance with at least 4 CPU cores. For one of the methods used above (random search, Bayesian optimization), run experiments with `n_workers=1`, `n_workers=2`, `n_workers=4`, and compare results (incumbent trajectories). At least for random search, you should observe linear scaling with respect to the number of workers. Hint: For robust results, you may have to average over several repetitions each.
-2. *Advanced*. The goal of this exercise is to implement a new scheduler in Syne Tune.
-    1. Create a virtual environment containing both the [d2lbook](https://github.com/d2l-ai/d2l-en/blob/master/INFO.md#installation-for-developers) and [syne-tune](https://syne-tune.readthedocs.io/en/latest/getting_started.html) sources.
-    2. Implement the `LocalSearcher` from Exercise 2 in :numref:`sec_api_hpo` as a new searcher in Syne Tune. Hint: Read [this tutorial](https://syne-tune.readthedocs.io/en/latest/tutorials/developer/README.html). Alternatively, you may follow this [example](https://syne-tune.readthedocs.io/en/latest/examples.html#launch-hpo-experiment-with-home-made-scheduler).
-    3. Compare your new `LocalSearcher` with `RandomSearch` on the `DropoutMLP` benchmark.
+1. Panagrinėkite `DropoutMLP` modelį, įgyvendintą :numref:`sec_dropout` ir naudotą 1 pratime :numref:`sec_api_hpo`.
+    1. Įgyvendinkite tikslo funkciją `hpo_objective_dropoutmlp_synetune`, skirtą naudoti su Syne Tune. Įsitikinkite, kad jūsų funkcija po kiekvienos epochos praneša patikros paklaidą.
+    2. Naudodami 1 pratimo iš :numref:`sec_api_hpo` sąranką, palyginkite atsitiktinę paiešką su Bajeso optimizavimu. Jei naudojate SageMaker, galite naudoti Syne Tune lyginamosios analizės galimybes, kad eksperimentus vykdytumėte lygiagrečiai. Užuomina: Bajeso optimizavimas pateikiamas kaip `syne_tune.optimizer.baselines.BayesianOptimization`.
+    3. Šiam pratimui reikia vykdyti egzemplioriuje, turinčiame bent 4 CPU branduolius. Vienam iš aukščiau naudotų metodų (atsitiktinė paieška, Bajeso optimizavimas) vykdykite eksperimentus su `n_workers=1`, `n_workers=2`, `n_workers=4` ir palyginkite rezultatus (geriausių esamų konfigūracijų trajektorijas). Bent jau atsitiktinei paieškai turėtumėte pastebėti tiesinį mastelio kitimą darbininkų skaičiaus atžvilgiu. Užuomina: patikimiems rezultatams gali tekti vidurkinti per kelis pakartojimus kiekvienu atveju.
+2. *Pažengusiems*. Šio pratimo tikslas yra įgyvendinti naują planuoklį Syne Tune.
+    1. Sukurkite virtualiąją aplinką, kurioje būtų ir [d2lbook](https://github.com/d2l-ai/d2l-en/blob/master/INFO.md#installation-for-developers), ir [syne-tune](https://syne-tune.readthedocs.io/en/latest/getting_started.html) šaltiniai.
+    2. Įgyvendinkite `LocalSearcher` iš 2 pratimo :numref:`sec_api_hpo` kaip naują ieškiklį Syne Tune. Užuomina: perskaitykite [šią pamoką](https://syne-tune.readthedocs.io/en/latest/tutorials/developer/README.html). Arba galite sekti šiuo [pavyzdžiu](https://syne-tune.readthedocs.io/en/latest/examples.html#launch-hpo-experiment-with-home-made-scheduler).
+    3. Palyginkite savo naująjį `LocalSearcher` su `RandomSearch` `DropoutMLP` lyginamojoje užduotyje.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12093)
+[Diskusijos](https://discuss.d2l.ai/t/12093)
 :end_tab:

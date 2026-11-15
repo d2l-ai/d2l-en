@@ -3,23 +3,23 @@
 tab.interact_select(["pytorch"])
 ```
 
-# Hyperparameter Optimization API
+# Hiperparametrų optimizavimo API
 :label:`sec_api_hpo`
 
-Before we dive into the methodology, we will first discuss a basic code
-structure that allows us to efficiently implement various HPO algorithms. In
-general, all HPO algorithms considered here need to implement two decision
-making primitives, *searching* and *scheduling*. First, they need to sample new
-hyperparameter configurations, which often involves some kind of search over the
-configuration space. Second, for each configuration, an HPO algorithm needs to
-schedule its evaluation and decide how many resources to allocate for it. Once
-we start to evaluate a configuration, we will refer to it as a *trial*. We map
-these decisions to two classes, `HPOSearcher` and `HPOScheduler`. On top of that,
-we also provide a `HPOTuner` class that executes the optimization process.
+Prieš gilindamiesi į metodiką, pirmiausia aptarsime pagrindinę kodo
+struktūrą, leidžiančią efektyviai įgyvendinti įvairius HPO algoritmus. Apskritai
+visi čia nagrinėjami HPO algoritmai turi įgyvendinti du sprendimų priėmimo
+primityvus: *paiešką* ir *planavimą*. Pirma, jie turi atrinkti naujas
+hiperparametrų konfigūracijas, o tai dažnai apima tam tikrą paiešką
+konfigūracijų erdvėje. Antra, kiekvienai konfigūracijai HPO algoritmas turi
+suplanuoti jos įvertinimą ir nuspręsti, kiek išteklių jai skirti. Pradėję
+vertinti konfigūraciją, ją vadinsime *bandymu*. Šiuos
+sprendimus atvaizduojame į dvi klases: `HPOSearcher` ir `HPOScheduler`. Be to,
+pateikiame klasę `HPOTuner`, kuri vykdo optimizavimo procesą.
 
-This concept of scheduler and searcher is also implemented in popular HPO
-libraries, such as Syne Tune :cite:`salinas-automl22`, Ray Tune
-:cite:`liaw-arxiv18` or Optuna :cite:`akiba-sigkdd19`.
+Ši planuoklio ir ieškiklio koncepcija taip pat įgyvendinta populiariose HPO
+bibliotekose, tokiose kaip Syne Tune :cite:`salinas-automl22`, Ray Tune
+:cite:`liaw-arxiv18` ar Optuna :cite:`akiba-sigkdd19`.
 
 ```{.python .input  n=2}
 %%tab pytorch
@@ -28,17 +28,17 @@ from d2l import torch as d2l
 from scipy import stats
 ```
 
-## Searcher
+## Ieškiklis
 
-Below we define a base class for searchers, which provides a new candidate
-configuration through the `sample_configuration` function. A simple way to
-implement this function would be to sample configurations uniformly at random,
-as we did for random search in :numref:`sec_what_is_hpo`. More sophisticated
-algorithms, such as Bayesian optimization, will make these
-decisions based on the performance of previous trials. As a result, these
-algorithms are able to sample more promising candidates over time. We add the
-`update` function in order to update the history of previous trials, which can
-then be exploited to improve our sampling distribution.
+Toliau apibrėžiame bazinę ieškiklių klasę, kuri pateikia naują kandidatinę
+konfigūraciją per funkciją `sample_configuration`. Paprastas šios funkcijos
+įgyvendinimo būdas būtų atrinkti konfigūracijas tolygiai atsitiktinai,
+kaip darėme atsitiktinės paieškos atveju :numref:`sec_what_is_hpo`. Sudėtingesni
+algoritmai, pavyzdžiui, Bajeso optimizavimas, šiuos sprendimus priims
+pagal ankstesnių bandymų našumą. Dėl to šie
+algoritmai laikui bėgant gali atrinkti perspektyvesnius kandidatus. Pridedame
+funkciją `update`, kad atnaujintume ankstesnių bandymų istoriją, kuri
+gali būti panaudota atrankos skirstiniui pagerinti.
 
 ```{.python .input  n=3}
 %%tab pytorch
@@ -50,10 +50,10 @@ class HPOSearcher(d2l.HyperParameters):  #@save
         pass
 ```
 
-The following code shows how to implement our random search optimizer from the
-previous section in this API. As a slight extension, we allow the user to
-prescribe the first configuration to be evaluated via `initial_config`, while
-subsequent ones are drawn at random.
+Šis kodas parodo, kaip įgyvendinti mūsų atsitiktinės paieškos optimizatorių iš
+ankstesnio skyrelio naudojant šią API. Kaip nedidelį pratęsimą, leidžiame
+naudotojui nurodyti pirmąją įvertinamą konfigūraciją per `initial_config`, o
+vėlesnės atrenkamos atsitiktinai.
 
 ```{.python .input  n=4}
 %%tab pytorch
@@ -73,16 +73,16 @@ class RandomSearcher(HPOSearcher):  #@save
         return result
 ```
 
-## Scheduler
+## Planuoklis
 
-Beyond sampling configurations for new trials, we also need to decide when and
-for how long to run a trial. In practice, all these decisions are done by the
-`HPOScheduler`, which delegates the choice of new configurations to a
-`HPOSearcher`. The `suggest` method is called whenever some resource for training
-becomes available. Apart from invoking `sample_configuration` of a searcher, it
-may also decide upon parameters like `max_epochs` (i.e., how long to train the
-model for). The `update` method is called whenever a trial returns a new
-observation.
+Be naujų bandymų konfigūracijų atrankos, taip pat turime nuspręsti, kada ir
+kiek laiko vykdyti bandymą. Praktikoje visus šiuos sprendimus priima
+`HPOScheduler`, kuris naujų konfigūracijų pasirinkimą deleguoja
+`HPOSearcher`. Metodas `suggest` iškviečiamas, kai tik atsiranda koks nors apmokymui
+skirtas išteklius. Be ieškiklio `sample_configuration` iškvietimo, jis
+taip pat gali nuspręsti dėl tokių parametrų kaip `max_epochs` (t. y. kiek laiko
+apmokyti modelį). Metodas `update` iškviečiamas, kai tik bandymas grąžina naują
+stebėjimą.
 
 ```{.python .input  n=5}
 %%tab pytorch
@@ -94,9 +94,9 @@ class HPOScheduler(d2l.HyperParameters):  #@save
         raise NotImplementedError
 ```
 
-To implement random search, but also other HPO algorithms, we only need a basic
-scheduler that schedules a new configuration every time new resources become
-available.
+Norint įgyvendinti atsitiktinę paiešką, taip pat ir kitus HPO algoritmus, mums reikia tik paprasto
+planuoklio, kuris suplanuoja naują konfigūraciją kaskart, kai atsiranda nauji
+ištekliai.
 
 ```{.python .input  n=6}
 %%tab pytorch
@@ -111,13 +111,13 @@ class BasicScheduler(HPOScheduler):  #@save
         self.searcher.update(config, error, additional_info=info)
 ```
 
-## Tuner
+## Derintojas
 
-Finally, we need a component that runs the scheduler/searcher and does some
-book-keeping of the results. The following code implements a sequential
-execution of the HPO trials that evaluates one training job after the next and
-will serve as a basic example. We will later use *Syne Tune* for more scalable
-distributed HPO cases.
+Galiausiai mums reikia komponento, kuris vykdo planuoklį ir (arba) ieškiklį ir
+tvarko rezultatų apskaitą. Šis kodas įgyvendina nuoseklų
+HPO bandymų vykdymą, kuris įvertina vieną apmokymo užduotį po kitos ir
+bus pagrindinis pavyzdys. Vėliau naudosime *Syne Tune* labiau mastelio didėjimui pritaikytiems
+paskirstytojo HPO atvejams.
 
 ```{.python .input  n=7}
 %%tab pytorch
@@ -145,17 +145,17 @@ class HPOTuner(d2l.HyperParameters):  #@save
             print(f"    error = {error}, runtime = {runtime}")
 ```
 
-## Bookkeeping the Performance of HPO Algorithms
+## HPO algoritmų našumo apskaita
 
-With any HPO algorithm, we are mostly interested in the best performing
-configuration (called *incumbent*) and its validation error after a given 
-wall-clock time. This is why we track `runtime` per iteration, which includes
-both the time to run an evaluation (call of `objective`) and the time to
-make a decision (call of `scheduler.suggest`). In the sequel, we will plot
-`cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
-*any-time performance* of the HPO algorithm defined in  terms of `scheduler`
-(and `searcher`). This allows us to quantify not only how well the configuration
-found by an optimizer works, but also how quickly an optimizer is able to find it.
+Su bet kuriuo HPO algoritmu mus daugiausia domina geriausiai veikianti
+konfigūracija (vadinama *geriausia esama konfigūracija*, angl. *incumbent*) ir jos patikros paklaida po duoto
+sienos laikrodžio laiko. Todėl sekame `runtime` kiekvienoje iteracijoje, kuris apima
+ir įvertinimo vykdymo laiką (`objective` iškvietimas), ir
+sprendimo priėmimo laiką (`scheduler.suggest` iškvietimas). Toliau
+braižysime `cumulative_runtime` prieš `incumbent_trajectory`, kad vizualizuotume
+HPO algoritmo, apibrėžto per `scheduler`
+(ir `searcher`), *bet kuriuo metu pasiekiamą našumą*. Tai leidžia įvertinti ne tik tai, kaip gerai veikia
+optimizatoriaus rasta konfigūracija, bet ir tai, kaip greitai optimizatorius ją randa.
 
 ```{.python .input  n=8}
 %%tab pytorch
@@ -174,12 +174,12 @@ def bookkeeping(self, config: dict, error: float, runtime: float):
     self.cumulative_runtime.append(self.current_runtime)
 ```
 
-## Example: Optimizing the Hyperparameters of a Convolutional Neural Network
+## Pavyzdys: konvoliucinio neuroninio tinklo hiperparametrų optimizavimas
 
-We now use our new implementation of random search to optimize the
-*batch size* and *learning rate* of the `LeNet` convolutional neural network
-from :numref:`sec_lenet`. We being by defining the objective function, which
-will once more be validation error.
+Dabar naudojame naują atsitiktinės paieškos įgyvendinimą, kad optimizuotume
+konvoliucinio neuroninio tinklo `LeNet` iš :numref:`sec_lenet`
+*rinkinio dydį* ir *mokymosi greitį*. Pradedame apibrėždami tikslo funkciją, kuri
+vėl bus patikros paklaida.
 
 ```{.python .input  n=9}
 %%tab pytorch
@@ -193,8 +193,8 @@ def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):  #@save
     return validation_error
 ```
 
-We also need to define the configuration space. Moreover, the first configuration
-to be evaluated is the default setting used in :numref:`sec_lenet`.
+Taip pat turime apibrėžti konfigūracijų erdvę. Be to, pirmoji įvertinama konfigūracija
+yra numatytasis nustatymas, naudotas :numref:`sec_lenet`.
 
 ```{.python .input  n=10}
 config_space = {
@@ -207,7 +207,7 @@ initial_config = {
 }
 ```
 
-Now we can start our random search:
+Dabar galime pradėti atsitiktinę paiešką:
 
 ```{.python .input}
 searcher = RandomSearcher(config_space, initial_config=initial_config)
@@ -216,8 +216,8 @@ tuner = HPOTuner(scheduler=scheduler, objective=hpo_objective_lenet)
 tuner.run(number_of_trials=5)
 ```
 
-Below we plot the optimization trajectory of the incumbent to get the any-time
-performance of random search:
+Toliau nubraižome geriausios esamos konfigūracijos optimizavimo trajektoriją, kad gautume
+atsitiktinės paieškos bet kuriuo metu pasiekiamą našumą:
 
 ```{.python .input  n=11}
 board = d2l.ProgressBoard(xlabel="time", ylabel="error")
@@ -227,50 +227,50 @@ for time_stamp, error in zip(
     board.draw(time_stamp, error, "random search", every_n=1)
 ```
 
-## Comparing HPO Algorithms
+## HPO algoritmų palyginimas
 
-Just as with training algorithms or model architectures, it is important to
-understand how to best compare different HPO algorithms. Each HPO run depends
-on two major sources of randomness: the random effects of the training process,
-such as random weight initialization or mini-batch ordering, and the intrinsic
-randomness of the HPO algorithm itself, such as the random sampling of random
-search. Hence, when comparing different algorithms, it is crucial to run each
-experiment several times and report statistics, such as mean or median, across
-a population of multiple repetitions of an algorithm based on different seeds
-of the random number generator.
+Kaip ir apmokymo algoritmus ar modelių architektūras, svarbu
+suprasti, kaip geriausiai palyginti skirtingus HPO algoritmus. Kiekvienas HPO vykdymas priklauso
+nuo dviejų pagrindinių atsitiktinumo šaltinių: apmokymo proceso atsitiktinių efektų,
+tokių kaip atsitiktinė svorių inicializacija ar minirinkinių tvarka, ir paties HPO algoritmo
+būdingo atsitiktinumo, pavyzdžiui, atsitiktinės paieškos atsitiktinės atrankos.
+Todėl lyginant skirtingus algoritmus, labai svarbu kiekvieną
+eksperimentą vykdyti kelis kartus ir pateikti statistiką, pavyzdžiui, vidurkį ar medianą,
+per kelių algoritmo pakartojimų populiaciją, pagrįstą skirtingomis
+atsitiktinių skaičių generatoriaus pradinėmis reikšmėmis.
 
-To illustrate this, we compare random search (see :numref:`sec_rs`) and Bayesian
-optimization :cite:`snoek-nips12` on tuning the hyperparameters of a feed-forward
-neural network. Each algorithm was evaluated
-$50$ times with a different random seed. The solid line indicates the average
-performance of the incumbent across these $50$ repetitions and the dashed line
-the standard deviation. We can see that random search and Bayesian optimization
-perform roughly the same up to ~1000 seconds, but Bayesian optimization can
-make use of the past observation to identify better configurations and thus
-quickly outperforms random search afterwards.
+Kad tai iliustruotume, lyginame atsitiktinę paiešką (žr. :numref:`sec_rs`) ir Bajeso
+optimizavimą :cite:`snoek-nips12` derinant tiesioginio sklidimo
+neuroninio tinklo hiperparametrus. Kiekvienas algoritmas buvo įvertintas
+$50$ kartų su skirtinga atsitiktine pradine reikšme. Ištisinė linija rodo vidutinį
+geriausios esamos konfigūracijos našumą per šiuos $50$ pakartojimų, o punktyrinė linija –
+standartinį nuokrypį. Matome, kad atsitiktinė paieška ir Bajeso optimizavimas
+veikia maždaug vienodai iki ~1000 sekundžių, bet Bajeso optimizavimas gali
+pasinaudoti ankstesniais stebėjimais, kad nustatytų geresnes konfigūracijas, todėl
+vėliau greitai aplenkia atsitiktinę paiešką.
 
 
-![Example any-time performance plot to compare two algorithms A and B.](../img/example_anytime_performance.svg)
+![Bet kuriuo metu pasiekiamo našumo grafiko pavyzdys dviem algoritmams A ir B palyginti.](../img/example_anytime_performance.svg)
 :label:`example_anytime_performance`
 
-## Summary
+## Santrauka
 
-This section laid out a simple, yet flexible interface to implement various HPO
-algorithms that we will look at in this chapter. Similar interfaces can be found
-in popular open-source HPO frameworks. We also looked at how we can compare HPO
-algorithms, and potential pitfall one needs to be aware. 
+Šiame skyrelyje pateikta paprasta, bet lanksti sąsaja įvairiems HPO
+algoritmams, kuriuos nagrinėsime šiame skyriuje, įgyvendinti. Panašias sąsajas galima rasti
+populiariuose atvirojo kodo HPO karkasuose. Taip pat apžvelgėme, kaip galime palyginti HPO
+algoritmus, ir galimas klaidas, apie kurias reikia žinoti.
 
-## Exercises
+## Pratimai
 
-1. The goal of this exercise is to implement the objective function for a slightly more challenging HPO problem, and to run more realistic experiments. We will use the two hidden layer MLP `DropoutMLP` implemented in :numref:`sec_dropout`.
-    1. Code up the objective function, which should depend on all hyperparameters of the model and `batch_size`. Use `max_epochs=50`. GPUs do not help here, so `num_gpus=0`. Hint: Modify `hpo_objective_lenet`.
-    2. Choose a sensible search space, where `num_hiddens_1`, `num_hiddens_2` are integers in $[8, 1024]$, and dropout values lie in $[0, 0.95]$, while `batch_size` lies in $[16, 384]$. Provide code for `config_space`, using sensible distributions from `scipy.stats`.
-    3. Run random search on this example with `number_of_trials=20` and plot the results. Make sure to first evaluate the default configuration of :numref:`sec_dropout`, which is `initial_config = {'num_hiddens_1': 256, 'num_hiddens_2': 256, 'dropout_1': 0.5, 'dropout_2': 0.5, 'lr': 0.1, 'batch_size': 256}`.
-2. In this exercise, you will implement a new searcher (subclass of `HPOSearcher`) which makes decisions based on past data. It depends on parameters `probab_local`, `num_init_random`. Its `sample_configuration` method works as follows. For the first `num_init_random` calls, do the same as `RandomSearcher.sample_configuration`. Otherwise, with probability `1 - probab_local`, do the same as `RandomSearcher.sample_configuration`. Otherwise, pick the configuration which attained the smallest validation error so far, select one of its hyperparameters at random, and sample its value randomly like in `RandomSearcher.sample_configuration`, but leave all other values the same. Return this configuration, which is identical to the best configuration so far, except in this one hyperparameter.
-    1. Code up this new `LocalSearcher`. Hint: Your searcher requires `config_space` as argument at construction. Feel free to use a member of type `RandomSearcher`. You will also have to implement the `update` method.
-    2. Re-run the experiment from the previous exercise, but using your new searcher instead of `RandomSearcher`. Experiment with different values for `probab_local`, `num_init_random`. However, note that a proper comparison between different HPO methods requires repeating experiments several times, and ideally considering a number of benchmark tasks.
+1. Šio pratimo tikslas yra įgyvendinti tikslo funkciją kiek sudėtingesniam HPO uždaviniui ir vykdyti realistiškesnius eksperimentus. Naudosime dviejų paslėptųjų sluoksnių MLP `DropoutMLP`, įgyvendintą :numref:`sec_dropout`.
+    1. Užprogramuokite tikslo funkciją, kuri turėtų priklausyti nuo visų modelio hiperparametrų ir `batch_size`. Naudokite `max_epochs=50`. GPU čia nepadeda, todėl `num_gpus=0`. Užuomina: modifikuokite `hpo_objective_lenet`.
+    2. Pasirinkite prasmingą paieškos erdvę, kur `num_hiddens_1`, `num_hiddens_2` yra sveikieji skaičiai intervale $[8, 1024]$, dropout reikšmės yra intervale $[0, 0.95]$, o `batch_size` yra intervale $[16, 384]$. Pateikite `config_space` kodą, naudodami prasmingus skirstinius iš `scipy.stats`.
+    3. Vykdykite atsitiktinę paiešką šiame pavyzdyje su `number_of_trials=20` ir nubraižykite rezultatus. Būtinai pirmiausia įvertinkite numatytąją :numref:`sec_dropout` konfigūraciją, kuri yra `initial_config = {'num_hiddens_1': 256, 'num_hiddens_2': 256, 'dropout_1': 0.5, 'dropout_2': 0.5, 'lr': 0.1, 'batch_size': 256}`.
+2. Šiame pratime įgyvendinsite naują ieškiklį (`HPOSearcher` poklasę), kuris sprendimus priima pagal ankstesnius duomenis. Jis priklauso nuo parametrų `probab_local`, `num_init_random`. Jo metodas `sample_configuration` veikia taip. Pirmiems `num_init_random` iškvietimų daro tą patį, ką `RandomSearcher.sample_configuration`. Kitu atveju su tikimybe `1 - probab_local` daro tą patį, ką `RandomSearcher.sample_configuration`. Kitu atveju pasirenka konfigūraciją, kuri iki šiol pasiekė mažiausią patikros paklaidą, atsitiktinai pasirenka vieną jos hiperparametrą ir atsitiktinai atrenka jo reikšmę kaip `RandomSearcher.sample_configuration`, bet visas kitas reikšmes palieka tokias pačias. Grąžinkite šią konfigūraciją, kuri yra identiška iki šiol geriausiai konfigūracijai, išskyrus šį vieną hiperparametrą.
+    1. Užprogramuokite šį naują `LocalSearcher`. Užuomina: jūsų ieškikliui kuriant reikia `config_space` kaip argumento. Galite naudoti `RandomSearcher` tipo narį. Taip pat turėsite įgyvendinti metodą `update`.
+    2. Pakartokite ankstesnio pratimo eksperimentą, bet vietoj `RandomSearcher` naudokite savo naują ieškiklį. Eksperimentuokite su skirtingomis `probab_local`, `num_init_random` reikšmėmis. Tačiau atkreipkite dėmesį, kad tinkamam skirtingų HPO metodų palyginimui reikia kelis kartus kartoti eksperimentus ir idealiu atveju nagrinėti kelias lyginamąsias užduotis.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12092)
+[Diskusijos](https://discuss.d2l.ai/t/12092)
 :end_tab:

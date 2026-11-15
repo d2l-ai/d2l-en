@@ -1,60 +1,60 @@
-# Markov Decision Process (MDP)
+# Markovo sprendimų procesas (MDP)
 :label:`sec_mdp`
-In this section, we will discuss how to formulate reinforcement learning problems using Markov decision processes (MDPs) and describe various components of MDPs in detail. 
+Šiame skyrelyje aptarsime, kaip formuluoti skatinamojo mokymosi uždavinius naudojant Markovo sprendimų procesus (MDP), ir išsamiai apibūdinsime įvairius MDP komponentus. 
 
-## Definition of an MDP
+## MDP apibrėžimas
 
-A Markov decision process (MDP) :cite:`BellmanMDP` is a model for how the state of a system evolves as different actions are applied to the system. A few different quantities come together to form an MDP.
+Markovo sprendimų procesas (MDP) :cite:`BellmanMDP` yra modelis, aprašantis, kaip sistemos būsena kinta, kai sistemai taikomi skirtingi veiksmai. MDP sudaro keli skirtingi dydžiai.
 
-![A simple gridworld navigation task where the robot not only has to find its way to the goal location (shown as a green house) but also has to avoid trap locations (shown as red cross signs).](../img/mdp.png)
+![Paprastas tinklelio pasaulio navigacijos uždavinys, kuriame robotas turi ne tik rasti kelią į tikslo vietą (parodyta kaip žalias namas), bet ir vengti spąstų vietų (parodyta kaip raudoni kryžiai).](../img/mdp.png)
 :width:`250px`
 :label:`fig_mdp`
 
-* Let $\mathcal{S}$ be the set of states in the MDP. As a concrete example see :numref:`fig_mdp`, for a robot that is navigating a gridworld. In this case, $\mathcal{S}$ corresponds to the set of locations that the robot can be at any given timestep.
-* Let $\mathcal{A}$ be the set of actions that the robot can take at each state, e.g., "go forward", "turn right", "turn left", "stay at the same location", etc. Actions can change the current state of the robot to some other state within the set $\mathcal{S}$.
-* It may happen that we do not know how the robot moves *exactly* but only know it up to some approximation. We model this situation in reinforcement learning as follows: if the robot takes an action "go forward", there might be a small probability that it stays at the current state, another small probability that it "turns left", etc. Mathematically, this amounts to defining a "transition function" $T: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \to [0,1]$ such that $T(s, a, s') = P(s' \mid s, a)$ using the conditional probability of reaching a state $s'$ given that the robot was at state $s$ and took an action $a$. The transition function is a probability distribution and we therefore have $\sum_{s' \in \mathcal{S}} T(s, a, s') = 1$ for all $s \in \mathcal{S}$ and $a \in \mathcal{A}$, i.e., the robot has to go to some state if it takes an action.
-* We now construct a notion of which actions are useful and which ones are not using the concept of a "reward" $r: \mathcal{S} \times \mathcal{A} \to \mathbb{R}$. We say that the robot gets a reward $r(s,a)$ if the robot takes an action $a$ at state $s$. If the reward $r(s, a)$ is large, this indicates that taking the action $a$ at state $s$ is more useful to achieving the goal of the robot, i.e., going to the green house. If the reward $r(s, a)$ is small, then action $a$ is less useful to achieving this goal. It is important to note that the reward is designed by the user (the person who creates the reinforcement learning algorithm) with the goal in mind.
+* Tegu $\mathcal{S}$ yra MDP būsenų aibė. Konkretų pavyzdį žr. :numref:`fig_mdp`, kuriame robotas naviguoja tinklelio pasaulyje. Šiuo atveju $\mathcal{S}$ atitinka vietų, kuriose robotas gali būti bet kuriuo laiko žingsniu, aibę.
+* Tegu $\mathcal{A}$ yra veiksmų, kuriuos robotas gali atlikti kiekvienoje būsenoje, aibė, pvz., „eiti pirmyn“, „sukti į dešinę“, „sukti į kairę“, „likti toje pačioje vietoje“ ir pan. Veiksmai gali pakeisti dabartinę roboto būseną į kitą aibės $\mathcal{S}$ būseną.
+* Gali būti, kad nežinome, kaip robotas juda *tiksliai*, o žinome tai tik apytiksliai. Skatinamajame mokyme šią situaciją modeliuojame taip: jei robotas atlieka veiksmą „eiti pirmyn“, gali būti nedidelė tikimybė, kad jis liks dabartinėje būsenoje, kita nedidelė tikimybė, kad jis „pasuks į kairę“, ir pan. Matematiškai tai reiškia „perėjimo funkcijos“ $T: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \to [0,1]$ apibrėžimą taip, kad $T(s, a, s') = P(s' \mid s, a)$, naudojant sąlyginę tikimybę pasiekti būseną $s'$, kai robotas buvo būsenoje $s$ ir atliko veiksmą $a$. Perėjimo funkcija yra tikimybių skirstinys, todėl visiems $s \in \mathcal{S}$ ir $a \in \mathcal{A}$ turime $\sum_{s' \in \mathcal{S}} T(s, a, s') = 1$, t. y. robotas, atlikęs veiksmą, turi patekti į kokią nors būseną.
+* Dabar sukonstruojame supratimą, kurie veiksmai yra naudingi, o kurie ne, naudodami „atlygio“ sąvoką $r: \mathcal{S} \times \mathcal{A} \to \mathbb{R}$. Sakome, kad robotas gauna atlygį $r(s,a)$, jei robotas būsenoje $s$ atlieka veiksmą $a$. Jei atlygis $r(s, a)$ didelis, tai rodo, kad veiksmas $a$ būsenoje $s$ yra naudingesnis roboto tikslui pasiekti, t. y. nueiti iki žaliojo namo. Jei atlygis $r(s, a)$ mažas, tada veiksmas $a$ yra mažiau naudingas šiam tikslui pasiekti. Svarbu pažymėti, kad atlygį, atsižvelgdamas į tikslą, suprojektuoja naudotojas (asmuo, kuris kuria skatinamojo mokymosi algoritmą).
 
-## Return and Discount Factor
+## Grąža ir diskonto koeficientas
 
-The different components above together form a Markov decision process (MDP)
+Aukščiau aprašyti komponentai kartu sudaro Markovo sprendimų procesą (MDP)
 $$\textrm{MDP}: (\mathcal{S}, \mathcal{A}, T, r).$$
 
-Let's now consider the situation when the robot starts at a particular state $s_0 \in \mathcal{S}$ and continues taking actions to result in a trajectory
+Dabar panagrinėkime situaciją, kai robotas pradeda nuo tam tikros būsenos $s_0 \in \mathcal{S}$ ir toliau atlieka veiksmus, taip sudarydamas trajektoriją
 $$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, s_2, a_2, r_2, \ldots).$$
 
-At each time step $t$ the robot is at a state $s_t$ and takes an action $a_t$ which results in a reward $r_t = r(s_t, a_t)$. The *return* of a trajectory is the total reward obtained by the robot along such a trajectory
+Kiekvienu laiko žingsniu $t$ robotas yra būsenoje $s_t$ ir atlieka veiksmą $a_t$, kuris lemia atlygį $r_t = r(s_t, a_t)$. Trajektorijos *grąža* yra bendras atlygis, kurį robotas gauna išilgai tokios trajektorijos
 $$R(\tau) = r_0 + r_1 + r_2 + \cdots.$$
 
-The goal in reinforcement learning is to find a trajectory that has the largest *return*.
+Skatinamojo mokymosi tikslas yra rasti trajektoriją, kurios *grąža* didžiausia.
 
-Think of the situation when the robot continues to travel in the gridworld without ever reaching the goal location. The sequence of states and actions in a trajectory can be infinitely long in this case and the *return* of any such infinitely long trajectory will be infinite. In order to keep the reinforcement learning formulation meaningful even for such trajectories, we introduce the notion of a discount factor $\gamma < 1$. We write the discounted *return* as
+Pagalvokite apie situaciją, kai robotas toliau keliauja tinklelio pasaulyje niekada nepasiekdamas tikslo vietos. Būsenų ir veiksmų seka trajektorijoje šiuo atveju gali būti be galo ilga, o bet kurios tokios be galo ilgos trajektorijos *grąža* bus begalinė. Kad skatinamojo mokymosi formuluotė išliktų prasminga net tokioms trajektorijoms, įvedame diskonto koeficiento $\gamma < 1$ sąvoką. Diskontuotą *grąžą* užrašome kaip
 $$R(\tau) = r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots = \sum_{t=0}^\infty \gamma^t r_t.$$
 
-Note that if $\gamma$ is very small, the rewards earned by the robot in the far future, say $t = 1000$, are heavily discounted by the factor $\gamma^{1000}$. This encourages the robot to select short trajectories that achieve its goal, namely that of going to the green house in the gridwold example (see :numref:`fig_mdp`). For large values of the discount factor, say $\gamma = 0.99$, the robot is encouraged to *explore* and then find the best trajectory to go to the goal location.
+Atkreipkite dėmesį, kad jei $\gamma$ labai mažas, atlygiai, kuriuos robotas gauna tolimoje ateityje, tarkime, kai $t = 1000$, yra stipriai diskontuojami koeficientu $\gamma^{1000}$. Tai skatina robotą rinktis trumpas trajektorijas, kuriomis pasiekiamas jo tikslas, būtent nueiti iki žaliojo namo tinklelio pasaulio pavyzdyje (žr. :numref:`fig_mdp`). Esant didelėms diskonto koeficiento reikšmėms, tarkime, $\gamma = 0.99$, robotas skatinamas *tyrinėti* ir tada rasti geriausią trajektoriją į tikslo vietą.
 
-## Discussion of the Markov Assumption
+## Markovo prielaidos aptarimas
 
-Let us think of a new robot where the state $s_t$ is the location as above but the action $a_t$ is the acceleration that the robot applies to its wheels instead of an abstract command like "go forward". If this robot has some non-zero velocity at state $s_t$, then the next location $s_{t+1}$ is a function of the past location $s_t$, the acceleration $a_t$, also the velocity of the robot at time $t$ which is proportional to $s_t - s_{t-1}$. This indicates that we should have
+Pagalvokime apie naują robotą, kurio būsena $s_t$ yra vieta kaip aukščiau, bet veiksmas $a_t$ yra pagreitis, kurį robotas pritaiko savo ratams, o ne abstrakti komanda, pavyzdžiui, „eiti pirmyn“. Jei šis robotas būsenoje $s_t$ turi tam tikrą nenulinį greitį, tada kita vieta $s_{t+1}$ yra praėjusios vietos $s_t$, pagreičio $a_t$ ir roboto greičio laiko momentu $t$, kuris proporcingas $s_t - s_{t-1}$, funkcija. Tai rodo, kad turėtume turėti
 
 $$s_{t+1} = \textrm{some function}(s_t, a_t, s_{t-1});$$
 
-the "some function" in our case would be Newton's law of motion. This is quite different from our transition function that simply depends upon $s_t$ and $a_t$.
+„tam tikra funkcija“ mūsų atveju būtų Niutono judėjimo dėsnis. Tai gana skiriasi nuo mūsų perėjimo funkcijos, kuri priklauso tik nuo $s_t$ ir $a_t$.
 
-Markov systems are all systems where the next state $s_{t+1}$ is only a function of the current state $s_t$ and the action $a_t$ taken at the current state. In Markov systems, the next state does not depend on which actions were taken in the past or the states that the robot was at in the past. For example, the new robot that has acceleration as the action above is not Markovian because the next location $s_{t+1}$ depends upon the previous state $s_{t-1}$ through the velocity. It may seem that Markovian nature of a system is a restrictive assumption, but it is not so. Markov Decision Processes are still capable of modeling a very large class of real systems. For example, for our new robot, if we chose our state $s_t$ to the tuple $(\textrm{location}, \textrm{velocity})$ then the system is Markovian because its next state $(\textrm{location}_{t+1}, \textrm{velocity}_{t+1})$ depends only upon the current state $(\textrm{location}_t, \textrm{velocity}_t)$ and the action at the current state $a_t$.
+Markovo sistemos yra visos sistemos, kuriose kita būsena $s_{t+1}$ yra tik dabartinės būsenos $s_t$ ir dabartinėje būsenoje atlikto veiksmo $a_t$ funkcija. Markovo sistemose kita būsena nepriklauso nuo to, kokie veiksmai buvo atlikti praeityje ar kokiose būsenose robotas buvo praeityje. Pavyzdžiui, naujasis robotas, kurio veiksmas yra pagreitis, nėra Markovo, nes kita vieta $s_{t+1}$ priklauso nuo ankstesnės būsenos $s_{t-1}$ per greitį. Gali atrodyti, kad sistemos Markovo prigimtis yra ribojanti prielaida, bet taip nėra. Markovo sprendimų procesai vis tiek geba modeliuoti labai didelę realių sistemų klasę. Pavyzdžiui, mūsų naujam robotui, jei savo būseną $s_t$ pasirinktume kaip kortežą $(\textrm{location}, \textrm{velocity})$, tada sistema yra Markovo, nes jos kita būsena $(\textrm{location}_{t+1}, \textrm{velocity}_{t+1})$ priklauso tik nuo dabartinės būsenos $(\textrm{location}_t, \textrm{velocity}_t)$ ir dabartinėje būsenoje atlikto veiksmo $a_t$.
 
-## Summary
-The reinforcement learning problem is typically modeled using Markov Decision Processes. A Markov decision process (MDP) is defined by a tuple of four entities $(\mathcal{S}, \mathcal{A}, T, r)$ where $\mathcal{S}$ is the state space, $\mathcal{A}$ is the action space, $T$ is the transition function that encodes the transition probabilities of the MDP and $r$ is the immediate reward obtained by taking action at a particular state.
+## Santrauka
+Skatinamojo mokymosi uždavinys paprastai modeliuojamas naudojant Markovo sprendimų procesus. Markovo sprendimų procesas (MDP) apibrėžiamas keturių elementų kortežu $(\mathcal{S}, \mathcal{A}, T, r)$, kur $\mathcal{S}$ yra būsenų erdvė, $\mathcal{A}$ yra veiksmų erdvė, $T$ yra perėjimo funkcija, koduojanti MDP perėjimo tikimybes, o $r$ yra betarpiškas atlygis, gaunamas atlikus veiksmą tam tikroje būsenoje.
 
 
-## Exercises
+## Pratimai
 
-1. Suppose that we want to design an MDP to model [MountainCar](https://www.gymlibrary.dev/environments/classic_control/mountain_car/) problem.
-    1. What would be the set of states?
-    2. What would be the set of actions?
-    3. What would be the possible reward functions?
-2. How would you design an MDP for an Atari game like [Pong game](https://www.gymlibrary.dev/environments/atari/pong/)?
+1. Tarkime, norime sukurti MDP [MountainCar](https://www.gymlibrary.dev/environments/classic_control/mountain_car/) uždaviniui modeliuoti.
+    1. Kokia būtų būsenų aibė?
+    2. Kokia būtų veiksmų aibė?
+    3. Kokios galėtų būti atlygio funkcijos?
+2. Kaip suprojektuotumėte MDP Atari žaidimui, pavyzdžiui, [Pong žaidimui](https://www.gymlibrary.dev/environments/atari/pong/)?
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12084)
+[Diskusijos](https://discuss.d2l.ai/t/12084)
 :end_tab:

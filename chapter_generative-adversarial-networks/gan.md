@@ -1,46 +1,46 @@
-# Generative Adversarial Networks
+# Generatyviniai priešiškieji tinklai
 :label:`sec_basic_gan`
 
-Throughout most of this book, we have talked about how to make predictions. In some form or another, we used deep neural networks to learn mappings from data examples to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos of cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images have gone from useless to human-level (with some caveats) in just 5-6 years. We will spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
+Didžiojoje šios knygos dalyje kalbėjome apie tai, kaip daryti prognozes. Vienaip ar kitaip naudojome giliuosius neuroninius tinklus, kad išmoktume atvaizdžius iš duomenų pavyzdžių į žymes. Toks mokymasis vadinamas diskriminatyviuoju mokymusi, nes norime sugebėti atskirti kačių nuotraukas nuo šunų nuotraukų. Klasifikatoriai ir regresoriai yra diskriminatyviojo mokymosi pavyzdžiai. O neuroniniai tinklai, apmokyti skleidimu atgal, apvertė aukštyn kojomis viską, ką manėme žinoję apie diskriminatyvųjį mokymąsi dideliuose sudėtinguose duomenų rinkiniuose. Didelės raiškos vaizdų klasifikavimo tikslumas per vos 5–6 metus pakilo nuo nenaudingo iki žmogaus lygio (su tam tikromis išlygomis). Nekartosime dar vienos kalbos apie visas kitas diskriminatyviąsias užduotis, kuriose giliesiems neuroniniams tinklams sekasi stulbinamai gerai.
 
-But there is more to machine learning than just solving discriminative tasks. For example, given a large dataset, without any labels, we might want to learn a model that concisely captures the characteristics of this data. Given such a model, we could sample synthetic data examples that resemble the distribution of the training data. For example, given a large corpus of photographs of faces, we might want to be able to generate a new photorealistic image that looks like it might plausibly have come from the same dataset. This kind of learning is called generative modeling.
+Tačiau mašininis mokymasis nėra vien diskriminatyviųjų užduočių sprendimas. Pavyzdžiui, turėdami didelį duomenų rinkinį be jokių žymių, galime norėti išmokti modelį, kuris glaustai užfiksuotų šių duomenų ypatybes. Turėdami tokį modelį, galėtume atrinkti sintetinius duomenų pavyzdžius, kurie primena apmokymo duomenų skirstinį. Pavyzdžiui, turėdami didelį veidų nuotraukų korpusą, galime norėti sugebėti sugeneruoti naują fotorealistišką vaizdą, kuris atrodytų taip, lyg galėtų tikėtinai būti kilęs iš to paties duomenų rinkinio. Toks mokymasis vadinamas generatyviuoju modeliavimu.
 
-Until recently, we had no method that could synthesize novel photorealistic images. But the success of deep neural networks for discriminative learning opened up new possibilities. One big trend over the last three years has been the application of discriminative deep nets to overcome challenges in problems that we do not generally think of as supervised learning problems. The recurrent neural network language models are one example of using a discriminative network (trained to predict the next character) that once trained can act as a generative model.
+Dar visai neseniai neturėjome metodo, galinčio sintezuoti naujus fotorealistiškus vaizdus. Tačiau gilių neuroninių tinklų sėkmė diskriminatyviajame mokyme atvėrė naujų galimybių. Viena didelė pastarųjų trejų metų tendencija – diskriminatyviųjų gilių tinklų taikymas problemoms įveikti uždaviniuose, kurių paprastai nelaikome prižiūrimojo mokymosi uždaviniais. Rekurentinių neuroninių tinklų kalbos modeliai yra vienas diskriminatyviojo tinklo (apmokyto prognozuoti kitą simbolį) naudojimo pavyzdys, kuris, kai tik apmokomas, gali veikti kaip generatyvusis modelis.
 
-In 2014, a breakthrough paper introduced Generative adversarial networks (GANs) :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`, a clever new way to leverage the power of discriminative models to get good generative models. At their heart, GANs rely on the idea that a data generator is good if we cannot tell fake data apart from real data. In statistics, this is called a two-sample test - a test to answer the question whether datasets $X=\{x_1,\ldots, x_n\}$ and $X'=\{x'_1,\ldots, x'_n\}$ were drawn from the same distribution. The main difference between most statistics papers and GANs is that the latter use this idea in a constructive way. In other words, rather than just training a model to say "hey, these two datasets do not look like they came from the same distribution", they use the [two-sample test](https://en.wikipedia.org/wiki/Two-sample_hypothesis_testing) to provide training signals to a generative model. This allows us to improve the data generator until it generates something that resembles the real data. At the very least, it needs to fool the classifier even if our classifier is a state of the art deep neural network.
+2014 m. proveržio straipsnis pristatė generatyvinius priešiškuosius tinklus (angl. *generative adversarial networks*, GAN) :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014` – gudrų naują būdą išnaudoti diskriminatyviųjų modelių galią geriems generatyviesiems modeliams gauti. GAN esmė remiasi mintimi, kad duomenų generatorius yra geras, jei negalime atskirti netikrų duomenų nuo tikrų. Statistikoje tai vadinama dviejų imčių testu – testu, atsakančiu į klausimą, ar duomenų rinkiniai $X=\{x_1,\ldots, x_n\}$ ir $X'=\{x'_1,\ldots, x'_n\}$ buvo atrinkti iš to paties skirstinio. Pagrindinis daugumos statistikos straipsnių ir GAN skirtumas yra tas, kad pastarieji šią idėją naudoja konstruktyviai. Kitaip tariant, užuot tiesiog mokę modelį sakyti „ei, atrodo, kad šie du duomenų rinkiniai nėra kilę iš to paties skirstinio“, jie naudoja [dviejų imčių testą](https://en.wikipedia.org/wiki/Two-sample_hypothesis_testing), kad suteiktų apmokymo signalus generatyviajam modeliui. Tai leidžia tobulinti duomenų generatorių, kol jis sugeneruoja kažką, kas primena tikrus duomenis. Mažų mažiausiai jis turi apgauti klasifikatorių, net jei mūsų klasifikatorius yra pažangiausias gilusis neuroninis tinklas.
 
-![Generative Adversarial Networks](../img/gan.svg)
+![Generatyviniai priešiškieji tinklai](../img/gan.svg)
 :label:`fig_gan`
 
 
-The GAN architecture is illustrated in :numref:`fig_gan`.
-As you can see, there are two pieces in GAN architecture - first off, we need a device (say, a deep network but it really could be anything, such as a game rendering engine) that might potentially be able to generate data that looks just like the real thing. If we are dealing with images, this needs to generate images. If we are dealing with speech, it needs to generate audio sequences, and so on. We call this the generator network. The second component is the discriminator network. It attempts to distinguish fake and real data from each other. Both networks are in competition with each other. The generator network attempts to fool the discriminator network. At that point, the discriminator network adapts to the new fake data. This information, in turn is used to improve the generator network, and so on.
+GAN architektūra iliustruota :numref:`fig_gan`.
+Kaip matote, GAN architektūroje yra dvi dalys. Pirma, mums reikia įtaiso (tarkime, gilaus tinklo, bet iš tikrųjų tai galėtų būti bet kas, pavyzdžiui, žaidimo vaizdavimo variklis), kuris galėtų sugeneruoti duomenis, atrodančius lygiai kaip tikri. Jei dirbame su vaizdais, jis turi generuoti vaizdus. Jei dirbame su kalba, jis turi generuoti garso sekas ir pan. Tai vadiname generatoriaus tinklu. Antroji dalis yra diskriminatoriaus tinklas. Jis bando atskirti netikrus ir tikrus duomenis. Abu tinklai konkuruoja tarpusavyje. Generatoriaus tinklas bando apgauti diskriminatoriaus tinklą. Tada diskriminatoriaus tinklas prisitaiko prie naujų netikrų duomenų. Ši informacija savo ruožtu naudojama generatoriaus tinklui tobulinti ir taip toliau.
 
 
-The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a fully connected layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for the true data is $1$ and $0$ for the fake data. We train the discriminator to minimize the cross-entropy loss, *i.e.*,
+Diskriminatorius yra dvejetainis klasifikatorius, atskiriantis, ar įvestis $x$ yra tikra (iš tikrų duomenų), ar netikra (iš generatoriaus). Paprastai diskriminatorius išveda skaliarinę prognozę $o\in\mathbb R$ įvesčiai $\mathbf x$, pavyzdžiui, naudodamas pilnai sujungtą sluoksnį su paslėptuoju dydžiu 1, o tada pritaiko sigmoidinę funkciją, kad gautų prognozuojamą tikimybę $D(\mathbf x) = 1/(1+e^{-o})$. Tarkime, kad tikrų duomenų žymė $y$ yra $1$, o netikrų – $0$. Diskriminatorių apmokome minimizuoti kryžminės entropijos nuostolį, *t. y.*
 
 $$ \min_D \{ - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)) \},$$
 
-For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, *e.g.*, a normal distribution $\mathbf z \sim \mathcal{N} (0, 1)$. We often call $\mathbf z$ as the latent variable.
-It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of the generator is to fool the discriminator to classify $\mathbf x'=G(\mathbf z)$ as true data, *i.e.*, we want $D( G(\mathbf z)) \approx 1$.
-In other words, for a given discriminator $D$, we update the parameters of the generator $G$ to maximize the cross-entropy loss when $y=0$, *i.e.*,
+Generatorius pirmiausia atrenka tam tikrą parametrą $\mathbf z\in\mathbb R^d$ iš atsitiktinumo šaltinio, *pvz.*, normaliojo skirstinio $\mathbf z \sim \mathcal{N} (0, 1)$. Dažnai $\mathbf z$ vadiname latentiniu kintamuoju.
+Tada jis pritaiko funkciją, kad sugeneruotų $\mathbf x'=G(\mathbf z)$. Generatoriaus tikslas yra apgauti diskriminatorių, kad jis $\mathbf x'=G(\mathbf z)$ klasifikuotų kaip tikrus duomenis, *t. y.* norime, kad $D( G(\mathbf z)) \approx 1$.
+Kitaip tariant, esant duotam diskriminatoriui $D$, atnaujiname generatoriaus $G$ parametrus, kad maksimizuotume kryžminės entropijos nuostolį, kai $y=0$, *t. y.*
 
 $$ \max_G \{ - (1-y) \log(1-D(G(\mathbf z))) \} = \max_G \{ - \log(1-D(G(\mathbf z))) \}.$$
 
-If the generator does a perfect job, then $D(\mathbf x')\approx 1$, so the above loss is near 0, which results in the gradients that are too small to make good progress for the discriminator. So commonly, we minimize the following loss:
+Jei generatorius atlieka darbą tobulai, tada $D(\mathbf x')\approx 1$, todėl aukščiau pateiktas nuostolis yra artimas 0, o tai lemia pernelyg mažus gradientus, kad diskriminatorius galėtų daryti gerą pažangą. Todėl dažniausiai minimizuojame šį nuostolį:
 
 $$ \min_G \{ - y \log(D(G(\mathbf z))) \} = \min_G \{ - \log(D(G(\mathbf z))) \}, $$
 
-which is just feeding $\mathbf x'=G(\mathbf z)$ into the discriminator but giving label $y=1$.
+o tai yra tiesiog $\mathbf x'=G(\mathbf z)$ paduodimas diskriminatoriui, bet suteikiant žymę $y=1$.
 
 
-To sum up, $D$ and $G$ are playing a "minimax" game with the comprehensive objective function:
+Apibendrinant, $D$ ir $G$ žaidžia „minimax“ žaidimą su šia visapusiška tikslo funkcija:
 
 $$\min_D \max_G \{ -E_{x \sim \textrm{Data}} \log D(\mathbf x) - E_{z \sim \textrm{Noise}} \log(1 - D(G(\mathbf z))) \}.$$
 
 
 
-Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
+Daug GAN taikymų yra susiję su vaizdais. Demonstracijos tikslais pirmiausia pasitenkinsime daug paprastesnio skirstinio pritaikymu. Parodysime, kas atsitinka, jei naudojame GAN, kad sukurtume pasaulyje neefektyviausią Gauso skirstinio parametrų vertintuvą. Pradėkime.
 
 ```{.python .input}
 #@tab mxnet
@@ -65,9 +65,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Generate Some "Real" Data
+## „Tikrų“ duomenų generavimas
 
-Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
+Kadangi tai bus nuobodžiausias pasaulyje pavyzdys, tiesiog sugeneruojame duomenis, atrinktus iš Gauso skirstinio.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -85,7 +85,7 @@ b = d2l.tensor([1, 2], tf.float32)
 data = d2l.matmul(X, A) + b
 ```
 
-Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
+Pažiūrėkime, ką gavome. Tai turėtų būti kiek savavališkai pastumtas Gauso skirstinys su vidurkiu $b$ ir kovariacijų matrica $A^TA$.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -107,9 +107,9 @@ batch_size = 8
 data_iter = d2l.load_array((data,), batch_size)
 ```
 
-## Generator
+## Generatorius
 
-Our generator network will be the simplest network possible - a single layer linear model. This is since we will be driving that linear network with a Gaussian data generator. Hence, it literally only needs to learn the parameters to fake things perfectly.
+Mūsų generatoriaus tinklas bus paprasčiausias įmanomas tinklas – vieno sluoksnio tiesinis modelis. Taip yra todėl, kad šį tiesinį tinklą valdysime Gauso duomenų generatoriumi. Todėl jam tiesiogine prasme reikia išmokti tik parametrus, kad puikiai suklastotų duomenis.
 
 ```{.python .input}
 #@tab mxnet
@@ -127,9 +127,9 @@ net_G = nn.Sequential(nn.Linear(2, 2))
 net_G = tf.keras.layers.Dense(2)
 ```
 
-## Discriminator
+## Diskriminatorius
 
-For the discriminator we will be a bit more discriminating: we will use an MLP with 3 layers to make things a bit more interesting.
+Diskriminatoriui būsime kiek išrankesni: naudosime 3 sluoksnių MLP, kad viskas būtų šiek tiek įdomiau.
 
 ```{.python .input}
 #@tab mxnet
@@ -156,9 +156,9 @@ net_D = tf.keras.models.Sequential([
 ])
 ```
 
-## Training
+## Apmokymas
 
-First we define a function to update the discriminator.
+Pirmiausia apibrėžiame funkciją diskriminatoriui atnaujinti.
 
 ```{.python .input}
 #@tab mxnet
@@ -222,7 +222,7 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
     return loss_D
 ```
 
-The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
+Generatorius atnaujinamas panašiai. Čia pakartotinai naudojame kryžminės entropijos nuostolį, bet netikrų duomenų žymę keičiame iš $0$ į $1$.
 
 ```{.python .input}
 #@tab mxnet
@@ -279,7 +279,7 @@ def update_G(Z, net_D, net_G, loss, optimizer_G):
     return loss_G
 ```
 
-Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
+Ir diskriminatorius, ir generatorius atlieka dvejetainę logistinę regresiją su kryžminės entropijos nuostoliu. Naudojame Adam apmokymo procesui sušvelninti. Kiekvienoje iteracijoje pirmiausia atnaujiname diskriminatorių, o paskui generatorių. Vizualizuojame abu nuostolius ir sugeneruotus pavyzdžius.
 
 ```{.python .input}
 #@tab mxnet
@@ -399,7 +399,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
 
-Now we specify the hyperparameters to fit the Gaussian distribution.
+Dabar nurodome hiperparametrus Gauso skirstiniui pritaikyti.
 
 ```{.python .input}
 #@tab all
@@ -408,20 +408,20 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
       latent_dim, d2l.numpy(data[:100]))
 ```
 
-## Summary
+## Santrauka
 
-* Generative adversarial networks (GANs) composes of two deep networks, the generator and the discriminator.
-* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross-entropy loss, *i.e.*, $\max \log(D(\mathbf{x'}))$.
-* The discriminator tries to distinguish the generated images from the true images, via minimizing the cross-entropy loss, *i.e.*, $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
+* Generatyviniai priešiškieji tinklai (GAN) sudaryti iš dviejų gilių tinklų – generatoriaus ir diskriminatoriaus.
+* Generatorius generuoja vaizdą kuo labiau panašų į tikrąjį, kad apgautų diskriminatorių, maksimizuodamas kryžminės entropijos nuostolį, *t. y.* $\max \log(D(\mathbf{x'}))$.
+* Diskriminatorius bando atskirti sugeneruotus vaizdus nuo tikrųjų, minimizuodamas kryžminės entropijos nuostolį, *t. y.* $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
 
-## Exercises
+## Pratimai
 
-* Does an equilibrium exist where the generator wins, *i.e.* the discriminator ends up unable to distinguish the two distributions on finite samples?
+* Ar egzistuoja pusiausvyra, kurioje laimi generatorius, *t. y.* diskriminatorius galiausiai nebegali atskirti dviejų skirstinių baigtinėse imtyse?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/408)
+[Diskusijos](https://discuss.d2l.ai/t/408)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1082)
+[Diskusijos](https://discuss.d2l.ai/t/1082)
 :end_tab:

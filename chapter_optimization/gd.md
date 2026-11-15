@@ -1,35 +1,35 @@
-# Gradient Descent
+# Gradientinis nusileidimas
 :label:`sec_gd`
 
-In this section we are going to introduce the basic concepts underlying *gradient descent*.
-Although it is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms.
-For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms.
-Let's start with a simple special case.
+Šiame skyrelyje pristatysime pagrindines *gradientinio nusileidimo* sąvokas.
+Nors giliajame mokymesi jis naudojamas retai tiesiogiai, gradientinio nusileidimo supratimas yra raktas į stochastinio gradientinio nusileidimo algoritmų supratimą.
+Pavyzdžiui, optimizavimo uždavinys gali diverguoti dėl pernelyg didelio mokymosi greičio. Šį reiškinį galima pastebėti jau gradientiniame nusileidime. Panašiai prekondicionavimas yra įprastas gradientinio nusileidimo metodas ir perkeliamas į pažangesnius algoritmus.
+Pradėkime nuo paprasto ypatingo atvejo.
 
 
-## One-Dimensional Gradient Descent
+## Vienmatis gradientinis nusileidimas
 
-Gradient descent in one dimension is an excellent example to explain why the gradient descent algorithm may reduce the value of the objective function. Consider some continuously differentiable real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$. Using a Taylor expansion we obtain
+Gradientinis nusileidimas vienoje dimensijoje yra puikus pavyzdys paaiškinti, kodėl gradientinio nusileidimo algoritmas gali sumažinti tikslo funkcijos reikšmę. Panagrinėkime tam tikrą tolydžiai diferencijuojamą realiųjų reikšmių funkciją $f: \mathbb{R} \rightarrow \mathbb{R}$. Naudodami Teiloro skleidinį gauname
 
 $$f(x + \epsilon) = f(x) + \epsilon f'(x) + \mathcal{O}(\epsilon^2).$$
 :eqlabel:`gd-taylor`
 
-That is, in first-order approximation $f(x+\epsilon)$ is given by the function value $f(x)$ and the first derivative $f'(x)$ at $x$. It is not unreasonable to assume that for small $\epsilon$ moving in the direction of the negative gradient will decrease $f$. To keep things simple we pick a fixed step size $\eta > 0$ and choose $\epsilon = -\eta f'(x)$. Plugging this into the Taylor expansion above we get
+Tai yra, pirmos eilės aproksimacijoje $f(x+\epsilon)$ nusako funkcijos reikšmė $f(x)$ ir pirmoji išvestinė $f'(x)$ taške $x$. Nėra nepagrįsta daryti prielaidą, kad mažiems $\epsilon$ judėjimas neigiamo gradiento kryptimi sumažins $f$. Kad viskas būtų paprasta, pasirenkame fiksuotą žingsnio dydį $\eta > 0$ ir parenkame $\epsilon = -\eta f'(x)$. Įstatę tai į aukščiau pateiktą Teiloro skleidinį, gauname
 
 $$f(x - \eta f'(x)) = f(x) - \eta f'^2(x) + \mathcal{O}(\eta^2 f'^2(x)).$$
 :eqlabel:`gd-taylor-2`
 
-If the derivative $f'(x) \neq 0$ does not vanish we make progress since $\eta f'^2(x)>0$. Moreover, we can always choose $\eta$ small enough for the higher-order terms to become irrelevant. Hence we arrive at
+Jei išvestinė $f'(x) \neq 0$ neišnyksta, darome pažangą, nes $\eta f'^2(x)>0$. Be to, visada galime pasirinkti pakankamai mažą $\eta$, kad aukštesnės eilės nariai taptų nesvarbūs. Taigi gauname
 
 $$f(x - \eta f'(x)) \lessapprox f(x).$$
 
-This means that, if we use
+Tai reiškia, kad jei naudojame
 
 $$x \leftarrow x - \eta f'(x)$$
 
-to iterate $x$, the value of function $f(x)$ might decline. Therefore, in gradient descent we first choose an initial value $x$ and a constant $\eta > 0$ and then use them to continuously iterate $x$ until the stop condition is reached, for example, when the magnitude of the gradient $|f'(x)|$ is small enough or the number of iterations has reached a certain value.
+$x$ iteracijoms, funkcijos $f(x)$ reikšmė gali mažėti. Todėl gradientiniame nusileidime pirmiausia pasirenkame pradinę reikšmę $x$ ir konstantą $\eta > 0$, o paskui jas naudojame nuolat iteruodami $x$, kol pasiekiama sustojimo sąlyga, pavyzdžiui, kai gradiento dydis $|f'(x)|$ yra pakankamai mažas arba iteracijų skaičius pasiekė tam tikrą reikšmę.
 
-For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to implement gradient descent. Although we know that $x=0$ is the solution to minimize $f(x)$, we still use this simple function to observe how $x$ changes.
+Paprastumo dėlei pasirenkame tikslo funkciją $f(x)=x^2$, kad iliustruotume, kaip įgyvendinti gradientinį nusileidimą. Nors žinome, kad $x=0$ yra $f(x)$ minimizavimo sprendinys, vis tiek naudojame šią paprastą funkciją stebėti, kaip kinta $x$.
 
 ```{.python .input}
 #@tab mxnet
@@ -64,7 +64,7 @@ def f_grad(x):  # Gradient (derivative) of the objective function
     return 2 * x
 ```
 
-Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
+Toliau kaip pradinę reikšmę naudojame $x=10$ ir tarkime, kad $\eta=0.2$. Naudodami gradientinį nusileidimą $x$ iteruoti 10 kartų, matome, kad galiausiai $x$ reikšmė artėja prie optimalaus sprendinio.
 
 ```{.python .input}
 #@tab all
@@ -80,7 +80,7 @@ def gd(eta, f_grad):
 results = gd(0.2, f_grad)
 ```
 
-The progress of optimizing over $x$ can be plotted as follows.
+Optimizavimo per $x$ eigą galima nubraižyti taip.
 
 ```{.python .input}
 #@tab all
@@ -94,26 +94,26 @@ def show_trace(results, f):
 show_trace(results, f)
 ```
 
-### Learning Rate
+### Mokymosi greitis
 :label:`subsec_gd-learningrate`
 
-The learning rate $\eta$ can be set by the algorithm designer. If we use a learning rate that is too small, it will cause $x$ to update very slowly, requiring more iterations to get a better solution. To show what happens in such a case, consider the progress in the same optimization problem for $\eta = 0.05$. As we can see, even after 10 steps we are still very far from the optimal solution.
+Mokymosi greitį $\eta$ gali nustatyti algoritmo kūrėjas. Jei naudojame pernelyg mažą mokymosi greitį, $x$ atnaujinamas labai lėtai, todėl reikia daugiau iteracijų geresniam sprendiniui gauti. Kad parodytume, kas nutinka tokiu atveju, panagrinėkime pažangą tame pačiame optimizavimo uždavinyje, kai $\eta = 0.05$. Kaip matome, net po 10 žingsnių vis dar esame labai toli nuo optimalaus sprendinio.
 
 ```{.python .input}
 #@tab all
 show_trace(gd(0.05, f_grad), f)
 ```
 
-Conversely, if we use an excessively high learning rate, $\left|\eta f'(x)\right|$ might be too large for the first-order Taylor expansion formula. That is, the term $\mathcal{O}(\eta^2 f'^2(x))$ in :eqref:`gd-taylor-2` might become significant. In this case, we cannot guarantee that the iteration of $x$ will be able to lower the value of $f(x)$. For example, when we set the learning rate to $\eta=1.1$, $x$ overshoots the optimal solution $x=0$ and gradually diverges.
+Ir atvirkščiai, jei naudojame pernelyg didelį mokymosi greitį, $\left|\eta f'(x)\right|$ gali būti per didelis pirmos eilės Teiloro skleidinio formulei. Tai yra, narys $\mathcal{O}(\eta^2 f'^2(x))$ :eqref:`gd-taylor-2` gali tapti reikšmingas. Tokiu atveju negalime garantuoti, kad $x$ iteravimas sumažins $f(x)$ reikšmę. Pavyzdžiui, kai mokymosi greitį nustatome $\eta=1.1$, $x$ peršoka optimalų sprendinį $x=0$ ir palaipsniui diverguoja.
 
 ```{.python .input}
 #@tab all
 show_trace(gd(1.1, f_grad), f)
 ```
 
-### Local Minima
+### Lokalieji minimumai
 
-To illustrate what happens for nonconvex functions consider the case of $f(x) = x \cdot \cos(cx)$ for some constant $c$. This function has infinitely many local minima. Depending on our choice of the learning rate and depending on how well conditioned the problem is, we may end up with one of many solutions. The example below illustrates how an (unrealistically) high learning rate will lead to a poor local minimum.
+Kad iliustruotume, kas nutinka neiškiliosioms funkcijoms, panagrinėkime atvejį $f(x) = x \cdot \cos(cx)$ su tam tikra konstanta $c$. Ši funkcija turi be galo daug lokaliųjų minimumų. Priklausomai nuo mokymosi greičio pasirinkimo ir nuo to, kiek gerai sąlygotas uždavinys, galime baigti viename iš daugelio sprendinių. Toliau pateiktas pavyzdys iliustruoja, kaip (nerealiai) didelis mokymosi greitis lems prastą lokalųjį minimumą.
 
 ```{.python .input}
 #@tab all
@@ -128,24 +128,24 @@ def f_grad(x):  # Gradient of the objective function
 show_trace(gd(2, f_grad), f)
 ```
 
-## Multivariate Gradient Descent
+## Daugiamatis gradientinis nusileidimas
 
-Now that we have a better intuition of the univariate case, let's consider the situation where $\mathbf{x} = [x_1, x_2, \ldots, x_d]^\top$. That is, the objective function $f: \mathbb{R}^d \to \mathbb{R}$ maps vectors into scalars. Correspondingly its gradient is multivariate, too. It is a vector consisting of $d$ partial derivatives:
+Dabar, kai geriau intuityviai suprantame vienmatį atvejį, panagrinėkime situaciją, kai $\mathbf{x} = [x_1, x_2, \ldots, x_d]^\top$. Tai yra, tikslo funkcija $f: \mathbb{R}^d \to \mathbb{R}$ atvaizduoja vektorius į skaliarus. Atitinkamai jos gradientas taip pat yra daugiamatis. Tai vektorius, sudarytas iš $d$ dalinių išvestinių:
 
 $$\nabla f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_d}\bigg]^\top.$$
 
-Each partial derivative element $\partial f(\mathbf{x})/\partial x_i$ in the gradient indicates the rate of change of $f$ at $\mathbf{x}$ with respect to the input $x_i$. As before in the univariate case we can use the corresponding Taylor approximation for multivariate functions to get some idea of what we should do. In particular, we have that
+Kiekvienas gradiento dalinės išvestinės elementas $\partial f(\mathbf{x})/\partial x_i$ nurodo $f$ kitimo spartą taške $\mathbf{x}$ įvesties $x_i$ atžvilgiu. Kaip ir anksčiau vienmačiu atveju, galime naudoti atitinkamą daugelio kintamųjų funkcijų Teiloro aproksimaciją, kad gautume supratimą, ką turėtume daryti. Visų pirma turime, kad
 
 $$f(\mathbf{x} + \boldsymbol{\epsilon}) = f(\mathbf{x}) + \mathbf{\boldsymbol{\epsilon}}^\top \nabla f(\mathbf{x}) + \mathcal{O}(\|\boldsymbol{\epsilon}\|^2).$$
 :eqlabel:`gd-multi-taylor`
 
-In other words, up to second-order terms in $\boldsymbol{\epsilon}$ the direction of steepest descent is given by the negative gradient $-\nabla f(\mathbf{x})$. Choosing a suitable learning rate $\eta > 0$ yields the prototypical gradient descent algorithm:
+Kitaip tariant, iki antros eilės narių $\boldsymbol{\epsilon}$ atžvilgiu staigiausio nusileidimo kryptį nusako neigiamas gradientas $-\nabla f(\mathbf{x})$. Pasirinkus tinkamą mokymosi greitį $\eta > 0$, gaunamas prototipinis gradientinio nusileidimo algoritmas:
 
 $$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$$
 
-To see how the algorithm behaves in practice let's construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$.
+Kad pamatytume, kaip algoritmas elgiasi praktikoje, sukonstruokime tikslo funkciją $f(\mathbf{x})=x_1^2+2x_2^2$, kurios įvestis yra dvimatis vektorius $\mathbf{x} = [x_1, x_2]^\top$, o išvestis – skaliaras. Gradientas yra $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. Stebėsime $\mathbf{x}$ trajektoriją gradientinio nusileidimo metu, pradedant nuo pradinės padėties $[-5, -2]$.
 
-To begin with, we need two more helper functions. The first uses an update function and applies it 20 times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
+Pirmiausia mums reikia dar dviejų pagalbinių funkcijų. Pirmoji naudoja atnaujinimo funkciją ir taiko ją 20 kartų pradinei reikšmei. Antroji pagalbinė funkcija vizualizuoja $\mathbf{x}$ trajektoriją.
 
 ```{.python .input}
 #@tab all
@@ -204,7 +204,7 @@ def show_trace_2d(f, results):  #@save
     d2l.plt.ylabel('x2')
 ```
 
-Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for learning rate $\eta = 0.1$. We can see that after 20 steps the value of $\mathbf{x}$ approaches its minimum at $[0, 0]$. Progress is fairly well-behaved albeit rather slow.
+Toliau stebime optimizavimo kintamojo $\mathbf{x}$ trajektoriją, kai mokymosi greitis $\eta = 0.1$. Matome, kad po 20 žingsnių $\mathbf{x}$ reikšmė artėja prie savo minimumo $[0, 0]$. Pažanga gana tvarkinga, nors ir gana lėta.
 
 ```{.python .input}
 #@tab all
@@ -222,37 +222,37 @@ eta = 0.1
 show_trace_2d(f_2d, train_2d(gd_2d, f_grad=f_2d_grad))
 ```
 
-## Adaptive Methods
+## Adaptyvieji metodai
 
-As we could see in :numref:`subsec_gd-learningrate`, getting the learning rate $\eta$ "just right" is tricky. If we pick it too small, we make little progress. If we pick it too large, the solution oscillates and in the worst case it might even diverge. What if we could determine $\eta$ automatically or get rid of having to select a learning rate at all?
-Second-order methods that look not only at the value and gradient of the objective function
-but also at its *curvature* can help in this case. While these methods cannot be applied to deep learning directly due to the computational cost, they provide useful intuition into how to design advanced optimization algorithms that mimic many of the desirable properties of the algorithms outlined below.
+Kaip matėme :numref:`subsec_gd-learningrate`, mokymosi greitį $\eta$ pasirinkti „tiksliai tinkamą“ yra sudėtinga. Jei pasirenkame per mažą, darome mažai pažangos. Jei pasirenkame per didelį, sprendinys svyruoja, o blogiausiu atveju gali net diverguoti. Ką, jei galėtume nustatyti $\eta$ automatiškai arba išvis atsikratytume poreikio rinktis mokymosi greitį?
+Antros eilės metodai, kurie žiūri ne tik į tikslo funkcijos reikšmę ir gradientą,
+bet ir į jos *kreivumą*, gali padėti šiuo atveju. Nors šių metodų negalima tiesiogiai taikyti giliajam mokymuisi dėl skaičiavimo kainos, jie suteikia naudingos intuicijos, kaip projektuoti pažangius optimizavimo algoritmus, imituojančius daugelį toliau aprašytų algoritmų pageidaujamų savybių.
 
 
-### Newton's Method
+### Niutono metodas
 
-Reviewing the Taylor expansion of some function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ there is no need to stop after the first term. In fact, we can write it as
+Peržiūrėdami kokios nors funkcijos $f: \mathbb{R}^d \rightarrow \mathbb{R}$ Teiloro skleidinį, nematome priežasties sustoti po pirmojo nario. Iš tikrųjų galime jį užrašyti kaip
 
 $$f(\mathbf{x} + \boldsymbol{\epsilon}) = f(\mathbf{x}) + \boldsymbol{\epsilon}^\top \nabla f(\mathbf{x}) + \frac{1}{2} \boldsymbol{\epsilon}^\top \nabla^2 f(\mathbf{x}) \boldsymbol{\epsilon} + \mathcal{O}(\|\boldsymbol{\epsilon}\|^3).$$
 :eqlabel:`gd-hot-taylor`
 
-To avoid cumbersome notation we define $\mathbf{H} \stackrel{\textrm{def}}{=} \nabla^2 f(\mathbf{x})$ to be the Hessian of $f$, which is a $d \times d$ matrix. For small $d$ and simple problems $\mathbf{H}$ is easy to compute. For deep neural networks, on the other hand, $\mathbf{H}$ may be prohibitively large, due to the cost of storing $\mathcal{O}(d^2)$ entries. Furthermore it may be too expensive to compute via backpropagation. For now let's ignore such considerations and look at what algorithm we would get.
+Kad išvengtume sudėtingo žymėjimo, apibrėžiame $\mathbf{H} \stackrel{\textrm{def}}{=} \nabla^2 f(\mathbf{x})$ kaip $f$ Hesės matricą, kuri yra $d \times d$ matrica. Mažiems $d$ ir paprastiems uždaviniams $\mathbf{H}$ lengva apskaičiuoti. Tačiau giliesiems neuroniniams tinklams $\mathbf{H}$ gali būti nepriimtinai didelė dėl $\mathcal{O}(d^2)$ elementų saugojimo kainos. Be to, ją gali būti pernelyg brangu apskaičiuoti atgaliniu sklidimu. Kol kas nekreipkime dėmesio į tokius svarstymus ir pažiūrėkime, koks algoritmas gautųsi.
 
-After all, the minimum of $f$ satisfies $\nabla f = 0$.
-Following calculus rules in :numref:`subsec_calculus-grad`,
-by taking derivatives of :eqref:`gd-hot-taylor` with regard to $\boldsymbol{\epsilon}$ and ignoring higher-order terms we arrive at
+Juk $f$ minimumas tenkina $\nabla f = 0$.
+Laikydamiesi diferencialinio skaičiavimo taisyklių :numref:`subsec_calculus-grad`,
+išvestinę :eqref:`gd-hot-taylor` $\boldsymbol{\epsilon}$ atžvilgiu ir ignoruodami aukštesnės eilės narius, gauname
 
 $$\nabla f(\mathbf{x}) + \mathbf{H} \boldsymbol{\epsilon} = 0 \textrm{ and hence }
 \boldsymbol{\epsilon} = -\mathbf{H}^{-1} \nabla f(\mathbf{x}).$$
 
-That is, we need to invert the Hessian $\mathbf{H}$ as part of the optimization problem.
+Tai yra, kaip optimizavimo uždavinio dalį turime invertuoti Hesės matricą $\mathbf{H}$.
 
-As a simple example, for $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $\mathbf{H} = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a *single* step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here: the Taylor expansion was exact since $f(x+\epsilon)= \frac{1}{2} x^2 + \epsilon x + \frac{1}{2} \epsilon^2$.
+Kaip paprastas pavyzdys, kai $f(x) = \frac{1}{2} x^2$, turime $\nabla f(x) = x$ ir $\mathbf{H} = 1$. Taigi bet kuriam $x$ gauname $\epsilon = -x$. Kitaip tariant, *vieno* žingsnio pakanka tobulai konverguoti, nereikia jokio koregavimo! Deja, čia mums šiek tiek pasisekė: Teiloro skleidinys buvo tikslus, nes $f(x+\epsilon)= \frac{1}{2} x^2 + \epsilon x + \frac{1}{2} \epsilon^2$.
 
-Let's see what happens in other problems.
-Given a convex hyperbolic cosine function $f(x) = \cosh(cx)$ for some constant $c$, we can see that
-the global minimum at $x=0$ is reached
-after a few iterations.
+Pažiūrėkime, kas nutinka kituose uždaviniuose.
+Turint iškilią hiperbolinio kosinuso funkciją $f(x) = \cosh(cx)$ su tam tikra konstanta $c$, matome, kad
+globalusis minimumas taške $x=0$ pasiekiamas
+po kelių iteracijų.
 
 ```{.python .input}
 #@tab all
@@ -279,9 +279,9 @@ def newton(eta=1):
 show_trace(newton(), f)
 ```
 
-Now let's consider a *nonconvex* function, such as $f(x) = x \cos(c x)$ for some constant $c$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we may walk into the direction of *increasing* the value of $f$.
-That is a fatal flaw of the algorithm.
-Let's see what happens in practice.
+Dabar panagrinėkime *neiškiliąją* funkciją, pavyzdžiui, $f(x) = x \cos(c x)$ su tam tikra konstanta $c$. Juk atkreipkite dėmesį, kad Niutono metode galiausiai dalijame iš Hesės matricos. Tai reiškia, kad jei antroji išvestinė yra *neigiama*, galime eiti *didėjančios* $f$ reikšmės kryptimi.
+Tai lemtinga algoritmo yda.
+Pažiūrėkime, kas nutinka praktikoje.
 
 ```{.python .input}
 #@tab all
@@ -299,81 +299,81 @@ def f_hess(x):  # Hessian of the objective function
 show_trace(newton(), f)
 ```
 
-This went spectacularly wrong. How can we fix it? One way would be to "fix" the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second-order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective function is flatter.
-Let's see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
+Tai nepavyko spektakliškai. Kaip tai ištaisyti? Vienas būdas būtų „ištaisyti“ Hesės matricą vietoj jos paėmus jos absoliutinę reikšmę. Kita strategija yra grąžinti mokymosi greitį. Atrodo, kad tai paneigia tikslą, bet ne visai. Turėdami antros eilės informaciją, galime būti atsargūs, kai kreivumas didelis, ir daryti ilgesnius žingsnius, kai tikslo funkcija plokštesnė.
+Pažiūrėkime, kaip tai veikia su kiek mažesniu mokymosi greičiu, tarkime, $\eta = 0.5$. Kaip matome, turime gana efektyvų algoritmą.
 
 ```{.python .input}
 #@tab all
 show_trace(newton(0.5), f)
 ```
 
-### Convergence Analysis
+### Konvergavimo analizė
 
-We only analyze the convergence rate of Newton's method for some convex and three times differentiable objective function $f$, where the second derivative is nonzero, i.e., $f'' > 0$. The multivariate proof is a straightforward extension of the one-dimensional argument below and omitted since it does not help us much in terms of intuition.
+Analizuojame tik Niutono metodo konvergavimo greitį kokiai nors iškiliajai ir tris kartus diferencijuojamai tikslo funkcijai $f$, kurios antroji išvestinė nelygi nuliui, t. y. $f'' > 0$. Daugiamatis įrodymas yra paprastas toliau pateikto vienmačio argumento plėtinys ir praleidžiamas, nes jis mums daug nepadeda intuicijos požiūriu.
 
-Denote by $x^{(k)}$ the value of $x$ at the $k^\textrm{th}$ iteration and let $e^{(k)} \stackrel{\textrm{def}}{=} x^{(k)} - x^*$ be the distance from optimality at the $k^\textrm{th}$ iteration. By Taylor  expansion we have that the condition $f'(x^*) = 0$ can be written as
+Pažymėkime $x^{(k)}$ reikšmę $x$ $k$-ojoje iteracijoje ir tegul $e^{(k)} \stackrel{\textrm{def}}{=} x^{(k)} - x^*$ yra atstumas nuo optimumo $k$-ojoje iteracijoje. Pagal Teiloro skleidinį sąlygą $f'(x^*) = 0$ galima užrašyti kaip
 
 $$0 = f'(x^{(k)} - e^{(k)}) = f'(x^{(k)}) - e^{(k)} f''(x^{(k)}) + \frac{1}{2} (e^{(k)})^2 f'''(\xi^{(k)}),$$
 
-which holds for some $\xi^{(k)} \in [x^{(k)} - e^{(k)}, x^{(k)}]$. Dividing the above expansion by $f''(x^{(k)})$ yields
+kuri galioja tam tikram $\xi^{(k)} \in [x^{(k)} - e^{(k)}, x^{(k)}]$. Padalijus aukščiau pateiktą skleidinį iš $f''(x^{(k)})$, gauname
 
 $$e^{(k)} - \frac{f'(x^{(k)})}{f''(x^{(k)})} = \frac{1}{2} (e^{(k)})^2 \frac{f'''(\xi^{(k)})}{f''(x^{(k)})}.$$
 
-Recall that we have the update $x^{(k+1)} = x^{(k)} - f'(x^{(k)}) / f''(x^{(k)})$.
-Plugging in this update equation and taking the absolute value of both sides, we have
+Prisiminkite, kad turime atnaujinimą $x^{(k+1)} = x^{(k)} - f'(x^{(k)}) / f''(x^{(k)})$.
+Įstatę šią atnaujinimo lygtį ir paėmę abiejų pusių absoliutinę reikšmę, turime
 
 $$\left|e^{(k+1)}\right| = \frac{1}{2}(e^{(k)})^2 \frac{\left|f'''(\xi^{(k)})\right|}{f''(x^{(k)})}.$$
 
-Consequently, whenever we are in a region of bounded $\left|f'''(\xi^{(k)})\right| / (2f''(x^{(k)})) \leq c$, we have a quadratically decreasing error
+Todėl, kai tik esame srityje, kurioje $\left|f'''(\xi^{(k)})\right| / (2f''(x^{(k)})) \leq c$ aprėžta, turime kvadratiškai mažėjančią paklaidą
 
 $$\left|e^{(k+1)}\right| \leq c (e^{(k)})^2.$$
 
 
-As an aside, optimization researchers call this *linear* convergence, whereas a condition such as $\left|e^{(k+1)}\right| \leq \alpha \left|e^{(k)}\right|$ would be called a *constant* rate of convergence.
-Note that this analysis comes with a number of caveats.
-First, we do not really have much of a guarantee when we will reach the region of rapid convergence. Instead, we only know that once we reach it, convergence will be very quick. Second, this analysis requires that $f$ is well-behaved up to higher-order derivatives. It comes down to ensuring that $f$ does not have any "surprising" properties in terms of how it might change its values.
+Pastebėkime, kad optimizavimo tyrėjai tai vadina *tiesiniu* konvergavimu, o tokia sąlyga kaip $\left|e^{(k+1)}\right| \leq \alpha \left|e^{(k)}\right|$ būtų vadinama *pastovia* konvergavimo sparta.
+Atkreipkite dėmesį, kad ši analizė turi keletą išlygų.
+Pirma, iš tikrųjų neturime didelės garantijos, kada pasieksime greito konvergavimo sritį. Vietoj to žinome tik tai, kad kai ją pasieksime, konvergavimas bus labai greitas. Antra, ši analizė reikalauja, kad $f$ būtų gerai besielgianti iki aukštesnės eilės išvestinių. Tai susiveda į tai, kad $f$ neturėtų jokių „netikėtų“ savybių, susijusių su tuo, kaip ji gali keisti savo reikšmes.
 
 
 
-### Preconditioning
+### Prekondicionavimas
 
-Quite unsurprisingly computing and storing the full Hessian is very expensive. It is thus desirable to find alternatives. One way to improve matters is *preconditioning*. It avoids computing the Hessian in its entirety but only computes the *diagonal* entries. This leads to update algorithms of the form
+Visai nenuostabu, kad pilnos Hesės matricos skaičiavimas ir saugojimas yra labai brangus. Todėl pageidautina rasti alternatyvų. Vienas būdas pagerinti padėtį yra *prekondicionavimas*. Jis vengia skaičiuoti visą Hesės matricą ir apskaičiuoja tik *įstrižainės* elementus. Tai veda prie tokios formos atnaujinimo algoritmų:
 
 $$\mathbf{x} \leftarrow \mathbf{x} - \eta \textrm{diag}(\mathbf{H})^{-1} \nabla f(\mathbf{x}).$$
 
 
-While this is not quite as good as the full Newton's method, it is still much better than not using it.
-To see why this might be a good idea consider a situation where one variable denotes height in millimeters and the other one denotes height in kilometers. Assuming that for both the natural scale is in meters, we have a terrible mismatch in parametrizations. Fortunately, using preconditioning removes this. Effectively preconditioning with gradient descent amounts to selecting a different learning rate for each variable (coordinate of vector $\mathbf{x}$).
-As we will see later, preconditioning drives some of the innovation in stochastic gradient descent optimization algorithms.
+Nors tai nėra visai taip gerai kaip pilnas Niutono metodas, vis tiek tai daug geriau nei jo nenaudoti.
+Kad pamatytume, kodėl tai gali būti gera idėja, panagrinėkime situaciją, kai vienas kintamasis žymi aukštį milimetrais, o kitas – aukštį kilometrais. Darant prielaidą, kad abiem natūralus mastelis yra metrai, turime baisų parametrizacijų neatitikimą. Laimė, prekondicionavimas tai pašalina. Efektyviai prekondicionavimas su gradientiniu nusileidimu reiškia skirtingo mokymosi greičio pasirinkimą kiekvienam kintamajam (vektoriaus $\mathbf{x}$ koordinatei).
+Kaip pamatysime vėliau, prekondicionavimas lemia dalį naujovių stochastinio gradientinio nusileidimo optimizavimo algoritmuose.
 
 
-### Gradient Descent with Line Search
+### Gradientinis nusileidimas su tiesine paieška
 
-One of the key problems in gradient descent is that we might overshoot the goal or make insufficient progress. A simple fix for the problem is to use line search in conjunction with gradient descent. That is, we use the direction given by $\nabla f(\mathbf{x})$ and then perform binary search as to which learning rate $\eta$ minimizes $f(\mathbf{x} - \eta \nabla f(\mathbf{x}))$.
+Viena pagrindinių gradientinio nusileidimo problemų yra ta, kad galime peršokti tikslą arba padaryti nepakankamą pažangą. Paprastas problemos sprendimas yra naudoti tiesinę paiešką kartu su gradientiniu nusileidimu. Tai yra, naudojame kryptį, kurią nurodo $\nabla f(\mathbf{x})$, o tada atliekame dvejetainę paiešką, kuris mokymosi greitis $\eta$ minimizuoja $f(\mathbf{x} - \eta \nabla f(\mathbf{x}))$.
 
-This algorithm converges rapidly (for an analysis and proof see e.g., :citet:`Boyd.Vandenberghe.2004`). However, for the purpose of deep learning this is not quite so feasible, since each step of the line search would require us to evaluate the objective function on the entire dataset. This is way too costly to accomplish.
+Šis algoritmas konverguoja sparčiai (analizės ir įrodymo žr., pvz., :citet:`Boyd.Vandenberghe.2004`). Tačiau giliojo mokymosi tikslais tai nėra visai įgyvendinama, nes kiekvienam tiesinės paieškos žingsniui reikėtų įvertinti tikslo funkciją visame duomenų rinkinyje. Tai pernelyg brangu.
 
-## Summary
+## Santrauka
 
-* Learning rates matter. Too large and we diverge, too small and we do not make progress.
-* Gradient descent can get stuck in local minima.
-* In high dimensions adjusting the learning rate is complicated.
-* Preconditioning can help with scale adjustment.
-* Newton's method is a lot faster once it has started working properly in convex problems.
-* Beware of using Newton's method without any adjustments for nonconvex problems.
+* Mokymosi greičiai svarbūs. Per dideli – diverguojame, per maži – nedarome pažangos.
+* Gradientinis nusileidimas gali įstrigti lokaliuosiuose minimumuose.
+* Didelėse dimensijose mokymosi greičio koregavimas yra sudėtingas.
+* Prekondicionavimas gali padėti koreguoti mastelį.
+* Niutono metodas yra daug greitesnis, kai jis pradeda tinkamai veikti iškiliuosiuose uždaviniuose.
+* Būkite atsargūs naudodami Niutono metodą be jokių koregavimų neiškiliesiems uždaviniams.
 
-## Exercises
+## Pratimai
 
-1. Experiment with different learning rates and objective functions for gradient descent.
-1. Implement line search to minimize a convex function in the interval $[a, b]$.
-    1. Do you need derivatives for binary search, i.e., to decide whether to pick $[a, (a+b)/2]$ or $[(a+b)/2, b]$.
-    1. How rapid is the rate of convergence for the algorithm?
-    1. Implement the algorithm and apply it to minimizing $\log (\exp(x) + \exp(-2x -3))$.
-1. Design an objective function defined on $\mathbb{R}^2$ where gradient descent is exceedingly slow. Hint: scale different coordinates differently.
-1. Implement the lightweight version of Newton's method using preconditioning:
-    1. Use diagonal Hessian as preconditioner.
-    1. Use the absolute values of that rather than the actual (possibly signed) values.
-    1. Apply this to the problem above.
-1. Apply the algorithm above to a number of objective functions (convex or not). What happens if you rotate coordinates by $45$ degrees?
+1. Eksperimentuokite su skirtingais mokymosi greičiais ir tikslo funkcijomis gradientiniam nusileidimui.
+1. Įgyvendinkite tiesinę paiešką iškiliajai funkcijai minimizuoti intervale $[a, b]$.
+    1. Ar dvejetainei paieškai reikia išvestinių, t. y. nuspręsti, ar rinktis $[a, (a+b)/2]$, ar $[(a+b)/2, b]$.
+    1. Kokia sparti yra algoritmo konvergavimo sparta?
+    1. Įgyvendinkite algoritmą ir pritaikykite jį $\log (\exp(x) + \exp(-2x -3))$ minimizavimui.
+1. Suprojektuokite tikslo funkciją, apibrėžtą $\mathbb{R}^2$, kuriai gradientinis nusileidimas yra nepaprastai lėtas. Užuomina: skirtingas koordinates keiskite skirtingu masteliu.
+1. Įgyvendinkite lengvą Niutono metodo versiją naudodami prekondicionavimą:
+    1. Kaip prekondicionuotoją naudokite įstrižainės Hesės matricą.
+    1. Naudokite jos absoliutines reikšmes, o ne tikrąsias (galbūt su ženklu) reikšmes.
+    1. Pritaikykite tai aukščiau pateiktam uždaviniui.
+1. Pritaikykite aukščiau pateiktą algoritmą daugeliui tikslo funkcijų (iškiliųjų ar ne). Kas nutinka, jei pasukate koordinates $45$ laipsniais?
 
-[Discussions](https://discuss.d2l.ai/t/351)
+[Diskusijos](https://discuss.d2l.ai/t/351)

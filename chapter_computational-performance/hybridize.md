@@ -1,7 +1,7 @@
-# Compilers and Interpreters
+# Kompiliatoriai ir interpretatoriai
 :label:`sec_hybridize`
 
-So far, this book has focused on imperative programming, which makes use of statements such as `print`, `+`, and `if` to change a program's state. Consider the following example of a simple imperative program.
+Iki šiol ši knyga daugiausia dėmesio skyrė imperatyviajam programavimui, kuris naudoja tokius sakinius kaip `print`, `+` ir `if`, kad pakeistų programos būseną. Panagrinėkime tokį paprastos imperatyviosios programos pavyzdį.
 
 ```{.python .input}
 #@tab all
@@ -17,24 +17,24 @@ def fancy_func(a, b, c, d):
 print(fancy_func(1, 2, 3, 4))
 ```
 
-Python is an *interpreted language*. When evaluating the above `fancy_func` function it performs the operations making up the function's body *in sequence*. That is, it will evaluate `e = add(a, b)` and store the results as variable `e`, thereby changing the program's state. The next two statements `f = add(c, d)` and `g = add(e, f)` will be executed similarly, performing additions and storing the results as variables. :numref:`fig_compute_graph` illustrates the flow of data.
+Python yra *interpretuojamoji kalba*. Vertindama aukščiau pateiktą funkciją `fancy_func`, ji atlieka funkcijos kūną sudarančias operacijas *nuosekliai*. Tai yra, ji įvertins `e = add(a, b)` ir išsaugos rezultatus kaip kintamąjį `e`, taip pakeisdama programos būseną. Kiti du sakiniai `f = add(c, d)` ir `g = add(e, f)` bus vykdomi panašiai, atliekant sudėtį ir išsaugant rezultatus kaip kintamuosius. :numref:`fig_compute_graph` iliustruoja duomenų srautą.
 
-![Data flow in an imperative program.](../img/computegraph.svg)
+![Duomenų srautas imperatyviojoje programoje.](../img/computegraph.svg)
 :label:`fig_compute_graph`
 
-Although imperative programming is convenient, it may be inefficient. On the one hand, even if the `add` function is repeatedly called throughout `fancy_func`, Python will execute the three function calls individually. If these are executed, say, on a GPU (or even on multiple GPUs), the overhead arising from the Python interpreter can become overwhelming. Moreover, it will need to save the variable values of `e` and `f` until all the statements in `fancy_func` have been executed. This is because we do not know whether the variables `e` and `f` will be used by other parts of the program after the statements `e = add(a, b)` and `f = add(c, d)` are executed.
+Nors imperatyvusis programavimas yra patogus, jis gali būti neefektyvus. Viena vertus, net jei funkcija `add` kartojamai kviečiama visoje `fancy_func`, Python vykdys tris funkcijų iškvietimus atskirai. Jei jie vykdomi, tarkime, GPU (ar net keliuose GPU), Python interpretatoriaus pridėtinės sąnaudos gali tapti didžiulės. Be to, jai reikės išsaugoti kintamųjų `e` ir `f` reikšmes, kol bus įvykdyti visi `fancy_func` sakiniai. Taip yra todėl, kad nežinome, ar kintamuosius `e` ir `f` naudos kitos programos dalys po to, kai bus įvykdyti sakiniai `e = add(a, b)` ir `f = add(c, d)`.
 
-## Symbolic Programming
+## Simbolinis programavimas
 
-Consider the alternative, *symbolic programming*, where computation is usually performed only once the process has been fully defined. This strategy is used by multiple deep learning frameworks, including Theano and TensorFlow (the latter has acquired imperative extensions). It usually involves the following steps:
+Panagrinėkime alternatyvą – *simbolinį programavimą*, kai skaičiavimas paprastai atliekamas tik tada, kai procesas yra visiškai apibrėžtas. Šią strategiją naudoja keli giliojo mokymosi karkasai, įskaitant Theano ir TensorFlow (pastarasis įgijo imperatyviuosius plėtinius). Ji paprastai apima šiuos žingsnius:
 
-1. Define the operations to be executed.
-1. Compile the operations into an executable program.
-1. Provide the required inputs and call the compiled program for execution.
+1. Apibrėžti vykdytinas operacijas.
+1. Sukompiliuoti operacijas į vykdomąją programą.
+1. Pateikti reikiamas įvestis ir iškviesti sukompiliuotą programą vykdymui.
 
-This allows for a significant amount of optimization. First, we can skip the Python interpreter in many cases, thus removing a performance bottleneck that can become significant on multiple fast GPUs paired with a single Python thread on a CPU. 
-Second, a compiler might optimize and rewrite the above code into `print((1 + 2) + (3 + 4))` or even `print(10)`. This is possible since a compiler gets to see the full code before turning it into machine instructions. For instance, it can release memory (or never allocate it) whenever a variable is no longer needed. Or it can transform the code entirely into an equivalent piece.
-To get a better idea, consider the following simulation of imperative programming (it is Python after all) below.
+Tai leidžia atlikti didelį optimizavimą. Pirma, daugeliu atvejų galime praleisti Python interpretatorių, taip pašalindami našumo kliūtį, kuri gali tapti reikšminga keliuose greituose GPU, suporuotuose su viena Python gija CPU. 
+Antra, kompiliatorius gali optimizuoti ir perrašyti aukščiau pateiktą kodą į `print((1 + 2) + (3 + 4))` ar net `print(10)`. Tai įmanoma, nes kompiliatorius mato visą kodą prieš paversdamas jį mašininėmis instrukcijomis. Pavyzdžiui, jis gali atlaisvinti atmintį (arba jos niekada neskirti), kai tik kintamasis nebereikalingas. Arba jis gali visiškai transformuoti kodą į ekvivalentų fragmentą.
+Kad geriau suprastume, panagrinėkime šią imperatyviojo programavimo imitaciją (juk tai Python) žemiau.
 
 ```{.python .input}
 #@tab all
@@ -62,34 +62,34 @@ y = compile(prog, '', 'exec')
 exec(y)
 ```
 
-The differences between imperative (interpreted) programming and symbolic programming are as follows:
+Skirtumai tarp imperatyviojo (interpretuojamojo) programavimo ir simbolinio programavimo yra tokie:
 
-* Imperative programming is easier. When imperative programming is used in Python, the majority of the code is straightforward and easy to write. It is also easier to debug imperative programming code. This is because it is easier to obtain and print all relevant intermediate variable values, or use Python's built-in debugging tools.
-* Symbolic programming is more efficient and easier to port. Symbolic programming makes it easier to optimize the code during compilation, while also having the ability to port the program into a format independent of Python. This allows the program to be run in a non-Python environment, thus avoiding any potential performance issues related to the Python interpreter.
+* Imperatyvusis programavimas yra lengvesnis. Kai Python naudojamas imperatyvusis programavimas, didžioji kodo dalis yra tiesmuka ir lengvai parašoma. Imperatyviojo programavimo kodą taip pat lengviau derinti. Taip yra todėl, kad lengviau gauti ir atspausdinti visas svarbias tarpinių kintamųjų reikšmes arba naudoti integruotus Python derinimo įrankius.
+* Simbolinis programavimas yra efektyvesnis ir lengviau perkeliamas. Simbolinis programavimas palengvina kodo optimizavimą kompiliavimo metu, o taip pat suteikia galimybę perkelti programą į nuo Python nepriklausomą formatą. Tai leidžia programą vykdyti ne Python aplinkoje ir taip išvengti bet kokių galimų našumo problemų, susijusių su Python interpretatoriumi.
 
 
-## Hybrid Programming
+## Hibridinis programavimas
 
-Historically most deep learning frameworks choose between an imperative or a symbolic approach. For example, Theano, TensorFlow (inspired by the former), Keras, and CNTK formulate models symbolically. Conversely, Chainer and PyTorch take an imperative approach. An imperative mode was added to TensorFlow 2.0 and Keras in later revisions.
+Istoriškai dauguma giliojo mokymosi karkasų pasirinkdavo imperatyvųjį arba simbolinį požiūrį. Pavyzdžiui, Theano, TensorFlow (įkvėptas pirmojo), Keras ir CNTK modelius formuluoja simboliškai. Ir atvirkščiai, Chainer ir PyTorch naudoja imperatyvųjį požiūrį. Vėlesnėse versijose TensorFlow 2.0 ir Keras buvo pridėtas imperatyvusis režimas.
 
 :begin_tab:`mxnet`
-When designing Gluon, developers considered whether it would be possible to combine the benefits of both programming paradigms. This led to a hybrid model that lets users develop and debug with pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
+Kurdami Gluon, kūrėjai svarstė, ar būtų įmanoma sujungti abiejų programavimo paradigmų privalumus. Tai lėmė hibridinį modelį, kuris leidžia naudotojams kurti ir derinti naudojant grynąjį imperatyvųjį programavimą, tuo pačiu turint galimybę daugumą programų konvertuoti į simbolines programas, kurias galima vykdyti, kai reikalingas produkcinio lygio skaičiavimo našumas ir diegimas.
 
-In practice this means that we build models using the `HybridBlock` or `HybridSequential` class. By default, either of them is executed in the same way the `Block` or `Sequential` class is executed in imperative programming. 
-The `HybridSequential` class is a subclass of `HybridBlock` (just like `Sequential` subclasses `Block`). When the `hybridize` function is called, Gluon compiles the model into the form used in symbolic programming. This allows one to optimize the computation-intensive components without sacrifices in the way a model is implemented. We will illustrate the benefits below, focusing on sequential models and blocks.
+Praktikoje tai reiškia, kad modelius kuriame naudodami klasę `HybridBlock` arba `HybridSequential`. Pagal numatytuosius nustatymus bet kuri iš jų vykdoma taip pat, kaip imperatyviajame programavime vykdoma klasė `Block` ar `Sequential`. 
+Klasė `HybridSequential` yra `HybridBlock` poklasė (kaip ir `Sequential` yra `Block` poklasė). Kai iškviečiama funkcija `hybridize`, Gluon sukompiliuoja modelį į simboliniame programavime naudojamą formą. Tai leidžia optimizuoti daug skaičiavimų reikalaujančias dalis nepaaukojant modelio įgyvendinimo būdo. Naudą iliustruosime žemiau, sutelkdami dėmesį į nuoseklius modelius ir blokus.
 :end_tab:
 
 :begin_tab:`pytorch`
-As mentioned above, PyTorch is based on imperative programming and uses dynamic computation graphs. In an effort to leverage the portability and efficiency of symbolic programming, developers considered whether it would be possible to combine the benefits of both programming paradigms. This led to a torchscript that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
+Kaip minėta aukščiau, PyTorch grindžiamas imperatyviuoju programavimu ir naudoja dinaminius skaičiavimo grafus. Siekdami pasinaudoti simbolinio programavimo perkeliamumu ir efektyvumu, kūrėjai svarstė, ar būtų įmanoma sujungti abiejų programavimo paradigmų privalumus. Tai lėmė torchscript, kuris leidžia naudotojams kurti ir derinti naudojant grynąjį imperatyvųjį programavimą, tuo pačiu turint galimybę daugumą programų konvertuoti į simbolines programas, kurias galima vykdyti, kai reikalingas produkcinio lygio skaičiavimo našumas ir diegimas.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The imperative programming paradigm is now the default in Tensorflow 2, a welcoming change for those new to the language. However, the same symbolic programming techniques and subsequent computational graphs still exist in TensorFlow, and can be accessed by the easy-to-use `tf.function` decorator. This brought the imperative programming paradigm to TensorFlow, allowed users to define more intuitive functions, then wrap them and compile them into computational graphs automatically using a feature the TensorFlow team refers to as [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
+Imperatyvusis programavimo modelis dabar yra numatytasis TensorFlow 2, o tai maloni naujovė naujokams šioje kalboje. Tačiau tos pačios simbolinio programavimo technikos ir iš jų kylantys skaičiavimo grafai vis dar egzistuoja TensorFlow ir yra pasiekiami lengvai naudojamu dekoratoriumi `tf.function`. Tai atnešė imperatyvųjį programavimo modelį į TensorFlow, leido naudotojams apibrėžti intuityvesnes funkcijas, o tada jas apgaubti ir automatiškai sukompiliuoti į skaičiavimo grafus naudojant TensorFlow komandos vadinamą funkciją [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
 :end_tab:
 
-## Hybridizing the `Sequential` Class
+## Klasės `Sequential` hibridizavimas
 
-The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) computing device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let's see how we can address this for significant parts of the code by replacing `Sequential` with `HybridSequential`. We begin by defining a simple MLP.
+Paprasčiausias būdas pajausti, kaip veikia hibridizavimas, yra panagrinėti giliuosius tinklus su keliais sluoksniais. Įprastai Python interpretatorius turės vykdyti visų sluoksnių kodą, kad sugeneruotų instrukciją, kurią galima perduoti CPU ar GPU. Vienam (greitam) skaičiavimo įrenginiui tai nesukelia jokių didelių problemų. Kita vertus, jei naudojame pažangų 8 GPU serverį, pavyzdžiui, AWS P3dn.24xlarge egzempliorių, Python sunkiai spės užimti visus GPU. Vienagijis Python interpretatorius čia tampa kliūtimi. Pažiūrėkime, kaip tai galime išspręsti reikšmingoms kodo dalims pakeisdami `Sequential` į `HybridSequential`. Pradedame apibrėždami paprastą MLP.
 
 ```{.python .input}
 #@tab mxnet
@@ -152,16 +152,16 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
+Iškvietę funkciją `hybridize`, galime sukompiliuoti ir optimizuoti skaičiavimą MLP. Modelio skaičiavimo rezultatas išlieka nepakitęs.
 :end_tab:
 
 :begin_tab:`pytorch`
-By converting the model using `torch.jit.script` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
+Konvertavę modelį naudodami funkciją `torch.jit.script`, galime sukompiliuoti ir optimizuoti skaičiavimą MLP. Modelio skaičiavimo rezultatas išlieka nepakitęs.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Formerly, all functions built in TensorFlow were built as a computational graph, and therefore JIT compiled by default. However, with the release of TensorFlow 2.X and EagerTensor, this is no longer the default behavor. 
-We cen re-enable this functionality with tf.function. tf.function is more commonly used as a function decorator, however it is possible to call it direcly as a normal python function, shown below. The model's computation result remains unchanged.
+Anksčiau visos TensorFlow sukurtos funkcijos buvo kuriamos kaip skaičiavimo grafas ir todėl pagal numatytuosius nustatymus buvo kompiliuojamos JIT. Tačiau išleidus TensorFlow 2.X ir EagerTensor, tai nebėra numatytasis elgesys. 
+Šią funkciją galime vėl įjungti su tf.function. tf.function dažniausiai naudojama kaip funkcijos dekoratorius, tačiau ją galima iškviesti ir tiesiogiai kaip įprastą Python funkciją, kaip parodyta žemiau. Modelio skaičiavimo rezultatas išlieka nepakitęs.
 :end_tab:
 
 ```{.python .input}
@@ -183,21 +183,21 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-This seems almost too good to be true: simply designate a block to be `HybridSequential`, write the same code as before and invoke `hybridize`. Once this happens the network is optimized (we will benchmark the performance below). Unfortunately this does not work magically for every layer. That said, a layer will not be optimized if it inherits from the `Block` class instead of the `HybridBlock` class.
+Tai atrodo beveik per gerai, kad būtų tiesa: tiesiog nurodykite bloką kaip `HybridSequential`, parašykite tą patį kodą kaip anksčiau ir iškvieskite `hybridize`. Kai tai įvyksta, tinklas optimizuojamas (našumą išmatuosime žemiau). Deja, tai neveikia stebuklingai kiekvienam sluoksniui. Vis dėlto sluoksnis nebus optimizuotas, jei paveldi klasę `Block`, o ne klasę `HybridBlock`.
 :end_tab:
 
 :begin_tab:`pytorch`
-This seems almost too good to be true: write the same code as before and simply convert the model using `torch.jit.script`. Once this happens the network is optimized (we will benchmark the performance below).
+Tai atrodo beveik per gerai, kad būtų tiesa: parašykite tą patį kodą kaip anksčiau ir tiesiog konvertuokite modelį naudodami `torch.jit.script`. Kai tai įvyksta, tinklas optimizuojamas (našumą išmatuosime žemiau).
 :end_tab:
 
 :begin_tab:`tensorflow`
-This seems almost too good to be true: write the same code as before and simply convert the model using `tf.function`. Once this happens the network is built as a computational graph in TensorFlow's MLIR intermediate representation and is heavily optimized at the compiler level for rapid execution (we will benchmark the performance below).
-Explicitly adding the `jit_compile = True` flag to the `tf.function()` call enables XLA (Accelerated Linear Algebra) functionality in TensorFlow. XLA can further optimize JIT compiled code in certain instances. Graph-mode execution is enabled without this explicit definition, however XLA can make certain large linear algebra operations (in the vein of those we see in deep learning applications) much faster, particularly in a GPU environment.
+Tai atrodo beveik per gerai, kad būtų tiesa: parašykite tą patį kodą kaip anksčiau ir tiesiog konvertuokite modelį naudodami `tf.function`. Kai tai įvyksta, tinklas sukuriamas kaip skaičiavimo grafas TensorFlow MLIR tarpiniu atvaizdu ir yra stipriai optimizuojamas kompiliatoriaus lygiu greitam vykdymui (našumą išmatuosime žemiau).
+Aiškiai pridėjus vėliavėlę `jit_compile = True` prie `tf.function()` iškvietimo, įjungiama XLA (Accelerated Linear Algebra) funkcija TensorFlow. XLA tam tikrais atvejais gali dar labiau optimizuoti JIT sukompiliuotą kodą. Grafo režimo vykdymas įjungiamas ir be šio aiškaus apibrėžimo, tačiau XLA gali gerokai pagreitinti kai kurias dideles tiesinės algebros operacijas (panašias į tas, kurias matome giliojo mokymosi taikymuose), ypač GPU aplinkoje.
 :end_tab:
 
-### Acceleration by Hybridization
+### Spartinimas hibridizavimu
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a class to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
+Kad parodytume kompiliavimu pasiektą našumo pagerėjimą, palyginame laiką, reikalingą įvertinti `net(x)` prieš hibridizavimą ir po jo. Pirmiausia apibrėžkime klasę šiam laikui matuoti. Ji pravers visame skyriuje, kai imsimės matuoti (ir gerinti) našumą.
 
 ```{.python .input}
 #@tab all
@@ -216,15 +216,15 @@ class Benchmark:
 ```
 
 :begin_tab:`mxnet`
-Now we can invoke the network twice, once with and once without hybridization.
+Dabar galime iškviesti tinklą du kartus: vieną kartą su hibridizavimu ir vieną kartą be jo.
 :end_tab:
 
 :begin_tab:`pytorch`
-Now we can invoke the network twice, once with and once without torchscript.
+Dabar galime iškviesti tinklą du kartus: vieną kartą su torchscript ir vieną kartą be jo.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Now we can invoke the network three times, once executed eagerly, once with graph-mode execution, and again using JIT compiled XLA.
+Dabar galime iškviesti tinklą tris kartus: vieną kartą vykdomą nedelsiant (angl. *eagerly*), vieną kartą grafo režimu ir dar kartą naudojant JIT sukompiliuotą XLA.
 :end_tab:
 
 ```{.python .input}
@@ -263,31 +263,31 @@ with Benchmark('Graph Mode'):
 ```
 
 :begin_tab:`mxnet`
-As is observed in the above results, after a `HybridSequential` instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
+Kaip matyti iš aukščiau pateiktų rezultatų, po to, kai `HybridSequential` egzempliorius iškviečia funkciją `hybridize`, skaičiavimo našumas pagerėja naudojant simbolinį programavimą.
 :end_tab:
 
 :begin_tab:`pytorch`
-As is observed in the above results, after an `nn.Sequential` instance is scripted using the `torch.jit.script` function, computing performance is improved through the use of symbolic programming.
+Kaip matyti iš aukščiau pateiktų rezultatų, po to, kai `nn.Sequential` egzempliorius paverčiamas scenarijumi naudojant funkciją `torch.jit.script`, skaičiavimo našumas pagerėja naudojant simbolinį programavimą.
 :end_tab:
 
 :begin_tab:`tensorflow`
-As is observed in the above results, after a `tf.keras.Sequential` instance is scripted using the `tf.function` function, computing performance is improved through the use of symbolic programming via graph-mode execution in tensorflow. 
+Kaip matyti iš aukščiau pateiktų rezultatų, po to, kai `tf.keras.Sequential` egzempliorius paverčiamas scenarijumi naudojant funkciją `tf.function`, skaičiavimo našumas pagerėja naudojant simbolinį programavimą per grafo režimo vykdymą TensorFlow. 
 :end_tab:
 
-### Serialization
+### Serializavimas
 
 :begin_tab:`mxnet`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let's see the `export` function in action.
+Vienas iš modelių kompiliavimo privalumų yra tas, kad galime serializuoti (išsaugoti) modelį ir jo parametrus diske. Tai leidžia mums išsaugoti modelį nepriklausomai nuo pasirinktos priekinės dalies kalbos. Tai leidžia diegti apmokytus modelius kituose įrenginiuose ir lengvai naudoti kitas priekinės dalies programavimo kalbas. Tuo pačiu kodas dažnai yra greitesnis nei tas, kurį galima pasiekti imperatyviajame programavime. Pažiūrėkime, kaip veikia funkcija `export`.
 :end_tab:
 
 :begin_tab:`pytorch`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let's see the `save` function in action.
+Vienas iš modelių kompiliavimo privalumų yra tas, kad galime serializuoti (išsaugoti) modelį ir jo parametrus diske. Tai leidžia mums išsaugoti modelį nepriklausomai nuo pasirinktos priekinės dalies kalbos. Tai leidžia diegti apmokytus modelius kituose įrenginiuose ir lengvai naudoti kitas priekinės dalies programavimo kalbas. Tuo pačiu kodas dažnai yra greitesnis nei tas, kurį galima pasiekti imperatyviajame programavime. Pažiūrėkime, kaip veikia funkcija `save`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages or execute a trained model on a server. At the same time the code is often faster than what can be achieved in imperative programming. 
-The low-level API that allows us to save in tensorflow is `tf.saved_model`. 
-Let's see the `saved_model` instance in action.
+Vienas iš modelių kompiliavimo privalumų yra tas, kad galime serializuoti (išsaugoti) modelį ir jo parametrus diske. Tai leidžia mums išsaugoti modelį nepriklausomai nuo pasirinktos priekinės dalies kalbos. Tai leidžia diegti apmokytus modelius kituose įrenginiuose ir lengvai naudoti kitas priekinės dalies programavimo kalbas arba vykdyti apmokytą modelį serveryje. Tuo pačiu kodas dažnai yra greitesnis nei tas, kurį galima pasiekti imperatyviajame programavime. 
+Žemo lygio API, leidžianti išsaugoti TensorFlow, yra `tf.saved_model`. 
+Pažiūrėkime, kaip veikia `saved_model` egzempliorius.
 :end_tab:
 
 ```{.python .input}
@@ -310,7 +310,7 @@ tf.saved_model.save(net, 'my_mlp')
 ```
 
 :begin_tab:`mxnet`
-The model is decomposed into a (large binary) parameter file and a JSON description of the program required to execute the model computation. The files can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. Let's have a look at the first few lines in the model description.
+Modelis suskaidomas į (didelį dvejetainį) parametrų failą ir JSON aprašą programos, reikalingos modelio skaičiavimui vykdyti. Failus gali nuskaityti kitos Python ar MXNet palaikomos priekinės dalies kalbos, pavyzdžiui, C++, R, Scala ir Perl. Pažvelkime į pirmąsias modelio aprašo eilutes.
 :end_tab:
 
 ```{.python .input}
@@ -319,9 +319,9 @@ The model is decomposed into a (large binary) parameter file and a JSON descript
 ```
 
 :begin_tab:`mxnet`
-Earlier, we demonstrated that, after calling the `hybridize` function, the model is able to achieve superior computing performance and portability. Note, though that hybridization can affect model flexibility, in particular in terms of control flow. 
+Anksčiau parodėme, kad iškvietus funkciją `hybridize`, modelis gali pasiekti aukštesnį skaičiavimo našumą ir perkeliamumą. Tačiau atkreipkite dėmesį, kad hibridizavimas gali paveikti modelio lankstumą, ypač valdymo srauto požiūriu. 
 
-Besides, contrary to the `Block` instance, which needs to use the `forward` function, for a `HybridBlock` instance we need to use the `hybrid_forward` function.
+Be to, priešingai nei `Block` egzemplioriui, kuriam reikia naudoti funkciją `forward`, `HybridBlock` egzemplioriui turime naudoti funkciją `hybrid_forward`.
 :end_tab:
 
 ```{.python .input}
@@ -341,7 +341,7 @@ class HybridNet(nn.HybridBlock):
 ```
 
 :begin_tab:`mxnet`
-The code above implements a simple network with 4 hidden units and 2 outputs. The `hybrid_forward` function takes an additional argument `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
+Aukščiau pateiktas kodas įgyvendina paprastą tinklą su 4 paslėptaisiais vienetais ir 2 išvestimis. Funkcija `hybrid_forward` priima papildomą argumentą `F`. Jo reikia, nes priklausomai nuo to, ar kodas buvo hibridizuotas, ar ne, apdorojimui bus naudojama šiek tiek skirtinga biblioteka (`ndarray` ar `symbol`). Abi klasės atlieka labai panašias funkcijas, o MXNet automatiškai nustato argumentą. Kad suprastume, kas vyksta, atspausdiname argumentus kaip funkcijos iškvietimo dalį.
 :end_tab:
 
 ```{.python .input}
@@ -353,7 +353,7 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-Repeating the forward computation will lead to the same output (we omit details). Now let's see what happens if we invoke the `hybridize` function.
+Pakartojus tiesioginio sklidimo skaičiavimą, gausime tą pačią išvestį (detalių praleidžiame). Dabar pažiūrėkime, kas nutinka, jei iškviečiame funkciją `hybridize`.
 :end_tab:
 
 ```{.python .input}
@@ -363,7 +363,7 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, even though the input is of `ndarray` type, the data flowing through the network is now converted to `symbol` type as part of the compilation process. Repeating the function call leads to a surprising outcome:
+Vietoj `ndarray` dabar `F` naudojame modulį `symbol`. Be to, nors įvestis yra `ndarray` tipo, duomenys, tekantys per tinklą, dabar kompiliavimo proceso metu konvertuojami į `symbol` tipą. Pakartojus funkcijos iškvietimą, gaunamas stebinantis rezultatas:
 :end_tab:
 
 ```{.python .input}
@@ -372,45 +372,45 @@ net(x)
 ```
 
 :begin_tab:`mxnet` 
-This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward`, are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (e.g.,  `asnumpy`) and operations in-place such as `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU, and the speed and number of GPUs.
+Tai gana skiriasi nuo to, ką matėme anksčiau. Visi spausdinimo sakiniai, apibrėžti `hybrid_forward`, praleidžiami. Iš tikrųjų po hibridizavimo `net(x)` vykdymas nebeapima Python interpretatoriaus. Tai reiškia, kad bet koks nereikalingas Python kodas (pavyzdžiui, spausdinimo sakiniai) praleidžiamas siekiant daug racionalesnio vykdymo ir geresnio našumo. Vietoj to MXNet tiesiogiai kviečia C++ vidinę dalį. Taip pat atkreipkite dėmesį, kad kai kurios funkcijos nepalaikomos modulyje `symbol` (pvz., `asnumpy`), o operacijos vietoje, pavyzdžiui, `a += b` ir `a[:] = a + b`, turi būti perrašytos kaip `a = a + b`. Vis dėlto modelių kompiliavimas yra vertas pastangų, kai tik svarbus greitis. Nauda gali svyruoti nuo kelių procentinių punktų iki daugiau nei dvigubo greičio, priklausomai nuo modelio sudėtingumo, CPU greičio ir GPU greičio bei skaičiaus.
 :end_tab:
 
-## Summary
+## Santrauka
 
 
-* Imperative programming makes it easy to design new models since it is possible to write code with control flow and the ability to use a large amount of the Python software ecosystem.
-* Symbolic programming requires that we specify the program and compile it before executing it. The benefit is improved performance.
+* Imperatyvusis programavimas leidžia lengvai kurti naujus modelius, nes galima rašyti kodą su valdymo srautu ir galimybe naudoti didelę Python programinės įrangos ekosistemos dalį.
+* Simbolinis programavimas reikalauja, kad nurodytume programą ir ją sukompiliuotume prieš vykdydami. Nauda – geresnis našumas.
 
 :begin_tab:`mxnet` 
-* MXNet is able to combine the advantages of both approaches as needed.
-* Models constructed by the `HybridSequential` and `HybridBlock` classes are able to convert imperative programs into symbolic programs by calling the `hybridize` function.
+* MXNet gali prireikus sujungti abiejų požiūrių privalumus.
+* Modeliai, sukonstruoti klasėmis `HybridSequential` ir `HybridBlock`, gali konvertuoti imperatyviąsias programas į simbolines iškviesdami funkciją `hybridize`.
 :end_tab:
 
 
-## Exercises
+## Pratimai
 
 
 :begin_tab:`mxnet` 
-1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the `HybridNet` class in this section. Execute the code and observe the errors you encounter. Why do they happen?
-1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
-1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
+1. Pridėkite `x.asnumpy()` prie pirmosios šiame skyrelyje esančios klasės `HybridNet` funkcijos `hybrid_forward` eilutės. Vykdykite kodą ir stebėkite klaidas, su kuriomis susidursite. Kodėl jos atsiranda?
+1. Kas nutinka, jei prie funkcijos `hybrid_forward` pridedame valdymo srautą, t. y. Python sakinius `if` ir `for`?
+1. Peržiūrėkite jus dominančius modelius ankstesniuose skyriuose. Ar galite pagerinti jų skaičiavimo našumą juos įgyvendindami iš naujo?
 :end_tab:
 
 :begin_tab:`pytorch,tensorflow` 
-1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
+1. Peržiūrėkite jus dominančius modelius ankstesniuose skyriuose. Ar galite pagerinti jų skaičiavimo našumą juos įgyvendindami iš naujo?
 :end_tab:
 
 
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/360)
+[Diskusijos](https://discuss.d2l.ai/t/360)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/2490)
+[Diskusijos](https://discuss.d2l.ai/t/2490)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/2492)
+[Diskusijos](https://discuss.d2l.ai/t/2492)
 :end_tab:

@@ -4,102 +4,102 @@ tab.interact_select(["pytorch"])
 #required_libs("setuptools==66", "wheel==0.38.4", "gym==0.21.0")
 ```
 
-# Value Iteration
+# Reikšmių iteracija
 :label:`sec_valueiter`
 
-In this section we will discuss how to pick the best action for the robot at each state to maximize the *return* of the trajectory. We will describe an algorithm called Value Iteration and implement it for a simulated robot that travels over a frozen lake.
+Šiame skyrelyje aptarsime, kaip kiekvienoje būsenoje parinkti geriausią roboto veiksmą, kad būtų maksimizuota trajektorijos *grąža*. Aprašysime algoritmą, vadinamą reikšmių iteracija, ir įgyvendinsime jį imituojamam robotui, keliaujančiam per užšalusį ežerą.
 
-## Stochastic Policy
+## Stochastinė strategija
 
-A stochastic policy denoted as $\pi(a \mid s)$ (policy for short) is a conditional distribution over the actions $a \in \mathcal{A}$ given the state $s \in \mathcal{S}$, $\pi(a \mid s) \equiv P(a \mid s)$. As an example, if the robot has four actions $\mathcal{A}=$ {go left, go down, go right, go up}. The policy at a state $s \in \mathcal{S}$ for such a set of actions $\mathcal{A}$ is a categorical distribution where the probabilities of the four actions could be $[0.4, 0.2, 0.1, 0.3]$; at some other state $s' \in \mathcal{S}$ the probabilities $\pi(a \mid s')$ of the same four actions could be $[0.1, 0.1, 0.2, 0.6]$. Note that we should have $\sum_a \pi(a \mid s) = 1$ for any state $s$. A deterministic policy is a special case of a stochastic policy in that the distribution $\pi(a \mid s)$ only gives non-zero probability to one particular action, e.g., $[1, 0, 0, 0]$ for our example with four actions.
+Stochastinė strategija, žymima $\pi(a \mid s)$ (trumpiau – strategija), yra sąlyginis veiksmų $a \in \mathcal{A}$ skirstinys, esant būsenai $s \in \mathcal{S}$, $\pi(a \mid s) \equiv P(a \mid s)$. Pavyzdžiui, jei robotas turi keturis veiksmus $\mathcal{A}=$ {eiti į kairę, eiti žemyn, eiti į dešinę, eiti aukštyn}. Strategija būsenoje $s \in \mathcal{S}$ tokiai veiksmų aibei $\mathcal{A}$ yra kategorinis skirstinys, kuriame keturių veiksmų tikimybės galėtų būti $[0.4, 0.2, 0.1, 0.3]$; kitoje būsenoje $s' \in \mathcal{S}$ tų pačių keturių veiksmų tikimybės $\pi(a \mid s')$ galėtų būti $[0.1, 0.1, 0.2, 0.6]$. Atkreipkite dėmesį, kad bet kuriai būsenai $s$ turime $\sum_a \pi(a \mid s) = 1$. Deterministinė strategija yra ypatingas stochastinės strategijos atvejis, kai skirstinys $\pi(a \mid s)$ nenulinę tikimybę suteikia tik vienam konkrečiam veiksmui, pvz., $[1, 0, 0, 0]$ mūsų pavyzdyje su keturiais veiksmais.
 
-To make the notation less cumbersome, we will often write $\pi(s)$ as the conditional distribution instead of $\pi(a \mid s)$.
+Kad žymėjimas būtų mažiau sudėtingas, dažnai rašysime $\pi(s)$ kaip sąlyginį skirstinį vietoj $\pi(a \mid s)$.
 
-## Value Function
+## Reikšmės funkcija
 
-Imagine now that the robot starts at a state $s_0$ and at each time instant, it first samples an action from the policy $a_t \sim \pi(s_t)$ and takes this action to result in the next state $s_{t+1}$. The trajectory $\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots)$, can be different depending upon which particular action $a_t$ is sampled at intermediate instants. We define the average *return* $R(\tau) = \sum_{t=0}^\infty \gamma^t r(s_t, a_t)$ of all such trajectories
+Įsivaizduokite, kad robotas pradeda nuo būsenos $s_0$ ir kiekvienu laiko momentu pirmiausia atrenka veiksmą iš strategijos $a_t \sim \pi(s_t)$ ir jį atlieka, taip patekdamas į kitą būseną $s_{t+1}$. Trajektorija $\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots)$ gali skirtis priklausomai nuo to, kuris konkretus veiksmas $a_t$ atrenkamas tarpiniais momentais. Apibrėžiame visų tokių trajektorijų vidutinę *grąžą* $R(\tau) = \sum_{t=0}^\infty \gamma^t r(s_t, a_t)$
 $$V^\pi(s_0) = E_{a_t \sim \pi(s_t)} \Big[ R(\tau) \Big] = E_{a_t \sim \pi(s_t)} \Big[ \sum_{t=0}^\infty \gamma^t r(s_t, a_t) \Big],$$
 
-where $s_{t+1} \sim P(s_{t+1} \mid s_t, a_t)$ is the next state of the robot and $r(s_t, a_t)$ is the instantaneous reward obtained by taking action $a_t$ in state $s_t$ at time $t$. This is called the "value function" for the policy $\pi$. In simple words, the value of a state $s_0$ for a policy $\pi$, denoted by $V^\pi(s_0)$, is the expected $\gamma$-discounted *return* obtained by the robot if it begins at state $s_0$ and takes actions from the policy $\pi$ at each time instant.
+kur $s_{t+1} \sim P(s_{t+1} \mid s_t, a_t)$ yra kita roboto būsena, o $r(s_t, a_t)$ yra betarpiškas atlygis, gaunamas atlikus veiksmą $a_t$ būsenoje $s_t$ laiko momentu $t$. Tai vadinama strategijos $\pi$ „reikšmės funkcija“. Paprastais žodžiais, būsenos $s_0$ reikšmė strategijai $\pi$, žymima $V^\pi(s_0)$, yra tikėtina $\gamma$ diskontuota *grąža*, kurią robotas gauna, jei pradeda būsenoje $s_0$ ir kiekvienu laiko momentu atlieka veiksmus pagal strategiją $\pi$.
 
-We next break down the trajectory into two stages (i) the first stage which corresponds to $s_0 \to s_1$ upon taking the action $a_0$, and (ii) a second stage which is the trajectory $\tau' = (s_1, a_1, r_1, \ldots)$ thereafter. The key idea behind all algorithms in reinforcement learning is that the value of state $s_0$ can be written as the average reward obtained in the first stage and the value function averaged over all possible next states $s_1$. This is quite intuitive and arises from our Markov assumption: the average return from the current state is the sum of the average return from the next state and the average reward of going to the next state. Mathematically, we write the two stages as
+Toliau suskaidome trajektoriją į du etapus: (i) pirmąjį etapą, atitinkantį $s_0 \to s_1$ atlikus veiksmą $a_0$, ir (ii) antrąjį etapą, kuris yra vėlesnė trajektorija $\tau' = (s_1, a_1, r_1, \ldots)$. Pagrindinė visų skatinamojo mokymosi algoritmų idėja yra ta, kad būsenos $s_0$ reikšmę galima užrašyti kaip vidutinį atlygį, gautą pirmajame etape, ir reikšmės funkciją, suvidurkintą per visas galimas kitas būsenas $s_1$. Tai gana intuityvu ir kyla iš mūsų Markovo prielaidos: vidutinė grąža iš dabartinės būsenos yra vidutinės grąžos iš kitos būsenos ir vidutinio atlygio už perėjimą į kitą būseną suma. Matematiškai du etapus užrašome kaip
 
 $$V^\pi(s_0) = r(s_0, a_0) + \gamma\ E_{a_0 \sim \pi(s_0)} \Big[ E_{s_1 \sim P(s_1 \mid s_0, a_0)} \Big[ V^\pi(s_1) \Big] \Big].$$
 :eqlabel:`eq_dynamic_programming`
 
-This decomposition is very powerful: it is the foundation of the principle of dynamic programming upon which all reinforcement learning algorithms are based. Notice that the second stage gets two expectations, one over the choices of the action $a_0$ taken in the first stage using the stochastic policy and another over the possible states $s_1$ obtained from the chosen action. We can write :eqref:`eq_dynamic_programming` using the transition probabilities in the Markov decision process (MDP) as
+Šis skaidymas yra labai galingas: tai dinaminio programavimo principo pagrindas, kuriuo remiasi visi skatinamojo mokymosi algoritmai. Atkreipkite dėmesį, kad antrasis etapas turi du vidurkius: vieną pagal pirmajame etape atlikto veiksmo $a_0$ pasirinkimus naudojant stochastinę strategiją, o kitą pagal galimas būsenas $s_1$, gautas atlikus pasirinktą veiksmą. Lygtį :eqref:`eq_dynamic_programming` galime užrašyti naudodami Markovo sprendimų proceso (MDP) perėjimo tikimybes kaip
 
 $$V^\pi(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) \Big[ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \Big];\ \textrm{for all } s \in \mathcal{S}.$$
 :eqlabel:`eq_dynamic_programming_val`
 
-An important thing to notice here is that the above identity holds for all states $s \in \mathcal{S}$ because we can think of any trajectory that begins at that state and break down the trajectory into two stages.
+Svarbu pastebėti, kad aukščiau pateikta tapatybė galioja visoms būsenoms $s \in \mathcal{S}$, nes galime apsvarstyti bet kurią trajektoriją, prasidedančią toje būsenoje, ir suskaidyti ją į du etapus.
 
-## Action-Value Function
+## Veiksmo ir reikšmės funkcija
 
-In implementations, it is often useful to maintain a quantity called the "action value" function which is a closely related quantity to the value function. This is defined to be the average *return* of a trajectory that begins at $s_0$ but when the action of the first stage is fixed to be $a_0$
+Įgyvendinimuose dažnai naudinga palaikyti dydį, vadinamą „veiksmo reikšmės“ funkcija, kuri yra glaudžiai susijęs su reikšmės funkcija dydis. Ji apibrėžiama kaip vidutinė trajektorijos, prasidedančios $s_0$, *grąža*, kai pirmojo etapo veiksmas fiksuojamas kaip $a_0$
 
 $$Q^\pi(s_0, a_0) = r(s_0, a_0) + E_{a_t \sim \pi(s_t)} \Big[ \sum_{t=1}^\infty \gamma^t r(s_t, a_t) \Big],$$
 
-note that the summation inside the expectation is from $t=1,\ldots, \infty$ because the reward of the first stage is fixed in this case. We can again break down the trajectory into two parts and write
+atkreipkite dėmesį, kad suma po vidurkio ženklu eina nuo $t=1,\ldots, \infty$, nes šiuo atveju pirmojo etapo atlygis yra fiksuotas. Galime vėl suskaidyti trajektoriją į dvi dalis ir užrašyti
 
 $$Q^\pi(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \sum_{a' \in \mathcal{A}} \pi(a' \mid s')\ Q^\pi(s', a');\ \textrm{ for all } s \in \mathcal{S}, a \in \mathcal{A}.$$
 :eqlabel:`eq_dynamic_programming_q`
 
-This version is the analog of :eqref:`eq_dynamic_programming_val` for the action value function.
+Ši versija yra :eqref:`eq_dynamic_programming_val` analogas veiksmo reikšmės funkcijai.
 
-## Optimal Stochastic Policy
+## Optimali stochastinė strategija
 
-Both the value function and the action-value function depend upon the policy that the robot chooses. We will next think of the "optimal policy" that achieves the maximal average *return*
+Tiek reikšmės funkcija, tiek veiksmo reikšmės funkcija priklauso nuo strategijos, kurią pasirenka robotas. Toliau pagalvosime apie „optimalią strategiją“, kuri pasiekia didžiausią vidutinę *grąžą*
 $$\pi^* = \underset{\pi}{\mathrm{argmax}} V^\pi(s_0).$$
 
-Of all possible stochastic policies that the robot could have taken, the optimal policy $\pi^*$  achieves the largest average discounted *return* for trajectories starting from state $s_0$. Let us denote the value function and the action-value function of the optimal policy as $V^* \equiv V^{\pi^*}$ and $Q^* \equiv Q^{\pi^*}$.
+Iš visų galimų stochastinių strategijų, kurias galėjo pasirinkti robotas, optimali strategija $\pi^*$ pasiekia didžiausią vidutinę diskontuotą *grąžą* trajektorijoms, prasidedančioms būsenoje $s_0$. Optimalios strategijos reikšmės funkciją ir veiksmo reikšmės funkciją žymėkime $V^* \equiv V^{\pi^*}$ ir $Q^* \equiv Q^{\pi^*}$.
 
-Let us observe that for a deterministic policy where there is only one action that is possible under the policy at any given state. This gives us
+Panagrinėkime deterministinę strategiją, kai bet kurioje būsenoje pagal strategiją galimas tik vienas veiksmas. Tai mums duoda
 
 $$\pi^*(s) = \underset{a \in \mathcal{A}}{\mathrm{argmax}} \Big[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a)\ V^*(s') \Big].$$
 
-A good mnemonic to remember this is that the optimal action at state $s$ (for a deterministic policy) is the one that maximizes the sum of reward $r(s, a)$ from the first stage and the average *return* of the trajectories starting from the next sate $s'$, averaged over all possible next states $s'$ from the second stage.
+Gera mnemonika šiam prisiminti yra tokia: optimalus veiksmas būsenoje $s$ (deterministinei strategijai) yra tas, kuris maksimizuoja pirmojo etapo atlygio $r(s, a)$ ir trajektorijų, prasidedančių kita būsena $s'$, vidutinės *grąžos* sumą, suvidurkintą per visas galimas kitas būsenas $s'$ iš antrojo etapo.
 
-## Principle of Dynamic Programming
+## Dinaminio programavimo principas
 
-Our developement in the previous section in :eqref:`eq_dynamic_programming` or :eqref:`eq_dynamic_programming_q` can be turned into an algorithm to compute the optimal value function $V^*$ or the action-value function $Q^*$, respectively. Observe that
+Mūsų ankstesnio skyrelio išvedžiojimą :eqref:`eq_dynamic_programming` arba :eqref:`eq_dynamic_programming_q` galima paversti algoritmu, skirtu apskaičiuoti atitinkamai optimalią reikšmės funkciją $V^*$ arba veiksmo reikšmės funkciją $Q^*$. Pastebėkite, kad
 $$ V^*(s) = \sum_{a \in \mathcal{A}} \pi^*(a \mid s) \Big[ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big];\ \textrm{for all } s \in \mathcal{S}.$$
 
-For a deterministic optimal policy $\pi^*$, since there is only one action that can be taken at state $s$, we can also write 
+Deterministinei optimaliai strategijai $\pi^*$, kadangi būsenoje $s$ galima atlikti tik vieną veiksmą, taip pat galime rašyti 
 
 $$V^*(s) = \mathrm{argmax}_{a \in \mathcal{A}} \Big\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big\}$$
 
-for all states $s \in \mathcal{S}$. This identity is called the "principle of dynamic programming" :cite:`BellmanDPPaper,BellmanDPBook`. It was formulated by Richard Bellman in 1950s and we can remember it as "the remainder of an optimal trajectory is also optimal".
+visoms būsenoms $s \in \mathcal{S}$. Ši tapatybė vadinama „dinaminio programavimo principu“ :cite:`BellmanDPPaper,BellmanDPBook`. Jį 1950-aisiais suformulavo Richardas Bellmanas, ir galime jį prisiminti kaip „likusi optimalios trajektorijos dalis taip pat yra optimali“.
 
-## Value Iteration
+## Reikšmių iteracija
 
-We can turn the principle of dynamic programming into an algorithm for finding the optimal value function called value iteration. The key idea behind value iteration is to think of this identity as a set of constraints that tie together $V^*(s)$ at different states $s \in \mathcal{S}$. We initialize the value function to some arbitrary values $V_0(s)$ for all states $s \in \mathcal{S}$. At the $k^{\textrm{th}}$ iteration, the Value Iteration algorithm updates the value function as
+Dinaminio programavimo principą galime paversti algoritmu, skirtu optimaliai reikšmės funkcijai rasti, vadinamu reikšmių iteracija. Pagrindinė reikšmių iteracijos idėja yra šią tapatybę laikyti ribojimų aibe, siejančia $V^*(s)$ skirtingose būsenose $s \in \mathcal{S}$. Reikšmės funkciją inicializuojame tam tikromis savavališkomis reikšmėmis $V_0(s)$ visoms būsenoms $s \in \mathcal{S}$. $k$-ojoje iteracijoje reikšmių iteracijos algoritmas atnaujina reikšmės funkciją taip
 
 $$V_{k+1}(s) = \max_{a \in \mathcal{A}} \Big\{ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V_k(s') \Big\};\ \textrm{for all } s \in \mathcal{S}.$$
 
-It turns out that as $k \to \infty$ the value function estimated by the Value Iteration algorithm converges to the optimal value function irrespective of the initialization $V_0$,
+Pasirodo, kad kai $k \to \infty$, reikšmių iteracijos algoritmo įvertinta reikšmės funkcija konverguoja į optimalią reikšmės funkciją nepriklausomai nuo inicializacijos $V_0$,
 $$V^*(s) = \lim_{k \to \infty} V_k(s);\ \textrm{for all states } s \in \mathcal{S}.$$
 
-The same Value Iteration algorithm can be equivalently written using the action-value function as
+Tą patį reikšmių iteracijos algoritmą galima ekvivalenčiai užrašyti naudojant veiksmo reikšmės funkciją
 $$Q_{k+1}(s, a) = r(s, a) + \gamma \max_{a' \in \mathcal{A}} \sum_{s' \in \mathcal{S}} P(s' \mid s, a) Q_k (s', a');\ \textrm{ for all } s \in \mathcal{S}, a \in \mathcal{A}.$$
 
-In this case we initialize $Q_0(s, a)$ to some arbitrary values for all $s \in \mathcal{S}$ and $a \in \mathcal{A}$. Again we have $Q^*(s, a) = \lim_{k \to \infty} Q_k(s, a)$ for all $s \in \mathcal{S}$ and $a \in \mathcal{A}$.
+Šiuo atveju inicializuojame $Q_0(s, a)$ tam tikromis savavališkomis reikšmėmis visiems $s \in \mathcal{S}$ ir $a \in \mathcal{A}$. Vėl turime $Q^*(s, a) = \lim_{k \to \infty} Q_k(s, a)$ visiems $s \in \mathcal{S}$ ir $a \in \mathcal{A}$.
 
-## Policy Evaluation
+## Strategijos įvertinimas
 
-Value Iteration enables us to compute the optimal value function, i.e., $V^{\pi^*}$ of the optimal deterministic policy $\pi^*$. We can also use similar iterative updates to compute the value function associated with any other, potentially stochastic, policy $\pi$. We again initialize $V^\pi_0(s)$ to some arbitrary values for all states $s \in \mathcal{S}$ and at the $k^{\textrm{th}}$ iteration, perform the updates
+Reikšmių iteracija leidžia apskaičiuoti optimalią reikšmės funkciją, t. y. optimalios deterministinės strategijos $\pi^*$ funkciją $V^{\pi^*}$. Panašius iteracinius atnaujinimus taip pat galime naudoti reikšmės funkcijai, susijusiai su bet kuria kita, galbūt stochastine, strategija $\pi$, apskaičiuoti. Vėl inicializuojame $V^\pi_0(s)$ tam tikromis savavališkomis reikšmėmis visoms būsenoms $s \in \mathcal{S}$, o $k$-ojoje iteracijoje atliekame atnaujinimus
 
 $$    V^\pi_{k+1}(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) \Big[ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi_k(s') \Big];\ \textrm{for all } s \in \mathcal{S}.$$
 
-This algorithm is known as policy evaluation and is useful to compute the value function given the policy. Again, it turns out that as $k \to \infty$ these updates converge to the correct value function irrespective of the initialization $V_0$,
+Šis algoritmas žinomas kaip strategijos įvertinimas ir yra naudingas reikšmės funkcijai pagal strategiją apskaičiuoti. Vėl pasirodo, kad kai $k \to \infty$, šie atnaujinimai konverguoja į teisingą reikšmės funkciją nepriklausomai nuo inicializacijos $V_0$,
 
 $$V^\pi(s) = \lim_{k \to \infty} V^\pi_k(s);\ \textrm{for all states } s \in \mathcal{S}.$$
 
-The algorithm for computing the action-value function $Q^\pi(s, a)$ of a policy $\pi$ is analogous.
+Strategijos $\pi$ veiksmo reikšmės funkcijos $Q^\pi(s, a)$ skaičiavimo algoritmas yra analogiškas.
 
-## Implementation of Value Iteration
+## Reikšmių iteracijos įgyvendinimas
 :label:`subsec_valueitercode`
-We next show how to implement Value Iteration for a navigation problem called FrozenLake from [Open AI Gym](https://gym.openai.com). We first need to setup the enviroment as shown in the following code.
+Toliau parodome, kaip įgyvendinti reikšmių iteraciją navigacijos uždaviniui, vadinamam FrozenLake iš [Open AI Gym](https://gym.openai.com). Pirmiausia turime nustatyti aplinką, kaip parodyta šiame kode.
 
 ```{.python .input}
 %%tab all
@@ -119,9 +119,9 @@ np.random.seed(seed)
 env_info = d2l.make_env('FrozenLake-v1', seed=seed)
 ```
 
-In the FrozenLake environment, the robot moves on a $4 \times 4$ grid (these are the states) with actions that are "up" ($\uparrow$), "down" ($\rightarrow$), "left" ($\leftarrow$), and "right" ($\rightarrow$). The environment contains a number of holes (H) cells and frozen (F) cells as well as a goal cell (G), all of which are unknown to the robot. To keep the problem simple, we assume the robot has reliable actions, i.e. $P(s' \mid s, a) = 1$ for all $s \in \mathcal{S}, a \in \mathcal{A}$. If the robot reaches the goal, the trial ends and the robot receives a reward of $1$ irrespective of the action; the reward at any other state is $0$ for all actions. The objective of the robot is to learn a policy that reaches the goal location (G) from a given start location (S) (this is $s_0$) to maximize the *return*.
+FrozenLake aplinkoje robotas juda $4 \times 4$ tinkleliu (tai yra būsenos) su veiksmais „aukštyn“ ($\uparrow$), „žemyn“ ($\rightarrow$), „į kairę“ ($\leftarrow$) ir „į dešinę“ ($\rightarrow$). Aplinkoje yra keletas duobių (H) langelių ir užšalusių (F) langelių, taip pat tikslo langelis (G), ir visi jie robotui nežinomi. Kad uždavinys būtų paprastas, darome prielaidą, kad robotas turi patikimus veiksmus, t. y. $P(s' \mid s, a) = 1$ visiems $s \in \mathcal{S}, a \in \mathcal{A}$. Jei robotas pasiekia tikslą, bandymas baigiasi ir robotas gauna $1$ atlygį nepriklausomai nuo veiksmo; atlygis bet kurioje kitoje būsenoje yra $0$ visiems veiksmams. Roboto tikslas yra išmokti strategiją, kuri iš nurodytos pradinės vietos (S) (tai yra $s_0$) pasiekia tikslo vietą (G), kad būtų maksimizuota *grąža*.
 
-The following function implements Value Iteration, where `env_info` contains MDP and environment related information and `gamma` is the discount factor:
+Ši funkcija įgyvendina reikšmių iteraciją, kur `env_info` turi su MDP ir aplinka susijusią informaciją, o `gamma` yra diskonto koeficientas:
 
 ```{.python .input}
 %%tab all
@@ -157,20 +157,20 @@ def value_iteration(env_info, gamma, num_iters):
 value_iteration(env_info=env_info, gamma=gamma, num_iters=num_iters)
 ```
 
-The above pictures show the policy (the arrow indicates the action) and value function (the change in color shows how the value function changes over time from the initial value shown by dark color to the optimal value shown by light colors.). As we see, Value Iteration finds the optimal value function after 10 iterations and the goal state (G) can be reached starting from any state as long as it is not an H cell. Another interesting aspect of the implementation is that in addition to finding the optimal value function, we also automatically found the optimal policy $\pi^*$ corresponding to this value function.
+Aukščiau pateiktuose paveiksluose parodyta strategija (rodyklė nurodo veiksmą) ir reikšmės funkcija (spalvos kitimas rodo, kaip reikšmės funkcija kinta laikui bėgant nuo pradinės reikšmės, rodomos tamsia spalva, iki optimalios reikšmės, rodomos šviesiomis spalvomis). Kaip matome, reikšmių iteracija optimalią reikšmės funkciją randa po 10 iteracijų, o tikslo būsenos (G) galima pasiekti iš bet kurios būsenos, jei tai nėra H langelis. Kitas įdomus įgyvendinimo aspektas yra tas, kad, be optimalios reikšmės funkcijos radimo, mes taip pat automatiškai radome ir šią reikšmės funkciją atitinkančią optimalią strategiją $\pi^*$.
 
 
-## Summary
-The main idea behind the Value Iteration algorithm is to use the principle of dynamic programming to find the optimal average return obtained from a given state. Note that implementing the Value Iteration algorithm requires that we know the Markov decision process (MDP), e.g., the transition and reward functions, completely.
+## Santrauka
+Pagrindinė reikšmių iteracijos algoritmo idėja yra naudoti dinaminio programavimo principą optimaliai vidutinei grąžai, gaunamai iš tam tikros būsenos, rasti. Atkreipkite dėmesį, kad reikšmių iteracijos algoritmui įgyvendinti reikia, kad mes visiškai žinotume Markovo sprendimų procesą (MDP), pavyzdžiui, perėjimo ir atlygio funkcijas.
 
 
-## Exercises
+## Pratimai
 
-1. Try increasing the grid size to $8 \times 8$. Compared with $4 \times 4$ grid, how many iterations does it take to find the optimal value function?
-1. What is the computational complexity of the Value Iteration algorithm?
-1. Run the Value Iteration algorithm again with $\gamma$ (i.e. "gamma" in the above code) when it equals to $0$, $0.5$, and $1$ and analyze its results. 
-1. How does the value of $\gamma$ affect the number of iterations taken by Value Iteration to converge? What happens when $\gamma=1$?
+1. Pabandykite padidinti tinklelio dydį iki $8 \times 8$. Kiek iteracijų prireikia optimaliai reikšmės funkcijai rasti, palyginti su $4 \times 4$ tinkleliu?
+1. Koks yra reikšmių iteracijos algoritmo skaičiavimo sudėtingumas?
+1. Dar kartą paleiskite reikšmių iteracijos algoritmą su $\gamma$ (t. y. „gamma“ aukščiau pateiktame kode), kai jis lygus $0$, $0.5$ ir $1$, ir išanalizuokite rezultatus. 
+1. Kaip $\gamma$ reikšmė veikia iteracijų, per kurias reikšmių iteracija konverguoja, skaičių? Kas atsitinka, kai $\gamma=1$?
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12005)
+[Diskusijos](https://discuss.d2l.ai/t/12005)
 :end_tab:

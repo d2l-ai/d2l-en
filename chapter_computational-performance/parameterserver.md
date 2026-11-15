@@ -1,119 +1,119 @@
-# Parameter Servers
+# Parametrų serveriai
 :label:`sec_parameterserver`
 
-As we move from a single GPU to multiple GPUs and then to multiple servers containing multiple GPUs, possibly all spread out across multiple racks and network switches,
-our algorithms for distributed and parallel training need to become much more sophisticated. Details matter since different interconnects have very different bandwidth (e.g., NVLink can offer up to 100 GB/s across 6 links in an appropriate setting, PCIe 4.0 (16-lane) offers 32 GB/s, while even high speed 100GbE Ethernet only amounts to 10 GB/s). At the same time it is unreasonable to expect that a statistical modeler be an expert in networking and systems.
+Pereidami nuo vieno GPU prie kelių GPU, o paskui prie kelių serverių, turinčių kelis GPU, galbūt visų išsibarsčiusių per kelias spinteles ir tinklo komutatorius,
+mūsų paskirstytojo ir lygiagrečiojo apmokymo algoritmai turi tapti gerokai sudėtingesni. Detalės svarbios, nes skirtingos jungtys turi labai skirtingą pralaidumą (pvz., NVLink tinkamoje aplinkoje gali pasiūlyti iki 100 GB/s per 6 jungtis, PCIe 4.0 (16 linijų) siūlo 32 GB/s, o net sparčiojo 100GbE Ethernet pralaidumas siekia tik 10 GB/s). Tuo pačiu nėra pagrįsta tikėtis, kad statistinis modeliuotojas bus tinklų ir sistemų ekspertas.
 
-The core idea of the parameter server was introduced in :citet:`Smola.Narayanamurthy.2010` in the context of distributed latent variable models. A description of the push and pull semantics then followed in :citet:`Ahmed.Aly.Gonzalez.ea.2012` and a description of the system and an open source library followed in :citet:`Li.Andersen.Park.ea.2014`. In the following we will motivate the components needed for efficiency.
+Pagrindinė parametrų serverio idėja buvo pristatyta :citet:`Smola.Narayanamurthy.2010` paskirstytųjų latentinių kintamųjų modelių kontekste. Vėliau :citet:`Ahmed.Aly.Gonzalez.ea.2012` pateiktas siuntimo (angl. *push*) ir gavimo (angl. *pull*) semantikos aprašymas, o :citet:`Li.Andersen.Park.ea.2014` – sistemos ir atvirojo kodo bibliotekos aprašymas. Toliau pagrįsime efektyvumui reikalingus komponentus.
 
 
-## Data-Parallel Training
+## Duomenų lygiagretusis apmokymas
 
-Let's review the data parallel training approach to distributed training. We will use this to the exclusion of all others in this section since it is significantly simpler to implement in practice. There are virtually no use cases (besides deep learning on graphs) where any other strategy for parallelism is preferred since GPUs have plenty of memory nowadays. :numref:`fig_parameterserver` describes the variant of data parallelism that we implemented in :numref:`sec_multi_gpu`. The key aspect in it is that the aggregation of gradients occurs on one single GPU (GPU 0) before the updated parameters are rebroadcast to all GPUs.
+Peržvelkime duomenų lygiagretųjį požiūrį į paskirstytąjį apmokymą. Šiame skyrelyje naudosime jį atmesdami visus kitus, nes praktikoje jį gerokai paprasčiau įgyvendinti. Praktiškai nėra naudojimo atvejų (be giliojo mokymosi grafuose), kuriuose būtų pageidaujama kokia nors kita lygiagretumo strategija, nes šiais laikais GPU turi daug atminties. :numref:`fig_parameterserver` aprašo duomenų lygiagretumo variantą, kurį įgyvendinome :numref:`sec_multi_gpu`. Pagrindinis jo aspektas yra tas, kad gradientų agregavimas vyksta viename GPU (GPU 0), prieš atnaujinti parametrai vėl išplatinami visiems GPU.
 
-![Left: single GPU training. Right: a variant of multi-GPU training: (1) we compute loss and gradient, (2) all gradients are aggregated on one GPU, (3) parameter update happens and the parameters are re-distributed to all GPUs.](../img/ps.svg)
+![Kairėje: apmokymas vienu GPU. Dešinėje: apmokymo keliuose GPU variantas: (1) apskaičiuojame nuostolį ir gradientą, (2) visi gradientai agreguojami viename GPU, (3) atnaujinami parametrai ir jie perskirstomi visiems GPU.](../img/ps.svg)
 :label:`fig_parameterserver`
 
-In retrospect, the decision to aggregate on GPU 0 seems rather ad-hoc. After all, we might just as well aggregate on the CPU. In fact, we could even decide to aggregate some of the parameters on one GPU and some others on another. Provided that the optimization algorithm supports this, there is no real reason for why we could not. For instance, if we have four parameter vectors with associated gradients $\mathbf{g}_1, \ldots, \mathbf{g}_4$ we could aggregate the gradients on one GPU for each $\mathbf{g}_i$ ($i = 1, \ldots, 4$).
+Žvelgiant atgal, sprendimas agreguoti GPU 0 atrodo gana ad hoc. Juk galėtume agreguoti ir CPU. Iš tikrųjų galėtume net nuspręsti agreguoti dalį parametrų viename GPU, o kitus – kitame. Jei optimizavimo algoritmas tai palaiko, nėra jokios realios priežasties, kodėl negalėtume. Pavyzdžiui, jei turime keturis parametrų vektorius su susijusiais gradientais $\mathbf{g}_1, \ldots, \mathbf{g}_4$, galėtume agreguoti gradientus viename GPU kiekvienam $\mathbf{g}_i$ ($i = 1, \ldots, 4$).
 
 
-This reasoning seems arbitrary and frivolous. After all, the mathematics is the same throughout. However, we are dealing with real physical hardware where different buses have different bandwidth as discussed in :numref:`sec_hardware`.
-Consider a real 4-way GPU server as described in :numref:`fig_bw_hierarchy`. If it is particularly well connected, it might have a 100 GbE network card. More typical numbers are in the 1--10 GbE range with an effective bandwidth of 100 MB/s to 1 GB/s.
-Since the CPUs have too few PCIe lanes to connect to all GPUs directly (e.g., consumer-grade Intel CPUs have 24 lanes) we need a [multiplexer](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). The bandwidth from the CPU on a 16x Gen3 link is 16 GB/s. This is also the speed at which *each* of the GPUs is connected to the switch. This means that it is more effective to communicate between the devices.
+Šis samprotavimas atrodo savavališkas ir lengvabūdiškas. Juk matematika visur ta pati. Tačiau mes susiduriame su tikra fizine aparatine įranga, kurioje skirtingos magistralės turi skirtingą pralaidumą, kaip aptarta :numref:`sec_hardware`.
+Panagrinėkime tikrą 4 GPU serverį, aprašytą :numref:`fig_bw_hierarchy`. Jei jis ypač gerai sujungtas, jis gali turėti 100 GbE tinklo plokštę. Tipiškesni skaičiai yra 1–10 GbE intervale su efektyviuoju pralaidumu nuo 100 MB/s iki 1 GB/s.
+Kadangi CPU turi per mažai PCIe linijų, kad tiesiogiai prisijungtų prie visų GPU (pvz., vartotojiško lygio Intel CPU turi 24 linijas), mums reikia [multiplekserio](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). Pralaidumas nuo CPU 16x Gen3 jungtimi yra 16 GB/s. Tokiu greičiu prie komutatoriaus yra prijungtas ir *kiekvienas* iš GPU. Tai reiškia, kad efektyviau komunikuoti tarp pačių įrenginių.
 
-![A 4-way GPU server.](../img/bw-hierarchy.svg)
+![4 GPU serveris.](../img/bw-hierarchy.svg)
 :label:`fig_bw_hierarchy`
 
-For the sake of the argument let's assume that the gradients are of 160 MB. In this case it takes 30 ms to send the gradients from all 3 remaining GPUs to the fourth one (each transfer takes 10 ms = 160 MB / 16 GB/s). Adding another 30 ms to transmit the weight vectors back we arrive at a total of 60 ms.
-If we send all data to the CPU we incur a penalty of 40 ms since *each* of the four GPUs needs to send the data to the CPU, yielding a total of 80 ms. Lastly assume that we are able to split the gradients into 4 parts of 40 MB each. Now we can aggregate each of the parts on a different GPU *simultaneously* since the PCIe switch offers a full-bandwidth operation between all links. Instead of 30 ms this takes 7.5 ms, yielding a total of 15 ms for a synchronization operation. In short, depending on how we synchronize parameters the same operation can take anywhere from 15 ms to 80 ms. :numref:`fig_ps_distributed` depicts the different strategies for exchanging parameters.
+Argumentavimo tikslais tarkime, kad gradientai yra 160 MB. Šiuo atveju gradientų siuntimas iš visų 3 likusių GPU į ketvirtąjį užtrunka 30 ms (kiekvienas perdavimas užtrunka 10 ms = 160 MB / 16 GB/s). Pridėję dar 30 ms svorių vektoriams perduoti atgal, gauname iš viso 60 ms.
+Jei siunčiame visus duomenis į CPU, patiriame 40 ms nuobaudą, nes *kiekvienas* iš keturių GPU turi siųsti duomenis į CPU, gaunant iš viso 80 ms. Galiausiai tarkime, kad galime padalyti gradientus į 4 dalis po 40 MB. Dabar galime agreguoti kiekvieną dalį skirtingame GPU *vienu metu*, nes PCIe komutatorius suteikia pilno pralaidumo operaciją tarp visų jungčių. Vietoj 30 ms tai užtrunka 7.5 ms, o sinchronizavimo operacijai gauname iš viso 15 ms. Trumpai tariant, priklausomai nuo to, kaip sinchronizuojame parametrus, ta pati operacija gali užtrukti nuo 15 ms iki 80 ms. :numref:`fig_ps_distributed` pavaizduotos skirtingos parametrų keitimosi strategijos.
 
-![Parameter synchronization strategies.](../img/ps-distributed.svg)
+![Parametrų sinchronizavimo strategijos.](../img/ps-distributed.svg)
 :label:`fig_ps_distributed`
 
-Note that we have yet another tool at our disposal when it comes to improving performance: in a deep network it takes some time to compute all gradients from the top to the bottom. We can begin synchronizing gradients for some parameter groups even while we are still busy computing them for others. See e.g., :citet:`Sergeev.Del-Balso.2018` for details on how to do this in [Horovod](https://github.com/horovod/horovod).
+Atkreipkite dėmesį, kad turime dar vieną įrankį našumui gerinti: giliajame tinkle užtrunka tam tikrą laiką apskaičiuoti visus gradientus iš viršaus į apačią. Gradientų sinchronizavimą kai kurioms parametrų grupėms galime pradėti net kai dar esame užimti jų skaičiavimu kitoms. Žr., pvz., :citet:`Sergeev.Del-Balso.2018` dėl detalių, kaip tai padaryti [Horovod](https://github.com/horovod/horovod).
 
-## Ring Synchronization
+## Žiedinis sinchronizavimas
 
-When it comes to synchronization on modern deep learning hardware we often encounter significantly bespoke network connectivity. For instance, the AWS p3.16xlarge and NVIDIA DGX-2 instances share the connectivity structure of :numref:`fig_nvlink`. Each GPU connects to a host CPU via a PCIe link which operates at best at 16 GB/s. Additionally each GPU also has 6 NVLink connections, each of which is capable of transferring 300 Gbit/s bidirectionally. This amounts to around 18 GB/s per link per direction. In short, the aggregate NVLink bandwidth is significantly higher than the PCIe bandwidth. The question is how to use it most efficiently.
+Kalbant apie sinchronizavimą šiuolaikinėje giliojo mokymosi aparatinėje įrangoje, dažnai susiduriame su gerokai specializuotu tinklo ryšiu. Pavyzdžiui, AWS p3.16xlarge ir NVIDIA DGX-2 egzemplioriai turi tą pačią :numref:`fig_nvlink` ryšio struktūrą. Kiekvienas GPU jungiasi su pagrindiniu CPU per PCIe jungtį, kuri geriausiu atveju veikia 16 GB/s greičiu. Be to, kiekvienas GPU taip pat turi 6 NVLink jungtis, kurių kiekviena geba perduoti 300 Gbit/s dvikryptiškai. Tai sudaro apie 18 GB/s vienai jungčiai viena kryptimi. Trumpai tariant, bendras NVLink pralaidumas yra gerokai didesnis nei PCIe pralaidumas. Klausimas, kaip jį efektyviausiai panaudoti.
 
-![NVLink connectivity on 8  V100 GPU servers (image courtesy of NVIDIA).](../img/nvlink.svg)
+![NVLink ryšys 8 V100 GPU serveriuose (paveikslas NVIDIA sutikimu).](../img/nvlink.svg)
 :label:`fig_nvlink`
 
-It turns out that the optimal synchronization strategy is to decompose the network into two rings and to use them to synchronize data directly :cite:`Wang.Li.Liberty.ea.2018`. :numref:`fig_nvlink_twoloop` illustrates that the network can be decomposed into one ring (1-2-3-4-5-6-7-8-1) with double NVLink bandwidth and into one (1-4-6-3-5-8-2-7-1) with regular bandwidth. Designing an efficient synchronization protocol in this case is nontrivial.
+Pasirodo, optimali sinchronizavimo strategija yra suskaidyti tinklą į du žiedus ir juos naudoti duomenims tiesiogiai sinchronizuoti :cite:`Wang.Li.Liberty.ea.2018`. :numref:`fig_nvlink_twoloop` iliustruoja, kad tinklą galima suskaidyti į vieną žiedą (1-2-3-4-5-6-7-8-1) su dvigubu NVLink pralaidumu ir į vieną (1-4-6-3-5-8-2-7-1) su įprastu pralaidumu. Efektyvaus sinchronizavimo protokolo projektavimas šiuo atveju nėra paprastas.
 
-![Decomposition of the NVLink network into two rings.](../img/nvlink-twoloop.svg)
+![NVLink tinklo skaidymas į du žiedus.](../img/nvlink-twoloop.svg)
 :label:`fig_nvlink_twoloop`
 
 
-Consider the following thought experiment: given a ring of $n$ computing nodes (or GPUs) we can send gradients from the first to the second node. There it is added to the local gradient and sent on to the third node, and so on. After $n-1$ steps the aggregate gradient can be found in the last-visited node. That is, the time to aggregate gradients grows linearly with the number of nodes. But if we do this the algorithm is quite inefficient. After all, at any time there is only one of the nodes communicating. What if we broke the gradients into $n$ chunks and started synchronizing chunk $i$ starting at node $i$?
-Since each chunk is of size $1/n$ the total time is now $(n-1)/n \approx 1$. In other words, the time spent to aggregate gradients *does not grow* as we increase the size of the ring. This is quite an astonishing result. :numref:`fig_ringsync` illustrates the sequence of steps on $n=4$ nodes.
+Panagrinėkime tokį minties eksperimentą: turint $n$ skaičiavimo mazgų (ar GPU) žiedą, galime siųsti gradientus iš pirmojo mazgo į antrąjį. Ten jis pridedamas prie lokaliojo gradiento ir siunčiamas toliau į trečiąjį mazgą ir taip toliau. Po $n-1$ žingsnių agreguotą gradientą galima rasti paskutiniame aplankytame mazge. Tai yra, gradientų agregavimo laikas auga tiesiškai didėjant mazgų skaičiui. Tačiau jei taip darome, algoritmas yra gana neefektyvus. Juk bet kuriuo metu komunikuoja tik vienas iš mazgų. O kas, jei suskaidytume gradientus į $n$ dalių ir pradėtume sinchronizuoti dalį $i$ pradedant mazge $i$?
+Kadangi kiekvienos dalies dydis yra $1/n$, bendras laikas dabar yra $(n-1)/n \approx 1$. Kitaip tariant, laikas, skirtas gradientams agreguoti, *neauga* didėjant žiedo dydžiui. Tai gana stulbinantis rezultatas. :numref:`fig_ringsync` iliustruoja žingsnių seką, kai $n=4$ mazgų.
 
-![Ring synchronization across 4 nodes. Each node starts transmitting parts of gradients to its left neighbor until the assembled gradient can be found in its right neighbor.](../img/ringsync.svg)
+![Žiedinis sinchronizavimas per 4 mazgus. Kiekvienas mazgas pradeda siųsti gradientų dalis savo kairiajam kaimynui, kol surinktą gradientą galima rasti jo dešiniajame kaimyne.](../img/ringsync.svg)
 :label:`fig_ringsync`
 
-If we use the same example of synchronizing 160 MB across 8 V100 GPUs we arrive at approximately $2 \cdot 160 \textrm{MB} / (3 \cdot 18 \textrm{GB/s}) \approx 6 \textrm{ms}$. This is better than using the PCIe bus, even though we are now using 8 GPUs. Note that in practice these numbers are a bit worse, since deep learning frameworks often fail to assemble communication into large burst transfers.
+Jei naudojame tą patį pavyzdį – 160 MB sinchronizavimą per 8 V100 GPU, gauname apytiksliai $2 \cdot 160 \textrm{MB} / (3 \cdot 18 \textrm{GB/s}) \approx 6 \textrm{ms}$. Tai geriau nei naudoti PCIe magistralę, nors dabar naudojame 8 GPU. Atkreipkite dėmesį, kad praktikoje šie skaičiai yra šiek tiek prastesni, nes giliojo mokymosi karkasai dažnai nesugeba komunikacijos surinkti į dideles pliūpsninio perdavimo siuntas.
 
-Note that there is a common misconception that ring synchronization is fundamentally different from other synchronization algorithms. The only difference is that the synchronization path is somewhat more elaborate when compared with a simple tree.
+Atkreipkite dėmesį, kad paplitusi klaidinga nuomonė, esą žiedinis sinchronizavimas iš esmės skiriasi nuo kitų sinchronizavimo algoritmų. Vienintelis skirtumas yra tas, kad sinchronizavimo kelias yra kiek sudėtingesnis, palyginti su paprastu medžiu.
 
-## Multi-Machine Training
+## Apmokymas keliuose kompiuteriuose
 
-Distributed training on multiple machines adds a further challenge: we need to communicate with servers that are only connected across a comparatively lower bandwidth fabric that can be over an order of magnitude slower in some cases.
-Synchronization across devices is tricky. After all, different machines running training code will have subtly different speed. Hence we need to *synchronize* them if we want to use synchronous distributed optimization. :numref:`fig_ps_multimachine` illustrates how distributed parallel training occurs.
+Paskirstytasis apmokymas keliuose kompiuteriuose prideda dar vieną iššūkį: turime komunikuoti su serveriais, kurie sujungti tik palyginti mažesnio pralaidumo tinklu, kuris kai kuriais atvejais gali būti daugiau nei eile lėtesnis.
+Sinchronizavimas tarp įrenginių yra sudėtingas. Juk skirtingi kompiuteriai, vykdantys apmokymo kodą, turės subtiliai skirtingą greitį. Todėl, jei norime naudoti sinchroninį paskirstytąjį optimizavimą, turime juos *sinchronizuoti*. :numref:`fig_ps_multimachine` iliustruoja, kaip vyksta paskirstytasis lygiagretusis apmokymas.
 
-1. A (different) batch of data is read on each machine, split across multiple GPUs and transferred to GPU memory. There predictions and gradients are computed on each GPU batch separately.
-2. The gradients from all local GPUs are aggregated on one GPU (or parts of it are aggregated over different GPUs).
-3. The gradients are sent to the CPUs.
-4. The CPUs send the gradients to a central parameter server which aggregates all the gradients.
-5. The aggregate gradients are then used to update the parameters and the updated parameters are broadcast back to the individual CPUs.
-6. The information is sent to one (or multiple) GPUs.
-7. The updated parameters are spread across all GPUs.
+1. Kiekviename kompiuteryje nuskaitomas (skirtingas) duomenų rinkinys, padalijamas tarp kelių GPU ir perduodamas į GPU atmintį. Ten prognozės ir gradientai apskaičiuojami kiekvienam GPU rinkiniui atskirai.
+2. Visų lokaliųjų GPU gradientai agreguojami viename GPU (arba jų dalys agreguojamos skirtinguose GPU).
+3. Gradientai siunčiami į CPU.
+4. CPU siunčia gradientus į centrinį parametrų serverį, kuris agreguoja visus gradientus.
+5. Agreguoti gradientai tada naudojami parametrams atnaujinti, o atnaujinti parametrai išplatinami atgal atskiriems CPU.
+6. Informacija siunčiama vienam (ar keliems) GPU.
+7. Atnaujinti parametrai paskleidžiami visiems GPU.
 
-![Multi-machine multi-GPU distributed parallel training.](../img/ps-multimachine.svg)
+![Paskirstytasis lygiagretusis apmokymas keliuose kompiuteriuose su keliais GPU.](../img/ps-multimachine.svg)
 :label:`fig_ps_multimachine`
 
-Each of these operations seems rather straightforward. And, indeed, they can be carried out efficiently *within* a single machine. Once we look at multiple machines, though, we can see that the central parameter server becomes the bottleneck. After all, the bandwidth per server is limited, hence for $m$ workers the time it takes to send all gradients to the server is $\mathcal{O}(m)$. We can break through this barrier by increasing the number of servers to $n$. At this point each server only needs to store $\mathcal{O}(1/n)$ of the parameters, hence the total time for updates and optimization becomes $\mathcal{O}(m/n)$.
-Matching both numbers yields constant scaling regardless of how many workers we are dealing with. In practice we use the *same* machines both as workers and as servers. :numref:`fig_ps_multips` illustrates the design (see also :cite:`Li.Andersen.Park.ea.2014` for details).
-In particular, ensuring that multiple machines work without unreasonable delays is nontrivial. 
+Kiekviena iš šių operacijų atrodo gana tiesmuka. Ir iš tikrųjų jas galima efektyviai atlikti *viename* kompiuteryje. Tačiau pažvelgę į kelis kompiuterius, matome, kad centrinis parametrų serveris tampa kliūtimi. Juk pralaidumas vienam serveriui yra ribotas, todėl $m$ darbininkų visų gradientų siuntimo į serverį laikas yra $\mathcal{O}(m)$. Šį barjerą galime peržengti padidinę serverių skaičių iki $n$. Šiuo atveju kiekvienam serveriui reikia saugoti tik $\mathcal{O}(1/n)$ parametrų, todėl bendras atnaujinimų ir optimizavimo laikas tampa $\mathcal{O}(m/n)$.
+Suderinus abu skaičius gaunamas pastovus mastelio didėjimas nepriklausomai nuo to, kiek darbininkų turime. Praktikoje *tuos pačius* kompiuterius naudojame ir kaip darbininkus, ir kaip serverius. :numref:`fig_ps_multips` iliustruoja dizainą (detalių taip pat žr. :cite:`Li.Andersen.Park.ea.2014`).
+Visų pirma užtikrinti, kad keli kompiuteriai veiktų be pernelyg didelių vėlavimų, nėra paprasta. 
 
-![Top: a single parameter server is a bottleneck since its bandwidth is finite. Bottom: multiple parameter servers store parts of the parameters with aggregate bandwidth.](../img/ps-multips.svg)
+![Viršuje: vienas parametrų serveris yra kliūtis, nes jo pralaidumas yra baigtinis. Apačioje: keli parametrų serveriai saugo parametrų dalis su bendru pralaidumu.](../img/ps-multips.svg)
 :label:`fig_ps_multips`
 
-## Key--Value Stores
+## Raktų ir reikšmių saugyklos
 
-Implementing the steps required for distributed multi-GPU training in practice is nontrivial.
-This is why it pays to use a common abstraction, namely that of a *key--value store* with redefined update semantics.
+Žingsnių, reikalingų paskirstytajam apmokymui keliuose GPU, įgyvendinimas praktikoje nėra paprastas.
+Todėl apsimoka naudoti bendrą abstrakciją, būtent *raktų ir reikšmių saugyklą* su iš naujo apibrėžta atnaujinimo semantika.
 
 
-Across many workers and many GPUs the computation for gradient $i$ can be defined as
+Per daugelį darbininkų ir daugelį GPU gradiento $i$ skaičiavimą galima apibrėžti kaip
 
 $$\mathbf{g}_{i} = \sum_{k \in \textrm{workers}} \sum_{j \in \textrm{GPUs}} \mathbf{g}_{ijk},$$
 
-where $\mathbf{g}_{ijk}$ is part of gradient $i$ split on GPU $j$ of worker $k$.
-The key aspect in this operation is that it is a *commutative reduction*, that is, it turns many vectors into one and the order in which the operation is applied does not matter. This is great for our purposes since we do not (need to) have fine grained control over when which gradient is received. Besides, note that this operation is independent among different $i$.
+kur $\mathbf{g}_{ijk}$ yra gradiento $i$ dalis, padalyta GPU $j$ darbininke $k$.
+Pagrindinis šios operacijos aspektas yra tas, kad tai *komutacinė redukcija*, t. y. ji paverčia daug vektorių vienu, o operacijos taikymo tvarka nesvarbi. Tai puiku mūsų tikslams, nes mums nereikia smulkaus valdymo, kada kuris gradientas gaunamas. Be to, atkreipkite dėmesį, kad ši operacija yra nepriklausoma tarp skirtingų $i$.
 
-This allows us to define the following two operations: *push*, which accumulates gradients, and *pull*, which retrieves aggregate gradients. Since we have many different sets of gradients (after all, we have many layers), we need to index the gradients with a key $i$. This similarity to key--value stores, such as the one introduced in Dynamo
-:cite:`DeCandia.Hastorun.Jampani.ea.2007` is not by coincidence. They, too, satisfy many similar characteristics, in particular when it comes to distributing the parameters across multiple servers.
-
-
-The push and pull operations for key-value stores are described as follows:
-
-* **push(key, value)** sends a particular gradient (the value) from a worker to a common storage. There the value is aggregated, e.g., by summing it up.
-* **pull(key, value)** retrieves an aggregate value from common storage, e.g., after combining the gradients from all workers.
-
-By hiding all the complexity about synchronization behind a simple push and pull operation we can decouple the concerns of statistical modelers who want to be able to express optimization in simple terms and the system engineers who need to deal with the complexity inherent in distributed synchronization.
-
-## Summary
-
-* Synchronization needs to be highly adaptive to specific network infrastructure and connectivity within a server. This can make a significant difference to the time it takes to synchronize.
-* Ring-synchronization can be optimal for p3 and DGX-2 servers. For others possibly not so much.
-* A hierarchical synchronization strategy works well when adding multiple parameter servers for increased bandwidth.
+Tai leidžia apibrėžti šias dvi operacijas: *push*, kuri kaupia gradientus, ir *pull*, kuri gauna agreguotus gradientus. Kadangi turime daug skirtingų gradientų aibių (juk turime daug sluoksnių), gradientus turime indeksuoti raktu $i$. Šis panašumas į raktų ir reikšmių saugyklas, tokias kaip pristatyta Dynamo
+:cite:`DeCandia.Hastorun.Jampani.ea.2007`, nėra atsitiktinis. Jos taip pat tenkina daug panašių savybių, ypač kai kalbama apie parametrų paskirstymą tarp kelių serverių.
 
 
-## Exercises
+Raktų ir reikšmių saugyklų siuntimo (push) ir gavimo (pull) operacijos aprašomos taip:
 
-1. Can you increase the ring synchronization even further? Hint: you can send messages in both directions.
-1. Is it possible to allow asynchronous communication (while computation is still ongoing)? How does it affect performance?
-1. What if we lost a server during a long-running computation? How can we design a *fault tolerance* mechanism to avoid restarting the computation fully?
+* **push(key, value)** siunčia tam tikrą gradientą (reikšmę) iš darbininko į bendrą saugyklą. Ten reikšmė agreguojama, pavyzdžiui, susumuojant.
+* **pull(key, value)** gauna agreguotą reikšmę iš bendros saugyklos, pavyzdžiui, sujungus visų darbininkų gradientus.
+
+Paslėpę visą sinchronizavimo sudėtingumą už paprastos siuntimo ir gavimo operacijos, galime atskirti statistinių modeliuotojų, norinčių gebėti išreikšti optimizavimą paprastais terminais, ir sistemų inžinierių, kuriems tenka tvarkytis su paskirstytajam sinchronizavimui būdingu sudėtingumu, rūpesčius.
+
+## Santrauka
+
+* Sinchronizavimas turi būti labai adaptyvus konkrečiai tinklo infrastruktūrai ir ryšiui serveryje. Tai gali sukelti didelį skirtumą sinchronizavimo laikui.
+* Žiedinis sinchronizavimas gali būti optimalus p3 ir DGX-2 serveriams. Kitiems galbūt ne taip.
+* Hierarchinė sinchronizavimo strategija gerai veikia pridedant kelis parametrų serverius didesniam pralaidumui.
 
 
-[Discussions](https://discuss.d2l.ai/t/366)
+## Pratimai
+
+1. Ar galite dar labiau pagerinti žiedinį sinchronizavimą? Užuomina: žinutes galite siųsti abiem kryptimis.
+1. Ar įmanoma leisti asinchroninę komunikaciją (kol skaičiavimas dar vyksta)? Kaip tai veikia našumą?
+1. Kas, jei prarastume serverį ilgai trunkančio skaičiavimo metu? Kaip galime suprojektuoti *atsparumo gedimams* mechanizmą, kad išvengtume visiško skaičiavimo paleidimo iš naujo?
+
+
+[Diskusijos](https://discuss.d2l.ai/t/366)

@@ -1,29 +1,26 @@
-# Optimization and Deep Learning
+# Optimizavimas ir gilusis mokymasis
 :label:`sec_optimization-intro`
 
-In this section, we will discuss the relationship between optimization and deep learning as well as the challenges of using optimization in deep learning.
-For a deep learning problem, we will usually define a *loss function* first. Once we have the loss function, we can use an optimization algorithm in attempt to minimize the loss.
-In optimization, a loss function is often referred to as the *objective function* of the optimization problem. By tradition and convention most optimization algorithms are concerned with *minimization*. If we ever need to maximize an objective there is a simple solution: just flip the sign on the objective.
+Šiame skyrelyje aptarsime optimizavimo ir giliojo mokymosi sąryšį, taip pat optimizavimo taikymo giliajame mokymesi iššūkius.
+Giliojo mokymosi uždaviniui paprastai pirmiausia apibrėžiame *nuostolio funkciją*. Turėdami nuostolio funkciją, galime naudoti optimizavimo algoritmą nuostoliui minimizuoti.
+Optimizavime nuostolio funkcija dažnai vadinama optimizavimo uždavinio *tikslo funkcija*. Pagal tradiciją ir susitarimą dauguma optimizavimo algoritmų susiję su *minimizavimu*. Jei kada reikėtų maksimizuoti tikslą, yra paprastas sprendimas: tiesiog pakeiskite tikslo ženklą.
 
-## Goal of Optimization
+## Optimizavimo tikslas
 
-Although optimization provides a way to minimize the loss function for deep
-learning, in essence, the goals of optimization and deep learning are
-fundamentally different.
-The former is primarily concerned with minimizing an
-objective whereas the latter is concerned with finding a suitable model, given a
-finite amount of data.
-In :numref:`sec_generalization_basics`,
-we discussed the difference between these two goals in detail.
-For instance,
-training error and generalization error generally differ: since the objective
-function of the optimization algorithm is usually a loss function based on the
-training dataset, the goal of optimization is to reduce the training error.
-However, the goal of deep learning (or more broadly, statistical inference) is to
-reduce the generalization error.
-To accomplish the latter we need to pay
-attention to overfitting in addition to using the optimization algorithm to
-reduce the training error.
+Nors optimizavimas suteikia būdą minimizuoti giliojo mokymosi nuostolio funkciją, iš esmės optimizavimo ir giliojo mokymosi tikslai
+iš principo skiriasi.
+Pirmasis daugiausia susijęs su tikslo minimizavimu, o antrasis – su tinkamo modelio radimu, turint
+ribotą duomenų kiekį.
+:numref:`sec_generalization_basics`
+išsamiai aptarėme šių dviejų tikslų skirtumą.
+Pavyzdžiui,
+apmokymo paklaida ir apibendrinimo paklaida paprastai skiriasi: kadangi optimizavimo algoritmo tikslo
+funkcija dažniausiai yra nuostolio funkcija, pagrįsta
+apmokymo duomenų rinkiniu, optimizavimo tikslas yra sumažinti apmokymo paklaidą.
+Tačiau giliojo mokymosi (arba plačiau – statistinės išvados) tikslas yra
+sumažinti apibendrinimo paklaidą.
+Kad pasiektume antrąjį, be optimizavimo algoritmo naudojimo apmokymo paklaidai mažinti,
+turime atkreipti dėmesį ir į persimokymą.
 
 ```{.python .input}
 #@tab mxnet
@@ -52,21 +49,21 @@ from mpl_toolkits import mplot3d
 import tensorflow as tf
 ```
 
-To illustrate the aforementioned different goals,
-let's consider
-the empirical risk and the risk.
-As described
-in :numref:`subsec_empirical-risk-and-risk`,
-the empirical risk
-is an average loss
-on the training dataset
-while the risk is the expected loss
-on the entire population of data.
-Below we define two functions:
-the risk function `f`
-and the empirical risk function `g`.
-Suppose that we have only a finite amount of training data.
-As a result, here `g` is less smooth than `f`.
+Kad iliustruotume minėtus skirtingus tikslus,
+panagrinėkime
+empirinę riziką ir riziką.
+Kaip aprašyta
+:numref:`subsec_empirical-risk-and-risk`,
+empirinė rizika
+yra vidutinis nuostolis
+apmokymo duomenų rinkinyje,
+o rizika yra tikėtinas nuostolis
+visoje duomenų populiacijoje.
+Toliau apibrėžiame dvi funkcijas:
+rizikos funkciją `f`
+ir empirinės rizikos funkciją `g`.
+Tarkime, kad turime tik ribotą kiekį apmokymo duomenų.
+Todėl čia `g` yra mažiau glotni nei `f`.
 
 ```{.python .input}
 #@tab all
@@ -77,7 +74,7 @@ def g(x):
     return f(x) + 0.2 * d2l.cos(5 * np.pi * x)
 ```
 
-The graph below illustrates that the minimum of the empirical risk on a training dataset may be at a different location from the minimum of the risk (generalization error).
+Žemiau pateiktas grafikas iliustruoja, kad empirinės rizikos minimumas apmokymo duomenų rinkinyje gali būti kitoje vietoje nei rizikos (apibendrinimo paklaidos) minimumas.
 
 ```{.python .input}
 #@tab all
@@ -92,36 +89,35 @@ annotate('min of\nempirical risk', (1.0, -1.2), (0.5, -1.1))
 annotate('min of risk', (1.1, -1.05), (0.95, -0.5))
 ```
 
-## Optimization Challenges in Deep Learning
+## Optimizavimo iššūkiai giliajame mokymesi
 
-In this chapter, we are going to focus specifically on the performance of optimization algorithms in minimizing the objective function, rather than a
-model's generalization error.
-In :numref:`sec_linear_regression`
-we distinguished between analytical solutions and numerical solutions in
-optimization problems.
-In deep learning, most objective functions are
-complicated and do not have analytical solutions. Instead, we must use numerical
-optimization algorithms.
-The optimization algorithms in this chapter
-all fall into this
-category.
+Šiame skyriuje daugiausia dėmesio skirsime optimizavimo algoritmų našumui minimizuojant tikslo funkciją, o ne
+modelio apibendrinimo paklaidai.
+:numref:`sec_linear_regression`
+optimizavimo uždaviniuose skyrėme analitinius ir skaitinius sprendinius.
+Giliajame mokymesi dauguma tikslo funkcijų yra
+sudėtingos ir neturi analitinių sprendinių. Vietoj to turime naudoti skaitinius
+optimizavimo algoritmus.
+Visi šio skyriaus optimizavimo algoritmai
+patenka į šią
+kategoriją.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients.
-Let's have a look at them.
+Giliojo mokymosi optimizavime yra daug iššūkių. Vieni erzinančiausių yra lokalieji minimumai, balno taškai ir nykstantys gradientai.
+Pažvelkime į juos.
 
 
-### Local Minima
+### Lokalieji minimumai
 
-For any objective function $f(x)$,
-if the value of $f(x)$ at $x$ is smaller than the values of $f(x)$ at any other points in the vicinity of $x$, then $f(x)$ could be a local minimum.
-If the value of $f(x)$ at $x$ is the minimum of the objective function over the entire domain,
-then $f(x)$ is the global minimum.
+Bet kuriai tikslo funkcijai $f(x)$,
+jei $f(x)$ reikšmė taške $x$ yra mažesnė nei $f(x)$ reikšmės bet kuriuose kituose taško $x$ aplinkos taškuose, tai $f(x)$ gali būti lokalusis minimumas.
+Jei $f(x)$ reikšmė taške $x$ yra tikslo funkcijos minimumas visoje apibrėžimo srityje,
+tai $f(x)$ yra globalusis minimumas.
 
-For example, given the function
+Pavyzdžiui, turint funkciją
 
 $$f(x) = x \cdot \textrm{cos}(\pi x) \textrm{ for } -1.0 \leq x \leq 2.0,$$
 
-we can approximate the local minimum and global minimum of this function.
+galime aproksimuoti šios funkcijos lokalųjį ir globalųjį minimumus.
 
 ```{.python .input}
 #@tab all
@@ -131,16 +127,16 @@ annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
 annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
 ```
 
-The objective function of deep learning models usually has many local optima.
-When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function *locally*, rather than *globally*, as the gradient of the objective function's solutions approaches or becomes zero.
-Only some degree of noise might knock the parameter out of the local minimum. In fact, this is one of the beneficial properties of
-minibatch stochastic gradient descent where the natural variation of gradients over minibatches is able to dislodge the parameters from local minima.
+Giliojo mokymosi modelių tikslo funkcija paprastai turi daug lokaliųjų optimumų.
+Kai skaitinis optimizavimo uždavinio sprendinys yra arti lokaliojo optimumo, paskutinės iteracijos gautas skaitinis sprendinys gali minimizuoti tikslo funkciją tik *lokaliai*, o ne *globaliai*, nes tikslo funkcijos sprendinių gradientas artėja prie nulio arba tampa nuliu.
+Tik tam tikras triukšmo kiekis gali išstumti parametrą iš lokaliojo minimumo. Iš tiesų tai viena iš naudingų
+minirinkinių stochastinio gradientinio nusileidimo savybių, kai natūrali gradientų kaita tarp minirinkinių gali išstumti parametrus iš lokaliųjų minimumų.
 
 
-### Saddle Points
+### Balno taškai
 
-Besides local minima, saddle points are another reason for gradients to vanish. A *saddle point* is any location where all gradients of a function vanish but which is neither a global nor a local minimum.
-Consider the function $f(x) = x^3$. Its first and second derivative vanish for $x=0$. Optimization might stall at this point, even though it is not a minimum.
+Be lokaliųjų minimumų, balno taškai yra dar viena gradientų išnykimo priežastis. *Balno taškas* yra bet kuri vieta, kurioje visi funkcijos gradientai išnyksta, bet kuri nėra nei globalusis, nei lokalusis minimumas.
+Panagrinėkime funkciją $f(x) = x^3$. Jos pirmoji ir antroji išvestinės išnyksta, kai $x=0$. Optimizavimas gali sustoti šiame taške, nors jis nėra minimumas.
 
 ```{.python .input}
 #@tab all
@@ -149,7 +145,7 @@ d2l.plot(x, [x**3], 'x', 'f(x)')
 annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 ```
 
-Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
+Balno taškai aukštesnėse dimensijose yra dar klastingesni, kaip rodo toliau pateiktas pavyzdys. Panagrinėkime funkciją $f(x, y) = x^2 - y^2$. Jos balno taškas yra $(0, 0)$. Tai maksimumas $y$ atžvilgiu ir minimumas $x$ atžvilgiu. Be to, ji *atrodo* kaip balnas, nuo ko ši matematinė savybė ir gavo pavadinimą.
 
 ```{.python .input}
 #@tab mxnet
@@ -186,25 +182,25 @@ d2l.plt.xlabel('x')
 d2l.plt.ylabel('y');
 ```
 
-We assume that the input of a function is a $k$-dimensional vector and its
-output is a scalar, so its Hessian matrix will have $k$ eigenvalues.
-The solution of the
-function could be a local minimum, a local maximum, or a saddle point at a
-position where the function gradient is zero:
+Tarkime, kad funkcijos įvestis yra $k$ dimensijų vektorius, o
+išvestis – skaliaras, taigi jos Hesės matrica turės $k$ tikrinių reikšmių.
+Funkcijos sprendinys
+gali būti lokalusis minimumas, lokalusis maksimumas arba balno taškas
+toje padėtyje, kur funkcijos gradientas lygus nuliui:
 
-* When the eigenvalues of the function's Hessian matrix at the zero-gradient position are all positive, we have a local minimum for the function.
-* When the eigenvalues of the function's Hessian matrix at the zero-gradient position are all negative, we have a local maximum for the function.
-* When the eigenvalues of the function's Hessian matrix at the zero-gradient position are negative and positive, we have a saddle point for the function.
+* Kai funkcijos Hesės matricos tikrinės reikšmės nulinio gradiento padėtyje yra visos teigiamos, funkcija turi lokalųjį minimumą.
+* Kai funkcijos Hesės matricos tikrinės reikšmės nulinio gradiento padėtyje yra visos neigiamos, funkcija turi lokalųjį maksimumą.
+* Kai funkcijos Hesės matricos tikrinės reikšmės nulinio gradiento padėtyje yra ir neigiamos, ir teigiamos, funkcija turi balno tašką.
 
-For high-dimensional problems the likelihood that at least *some* of the eigenvalues are negative is quite high. This makes saddle points more likely than local minima. We will discuss some exceptions to this situation in the next section when introducing convexity. In short, convex functions are those where the eigenvalues of the Hessian are never negative. Sadly, though, most deep learning problems do not fall into this category. Nonetheless it is a great tool to study optimization algorithms.
+Aukštos dimensijos uždaviniuose tikimybė, kad bent *kai kurios* tikrinės reikšmės bus neigiamos, yra gana didelė. Dėl to balno taškai tikėtinesni nei lokalieji minimumai. Kai kurias šios situacijos išimtis aptarsime kitame skyrelyje, pristatydami iškilumą. Trumpai tariant, iškiliosios funkcijos yra tos, kurių Hesės matricos tikrinės reikšmės niekada nėra neigiamos. Deja, dauguma giliojo mokymosi uždavinių nepriklauso šiai kategorijai. Vis dėlto tai puikus įrankis optimizavimo algoritmams tirti.
 
-### Vanishing Gradients
+### Nykstantys gradientai
 
-Probably the most insidious problem to encounter is the vanishing gradient.
-Recall our commonly-used activation functions and their derivatives in :numref:`subsec_activation-functions`.
-For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil.
-More specifically, $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$.
-Consequently, optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.
+Tikriausiai klastingiausia susiduriama problema yra nykstantis gradientas.
+Prisiminkite dažniausiai naudojamas aktyvacijos funkcijas ir jų išvestines :numref:`subsec_activation-functions`.
+Pavyzdžiui, tarkime, kad norime minimizuoti funkciją $f(x) = \tanh(x)$ ir atsitiktinai pradedame nuo $x = 4$. Kaip matome, $f$ gradientas yra artimas nuliui.
+Tiksliau, $f'(x) = 1 - \tanh^2(x)$, taigi $f'(4) = 0.0013$.
+Todėl optimizavimas ilgą laiką stringa, kol padarome pažangą. Paaiškėja, kad tai viena iš priežasčių, kodėl giliojo mokymosi modelių apmokymas buvo gana sudėtingas prieš atsirandant ReLU aktyvacijos funkcijai.
 
 ```{.python .input}
 #@tab all
@@ -213,38 +209,38 @@ d2l.plot(x, [d2l.tanh(x)], 'x', 'f(x)')
 annotate('vanishing gradient', (4, 1), (2, 0.0))
 ```
 
-As we saw, optimization for deep learning is full of challenges. Fortunately there exists a robust range of algorithms that perform well and that are easy to use even for beginners. Furthermore, it is not really necessary to find *the* best solution. Local optima or even approximate solutions thereof are still very useful.
+Kaip matėme, giliojo mokymosi optimizavimas kupinas iššūkių. Laimė, yra tvirtas algoritmų rinkinys, kuris veikia gerai ir yra lengvai naudojamas net pradedantiesiems. Be to, iš tikrųjų nebūtina rasti *geriausią* sprendinį. Lokalieji optimumai ar net jų apytiksliai sprendiniai vis tiek yra labai naudingi.
 
-## Summary
+## Santrauka
 
-* Minimizing the training error does *not* guarantee that we find the best set of parameters to minimize the generalization error.
-* The optimization problems may have many local minima.
-* The problem may have even more saddle points, as generally the problems are not convex.
-* Vanishing gradients can cause optimization to stall. Often a reparametrization of the problem helps. Good initialization of the parameters can be beneficial, too.
+* Apmokymo paklaidos minimizavimas *negarantuoja*, kad rasime geriausią parametrų rinkinį apibendrinimo paklaidai minimizuoti.
+* Optimizavimo uždaviniai gali turėti daug lokaliųjų minimumų.
+* Uždavinys gali turėti dar daugiau balno taškų, nes paprastai uždaviniai nėra iškilieji.
+* Nykstantys gradientai gali sustabdyti optimizavimą. Dažnai padeda uždavinio perparametrizavimas. Gerai inicializuoti parametrai taip pat gali būti naudingi.
 
 
-## Exercises
+## Pratimai
 
-1. Consider a simple MLP with a single hidden layer of, say, $d$ dimensions in the hidden layer and a single output. Show that for any local minimum there are at least $d!$ equivalent solutions that behave identically.
-1. Assume that we have a symmetric random matrix $\mathbf{M}$ where the entries
-   $M_{ij} = M_{ji}$ are each drawn from some probability distribution
-   $p_{ij}$. Furthermore assume that $p_{ij}(x) = p_{ij}(-x)$, i.e., that the
-   distribution is symmetric (see e.g., :citet:`Wigner.1958` for details).
-    1. Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $P(\lambda > 0) = P(\lambda < 0)$.
-    1. Why does the above *not* imply $P(\lambda > 0) = 0.5$?
-1. What other challenges involved in deep learning optimization can you think of?
-1. Assume that you want to balance a (real) ball on a (real) saddle.
-    1. Why is this hard?
-    1. Can you exploit this effect also for optimization algorithms?
+1. Panagrinėkime paprastą MLP su vienu paslėptuoju sluoksniu, kurio paslėptasis sluoksnis turi, tarkime, $d$ dimensijų, ir viena išvestimi. Įrodykite, kad bet kuriam lokaliajam minimumui yra bent $d!$ ekvivalentiškų sprendinių, kurie elgiasi identiškai.
+1. Tarkime, kad turime simetrinę atsitiktinę matricą $\mathbf{M}$, kurios elementai
+   $M_{ij} = M_{ji}$ yra atsitiktinai gaunami iš tam tikro tikimybių skirstinio
+   $p_{ij}$. Be to, tarkime, kad $p_{ij}(x) = p_{ij}(-x)$, t. y. kad
+   skirstinys yra simetrinis (išsamiau žr., pvz., :citet:`Wigner.1958`).
+    1. Įrodykite, kad tikrinių reikšmių skirstinys taip pat yra simetrinis. Tai yra, bet kuriam tikriniam vektoriui $\mathbf{v}$ tikimybė, kad su juo susijusi tikrinė reikšmė $\lambda$ tenkina $P(\lambda > 0) = P(\lambda < 0)$.
+    1. Kodėl aukščiau pateiktas teiginys *neįrodo*, kad $P(\lambda > 0) = 0.5$?
+1. Kokius kitus su giliojo mokymosi optimizavimu susijusius iššūkius galite įsivaizduoti?
+1. Tarkime, kad norite išlaikyti (tikrą) rutulį ant (tikro) balno.
+    1. Kodėl tai sunku?
+    1. Ar galite šį efektą išnaudoti ir optimizavimo algoritmams?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/349)
+[Diskusijos](https://discuss.d2l.ai/t/349)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/487)
+[Diskusijos](https://discuss.d2l.ai/t/487)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/489)
+[Diskusijos](https://discuss.d2l.ai/t/489)
 :end_tab:

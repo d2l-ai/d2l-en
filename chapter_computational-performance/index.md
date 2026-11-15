@@ -1,14 +1,14 @@
-# Computational Performance
+# Skaičiavimo našumas
 :label:`chap_performance`
 
-In deep learning, 
-datasets and models are usually large,
-which involves heavy computation.
-Therefore, computational performance matters a lot.
-This chapter will focus on the major factors that affect computational performance:
-imperative programming, symbolic programming, asynchronous computing, automatic parallelism, and multi-GPU computation.
-By studying this chapter, you may further improve computational performance of those models implemented in the previous chapters,
-for example, by reducing training time without affecting accuracy.
+Giliajame mokyme
+duomenų rinkiniai ir modeliai paprastai yra dideli,
+todėl reikia daug skaičiavimų.
+Todėl skaičiavimo našumas yra labai svarbus.
+Šiame skyriuje daugiausia dėmesio skirsime pagrindiniams veiksniams, darantiems įtaką skaičiavimo našumui:
+imperatyviajam programavimui, simboliniam programavimui, asinchroniniams skaičiavimams, automatiniam lygiagretinimui ir daugelio GPU skaičiavimams.
+Išnagrinėję šį skyrių, galėsite dar labiau pagerinti ankstesniuose skyriuose įgyvendintų modelių skaičiavimo našumą,
+pavyzdžiui, sutrumpinti apmokymo laiką nepabloginant tikslumo.
 
 ```toc
 :maxdepth: 2
@@ -21,4 +21,3 @@ multiple-gpus
 multiple-gpus-concise
 parameterserver
 ```
-

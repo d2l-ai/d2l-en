@@ -4,73 +4,73 @@ tab.interact_select(["pytorch"])
 #required_libs("syne-tune[gpsearchers]==0.3.2")
 ```
 
-# Asynchronous Successive Halving
+# Asinchroninis nuoseklus dalijimas pusiau
 
 :label:`sec_sh_async`
 
-As we have seen in :numref:`sec_rs_async`, we can accelerate HPO by
-distributing the evaluation of hyperparameter configurations across either
-multiple instances or multiples CPUs / GPUs on a single instance. However,
-compared to random search, it is not straightforward to run
-successive halving (SH) asynchronously in a distributed setting. Before we can
-decide which configuration to run next, we first have to collect all
-observations at the current rung level. This requires to
-synchronize workers at each rung level. For example, for the lowest rung level
-$r_{\mathrm{min}}$, we first have to evaluate all $N = \eta^K$ configurations, before we
-can promote the $\frac{1}{\eta}$ of them to the next rung level.
+Kaip matėme :numref:`sec_rs_async`, HPO galime pagreitinti paskirstydami
+hiperparametrų konfigūracijų įvertinimą arba tarp kelių egzempliorių,
+arba tarp kelių CPU / GPU viename egzemplioriuje. Tačiau,
+palyginti su atsitiktine paieška, nuosekliojo dalijimo pusiau (SH) vykdyti asinchroniškai
+paskirstytoje aplinkoje nėra paprasta. Prieš galėdami
+nuspręsti, kurią konfigūraciją vykdyti toliau, pirmiausia turime surinkti visus
+dabartinės pakopos stebėjimus. Tam reikia
+sinchronizuoti darbininkus kiekvienoje pakopoje. Pavyzdžiui, žemiausioje pakopoje
+$r_{\mathrm{min}}$ pirmiausia turime įvertinti visas $N = \eta^K$ konfigūracijų, kad
+galėtume paaukštinti $\frac{1}{\eta}$ jų į kitą pakopą.
 
-In any distributed system, synchronization typically implies idle time for workers.
-First, we often observe high variations in training time across hyperparameter
-configurations. For example, assuming the number of filters per layer is a
-hyperparameter, then networks with less filters finish training faster than
-networks with more filters, which implies idle worker time due to stragglers.
-Moreover, the number of slots in a rung level is not always a multiple of the number
-of workers, in which case some workers may even sit idle for a full batch.
+Bet kurioje paskirstytoje sistemoje sinchronizavimas paprastai reiškia darbininkų dykinimo laiką.
+Pirma, dažnai matome dideles apmokymo laiko variacijas tarp hiperparametrų
+konfigūracijų. Pavyzdžiui, jei filtrų skaičius sluoksnyje yra
+hiperparametras, tinklai su mažiau filtrų baigia apmokymą greičiau nei
+tinklai su daugiau filtrų, o tai reiškia darbininkų dykinimo laiką dėl atsiliekančių bandymų.
+Be to, vietų skaičius pakopoje ne visada yra darbininkų skaičiaus
+kartotinis, ir tokiu atveju kai kurie darbininkai gali dykinėti net visą partiją.
 
-Figure :numref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$
-for four different trials with two workers. We start with evaluating Trial-0 and
-Trial-1 for one epoch and immediately continue with the next two trials once they
-are finished. We first have to wait until Trial-2 finishes, which takes
-substantially more time than the other trials, before we can promote the best two
-trials, i.e., Trial-0 and Trial-3 to the next rung level. This causes idle time for
-Worker-1. Then, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
-which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only
-the best trial, Trial-0, remains which occupies only one worker. To avoid that
-Worker-1 idles during that time, most implementaitons of SH continue already with
-the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
+:numref:`synchronous_sh` paveiksle parodytas sinchroninio SH su $\eta=2$ planavimas
+keturiems skirtingiems bandymams su dviem darbininkais. Pradedame įvertindami Trial-0 ir
+Trial-1 vieną epochą ir iš karto tęsiame su kitais dviem bandymais, kai šie
+baigiasi. Pirmiausia turime palaukti, kol baigsis Trial-2, kuris trunka
+gerokai ilgiau nei kiti bandymai, ir tik tada galime paaukštinti du geriausius
+bandymus, t. y. Trial-0 ir Trial-3, į kitą pakopą. Tai sukelia Worker-1 dykinimo laiką.
+Tada tęsiame su Rung 1. Čia taip pat Trial-3 trunka ilgiau nei Trial-0,
+o tai lemia papildomą Worker-0 dykinimo laiką. Pasiekus Rung-2, lieka tik
+geriausias bandymas Trial-0, kuris užima tik vieną darbininką. Kad Worker-1 tuo metu
+nedykinėtų, dauguma SH įgyvendinimų jau tęsia su
+kitu raundu ir pradeda vertinti naujus bandymus (pvz., Trial-4) pirmoje pakopoje.
 
-![Synchronous successive halving with two workers.](../img/sync_sh.svg)
+![Sinchroninis nuoseklus dalijimas pusiau su dviem darbininkais.](../img/sync_sh.svg)
 :label:`synchronous_sh`
 
-Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
-parallel scenario. The main idea of ASHA is to promote configurations to the next rung
-level as soon as we collected at least $\eta$ observations on the current rung level.
-This decision rule may lead to suboptimal promotions: configurations can be promoted to the
-next rung level, which in hindsight do not compare favourably against most others
-at the same rung level. On the other hand, we get rid of all synchronization points
-this way. In practice, such suboptimal initial promotions have only a modest impact on
-performance, not only because the ranking of hyperparameter configurations is often
-fairly consistent across rung levels, but also because rungs grow over time and
-reflect the distribution of metric values at this level better and better. If a
-worker is free, but no configuration can be promoted, we start a new configuration
-with $r = r_{\mathrm{min}}$, i.e the first rung level.
+Asinchroninis nuoseklus dalijimas pusiau (ASHA) :cite:`li-arxiv18` pritaiko SH asinchroniniam
+lygiagrečiam scenarijui. Pagrindinė ASHA idėja yra paaukštinti konfigūracijas į kitą pakopą,
+kai tik dabartinėje pakopoje surenkame bent $\eta$ stebėjimų.
+Ši sprendimo taisyklė gali lemti neoptimalius paaukštinimus: į kitą
+pakopą gali būti paaukštintos konfigūracijos, kurios, žvelgiant iš ateities, nepalankiai lyginasi su dauguma kitų
+toje pačioje pakopoje. Kita vertus, tokiu būdu atsisakome visų sinchronizavimo taškų.
+Praktikoje tokie neoptimalūs ankstyvieji paaukštinimai turi tik nedidelį poveikį
+našumui ne vien todėl, kad hiperparametrų konfigūracijų reitingas dažnai yra
+gana nuoseklus tarp pakopų, bet ir todėl, kad pakopos laikui bėgant auga ir
+vis geriau atspindi metrikos reikšmių skirstinį šiame lygyje. Jei
+darbininkas laisvas, bet jokios konfigūracijos paaukštinti negalima, pradedame naują konfigūraciją
+su $r = r_{\mathrm{min}}$, t. y. pirmoje pakopoje.
 
-:numref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
-finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
-immediately promote the better of them (Trial-0) to the next rung level. After Trial-0
-finishes on rung 1, there are too few trials there in order to support a further
-promotion. Hence, we continue with rung 0 and evaluate Trial-3. Once Trial-3 finishes,
-Trial-2 is still pending. At this point we have 3 trials evaluated on rung 0 and one
-trial evaluated already on rung 1. Since Trial-3 performs worse than Trial-0 at rung 0,
-and $\eta=2$, we cannot promote any new trial yet, and Worker-1 starts Trial-4 from
-scratch instead. However, once Trial-2 finishes and
-scores worse than Trial-3, the latter is promoted towards rung 1. Afterwards, we
-collected 2 evaluations on rung 1, which means we can now promote Trial-0 towards
-rung 2. At the same time, Worker-1 continues with evaluating new trials (i.e.,
-Trial-5) on rung 0.
+:numref:`asha` parodytas tų pačių konfigūracijų planavimas su ASHA. Kai Trial-1
+baigiasi, surenkame dviejų bandymų (t. y. Trial-0 ir Trial-1) rezultatus ir
+nedelsdami paaukštiname geresnį iš jų (Trial-0) į kitą pakopą. Kai Trial-0
+baigiasi 1 pakopoje, ten yra per mažai bandymų, kad būtų galima atlikti tolesnį
+paaukštinimą. Todėl tęsiame su 0 pakopa ir įvertiname Trial-3. Kai Trial-3 baigiasi,
+Trial-2 vis dar vykdomas. Šiuo metu turime 3 bandymus, įvertintus 0 pakopoje, ir vieną
+bandymą, jau įvertintą 1 pakopoje. Kadangi Trial-3 0 pakopoje veikia prasčiau nei Trial-0,
+o $\eta=2$, dar negalime paaukštinti jokio naujo bandymo, ir Worker-1 vietoj to pradeda Trial-4
+nuo nulio. Tačiau kai Trial-2 baigiasi ir
+įvertinamas prasčiau nei Trial-3, pastarasis paaukštinamas į 1 pakopą. Po to
+surinkome 2 įvertinimus 1 pakopoje, o tai reiškia, kad dabar galime paaukštinti Trial-0 į
+2 pakopą. Tuo pačiu metu Worker-1 tęsia naujų bandymų (t. y.
+Trial-5) vertinimą 0 pakopoje.
 
 
-![Asynchronous successive halving (ASHA) with two workers.](../img/asha.svg)
+![Asinchroninis nuoseklus dalijimas pusiau (ASHA) su dviem darbininkais.](../img/asha.svg)
 :label:`asha`
 
 ```{.python .input}
@@ -85,9 +85,9 @@ from syne_tune import Tuner, StoppingCriterion
 from syne_tune.experiments import load_experiment
 ```
 
-## Objective Function
+## Tikslo funkcija
 
-We will use *Syne Tune* with the same objective function as in
+Naudosime *Syne Tune* su ta pačia tikslo funkcija kaip
 :numref:`sec_rs_async`.
 
 ```{.python .input  n=54}
@@ -110,7 +110,7 @@ def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
-We will also use the same configuration space as before:
+Taip pat naudosime tą pačią konfigūracijų erdvę kaip anksčiau:
 
 ```{.python .input  n=55}
 min_number_of_epochs = 2
@@ -128,19 +128,19 @@ initial_config = {
 }
 ```
 
-## Asynchronous Scheduler
+## Asinchroninis planuoklis
 
-First, we define the number of workers that evaluate trials concurrently. We
-also need to specify how long we want to run random search, by defining an
-upper limit on the total wall-clock time.
+Pirmiausia apibrėžiame darbininkų, kurie vienu metu vertina bandymus, skaičių. Taip pat
+turime nurodyti, kiek laiko norime vykdyti atsitiktinę paiešką, apibrėždami
+viršutinę bendro sienos laikrodžio laiko ribą.
 
 ```{.python .input  n=56}
 n_workers = 2  # Needs to be <= the number of available GPUs
 max_wallclock_time = 12 * 60  # 12 minutes
 ```
 
-The code for running ASHA is a simple variation of what we did for asynchronous
-random search.
+ASHA vykdymo kodas yra paprastas asinchroninės atsitiktinės
+paieškos kodo variantas.
 
 ```{.python .input  n=56}
 mode = "min"
@@ -159,11 +159,11 @@ scheduler = ASHA(
 )
 ```
 
-Here, `metric` and `resource_attr` specify the key names used with the `report`
-callback, and `max_resource_attr` denotes which input to the objective function
-corresponds to $r_{\mathrm{max}}$. Moreover, `grace_period` provides $r_{\mathrm{min}}$, and
-`reduction_factor` is $\eta$. We can run Syne Tune as before (this will
-take about 12 minutes):
+Čia `metric` ir `resource_attr` nurodo raktų pavadinimus, naudojamus su atgaliniu iškvietimu `report`,
+o `max_resource_attr` nurodo, kuri tikslo funkcijos įvestis
+atitinka $r_{\mathrm{max}}$. Be to, `grace_period` nurodo $r_{\mathrm{min}}$, o
+`reduction_factor` yra $\eta$. Syne Tune galime vykdyti kaip anksčiau (tai
+užtruks apie 12 minučių):
 
 ```{.python .input  n=57}
 trial_backend = PythonBackend(
@@ -182,15 +182,15 @@ tuner = Tuner(
 tuner.run()
 ```
 
-Note that we are running a variant of ASHA where underperforming trials are
-stopped early. This is different to our implementation in
-:numref:`sec_mf_hpo_sh`, where each training job is started with a fixed
-`max_epochs`. In the latter case, a well-performing trial which reaches the
-full 10 epochs, first needs to train 1, then 2, then 4, then 8 epochs, each
-time starting from scratch. This type of pause-and-resume scheduling can be
-implemented efficiently by checkpointing the training state after each epoch,
-but we avoid this extra complexity here. After the experiment has finished,
-we can retrieve and plot results.
+Atkreipkite dėmesį, kad vykdome ASHA variantą, kuriame prastai veikiantys bandymai
+sustabdomi anksti. Tai skiriasi nuo mūsų įgyvendinimo
+:numref:`sec_mf_hpo_sh`, kur kiekviena apmokymo užduotis pradedama su fiksuotu
+`max_epochs`. Pastaruoju atveju gerai veikiantis bandymas, pasiekiantis
+visas 10 epochų, pirmiausia turi apsimokyti 1, paskui 2, paskui 4, paskui 8 epochas, kiekvieną
+kartą pradėdamas nuo nulio. Šio tipo pristabdymo ir atnaujinimo planavimą
+galima efektyviai įgyvendinti po kiekvienos epochos išsaugant apmokymo būsenos kontrolinius taškus,
+tačiau čia šio papildomo sudėtingumo vengiame. Pasibaigus eksperimentui
+galime gauti rezultatus ir juos nubraižyti.
 
 ```{.python .input  n=59}
 d2l.set_figsize()
@@ -198,15 +198,15 @@ e = load_experiment(tuner.name)
 e.plot()
 ```
 
-## Visualize the Optimization Process
+## Optimizavimo proceso vizualizavimas
 
-Once more, we visualize the learning curves of every trial (each color in the plot represents a trial). Compare this to
-asynchronous random search in :numref:`sec_rs_async`. As we have seen for
-successive halving in :numref:`sec_mf_hpo`, most of the trials are stopped
-at 1 or 2 epochs ($r_{\mathrm{min}}$ or $\eta * r_{\mathrm{min}}$). However, trials do not stop
-at the same point, because they require different amount of time per epoch. If
-we ran standard successive halving instead of ASHA, we would need to synchronize
-our workers, before we can promote configurations to the next rung level.
+Dar kartą vizualizuojame kiekvieno bandymo mokymosi kreives (kiekviena grafiko spalva atitinka bandymą). Palyginkite tai su
+asinchronine atsitiktine paieška :numref:`sec_rs_async`. Kaip matėme nuosekliajam
+dalijimui pusiau :numref:`sec_mf_hpo`, dauguma bandymų sustabdomi
+po 1 ar 2 epochų ($r_{\mathrm{min}}$ arba $\eta * r_{\mathrm{min}}$). Tačiau bandymai nesustoja
+tame pačiame taške, nes jiems reikia skirtingo laiko vienai epochai. Jei
+vietoj ASHA vykdytume standartinį nuoseklų dalijimą pusiau, turėtume sinchronizuoti
+savo darbininkus, kad galėtume paaukštinti konfigūracijas į kitą pakopą.
 
 ```{.python .input  n=60}
 d2l.set_figsize([6, 2.5])
@@ -222,16 +222,16 @@ d2l.plt.xlabel("wall-clock time")
 d2l.plt.ylabel("objective function")
 ```
 
-## Summary
+## Santrauka
 
-Compared to random search, successive halving is not quite as trivial to run in
-an asynchronous distributed setting. To avoid synchronisation points, we promote
-configurations as quickly as possible to the next rung level, even if this means
-promoting some wrong ones. In practice, this usually does not hurt much, and the
-gains of asynchronous versus synchronous scheduling are usually much higher
-than the loss of the suboptimal decision making.
+Palyginti su atsitiktine paieška, nuosekliojo dalijimo pusiau vykdyti
+asinchroninėje paskirstytoje aplinkoje nėra visiškai paprasta. Kad išvengtume sinchronizavimo taškų, paaukštiname
+konfigūracijas į kitą pakopą kuo greičiau, net jei tai reiškia
+kai kurių netinkamų paaukštinimą. Praktikoje tai paprastai nedaug kenkia, o
+asinchroninio planavimo, palyginti su sinchroniniu, nauda paprastai yra daug didesnė
+nei neoptimalaus sprendimų priėmimo nuostoliai.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12101)
+[Diskusijos](https://discuss.d2l.ai/t/12101)
 :end_tab:

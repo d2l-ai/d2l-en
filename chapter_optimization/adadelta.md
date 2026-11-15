@@ -1,43 +1,43 @@
 # Adadelta
 :label:`sec_adadelta`
 
-Adadelta is yet another variant of AdaGrad (:numref:`sec_adagrad`). The main difference lies in the fact that it decreases the amount by which the learning rate is adaptive to coordinates. Moreover, traditionally it referred to as not having a learning rate since it uses the amount of change itself as calibration for future change. The algorithm was proposed in :citet:`Zeiler.2012`. It is fairly straightforward, given the discussion of previous algorithms so far.
+Adadelta yra dar vienas AdaGrad (:numref:`sec_adagrad`) variantas. Pagrindinis skirtumas yra tas, kad jis sumažina dydį, kuriuo mokymosi greitis prisitaiko prie koordinačių. Be to, tradiciškai sakoma, kad jis neturi mokymosi greičio, nes pačią pokyčio apimtį naudoja kaip kalibravimą būsimam pokyčiui. Algoritmą pasiūlė :citet:`Zeiler.2012`. Jis gana paprastas, turint omenyje iki šiol aptartus ankstesnius algoritmus.
 
-## The Algorithm
+## Algoritmas
 
-In a nutshell, Adadelta uses two state variables, $\mathbf{s}_t$ to store a leaky average of the second moment of the gradient and $\Delta\mathbf{x}_t$ to store a leaky average of the second moment of the change of parameters in the model itself. Note that we use the original notation and naming of the authors for compatibility with other publications and implementations (there is no other real reason why one should use different Greek variables to indicate a parameter serving the same purpose in momentum, Adagrad, RMSProp, and Adadelta).
+Trumpai tariant, Adadelta naudoja du būsenos kintamuosius: $\mathbf{s}_t$ gradiento antrojo momento nuotėkio vidurkiui saugoti ir $\Delta\mathbf{x}_t$ paties modelio parametrų pokyčio antrojo momento nuotėkio vidurkiui saugoti. Atkreipkite dėmesį, kad naudojame originalius autorių žymėjimus ir pavadinimus suderinamumui su kitomis publikacijomis ir įgyvendinimais (nėra jokios kitos tikros priežasties, kodėl reikėtų naudoti skirtingus graikiškus kintamuosius tą patį tikslą atliekančiam parametrui žymėti momentų, Adagrad, RMSProp ir Adadelta metoduose).
 
-Here are the technical details of Adadelta. Given the parameter du jour is $\rho$, we obtain the following leaky updates similarly to :numref:`sec_rmsprop`:
+Štai techninės Adadelta detalės. Tarkime, kad dienos parametras yra $\rho$; gauname šiuos nuotėkio atnaujinimus, panašiai kaip :numref:`sec_rmsprop`:
 
 $$\begin{aligned}
     \mathbf{s}_t & = \rho \mathbf{s}_{t-1} + (1 - \rho) \mathbf{g}_t^2.
 \end{aligned}$$
 
-The difference to :numref:`sec_rmsprop` is that we perform updates with the rescaled gradient $\mathbf{g}_t'$, i.e.,
+Skirtumas nuo :numref:`sec_rmsprop` yra tas, kad atnaujinimus atliekame su pakartotinai sumastelintu gradientu $\mathbf{g}_t'$, t. y.
 
 $$\begin{aligned}
     \mathbf{x}_t  & = \mathbf{x}_{t-1} - \mathbf{g}_t'. \\
 \end{aligned}$$
 
-So what is the rescaled gradient $\mathbf{g}_t'$? We can calculate it as follows:
+Taigi kas yra pakartotinai sumastelintas gradientas $\mathbf{g}_t'$? Jį galime apskaičiuoti taip:
 
 $$\begin{aligned}
     \mathbf{g}_t' & = \frac{\sqrt{\Delta\mathbf{x}_{t-1} + \epsilon}}{\sqrt{{\mathbf{s}_t + \epsilon}}} \odot \mathbf{g}_t, \\
 \end{aligned}$$
 
-where $\Delta \mathbf{x}_{t-1}$ is the leaky average of the squared rescaled gradients $\mathbf{g}_t'$. We initialize $\Delta \mathbf{x}_{0}$ to be $0$ and update it at each step with $\mathbf{g}_t'$, i.e.,
+kur $\Delta \mathbf{x}_{t-1}$ yra pakartotinai sumastelintų gradientų $\mathbf{g}_t'$ kvadratų nuotėkio vidurkis. $\Delta \mathbf{x}_{0}$ inicializuojame $0$ ir atnaujiname jį kiekviename žingsnyje su $\mathbf{g}_t'$, t. y.
 
 $$\begin{aligned}
     \Delta \mathbf{x}_t & = \rho \Delta\mathbf{x}_{t-1} + (1 - \rho) {\mathbf{g}_t'}^2,
 \end{aligned}$$
 
-and $\epsilon$ (a small value such as $10^{-5}$) is added to maintain numerical stability.
+o $\epsilon$ (maža reikšmė, pavyzdžiui, $10^{-5}$) pridedamas skaitiniam stabilumui išlaikyti.
 
 
 
-## Implementation
+## Įgyvendinimas
 
-Adadelta needs to maintain two state variables for each variable, $\mathbf{s}_t$ and $\Delta\mathbf{x}_t$. This yields the following implementation.
+Adadelta kiekvienam kintamajam turi išlaikyti du būsenos kintamuosius: $\mathbf{s}_t$ ir $\Delta\mathbf{x}_t$. Taip gaunamas toks įgyvendinimas.
 
 ```{.python .input}
 #@tab mxnet
@@ -106,7 +106,7 @@ def adadelta(params, grads, states, hyperparams):
         delta[:].assign(rho * delta + (1 - rho) * g * g)
 ```
 
-Choosing $\rho = 0.9$ amounts to a half-life time of 10 for each parameter update. This tends to work quite well. We get the following behavior.
+Pasirinkus $\rho = 0.9$, kiekvieno parametro atnaujinimo pusėjimo trukmė yra 10. Tai paprastai veikia gana gerai. Gauname tokį elgesį.
 
 ```{.python .input}
 #@tab all
@@ -115,7 +115,7 @@ d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
                {'rho': 0.9}, data_iter, feature_dim);
 ```
 
-For a concise implementation we simply use the Adadelta algorithm from high-level APIs. This yields the following one-liner for a much more compact invocation.
+Glaustam įgyvendinimui tiesiog naudojame Adadelta algoritmą iš aukšto lygio API. Taip gauname šią vienos eilutės komandą daug kompaktiškesniam iškvietimui.
 
 ```{.python .input}
 #@tab mxnet
@@ -136,28 +136,28 @@ trainer = tf.keras.optimizers.Adadelta
 d2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)
 ```
 
-## Summary
+## Santrauka
 
-* Adadelta has no learning rate parameter. Instead, it uses the rate of change in the parameters itself to adapt the learning rate.
-* Adadelta requires two state variables to store the second moments of gradient and the change in parameters.
-* Adadelta uses leaky averages to keep a running estimate of the appropriate statistics.
+* Adadelta neturi mokymosi greičio parametro. Vietoj to mokymosi greičiui adaptuoti jis naudoja paties parametrų pokyčio spartą.
+* Adadelta reikia dviejų būsenos kintamųjų gradiento antriesiems momentams ir parametrų pokyčiui saugoti.
+* Adadelta naudoja nuotėkio vidurkius, kad palaikytų einamąjį atitinkamos statistikos įvertį.
 
-## Exercises
+## Pratimai
 
-1. Adjust the value of $\rho$. What happens?
-1. Show how to implement the algorithm without the use of $\mathbf{g}_t'$. Why might this be a good idea?
-1. Is Adadelta really learning rate free? Could you find optimization problems that break Adadelta?
-1. Compare Adadelta to Adagrad and RMS prop to discuss their convergence behavior.
+1. Keiskite $\rho$ reikšmę. Kas nutinka?
+1. Parodykite, kaip įgyvendinti algoritmą nenaudojant $\mathbf{g}_t'$. Kodėl tai galėtų būti gera idėja?
+1. Ar Adadelta tikrai neturi mokymosi greičio? Ar galite rasti optimizavimo uždavinių, kurie sugadina Adadelta?
+1. Palyginkite Adadelta su Adagrad ir RMSProp ir aptarkite jų konvergavimo elgesį.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/357)
+[Diskusijos](https://discuss.d2l.ai/t/357)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1076)
+[Diskusijos](https://discuss.d2l.ai/t/1076)
 :end_tab:
 
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1077)
+[Diskusijos](https://discuss.d2l.ai/t/1077)
 :end_tab:

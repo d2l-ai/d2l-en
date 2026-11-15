@@ -3,42 +3,42 @@
 tab.interact_select(["pytorch"])
 ```
 
-# Multi-Fidelity Hyperparameter Optimization
+# Daugiapakopis hiperparametrų optimizavimas
 :label:`sec_mf_hpo`
 
-Training neural networks can be expensive even on moderate size datasets.
-Depending on the configuration space (:numref:`sec_intro_config_spaces`),
-hyperparameter optimization requires tens to hundreds of function evaluations
-to find a well-performing hyperparameter configuration. As we have seen in
-:numref:`sec_rs_async`, we can significantly speed up the overall wall-clock
-time of HPO by exploiting parallel resources, but this does not reduce the total
-amount of compute required.
+Neuroninių tinklų apmokymas gali būti brangus net vidutinio dydžio duomenų rinkiniuose.
+Priklausomai nuo konfigūracijų erdvės (:numref:`sec_intro_config_spaces`),
+hiperparametrų optimizavimui reikia dešimčių ar šimtų funkcijos įvertinimų,
+kad būtų rasta gerai veikianti hiperparametrų konfigūracija. Kaip matėme
+:numref:`sec_rs_async`, galime žymiai sutrumpinti bendrą HPO sienos laikrodžio
+laiką išnaudodami lygiagrečius išteklius, tačiau tai nesumažina bendro
+reikalingo skaičiavimo kiekio.
 
-In this section, we will show how the evaluation of hyperparameter configurations
-can be sped up. Methods such as random search allocate the same amount of
-resources (e.g., number of epochs, training data points) to each hyperparameter
-evaluation. :numref:`img_samples_lc` depicts learning curves of a set of neural
-networks trained with different hyperparameter configurations. After a few epochs we are
-already able to visually distinguish between well-performing and suboptimal
-configurations. However, the learning curves are noisy, and we might still require
-the full amount of 100 epochs to identify the best performing one.
+Šiame skyrelyje parodysime, kaip galima pagreitinti hiperparametrų konfigūracijų
+įvertinimą. Tokie metodai kaip atsitiktinė paieška kiekvienam hiperparametrų
+įvertinimui skiria tą patį išteklių kiekį (pvz., epochų skaičių, apmokymo duomenų taškus). :numref:`img_samples_lc` pavaizduotos
+skirtingomis hiperparametrų konfigūracijomis apmokytų neuroninių
+tinklų mokymosi kreivės. Po kelių epochų jau galime
+vizualiai atskirti gerai veikiančias konfigūracijas nuo neoptimalių.
+Tačiau mokymosi kreivės yra triukšmingos, ir gali vis tiek prireikti
+visų 100 epochų, kad nustatytume geriausiai veikiančią.
 
-![Learning curves of random hyperparameter configurations](../img/samples_lc.svg)
+![Atsitiktinių hiperparametrų konfigūracijų mokymosi kreivės](../img/samples_lc.svg)
 :label:`img_samples_lc`
 
-Multi-fidelity hyperparameter optimization allocates more resources
-to promising configurations and stop evaluations of poorly performing ones early.
-This speeds up the optimization process, since we can try a larger number of
-configurations for the same total amount of resources.
+Daugiapakopis hiperparametrų optimizavimas skiria daugiau išteklių
+perspektyvioms konfigūracijoms ir anksti nutraukia prastai veikiančių konfigūracijų įvertinimą.
+Tai pagreitina optimizavimo procesą, nes galime išbandyti didesnį
+konfigūracijų skaičių su tuo pačiu bendru išteklių kiekiu.
 
-More formally, we expand our definition in :numref:`sec_definition_hpo`,
-such that our objective function $f(\mathbf{x}, r)$ gets an additional input
-$r \in [r_{\mathrm{min}}, r_{max}]$, specifying the amount of resources that we are
-willing to spend for the evaluation of configuration $\mathbf{x}$. We assume that
-the error $f(\mathbf{x}, r)$ decreases with $r$, whereas the computational
-cost $c(\mathbf{x}, r)$ increases. Typically, $r$ represents the number of
-epochs for training the neural network, but it could also be the training
-subset size or the number of cross-validation folds.
+Formaliau, išplečiame savo apibrėžimą iš :numref:`sec_definition_hpo`,
+kad mūsų tikslo funkcija $f(\mathbf{x}, r)$ gautų papildomą įvestį
+$r \in [r_{\mathrm{min}}, r_{max}]$, nurodančią išteklių kiekį, kurį
+esame pasirengę skirti konfigūracijos $\mathbf{x}$ įvertinimui. Darome prielaidą, kad
+paklaida $f(\mathbf{x}, r)$ mažėja didėjant $r$, o skaičiavimo
+kaštai $c(\mathbf{x}, r)$ didėja. Paprastai $r$ žymi
+neuroninio tinklo apmokymo epochų skaičių, bet tai taip pat gali būti apmokymo
+poaibio dydis arba kryžminės patikros sluoksnių skaičius.
 
 ```{.python .input}
 %%tab pytorch
@@ -49,44 +49,43 @@ from collections import defaultdict
 d2l.set_figsize()
 ```
 
-## Successive Halving
+## Nuoseklus dalijimas pusiau
 :label:`sec_mf_hpo_sh`
 
-One of the simplest ways to adapt random search to the multi-fidelity setting is
-*successive halving* :cite:`jamieson-aistats16,karnin-icml13`. The basic
-idea is to start with $N$ configurations, for example randomly sampled from the
-configuration space, and to train each of them for $r_{\mathrm{min}}$ epochs only. We
-then discard a fraction of the worst performing trials and train the remaining
-ones for longer. Iterating this process, fewer trials run for longer, until at
-least one trial reaches $r_{max}$ epochs.
+Vienas paprasčiausių būdų pritaikyti atsitiktinę paiešką daugiapakopiam atvejui yra
+*nuoseklus dalijimas pusiau* (angl. *successive halving*) :cite:`jamieson-aistats16,karnin-icml13`. Pagrindinė
+idėja yra pradėti nuo $N$ konfigūracijų, pavyzdžiui, atsitiktinai atrinktų iš
+konfigūracijų erdvės, ir apmokyti kiekvieną iš jų tik $r_{\mathrm{min}}$ epochų. Tada
+atmetame dalį prasčiausiai veikiančių bandymų, o likusius apmokome ilgiau.
+Kartojant šį procesą, vis mažiau bandymų vykdoma vis ilgiau, kol bent
+vienas bandymas pasiekia $r_{max}$ epochų.
 
-More formally, consider a minimum budget $r_{\mathrm{min}}$ (for example 1 epoch), a maximum
-budget $r_{max}$, for example `max_epochs` in our previous example, and a halving
-constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that
-$r_{max} = r_{\mathrm{min}} \eta^K$, with $K \in \mathbb{I}$ . The number of initial
-configurations is then $N = \eta^K$. Let us define the set of rungs
+Formaliau, panagrinėkime minimalų biudžetą $r_{\mathrm{min}}$ (pavyzdžiui, 1 epocha), didžiausią
+biudžetą $r_{max}$, pavyzdžiui, `max_epochs` ankstesniame pavyzdyje, ir dalijimo
+konstantą $\eta\in\{2, 3, \dots\}$. Paprastumo dėlei tarkime, kad
+$r_{max} = r_{\mathrm{min}} \eta^K$, kur $K \in \mathbb{I}$. Pradinių
+konfigūracijų skaičius tada yra $N = \eta^K$. Apibrėžkime pakopų aibę
 $\mathcal{R} = \{ r_{\mathrm{min}}, r_{\mathrm{min}}\eta, r_{\mathrm{min}}\eta^2, \dots, r_{max} \}$.
 
-One round of successive halving proceeds as follows. We start with running $N$
-trials until the first rung $r_{\mathrm{min}}$. Sorting the validation errors, we keep
-the top $1 / \eta$ fraction (which amounts to $\eta^{K-1}$ configurations) and
-discard all the rest. The surviving trials are trained for the next rung
-($r_{\mathrm{min}}\eta$ epochs), and the process is repeated. At each rung, a
-$1 / \eta$ fraction of trials survives and their training continues with a
-$\eta$ times larger budget. With this particular choice of $N$, only a single
-trial will be trained to the full budget $r_{max}$. Once such a round of
-successive halving is done, we start the next one with a new set of initial
-configurations, iterating until the total budget is spent.
+Vienas nuoseklaus dalijimo pusiau raundas vyksta taip. Pradedame vykdydami $N$
+bandymų iki pirmosios pakopos $r_{\mathrm{min}}$. Surūšiavę patikros paklaidas, paliekame
+geriausią $1 / \eta$ dalį (tai sudaro $\eta^{K-1}$ konfigūracijų) ir
+visas likusias atmetame. Išlikę bandymai apmokomi iki kitos pakopos
+($r_{\mathrm{min}}\eta$ epochų), ir procesas kartojamas. Kiekvienoje pakopoje
+išlieka $1 / \eta$ dalis bandymų, o jų apmokymas tęsiamas su
+$\eta$ kartų didesniu biudžetu. Su šiuo konkrečiu $N$ pasirinkimu iki viso biudžeto $r_{max}$ bus apmokytas tik vienas
+bandymas. Pasibaigus tokiam nuoseklaus dalijimo pusiau raundui, pradedame kitą su nauja pradinių
+konfigūracijų aibe ir kartojame, kol išnaudojamas visas biudžetas.
 
-![Learning curves of random hyperparameter configurations.](../img/sh.svg)
+![Atsitiktinių hiperparametrų konfigūracijų mokymosi kreivės.](../img/sh.svg)
 
-We subclass the `HPOScheduler` base class from :numref:`sec_api_hpo` in order to
-implement successive halving, allowing for a generic `HPOSearcher` object to
-sample configurations (which, in our example below, will be a `RandomSearcher`).
-Additionally, the user has to pass the minimum resource $r_{\mathrm{min}}$, the maximum
-resource $r_{max}$ and $\eta$ as input. Inside our scheduler, we maintain a
-queue of configurations that still need to be evaluated for the current rung
-$r_i$. We update the queue every time we jump to the next rung.
+Nuoseklų dalijimą pusiau įgyvendiname kurdami `HPOScheduler` bazinės klasės poklasį iš :numref:`sec_api_hpo`,
+leisdami bendram `HPOSearcher` objektui
+atrinkti konfigūracijas (mūsų pavyzdyje tai bus `RandomSearcher`).
+Be to, naudotojas turi perduoti minimalų išteklių kiekį $r_{\mathrm{min}}$, didžiausią
+išteklių kiekį $r_{max}$ ir $\eta$ kaip įvestį. Planuoklio viduje palaikome
+konfigūracijų, kurias dar reikia įvertinti dabartinei pakopai
+$r_i$, eilę. Eilę atnaujiname kaskart, kai pereiname į kitą pakopą.
 
 ```{.python .input  n=2}
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
@@ -107,16 +106,16 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
         self.queue = []
 ```
 
-In the beginning our queue is empty, and we fill it with
-$n = \textrm{prefact} \cdot \eta^{K}$ configurations, which are first evaluated on
-the smallest rung $r_{\mathrm{min}}$. Here, $\textrm{prefact}$ allows us to reuse our
-code in a different context. For the purpose of this section, we fix
-$\textrm{prefact} = 1$. Every time resources become available and the `HPOTuner`
-object queries the `suggest` function, we return an element from the queue. Once
-we finish one round of successive halving, which means that we evaluated all
-surviving configurations on the highest resource level $r_{max}$ and our queue
-is empty, we start the entire process again with a new, randomly sampled set
-of configurations.
+Pradžioje mūsų eilė tuščia, ir ją užpildome
+$n = \textrm{prefact} \cdot \eta^{K}$ konfigūracijų, kurios pirmiausia įvertinamos
+mažiausioje pakopoje $r_{\mathrm{min}}$. Čia $\textrm{prefact}$ leidžia pakartotinai naudoti
+mūsų kodą kitame kontekste. Šio skyrelio tikslais fiksuojame
+$\textrm{prefact} = 1$. Kaskart, kai atsiranda išteklių ir `HPOTuner`
+objektas kreipiasi į funkciją `suggest`, grąžiname eilės elementą. Kai
+baigiame vieną nuoseklaus dalijimo pusiau raundą, t. y. įvertinome visas
+išlikusias konfigūracijas aukščiausiame išteklių lygyje $r_{max}$ ir mūsų eilė
+tuščia, visą procesą pradedame iš naujo su nauja atsitiktinai atrinkta
+konfigūracijų aibe.
 
 ```{.python .input  n=12}
 %%tab pytorch
@@ -134,10 +133,10 @@ def suggest(self):
     return self.queue.pop()
 ```
 
-When we collected a new data point, we first update the searcher module.
-Afterwards we check if we already collect all data points on the current rung.
-If so, we sort all configurations and push the top $\frac{1}{\eta}$
-configurations into the queue.
+Kai surenkame naują duomenų tašką, pirmiausia atnaujiname ieškiklio modulį.
+Po to patikriname, ar jau surinkome visus dabartinės pakopos duomenų taškus.
+Jei taip, surūšiuojame visas konfigūracijas ir geriausias $\frac{1}{\eta}$
+konfigūracijų dalį įstumiame į eilę.
 
 ```{.python .input  n=4}
 %%tab pytorch
@@ -171,8 +170,8 @@ def update(self, config: dict, error: float, info=None):
             self.observed_error_at_rungs[ri] = []  # Reset
 ```
 
-Configurations are sorted based on their observed performance on the current
-rung.
+Konfigūracijos rūšiuojamos pagal jų stebėtą našumą dabartinėje
+pakopoje.
 
 ```{.python .input  n=4}
 %%tab pytorch
@@ -186,8 +185,8 @@ def get_top_n_configurations(self, rung_level, n):
     return [x[0] for x in sorted_rung[:n]]
 ```
 
-Let us see how successive halving is doing on our neural network example. We
-will use $r_{\mathrm{min}} = 2$, $\eta = 2$, $r_{max} = 10$, so that rung levels are
+Pažiūrėkime, kaip nuoseklus dalijimas pusiau veikia mūsų neuroninio tinklo pavyzdyje.
+Naudosime $r_{\mathrm{min}} = 2$, $\eta = 2$, $r_{max} = 10$, taigi pakopų lygiai yra
 $2, 4, 8, 10$.
 
 ```{.python .input  n=5}
@@ -206,7 +205,7 @@ initial_config = {
 }
 ```
 
-We just replace the scheduler with our new `SuccessiveHalvingScheduler`.
+Tiesiog pakeičiame planuoklį savo nauju `SuccessiveHalvingScheduler`.
 
 ```{.python .input  n=14}
 searcher = d2l.RandomSearcher(config_space, initial_config=initial_config)
@@ -223,10 +222,10 @@ tuner = d2l.HPOTuner(
 tuner.run(number_of_trials=30)
 ```
 
-We can visualize the learning curves of all configurations that we evaluated.
-Most of the configurations are stopped early and only the better performing
-configurations survive until $r_{max}$. Compare this to vanilla random search,
-which would allocate $r_{max}$ to every configuration.
+Galime vizualizuoti visų įvertintų konfigūracijų mokymosi kreives.
+Dauguma konfigūracijų nutraukiamos anksti, ir iki $r_{max}$ išlieka tik geriau
+veikiančios konfigūracijos. Palyginkite tai su įprasta atsitiktine paieška,
+kuri kiekvienai konfigūracijai skirtų $r_{max}$.
 
 ```{.python .input  n=19}
 for rung_index, rung in scheduler.all_observed_error_at_rungs.items():
@@ -241,31 +240,31 @@ d2l.plt.ylabel("validation error")
 d2l.plt.xlabel("epochs")
 ```
 
-Finally, note some slight complexity in our implementation of
-`SuccessiveHalvingScheduler`. Say that a worker is free to run a job, and
-`suggest` is called when the current rung has almost been completely filled, but
-another worker is still busy with an evaluation. Since we lack the metric value
-from this worker, we cannot determine the top $1 / \eta$ fraction to open up
-the next rung. On the other hand, we want to assign a job to our free worker,
-so it does not remain idle. Our solution is to start a new round of successive
-halving and assign our worker to the first trial there. However, once a rung is
-completed in `update`, we make sure to insert new configurations at the
-beginning of the queue, so they take precedence over configurations from the
-next round.
+Galiausiai atkreipkite dėmesį į tam tikrą mūsų `SuccessiveHalvingScheduler`
+įgyvendinimo sudėtingumą. Tarkime, kad darbininkas yra laisvas vykdyti užduotį, o
+`suggest` iškviečiamas, kai dabartinė pakopa jau beveik visiškai užpildyta, bet
+kitas darbininkas vis dar užimtas įvertinimu. Kadangi neturime
+šio darbininko metrikos reikšmės, negalime nustatyti geriausios $1 / \eta$ dalies, kad atvertume
+kitą pakopą. Kita vertus, norime priskirti užduotį savo laisvam darbininkui,
+kad jis nedykinėtų. Mūsų sprendimas yra pradėti naują nuoseklaus
+dalijimo pusiau raundą ir priskirti darbininką pirmajam jo bandymui. Tačiau kai tik pakopa
+baigiama `update`, užtikriname, kad naujos konfigūracijos būtų įterptos į
+eilės pradžią, kad jos turėtų pirmenybę prieš kito raundo
+konfigūracijas.
 
-## Summary
+## Santrauka
 
-In this section, we introduced the concept of multi-fidelity hyperparameter
-optimization, where we assume to have access to cheap-to-evaluate approximations
-of the objective function, such as validation error after a certain number of
-epochs of training as proxy to validation error after the full number of epochs.
-Multi-fidelity hyperparameter optimization allows to reduce the overall
-computation of the HPO instead of just reducing the wall-clock time.
+Šiame skyrelyje pristatėme daugiapakopio hiperparametrų
+optimizavimo sąvoką, kai darome prielaidą, kad turime prieigą prie pigiai įvertinamų
+tikslo funkcijos aproksimacijų, pavyzdžiui, patikros paklaidos po tam tikro
+apmokymo epochų skaičiaus kaip pakaitalo patikros paklaidai po viso epochų skaičiaus.
+Daugiapakopis hiperparametrų optimizavimas leidžia sumažinti bendrą
+HPO skaičiavimą, o ne tik sienos laikrodžio laiką.
 
-We implemented and evaluated successive halving, a simple yet efficient
-multi-fidelity HPO algorithm.
+Įgyvendinome ir įvertinome nuoseklų dalijimą pusiau – paprastą, bet efektyvų
+daugiapakopį HPO algoritmą.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/12094)
+[Diskusijos](https://discuss.d2l.ai/t/12094)
 :end_tab:

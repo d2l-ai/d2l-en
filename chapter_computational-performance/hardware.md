@@ -1,232 +1,232 @@
-# Hardware
+# Aparatinė įranga
 :label:`sec_hardware`
 
-Building systems with great performance requires a good understanding of the algorithms and models to capture the statistical aspects of the problem. At the same time it is also indispensable to have at least a modicum of knowledge of the underlying hardware. The current section is no substitute for a proper course on hardware and system design. Instead, it might serve as a starting point for understanding why some algorithms are more efficient than others and how to achieve good throughput. A good design can easily make a difference of an order of magnitude and, in turn, this can make the difference between being able to train a network (e.g., in a week) and not at all (in 3 months, thus missing the deadline). 
-We will start by looking at computers. Then we will zoom in to look more carefully at CPUs and GPUs. Lastly we zoom out to review how multiple computers are connected in a server center or in the cloud. 
+Kuriant didelio našumo sistemas, reikia gerai suprasti algoritmus ir modelius, kad būtų užfiksuoti statistiniai uždavinio aspektai. Tuo pačiu būtina turėti bent minimalių žinių apie pagrindinę aparatinę įrangą. Šis skyrelis nėra tinkamo aparatinės įrangos ir sistemų projektavimo kurso pakaitalas. Vietoj to jis gali būti atspirties taškas suprantant, kodėl kai kurie algoritmai yra efektyvesni už kitus ir kaip pasiekti gerą pralaidumą. Geras dizainas gali lengvai lemti eilės dydžio skirtumą, o tai savo ruožtu gali lemti skirtumą tarp galimybės apmokyti tinklą (pvz., per savaitę) ir visiško negalėjimo to padaryti (per 3 mėnesius, taip praleidžiant terminą). 
+Pradėsime nuo kompiuterių apžvalgos. Tada priartinsime vaizdą, kad atidžiau pažiūrėtume į CPU ir GPU. Galiausiai nutolinsime vaizdą, kad apžvelgtume, kaip keli kompiuteriai sujungiami serverių centre ar debesyje. 
 
-![Latency Numbers that every programmer should know.](../img/latencynumbers.png)
+![Vėlinimo skaičiai, kuriuos turėtų žinoti kiekvienas programuotojas.](../img/latencynumbers.png)
 :label:`fig_latencynumbers`
 
-Impatient readers may be able to get by with :numref:`fig_latencynumbers`. It is taken from Colin Scott's [interactive post](https://people.eecs.berkeley.edu/%7Ercs/research/interactive_latency.html) that gives a good overview of the progress over the past decade. The original numbers are due to Jeff Dean's [Stanford talk from 2010](https://static.googleusercontent.com/media/research.google.com/en//people/jeff/Stanford-DL-Nov-2010.pdf).
-The discussion below explains some of the rationale for these numbers and how they can guide us in designing algorithms. The discussion below is very high level and cursory. It is clearly *no substitute* for a proper course but rather just meant to provide enough information for a statistical modeler to make suitable design decisions. For an in-depth overview of computer architecture we refer the reader to :cite:`Hennessy.Patterson.2011` or a recent course on the subject, such as the one by [Arste Asanovic](http://inst.eecs.berkeley.edu/%7Ecs152/sp19/).
+Nekantriems skaitytojams gali pakakti :numref:`fig_latencynumbers`. Jis paimtas iš Colin Scott [interaktyvaus įrašo](https://people.eecs.berkeley.edu/%7Ercs/research/interactive_latency.html), kuris pateikia gerą pastarojo dešimtmečio pažangos apžvalgą. Originalūs skaičiai priklauso Jeff Dean [Stanfordo pranešimui 2010 m.](https://static.googleusercontent.com/media/research.google.com/en//people/jeff/Stanford-DL-Nov-2010.pdf).
+Toliau pateiktas aptarimas paaiškina dalį šių skaičių pagrindimo ir tai, kaip jie gali padėti mums projektuojant algoritmus. Toliau pateiktas aptarimas yra labai aukšto lygio ir paviršutiniškas. Jis aiškiai *nėra tinkamo kurso pakaitalas*, o tik skirtas suteikti pakankamai informacijos statistiniam modeliuotojui, kad šis galėtų priimti tinkamus dizaino sprendimus. Išsamiai kompiuterių architektūros apžvalgai nukreipiame skaitytoją į :cite:`Hennessy.Patterson.2011` arba naujesnį kursą šia tema, pavyzdžiui, [Arste Asanovic](http://inst.eecs.berkeley.edu/%7Ecs152/sp19/) kursą.
 
-## Computers
+## Kompiuteriai
 
-Most deep learning researchers and practitioners have access to a computer with a fair amount of memory, computation, some form of an accelerator such as a GPU, or multiples thereof. A computer consists of the following key components:
+Dauguma giliojo mokymosi tyrėjų ir praktikų turi prieigą prie kompiuterio su pakankamu atminties ir skaičiavimo kiekiu, tam tikra spartintuvo forma, pavyzdžiui, GPU, ar jų keliais. Kompiuterį sudaro šie pagrindiniai komponentai:
 
-* A processor (also referred to as a CPU) that is able to execute the programs we give it (in addition to running an operating system and many other things), typically consisting of 8 or more cores.
-* Memory (RAM) to store and retrieve the results from computation, such as weight vectors and activations, and training data.
-* An Ethernet network connection (sometimes multiple) with speeds ranging from 1 GB/s to 100 GB/s. On high end servers more advanced interconnects can be found.
-* A high speed expansion bus (PCIe) to connect the system to one or more GPUs. Servers have up to 8 accelerators, often connected in an advanced topology, while desktop systems have 1 or 2, depending on the budget of the user and the size of the power supply.
-* Durable storage, such as a magnetic hard disk drive, a solid state drive, in many cases connected using the PCIe bus. It provides efficient transfer of training data to the system and storage of intermediate checkpoints as needed.
+* Procesorius (dar vadinamas CPU), gebantis vykdyti mums skirtas programas (be operacinės sistemos ir daugelio kitų dalykų vykdymo), paprastai sudarytas iš 8 ar daugiau branduolių.
+* Atmintis (RAM) skaičiavimo rezultatams, pavyzdžiui, svorių vektoriams ir aktyvacijoms, bei apmokymo duomenims saugoti ir gauti.
+* Ethernet tinklo ryšys (kartais keli) nuo 1 GB/s iki 100 GB/s greičių. Aukščiausios klasės serveriuose galima rasti pažangesnių jungčių.
+* Greita plėtimo magistralė (PCIe) sistemai prijungti prie vieno ar kelių GPU. Serveriuose yra iki 8 spartintuvų, dažnai sujungtų pažangia topologija, o staliniuose kompiuteriuose – 1 ar 2, priklausomai nuo naudotojo biudžeto ir maitinimo šaltinio dydžio.
+* Ilgalaikė saugykla, pavyzdžiui, magnetinis standusis diskas, kietojo kūno diskas, daugeliu atvejų prijungtas per PCIe magistralę. Ji suteikia efektyvų apmokymo duomenų perdavimą sistemai ir tarpinių kontrolinių taškų saugojimą, kai reikia.
 
-![Connectivity of components of a computer.](../img/mobo-symbol.svg)
+![Kompiuterio komponentų ryšiai.](../img/mobo-symbol.svg)
 :label:`fig_mobo-symbol`
 
-As :numref:`fig_mobo-symbol` indicates, most components (network, GPU, and storage) are connected to the CPU across the PCIe bus. It consists of multiple lanes that are directly attached to the CPU. For instance AMD's Threadripper 3 has 64 PCIe 4.0 lanes, each of which is capable 16 Gbit/s data transfer in both directions. The memory is directly attached to the CPU with a total bandwidth of up to 100 GB/s.
+Kaip rodo :numref:`fig_mobo-symbol`, dauguma komponentų (tinklas, GPU ir saugykla) prie CPU prijungti per PCIe magistralę. Ją sudaro kelios linijos, tiesiogiai prijungtos prie CPU. Pavyzdžiui, AMD Threadripper 3 turi 64 PCIe 4.0 linijas, kurių kiekviena gali perduoti 16 Gbit/s duomenų abiem kryptimis. Atmintis tiesiogiai prijungta prie CPU, kurios bendras pralaidumas siekia iki 100 GB/s.
 
-When we run code on a computer we need to shuffle data to the processors (CPUs or GPUs), perform computation, and then move the results off the processor back to RAM and durable storage. Hence, in order to get good performance we need to make sure that this works seamlessly without any one of the systems becoming a major bottleneck. For instance, if we cannot load images quickly enough the processor will not have any work to do. Likewise, if we cannot move matrices quickly enough to the CPU (or GPU), its processing elements will starve. Finally, if we want to synchronize multiple computers across the network, the latter should not slow down computation. One option is to interleave communication and computation. Let's have a look at the various components in more detail.
-
-
-## Memory
-
-At its most basic memory is used to store data that needs to be readily accessible. At present CPU RAM is typically of the [DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM) variety, offering 20--25 GB/s bandwidth per module. Each module has a 64-bit-wide bus. Typically pairs of memory modules are used to allow for multiple channels. CPUs have between 2 and 4 memory channels, i.e., they have between 4 0GB/s and 100 GB/s peak memory bandwidth. Often there are two banks per channel. For instance AMD's Zen 3 Threadripper has 8 slots.
-
-While these numbers are impressive, indeed, they only tell part of the story. When we want to read a portion from memory we first need to tell the memory module where the information can be found. That is, we first need to send the *address* to RAM. Once this is accomplished we can choose to read just a single 64 bit record or a long sequence of records. The latter is called *burst read*. In a nutshell, sending an address to memory and setting up the transfer takes approximately 100 ns (details depend on the specific timing coefficients of the memory chips used), every subsequent transfer takes only 0.2 ns. In short, the first read is 500 times as expensive as subsequent ones! Note that we could perform up to 10,000,000 random reads per second. This suggests that we avoid random memory access as far as possible and use burst reads (and writes) instead.
-
-Matters are a bit more complex when we take into account that we have multiple *banks*. Each bank can read memory largely independently. This means two things. 
-On the one hand, the effective number of random reads is up to 4 times higher, provided that they are spread evenly across memory. It also means that it is still a bad idea to perform random reads since burst reads are 4 times faster, too. On the other hand, due to memory alignment to 64 bit boundaries it is a good idea to align any data structures with the same boundaries. Compilers do this pretty much [automatically](https://en.wikipedia.org/wiki/Data_structure_alignment) when the appropriate flags are set. Curious readers are encouraged to review a lecture on DRAMs such as the one by [Zeshan Chishti](http://web.cecs.pdx.edu/%7Ezeshan/ece585_lec5.pdf).
-
-GPU memory is subject to even higher bandwidth requirements since they have many more processing elements than CPUs. By and large there are two options to address them. The first is to make the memory bus significantly wider. For instance, NVIDIA's RTX 2080 Ti has a 352-bit-wide bus. This allows for much more information to be transferred at the same time. Second, GPUs use specific high-performance memory. Consumer-grade devices, such as NVIDIA's RTX and Titan series typically use [GDDR6](https://en.wikipedia.org/wiki/GDDR6_SDRAM) chips with over 500 GB/s aggregate bandwidth. An alternative is to use HBM (high bandwidth memory) modules. They use a very different interface and connect directly with GPUs on a dedicated silicon wafer. This makes them very expensive and their use is typically limited to high-end server chips, such as the NVIDIA Volta V100 series of accelerators. Quite unsurprisingly, GPU memory is generally *much* smaller than CPU memory due to the higher cost of the former. For our purposes, by and large their performance characteristics are similar, just a lot faster. We can safely ignore the details for the purpose of this book. They only matter when tuning GPU kernels for high throughput.
-
-## Storage
-
-We saw that some of the key characteristics of RAM are *bandwidth* and *latency*. The same is true for storage devices, just that the differences can be even more extreme.
-
-### Hard Disk Drives
-
-*Hard disk drives* (HDDs) have been in use for over half a century. In a nutshell they contain a number of spinning platters with heads that can be positioned to read or write at any given track. High-end disks hold up to 16 TB on 9 platters. One of the key benefits of HDDs is that they are relatively inexpensive. One of their many downsides are their typically catastrophic failure modes and their relatively high read latency.
-
-To understand the latter, consider the fact that HDDs spin at around 7,200 RPM (revolutions per minute). If they were much faster they would shatter due to the centrifugal force exerted on the platters. This has a major downside when it comes to accessing a specific sector on the disk: we need to wait until the platter has rotated in position (we can move the heads but not accelerate the actual disks). Hence it can take over 8 ms until the requested data is available. A common way this is expressed is to say that HDDs can operate at approximately 100 IOPs (input/output operations per second). This number has essentially remained unchanged for the past two decades. Worse still, it is equally difficult to increase bandwidth (it is in the order of 100--200 MB/s). After all, each head reads a track of bits, hence the bit rate only scales with the square root of the information density. As a result, HDDs are quickly becoming relegated to archival storage and low-grade storage for very large datasets.
+Kai vykdome kodą kompiuteryje, turime perkelti duomenis į procesorius (CPU ar GPU), atlikti skaičiavimą, o tada perkelti rezultatus iš procesoriaus atgal į RAM ir ilgalaikę saugyklą. Todėl, kad pasiektume gerą našumą, turime užtikrinti, kad tai veiktų sklandžiai ir nė viena iš sistemų netaptų pagrindine kliūtimi. Pavyzdžiui, jei negalime pakankamai greitai įkelti vaizdų, procesorius neturės darbo. Panašiai, jei negalime pakankamai greitai perkelti matricų į CPU (ar GPU), jo apdorojimo elementai badaus. Galiausiai, jei norime sinchronizuoti kelis kompiuterius tinkle, pastarasis neturėtų sulėtinti skaičiavimo. Viena galimybė yra suplakti komunikaciją ir skaičiavimą. Pažvelkime į įvairius komponentus išsamiau.
 
 
-### Solid State Drives
+## Atmintis
 
-Solid state drives (SSDs) use flash memory to store information persistently. This allows for *much faster* access to stored records. Modern SSDs can operate at 100,000 to 500,000 IOPs, i.e., up to 3 orders of magnitude faster than HDDs. Furthermore, their bandwidth can reach 1--3GB/s, i.e., one order of magnitude faster than HDDs. These improvements sound almost too good to be true. Indeed, they come with the following caveats, due to the way SSDs are designed.
+Pagrindine prasme atmintis naudojama duomenims, kuriuos reikia lengvai pasiekti, saugoti. Šiuo metu CPU RAM paprastai yra [DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM) tipo, siūlanti 20–25 GB/s pralaidumą vienam moduliui. Kiekvienas modulis turi 64 bitų pločio magistralę. Paprastai atminties modulių poros naudojamos kelių kanalų galimybei suteikti. CPU turi nuo 2 iki 4 atminties kanalų, t. y. jų didžiausias atminties pralaidumas yra nuo 40 GB/s iki 100 GB/s. Dažnai kiekvienam kanalui yra du bankai. Pavyzdžiui, AMD Zen 3 Threadripper turi 8 lizdus.
 
-* SSDs store information in blocks (256 KB or larger). They can only be written as a whole, which takes significant time. Consequently bit-wise random writes on SSD have very poor performance. Likewise, writing data in general takes significant time since the block has to be read, erased and then rewritten with new information. By now SSD controllers and firmware have developed algorithms to mitigate this. Nonetheless, writes can be much slower, in particular for QLC (quad level cell) SSDs. The key for improved performance is to maintain a *queue* of operations, to prefer reads and to write in large blocks if possible.
-* The memory cells in SSDs wear out relatively quickly (often already after a few thousand writes). Wear-level protection algorithms are able to spread the degradation over many cells. That said, it is not recommended to use SSDs for swapping files or for large aggregations of log-files.
-* Lastly, the massive increase in bandwidth has forced computer designers to attach SSDs directly to the PCIe bus. The drives capable of handling this, referred to as NVMe (Non Volatile Memory enhanced), can use up to 4 PCIe lanes. This amounts to up to 8GB/s on PCIe 4.0.
+Nors šie skaičiai įspūdingi, jie pasako tik dalį istorijos. Kai norime perskaityti dalį iš atminties, pirmiausia turime pasakyti atminties moduliui, kur galima rasti informaciją. Tai yra, pirmiausia turime nusiųsti *adresą* į RAM. Tai atlikę, galime pasirinkti skaityti tik vieną 64 bitų įrašą arba ilgą įrašų seką. Pastarasis vadinamas *pliūpsniniu skaitymu* (angl. *burst read*). Trumpai tariant, adreso siuntimas į atmintį ir perdavimo paruošimas užtrunka apytiksliai 100 ns (detalės priklauso nuo konkrečių naudojamų atminties lustų laiko koeficientų), o kiekvienas vėlesnis perdavimas užtrunka tik 0.2 ns. Trumpai tariant, pirmasis skaitymas yra 500 kartų brangesnis nei vėlesni! Atkreipkite dėmesį, kad per sekundę galėtume atlikti iki 10 000 000 atsitiktinių skaitymų. Tai rodo, kad turėtume kiek įmanoma vengti atsitiktinės prieigos prie atminties ir vietoj to naudoti pliūpsninius skaitymus (ir rašymus).
 
-### Cloud Storage
+Reikalai kiek sudėtingesni, kai atsižvelgiame į tai, kad turime kelis *bankus*. Kiekvienas bankas gali skaityti atmintį iš esmės nepriklausomai. Tai reiškia du dalykus. 
+Viena vertus, efektyvus atsitiktinių skaitymų skaičius yra iki 4 kartų didesnis, jei jie tolygiai paskirstyti per atmintį. Tai taip pat reiškia, kad atlikti atsitiktinius skaitymus vis tiek yra bloga idėja, nes pliūpsniniai skaitymai taip pat yra 4 kartus greitesni. Kita vertus, dėl atminties lygiavimo pagal 64 bitų ribas gera idėja yra lygiuoti bet kokias duomenų struktūras pagal tas pačias ribas. Kompiliatoriai tai atlieka beveik [automatiškai](https://en.wikipedia.org/wiki/Data_structure_alignment), kai nustatomos tinkamos vėliavėlės. Smalsūs skaitytojai raginami peržiūrėti paskaitą apie DRAM, pavyzdžiui, [Zeshan Chishti](http://web.cecs.pdx.edu/%7Ezeshan/ece585_lec5.pdf) paskaitą.
 
-Cloud storage provides a configurable range of performance. That is, the assignment of storage to virtual machines is dynamic, both in terms of quantity and in terms of speed, as chosen by users. We recommend that users increase the provisioned number of IOPs whenever latency is too high, e.g., during training with many small records.
+GPU atmintis patiria dar didesnius pralaidumo reikalavimus, nes jie turi daug daugiau apdorojimo elementų nei CPU. Apskritai yra du būdai jiems patenkinti. Pirmasis yra padaryti atminties magistralę gerokai platesnę. Pavyzdžiui, NVIDIA RTX 2080 Ti turi 352 bitų pločio magistralę. Tai leidžia vienu metu perduoti daug daugiau informacijos. Antra, GPU naudoja specialią didelio našumo atmintį. Vartotojiško lygio įrenginiai, pavyzdžiui, NVIDIA RTX ir Titan serijos, paprastai naudoja [GDDR6](https://en.wikipedia.org/wiki/GDDR6_SDRAM) lustus su daugiau nei 500 GB/s bendru pralaidumu. Alternatyva yra naudoti HBM (didelio pralaidumo atminties, angl. *high bandwidth memory*) modulius. Jie naudoja labai kitokią sąsają ir jungiasi tiesiogiai su GPU ant specialios silicio plokštelės. Dėl to jie yra labai brangūs, o jų naudojimas paprastai apsiriboja aukščiausios klasės serverių lustais, pavyzdžiui, NVIDIA Volta V100 serijos spartintuvais. Visiškai nenuostabu, kad GPU atmintis paprastai yra *daug* mažesnė nei CPU atmintis dėl pirmosios didesnės kainos. Mūsų tikslams jų našumo charakteristikos iš esmės yra panašios, tik daug greitesnės. Šios knygos tikslais detales galime saugiai ignoruoti. Jos svarbios tik derinant GPU branduolius dideliam pralaidumui.
 
-## CPUs
+## Saugykla
 
-Central processing units (CPUs) are the centerpiece of any computer. They consist of a number of key components: *processor cores* that are able to execute machine code, a *bus* connecting them (the specific topology differs significantly between processor models, generations, and vendors), and *caches* to allow for higher bandwidth and lower latency memory access than what is possible by reads from main memory. Lastly, almost all modern CPUs contain *vector processing units* to aid with high performance linear algebra and convolutions, as they are common in media processing and machine learning.
+Matėme, kad kai kurios pagrindinės RAM charakteristikos yra *pralaidumas* ir *vėlinimas*. Tas pats pasakytina apie saugojimo įrenginius, tik skirtumai gali būti dar ekstremalesni.
 
-![Intel Skylake consumer quad-core CPU.](../img/skylake.svg)
+### Standieji diskai
+
+*Standieji diskai* (HDD) naudojami jau daugiau nei pusę amžiaus. Trumpai tariant, juose yra keletas besisukančių diskų su galvutėmis, kurias galima pozicionuoti skaityti ar rašyti bet kuriame take. Aukščiausios klasės diskai talpina iki 16 TB ant 9 diskų. Vienas pagrindinių HDD privalumų yra tai, kad jie yra santykinai nebrangūs. Vienas iš daugelio jų trūkumų yra paprastai katastrofiški gedimų režimai ir santykinai didelis skaitymo vėlinimas.
+
+Norėdami suprasti pastarąjį, atsiminkime, kad HDD sukasi apie 7 200 aps./min. (apsisukimų per minutę). Jei jie suktųsi daug greičiau, jie subyrėtų dėl diskus veikiančios išcentrinės jėgos. Tai turi didelį trūkumą, kai reikia pasiekti konkretų disko sektorių: turime laukti, kol diskas pasisuks į reikiamą padėtį (galime judinti galvutes, bet ne pagreitinti pačius diskus). Todėl gali užtrukti daugiau nei 8 ms, kol prašomi duomenys bus pasiekiami. Dažnas būdas tai išreikšti – sakyti, kad HDD gali veikti apytiksliai 100 IOPs (įvesties ir išvesties operacijų per sekundę). Šis skaičius iš esmės nepasikeitė pastaruosius du dešimtmečius. Dar blogiau, pralaidumą padidinti yra lygiai taip pat sunku (jis yra 100–200 MB/s eilės). Juk kiekviena galvutė skaito bitų taką, todėl bitų sparta didėja tik kaip informacijos tankio kvadratinė šaknis. Dėl to HDD sparčiai tampa archyvine saugykla ir žemos kokybės saugykla labai dideliems duomenų rinkiniams.
+
+
+### Kietojo kūno diskai
+
+Kietojo kūno diskai (SSD) informacijai nuolat saugoti naudoja flash atmintį. Tai leidžia *daug greičiau* pasiekti saugomus įrašus. Šiuolaikiniai SSD gali veikti 100 000–500 000 IOPs, t. y. iki 3 eilių greičiau nei HDD. Be to, jų pralaidumas gali siekti 1–3 GB/s, t. y. viena eile greičiau nei HDD. Šie patobulinimai skamba beveik per gerai, kad būtų tiesa. Iš tikrųjų jie turi tokių išlygų dėl SSD projektavimo būdo.
+
+* SSD informaciją saugo blokais (256 KB ar didesniais). Jie gali būti rašomi tik visu bloku, o tai užtrunka daug laiko. Todėl atsitiktiniai bitų lygio rašymai SSD veikia labai prastai. Panašiai duomenų rašymas apskritai užtrunka daug laiko, nes blokas turi būti perskaitytas, ištrintas ir tada perrašytas su nauja informacija. Šiuo metu SSD valdikliai ir programinė aparatinė įranga yra sukūrę algoritmus tam sušvelninti. Vis dėlto rašymai gali būti daug lėtesni, ypač QLC (keturių lygių ląstelių) SSD. Esminis dalykas našumui pagerinti yra palaikyti operacijų *eilę*, teikti pirmenybę skaitymams ir, jei įmanoma, rašyti dideliais blokais.
+* SSD atminties ląstelės nusidėvi gana greitai (dažnai jau po kelių tūkstančių rašymų). Nusidėvėjimo lygio apsaugos algoritmai geba paskirstyti degradaciją per daug ląstelių. Vis dėlto SSD nerekomenduojama naudoti keitimo failams ar dideliems žurnalo failų kaupimams.
+* Galiausiai, didžiulis pralaidumo padidėjimas privertė kompiuterių projektuotojus SSD jungti tiesiogiai prie PCIe magistralės. Diskai, gebantys tai tvarkyti, vadinami NVMe (angl. *Non Volatile Memory enhanced*), gali naudoti iki 4 PCIe linijų. Tai sudaro iki 8 GB/s PCIe 4.0.
+
+### Debesų saugykla
+
+Debesų saugykla suteikia konfigūruojamą našumo intervalą. Tai yra, saugyklos priskyrimas virtualioms mašinoms yra dinaminis tiek kiekio, tiek greičio požiūriu, kaip pasirenka naudotojai. Rekomenduojame naudotojams padidinti paskirtą IOPs skaičių, kai tik vėlinimas yra per didelis, pavyzdžiui, apmokant su daug mažų įrašų.
+
+## CPU
+
+Centriniai procesoriai (CPU) yra bet kurio kompiuterio pagrindas. Juos sudaro keli pagrindiniai komponentai: *procesoriaus branduoliai*, gebantys vykdyti mašininį kodą, juos jungianti *magistralė* (konkreti topologija gerokai skiriasi tarp procesorių modelių, kartų ir gamintojų) ir *spartinančiosios atmintinės* (angl. *caches*), leidžiančios pasiekti didesnį pralaidumą ir mažesnį atminties prieigos vėlinimą, nei įmanoma skaitant iš pagrindinės atminties. Galiausiai beveik visi šiuolaikiniai CPU turi *vektorinio apdorojimo blokus*, padedančius atlikti didelio našumo tiesinę algebrą ir konvoliucijas, kurios yra įprastos medijų apdorojime ir mašininiame mokymesi.
+
+![Intel Skylake vartotojiško lygio keturių branduolių CPU.](../img/skylake.svg)
 :label:`fig_skylake`
 
-:numref:`fig_skylake` depicts an Intel Skylake consumer-grade quad-core CPU. It has an integrated GPU, caches, and a ringbus connecting the four cores. Peripherals, such as Ethernet, WiFi, Bluetooth, SSD controller, and USB, are either part of the chipset or directly attached (PCIe) to the CPU.
+:numref:`fig_skylake` pavaizduotas Intel Skylake vartotojiško lygio keturių branduolių CPU. Jis turi integruotą GPU, spartinančiąsias atmintines ir žiedinę magistralę, jungiančią keturis branduolius. Periferiniai įrenginiai, pavyzdžiui, Ethernet, WiFi, Bluetooth, SSD valdiklis ir USB, yra arba lustų rinkinio dalis, arba tiesiogiai prijungti (PCIe) prie CPU.
 
 
-### Microarchitecture
+### Mikroarchitektūra
 
-Each of the processor cores consists of a rather sophisticated set of components. While details differ between generations and vendors, the basic functionality is pretty much standard. The front-end loads instructions and tries to predict which path will be taken (e.g., for control flow). Instructions are then decoded from assembly code to microinstructions. Assembly code is often not the lowest level code that a processor executes. Instead, complex instructions may be decoded into a set of more lower level operations. These are then processed by the actual execution core. Often the latter is capable of performing many operations simultaneously. For instance, the ARM Cortex A77 core of :numref:`fig_cortexa77` is able to perform up to 8 operations simultaneously.
+Kiekvieną iš procesoriaus branduolių sudaro gana sudėtingas komponentų rinkinys. Nors detalės skiriasi tarp kartų ir gamintojų, pagrindinis funkcionalumas yra beveik standartinis. Priekinė dalis įkelia instrukcijas ir bando nuspėti, kuris kelias bus pasirinktas (pvz., valdymo srautui). Tada instrukcijos iš asemblerio kodo dekoduojamos į mikroinstrukcijas. Asemblerio kodas dažnai nėra žemiausio lygio kodas, kurį vykdo procesorius. Vietoj to sudėtingos instrukcijos gali būti dekoduojamos į žemesnio lygio operacijų rinkinį. Jas tada apdoroja tikrasis vykdymo branduolys. Dažnai pastarasis geba atlikti daug operacijų vienu metu. Pavyzdžiui, :numref:`fig_cortexa77` pavaizduotas ARM Cortex A77 branduolys geba atlikti iki 8 operacijų vienu metu.
 
-![ARM Cortex A77 Microarchitecture.](../img/a77.svg)
+![ARM Cortex A77 mikroarchitektūra.](../img/a77.svg)
 :label:`fig_cortexa77`
 
-This means that efficient programs might be able to perform more than one instruction per clock cycle, provided that they can be carried out independently. Not all units are created equal. Some specialize in integer instructions whereas others are optimized for floating point performance. To increase throughput, the processor might also follow  multiple code paths simultaneously in a branching instruction and then discard the results of the branches not taken. This is why branch prediction units matter (on the front-end) such that only the most promising paths are pursued.
+Tai reiškia, kad efektyvios programos gali atlikti daugiau nei vieną instrukciją per taktą, jei jas galima vykdyti nepriklausomai. Ne visi blokai yra vienodi. Kai kurie specializuojasi sveikųjų skaičių instrukcijose, o kiti optimizuoti slankiojo kablelio našumui. Pralaidumui padidinti procesorius taip pat gali sekti kelis kodo kelius vienu metu, kai yra šakojimosi instrukcija, o tada atmesti nepasirinktų šakų rezultatus. Todėl šakojimosi prognozavimo blokai yra svarbūs (priekinėje dalyje), kad būtų sekami tik perspektyviausi keliai.
 
-### Vectorization
+### Vektorizavimas
 
-Deep learning is extremely compute-hungry. Hence, to make CPUs suitable for machine learning, one needs to perform many operations in one clock cycle. This is achieved via vector units. They have different names: on ARM they are called NEON, on x86 they (a recent generation) are referred to as [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) units. A common aspect is that they are able to perform SIMD (single instruction multiple data) operations. :numref:`fig_neon128` shows how 8 short integers can be added in one clock cycle on ARM.
+Gilusis mokymasis yra itin išalkęs skaičiavimų. Todėl, kad CPU taptų tinkami mašininiam mokymuisi, reikia atlikti daug operacijų per vieną taktą. Tai pasiekiama per vektorinius blokus. Jie turi skirtingus pavadinimus: ARM jie vadinami NEON, x86 (naujesnė karta) – [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) blokais. Bendras aspektas yra tas, kad jie geba atlikti SIMD (viena instrukcija, daug duomenų) operacijas. :numref:`fig_neon128` parodyta, kaip ARM per vieną taktą galima sudėti 8 trumpuosius sveikuosius skaičius.
 
-![128 bit NEON vectorization.](../img/neon128.svg)
+![128 bitų NEON vektorizavimas.](../img/neon128.svg)
 :label:`fig_neon128`
 
-Depending on architecture choices, such registers are up to 512 bits long, allowing for the combination of up to 64 pairs of numbers. For instance, we might be multiplying two numbers and adding them to a third, which is also known as a fused multiply-add. Intel's [OpenVino](https://01.org/openvinotoolkit) uses these to achieve respectable throughput for deep learning on server-grade CPUs. Note, though, that this number is entirely dwarfed by what GPUs are capable of achieving. For instance, NVIDIA's RTX 2080 Ti has 4,352 CUDA cores, each of which is capable of processing such an operation at any time.
+Priklausomai nuo architektūros pasirinkimų, tokie registrai yra iki 512 bitų ilgio, leidžiantys sujungti iki 64 skaičių porų. Pavyzdžiui, galime dauginti du skaičius ir pridėti juos prie trečiojo, o tai dar žinoma kaip suliejamoji daugyba ir sudėtis (angl. *fused multiply-add*). Intel [OpenVino](https://01.org/openvinotoolkit) jas naudoja, kad pasiektų pagarbų giliojo mokymosi pralaidumą serverių klasės CPU. Vis dėlto atkreipkite dėmesį, kad šį skaičių visiškai nustelbia tai, ką geba pasiekti GPU. Pavyzdžiui, NVIDIA RTX 2080 Ti turi 4 352 CUDA branduolius, kurių kiekvienas bet kuriuo metu geba apdoroti tokią operaciją.
 
-### Cache
+### Spartinančioji atmintinė
 
-Consider the following situation: we have a modest CPU core with 4 cores as depicted in :numref:`fig_skylake` above, running at 2 GHz frequency.
-Moreover, let's assume that we have an IPC (instructions per clock) count of 1 and that the units have AVX2 with 256-bit width enabled. Let's furthermore assume that at least one of the registers used for AVX2 operations needs to be retrieved from memory. This means that the CPU consumes $4 \times 256 \textrm{ bit} = 128 \textrm{ bytes}$ of data per clock cycle. Unless we are able to transfer $2 \times 10^9 \times 128 = 256 \times 10^9$ bytes to the processor per second the processing elements are going to starve. Unfortunately the memory interface of such a chip only supports 20--40 GB/s data transfer, i.e., one order of magnitude less. The fix is to avoid loading *new* data from memory as far as possible and rather to cache it locally on the CPU. This is where caches come in handy. Commonly the following names or concepts are used:
+Panagrinėkime tokią situaciją: turime kuklų CPU su 4 branduoliais, kaip pavaizduota aukščiau :numref:`fig_skylake`, veikiantį 2 GHz dažniu.
+Be to, tarkime, kad turime IPC (instrukcijų per taktą) skaičių 1 ir kad blokai turi įjungtą AVX2 su 256 bitų pločiu. Be to, tarkime, kad bent vienas iš AVX2 operacijoms naudojamų registrų turi būti gautas iš atminties. Tai reiškia, kad CPU per taktą sunaudoja $4 \times 256 \textrm{ bit} = 128 \textrm{ bytes}$ duomenų. Jei negalime perduoti $2 \times 10^9 \times 128 = 256 \times 10^9$ baitų į procesorių per sekundę, apdorojimo elementai badaus. Deja, tokio lusto atminties sąsaja palaiko tik 20–40 GB/s duomenų perdavimą, t. y. viena eile mažiau. Sprendimas yra kiek įmanoma vengti *naujų* duomenų įkėlimo iš atminties ir vietoj to juos kaupti lokaliai CPU. Čia praverčia spartinančiosios atmintinės. Paprastai naudojami šie pavadinimai ar sąvokos:
 
-* **Registers** are strictly speaking not part of the cache. They help stage instructions. That said, CPU registers are memory locations that a CPU can access at clock speed without any delay penalty. CPUs have tens of registers. It is up to the compiler (or programmer) to use registers efficiently. For instance the C programming language has a `register` keyword.
-* **L1 caches** are the first line of defense against high memory bandwidth requirements. L1 caches are tiny (typical sizes might be 32--64 KB) and often split into data and instructions caches. When data is found in the L1 cache, access is very fast. If they cannot be found there, the search progresses down the cache hierarchy.
-* **L2 caches** are the next stop. Depending on architecture design and processor size they might be exclusive. They might be accessible only by a given core or shared among multiple cores. L2 caches are larger (typically 256--512 KB per core) and slower than L1. Furthermore, to access something in L2 we first need to check to realize that the data is not in L1, which adds a small amount of extra latency.
-* **L3 caches** are shared among multiple cores and can be quite large. AMD's Epyc 3 server CPUs have a whopping 256 MB of cache spread across multiple chiplets. More typical numbers are in the 4--8 MB range.
+* **Registrai**, griežtai kalbant, nėra spartinančiosios atmintinės dalis. Jie padeda ruošti instrukcijas. Vis dėlto CPU registrai yra atminties vietos, kurias CPU gali pasiekti taktiniu greičiu be jokios vėlinimo nuobaudos. CPU turi dešimtis registrų. Kompiliatoriui (ar programuotojui) tenka efektyviai naudoti registrus. Pavyzdžiui, C programavimo kalba turi raktažodį `register`.
+* **L1 spartinančiosios atmintinės** yra pirmoji gynybos linija nuo didelių atminties pralaidumo reikalavimų. L1 spartinančiosios atmintinės yra mažutės (tipiniai dydžiai gali būti 32–64 KB) ir dažnai padalytos į duomenų ir instrukcijų atmintines. Kai duomenys randami L1 spartinančiojoje atmintinėje, prieiga yra labai greita. Jei jų ten nerandama, paieška tęsiasi žemyn spartinančiųjų atmintinių hierarchija.
+* **L2 spartinančiosios atmintinės** yra kita stotelė. Priklausomai nuo architektūros dizaino ir procesoriaus dydžio jos gali būti išskirtinės. Jos gali būti pasiekiamos tik tam tikro branduolio arba bendros keliems branduoliams. L2 spartinančiosios atmintinės yra didesnės (paprastai 256–512 KB vienam branduoliui) ir lėtesnės nei L1. Be to, norėdami ką nors pasiekti L2, pirmiausia turime patikrinti ir suprasti, kad duomenų nėra L1, o tai prideda šiek tiek papildomo vėlinimo.
+* **L3 spartinančiosios atmintinės** yra bendros keliems branduoliams ir gali būti gana didelės. AMD Epyc 3 serverių CPU turi didžiulę 256 MB spartinančiąją atmintinę, paskirstytą per kelis lustelius (angl. *chiplets*). Tipiškesni skaičiai yra 4–8 MB intervale.
 
-Predicting which memory elements will be needed next is one of the key optimization parameters in chip design. For instance, it is advisable to traverse memory in a *forward* direction since most caching algorithms will try to *read ahead* rather than backwards. Likewise, keeping memory access patterns local is a good way of improving performance.
+Numatyti, kurių atminties elementų prireiks toliau, yra vienas pagrindinių optimizavimo parametrų lustų projektavime. Pavyzdžiui, patartina atmintį peržiūrėti *pirmyn*, nes dauguma spartinimo algoritmų bandys skaityti *į priekį*, o ne atgal. Panašiai atminties prieigos šablonų išlaikymas lokaliais yra geras būdas pagerinti našumą.
 
-Adding caches is a double-edge sword. On the one hand they ensure that the processor cores do not starve of data. At the same time they increase chip size, using up area that otherwise could have been spent on increasing processing power. Moreover, *cache misses* can be expensive. Consider the worst case scenario, *false sharing*, as depicted in :numref:`fig_falsesharing`. A memory location is cached on processor 0 when a thread on processor 1 requests the data. To obtain it, processor 0 needs to stop what it is doing, write the information back to main memory and then let processor 1 read it from memory. During this operation both processors wait. Quite potentially such code runs *more slowly* on multiple processors when compared with an efficient single-processor implementation. This is one more reason for why there is a practical limit to cache sizes (besides their physical size).
+Spartinančiųjų atmintinių pridėjimas yra dviašmenis kardas. Viena vertus, jos užtikrina, kad procesoriaus branduoliai nebadautų duomenų. Tuo pačiu jos didina lusto dydį, užimdamos plotą, kurį kitu atveju būtų galima skirti apdorojimo galiai didinti. Be to, *spartinančiosios atmintinės nepataikymai* gali būti brangūs. Panagrinėkime blogiausią scenarijų, *klaidingą dalijimąsi* (angl. *false sharing*), kaip pavaizduota :numref:`fig_falsesharing`. Atminties vieta yra užkaupta procesoriuje 0, kai procesoriaus 1 gija paprašo duomenų. Kad juos gautų, procesorius 0 turi sustabdyti tai, ką daro, įrašyti informaciją atgal į pagrindinę atmintį ir tada leisti procesoriui 1 ją perskaityti iš atminties. Šios operacijos metu abu procesoriai laukia. Visai tikėtina, kad toks kodas veikia *lėčiau* keliuose procesoriuose, palyginti su efektyviu vieno procesoriaus įgyvendinimu. Tai dar viena priežastis, kodėl spartinančiųjų atmintinių dydžiai turi praktinę ribą (be jų fizinio dydžio).
 
-![False sharing (image courtesy of Intel).](../img/falsesharing.svg)
+![Klaidingas dalijimasis (paveikslas Intel sutikimu).](../img/falsesharing.svg)
 :label:`fig_falsesharing`
 
-## GPUs and other Accelerators
+## GPU ir kiti spartintuvai
 
-It is not an exaggeration to claim that deep learning would not have been successful without GPUs. By the same token, it is quite reasonable to argue that GPU manufacturers' fortunes have increased significantly due to deep learning. This co-evolution of hardware and algorithms has led to a situation where for better or worse deep learning is the preferable statistical modeling paradigm. Hence it pays to understand the specific benefits that GPUs and related accelerators such as the TPU :cite:`Jouppi.Young.Patil.ea.2017`.
+Nebus perdėta teigti, kad gilusis mokymasis nebūtų buvęs sėkmingas be GPU. Tuo pačiu pagrįstai galima teigti, kad GPU gamintojų turtai gerokai išaugo dėl giliojo mokymosi. Ši aparatinės įrangos ir algoritmų koevoliucija lėmė situaciją, kai, gerai ar blogai, gilusis mokymasis yra pageidaujama statistinio modeliavimo paradigma. Todėl apsimoka suprasti konkrečią GPU ir susijusių spartintuvų, tokių kaip TPU :cite:`Jouppi.Young.Patil.ea.2017`, naudą.
 
-Of note is a distinction that is often made in practice: accelerators are optimized either for training or inference. For the latter we only need to compute the forward propagation in a network. No storage of intermediate data is needed for backpropagation. Moreover, we may not need very precise computation (FP16 or INT8 typically suffice). On the other hand, during training all intermediate results need storage to compute gradients. Moreover, accumulating gradients requires higher precision to avoid numerical underflow (or overflow). This means that FP16 (or mixed precision with FP32) is the minimum requirement. All of this necessitates faster and larger memory (HBM2 vs. GDDR6) and more processing power. For instance, NVIDIA's [Turing](https://devblogs.nvidia.com/nvidia-turing-architecture-in-depth/) T4 GPUs are optimized for inference whereas the V100 GPUs are preferable for training.
+Verta paminėti praktikoje dažnai daromą skirtį: spartintuvai optimizuojami arba apmokymui, arba inferencijai. Pastarajai reikia apskaičiuoti tik tinklo tiesioginį sklidimą. Nereikia saugoti tarpinių duomenų atgaliniam sklidimui. Be to, galbūt nereikia labai tikslaus skaičiavimo (paprastai pakanka FP16 ar INT8). Kita vertus, apmokymo metu visi tarpiniai rezultatai turi būti saugomi gradientams apskaičiuoti. Be to, gradientų kaupimui reikia didesnio tikslumo, kad būtų išvengta skaitinio nuosmukio (angl. *underflow*) (ar perpildos). Tai reiškia, kad FP16 (ar mišrus tikslumas su FP32) yra minimalus reikalavimas. Visa tai reikalauja greitesnės ir didesnės atminties (HBM2, palyginti su GDDR6) ir daugiau apdorojimo galios. Pavyzdžiui, NVIDIA [Turing](https://devblogs.nvidia.com/nvidia-turing-architecture-in-depth/) T4 GPU optimizuoti inferencijai, o V100 GPU labiau tinka apmokymui.
 
-Recall vectorization as illustrated in :numref:`fig_neon128`. Adding vector units to a processor core allowed us to increase throughput significantly. For example, in the example in :numref:`fig_neon128` we were able to perform 16 operations simultaneously.
-First,
-what if we added operations that optimized not just operations between vectors but also between matrices? This strategy led to tensor cores (to be covered shortly). 
-Second, what if we added many more cores? In a nutshell, these two strategies summarize the design decisions in GPUs. :numref:`fig_turing_processing_block` gives an overview of a basic processing block. It contains 16 integer and 16 floating point units. In addition to that, two tensor cores accelerate a narrow subset of additional operations relevant for deep learning. Each streaming multiprocessor consists of four such blocks.
+Prisiminkite vektorizavimą, kaip iliustruota :numref:`fig_neon128`. Pridėjus vektorinius blokus prie procesoriaus branduolio, galėjome žymiai padidinti pralaidumą. Pavyzdžiui, :numref:`fig_neon128` pavyzdyje galėjome atlikti 16 operacijų vienu metu.
+Pirma,
+kas, jei pridėtume operacijas, kurios optimizuotų ne tik operacijas tarp vektorių, bet ir tarp matricų? Ši strategija lėmė tenzorinius branduolius (apie kuriuos netrukus). 
+Antra, kas, jei pridėtume daug daugiau branduolių? Trumpai tariant, šios dvi strategijos apibendrina GPU dizaino sprendimus. :numref:`fig_turing_processing_block` pateikta pagrindinio apdorojimo bloko apžvalga. Jame yra 16 sveikųjų skaičių ir 16 slankiojo kablelio blokų. Be to, du tenzoriniai branduoliai pagreitina siaurą papildomų giliajam mokymuisi aktualių operacijų poaibį. Kiekvieną srautinį multiprocesorių sudaro keturi tokie blokai.
 
-![NVIDIA Turing processing block (image courtesy of NVIDIA).](../img/turing-processing-block.png)
+![NVIDIA Turing apdorojimo blokas (paveikslas NVIDIA sutikimu).](../img/turing-processing-block.png)
 :width:`150px`
 :label:`fig_turing_processing_block`
 
-Next, 12 streaming multiprocessors are grouped into graphics processing clusters which make up the high-end TU102 processors. Ample memory channels and an L2 cache complement the setup. :numref:`fig_turing` has the relevant details. One of the reasons for designing such a device is that individual blocks can be added or removed as needed to allow for more compact chips and to deal with yield issues (faulty modules might not be activated). Fortunately programming such devices is well hidden from the casual deep learning researcher beneath layers of CUDA and framework code. In particular, more than one of the programs might well be executed simultaneously on the GPU, provided that there are available resources. Nonetheless it pays to be aware of the limitations of the devices to avoid picking models that do not fit into device memory.
+Toliau 12 srautinių multiprocesorių sugrupuojami į grafikos apdorojimo klasterius, kurie sudaro aukščiausios klasės TU102 procesorius. Gausūs atminties kanalai ir L2 spartinančioji atmintinė papildo konfigūraciją. :numref:`fig_turing` pateikiamos svarbios detalės. Viena iš tokio įrenginio projektavimo priežasčių yra ta, kad atskirus blokus galima pridėti ar pašalinti pagal poreikį, kad lustai būtų kompaktiškesni ir būtų sprendžiamos išeigos problemos (sugedę moduliai gali būti neaktyvuojami). Laimei, tokių įrenginių programavimas yra gerai paslėptas nuo atsitiktinio giliojo mokymosi tyrėjo po CUDA ir karkaso kodo sluoksniais. Visų pirma daugiau nei viena programa gali būti vykdoma GPU vienu metu, jei yra laisvų išteklių. Vis dėlto apsimoka žinoti įrenginių apribojimus, kad nepasirinktume modelių, kurie netelpa į įrenginio atmintį.
 
-![NVIDIA Turing architecture (image courtesy of NVIDIA)](../img/turing.png)
+![NVIDIA Turing architektūra (paveikslas NVIDIA sutikimu)](../img/turing.png)
 :width:`350px`
 :label:`fig_turing`
 
-A last aspect that is worth mentioning in more detail are *tensor cores*. They are an example of a recent trend of adding more optimized circuits that are specifically effective for deep learning. For instance, the TPU added a systolic array :cite:`Kung.1988` for fast matrix multiplication. There the design was to support a very small number (one for the first generation of TPUs) of large operations. Tensor cores are at the other end. They are optimized for small operations involving between $4 \times 4$ and $16 \times 16$ matrices, depending on their numerical precision. :numref:`fig_tensorcore` gives an overview of the optimizations.
+Paskutinis aspektas, kurį verta aptarti išsamiau, yra *tenzoriniai branduoliai*. Tai naujausios tendencijos pridėti daugiau optimizuotų grandinių, ypač veiksmingų giliajam mokymuisi, pavyzdys. Pavyzdžiui, TPU pridėjo sistolinį masyvą :cite:`Kung.1988` greitai matricų daugybai. Ten dizainas buvo skirtas palaikyti labai mažą skaičių (pirmajai TPU kartai – vieną) didelių operacijų. Tenzoriniai branduoliai yra kitame gale. Jie optimizuoti mažoms operacijoms, apimančioms $4 \times 4$ ir $16 \times 16$ matricas, priklausomai nuo jų skaitinio tikslumo. :numref:`fig_tensorcore` pateikiama optimizacijų apžvalga.
 
-![NVIDIA tensor cores in Turing (image courtesy of NVIDIA).](../img/tensorcore.jpg)
+![NVIDIA tenzoriniai branduoliai Turing (paveikslas NVIDIA sutikimu).](../img/tensorcore.jpg)
 :width:`400px`
 :label:`fig_tensorcore`
 
-Obviously when optimizing for computation we end up making certain compromises. One of them is that GPUs are not very good at handling interrupts and sparse data. While there are notable exceptions, such as [Gunrock](https://github.com/gunrock/gunrock) :cite:`Wang.Davidson.Pan.ea.2016`, the access pattern of sparse matrices and vectors do not go well with the high bandwidth burst read operations where GPUs excel. Matching both goals is an area of active research. See e.g., [DGL](http://dgl.ai), a library tuned for deep learning on graphs.
+Akivaizdu, kad optimizuodami skaičiavimą galiausiai darome tam tikrus kompromisus. Vienas iš jų yra tas, kad GPU nelabai gerai tvarko pertraukimus ir retuosius duomenis. Nors yra žymių išimčių, pavyzdžiui, [Gunrock](https://github.com/gunrock/gunrock) :cite:`Wang.Davidson.Pan.ea.2016`, retųjų matricų ir vektorių prieigos šablonas netinka dideliam pralaidumui pliūpsninių skaitymų operacijoms, kuriose GPU pasižymi. Abiejų tikslų suderinimas yra aktyvių tyrimų sritis. Žr., pvz., [DGL](http://dgl.ai) – biblioteką, pritaikytą giliajam mokymuisi grafuose.
 
 
-## Networks and Buses
+## Tinklai ir magistralės
 
-Whenever a single device is insufficient for optimization we need to transfer data to and from it to synchronize processing. This is where networks and buses come in handy. We have a number of design parameters: bandwidth, cost, distance, and flexibility.
-On one end we have WiFi that has a pretty good range, is very easy to use (no wires, after all), cheap but it offers comparatively mediocre bandwidth and latency. No machine learning researcher within their right mind would use it to build a cluster of servers. In what follows we focus on interconnects that are suitable for deep learning.
+Kai vieno įrenginio optimizavimui nepakanka, turime perduoti duomenis į jį ir iš jo, kad sinchronizuotume apdorojimą. Čia praverčia tinklai ir magistralės. Turime keletą dizaino parametrų: pralaidumą, kainą, atstumą ir lankstumą.
+Viename gale turime WiFi, kuris turi gana gerą aprėptį, yra labai paprastas naudoti (juk nėra laidų), pigus, bet siūlo palyginti vidutinišką pralaidumą ir vėlinimą. Joks sveiko proto mašininio mokymosi tyrėjas nenaudotų jo serverių klasteriui kurti. Toliau sutelksime dėmesį į jungtis, tinkamas giliajam mokymuisi.
 
-* **PCIe** is a dedicated bus for very high bandwidth point-to-point connections (up to 32 GB/s on PCIe 4.0 in a 16-lane slot) per lane. Latency is in the order of single-digit microseconds (5 μs). PCIe links are precious. Processors only have a limited number of them: AMD's EPYC 3 has 128 lanes, Intel's Xeon has up to 48 lanes per chip; on desktop-grade CPUs the numbers are 20 (Ryzen 9) and 16 (Core i9) respectively. Since GPUs have typically 16 lanes, this limits the number of GPUs that can connect to the CPU at full bandwidth. After all, they need to share the links with other high bandwidth peripherals such as storage and Ethernet. Just like with RAM access, large bulk transfers are preferable due to reduced packet overhead.
-* **Ethernet** is the most commonly used way of connecting computers. While it is significantly slower than PCIe, it is very cheap and resilient to install and covers much longer distances. Typical bandwidth for low-grade servers is 1 GBit/s. Higher-end devices (e.g., [C5 instances](https://aws.amazon.com/ec2/instance-types/c5/) in the cloud) offer between 10 and 100 GBit/s bandwidth. As in all previous cases data transmission has significant overheads. Note that we almost never use raw Ethernet directly but rather a protocol that is executed on top of the physical interconnect (such as UDP or TCP/IP). This adds further overhead. Like PCIe, Ethernet is designed to connect two devices, e.g., a computer and a switch.
-* **Switches** allow us to connect multiple devices in a manner where any pair of them can carry out a (typically full bandwidth) point-to-point connection simultaneously. For instance, Ethernet switches might connect 40 servers at high cross-sectional bandwidth. Note that switches are not unique to traditional computer networks. Even PCIe lanes can be [switched](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). This occurs, e.g., to connect a large number of GPUs to a host processor, as is the case for the [P2 instances](https://aws.amazon.com/ec2/instance-types/p2/).
-* **NVLink** is an alternative to PCIe when it comes to very high bandwidth interconnects. It offers up to 300 Gbit/s data transfer rate per link. Server GPUs (Volta V100) have six links whereas consumer-grade GPUs (RTX 2080 Ti) have only one link, operating at a reduced 100 Gbit/s rate. We recommend to use [NCCL](https://github.com/NVIDIA/nccl) to achieve high data transfer between GPUs.
+* **PCIe** yra specializuota magistralė labai didelio pralaidumo taškas–taškas jungtims (iki 32 GB/s PCIe 4.0 16 linijų lizde) vienai linijai. Vėlinimas yra vienženklių mikrosekundžių eilės (5 μs). PCIe jungtys yra brangios. Procesoriai jų turi tik ribotą skaičių: AMD EPYC 3 turi 128 linijas, Intel Xeon – iki 48 linijų vienam lustui; staliniams skirtuose CPU skaičiai yra atitinkamai 20 (Ryzen 9) ir 16 (Core i9). Kadangi GPU paprastai turi 16 linijų, tai riboja GPU, kurie gali jungtis prie CPU visu pralaidumu, skaičių. Juk jie turi dalytis jungtimis su kita didelio pralaidumo periferija, tokia kaip saugykla ir Ethernet. Kaip ir su RAM prieiga, didelės masinės siuntos yra pageidautinos dėl sumažintų paketų pridėtinių sąnaudų.
+* **Ethernet** yra dažniausiai naudojamas kompiuterių jungimo būdas. Nors jis yra gerokai lėtesnis nei PCIe, jis labai pigus, atsparus diegiant ir apima daug didesnius atstumus. Tipinis žemos klasės serverių pralaidumas yra 1 GBit/s. Aukštesnės klasės įrenginiai (pvz., [C5 egzemplioriai](https://aws.amazon.com/ec2/instance-types/c5/) debesyje) siūlo pralaidumą nuo 10 iki 100 GBit/s. Kaip ir visais ankstesniais atvejais, duomenų perdavimas turi didelių pridėtinių sąnaudų. Atkreipkite dėmesį, kad beveik niekada nenaudojame grynojo Ethernet tiesiogiai, o naudojame protokolą, vykdomą virš fizinės jungties (pavyzdžiui, UDP ar TCP/IP). Tai prideda dar daugiau pridėtinių sąnaudų. Kaip ir PCIe, Ethernet sukurtas dviem įrenginiams, pavyzdžiui, kompiuteriui ir komutatoriui, sujungti.
+* **Komutatoriai** leidžia mums sujungti kelis įrenginius taip, kad bet kuri jų pora gali vienu metu atlikti (paprastai pilno pralaidumo) taškas–taškas ryšį. Pavyzdžiui, Ethernet komutatoriai gali sujungti 40 serverių dideliu skerspjūvio pralaidumu. Atkreipkite dėmesį, kad komutatoriai nėra išskirtiniai tradiciniams kompiuterių tinklams. Net PCIe linijas galima [komutuoti](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). Tai daroma, pavyzdžiui, siekiant prijungti didelį GPU skaičių prie pagrindinio procesoriaus, kaip yra [P2 egzempliorių](https://aws.amazon.com/ec2/instance-types/p2/) atveju.
+* **NVLink** yra alternatyva PCIe, kai kalbama apie labai didelio pralaidumo jungtis. Jis siūlo iki 300 Gbit/s duomenų perdavimo spartą vienai jungčiai. Serverių GPU (Volta V100) turi šešias jungtis, o vartotojiško lygio GPU (RTX 2080 Ti) turi tik vieną jungtį, veikiančią sumažinta 100 Gbit/s sparta. Rekomenduojame naudoti [NCCL](https://github.com/NVIDIA/nccl), kad pasiektumėte didelį duomenų perdavimą tarp GPU.
 
 
 
-## More Latency Numbers
+## Daugiau vėlinimo skaičių
 
-The summary in :numref:`table_latency_numbers` and :numref:`table_latency_numbers_tesla` are from [Eliot Eshelman](https://gist.github.com/eshelman) who maintains an updated version of the numbers as a [GitHub gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646).
+:numref:`table_latency_numbers` ir :numref:`table_latency_numbers_tesla` santrauka yra iš [Eliot Eshelman](https://gist.github.com/eshelman), kuris palaiko atnaujintą skaičių versiją kaip [GitHub gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646).
 
-:Common Latency Numbers.
+:Dažni vėlinimo skaičiai.
 
-| Action | Time | Notes |
+| Veiksmas | Laikas | Pastabos |
 | :----------------------------------------- | -----: | :---------------------------------------------- |
-| L1 cache reference/hit                     | 1.5 ns | 4 cycles                                        |
-| Floating-point add/mult/FMA                | 1.5 ns | 4 cycles                                        |
-| L2 cache reference/hit                     |   5 ns | 12 ~ 17 cycles                                  |
-| Branch mispredict                          |   6 ns | 15 ~ 20 cycles                                  |
-| L3 cache hit (unshared cache)              |  16 ns | 42 cycles                                       |
-| L3 cache hit (shared in another core)      |  25 ns | 65 cycles                                       |
-| Mutex lock/unlock                          |  25 ns |                                                 |
-| L3 cache hit (modified in another core)    |  29 ns | 75 cycles                                       |
-| L3 cache hit (on a remote CPU socket)      |  40 ns | 100 ~ 300 cycles (40 ~ 116 ns)                  |
-| QPI hop to a another CPU (per hop)         |  40 ns |                                                 |
-| 64MB memory ref. (local CPU)          |  46 ns | TinyMemBench on Broadwell E5-2690v4             |
-| 64MB memory ref. (remote CPU)         |  70 ns | TinyMemBench on Broadwell E5-2690v4             |
-| 256MB memory ref. (local CPU)         |  75 ns | TinyMemBench on Broadwell E5-2690v4             |
-| Intel Optane random write                  |  94 ns | UCSD Non-Volatile Systems Lab                   |
-| 256MB memory ref. (remote CPU)        | 120 ns | TinyMemBench on Broadwell E5-2690v4             |
-| Intel Optane random read                   | 305 ns | UCSD Non-Volatile Systems Lab                   |
-| Send 4KB over 100 Gbps HPC fabric          |   1 μs | MVAPICH2 over Intel Omni-Path                   |
-| Compress 1KB with Google Snappy            |   3 μs |                                                 |
-| Send 4KB over 10 Gbps ethernet             |  10 μs |                                                 |
-| Write 4KB randomly to NVMe SSD             |  30 μs | DC P3608 NVMe SSD (QOS 99% is 500μs)            |
-| Transfer 1MB to/from NVLink GPU            |  30 μs | ~33GB/s on NVIDIA 40GB NVLink                 |
-| Transfer 1MB to/from PCI-E GPU             |  80 μs | ~12GB/s on PCIe 3.0 x16 link                  |
-| Read 4KB randomly from NVMe SSD            | 120 μs | DC P3608 NVMe SSD (QOS 99%)                     |
-| Read 1MB sequentially from NVMe SSD        | 208 μs | ~4.8GB/s DC P3608 NVMe SSD                    |
-| Write 4KB randomly to SATA SSD             | 500 μs | DC S3510 SATA SSD (QOS 99.9%)                   |
-| Read 4KB randomly from SATA SSD            | 500 μs | DC S3510 SATA SSD (QOS 99.9%)                   |
-| Round trip within same data center          | 500 μs | One-way ping is ~250μs                          |
-| Read 1MB sequentially from SATA SSD        |   2 ms | ~550MB/s DC S3510 SATA SSD                    |
-| Read 1MB sequentially from disk            |   5 ms | ~200MB/s server HDD                           |
-| Random Disk Access (seek+rotation)         |  10 ms |                                                 |
-| Send packet CA->Netherlands->CA            | 150 ms |                                                 |
+| L1 spartinančiosios atmintinės nuoroda/pataikymas | 1.5 ns | 4 taktai                                  |
+| Slankiojo kablelio sudėtis/daugyba/FMA     | 1.5 ns | 4 taktai                                        |
+| L2 spartinančiosios atmintinės nuoroda/pataikymas |   5 ns | 12 ~ 17 taktų                            |
+| Šakojimosi neteisingas prognozavimas       |   6 ns | 15 ~ 20 taktų                                   |
+| L3 spartinančiosios atmintinės pataikymas (nebendra atmintinė) |  16 ns | 42 taktai                   |
+| L3 spartinančiosios atmintinės pataikymas (bendra kitame branduolyje) |  25 ns | 65 taktai            |
+| Mutekso užraktas/atrakinimas               |  25 ns |                                                 |
+| L3 spartinančiosios atmintinės pataikymas (modifikuota kitame branduolyje) |  29 ns | 75 taktai       |
+| L3 spartinančiosios atmintinės pataikymas (nuotolinio CPU lizde) |  40 ns | 100 ~ 300 taktų (40 ~ 116 ns)         |
+| QPI šuolis į kitą CPU (už šuolį)           |  40 ns |                                                 |
+| 64 MB atminties nuoroda (vietinis CPU)     |  46 ns | TinyMemBench su Broadwell E5-2690v4             |
+| 64 MB atminties nuoroda (nuotolinis CPU)   |  70 ns | TinyMemBench su Broadwell E5-2690v4             |
+| 256 MB atminties nuoroda (vietinis CPU)    |  75 ns | TinyMemBench su Broadwell E5-2690v4             |
+| Intel Optane atsitiktinis rašymas          |  94 ns | UCSD Non-Volatile Systems Lab                   |
+| 256 MB atminties nuoroda (nuotolinis CPU)  | 120 ns | TinyMemBench su Broadwell E5-2690v4             |
+| Intel Optane atsitiktinis skaitymas        | 305 ns | UCSD Non-Volatile Systems Lab                   |
+| Siųsti 4 KB per 100 Gbps HPC tinklą        |   1 μs | MVAPICH2 per Intel Omni-Path                    |
+| Suspausti 1 KB su Google Snappy            |   3 μs |                                                 |
+| Siųsti 4 KB per 10 Gbps ethernet           |  10 μs |                                                 |
+| Atsitiktinai įrašyti 4 KB į NVMe SSD       |  30 μs | DC P3608 NVMe SSD (QOS 99 % yra 500 μs)         |
+| Perduoti 1 MB į/iš NVLink GPU              |  30 μs | ~33 GB/s su NVIDIA 40 GB NVLink                 |
+| Perduoti 1 MB į/iš PCI-E GPU               |  80 μs | ~12 GB/s PCIe 3.0 x16 jungtimi                  |
+| Atsitiktinai perskaityti 4 KB iš NVMe SSD  | 120 μs | DC P3608 NVMe SSD (QOS 99 %)                    |
+| Nuosekliai perskaityti 1 MB iš NVMe SSD    | 208 μs | ~4.8 GB/s DC P3608 NVMe SSD                     |
+| Atsitiktinai įrašyti 4 KB į SATA SSD       | 500 μs | DC S3510 SATA SSD (QOS 99.9 %)                  |
+| Atsitiktinai perskaityti 4 KB iš SATA SSD  | 500 μs | DC S3510 SATA SSD (QOS 99.9 %)                  |
+| Kelionė pirmyn ir atgal tame pačiame duomenų centre | 500 μs | Vienos krypties ping yra ~250 μs       |
+| Nuosekliai perskaityti 1 MB iš SATA SSD    |   2 ms | ~550 MB/s DC S3510 SATA SSD                     |
+| Nuosekliai perskaityti 1 MB iš disko       |   5 ms | ~200 MB/s serverio HDD                          |
+| Atsitiktinė disko prieiga (paieška + sukimasis) |  10 ms |                                            |
+| Siųsti paketą CA->Nyderlandai->CA          | 150 ms |                                                 |
 :label:`table_latency_numbers`
 
-:Latency Numbers for NVIDIA Tesla GPUs.
+:NVIDIA Tesla GPU vėlinimo skaičiai.
 
-| Action | Time | Notes |
+| Veiksmas | Laikas | Pastabos |
 | :------------------------------ | -----: | :---------------------------------------- |
-| GPU Shared Memory access        |  30 ns | 30~90 cycles (bank conflicts add latency) |
-| GPU Global Memory access        | 200 ns | 200~800 cycles                            |
-| Launch CUDA kernel on GPU       |  10 μs | Host CPU instructs GPU to start kernel    |
-| Transfer 1MB to/from NVLink GPU |  30 μs | ~33GB/s on NVIDIA 40GB NVLink           |
-| Transfer 1MB to/from PCI-E GPU  |  80 μs | ~12GB/s on PCI-Express x16 link         |
+| GPU bendrosios atminties prieiga |  30 ns | 30~90 taktų (bankų konfliktai prideda vėlinimo) |
+| GPU globaliosios atminties prieiga | 200 ns | 200~800 taktų                          |
+| Paleisti CUDA branduolį GPU     |  10 μs | Pagrindinis CPU nurodo GPU pradėti branduolį |
+| Perduoti 1 MB į/iš NVLink GPU   |  30 μs | ~33 GB/s su NVIDIA 40 GB NVLink           |
+| Perduoti 1 MB į/iš PCI-E GPU    |  80 μs | ~12 GB/s PCI-Express x16 jungtimi         |
 :label:`table_latency_numbers_tesla`
 
-## Summary
+## Santrauka
 
-* Devices have overheads for operations. Hence it is important to aim for a small number of large transfers rather than many small ones. This applies to RAM, SSDs, networks and GPUs.
-* Vectorization is key for performance. Make sure you are aware of the specific abilities of your accelerator. E.g., some Intel Xeon CPUs are particularly good for INT8 operations, NVIDIA Volta GPUs excel at FP16 matrix-matrix operations and NVIDIA Turing shines at FP16, INT8, and INT4 operations.
-* Numerical overflow due to small data types can be a problem during training (and to a lesser extent during inference).
-* Aliasing can significantly degrade performance. For instance, memory alignment on 64 bit CPUs should be done with respect to 64 bit boundaries. On GPUs it is a good idea to keep convolution sizes aligned, e.g., to tensor cores.
-* Match your algorithms to the hardware (e.g., memory footprint, and bandwidth). Great speedup (orders of magnitude) can be achieved when fitting the parameters into caches.
-* We recommend that you sketch out the performance of a novel algorithm on paper before verifying the experimental results. Discrepancies of an order-of-magnitude or more are reasons for concern.
-* Use profilers to debug performance bottlenecks.
-* Training and inference hardware have different sweet spots in terms of price and performance.
+* Įrenginiai turi pridėtinių sąnaudų operacijoms. Todėl svarbu siekti nedidelio skaičiaus didelių perdavimų, o ne daug mažų. Tai taikoma RAM, SSD, tinklams ir GPU.
+* Vektorizavimas yra esminis našumui. Įsitikinkite, kad žinote konkrečias savo spartintuvo galimybes. Pavyzdžiui, kai kurie Intel Xeon CPU ypač tinka INT8 operacijoms, NVIDIA Volta GPU pasižymi FP16 matricų daugybos operacijomis, o NVIDIA Turing spindi FP16, INT8 ir INT4 operacijose.
+* Skaitinis perpildymas dėl mažų duomenų tipų gali būti problema apmokymo metu (ir mažesniu mastu inferencijos metu).
+* Aliasing (angl. *aliasing*) gali žymiai pabloginti našumą. Pavyzdžiui, atminties lygiavimas 64 bitų CPU turėtų būti atliekamas pagal 64 bitų ribas. GPU gera idėja yra išlaikyti konvoliucijų dydžius sulygiuotus, pavyzdžiui, pagal tenzorinius branduolius.
+* Suderinkite savo algoritmus su aparatine įranga (pvz., atminties poreikiu ir pralaidumu). Didelis pagreitėjimas (eilėmis) gali būti pasiektas, kai parametrai telpa į spartinančiąsias atmintines.
+* Rekomenduojame, kad prieš tikrindami eksperimentinius rezultatus, naujo algoritmo našumą pasiskaičiuotumėte ant popieriaus. Eilės dydžio ar didesni neatitikimai yra priežastis nerimauti.
+* Naudokite profiliuoklius našumo kliūtims derinti.
+* Apmokymo ir inferencijos aparatinė įranga turi skirtingus optimalius taškus kainos ir našumo požiūriu.
 
-## Exercises
+## Pratimai
 
-1. Write C code to test whether there is any difference in speed between accessing memory aligned or misaligned relative to the external memory interface. Hint: be careful of caching effects.
-1. Test the difference in speed between accessing memory in sequence or with a given stride.
-1. How could you measure the cache sizes on a CPU?
-1. How would you lay out data across multiple memory channels for maximum bandwidth? How would you lay it out if you had many small threads?
-1. An enterprise-class HDD is spinning at 10,000 rpm. What is the absolutely minimum time an HDD needs to spend worst case before it can read data (you can assume that heads move almost instantaneously)? Why are 2.5" HDDs becoming popular for commercial servers (relative to 3.5" and 5.25" drives)?
-1. Assume that an HDD manufacturer increases the storage density from 1 Tbit per square inch to 5 Tbit per square inch. How much information can you store on a ring on a 2.5" HDD? Is there a difference between the inner and outer tracks?
-1. Going from 8 bit to 16 bit data types increases the amount of silicon approximately by four times. Why? Why might NVIDIA have added INT4 operations to their Turing GPUs?
-1. How much faster is it to read forward through memory vs. reading backwards? Does this number differ between different computers and CPU vendors? Why? Write C code and experiment with it.
-1. Can you measure the cache size of your disk? What is it for a typical HDD? Do SSDs need a cache?
-1. Measure the packet overhead when sending messages across the Ethernet. Look up the difference between UDP and TCP/IP connections.
-1. Direct memory access allows devices other than the CPU to write (and read) directly to (from) memory. Why is this a good idea?
-1. Look at the performance numbers for the Turing T4 GPU. Why does the performance "only" double as you go from FP16 to INT8 and INT4?
-1. What is the shortest time it should take for a packet on a round trip between San Francisco and Amsterdam? Hint: you can assume that the distance is 10,000 km.
+1. Parašykite C kodą, kuris patikrintų, ar yra koks nors greičio skirtumas tarp atminties pasiekimo sulygiuotai ar nesulygiuotai išorinės atminties sąsajos atžvilgiu. Užuomina: saugokitės spartinimo efektų.
+1. Patikrinkite greičio skirtumą tarp atminties pasiekimo nuosekliai arba su duotu žingsniu.
+1. Kaip galėtumėte išmatuoti CPU spartinančiųjų atmintinių dydžius?
+1. Kaip išdėstytumėte duomenis per kelis atminties kanalus maksimaliam pralaidumui? Kaip juos išdėstytumėte, jei turėtumėte daug mažų gijų?
+1. Įmonės klasės HDD sukasi 10 000 aps./min. Koks yra absoliučiai minimalus laikas, kurį blogiausiu atveju HDD turi praleisti prieš galėdamas perskaityti duomenis (galite daryti prielaidą, kad galvutės juda beveik akimirksniu)? Kodėl 2.5" HDD tampa populiarūs komerciniuose serveriuose (palyginti su 3.5" ir 5.25" diskais)?
+1. Tarkime, kad HDD gamintojas padidina saugojimo tankį nuo 1 Tbit kvadratiniam coliui iki 5 Tbit kvadratiniam coliui. Kiek informacijos galite saugoti ant žiedo 2.5" HDD? Ar yra skirtumas tarp vidinių ir išorinių takų?
+1. Pereinant nuo 8 bitų prie 16 bitų duomenų tipų, silicio kiekis padidėja maždaug keturis kartus. Kodėl? Kodėl NVIDIA galėjo pridėti INT4 operacijas savo Turing GPU?
+1. Kiek greičiau skaityti atmintį pirmyn, palyginti su skaitymu atgal? Ar šis skaičius skiriasi tarp skirtingų kompiuterių ir CPU gamintojų? Kodėl? Parašykite C kodą ir eksperimentuokite su juo.
+1. Ar galite išmatuoti savo disko spartinančiosios atmintinės dydį? Koks jis tipiniam HDD? Ar SSD reikia spartinančiosios atmintinės?
+1. Išmatuokite paketų pridėtines sąnaudas siunčiant žinutes per Ethernet. Išsiaiškinkite skirtumą tarp UDP ir TCP/IP ryšių.
+1. Tiesioginė atminties prieiga (angl. *direct memory access*) leidžia kitiems įrenginiams nei CPU tiesiogiai rašyti į atmintį (ir skaityti iš jos). Kodėl tai gera idėja?
+1. Pažiūrėkite į Turing T4 GPU našumo skaičius. Kodėl našumas „tik“ padvigubėja pereinant nuo FP16 prie INT8 ir INT4?
+1. Koks trumpiausias laikas, kurio turėtų prireikti paketui nukeliauti pirmyn ir atgal tarp San Fransisko ir Amsterdamo? Užuomina: galite daryti prielaidą, kad atstumas yra 10 000 km.
 
 
-[Discussions](https://discuss.d2l.ai/t/363)
+[Diskusijos](https://discuss.d2l.ai/t/363)

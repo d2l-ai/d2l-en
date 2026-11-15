@@ -1,85 +1,85 @@
-# Training on Multiple GPUs
+# Apmokymas keliuose GPU
 :label:`sec_multi_gpu`
 
-So far we discussed how to train models efficiently on CPUs and GPUs. We even showed how deep learning frameworks allow one to parallelize computation and communication automatically between them in :numref:`sec_auto_para`. We also showed in :numref:`sec_use_gpu` how to list all the available GPUs on a computer using the `nvidia-smi` command.
-What we did *not* discuss is how to actually parallelize deep learning training.
-Instead, we implied in passing that one would somehow split the data across multiple devices and make it work. The present section fills in the details and shows how to train a network in parallel when starting from scratch. Details on how to take advantage of functionality in high-level APIs is relegated to :numref:`sec_multi_gpu_concise`.
-We assume that you are familiar with minibatch stochastic gradient descent algorithms such as the ones described in :numref:`sec_minibatch_sgd`.
+Iki šiol aptarėme, kaip efektyviai apmokyti modelius CPU ir GPU. Netgi parodėme :numref:`sec_auto_para`, kaip giliojo mokymosi karkasai leidžia automatiškai lygiagretinti skaičiavimą ir komunikaciją tarp jų. Taip pat :numref:`sec_use_gpu` parodėme, kaip išvardyti visus kompiuteryje esamus GPU naudojant komandą `nvidia-smi`.
+To, ką *neaptarėme*, yra tai, kaip iš tikrųjų lygiagretinti giliojo mokymosi apmokymą.
+Vietoj to tarp kita ko numanėme, kad kaip nors padalysime duomenis tarp kelių įrenginių ir tai veiks. Šis skyrelis užpildo detales ir parodo, kaip lygiagrečiai apmokyti tinklą pradedant nuo nulio. Detalės apie tai, kaip pasinaudoti aukšto lygio API funkcionalumu, perkeltos į :numref:`sec_multi_gpu_concise`.
+Darome prielaidą, kad esate susipažinę su minirinkinio stochastinio gradientinio nusileidimo algoritmais, tokiais kaip aprašyti :numref:`sec_minibatch_sgd`.
 
 
-## Splitting the Problem
+## Uždavinio padalijimas
 
-Let's start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end.
-That is, let's start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`.
-Given multiple GPUs (2 if it is a desktop server, 4 on an AWS g4dn.12xlarge instance, 8 on a p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *computation* ability. In a nutshell, we have the following choices, given a minibatch of training data that we want to classify.
+Pradėkime nuo paprasto kompiuterinės regos uždavinio ir kiek archajiško tinklo, pavyzdžiui, su keliais konvoliucijų, sutraukimo sluoksniais ir galbūt keliais pilnai sujungtais sluoksniais pabaigoje.
+Tai yra, pradėkime nuo tinklo, kuris atrodo gana panašiai į LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` arba AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`.
+Turėdami kelis GPU (2, jei tai staliniame kompiuteryje esantis serveris, 4 AWS g4dn.12xlarge egzemplioriuje, 8 p3.16xlarge arba 16 p2.16xlarge), norime suskaidyti apmokymą taip, kad pasiektume gerą pagreitėjimą ir tuo pačiu pasinaudotume paprastais ir atkartojamais dizaino sprendimais. Juk keli GPU padidina ir *atminties*, ir *skaičiavimo* gebą. Trumpai tariant, turime tokius pasirinkimus, turint apmokymo duomenų minirinkinį, kurį norime klasifikuoti.
 
-First, we could partition the network across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
-This allows us to process data with larger networks when compared with what a single GPU could handle.
-Besides,
-memory footprint per GPU can be well controlled (it is a fraction of the total network footprint).
+Pirma, galėtume padalyti tinklą tarp kelių GPU. Tai yra, kiekvienas GPU gauna kaip įvestį duomenis, tekančius į tam tikrą sluoksnį, apdoroja duomenis per kelis vėlesnius sluoksnius ir tada siunčia duomenis kitam GPU.
+Tai leidžia apdoroti duomenis didesniais tinklais, palyginti su tuo, ką galėtų apdoroti vienas GPU.
+Be to,
+atminties poreikį vienam GPU galima gerai kontroliuoti (jis sudaro bendro tinklo poreikio dalį).
 
-However, the interface between layers (and thus GPUs) requires tight synchronization. This can be tricky, in particular if the computational workloads are not properly matched between layers. The problem is exacerbated for large numbers of GPUs.
-The interface between layers also
-requires large amounts of data transfer,
-such as activations and gradients.
-This may overwhelm the bandwidth of the GPU buses.
-Moreover, compute-intensive, yet sequential operations are nontrivial to partition. See e.g., :citet:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework or operating system support for chaining together multiple GPUs.
+Tačiau sąsaja tarp sluoksnių (ir taip GPU) reikalauja glaudaus sinchronizavimo. Tai gali būti sudėtinga, ypač jei skaičiavimo apkrovos tarp sluoksnių nėra tinkamai suderintos. Problema paaštrėja esant dideliam GPU skaičiui.
+Sąsaja tarp sluoksnių taip pat
+reikalauja didelių duomenų perdavimo kiekių,
+pavyzdžiui, aktyvacijų ir gradientų.
+Tai gali viršyti GPU magistralių pralaidumą.
+Be to, daug skaičiavimų reikalaujančias, bet nuoseklias operacijas padalyti nėra paprasta. Žr., pvz., :citet:`Mirhoseini.Pham.Le.ea.2017` – geriausią pastangą šiuo požiūriu. Tai išlieka sudėtinga problema, ir neaišku, ar įmanoma pasiekti gerą (tiesinį) mastelio didėjimą nebanaliems uždaviniams. Nerekomenduojame to, nebent yra puikus karkaso ar operacinės sistemos palaikymas kelių GPU sujungimui į grandinę.
 
 
-Second, we could split the work layerwise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
-Likewise, for a fully connected layer we could split the number of output units. :numref:`fig_alexnet_original` (taken from :citet:`Krizhevsky.Sutskever.Hinton.2012`)
-illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
-This allows for good scaling in terms of computation, provided that the number of channels (or units) is not too small.
-Besides,
-multiple GPUs can process increasingly larger networks since the available memory scales linearly.
+Antra, galėtume padalyti darbą pagal sluoksnius. Pavyzdžiui, užuot skaičiavę 64 kanalus viename GPU, galėtume padalyti uždavinį tarp 4 GPU, kurių kiekvienas generuoja duomenis 16 kanalų.
+Panašiai pilnai sujungtam sluoksniui galėtume padalyti išvesties vienetų skaičių. :numref:`fig_alexnet_original` (paimtas iš :citet:`Krizhevsky.Sutskever.Hinton.2012`)
+iliustruoja šį dizainą, kuriame ši strategija buvo naudojama GPU su labai mažu atminties kiekiu (tuo metu 2 GB).
+Tai leidžia pasiekti gerą mastelio didėjimą skaičiavimo požiūriu, jei kanalų (ar vienetų) skaičius nėra pernelyg mažas.
+Be to,
+keli GPU gali apdoroti vis didesnius tinklus, nes turima atmintis didėja tiesiškai.
 
-![Model parallelism in the original AlexNet design due to limited GPU memory.](../img/alexnet-original.svg)
+![Modelio lygiagretinimas originaliame AlexNet dizaine dėl ribotos GPU atminties.](../img/alexnet-original.svg)
 :label:`fig_alexnet_original`
 
-However,
-we need a *very large* number of synchronization or barrier operations since each layer depends on the results from all the other layers.
-Moreover, the amount of data that needs to be transferred is potentially even larger than when distributing layers across GPUs. Thus, we do not recommend this approach due to its bandwidth cost and complexity.
+Tačiau
+mums reikia *labai didelio* sinchronizavimo ar barjerų operacijų skaičiaus, nes kiekvienas sluoksnis priklauso nuo visų kitų sluoksnių rezultatų.
+Be to, duomenų kiekis, kurį reikia perduoti, potencialiai yra dar didesnis nei paskirstant sluoksnius tarp GPU. Todėl nerekomenduojame šio požiūrio dėl jo pralaidumo kaštų ir sudėtingumo.
 
-Last, we could partition data across multiple GPUs. This way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated across GPUs after each minibatch of training data.
-This is the simplest approach and it can be applied in any situation.
-We only need to synchronize after each minibatch. That said, it is highly desirable to start exchanging gradients parameters already while others are still being computed.
-Moreover, larger numbers of GPUs lead to larger minibatch sizes, thus increasing training efficiency.
-However, adding more GPUs does not allow us to train larger models.
+Galiausiai galėtume padalyti duomenis tarp kelių GPU. Taip visi GPU atlieka to paties tipo darbą, nors ir su skirtingais stebiniais. Gradientai agreguojami per GPU po kiekvieno apmokymo duomenų minirinkinio.
+Tai paprasčiausias požiūris, ir jį galima taikyti bet kuriose situacijose.
+Sinchronizuoti reikia tik po kiekvieno minirinkinio. Vis dėlto labai pageidautina pradėti keistis gradientų parametrais jau tada, kai kiti dar skaičiuojami.
+Be to, didesnis GPU skaičius lemia didesnius minirinkinių dydžius, taip padidindamas apmokymo efektyvumą.
+Tačiau pridėjus daugiau GPU negalime apmokyti didesnių modelių.
 
 
-![Parallelization on multiple GPUs. From left to right: original problem, network partitioning, layerwise partitioning, data parallelism.](../img/splitting.svg)
+![Lygiagretinimas keliuose GPU. Iš kairės į dešinę: pradinis uždavinys, tinklo padalijimas, padalijimas pagal sluoksnius, duomenų lygiagretumas.](../img/splitting.svg)
 :label:`fig_splitting`
 
 
-A comparison of different ways of parallelization on multiple GPUs is depicted in :numref:`fig_splitting`.
-By and large, data parallelism is the most convenient way to proceed, provided that we have access to GPUs with sufficiently large memory. See also :cite:`Li.Andersen.Park.ea.2014` for a detailed description of partitioning for distributed training. GPU memory used to be a problem in the early days of deep learning. By now this issue has been resolved for all but the most unusual cases. We focus on data parallelism in what follows.
+Skirtingų lygiagretinimo keliuose GPU būdų palyginimas pavaizduotas :numref:`fig_splitting`.
+Apskritai duomenų lygiagretumas yra patogiausias būdas, jei turime prieigą prie pakankamai didelės atminties GPU. Taip pat žr. :cite:`Li.Andersen.Park.ea.2014` išsamiam paskirstytojo apmokymo skaidymo aprašymui. GPU atmintis buvo problema pirmaisiais giliojo mokymosi laikais. Šiuo metu ši problema išspręsta visais atvejais, išskyrus patį neįprasčiausius. Toliau sutelkiame dėmesį į duomenų lygiagretumą.
 
-## Data Parallelism
+## Duomenų lygiagretumas
 
-Assume that there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently though parameter values across the GPUs are identical and synchronized.
-As an example,
-:numref:`fig_data_parallel` illustrates
-training with
-data parallelism when $k=2$.
+Tarkime, kad kompiuteryje yra $k$ GPU. Turint apmokomą modelį, kiekvienas GPU nepriklausomai palaikys pilną modelio parametrų aibę, nors parametrų reikšmės tarp GPU yra identiškos ir sinchronizuotos.
+Pavyzdžiui,
+:numref:`fig_data_parallel` iliustruoja
+apmokymą su
+duomenų lygiagretumu, kai $k=2$.
 
 
-![Calculation of minibatch stochastic gradient descent using data parallelism on two GPUs.](../img/data-parallel.svg)
+![Minirinkinio stochastinio gradientinio nusileidimo skaičiavimas naudojant duomenų lygiagretumą dviejuose GPU.](../img/data-parallel.svg)
 :label:`fig_data_parallel`
 
-In general, the training proceeds as follows:
+Apskritai apmokymas vyksta taip:
 
-* In any iteration of training, given a random minibatch, we split the examples in the batch into $k$ portions and distribute them evenly across the GPUs.
-* Each GPU calculates loss and gradient of the model parameters based on the minibatch subset it was assigned.
-* The local gradients of each of the $k$ GPUs are aggregated to obtain the current minibatch stochastic gradient.
-* The aggregate gradient is re-distributed to each GPU.
-* Each GPU uses this minibatch stochastic gradient to update the complete set of model parameters that it maintains.
-
-
+* Bet kurioje apmokymo iteracijoje, turint atsitiktinį minirinkinį, rinkinyje esančius pavyzdžius padalijame į $k$ dalių ir vienodai paskirstome tarp GPU.
+* Kiekvienas GPU apskaičiuoja modelio parametrų nuostolį ir gradientą pagal jam priskirtą minirinkinio poaibį.
+* Kiekvieno iš $k$ GPU lokalūs gradientai agreguojami, kad gautume dabartinį minirinkinio stochastinį gradientą.
+* Agreguotas gradientas perskirstomas kiekvienam GPU.
+* Kiekvienas GPU naudoja šį minirinkinio stochastinį gradientą, kad atnaujintų pilną jo palaikomą modelio parametrų aibę.
 
 
-Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16-GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly.
-Also note that batch normalization in :numref:`sec_batch_norm` needs to be adjusted, e.g., by keeping a separate batch normalization coefficient per GPU.
-In what follows we will use a toy network to illustrate multi-GPU training.
+
+
+Atkreipkite dėmesį, kad praktikoje, apmokant $k$ GPU, minirinkinio dydį *padidiname* $k$ kartų, kad kiekvienas GPU turėtų tiek pat darbo, kaip jei apmokytume tik vieną GPU. 16 GPU serveryje tai gali žymiai padidinti minirinkinio dydį, todėl gali tekti atitinkamai padidinti mokymosi greitį.
+Taip pat atkreipkite dėmesį, kad :numref:`sec_batch_norm` paketinę normalizaciją reikia pritaikyti, pavyzdžiui, palaikant atskirą paketinės normalizacijos koeficientą kiekvienam GPU.
+Toliau naudosime žaislinį tinklą keliems GPU skirtam apmokymui iliustruoti.
 
 ```{.python .input}
 #@tab mxnet
@@ -98,9 +98,9 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-## [**A Toy Network**]
+## [**Žaislinis tinklas**]
 
-We use LeNet as introduced in :numref:`sec_lenet` (with slight modifications). We define it from scratch to illustrate parameter exchange and synchronization in detail.
+Naudojame LeNet, kaip pristatyta :numref:`sec_lenet` (su nedideliais pakeitimais). Apibrėžiame jį nuo nulio, kad detaliai iliustruotume parametrų keitimąsi ir sinchronizavimą.
 
 ```{.python .input}
 #@tab mxnet
@@ -170,11 +170,11 @@ def lenet(X, params):
 loss = nn.CrossEntropyLoss(reduction='none')
 ```
 
-## Data Synchronization
+## Duomenų sinchronizavimas
 
-For efficient multi-GPU training we need two basic operations.
-First we need to have the ability to [**distribute a list of parameters to multiple devices**] and to attach gradients (`get_params`). Without parameters it is impossible to evaluate the network on a GPU.
-Second, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
+Efektyviam apmokymui keliuose GPU mums reikia dviejų pagrindinių operacijų.
+Pirma, turime turėti galimybę [**paskirstyti parametrų sąrašą keliems įrenginiams**] ir pridėti gradientus (`get_params`). Be parametrų neįmanoma įvertinti tinklo GPU.
+Antra, mums reikia galimybės sumuoti parametrus per kelis įrenginius, t. y. mums reikia funkcijos `allreduce`.
 
 ```{.python .input}
 #@tab mxnet
@@ -194,7 +194,7 @@ def get_params(params, device):
     return new_params
 ```
 
-Let's try it out by copying the model parameters to one GPU.
+Išbandykime nukopijuodami modelio parametrus į vieną GPU.
 
 ```{.python .input}
 #@tab all
@@ -203,8 +203,8 @@ print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
 ```
 
-Since we did not perform any computation yet, the gradient with regard to the bias parameter is still zero.
-Now let's assume that we have a vector distributed across multiple GPUs. The following [**`allreduce` function adds up all vectors and broadcasts the result back to all GPUs**]. Note that for this to work we need to copy the data to the device accumulating the results.
+Kadangi dar neatlikome jokių skaičiavimų, poslinkio parametro gradientas vis dar lygus nuliui.
+Dabar tarkime, kad turime vektorių, paskirstytą keliuose GPU. Ši [**funkcija `allreduce` sudeda visus vektorius ir išplatina rezultatą atgal visiems GPU**]. Atkreipkite dėmesį, kad tam, kad tai veiktų, turime nukopijuoti duomenis į įrenginį, kuris kaupia rezultatus.
 
 ```{.python .input}
 #@tab mxnet
@@ -224,7 +224,7 @@ def allreduce(data):
         data[i][:] = data[0].to(data[i].device)
 ```
 
-Let's test this by creating vectors with different values on different devices and aggregate them.
+Patikrinkime tai sukurdami vektorius su skirtingomis reikšmėmis skirtinguose įrenginiuose ir juos suagreguodami.
 
 ```{.python .input}
 #@tab mxnet
@@ -242,10 +242,10 @@ allreduce(data)
 print('after allreduce:\n', data[0], '\n', data[1])
 ```
 
-## Distributing Data
+## Duomenų paskirstymas
 
-We need a simple utility function to [**distribute a minibatch evenly across multiple GPUs**]. For instance, on two GPUs we would like to have half of the data to be copied to either of the GPUs.
-Since it is more convenient and more concise, we use the built-in function from the deep learning framework to try it out on a $4 \times 5$ matrix.
+Mums reikia paprastos pagalbinės funkcijos, kad [**vienodai paskirstytume minirinkinį tarp kelių GPU**]. Pavyzdžiui, dviejuose GPU norėtume, kad pusė duomenų būtų nukopijuota į kiekvieną iš GPU.
+Kadangi tai patogiau ir glausčiau, naudojame giliojo mokymosi karkaso integruotą funkciją, kad išbandytume ją su $4 \times 5$ matrica.
 
 ```{.python .input}
 #@tab mxnet
@@ -267,7 +267,7 @@ print('load into', devices)
 print('output:', split)
 ```
 
-For later reuse we define a `split_batch` function that splits both data and labels.
+Vėlesniam pakartotiniam naudojimui apibrėžiame funkciją `split_batch`, kuri padalija ir duomenis, ir žymes.
 
 ```{.python .input}
 #@tab mxnet
@@ -289,9 +289,9 @@ def split_batch(X, y, devices):
             nn.parallel.scatter(y, devices))
 ```
 
-## Training
+## Apmokymas
 
-Now we can implement [**multi-GPU training on a single minibatch**]. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the computational graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
+Dabar galime įgyvendinti [**apmokymą keliuose GPU vienam minirinkiniui**]. Jo įgyvendinimas daugiausia grindžiamas šiame skyrelyje aprašytu duomenų lygiagretumo požiūriu. Naudosime ką tik aptartas pagalbines funkcijas `allreduce` ir `split_and_load`, kad sinchronizuotume duomenis tarp kelių GPU. Atkreipkite dėmesį, kad nereikia rašyti jokio specialaus kodo lygiagretumui pasiekti. Kadangi skaičiavimo grafas neturi jokių priklausomybių tarp įrenginių vieno minirinkinio viduje, jis vykdomas lygiagrečiai *automatiškai*.
 
 ```{.python .input}
 #@tab mxnet
@@ -330,8 +330,8 @@ def train_batch(X, y, device_params, devices, lr):
         d2l.sgd(param, lr, X.shape[0]) # Here, we use a full-size batch
 ```
 
-Now, we can define [**the training function**]. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all the devices.
-Obviously each batch is processed using the `train_batch` function to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU, though this is *inefficient* since the other GPUs are idle.
+Dabar galime apibrėžti [**apmokymo funkciją**]. Ji šiek tiek skiriasi nuo naudotų ankstesniuose skyriuose: turime paskirti GPU ir nukopijuoti visus modelio parametrus į visus įrenginius.
+Akivaizdu, kad kiekvienas rinkinys apdorojamas naudojant funkciją `train_batch`, kad būtų galima tvarkyti kelis GPU. Patogumo (ir kodo glaustumo) dėlei tikslumą apskaičiuojame viename GPU, nors tai *neefektyvu*, nes kiti GPU dykinėja.
 
 ```{.python .input}
 #@tab mxnet
@@ -381,42 +381,42 @@ def train(num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
-Let's see how well this works [**on a single GPU**].
-We first use a batch size of 256 and a learning rate of 0.2.
+Pažiūrėkime, kaip gerai tai veikia [**viename GPU**].
+Pirmiausia naudojame 256 rinkinio dydį ir 0.2 mokymosi greitį.
 
 ```{.python .input}
 #@tab all
 train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
-By keeping the batch size and learning rate unchanged and [**increasing the number of GPUs to 2**], we can see that the test accuracy roughly stays the same compared with
-the previous experiment.
-In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward.
-Let's see what happens nonetheless for Fashion-MNIST.
+Palikę rinkinio dydį ir mokymosi greitį nepakeistus ir [**padidinę GPU skaičių iki 2**], matome, kad testavimo tikslumas maždaug išlieka toks pat, palyginti su
+ankstesniu eksperimentu.
+Optimizavimo algoritmų požiūriu jie yra identiški. Deja, čia negalima pasiekti prasmingo pagreitėjimo: modelis tiesiog per mažas; be to, turime tik nedidelį duomenų rinkinį, kuriame mūsų šiek tiek paprastas apmokymo keliuose GPU įgyvendinimo būdas patyrė didelių Python pridėtinių sąnaudų. Toliau susidursime su sudėtingesniais modeliais ir sudėtingesniais lygiagretinimo būdais.
+Vis dėlto pažiūrėkime, kas nutinka su Fashion-MNIST.
 
 ```{.python .input}
 #@tab all
 train(num_gpus=2, batch_size=256, lr=0.2)
 ```
 
-## Summary
+## Santrauka
 
-* There are multiple ways to split deep network training over multiple GPUs. We could split them between layers, across layers, or across data. The former two require tightly choreographed data transfers. Data parallelism is the simplest strategy.
-* Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient.
-* In data parallelism, data is split across multiple GPUs, where each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results are broadcast back to the GPUs.
-* We may use slightly increased learning rates for larger minibatches.
+* Yra keli būdai, kaip padalyti giliojo tinklo apmokymą tarp kelių GPU. Galime jį padalyti tarp sluoksnių, per sluoksnius arba per duomenis. Pirmieji du reikalauja glaudžiai choreografuotų duomenų perdavimų. Duomenų lygiagretumas yra paprasčiausia strategija.
+* Duomenų lygiagretusis apmokymas yra tiesmukas. Tačiau, kad būtų efektyvus, jis padidina efektyvų minirinkinio dydį.
+* Duomenų lygiagretume duomenys padalijami tarp kelių GPU, kur kiekvienas GPU vykdo savo tiesioginio ir atgalinio sklidimo operaciją, o vėliau gradientai agreguojami ir rezultatai išplatinami atgal GPU.
+* Didesniems minirinkiniams galime naudoti šiek tiek padidintus mokymosi greičius.
 
-## Exercises
+## Pratimai
 
-1. When training on $k$ GPUs, change the minibatch size from $b$ to $k \cdot b$, i.e., scale it up by the number of GPUs.
-1. Compare accuracy for different learning rates. How does it scale with the number of GPUs?
-1. Implement a more efficient `allreduce` function that aggregates different parameters on different GPUs? Why is it more efficient?
-1. Implement multi-GPU test accuracy computation.
+1. Apmokydami $k$ GPU, pakeiskite minirinkinio dydį iš $b$ į $k \cdot b$, t. y. padidinkite jį GPU skaičiumi.
+1. Palyginkite tikslumą esant skirtingiems mokymosi greičiams. Kaip jis kinta priklausomai nuo GPU skaičiaus?
+1. Įgyvendinkite efektyvesnę funkciją `allreduce`, kuri agreguotų skirtingus parametrus skirtinguose GPU. Kodėl ji efektyvesnė?
+1. Įgyvendinkite testavimo tikslumo skaičiavimą keliuose GPU.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/364)
+[Diskusijos](https://discuss.d2l.ai/t/364)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1669)
+[Diskusijos](https://discuss.d2l.ai/t/1669)
 :end_tab:

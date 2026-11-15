@@ -2,22 +2,22 @@
 :label:`sec_rmsprop`
 
 
-One of the key issues in :numref:`sec_adagrad` is that the learning rate decreases at a predefined schedule of effectively $\mathcal{O}(t^{-\frac{1}{2}})$. While this is generally appropriate for convex problems, it might not be ideal for nonconvex ones, such as those encountered in deep learning. Yet, the coordinate-wise adaptivity of Adagrad is highly desirable as a preconditioner.
+Viena pagrindinių :numref:`sec_adagrad` problemų yra ta, kad mokymosi greitis mažėja pagal iš anksto nustatytą grafiką, efektyviai $\mathcal{O}(t^{-\frac{1}{2}})$. Nors tai paprastai tinka iškiliosioms problemoms, neiškiliosioms, tokioms kaip sutinkamos giliajame mokymesi, tai gali būti neidealu. Vis dėlto koordinatėms specifinis Adagrad prisitaikymas yra labai pageidautinas kaip prekondicionuotojas.
 
-:citet:`Tieleman.Hinton.2012` proposed the RMSProp algorithm as a simple fix to decouple rate scheduling from coordinate-adaptive learning rates. The issue is that Adagrad accumulates the squares of the gradient $\mathbf{g}_t$ into a state vector $\mathbf{s}_t = \mathbf{s}_{t-1} + \mathbf{g}_t^2$. As a result $\mathbf{s}_t$ keeps on growing without bound due to the lack of normalization, essentially linearly as the algorithm converges.
+:citet:`Tieleman.Hinton.2012` pasiūlė RMSProp algoritmą kaip paprastą sprendimą, atskiriantį greičio planavimą nuo koordinatėms adaptyvių mokymosi greičių. Problema ta, kad Adagrad kaupia gradiento $\mathbf{g}_t$ kvadratus būsenos vektoriuje $\mathbf{s}_t = \mathbf{s}_{t-1} + \mathbf{g}_t^2$. Dėl to $\mathbf{s}_t$ be paliovos auga be ribų dėl normalizavimo nebuvimo, iš esmės tiesiškai, algoritmui konverguojant.
 
-One way of fixing this problem would be to use $\mathbf{s}_t / t$. For reasonable distributions of $\mathbf{g}_t$ this will converge. Unfortunately it might take a very long time until the limit behavior starts to matter since the procedure remembers the full trajectory of values. An alternative is to use a leaky average in the same way we used in the momentum method, i.e., $\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1-\gamma) \mathbf{g}_t^2$ for some parameter $\gamma > 0$. Keeping all other parts unchanged yields RMSProp.
+Vienas būdas ištaisyti šią problemą būtų naudoti $\mathbf{s}_t / t$. Pagrįstiems $\mathbf{g}_t$ skirstiniams tai konverguos. Deja, gali užtrukti labai ilgai, kol ribinis elgesys pradės turėti reikšmės, nes procedūra prisimena visą reikšmių trajektoriją. Alternatyva yra naudoti nuotėkio vidurkį taip pat, kaip naudojome momentų metode, t. y. $\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1-\gamma) \mathbf{g}_t^2$ su tam tikru parametru $\gamma > 0$. Palikus visas kitas dalis nepakeistas, gaunamas RMSProp.
 
-## The Algorithm
+## Algoritmas
 
-Let's write out the equations in detail.
+Užrašykime lygtis išsamiai.
 
 $$\begin{aligned}
     \mathbf{s}_t & \leftarrow \gamma \mathbf{s}_{t-1} + (1 - \gamma) \mathbf{g}_t^2, \\
     \mathbf{x}_t & \leftarrow \mathbf{x}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \mathbf{g}_t.
 \end{aligned}$$
 
-The constant $\epsilon > 0$ is typically set to $10^{-6}$ to ensure that we do not suffer from division by zero or overly large step sizes. Given this expansion we are now free to control the learning rate $\eta$ independently of the scaling that is applied on a per-coordinate basis. In terms of leaky averages we can apply the same reasoning as previously applied in the case of the momentum method. Expanding the definition of $\mathbf{s}_t$ yields
+Konstanta $\epsilon > 0$ paprastai nustatoma $10^{-6}$, kad išvengtume dalybos iš nulio ar pernelyg didelių žingsnių dydžių. Turėdami šį išplėtimą, galime laisvai valdyti mokymosi greitį $\eta$ nepriklausomai nuo mastelio keitimo, taikomo kiekvienai koordinatei atskirai. Nuotėkio vidurkių atžvilgiu galime taikyti tą pačią logiką, kaip anksčiau taikėme momentų metode. Išplėtus $\mathbf{s}_t$ apibrėžimą, gauname
 
 $$
 \begin{aligned}
@@ -26,7 +26,7 @@ $$
 \end{aligned}
 $$
 
-As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots, = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 time steps for various choices of $\gamma$.
+Kaip ir anksčiau :numref:`sec_momentum`, naudojame $1 + \gamma + \gamma^2 + \ldots, = \frac{1}{1-\gamma}$. Taigi svorių suma normalizuojama iki $1$, o stebėjimo pusėjimo trukmė yra $\gamma^{-1}$. Pavaizduokime svorius paskutiniams 40 laiko žingsnių su įvairiomis $\gamma$ reikšmėmis.
 
 ```{.python .input}
 #@tab mxnet
@@ -62,9 +62,9 @@ for gamma in gammas:
 d2l.plt.xlabel('time');
 ```
 
-## Implementation from Scratch
+## Įgyvendinimas nuo nulio
 
-As before we use the quadratic function $f(\mathbf{x})=0.1x_1^2+2x_2^2$ to observe the trajectory of RMSProp. Recall that in :numref:`sec_adagrad`, when we used Adagrad with a learning rate of 0.4, the variables moved only very slowly in the later stages of the algorithm since the learning rate decreased too quickly. Since $\eta$ is controlled separately this does not happen with RMSProp.
+Kaip ir anksčiau, naudojame kvadratinę funkciją $f(\mathbf{x})=0.1x_1^2+2x_2^2$ RMSProp trajektorijai stebėti. Prisiminkite, kad :numref:`sec_adagrad`, kai naudojome Adagrad su 0,4 mokymosi greičiu, kintamieji vėlesniuose algoritmo etapuose judėjo tik labai lėtai, nes mokymosi greitis mažėjo per greitai. Kadangi $\eta$ valdomas atskirai, RMSProp taip nenutinka.
 
 ```{.python .input}
 #@tab all
@@ -83,7 +83,7 @@ eta, gamma = 0.4, 0.9
 d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 ```
 
-Next, we implement RMSProp to be used in a deep network. This is equally straightforward.
+Toliau įgyvendiname RMSProp, kuris bus naudojamas giliajame tinkle. Tai lygiai taip pat paprasta.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -130,7 +130,7 @@ def rmsprop(params, grads, states, hyperparams):
         p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
 ```
 
-We set the initial learning rate to 0.01 and the weighting term $\gamma$ to 0.9. That is, $\mathbf{s}$ aggregates on average over the past $1/(1-\gamma) = 10$ observations of the square gradient.
+Pradinį mokymosi greitį nustatome 0,01, o svorio narį $\gamma$ – 0,9. Tai yra, $\mathbf{s}$ vidutiniškai agreguoja paskutinius $1/(1-\gamma) = 10$ gradiento kvadrato stebėjimų.
 
 ```{.python .input}
 #@tab all
@@ -139,9 +139,9 @@ d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
                {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);
 ```
 
-## Concise Implementation
+## Glaustas įgyvendinimas
 
-Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
+Kadangi RMSProp yra gana populiarus algoritmas, jis taip pat prieinamas `Trainer` egzemplioriuje. Tereikia jį sukurti naudojant algoritmą, pavadintą `rmsprop`, ir priskiriant $\gamma$ parametrui `gamma1`.
 
 ```{.python .input}
 #@tab mxnet
@@ -163,28 +163,28 @@ d2l.train_concise_ch11(trainer, {'learning_rate': 0.01, 'rho': 0.9},
                        data_iter)
 ```
 
-## Summary
+## Santrauka
 
-* RMSProp is very similar to Adagrad insofar as both use the square of the gradient to scale coefficients.
-* RMSProp shares with momentum the leaky averaging. However, RMSProp uses the technique to adjust the coefficient-wise preconditioner.
-* The learning rate needs to be scheduled by the experimenter in practice.
-* The coefficient $\gamma$ determines how long the history is when adjusting the per-coordinate scale.
+* RMSProp labai panašus į Adagrad tuo, kad abu naudoja gradiento kvadratą koeficientams mastelio keitimui.
+* RMSProp su momentų metodu dalijasi nuotėkio vidurkinimu. Tačiau RMSProp šį metodą naudoja koeficientams specifiniam prekondicionuotojui koreguoti.
+* Praktikoje mokymosi greitį turi suplanuoti eksperimentuotojas.
+* Koeficientas $\gamma$ nustato, kokia ilga yra istorija koreguojant kiekvienos koordinatės mastelį.
 
-## Exercises
+## Pratimai
 
-1. What happens experimentally if we set $\gamma = 1$? Why?
-1. Rotate the optimization problem to minimize $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. What happens to the convergence?
-1. Try out what happens to RMSProp on a real machine learning problem, such as training on Fashion-MNIST. Experiment with different choices for adjusting the learning rate.
-1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
+1. Kas eksperimentiškai nutinka, jei nustatome $\gamma = 1$? Kodėl?
+1. Pasukite optimizavimo uždavinį, kad minimizuotumėte $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Kas nutinka konvergavimui?
+1. Išbandykite, kas nutinka RMSProp realioje mašininio mokymosi problemoje, pavyzdžiui, apmokant Fashion-MNIST. Eksperimentuokite su skirtingais mokymosi greičio koregavimo pasirinkimais.
+1. Ar norėtumėte koreguoti $\gamma$ optimizavimui vykstant? Kiek RMSProp jautrus tam?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/356)
+[Diskusijos](https://discuss.d2l.ai/t/356)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1074)
+[Diskusijos](https://discuss.d2l.ai/t/1074)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1075)
+[Diskusijos](https://discuss.d2l.ai/t/1075)
 :end_tab:

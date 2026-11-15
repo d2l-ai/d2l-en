@@ -1,11 +1,11 @@
-# Asynchronous Computation
+# Asinchroniniai skaičiavimai
 :label:`sec_async`
 
-Today's computers are highly parallel systems, consisting of multiple CPU cores (often multiple threads per core), multiple processing elements per GPU, and often multiple GPUs per device. In short, we can process many different things at the same time, often on different devices. Unfortunately Python is not a great way of writing parallel and asynchronous code, at least not without some extra help. After all, Python is single-threaded and this is unlikely to change in the future. Deep learning frameworks such as MXNet and TensorFlow adopt an *asynchronous programming* model to improve performance,
-while PyTorch uses Python's own scheduler leading to a different performance trade-off.
-For PyTorch, by default, GPU operations are asynchronous. When you call a function that uses the GPU, the operations are enqueued to the particular device, but not necessarily executed until later. This allows us to execute more computations in parallel, including operations on the CPU or other GPUs.
+Šiandieniniai kompiuteriai yra labai lygiagrečios sistemos, sudarytos iš kelių CPU branduolių (dažnai su keliomis gijomis kiekvienam branduoliui), kelių apdorojimo elementų kiekviename GPU ir dažnai kelių GPU kiekviename įrenginyje. Trumpai tariant, galime apdoroti daug skirtingų dalykų vienu metu, dažnai skirtinguose įrenginiuose. Deja, Python nėra puikus būdas rašyti lygiagretų ir asinchroninį kodą, bent jau be papildomos pagalbos. Juk Python yra vienagijis, ir tai vargu ar pasikeis ateityje. Giliojo mokymosi karkasai, tokie kaip MXNet ir TensorFlow, naudoja *asinchroninio programavimo* modelį našumui pagerinti,
+o PyTorch naudoja paties Python planuoklį, todėl našumo kompromisas yra kitoks.
+PyTorch pagal numatytuosius nustatymus GPU operacijos yra asinchroninės. Kai iškviečiate funkciją, naudojančią GPU, operacijos įtraukiamos į konkretaus įrenginio eilę, bet nebūtinai įvykdomos iš karto, o tik vėliau. Tai leidžia mums vykdyti daugiau skaičiavimų lygiagrečiai, įskaitant operacijas CPU ar kituose GPU.
 
-Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization.
+Todėl supratimas, kaip veikia asinchroninis programavimas, padeda mums kurti efektyvesnes programas proaktyviai mažinant skaičiavimo reikalavimus ir tarpusavio priklausomybes. Tai leidžia sumažinti atminties pridėtines sąnaudas ir padidinti procesorių panaudojimą.
 
 ```{.python .input}
 #@tab mxnet
@@ -24,15 +24,15 @@ import torch
 from torch import nn
 ```
 
-## Asynchrony via Backend
+## Asinchroniškumas per vidinę dalį
 
 :begin_tab:`mxnet`
-For a warmup consider the following toy problem: we want to generate a random matrix and multiply it. Let's do that both in NumPy and in `mxnet.np` to see the difference.
+Apšilimui panagrinėkime tokį žaislinį uždavinį: norime sugeneruoti atsitiktinę matricą ir ją sudauginti. Padarykime tai ir su NumPy, ir su `mxnet.np`, kad pamatytume skirtumą.
 :end_tab:
 
 :begin_tab:`pytorch`
-For a warmup consider the following toy problem: we want to generate a random matrix and multiply it. Let's do that both in NumPy and in PyTorch tensor to see the difference.
-Note that PyTorch `tensor` is defined on a GPU.
+Apšilimui panagrinėkime tokį žaislinį uždavinį: norime sugeneruoti atsitiktinę matricą ir ją sudauginti. Padarykime tai ir su NumPy, ir su PyTorch tenzoriumi, kad pamatytume skirtumą.
+Atkreipkite dėmesį, kad PyTorch `tensor` apibrėžtas GPU.
 :end_tab:
 
 ```{.python .input}
@@ -67,20 +67,20 @@ with d2l.Benchmark('torch'):
 ```
 
 :begin_tab:`mxnet`
-The benchmark output via MXNet is orders of magnitude faster. Since both are executed on the same processor something else must be going on.
-Forcing MXNet to finish all the backend computation prior to returning shows what happened previously: computation is executed by the backend while the frontend returns control to Python.
+Lyginamosios analizės išvestis per MXNet yra eilėmis greitesnė. Kadangi abi vykdomos tame pačiame procesoriuje, turi vykti kažkas kita.
+Priversdami MXNet baigti visus vidinės dalies skaičiavimus prieš grąžinant rezultatą, matome, kas anksčiau įvyko: skaičiavimas vykdomas vidinėje dalyje, o priekinė dalis grąžina valdymą Python.
 :end_tab:
 
 :begin_tab:`pytorch`
-The benchmark output via PyTorch is orders of magnitude faster.
-NumPy dot product is executed on the CPU processor while
-PyTorch matrix multiplication is executed on GPU and hence the latter
-is expected to be much faster. But the huge time difference suggests something
-else must be going on.
-By default, GPU operations are asynchronous in PyTorch.
-Forcing PyTorch to finish all computation prior to returning shows
-what happened previously: computation is being executed by the backend
-while the frontend returns control to Python.
+Lyginamosios analizės išvestis per PyTorch yra eilėmis greitesnė.
+NumPy skaliarinė sandauga vykdoma CPU procesoriuje, o
+PyTorch matricų daugyba vykdoma GPU, todėl tikimasi, kad pastaroji
+bus daug greitesnė. Tačiau didžiulis laiko skirtumas rodo, kad turi vykti
+kažkas kita.
+PyTorch pagal numatytuosius nustatymus GPU operacijos yra asinchroninės.
+Priversdami PyTorch baigti visus skaičiavimus prieš grąžinant rezultatą, matome,
+kas anksčiau įvyko: skaičiavimas vykdomas vidinėje dalyje,
+o priekinė dalis grąžina valdymą Python.
 :end_tab:
 
 ```{.python .input}
@@ -102,25 +102,25 @@ with d2l.Benchmark():
 ```
 
 :begin_tab:`mxnet`
-Broadly speaking, MXNet has a frontend for direct interactions with users, e.g., via Python, as well as a backend used by the system to perform the computation. 
-As shown in :numref:`fig_frontends`, users can write MXNet programs in various frontend languages, such as Python, R, Scala, and C++. Regardless of the frontend programming language used, the execution of MXNet programs occurs primarily in the backend of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. 
-The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence, it is not possible to parallelize operations that depend on each other.
+Plačiai kalbant, MXNet turi priekinę dalį (angl. *frontend*) tiesioginei sąveikai su naudotojais, pavyzdžiui, per Python, taip pat vidinę dalį (angl. *backend*), kurią sistema naudoja skaičiavimams atlikti.
+Kaip parodyta :numref:`fig_frontends`, naudotojai gali rašyti MXNet programas įvairiomis priekinės dalies kalbomis, pavyzdžiui, Python, R, Scala ir C++. Nepriklausomai nuo naudojamos priekinės dalies programavimo kalbos, MXNet programų vykdymas vyksta daugiausia vidinėje C++ įgyvendinimų dalyje. Priekinės dalies kalbos išduotos operacijos perduodamos vidinei daliai vykdyti.
+Vidinė dalis valdo savo gijas, kurios nuolat renka ir vykdo eilėje esančias užduotis. Atkreipkite dėmesį, kad tam, kad tai veiktų, vidinė dalis turi gebėti sekti priklausomybes tarp įvairių skaičiavimo grafo žingsnių. Todėl negalima lygiagretinti operacijų, kurios priklauso viena nuo kitos.
 :end_tab:
 
 :begin_tab:`pytorch`
-Broadly speaking, PyTorch has a frontend for direct interaction with the users, e.g., via Python, as well as a backend used by the system to perform the computation. 
-As shown in :numref:`fig_frontends`, users can write PyTorch programs in various frontend languages, such as Python and C++. Regardless of the frontend programming language used, the execution of PyTorch programs occurs primarily in the backend of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution.
-The backend manages its own threads that continuously collect and execute queued tasks.
-Note that for this to work the backend must be able to keep track of the
-dependencies between various steps in the computational graph.
-Hence, it is not possible to parallelize operations that depend on each other.
+Plačiai kalbant, PyTorch turi priekinę dalį (angl. *frontend*) tiesioginei sąveikai su naudotojais, pavyzdžiui, per Python, taip pat vidinę dalį (angl. *backend*), kurią sistema naudoja skaičiavimams atlikti.
+Kaip parodyta :numref:`fig_frontends`, naudotojai gali rašyti PyTorch programas įvairiomis priekinės dalies kalbomis, pavyzdžiui, Python ir C++. Nepriklausomai nuo naudojamos priekinės dalies programavimo kalbos, PyTorch programų vykdymas vyksta daugiausia vidinėje C++ įgyvendinimų dalyje. Priekinės dalies kalbos išduotos operacijos perduodamos vidinei daliai vykdyti.
+Vidinė dalis valdo savo gijas, kurios nuolat renka ir vykdo eilėje esančias užduotis.
+Atkreipkite dėmesį, kad tam, kad tai veiktų, vidinė dalis turi gebėti sekti
+priklausomybes tarp įvairių skaičiavimo grafo žingsnių.
+Todėl negalima lygiagretinti operacijų, kurios priklauso viena nuo kitos.
 :end_tab:
 
-![Programming language frontends and deep learning framework backends.](../img/frontends.png)
+![Programavimo kalbų priekinės dalys ir giliojo mokymosi karkasų vidinės dalys.](../img/frontends.png)
 :width:`300px`
 :label:`fig_frontends`
 
-Let's look at another toy example to understand the dependency graph a bit better.
+Pažiūrėkime į kitą žaislinį pavyzdį, kad geriau suprastume priklausomybių grafą.
 
 ```{.python .input}
 #@tab mxnet
@@ -138,29 +138,29 @@ z = x * y + 2
 z
 ```
 
-![The backend tracks dependencies between various steps in the computational graph.](../img/asyncgraph.svg)
+![Vidinė dalis seka priklausomybes tarp įvairių skaičiavimo grafo žingsnių.](../img/asyncgraph.svg)
 :label:`fig_asyncgraph`
 
 
 
-The code snippet above is also illustrated in :numref:`fig_asyncgraph`.
-Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement's results need to be *printed*, the Python frontend thread will wait for the C++ backend thread to finish computing the result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program's overall performance, regardless of Python's performance. :numref:`fig_threading` illustrates how frontend and backend interact.
+Aukščiau pateiktas kodo fragmentas taip pat iliustruotas :numref:`fig_asyncgraph`.
+Kai Python priekinės dalies gija vykdo vieną iš pirmųjų trijų sakinių, ji tiesiog grąžina užduotį į vidinės dalies eilę. Kai paskutinio sakinio rezultatus reikia *atspausdinti*, Python priekinės dalies gija lauks, kol C++ vidinės dalies gija baigs skaičiuoti kintamojo `z` rezultatą. Vienas šio dizaino privalumas yra tas, kad Python priekinės dalies gijai nereikia atlikti tikrų skaičiavimų. Todėl bendram programos našumui turi mažai įtakos, koks yra paties Python našumas. :numref:`fig_threading` iliustruoja, kaip sąveikauja priekinė ir vidinė dalys.
 
-![Interactions of the frontend and backend.](../img/threading.svg)
+![Priekinės ir vidinės dalių sąveika.](../img/threading.svg)
 :label:`fig_threading`
 
 
 
 
-## Barriers and Blockers
+## Barjerai ir blokatoriai
 
 :begin_tab:`mxnet`
-There are a number of operations that will force Python to wait for completion:
+Yra keletas operacijų, kurios privers Python laukti, kol jos bus baigtos:
 
-* Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance.
-* If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards.
+* Akivaizdžiausia, `npx.waitall()` laukia, kol baigsis visi skaičiavimai, nepriklausomai nuo to, kada skaičiavimo instrukcijos buvo išduotos. Praktikoje šį operatorių naudoti yra bloga idėja, nebent tai būtina, nes tai gali lemti prastą našumą.
+* Jei tiesiog norime palaukti, kol bus pasiekiamas konkretus kintamasis, galime iškviesti `z.wait_to_read()`. Šiuo atveju MXNet blokuoja grįžimą į Python, kol bus apskaičiuotas kintamasis `z`. Kiti skaičiavimai po to gali tęstis.
 
-Let's see how this works in practice.
+Pažiūrėkime, kaip tai veikia praktiškai.
 :end_tab:
 
 ```{.python .input}
@@ -175,9 +175,9 @@ with d2l.Benchmark('wait_to_read'):
 ```
 
 :begin_tab:`mxnet`
-Both operations take approximately the same time to complete. Besides the obvious blocking operations we recommend that you are aware of *implicit* blockers. Printing a variable clearly requires the variable to be available and is thus a blocker. Last, conversions to NumPy via `z.asnumpy()` and conversions to scalars via `z.item()` are blocking, since NumPy has no notion of asynchrony. It needs access to the values just like the `print` function. 
+Abi operacijos užtrunka maždaug tiek pat laiko. Be akivaizdžių blokuojančių operacijų, rekomenduojame žinoti apie *numanomus* blokatorius. Kintamojo spausdinimas akivaizdžiai reikalauja, kad kintamasis būtų pasiekiamas, todėl yra blokatorius. Galiausiai konvertavimai į NumPy per `z.asnumpy()` ir konvertavimai į skaliarus per `z.item()` yra blokuojantys, nes NumPy neturi asinchroniškumo sąvokos. Jam reikia prieigos prie reikšmių, kaip ir funkcijai `print`. 
 
-Copying small amounts of data frequently from MXNet's scope to NumPy and back can destroy performance of an otherwise efficient code, since each such operation requires the computational graph to evaluate all intermediate results needed to get the relevant term *before* anything else can be done.
+Dažnai kopijuoti nedidelius duomenų kiekius iš MXNet srities į NumPy ir atgal gali sugriauti kitaip efektyvaus kodo našumą, nes kiekviena tokia operacija reikalauja, kad skaičiavimo grafas įvertintų visus tarpinius rezultatus, reikalingus atitinkamam nariui gauti, *prieš* galint daryti bet ką kita.
 :end_tab:
 
 ```{.python .input}
@@ -191,10 +191,10 @@ with d2l.Benchmark('scalar conversion'):
     b.sum().item()
 ```
 
-## Improving Computation
+## Skaičiavimo gerinimas
 
 :begin_tab:`mxnet`
-On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it is highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing so let's see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read` barrier in between each addition.
+Labai daugiagijėje sistemoje (net įprasti nešiojamieji kompiuteriai turi 4 ar daugiau gijų, o kelių lizdų serveriuose šis skaičius gali viršyti 256) operacijų planavimo pridėtinės sąnaudos gali tapti reikšmingos. Todėl labai pageidautina, kad skaičiavimas ir planavimas vyktų asinchroniškai ir lygiagrečiai. Kad parodytume tokio požiūrio naudą, pažiūrėkime, kas nutinka, jei kelis kartus padidiname kintamąjį 1, nuosekliai arba asinchroniškai. Sinchroninį vykdymą imituojame įterpdami `wait_to_read` barjerą tarp kiekvieno pridėjimo.
 :end_tab:
 
 ```{.python .input}
@@ -211,41 +211,41 @@ with d2l.Benchmark('asynchronous'):
 ```
 
 :begin_tab:`mxnet`
-A slightly simplified interaction between the Python frontend thread and the C++ backend thread can be summarized as follows:
-1. The frontend orders the backend to insert the computation task `y = x + 1` into the queue.
-1. The backend then receives the computation tasks from the queue and performs the actual computations.
-1. The backend then returns the computation results to the frontend.
-Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 10000 computations is approximately $10000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 10000 computations can be reduced to $t_1 + 10000 t_2 + t_3$ (assuming $10000 t_2 > 9999t_1$), since the frontend does not have to wait for the backend to return computation results for each loop.
+Kiek supaprastintą Python priekinės dalies gijos ir C++ vidinės dalies gijos sąveiką galima apibendrinti taip:
+1. Priekinė dalis nurodo vidinei daliai įterpti skaičiavimo užduotį `y = x + 1` į eilę.
+1. Tada vidinė dalis gauna skaičiavimo užduotis iš eilės ir atlieka tikruosius skaičiavimus.
+1. Tada vidinė dalis grąžina skaičiavimo rezultatus priekinei daliai.
+Tarkime, kad šių trijų etapų trukmės yra atitinkamai $t_1, t_2$ ir $t_3$. Jei nenaudojame asinchroninio programavimo, bendras laikas, reikalingas 10000 skaičiavimų atlikti, yra apytiksliai $10000 (t_1+ t_2 + t_3)$. Jei naudojamas asinchroninis programavimas, bendras laikas, reikalingas 10000 skaičiavimų atlikti, gali sumažėti iki $t_1 + 10000 t_2 + t_3$ (darant prielaidą, kad $10000 t_2 > 9999t_1$), nes priekinei daliai nereikia laukti, kol vidinė dalis grąžins skaičiavimo rezultatus kiekvienoje ciklo iteracijoje.
 :end_tab:
 
 
-## Summary
+## Santrauka
 
 
-* Deep learning frameworks may decouple the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
-* Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
-* Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
+* Giliojo mokymosi karkasai gali atskirti Python priekinę dalį nuo vykdymo vidinės dalies. Tai leidžia greitai asinchroniškai įterpti komandas į vidinę dalį ir gauti susijusį lygiagretumą.
+* Asinchroniškumas lemia gana greitai reaguojančią priekinę dalį. Tačiau būkite atsargūs ir nepripildykite užduočių eilės, nes tai gali lemti pernelyg didelį atminties suvartojimą. Rekomenduojama sinchronizuoti kiekvienam minirinkiniui, kad priekinė ir vidinė dalys išliktų apytiksliai sinchronizuotos.
+* Lustų gamintojai siūlo sudėtingus našumo analizės įrankius, kad būtų galima gauti daug smulkesnį supratimą apie giliojo mokymosi efektyvumą.
 
 :begin_tab:`mxnet`
-* Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. Functions such as `print`, `asnumpy` and `item` all have this effect. This can be desirable but a careless use of synchronization can ruin performance.
+* Atminkite, kad konvertavimai iš MXNet atminties valdymo į Python privers vidinę dalį laukti, kol bus paruoštas konkretus kintamasis. Tokias funkcijas kaip `print`, `asnumpy` ir `item` visos turi šį poveikį. Tai gali būti pageidautina, bet neapgalvotas sinchronizavimo naudojimas gali sugadinti našumą.
 :end_tab:
 
 
-## Exercises
+## Pratimai
 
 :begin_tab:`mxnet`
-1. We mentioned above that using asynchronous computation can reduce the total amount of time needed to perform 10000 computations to $t_1 + 10000 t_2 + t_3$. Why do we have to assume $10000 t_2 > 9999 t_1$ here?
-1. Measure the difference between `waitall` and `wait_to_read`. Hint: perform a number of instructions and synchronize for an intermediate result.
+1. Aukščiau minėjome, kad naudojant asinchroninį skaičiavimą bendrą laiką, reikalingą 10000 skaičiavimų atlikti, galima sumažinti iki $t_1 + 10000 t_2 + t_3$. Kodėl čia turime daryti prielaidą $10000 t_2 > 9999 t_1$?
+1. Išmatuokite skirtumą tarp `waitall` ir `wait_to_read`. Užuomina: atlikite keletą instrukcijų ir sinchronizuokite tarpiniam rezultatui.
 :end_tab:
 
 :begin_tab:`pytorch`
-1. On the CPU, benchmark the same matrix multiplication operations in this section. Can you still observe asynchrony via the backend?
+1. Atlikite tų pačių šiame skyrelyje pateiktų matricų daugybos operacijų lyginamąją analizę CPU. Ar vis tiek galite pastebėti asinchroniškumą per vidinę dalį?
 :end_tab:
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/361)
+[Diskusijos](https://discuss.d2l.ai/t/361)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/2564)
+[Diskusijos](https://discuss.d2l.ai/t/2564)
 :end_tab:

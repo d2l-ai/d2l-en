@@ -1,9 +1,9 @@
-# Deep Convolutional Generative Adversarial Networks
+# Gilieji konvoliuciniai generatyviniai priešiškieji tinklai
 :label:`sec_dcgan`
 
-In :numref:`sec_basic_gan`, we introduced the basic ideas behind how GANs work. We showed that they can draw samples from some simple, easy-to-sample distribution, like a uniform or normal distribution, and transform them into samples that appear to match the distribution of some dataset. And while our example of matching a 2D Gaussian distribution got the point across, it is not especially exciting.
+:numref:`sec_basic_gan` pristatėme pagrindines GAN veikimo idėjas. Parodėme, kad jie gali atrinkti imtis iš kokio nors paprasto, lengvai atrenkamo skirstinio, pavyzdžiui, tolygiojo ar normaliojo, ir paversti jas imtimis, kurios atitinka tam tikro duomenų rinkinio skirstinį. Ir nors dvimačio Gauso skirstinio pritaikymo pavyzdys atskleidė esmę, jis nėra ypač įdomus.
 
-In this section, we will demonstrate how you can use GANs to generate photorealistic images. We will be basing our models on the deep convolutional GANs (DCGAN) introduced in :citet:`Radford.Metz.Chintala.2015`. We will borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
+Šiame skyrelyje parodysime, kaip GAN galima naudoti fotorealistiškiems vaizdams generuoti. Savo modelius grįsime giliaisiais konvoliuciniais GAN (DCGAN), pristatytais :citet:`Radford.Metz.Chintala.2015`. Pasiskolinsime konvoliucinę architektūrą, kuri pasirodė tokia sėkminga diskriminatyviosiose kompiuterinės regos problemose, ir parodysime, kaip per GAN ją galima panaudoti fotorealistiškiems vaizdams generuoti.
 
 ```{.python .input}
 #@tab mxnet
@@ -29,9 +29,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## The Pokemon Dataset
+## Pokemon duomenų rinkinys
 
-The dataset we will use is a collection of Pokemon sprites obtained from [pokemondb](https://pokemondb.net/sprites). First download, extract and load this dataset.
+Naudosime Pokemon sprite'ų rinkinį, gautą iš [pokemondb](https://pokemondb.net/sprites). Pirmiausia atsisiųskite, išskleiskite ir įkelkite šį duomenų rinkinį.
 
 ```{.python .input}
 #@tab mxnet
@@ -65,7 +65,7 @@ pokemon = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir, batch_size=batch_size, image_size=(64, 64))
 ```
 
-We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
+Kiekvieną vaizdą pakeičiame į $64\times 64$ dydžio. Transformacija `ToTensor` pikselių reikšmes projektuos į $[0, 1]$, o mūsų generatorius naudos tanh funkciją, kad gautų išvestis iš $[-1, 1]$. Todėl duomenis normalizuojame su $0.5$ vidurkiu ir $0.5$ standartiniu nuokrypiu, kad atitiktų reikšmių intervalą.
 
 ```{.python .input}
 #@tab mxnet
@@ -108,7 +108,7 @@ data_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(
     buffer_size=tf.data.experimental.AUTOTUNE)
 ```
 
-Let's visualize the first 20 images.
+Vizualizuokime pirmuosius 20 vaizdų.
 
 ```{.python .input}
 #@tab mxnet
@@ -137,9 +137,9 @@ for X, y in data_iter.take(1):
     d2l.show_images(imgs, num_rows=4, num_cols=5)
 ```
 
-## The Generator
+## Generatorius
 
-The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with width and height to be $64\times 64$ . In :numref:`sec_fcn` we introduced the fully convolutional network that uses transposed convolution layer (refer to :numref:`sec_transposed_conv`) to enlarge input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
+Generatorius turi atvaizduoti triukšmo kintamąjį $\mathbf z\in\mathbb R^d$, ilgio $d$ vektorių, į RGB vaizdą, kurio plotis ir aukštis yra $64\times 64$. :numref:`sec_fcn` pristatėme pilnai konvoliucinį tinklą, kuris įvesties dydžiui padidinti naudoja transponuotosios konvoliucijos sluoksnį (žr. :numref:`sec_transposed_conv`). Pagrindinį generatoriaus bloką sudaro transponuotosios konvoliucijos sluoksnis, po kurio eina paketinė normalizacija ir ReLU aktyvacija.
 
 ```{.python .input}
 #@tab mxnet
@@ -186,7 +186,7 @@ class G_block(tf.keras.layers.Layer):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
-In default, the transposed convolution layer uses a $k_h = k_w = 4$ kernel, a $s_h = s_w = 2$ strides, and a $p_h = p_w = 1$ padding. With a input shape of $n_h^{'} \times n_w^{'} = 16 \times 16$, the generator block will double input's width and height.
+Pagal numatytuosius nustatymus transponuotosios konvoliucijos sluoksnis naudoja $k_h = k_w = 4$ branduolį, $s_h = s_w = 2$ žingsnius ir $p_h = p_w = 1$ papildymą. Esant įvesties formai $n_h^{'} \times n_w^{'} = 16 \times 16$, generatoriaus blokas padvigubins įvesties plotį ir aukštį.
 
 $$
 \begin{aligned}
@@ -219,7 +219,7 @@ g_blk = G_block(20)
 g_blk(x).shape
 ```
 
-If changing the transposed convolution layer to a $4\times 4$ kernel, $1\times 1$ strides and zero padding. With a input size of $1 \times 1$, the output will have its width and height increased by 3 respectively.
+Jei transponuotosios konvoliucijos sluoksnį pakeisime į $4\times 4$ branduolį, $1\times 1$ žingsnius ir nulinį papildymą, esant $1 \times 1$ dydžio įvesčiai, išvesties plotis ir aukštis padidės po 3.
 
 ```{.python .input}
 #@tab mxnet
@@ -244,7 +244,7 @@ g_blk = G_block(20, strides=1, padding="valid")
 g_blk(x).shape
 ```
 
-The generator consists of four basic blocks that increase input's both width and height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halve the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
+Generatorių sudaro keturi pagrindiniai blokai, didinantys įvesties plotį ir aukštį nuo 1 iki 32. Tuo pačiu metu jis pirmiausia latentinį kintamąjį projektuoja į $64\times 8$ kanalų, o paskui kiekvieną kartą perpus sumažina kanalų skaičių. Galiausiai išvesčiai gauti naudojamas transponuotosios konvoliucijos sluoksnis. Jis dar kartą padvigubina plotį ir aukštį, kad atitiktų norimą $64\times 64$ formą, ir sumažina kanalų dydį iki $3$. Tanh aktyvacijos funkcija pritaikoma išvesties reikšmėms projektuoti į $(-1, 1)$ intervalą.
 
 ```{.python .input}
 #@tab mxnet
@@ -289,7 +289,7 @@ net_G = tf.keras.Sequential([
 ])
 ```
 
-Generate a 100 dimensional latent variable to verify the generator's output shape.
+Sugeneruokite 100 matmenų latentinį kintamąjį, kad patikrintumėte generatoriaus išvesties formą.
 
 ```{.python .input}
 #@tab mxnet
@@ -310,13 +310,13 @@ x = tf.zeros((1, 1, 1, 100))
 net_G(x).shape
 ```
 
-## Discriminator
+## Diskriminatorius
 
-The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0, 1]$, its definition is
+Diskriminatorius yra įprastas konvoliucinis tinklas, išskyrus tai, kad aktyvacijos funkcijai jis naudoja nuotėkio ReLU (angl. *leaky ReLU*). Esant $\alpha \in[0, 1]$, jos apibrėžimas yra
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \textrm{if}\ x > 0\\ \alpha x &\textrm{otherwise}\end{cases}.$$
 
-As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0, 1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
+Kaip matome, tai įprasta ReLU, jei $\alpha=0$, ir tapatumo funkcija, jei $\alpha=1$. Kai $\alpha \in (0, 1)$, nuotėkio ReLU yra netiesinė funkcija, kuri neigiamai įvesčiai grąžina nenulinę išvestį. Ja siekiama ištaisyti „mirštančios ReLU“ problemą, kai neuronas gali visada išvesti neigiamą reikšmę ir todėl negali daryti pažangos, nes ReLU gradientas yra 0.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -334,7 +334,7 @@ Y = [tf.keras.layers.LeakyReLU(alpha)(x).numpy() for alpha in alphas]
 d2l.plot(x.numpy(), Y, 'x', 'y', alphas)
 ```
 
-The basic block of the discriminator is a convolution layer followed by a batch normalization layer and a leaky ReLU activation. The hyperparameters of the convolution layer are similar to the transpose convolution layer in the generator block.
+Pagrindinį diskriminatoriaus bloką sudaro konvoliucinis sluoksnis, po kurio eina paketinės normalizacijos sluoksnis ir nuotėkio ReLU aktyvacija. Konvoliucinio sluoksnio hiperparametrai panašūs į transponuotosios konvoliucijos sluoksnio generatoriaus bloke.
 
 ```{.python .input}
 #@tab mxnet
@@ -381,7 +381,7 @@ class D_block(tf.keras.layers.Layer):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16$, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
+Pagrindinis blokas su numatytaisiais nustatymais perpus sumažins įvesties plotį ir aukštį, kaip parodėme :numref:`sec_padding`. Pavyzdžiui, esant įvesties formai $n_h = n_w = 16$, branduolio formai $k_h = k_w = 4$, žingsnio formai $s_h = s_w = 2$ ir papildymo formai $p_h = p_w = 1$, išvesties forma bus:
 
 $$
 \begin{aligned}
@@ -413,7 +413,7 @@ d_blk = D_block(20)
 d_blk(x).shape
 ```
 
-The discriminator is a mirror of the generator.
+Diskriminatorius yra generatoriaus veidrodinis atvaizdas.
 
 ```{.python .input}
 #@tab mxnet
@@ -451,7 +451,7 @@ net_D = tf.keras.Sequential([
 ])
 ```
 
-It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
+Paskutiniam sluoksniui naudojamas konvoliucinis sluoksnis su išvesties kanalu $1$, kad gautume vieną prognozės reikšmę.
 
 ```{.python .input}
 #@tab mxnet
@@ -472,9 +472,9 @@ x = tf.zeros((1, 64, 64, 3))
 net_D(x).shape
 ```
 
-## Training
+## Apmokymas
 
-Compared to the basic GAN in :numref:`sec_basic_gan`, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`sec_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other. Besides, the random generated noise `Z`, is a 4-D tensor and we are using GPU to accelerate the computation.
+Palyginti su pagrindiniu GAN iš :numref:`sec_basic_gan`, tiek generatoriui, tiek diskriminatoriui naudojame tą patį mokymosi greitį, nes jie panašūs vienas į kitą. Be to, Adam (:numref:`sec_adam`) $\beta_1$ keičiame iš $0.9$ į $0.5$. Tai sumažina momento – eksponentiškai pasvertojo praeities gradientų slenkamojo vidurkio – glotnumą, kad būtų atsižvelgta į sparčiai kintančius gradientus, nes generatorius ir diskriminatorius kovoja tarpusavyje. Be to, atsitiktinai sugeneruotas triukšmas `Z` yra 4 matmenų tenzorius, o skaičiavimams pagreitinti naudojame GPU.
 
 ```{.python .input}
 #@tab mxnet
@@ -611,9 +611,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
           f'{metric[2] / timer.stop():.1f} examples/sec on {str(device._device_name)}')
 ```
 
-We train the model with a small number of epochs just for demonstration.
-For better performance,
-the variable `num_epochs` can be set to a larger number.
+Modelį apmokome su nedideliu epochų skaičiumi tik demonstracijai.
+Siekiant geresnio našumo,
+kintamajam `num_epochs` galima nustatyti didesnę reikšmę.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -627,22 +627,22 @@ latent_dim, lr, num_epochs = 100, 0.0005, 40
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
-## Summary
+## Santrauka
 
-* DCGAN architecture has four convolutional layers for the Discriminator and four "fractionally-strided" convolutional layers for the Generator.
-* The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations.
-* Leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the “dying ReLU” problem and helps the gradients flow easier through the architecture.
+* DCGAN architektūroje yra keturi konvoliuciniai diskriminatoriaus sluoksniai ir keturi „trupmeninio žingsnio“ konvoliuciniai generatoriaus sluoksniai.
+* Diskriminatorius yra 4 sluoksnių žingsninių konvoliucijų tinklas su paketine normalizacija (išskyrus jo įvesties sluoksnį) ir nuotėkio ReLU aktyvacijomis.
+* Nuotėkio ReLU yra netiesinė funkcija, kuri neigiamai įvesčiai grąžina nenulinę išvestį. Ja siekiama ištaisyti „mirštančios ReLU“ problemą ir padėti gradientams lengviau tekėti per architektūrą.
 
 
-## Exercises
+## Pratimai
 
-1. What will happen if we use standard ReLU activation rather than leaky ReLU?
-1. Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
+1. Kas atsitiks, jei vietoj nuotėkio ReLU naudosime standartinę ReLU aktyvaciją?
+1. Pritaikykite DCGAN Fashion-MNIST duomenims ir pažiūrėkite, kurios kategorijos veikia gerai, o kurios – ne.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/409)
+[Diskusijos](https://discuss.d2l.ai/t/409)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1083)
+[Diskusijos](https://discuss.d2l.ai/t/1083)
 :end_tab:

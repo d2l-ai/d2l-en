@@ -1,45 +1,45 @@
-# Momentum
+# Momentas
 :label:`sec_momentum`
 
-In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradient descent, i.e., when performing optimization where only a noisy variant of the gradient is available. In particular, we noticed that for noisy gradients we need to be extra cautious when it comes to choosing the learning rate in the face of noise. If we decrease it too rapidly, convergence stalls. If we are too lenient, we fail to converge to a good enough solution since noise keeps on driving us away from optimality.
+:numref:`sec_sgd` apžvelgėme, kas nutinka atliekant stochastinį gradientinį nusileidimą, t. y. optimizuojant, kai prieinamas tik triukšmingas gradiento variantas. Visų pirma pastebėjome, kad triukšmingiems gradientams turime būti ypač atsargūs rinkdamiesi mokymosi greitį esant triukšmui. Jei jį sumažiname per greitai, konvergavimas sustoja. Jei esame per nuolaidūs, nekonverguojame į pakankamai gerą sprendinį, nes triukšmas toliau veda mus nuo optimumo.
 
-## Basics
+## Pagrindai
 
-In this section, we will explore more effective optimization algorithms, especially for certain types of optimization problems that are common in practice.
+Šiame skyrelyje nagrinėsime veiksmingesnius optimizavimo algoritmus, ypač tam tikriems optimizavimo uždavinių tipams, kurie įprasti praktikoje.
 
 
-### Leaky Averages
+### Nuotėkio vidurkiai
 
-The previous section saw us discussing minibatch SGD as a means for accelerating computation. It also had the nice side-effect that averaging gradients reduced the amount of variance. The minibatch stochastic gradient descent can be calculated by:
+Ankstesniame skyrelyje aptarėme minirinkinių SGD kaip skaičiavimo spartinimo priemonę. Tai taip pat turėjo malonų šalutinį poveikį: gradientų vidurkinimas sumažino dispersiją. Minirinkinio stochastinį gradientinį nusileidimą galima apskaičiuoti pagal:
 
 $$\mathbf{g}_{t, t-1} = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w}_{t-1}) = \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} \mathbf{h}_{i, t-1}.
 $$
 
-To keep the notation simple, here we used $\mathbf{h}_{i, t-1} = \partial_{\mathbf{w}} f(\mathbf{x}_i, \mathbf{w}_{t-1})$ as the stochastic gradient descent for sample $i$ using the weights updated at time $t-1$.
-It would be nice if we could benefit from the effect of variance reduction even beyond averaging gradients on a minibatch. One option to accomplish this task is to replace the gradient computation by a "leaky average":
+Kad žymėjimas būtų paprastas, čia naudojome $\mathbf{h}_{i, t-1} = \partial_{\mathbf{w}} f(\mathbf{x}_i, \mathbf{w}_{t-1})$ kaip stochastinį gradientinį nusileidimą pavyzdžiui $i$, naudojant svorius, atnaujintus laiko momentu $t-1$.
+Būtų gerai, jei dispersijos mažinimo poveikiu galėtume pasinaudoti ir už gradientų vidurkinimo minirinkinyje ribų. Vienas būdas tai pasiekti yra gradiento skaičiavimą pakeisti „nuotėkio vidurkiu“:
 
 $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$
 
-for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that is been averaged over multiple *past* gradients. $\mathbf{v}$ is called *velocity*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let's expand $\mathbf{v}_t$ recursively into
+kuriam nors $\beta \in (0, 1)$. Tai efektyviai pakeičia momentinį gradientą tokiu, kuris suvidurkintas iš kelių *praeities* gradientų. $\mathbf{v}$ vadinamas *greičiu*. Jis kaupia praeities gradientus panašiai, kaip sunkus rutulys, riedantis tikslo funkcijos reljefu, integruoja praeities jėgas. Kad geriau pamatytume, kas vyksta, išplėskime $\mathbf{v}_t$ rekursyviai į
 
 $$\begin{aligned}
 \mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t, t-1}
 = \ldots, = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}.
 \end{aligned}$$
 
-Large $\beta$ amounts to a long-range average, whereas small $\beta$ amounts to only a slight correction relative to a gradient method. The new gradient replacement no longer points into the direction of steepest descent on a particular instance any longer but rather in the direction of a weighted average of past gradients. This allows us to realize most of the benefits of averaging over a batch without the cost of actually computing the gradients on it. We will revisit this averaging procedure in more detail later.
+Didelis $\beta$ reiškia tolimo nuotolio vidurkį, o mažas $\beta$ – tik nedidelę pataisą, palyginti su gradientiniu metodu. Naujas gradiento pakaitalas nebenurodo staigiausio nusileidimo krypties konkrečiame pavyzdyje, o veikiau praeities gradientų svertinio vidurkio kryptį. Tai leidžia mums pasiekti didžiąją dalį vidurkinimo rinkinyje naudos neapskaičiuojant jame gradientų. Prie šios vidurkinimo procedūros dar išsamiau grįšime vėliau.
 
-The above reasoning formed the basis for what is now known as *accelerated* gradient methods, such as gradients with momentum. They enjoy the additional benefit of being much more effective in cases where the optimization problem is ill-conditioned (i.e., where there are some directions where progress is much slower than in others, resembling a narrow canyon). Furthermore, they allow us to average over subsequent gradients to obtain more stable directions of descent. Indeed, the aspect of acceleration even for noise-free convex problems is one of the key reasons why momentum works and why it works so well.
+Aukščiau pateiktas samprotavimas tapo pagrindu tam, kas dabar vadinama *pagreitintais* gradientiniais metodais, pavyzdžiui, gradientais su momentu. Jie turi papildomą privalumą – yra daug veiksmingesni tais atvejais, kai optimizavimo uždavinys yra blogai sąlygotas (t. y. kai kai kuriomis kryptimis pažanga daug lėtesnė nei kitomis, primenant siaurą kanjoną). Be to, jie leidžia vidurkinti vėlesnius gradientus ir gauti stabilesnes nusileidimo kryptis. Iš tiesų pagreitinimo aspektas net be triukšmo iškiliesiems uždaviniams yra viena pagrindinių priežasčių, kodėl momentas veikia ir kodėl jis veikia taip gerai.
 
-As one would expect, due to its efficacy momentum is a well-studied subject in optimization for deep learning and beyond. See e.g., the beautiful [expository article](https://distill.pub/2017/momentum/) by :citet:`Goh.2017` for an in-depth analysis and interactive animation. It was proposed by :citet:`Polyak.1964`. :citet:`Nesterov.2018` has a detailed theoretical discussion in the context of convex optimization. Momentum in deep learning has been known to be beneficial for a long time. See e.g., the discussion by :citet:`Sutskever.Martens.Dahl.ea.2013` for details.
+Kaip ir galima tikėtis, dėl savo veiksmingumo momentas yra gerai ištirta tema giliojo mokymosi optimizavime ir už jo ribų. Žr., pvz., puikų :citet:`Goh.2017` [aiškinamąjį straipsnį](https://distill.pub/2017/momentum/), kuriame pateikiama išsami analizė ir interaktyvi animacija. Jį pasiūlė :citet:`Polyak.1964`. :citet:`Nesterov.2018` pateikia išsamų teorinį aptarimą iškiliojo optimizavimo kontekste. Momento nauda giliajame mokymesi žinoma jau seniai. Žr., pvz., :citet:`Sutskever.Martens.Dahl.ea.2013` aptarimą.
 
-### An Ill-conditioned Problem
+### Blogai sąlygotas uždavinys
 
-To get a better understanding of the geometric properties of the momentum method we revisit gradient descent, albeit with a significantly less pleasant objective function. Recall that in :numref:`sec_gd` we used $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, i.e., a moderately distorted ellipsoid objective. We distort this function further by stretching it out in the $x_1$ direction via
+Kad geriau suprastume geometrines momentų metodo savybes, grįžtame prie gradientinio nusileidimo, nors ir su gerokai nemalonesne tikslo funkcija. Prisiminkite, kad :numref:`sec_gd` naudojome $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, t. y. vidutiniškai iškreiptą elipsoidinę tikslo funkciją. Šią funkciją iškreipiame dar labiau ištempdami ją $x_1$ kryptimi:
 
 $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
-As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
+Kaip ir anksčiau, $f$ minimumas yra $(0, 0)$. Ši funkcija yra *labai* plokščia $x_1$ kryptimi. Pažiūrėkime, kas nutinka, kai su šia nauja funkcija atliekame gradientinį nusileidimą kaip anksčiau. Pasirenkame mokymosi greitį $0.4$.
 
 ```{.python .input}
 #@tab mxnet
@@ -87,7 +87,7 @@ def gd_2d(x1, x2, s1, s2):
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
-By construction, the gradient in the $x_2$ direction is *much* higher and changes much more rapidly than in the horizontal $x_1$ direction. Thus we are stuck between two undesirable choices: if we pick a small learning rate we ensure that the solution does not diverge in the $x_2$ direction but we are saddled with slow convergence in the $x_1$ direction. Conversely, with a large learning rate we progress rapidly in the $x_1$ direction but diverge in $x_2$. The example below illustrates what happens even after a slight increase in learning rate from $0.4$ to $0.6$. Convergence in the $x_1$ direction improves but the overall solution quality is much worse.
+Pagal konstrukciją, gradientas $x_2$ kryptimi yra *daug* didesnis ir kinta daug greičiau nei horizontalia $x_1$ kryptimi. Taigi esame įstrigę tarp dviejų nepageidaujamų pasirinkimų: jei pasirenkame mažą mokymosi greitį, užtikriname, kad sprendinys nediverguos $x_2$ kryptimi, bet gauname lėtą konvergavimą $x_1$ kryptimi. Ir atvirkščiai, su dideliu mokymosi greičiu greitai judame $x_1$ kryptimi, bet diverguojame $x_2$ kryptimi. Toliau pateiktas pavyzdys iliustruoja, kas nutinka net po nežymaus mokymosi greičio padidinimo nuo $0.4$ iki $0.6$. Konvergavimas $x_1$ kryptimi pagerėja, bet bendra sprendinio kokybė yra daug prastesnė.
 
 ```{.python .input}
 #@tab all
@@ -95,11 +95,10 @@ eta = 0.6
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
-### The Momentum Method
+### Momentų metodas
 
-The momentum method allows us to solve the gradient descent problem described
-above. Looking at the optimization trace above we might intuit that averaging gradients over the past would work well. After all, in the $x_1$ direction this will aggregate well-aligned gradients, thus increasing the distance we cover with every step. Conversely, in the $x_2$ direction where gradients oscillate, an aggregate gradient will reduce step size due to oscillations that cancel each other out.
-Using $\mathbf{v}_t$ instead of the gradient $\mathbf{g}_t$ yields the following update equations:
+Momentų metodas leidžia išspręsti aukščiau aprašytą gradientinio nusileidimo problemą. Žiūrėdami į aukščiau pateiktą optimizavimo trasą, galime nujausti, kad praeities gradientų vidurkinimas veiktų gerai. Juk $x_1$ kryptimi tai sukaups gerai sulygiuotus gradientus, taip padidindamas atstumą, kurį įveikiame kiekvienu žingsniu. Ir atvirkščiai, $x_2$ kryptimi, kur gradientai svyruoja, agreguotas gradientas sumažins žingsnio dydį dėl vienas kitą naikinančių svyravimų.
+Naudojant $\mathbf{v}_t$ vietoj gradiento $\mathbf{g}_t$, gaunamos šios atnaujinimo lygtys:
 
 $$
 \begin{aligned}
@@ -108,7 +107,7 @@ $$
 \end{aligned}
 $$
 
-Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let's have a quick look at how the algorithm behaves in practice.
+Atkreipkite dėmesį, kad kai $\beta = 0$, gauname įprastą gradientinį nusileidimą. Prieš gilindamiesi į matematines savybes, trumpai pažvelkime, kaip algoritmas elgiasi praktikoje.
 
 ```{.python .input}
 #@tab all
@@ -121,7 +120,7 @@ eta, beta = 0.6, 0.5
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-As we can see, even with the same learning rate that we used before, momentum still converges well. Let's see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
+Kaip matome, net su tuo pačiu mokymosi greičiu, kurį naudojome anksčiau, momentas vis tiek gerai konverguoja. Pažiūrėkime, kas nutinka sumažinus momento parametrą. Perpus sumažinus iki $\beta = 0.25$, gauname trajektoriją, kuri vos konverguoja. Vis dėlto tai daug geriau nei be momento (kai sprendinys diverguoja).
 
 ```{.python .input}
 #@tab all
@@ -129,11 +128,11 @@ eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-Note that we can combine momentum with stochastic gradient descent and in particular, minibatch stochastic gradient descent. The only change is that in that case we replace the gradients $\mathbf{g}_{t, t-1}$ with $\mathbf{g}_t$. Last, for convenience we initialize $\mathbf{v}_0 = 0$ at time $t=0$. Let's look at what leaky averaging actually does to the updates.
+Atkreipkite dėmesį, kad momentą galime derinti su stochastiniu gradientiniu nusileidimu ir ypač su minirinkinių stochastiniu gradientiniu nusileidimu. Vienintelis pokytis yra tas, kad tuomet gradientus $\mathbf{g}_{t, t-1}$ pakeičiame $\mathbf{g}_t$. Galiausiai patogumui inicializuojame $\mathbf{v}_0 = 0$ laiko momentu $t=0$. Pažiūrėkime, ką nuotėkio vidurkinimas iš tikrųjų daro atnaujinimams.
 
-### Effective Sample Weight
+### Efektyvus pavyzdžio svoris
 
-Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in gradient descent or stochastic gradient descent we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below.
+Prisiminkite, kad $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. Riboje nariai susumuojami į $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. Kitaip tariant, užuot darę $\eta$ dydžio žingsnį gradientiniame ar stochastiniame gradientiniame nusileidime, darome $\frac{\eta}{1-\beta}$ dydžio žingsnį, kartu gaudami potencialiai daug geriau besielgiančią nusileidimo kryptį. Tai du privalumai viename. Kad iliustruotume, kaip svoriai elgiasi esant skirtingoms $\beta$ reikšmėms, panagrinėkite žemiau pateiktą diagramą.
 
 ```{.python .input}
 #@tab all
@@ -146,13 +145,13 @@ d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
 
-## Practical Experiments
+## Praktiniai eksperimentai
 
-Let's see how momentum works in practice, i.e., when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation.
+Pažiūrėkime, kaip momentas veikia praktikoje, t. y. kai naudojamas tinkamo optimizatoriaus kontekste. Tam mums reikia kiek labiau mastelio didėjimui pritaikyto įgyvendinimo.
 
-### Implementation from Scratch
+### Įgyvendinimas nuo nulio
 
-Compared with (minibatch) stochastic gradient descent the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
+Palyginti su (minirinkinių) stochastiniu gradientiniu nusileidimu, momentų metodas turi išlaikyti pagalbinių kintamųjų aibę, t. y. greitį. Jis turi tokią pat formą kaip gradientai (ir optimizavimo uždavinio kintamieji). Toliau pateiktame įgyvendinime šiuos kintamuosius vadiname `states`.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -196,7 +195,7 @@ def sgd_momentum(params, grads, states, hyperparams):
             p[:].assign(p - hyperparams['lr'] * v)
 ```
 
-Let's see how this works in practice.
+Pažiūrėkime, kaip tai veikia praktikoje.
 
 ```{.python .input}
 #@tab all
@@ -209,23 +208,23 @@ data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 train_momentum(0.02, 0.5)
 ```
 
-When we increase the momentum hyperparameter `momentum` to 0.9, it amounts to a significantly larger effective sample size of $\frac{1}{1 - 0.9} = 10$. We reduce the learning rate slightly to $0.01$ to keep matters under control.
+Kai momento hiperparametrą `momentum` padidiname iki 0,9, tai atitinka gerokai didesnį efektyvų imties dydį $\frac{1}{1 - 0.9} = 10$. Mokymosi greitį truputį sumažiname iki $0.01$, kad išlaikytume padėtį kontroliuojamą.
 
 ```{.python .input}
 #@tab all
 train_momentum(0.01, 0.9)
 ```
 
-Reducing the learning rate further addresses any issue of non-smooth optimization problems. Setting it to $0.005$ yields good convergence properties.
+Dar labiau sumažinus mokymosi greitį, sprendžiamos neglotnių optimizavimo uždavinių problemos. Nustačius $0.005$, gaunamos geros konvergavimo savybės.
 
 ```{.python .input}
 #@tab all
 train_momentum(0.005, 0.9)
 ```
 
-### Concise Implementation
+### Glaustas įgyvendinimas
 
-There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
+Gluon beveik nieko nereikia daryti, nes standartiniame `sgd` sprendiklyje momentas jau įtaisytas. Nustačius atitinkamus parametrus, gaunama labai panaši trajektorija.
 
 ```{.python .input}
 #@tab mxnet
@@ -246,31 +245,31 @@ d2l.train_concise_ch11(trainer, {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
 ```
 
-## Theoretical Analysis
+## Teorinė analizė
 
-So far the 2D example of $f(x) = 0.1 x_1^2 + 2 x_2^2$ seemed rather contrived. We will now see that this is actually quite representative of the types of problem one might encounter, at least in the case of minimizing convex quadratic objective functions.
+Iki šiol dvimatis pavyzdys $f(x) = 0.1 x_1^2 + 2 x_2^2$ atrodė gana dirbtinis. Dabar pamatysime, kad jis iš tikrųjų gana reprezentatyvus uždavinių, su kuriais galime susidurti, tipams, bent jau minimizuojant iškiliąsias kvadratines tikslo funkcijas.
 
-### Quadratic Convex Functions
+### Kvadratinės iškilosios funkcijos
 
-Consider the function
+Panagrinėkime funkciją
 
 $$h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b.$$
 
-This is a general quadratic function. For positive definite matrices $\mathbf{Q} \succ 0$, i.e., for matrices with positive eigenvalues this has a minimizer at $\mathbf{x}^* = -\mathbf{Q}^{-1} \mathbf{c}$ with minimum value $b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Hence we can rewrite $h$ as
+Tai bendroji kvadratinė funkcija. Teigiamai apibrėžtoms matricoms $\mathbf{Q} \succ 0$, t. y. matricoms su teigiamomis tikrinėmis reikšmėmis, ji turi minimizuotoją $\mathbf{x}^* = -\mathbf{Q}^{-1} \mathbf{c}$ su minimalia reikšme $b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Taigi galime perrašyti $h$ kaip
 
 $$h(\mathbf{x}) = \frac{1}{2} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})^\top \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c}) + b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}.$$
 
-The gradient is given by $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. That is, it is given by the distance between $\mathbf{x}$ and the minimizer, multiplied by $\mathbf{Q}$. Consequently also the velocity  is a linear combination of terms $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
+Gradientas yra $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. Tai yra, jis lygus atstumui tarp $\mathbf{x}$ ir minimizuotojo, padaugintam iš $\mathbf{Q}$. Todėl ir greitis yra narių $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$ tiesinis darinys.
 
-Since $\mathbf{Q}$ is positive definite it can be decomposed into its eigensystem via $\mathbf{Q} = \mathbf{O}^\top \boldsymbol{\Lambda} \mathbf{O}$ for an orthogonal (rotation) matrix $\mathbf{O}$ and a diagonal matrix $\boldsymbol{\Lambda}$ of positive eigenvalues. This allows us to perform a change of variables from $\mathbf{x}$ to $\mathbf{z} \stackrel{\textrm{def}}{=} \mathbf{O} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$ to obtain a much simplified expression:
+Kadangi $\mathbf{Q}$ yra teigiamai apibrėžta, ją galima išskaidyti į jos tikrinę sistemą pagal $\mathbf{Q} = \mathbf{O}^\top \boldsymbol{\Lambda} \mathbf{O}$ su ortogonaliąja (sukimo) matrica $\mathbf{O}$ ir įstrižaine teigiamų tikrinių reikšmių matrica $\boldsymbol{\Lambda}$. Tai leidžia pakeisti kintamuosius iš $\mathbf{x}$ į $\mathbf{z} \stackrel{\textrm{def}}{=} \mathbf{O} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$ ir gauti daug paprastesnę išraišką:
 
 $$h(\mathbf{z}) = \frac{1}{2} \mathbf{z}^\top \boldsymbol{\Lambda} \mathbf{z} + b'.$$
 
-Here $b' = b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Since $\mathbf{O}$ is only an orthogonal matrix this does not perturb the gradients in a meaningful way. Expressed in terms of $\mathbf{z}$ gradient descent becomes
+Čia $b' = b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Kadangi $\mathbf{O}$ yra tik ortogonalioji matrica, tai reikšmingai nesutrikdo gradientų. Išreikštas per $\mathbf{z}$, gradientinis nusileidimas tampa
 
 $$\mathbf{z}_t = \mathbf{z}_{t-1} - \boldsymbol{\Lambda} \mathbf{z}_{t-1} = (\mathbf{I} - \boldsymbol{\Lambda}) \mathbf{z}_{t-1}.$$
 
-The important fact in this expression is that gradient descent *does not mix* between different eigenspaces. That is, when expressed in terms of the eigensystem of $\mathbf{Q}$ the optimization problem proceeds in a coordinate-wise manner. This also holds for
+Svarbus šios išraiškos faktas yra tas, kad gradientinis nusileidimas *nemaišo* skirtingų tikrinių poerdvių. Tai yra, išreikštas per $\mathbf{Q}$ tikrinę sistemą, optimizavimo uždavinys vyksta koordinatė po koordinatės. Tai galioja ir
 
 $$\begin{aligned}
 \mathbf{v}_t & = \beta \mathbf{v}_{t-1} + \boldsymbol{\Lambda} \mathbf{z}_{t-1} \\
@@ -278,15 +277,15 @@ $$\begin{aligned}
     & = (\mathbf{I} - \eta \boldsymbol{\Lambda}) \mathbf{z}_{t-1} - \eta \beta \mathbf{v}_{t-1}.
 \end{aligned}$$
 
-In doing this we just proved the following theorem: gradient descent with and without momentum for a convex quadratic function decomposes into coordinate-wise optimization in the direction of the eigenvectors of the quadratic matrix.
+Tai darydami, ką tik įrodėme tokią teoremą: gradientinis nusileidimas su momentu ir be jo iškiliajai kvadratinei funkcijai skaidomas į optimizavimą koordinatė po koordinatės kvadratinės matricos tikrinių vektorių kryptimis.
 
-### Scalar Functions
+### Skaliarinės funkcijos
 
-Given the above result let's see what happens when we minimize the function $f(x) = \frac{\lambda}{2} x^2$. For gradient descent we have
+Turėdami aukščiau pateiktą rezultatą, pažiūrėkime, kas nutinka minimizuojant funkciją $f(x) = \frac{\lambda}{2} x^2$. Gradientiniam nusileidimui turime
 
 $$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$
 
-Whenever $|1 - \eta \lambda| < 1$ this optimization converges at an exponential rate since after $t$ steps we have $x_t = (1 - \eta \lambda)^t x_0$. This shows how the rate of convergence improves initially as we increase the learning rate $\eta$ until $\eta \lambda = 1$. Beyond that things diverge and for $\eta \lambda > 2$ the optimization problem diverges.
+Kai tik $|1 - \eta \lambda| < 1$, šis optimizavimas konverguoja eksponentiniu greičiu, nes po $t$ žingsnių turime $x_t = (1 - \eta \lambda)^t x_0$. Tai rodo, kaip konvergavimo greitis iš pradžių gerėja didinant mokymosi greitį $\eta$, kol $\eta \lambda = 1$. Toliau viskas diverguoja, o kai $\eta \lambda > 2$, optimizavimo uždavinys diverguoja.
 
 ```{.python .input}
 #@tab all
@@ -300,7 +299,7 @@ d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
 
-To analyze convergence in the case of momentum we begin by rewriting the update equations in terms of two scalars: one for $x$ and one for velocity $v$. This yields:
+Kad išanalizuotume konvergavimą momento atveju, pradedame perrašydami atnaujinimo lygtis dviem skaliarais: vienu $x$ ir vienu greičiui $v$. Taip gauname:
 
 $$
 \begin{bmatrix} v_{t+1} \\ x_{t+1} \end{bmatrix} =
@@ -308,32 +307,32 @@ $$
 \begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix} = \mathbf{R}(\beta, \eta, \lambda) \begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix}.
 $$
 
-We used $\mathbf{R}$ to denote the $2 \times 2$ governing convergence behavior. After $t$ steps the initial choice $[v_0, x_0]$ becomes $\mathbf{R}(\beta, \eta, \lambda)^t [v_0, x_0]$. Hence, it is up to the eigenvalues of $\mathbf{R}$ to determine the speed of convergence. See the [Distill post](https://distill.pub/2017/momentum/) of :citet:`Goh.2017` for a great animation and :citet:`Flammarion.Bach.2015` for a detailed analysis. One can show that $0 < \eta \lambda < 2 + 2 \beta$ velocity converges. This is a larger range of feasible parameters when compared to $0 < \eta \lambda < 2$ for gradient descent. It also suggests that in general large values of $\beta$ are desirable. Further details require a fair amount of technical detail and we suggest that the interested reader consult the original publications.
+Konvergavimo elgesį lemiančiai $2 \times 2$ matricai žymėti naudojome $\mathbf{R}$. Po $t$ žingsnių pradinis pasirinkimas $[v_0, x_0]$ tampa $\mathbf{R}(\beta, \eta, \lambda)^t [v_0, x_0]$. Taigi konvergavimo greitį lemia $\mathbf{R}$ tikrinės reikšmės. Puikią animaciją rasite :citet:`Goh.2017` [Distill įraše](https://distill.pub/2017/momentum/), o išsamią analizę – :citet:`Flammarion.Bach.2015`. Galima įrodyti, kad kai $0 < \eta \lambda < 2 + 2 \beta$, greitis konverguoja. Tai platesnis galimų parametrų diapazonas nei $0 < \eta \lambda < 2$ gradientiniam nusileidimui. Tai taip pat leidžia manyti, kad apskritai pageidautinos didelės $\beta$ reikšmės. Tolesnės detalės reikalauja nemažai techninių smulkmenų, todėl rekomenduojame norintiems susipažinti su originaliomis publikacijomis.
 
-## Summary
+## Santrauka
 
-* Momentum replaces gradients with a leaky average over past gradients. This accelerates convergence significantly.
-* It is desirable for both noise-free gradient descent and (noisy) stochastic gradient descent.
-* Momentum prevents stalling of the optimization process that is much more likely to occur for stochastic gradient descent.
-* The effective number of gradients is given by $\frac{1}{1-\beta}$ due to exponentiated downweighting of past data.
-* In the case of convex quadratic problems this can be analyzed explicitly in detail.
-* Implementation is quite straightforward but it requires us to store an additional state vector (velocity $\mathbf{v}$).
+* Momentas pakeičia gradientus nuotėkio vidurkiu iš praeities gradientų. Tai gerokai pagreitina konvergavimą.
+* Jis pageidautinas tiek be triukšmo gradientiniam nusileidimui, tiek (triukšmingam) stochastiniam gradientiniam nusileidimui.
+* Momentas apsaugo nuo optimizavimo proceso sustojimo, kuris daug labiau tikėtinas stochastiniam gradientiniam nusileidimui.
+* Efektyvus gradientų skaičius yra $\frac{1}{1-\beta}$ dėl eksponentinio praeities duomenų svorio mažinimo.
+* Iškiliųjų kvadratinių uždavinių atveju tai galima išsamiai analizuoti aiškiai.
+* Įgyvendinimas gana paprastas, bet reikia saugoti papildomą būsenos vektorių (greitį $\mathbf{v}$).
 
-## Exercises
+## Pratimai
 
-1. Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
-1. Try out gradient descent and momentum for a quadratic problem where you have multiple eigenvalues, i.e., $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, e.g., $\lambda_i = 2^{-i}$. Plot how the values of $x$ decrease for the initialization $x_i = 1$.
-1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
-1. What changes when we perform stochastic gradient descent with momentum? What happens when we use minibatch stochastic gradient descent with momentum? Experiment with the parameters?
+1. Naudokite kitus momento hiperparametrų ir mokymosi greičių derinius ir stebėkite bei analizuokite skirtingus eksperimentų rezultatus.
+1. Išbandykite gradientinį nusileidimą ir momentą kvadratiniam uždaviniui, kuriame turite kelias tikrines reikšmes, t. y. $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, pvz., $\lambda_i = 2^{-i}$. Nubraižykite, kaip mažėja $x$ reikšmės esant inicializacijai $x_i = 1$.
+1. Išveskite $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$ minimalią reikšmę ir minimizuotoją.
+1. Kas pasikeičia atliekant stochastinį gradientinį nusileidimą su momentu? Kas nutinka naudojant minirinkinių stochastinį gradientinį nusileidimą su momentu? Eksperimentuokite su parametrais.
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/354)
+[Diskusijos](https://discuss.d2l.ai/t/354)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1070)
+[Diskusijos](https://discuss.d2l.ai/t/1070)
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/1071)
+[Diskusijos](https://discuss.d2l.ai/t/1071)
 :end_tab:

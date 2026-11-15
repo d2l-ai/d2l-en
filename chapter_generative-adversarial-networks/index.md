@@ -1,4 +1,4 @@
-# Generative Adversarial Networks
+# Generatyviniai priešiškieji tinklai
 :label:`chap_gans`
 
 ```toc

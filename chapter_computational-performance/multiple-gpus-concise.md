@@ -1,9 +1,9 @@
-# Concise Implementation for Multiple GPUs
+# Glaustas įgyvendinimas keliems GPU
 :label:`sec_multi_gpu_concise`
 
-Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using high-level APIs of deep learning frameworks.
-The mathematics and the algorithms are the same as in :numref:`sec_multi_gpu`.
-Quite unsurprisingly you will need at least two GPUs to run code of this section.
+Įgyvendinti lygiagretinimą nuo nulio kiekvienam naujam modeliui nėra malonu. Be to, yra didelė nauda optimizuojant sinchronizavimo įrankius dideliam našumui. Toliau parodysime, kaip tai padaryti naudojant aukšto lygio giliojo mokymosi karkasų API.
+Matematika ir algoritmai yra tokie patys kaip :numref:`sec_multi_gpu`.
+Visiškai nenuostabu, kad šio skyrelio kodui vykdyti jums reikės bent dviejų GPU.
 
 ```{.python .input}
 #@tab mxnet
@@ -20,11 +20,11 @@ import torch
 from torch import nn
 ```
 
-## [**A Toy Network**]
+## [**Žaislinis tinklas**]
 
-Let's use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train.
-We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference from :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning.
-Moreover, we remove the max-pooling layer.
+Naudokime šiek tiek prasmingesnį tinklą nei LeNet iš :numref:`sec_multi_gpu`, kuris vis dar pakankamai lengvas ir greitai apmokomas.
+Pasirenkame ResNet-18 variantą :cite:`He.Zhang.Ren.ea.2016`. Kadangi įvesties vaizdai yra maži, jį šiek tiek modifikuojame. Visų pirma, skirtumas nuo :numref:`sec_resnet` yra tas, kad pradžioje naudojame mažesnį konvoliucijos branduolį, žingsnį ir papildymą.
+Be to, pašaliname maksimalaus sutraukimo sluoksnį.
 
 ```{.python .input}
 #@tab mxnet
@@ -86,16 +86,16 @@ def resnet18(num_classes, in_channels=1):
     return net
 ```
 
-## Network Initialization
+## Tinklo inicializavimas
 
 :begin_tab:`mxnet`
-The `initialize` function allows us to initialize parameters on a device of our choice.
-For a refresher on initialization methods see :numref:`sec_numerical_stability`. What is particularly convenient is that it also allows us to initialize the network on *multiple* devices simultaneously. Let's try how this works in practice.
+Funkcija `initialize` leidžia mums inicializuoti parametrus pasirinktame įrenginyje.
+Inicializavimo metodų priminimui žr. :numref:`sec_numerical_stability`. Ypač patogu tai, kad ji taip pat leidžia inicializuoti tinklą *keliuose* įrenginiuose vienu metu. Pabandykime, kaip tai veikia praktiškai.
 :end_tab:
 
 :begin_tab:`pytorch`
-We will initialize the network inside the training loop.
-For a refresher on initialization methods see :numref:`sec_numerical_stability`.
+Tinklą inicializuosime apmokymo ciklo viduje.
+Inicializavimo metodų priminimui žr. :numref:`sec_numerical_stability`.
 :end_tab:
 
 ```{.python .input}
@@ -116,7 +116,7 @@ devices = d2l.try_all_gpus()
 ```
 
 :begin_tab:`mxnet`
-Using the `split_and_load` function introduced in :numref:`sec_multi_gpu` we can divide a minibatch of data and copy portions to the list of devices provided by the `devices` variable. The network instance *automatically* uses the appropriate GPU to compute the value of the forward propagation. Here we generate 4 observations and split them over the GPUs.
+Naudodami :numref:`sec_multi_gpu` pristatytą funkciją `split_and_load`, galime padalyti duomenų minirinkinį ir nukopijuoti dalis į įrenginių sąrašą, pateiktą kintamuoju `devices`. Tinklo egzempliorius *automatiškai* naudoja tinkamą GPU tiesioginio sklidimo reikšmei apskaičiuoti. Čia sugeneruojame 4 stebinius ir padalijame juos tarp GPU.
 :end_tab:
 
 ```{.python .input}
@@ -127,8 +127,8 @@ net(x_shards[0]), net(x_shards[1])
 ```
 
 :begin_tab:`mxnet`
-Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*.
-This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the CPU. We can verify this by printing out the parameters and observing any errors that might arise.
+Kai duomenys praeina per tinklą, atitinkami parametrai inicializuojami *įrenginyje, per kurį praėjo duomenys*.
+Tai reiškia, kad inicializavimas vyksta kiekvienam įrenginiui atskirai. Kadangi inicializavimui pasirinkome GPU 0 ir GPU 1, tinklas inicializuojamas tik ten, o ne CPU. Iš tikrųjų parametrų CPU net nėra. Tai galime patikrinti atspausdinę parametrus ir stebėdami galimas klaidas.
 :end_tab:
 
 ```{.python .input}
@@ -143,7 +143,7 @@ weight.data(devices[0])[0], weight.data(devices[1])[0]
 ```
 
 :begin_tab:`mxnet`
-Next, let's replace the code to [**evaluate the accuracy**] by one that works (**in parallel across multiple devices**). This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a minibatch before invoking the network. All else is essentially identical.
+Toliau pakeiskime kodą, skirtą [**tikslumui įvertinti**], tokiu, kuris veikia (**lygiagrečiai keliuose įrenginiuose**). Tai pakeičia :numref:`sec_lenet` funkciją `evaluate_accuracy_gpu`. Pagrindinis skirtumas yra tas, kad prieš iškviesdami tinklą padalijame minirinkinį. Visa kita iš esmės identiška.
 :end_tab:
 
 ```{.python .input}
@@ -165,16 +165,16 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     return metric[0] / metric[1]
 ```
 
-## [**Training**]
+## [**Apmokymas**]
 
-As before, the training code needs to perform several basic functions for efficient parallelism:
+Kaip ir anksčiau, apmokymo kodas turi atlikti kelias pagrindines funkcijas efektyviam lygiagretinimui:
 
-* Network parameters need to be initialized across all devices.
-* While iterating over the dataset minibatches are to be divided across all devices.
-* We compute the loss and its gradient in parallel across devices.
-* Gradients are aggregated and parameters are updated accordingly.
+* Tinklo parametrai turi būti inicializuoti visuose įrenginiuose.
+* Iteruojant per duomenų rinkinio minirinkinius, jie turi būti padalijami tarp visų įrenginių.
+* Nuostolį ir jo gradientą apskaičiuojame lygiagrečiai per įrenginius.
+* Gradientai agreguojami ir parametrai atitinkamai atnaujinami.
 
-In the end we compute the accuracy (again in parallel) to report the final performance of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
+Pabaigoje apskaičiuojame tikslumą (vėlgi lygiagrečiai), kad pateiktume galutinį tinklo našumą. Apmokymo procedūra yra gana panaši į ankstesnių skyrių įgyvendinimus, išskyrus tai, kad turime padalyti ir agreguoti duomenis.
 
 ```{.python .input}
 #@tab mxnet
@@ -234,7 +234,7 @@ def train(net, num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
-Let's see how this works in practice. As a warm-up we [**train the network on a single GPU.**]
+Pažiūrėkime, kaip tai veikia praktiškai. Apšilimui [**apmokome tinklą viename GPU.**]
 
 ```{.python .input}
 #@tab mxnet
@@ -246,9 +246,9 @@ train(num_gpus=1, batch_size=256, lr=0.1)
 train(net, num_gpus=1, batch_size=256, lr=0.1)
 ```
 
-Next we [**use 2 GPUs for training**]. Compared with LeNet
-evaluated in :numref:`sec_multi_gpu`,
-the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant.
+Toliau [**apmokymui naudojame 2 GPU**]. Palyginti su LeNet,
+įvertintu :numref:`sec_multi_gpu`,
+ResNet-18 modelis yra gerokai sudėtingesnis. Čia lygiagretinimas parodo savo pranašumą. Skaičiavimo laikas yra prasmingai didesnis nei parametrų sinchronizavimo laikas. Tai pagerina mastelio didėjimą, nes lygiagretinimo pridėtinės sąnaudos yra mažiau svarbios.
 
 ```{.python .input}
 #@tab mxnet
@@ -260,36 +260,36 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 train(net, num_gpus=2, batch_size=512, lr=0.2)
 ```
 
-## Summary
+## Santrauka
 
 :begin_tab:`mxnet`
-* Gluon provides primitives for model initialization across multiple devices by providing a context list.
+* Gluon suteikia primityvus modelio inicializavimui keliuose įrenginiuose pateikiant konteksto sąrašą.
 :end_tab:
-* Data is automatically evaluated on the devices where the data can be found.
-* Take care to initialize the networks on each device before trying to access the parameters on that device. Otherwise you will encounter an error.
-* The optimization algorithms automatically aggregate over multiple GPUs.
+* Duomenys automatiškai įvertinami įrenginiuose, kuriuose jie randami.
+* Pasirūpinkite, kad tinklai būtų inicializuoti kiekviename įrenginyje prieš bandant pasiekti to įrenginio parametrus. Kitaip susidursite su klaida.
+* Optimizavimo algoritmai automatiškai agreguoja per kelis GPU.
 
 
 
-## Exercises
+## Pratimai
 
 :begin_tab:`mxnet`
-1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this with 16 GPUs (e.g., on an AWS p2.16xlarge instance)?
-1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
-1. What happens if we drop `npx.waitall()`? How would you modify training such that you have an overlap of up to two steps for parallelism?
+1. Šiame skyrelyje naudojamas ResNet-18. Išbandykite skirtingas epochas, rinkinio dydžius ir mokymosi greičius. Skaičiavimams naudokite daugiau GPU. Kas nutinka, jei tai išbandysite su 16 GPU (pvz., AWS p2.16xlarge egzemplioriuje)?
+1. Kartais skirtingi įrenginiai suteikia skirtingą skaičiavimo galią. Galėtume naudoti GPU ir CPU vienu metu. Kaip turėtume padalyti darbą? Ar tai vertas pastangų? Kodėl? Kodėl ne?
+1. Kas nutinka, jei atsisakome `npx.waitall()`? Kaip modifikuotumėte apmokymą, kad lygiagretinimui būtų iki dviejų žingsnių persidengimas?
 :end_tab:
 
 :begin_tab:`pytorch`
-1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this with 16 GPUs (e.g., on an AWS p2.16xlarge instance)?
-1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
+1. Šiame skyrelyje naudojamas ResNet-18. Išbandykite skirtingas epochas, rinkinio dydžius ir mokymosi greičius. Skaičiavimams naudokite daugiau GPU. Kas nutinka, jei tai išbandysite su 16 GPU (pvz., AWS p2.16xlarge egzemplioriuje)?
+1. Kartais skirtingi įrenginiai suteikia skirtingą skaičiavimo galią. Galėtume naudoti GPU ir CPU vienu metu. Kaip turėtume padalyti darbą? Ar tai vertas pastangų? Kodėl? Kodėl ne?
 :end_tab:
 
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/365)
+[Diskusijos](https://discuss.d2l.ai/t/365)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/1403)
+[Diskusijos](https://discuss.d2l.ai/t/1403)
 :end_tab:
